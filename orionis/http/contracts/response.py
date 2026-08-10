@@ -290,20 +290,49 @@ class IResponse(ABC):
         """
 
     @abstractmethod
-    def withFlash(
-        self,
-        key: str | Mapping[str, Any],
-        value: Any = None,
-    ) -> Self:
+    def withFlash(self, key: str, value: Any = None) -> Self:
         """
-        Flash data into the session and return the response for chaining.
+        Flash a status message into the session and return the response.
 
         Parameters
         ----------
-        key : str | Mapping[str, Any]
-            Flash data key, or a mapping of several key-value pairs.
+        key : str
+            Flash data key.
         value : Any, optional
-            Value to flash when *key* is a plain key.
+            Value to flash.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+
+    @abstractmethod
+    def withInput(self, values: Mapping[str, Any]) -> Self:
+        """
+        Flash the submitted payload so the next request can repopulate it.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted form payload to remember.  Credential-like fields
+            are stripped before storing.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+
+    @abstractmethod
+    def withErrors(self, errors: Mapping[str, Any] | Exception) -> Self:
+        """
+        Flash validation errors for the next request.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
 
         Returns
         -------

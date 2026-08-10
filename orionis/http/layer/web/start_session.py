@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
+from orionis.session.flash import apply_flash
 from orionis.session.manager import SessionManager
 from orionis.support.facades.session import Session
 
@@ -68,8 +69,7 @@ class StartSessionMiddleware(BaseMiddleware):
         # Move data queued with ``Response.withFlash()`` into the flash bag.
         flash_data = response.getFlashData()
         if flash_data:
-            for key, value in flash_data.items():
-                session.flash(key, value)
+            apply_flash(session, flash_data)
 
         # Persist the session and set the cookie only when it was used.
         await self._manager.save(response, session)

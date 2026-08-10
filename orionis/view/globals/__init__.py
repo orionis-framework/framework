@@ -7,6 +7,8 @@ from orionis.view.globals.config import _global_config
 from orionis.view.globals.csrf import _global_csrf_field, _global_csrf_token
 from orionis.view.globals.datetime import _global_now, _global_today
 from orionis.view.globals.dump import _global_dump
+from orionis.view.globals.errors import _global_errors
+from orionis.view.globals.flash import _global_flash
 from orionis.view.globals.lang import (
     _global_choice,
     _global_locale,
@@ -36,6 +38,8 @@ __all__ = [
     "_global_decrypt",
     "_global_dump",
     "_global_encrypt",
+    "_global_errors",
+    "_global_flash",
     "_global_framework_version",
     "_global_locale",
     "_global_locales",

@@ -59,7 +59,7 @@ class ViewFactory(IViewFactory):
         Raises
         ------
         ViewTemplateNotFoundException
-            When the template file cannot be located.
+            When the view file cannot be located.
         ViewRenderException
             When rendering fails for any reason.
         """
@@ -68,5 +68,5 @@ class ViewFactory(IViewFactory):
             return HTMLResponse(content=_html, headers={"X-Orionis-Render": "SSR"})
         except Exception as e:
             detail: str = _LOCALS_QUALNAME.sub("", str(e))
-            exc_msg: str = f"Failed to render template '{template}': {detail}"
+            exc_msg: str = f"Failed to render view '{template}': {detail}"
             raise ViewRenderException(exc_msg) from e

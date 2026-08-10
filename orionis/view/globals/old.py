@@ -42,6 +42,7 @@ def _global_old(app: IApplication) -> Any:
         except Exception:
             return default
 
-        return session.getFlash(key, default)
+        value: Any = session.getOld(key, default)
+        return "" if value is None else value
 
     return old

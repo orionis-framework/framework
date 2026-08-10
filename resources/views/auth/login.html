@@ -19,7 +19,7 @@
             {% csrf %}
             <div class="mb-3">
               <label for="email" class="form-label">{{ __('Email address') }}</label>
-              <input type="email" id="email" name="email" class="form-control" placeholder="{{ __('your@email.com') }}" autocomplete="off">
+              <input type="email" id="email" name="email" class="form-control" placeholder="{{ __('your@email.com') }}" autocomplete="off" value="{{ old('email') }}">
             </div>
             <div class="mb-2">
               <label for="password" class="form-label">

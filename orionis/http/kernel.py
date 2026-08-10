@@ -135,6 +135,7 @@ class KernelHTTP(IKernelHTTP):
         "__default_responses",
         "__fallback",
         "__fn_dispatch",
+        "__maintenance_enabled",
         "__middleware_cache",
         "__printer_enabled",
         "__proxies",
@@ -339,6 +340,8 @@ class KernelHTTP(IKernelHTTP):
             under_maintenance=under_maintenance,
             default_responses=default_responses,
         )
+        # Cache the maintenance flag to skip the check on the hot path.
+        self.__maintenance_enabled = under_maintenance
         # Cache the limiter's enabled state to skip async overhead when disabled.
         self.__rate_limit_enabled = self.__rate_limit.isEnabled()
 
@@ -434,9 +437,10 @@ class KernelHTTP(IKernelHTTP):
         # Apply trusted-proxy IP and scheme normalization.
         adapter = self.__proxies.handle(adapter)
         # Return 503 immediately when the application is in maintenance mode.
-        response = self.__under_maintenance.handle(adapter)
-        if response is not None:
-            return response
+        if self.__maintenance_enabled:
+            response = self.__under_maintenance.handle(adapter)
+            if response is not None:
+                return response
         # Enforce baseline security header policies.
         response = self.__security.handle(adapter)
         if response is not None:

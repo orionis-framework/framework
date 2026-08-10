@@ -13,6 +13,19 @@ class CORSException(Exception):
 
 class CORSMiddleware:
 
+    __slots__ = (
+        "__allow_all_headers",
+        "__allow_all_methods",
+        "__allow_all_origins",
+        "__allow_credentials",
+        "__allow_headers_value",
+        "__allow_methods_value",
+        "__allow_origins",
+        "__expose_headers_value",
+        "__max_age_value",
+        "__origin_regex",
+    )
+
     # Methods allowed in CORS preflight responses when the wildcard is used.
     ALL_METHODS: Final[str] = (
         "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"
@@ -148,10 +161,10 @@ class CORSMiddleware:
         bool
             ``True`` for preflight requests (OPTIONS + ACRM header).
         """
-        return (
-            method.upper() == "OPTIONS"
-            and "access-control-request-method" in headers
-        )
+        # Transports already deliver uppercase verbs; normalise only on miss.
+        if method != "OPTIONS" and method.upper() != "OPTIONS":
+            return False
+        return "access-control-request-method" in headers
 
     def __mergeVary(
         self,

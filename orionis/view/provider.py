@@ -5,14 +5,18 @@ from orionis.view.contracts.environment import IViewEnvironment
 from orionis.view.contracts.factory import IViewFactory
 from orionis.view.engine import Jinja2Engine
 from orionis.view.environment import ViewEnvironment
-from orionis.view.extensions import buildViewExtensions
+from orionis.view.extensions import CsrfExtension
 from orionis.view.factory import ViewFactory
-from orionis.view.filters import buildViewFilters
-from orionis.view.helpers import (
+from orionis.view.filters import (
+    _filter_json,
+    _filter_markdown,
+)
+from orionis.view.globals import (
     _global_app,
     _global_asset,
     _global_cache,
     _global_choice,
+    _global_collect,
     _global_config,
     _global_csrf_field,
     _global_csrf_token,
@@ -29,6 +33,7 @@ from orionis.view.helpers import (
     _global_secure_asset,
     _global_secure_url,
     _global_session,
+    _global_stringable,
     _global_today,
     _global_trans,
     _global_url,
@@ -86,6 +91,7 @@ class ViewServiceProvider(ServiceProvider):
             "asset": _global_asset(self.app),
             "cache": _global_cache(self.app),
             "choice": _global_choice(),
+            "collect": _global_collect(),
             "config": _global_config(self.app),
             "csrf_field": _global_csrf_field(self.app),
             "csrf_token": _global_csrf_token(self.app),
@@ -102,6 +108,7 @@ class ViewServiceProvider(ServiceProvider):
             "secure_asset": _global_secure_asset(self.app),
             "secure_url": _global_secure_url(self.app),
             "session": _global_session(self.app),
+            "stringable": _global_stringable(),
             "today": _global_today(),
             "url": _global_url(self.app),
         }
@@ -115,12 +122,22 @@ class ViewServiceProvider(ServiceProvider):
         for _name, _value in _globals.items():
             _env.addGlobal(_name, _value)
 
+        # Build every template filter
+        _filters: dict[str, Any] = {
+            "json": _filter_json(),
+            "markdown": _filter_markdown(),
+        }
+
         # Register all template filters
-        for _name, _callback in buildViewFilters().items():
+        for _name, _callback in _filters.items():
             _env.addFilter(_name, _callback)
 
         # Register all Jinja2 extensions
-        for _extension in buildViewExtensions():
+        _extensions: tuple[Any, ...] = (
+            CsrfExtension,
+        )
+
+        for _extension in _extensions:
             _env.addExtension(_extension)
 
         # Pin the facade for direct attribute access without DI overhead

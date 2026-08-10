@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from orionis.http.response import HTMLResponse
+    from orionis.view.pending import PendingView
 
 class IViewFactory(ABC):
     """
@@ -19,9 +19,9 @@ class IViewFactory(ABC):
     __slots__ = ()
 
     @abstractmethod
-    async def make(self, template: str, **context: Any) -> HTMLResponse:
+    def make(self, template: str, **context: Any) -> PendingView:
         """
-        Render a template and return an :class:`HTMLResponse`.
+        Prepare a template render as an awaitable, chainable response.
 
         Parameters
         ----------
@@ -33,8 +33,9 @@ class IViewFactory(ABC):
 
         Returns
         -------
-        HTMLResponse
-            An HTTP response whose body is the rendered HTML string.
+        PendingView
+            Awaitable proxy that resolves to an :class:`HTMLResponse` and
+            accepts chained response mutators such as ``withFlash()``.
 
         Raises
         ------

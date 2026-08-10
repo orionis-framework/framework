@@ -28,16 +28,36 @@ class LoginController(BaseController):
         Returns
         -------
         RedirectResponse
-            Redirect back to the login page with the submitted email.
+            Redirect back to the login page, carrying the submitted input
+            plus either the field errors or a success message.
         """
+        url: str = "/login"
+
         credentials: dict[str, Any] = await request.data()
+        email: str = credentials.get("email", "")
+        password: str = credentials.get("password", "")
+
+        errors: dict[str, str] = {}
+        if not email:
+            errors["email"] = "Email is required."
+        if not password:
+            errors["password"] = "Password is required."  # noqa: S105
+
+        # withInput() repopulates the form; withErrors() feeds the errors bag.
+        if errors:
+            return (
+                RedirectResponse(url)
+                    .withInput(credentials)
+                    .withErrors(errors)
+            )
+
         remember: bool = credentials.get("remember", "off") == "on"
-        email: str = credentials.get("email")
+        value_cookie: str = email if remember else ""
+        max_age_cookie: int = 3600 if remember else 0
 
         return (
-            RedirectResponse("/login")
-                .withCookie("usrname", email if remember else "")
-                .withFlash({
-                    "email": email,
-                })
+            RedirectResponse(url)
+                .withCookie("usrname", value_cookie, max_age=max_age_cookie)
+                .withInput(credentials)
+                .withFlash("success", "Credentials received.")
         )

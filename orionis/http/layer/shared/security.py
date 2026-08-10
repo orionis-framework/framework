@@ -152,7 +152,7 @@ class SecurityMiddleware:
         headers = adapter.headers()
 
         # 1. Reject headers that contain bare CR or LF (CRLF injection).
-        for name, value in headers.items():
+        for name, value in headers:
             if (
                 "\r" in name or "\n" in name
                 or "\r" in value or "\n" in value

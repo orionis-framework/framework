@@ -5,16 +5,16 @@ from orionis.console.output.var_dumper import VarDumper
 
 # ruff: noqa: ANN401, S704
 
-def _global_dd() -> Any:
+def _global_dump() -> Any:
     """
-    Build the ``dd`` template global.
+    Build the ``dump`` template global.
 
     Returns
     -------
     Any
         Callable dumping the given variables and returning safe HTML.
     """
-    def dd(*args: Any) -> Markup:
+    def dump(*args: Any) -> Markup:
         """
         Dump the given variables and return their HTML representation.
 
@@ -33,4 +33,4 @@ def _global_dd() -> Any:
         dumper.values(*args)
         return Markup(dumper.toHtml(insert_line=True))
 
-    return dd
+    return dump

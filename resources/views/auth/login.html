@@ -15,11 +15,17 @@
       <div class="card card-md">
         <div class="card-body">
           <h2 class="h2 text-center mb-4">{{ __('Login to your account') }}</h2>
+          {% if errors.any() %}
+            <div class="alert alert-danger" role="alert">{{ errors.first() }}</div>
+          {% endif %}
           <form action="{{ route('login') }}" method="post" autocomplete="off" novalidate="">
             {% csrf %}
             <div class="mb-3">
               <label for="email" class="form-label">{{ __('Email address') }}</label>
-              <input type="email" id="email" name="email" class="form-control" placeholder="{{ __('your@email.com') }}" autocomplete="off" value="{{ old('email') }}">
+              <input type="email" id="email" name="email" class="form-control{% if errors.has('email') %} is-invalid{% endif %}" placeholder="{{ __('your@email.com') }}" autocomplete="off" value="{{ old('email') }}">
+              {% if errors.has('email') %}
+                <div class="invalid-feedback">{{ errors.first('email') }}</div>
+              {% endif %}
             </div>
             <div class="mb-2">
               <label for="password" class="form-label">
@@ -29,7 +35,7 @@
                 </span>
               </label>
               <div class="input-group input-group-flat">
-                <input type="password" id="password" name="password" class="form-control" placeholder="{{ __('Your password') }}" autocomplete="off">
+                <input type="password" id="password" name="password" class="form-control{% if errors.has('password') %} is-invalid{% endif %}" placeholder="{{ __('Your password') }}" autocomplete="off">
                 <span class="input-group-text">
                   <a href="#" class="link-secondary" data-password-toggle="password" data-label-show="{{ __('Show password') }}" data-label-hide="{{ __('Hide password') }}" title="{{ __('Show password') }}" aria-label="{{ __('Show password') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2" data-password-icon="show">
@@ -46,10 +52,13 @@
                   </a>
                 </span>
               </div>
+              {% if errors.has('password') %}
+                <div class="invalid-feedback d-block">{{ errors.first('password') }}</div>
+              {% endif %}
             </div>
             <div class="mb-2">
               <label class="form-check">
-                <input type="checkbox" name="remember" class="form-check-input">
+                <input type="checkbox" name="remember" class="form-check-input"{% if old('remember') %} checked{% endif %}>
                 <span class="form-check-label">{{ __('Remember me on this device') }}</span>
               </label>
             </div>

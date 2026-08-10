@@ -55,8 +55,9 @@ class ViewFactory(IViewFactory):
         -------
         HTMLResponse
             An HTTP response whose body is the rendered HTML content.
-            Cookies can be attached fluently on the returned response via
-            ``withCookie()`` / ``withCookies()`` / ``withoutCookie()``.
+            Cookies and flash data can be attached fluently on the returned
+            response via ``withCookie()`` / ``withCookies()`` /
+            ``withoutCookie()`` / ``withFlash()``.
 
         Raises
         ------

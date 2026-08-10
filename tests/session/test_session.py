@@ -303,7 +303,7 @@ class TestSession(TestCase):
         session.clear()
         self.assertFalse(session.dirty)
 
-    # ── flash / getFlash / hasFlash ──────────────────────────────────────────
+    # ── flash / getFlash ─────────────────────────────────────────────────────
 
     def testFlashActivatesSession(self) -> None:
         """
@@ -379,34 +379,34 @@ class TestSession(TestCase):
         """
         Confirm flash key presence after aging through one request.
 
-        Validates that hasFlash() reports True for a key that was
-        written with flash() and aged into the old bag.
+        Validates that a key written with flash() is still readable once
+        it has been aged into the old bag.
         """
         session = Session()
         session.flash("key", "v")
         session._ageFlashData()
-        self.assertTrue(session.hasFlash("key"))
+        self.assertEqual(session.getFlash("key"), "v")
 
-    def testHasFlashReturnsFalseForMissingKey(self) -> None:
+    def testGetFlashReturnsFalseForMissingKey(self) -> None:
         """
-        Report False when the flash key was never written.
+        Report None when the flash key was never written.
 
-        Validates that hasFlash() does not raise and returns False
-        when the old flash bag is absent or empty.
+        Validates that getFlash() does not raise and returns None when
+        the flash bags are absent or empty.
         """
         session = Session()
-        self.assertFalse(session.hasFlash("ghost"))
+        self.assertIsNone(session.getFlash("ghost"))
 
-    def testFlashValueNotAccessibleBeforeAging(self) -> None:
+    def testFlashValueIsAccessibleBeforeAging(self) -> None:
         """
-        Hide flash values from getFlash before the aging step.
+        Expose flash values written during the current request.
 
-        Validates that a value written with flash() is stored in the
-        new bag and is not yet visible through getFlash().
+        Validates that a handler re-rendering its own view reads back
+        what it just flashed, without having to redirect first.
         """
         session = Session()
         session.flash("msg", "pending")
-        self.assertIsNone(session.getFlash("msg"))
+        self.assertEqual(session.getFlash("msg"), "pending")
 
     # ── regenerate ───────────────────────────────────────────────────────────
 
@@ -529,7 +529,7 @@ class TestSession(TestCase):
         session = Session()
         session.flash("k", "v")
         session._ageFlashData()
-        self.assertTrue(session.hasFlash("k"))
+        self.assertEqual(session.getFlash("k"), "v")
 
     def testAgeFlashDataDiscardsOldBag(self) -> None:
         """
@@ -542,7 +542,7 @@ class TestSession(TestCase):
         session.flash("k", "v")
         session._ageFlashData()
         session._ageFlashData()
-        self.assertFalse(session.hasFlash("k"))
+        self.assertIsNone(session.getFlash("k"))
 
     def testAgeFlashDataMarksDirtyOnChange(self) -> None:
         """

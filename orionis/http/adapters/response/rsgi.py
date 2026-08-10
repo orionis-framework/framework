@@ -92,14 +92,8 @@ class RSGIResponseAdapter(ResponseAdapter):
             await response.runBackground()
             return
 
-        if self.__isTextResponse(response):
-            protocol.response_str(
-                status,
-                headers,
-                body.decode(response.charset),
-            )
-        else:
-            protocol.response_bytes(status, headers, body)
+        # The body is already encoded; hand the bytes straight to the protocol.
+        protocol.response_bytes(status, headers, body)
 
         await response.runBackground()
 
@@ -150,34 +144,6 @@ class RSGIResponseAdapter(ResponseAdapter):
         """
         # Build string headers directly from the internal dict, bypassing encode/decode.
         return response.getStringHeaders()
-
-    def __isTextResponse(
-        self,
-        response: Response,
-    ) -> bool:
-        """
-        Determine whether the response body should be sent as text.
-
-        Parameters
-        ----------
-        response : Response
-            Response object to inspect for its media type.
-
-        Returns
-        -------
-        bool
-            True if the media type is text-based, False otherwise.
-        """
-        media_type = response.getMediaType()
-
-        if media_type is None:
-            return False
-
-        return (
-            media_type.startswith("text/")
-            or media_type == "application/json"
-            or media_type.endswith("+json")
-        )
 
     def __parseRange(
         self,

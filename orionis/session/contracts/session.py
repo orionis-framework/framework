@@ -1,6 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 class ISession(ABC):
     """
@@ -147,25 +150,10 @@ class ISession(ABC):
     @abstractmethod
     def getFlash(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
         """
-        Return the flash value for *key* set during the previous request.
+        Return the flash value for *key*.
 
-        Parameters
-        ----------
-        key : str
-            Flash data key.
-        default : Any, optional
-            Fallback value when the key is absent.
-
-        Returns
-        -------
-        Any
-            The flash value, or *default*.
-        """
-
-    @abstractmethod
-    def getOld(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
-        """
-        Return a flash value written in this request or the previous one.
+        Values flashed during the current request take precedence over the
+        ones inherited from the previous one.
 
         Parameters
         ----------
@@ -181,19 +169,63 @@ class ISession(ABC):
         """
 
     @abstractmethod
-    def hasFlash(self, key: str) -> bool:
+    def flashInput(self, values: Mapping[str, Any]) -> None:
         """
-        Return ``True`` when a flash value for *key* is available.
+        Flash a submitted form payload so the next request can repopulate it.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted payload to remember.  Credential-like fields are
+            stripped before storing.
+
+        Returns
+        -------
+        None
+        """
+
+    @abstractmethod
+    def getOldInput(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+        """
+        Return the value submitted for *key* in the previous request.
 
         Parameters
         ----------
         key : str
-            Flash data key.
+            Form field name.
+        default : Any, optional
+            Fallback value when the field was not submitted.
 
         Returns
         -------
-        bool
-            ``True`` if the flash key is present from the previous request.
+        Any
+            The previously submitted value, or *default*.
+        """
+
+    @abstractmethod
+    def flashErrors(self, errors: Mapping[str, Any] | Exception) -> None:
+        """
+        Flash validation errors for the next request.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
+
+        Returns
+        -------
+        None
+        """
+
+    @abstractmethod
+    def getErrors(self) -> dict[str, list[str]]:
+        """
+        Return the validation errors flashed for this request.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Field-indexed error messages, empty when none were flashed.
         """
 
     @abstractmethod

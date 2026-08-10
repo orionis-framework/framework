@@ -1,5 +1,6 @@
 import json
 import platform
+import re
 from pathlib import Path
 from typing import ClassVar
 from orionis.foundation.contracts.directory import IDirectory
@@ -12,6 +13,46 @@ from orionis.http.response import FileResponse, HTMLResponse, JSONResponse, Resp
 from orionis.metadata import VERSION
 from orionis.support.facades.datetime import DateTime
 from orionis.support.formatter.exceptions.parser import ExceptionParser
+
+# Dynamic placeholders substituted on every generic error page render.
+_ERROR_PLACEHOLDER_RE: re.Pattern = re.compile(
+    r"\{\{(0|1|2|error|message|description)\}\}",
+)
+
+# Human-readable status labels resolved once per HTTP status code.
+_STATUS_MESSAGES: dict[int, str] = {}
+
+def _compile_placeholders(
+    template: str,
+    pattern: re.Pattern,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """
+    Split a template into literal chunks and the placeholder keys between them.
+
+    Parameters
+    ----------
+    template : str
+        Raw template text containing ``{{key}}`` placeholders.
+    pattern : re.Pattern
+        Compiled pattern whose first group captures the placeholder key.
+
+    Returns
+    -------
+    tuple[tuple[str, ...], tuple[str, ...]]
+        The literal chunks and the ordered placeholder keys, so rendering
+        becomes a single join instead of one full copy per placeholder.
+    """
+    literals: list[str] = []
+    keys: list[str] = []
+    cursor = 0
+
+    for match in pattern.finditer(template):
+        literals.append(template[cursor:match.start()])
+        keys.append(match.group(1))
+        cursor = match.end()
+
+    literals.append(template[cursor:])
+    return tuple(literals), tuple(keys)
 
 class DefaultResponses(IDefaultResponses):
 
@@ -399,9 +440,11 @@ class DefaultResponses(IDefaultResponses):
 
         cache = self.__memory_cache
 
-        # Load and pre-substitute static placeholders into the template on first use
-        template: str | None = cache.get("error_page_template")  # type: ignore[assignment]
-        if template is None:
+        # Build the chunked render plan once, with static placeholders resolved
+        plan: tuple[tuple[str, ...], tuple[str, ...]] | None = cache.get(
+            "error_page_plan",
+        )  # type: ignore[assignment]
+        if plan is None:
             error_page_path = self._PAGES_DIR / "error.html"
             with error_page_path.open() as f:
                 raw = f.read()
@@ -409,25 +452,37 @@ class DefaultResponses(IDefaultResponses):
                 raw.replace(self._TPL_APP_NAME, self.__app_name)
                    .replace(self._TPL_LOCALE, self.__app_locale)
             )
-            cache["error_page_template"] = template
+            plan = _compile_placeholders(template, _ERROR_PLACEHOLDER_RE)
+            cache["error_page_plan"] = plan
 
         # Compute status string once to eliminate repeated int-to-str conversions
         status_str = str(status_code)
-        message: str = HTTPStatus(status_code).name.replace("_", " ").title()
+        message: str | None = _STATUS_MESSAGES.get(status_code)
+        if message is None:
+            message = HTTPStatus(status_code).name.replace("_", " ").title()
+            _STATUS_MESSAGES[status_code] = message
         description: str = (
             content.get("message", json.dumps(content))
             if isinstance(content, dict)
             else content
         )
 
-        html: str = (
-            template.replace("{{0}}", status_str[0])
-                    .replace("{{1}}", status_str[1])
-                    .replace("{{2}}", status_str[2])
-                    .replace("{{error}}", status_str)
-                    .replace("{{message}}", message)
-                    .replace("{{description}}", description)
-        )
+        values: dict[str, str] = {
+            "0": status_str[0],
+            "1": status_str[1],
+            "2": status_str[2],
+            "error": status_str,
+            "message": message,
+            "description": description,
+        }
+
+        literals, keys = plan
+        pieces: list[str] = []
+        for index, key in enumerate(keys):
+            pieces.append(literals[index])
+            pieces.append(values[key])
+        pieces.append(literals[-1])
+        html: str = "".join(pieces)
 
         # Return the rendered error page with the specified status code and headers
         return HTMLResponse(content=html, status_code=status_code, headers=headers)

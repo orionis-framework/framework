@@ -1,13 +1,20 @@
 from __future__ import annotations
 import re
-from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING
 from orionis.http.response import HTMLResponse
+from orionis.session.flash import (
+    ERRORS_KEY,
+    OLD_INPUT_KEY,
+    apply_flash,
+    filter_input,
+    normalize_errors,
+    queue_bag,
+)
 from orionis.support.facades.session import Session
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Generator, Mapping
     from orionis.session.contracts.session import ISession
     from orionis.view.contracts.engine import IViewEngine
 
@@ -20,10 +27,10 @@ class PendingView:
     Awaitable, chainable result of :meth:`IViewFactory.make`.
 
     Rendering is deferred until the object is awaited, so response
-    mutators such as ``withFlash()`` or ``withCookie()`` can be chained
-    directly on the ``make()`` call::
+    mutators such as ``withInput()``, ``withErrors()``, ``withFlash()``
+    or ``withCookie()`` can be chained directly on the ``make()`` call::
 
-        return await View.make("auth.login").withFlash("email", email)
+        return await View.make("auth.login").withErrors(errors)
 
     Every attribute that exists on :class:`HTMLResponse` is accepted and
     replayed on the real response once the template has been rendered.
@@ -61,24 +68,20 @@ class PendingView:
         self._mutations: list[tuple[str, tuple, dict]] | None = None
         self._flash: dict[str, Any] | None = None
 
-    def withFlash(
-        self,
-        key: str | Mapping[str, Any],
-        value: Any = None,
-    ) -> PendingView:
+    def withFlash(self, key: str, value: Any = None) -> PendingView:
         """
-        Flash data into the session before the template is rendered.
+        Flash a status message into the session before rendering.
 
-        Writing happens ahead of rendering so the very same view can read
-        the values back through the ``old()`` global, and they remain
-        available for the next request as regular flash data.
+        Writing happens ahead of rendering so this very view can read the
+        value back through the ``flash()`` global, and it remains
+        available for the next request.
 
         Parameters
         ----------
-        key : str | Mapping[str, Any]
-            Flash data key, or a mapping of several key-value pairs.
+        key : str
+            Flash data key.
         value : Any, optional
-            Value to flash when *key* is a plain key.
+            Value to flash.
 
         Returns
         -------
@@ -89,11 +92,51 @@ class PendingView:
         if flash is None:
             flash = self._flash = {}
 
-        if isinstance(key, Mapping):
-            flash.update(key)
-        else:
-            flash[key] = value
+        flash[key] = value
+        return self
 
+    def withInput(self, values: Mapping[str, Any]) -> PendingView:
+        """
+        Flash the submitted payload so ``old()`` can repopulate the form.
+
+        Credential-like fields such as ``password`` are stripped.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted form payload to remember.
+
+        Returns
+        -------
+        PendingView
+            The same pending view, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, OLD_INPUT_KEY, filter_input(values))
+        return self
+
+    def withErrors(self, errors: Mapping[str, Any] | Exception) -> PendingView:
+        """
+        Flash validation errors so the ``errors`` global can read them.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
+
+        Returns
+        -------
+        PendingView
+            The same pending view, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, ERRORS_KEY, normalize_errors(errors))
         return self
 
     def __getattr__(self, name: str) -> Callable[..., PendingView]:
@@ -201,5 +244,4 @@ class PendingView:
         except Exception:
             return
 
-        for key, value in self._flash.items():
-            session.flash(key, value)
+        apply_flash(session, self._flash)

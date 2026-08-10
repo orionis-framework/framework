@@ -37,10 +37,8 @@ class UnsupportedMediaTypeException(Exception):
 class Request(IRequest):
 
     __slots__ = (
+        "__adapter",
         "__body_stream",
-        "__build_base_url",
-        "__build_headers",
-        "__build_url",
         "__cached_accept_lower",
         "__cached_base_url",
         "__cached_content_type",
@@ -97,7 +95,7 @@ class Request(IRequest):
         None
         """
         self.__scope = adapter.getScope()
-        self.__build_headers = adapter.headers
+        self.__adapter = adapter
         # Reuse the enum member directly when the caller already passes one.
         self.__interface = (
             interface
@@ -129,12 +127,6 @@ class Request(IRequest):
         self.__cached_accept_lower = None
         self.__path_params: dict[str, Any] = params if params is not None else {}
         self.__state: SimpleNamespace = SimpleNamespace()
-        if self.__interface is Interface.RSGI:
-            self.__build_url = self.__buildUrlRSGI
-            self.__build_base_url = self.__buildBaseUrlRSGI
-        else:
-            self.__build_url = self.__buildUrlASGI
-            self.__build_base_url = self.__buildBaseUrlASGI
 
     def __buildUrlRSGI(self) -> str:
         """
@@ -478,7 +470,11 @@ class Request(IRequest):
             Result is cached after the first call.
         """
         if self.__cached_url is None:
-            self.__cached_url = self.__build_url()
+            self.__cached_url = (
+                self.__buildUrlRSGI()
+                if self.__interface is Interface.RSGI
+                else self.__buildUrlASGI()
+            )
         return self.__cached_url
 
     @property
@@ -494,7 +490,11 @@ class Request(IRequest):
         """
         # Use cached base URL if available; build and cache on first access.
         if self.__cached_base_url is None:
-            self.__cached_base_url = self.__build_base_url()
+            self.__cached_base_url = (
+                self.__buildBaseUrlRSGI()
+                if self.__interface is Interface.RSGI
+                else self.__buildBaseUrlASGI()
+            )
         return self.__cached_base_url
 
     # ---- Properties: Headers & Structures ----
@@ -510,7 +510,7 @@ class Request(IRequest):
             The headers associated with the request.
         """
         if self.__cached_headers is None:
-            self.__cached_headers = self.__build_headers()
+            self.__cached_headers = self.__adapter.headers()
         return self.__cached_headers
 
     @property

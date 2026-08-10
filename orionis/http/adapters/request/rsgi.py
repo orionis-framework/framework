@@ -143,10 +143,7 @@ class RSGITransportAdapter(TransportAdapter):
             for key in scope_headers
             for value in scope_headers.get_all(key)
         ]
-        headers = Headers(raw)
-        # Expose parsed headers through the override layer.
-        self.__overrides["headers"] = headers
-        return headers
+        return Headers(raw)
 
     def client(self) -> str | None:
         """
@@ -306,7 +303,6 @@ class RSGITransportAdapter(TransportAdapter):
             result = "application/json" in lower or "+json" in lower
 
         self.__wants_json = result
-        self.__overrides["wants_json"] = result
         return result
 
     def getScope(self) -> dict:

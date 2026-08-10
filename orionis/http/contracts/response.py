@@ -290,6 +290,39 @@ class IResponse(ABC):
         """
 
     @abstractmethod
+    def withFlash(
+        self,
+        key: str | Mapping[str, Any],
+        value: Any = None,
+    ) -> Self:
+        """
+        Flash data into the session and return the response for chaining.
+
+        Parameters
+        ----------
+        key : str | Mapping[str, Any]
+            Flash data key, or a mapping of several key-value pairs.
+        value : Any, optional
+            Value to flash when *key* is a plain key.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+
+    @abstractmethod
+    def getFlashData(self) -> dict[str, Any] | None:
+        """
+        Return the data queued by ``withFlash()`` for the session flash bag.
+
+        Returns
+        -------
+        dict[str, Any] | None
+            The queued key-value pairs, or None when nothing was queued.
+        """
+
+    @abstractmethod
     def getBody(self) -> bytes | None:
         """
         Return the response body as bytes.

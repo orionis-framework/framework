@@ -1,10 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from collections.abc import AsyncIterable
+    from collections.abc import AsyncIterable, Mapping
 
 class IResponse(ABC):
 
@@ -194,6 +194,99 @@ class IResponse(ABC):
         -------
         None
             This method does not return a value.
+        """
+
+    @abstractmethod
+    def withCookie(
+        self,
+        key: str,
+        value: str = "",
+        *,
+        max_age: int | None = None,
+        expires: datetime | str | int | None = None,
+        path: str | None = "/",
+        domain: str | None = None,
+        secure: bool = False,
+        http_only: bool = False,
+        same_site: Literal["lax", "strict", "none"] | None = "lax",
+        partitioned: bool = False,
+    ) -> Self:
+        """
+        Attach a cookie and return the response for chaining.
+
+        Parameters
+        ----------
+        key : str
+            The cookie name.
+        value : str, optional
+            The cookie value. Defaults to an empty string.
+        max_age : int | None, optional
+            The maximum age of the cookie in seconds.
+        expires : datetime | str | int | None, optional
+            The expiration date of the cookie.
+        path : str | None, optional
+            The path for which the cookie is valid.
+        domain : str | None, optional
+            The domain for which the cookie is valid.
+        secure : bool, optional
+            Whether the cookie is secure.
+        http_only : bool, optional
+            Whether the cookie is HTTP only.
+        same_site : str | None, optional
+            The SameSite policy for the cookie.
+        partitioned : bool, optional
+            Whether the cookie is partitioned.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+
+    @abstractmethod
+    def withCookies(
+        self,
+        cookies: Mapping[str, str | Mapping[str, Any]],
+    ) -> Self:
+        """
+        Attach several cookies at once and return the response.
+
+        Parameters
+        ----------
+        cookies : Mapping[str, str | Mapping[str, Any]]
+            Mapping of cookie names to either a plain value or a mapping of
+            keyword arguments accepted by :meth:`setCookie`.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+
+    @abstractmethod
+    def withoutCookie(
+        self,
+        key: str,
+        *,
+        path: str = "/",
+        domain: str | None = None,
+    ) -> Self:
+        """
+        Expire a cookie and return the response for chaining.
+
+        Parameters
+        ----------
+        key : str
+            The name of the cookie to delete.
+        path : str, default="/"
+            The path for which the cookie is valid.
+        domain : str | None, optional
+            The domain for which the cookie is valid.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
         """
 
     @abstractmethod

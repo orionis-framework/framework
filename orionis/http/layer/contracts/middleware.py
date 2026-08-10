@@ -18,6 +18,8 @@ class IBaseMiddleware(ABC):
     middleware in the chain, and inspect or modify the response.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def handle(
         self,

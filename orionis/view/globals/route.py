@@ -13,6 +13,43 @@ if TYPE_CHECKING:
 # Matches route path placeholders such as ``{id}`` or ``{id:int}``.
 _ROUTE_PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::\w+)?\}")
 
+# Sentinel telling a missing placeholder apart from a legitimate ``None`` value.
+_MISSING: Any = object()
+
+# Interpolation plans keyed by route template: (literal chunks, parameter names).
+_ROUTE_PLAN_CACHE: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {}
+
+def _compile_route_template(
+    template: str,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """
+    Split a route template into literal chunks and placeholder names.
+
+    Parameters
+    ----------
+    template : str
+        Route path containing ``{name}`` or ``{name:type}`` segments.
+
+    Returns
+    -------
+    tuple[tuple[str, ...], tuple[str, ...]]
+        Literal chunks surrounding each placeholder and the ordered
+        placeholder names.  The result is memoised for later calls.
+    """
+    literals: list[str] = []
+    names: list[str] = []
+    cursor = 0
+
+    for match in _ROUTE_PARAM_RE.finditer(template):
+        literals.append(template[cursor:match.start()])
+        names.append(match.group(1))
+        cursor = match.end()
+
+    literals.append(template[cursor:])
+    plan = (tuple(literals), tuple(names))
+    _ROUTE_PLAN_CACHE[template] = plan
+    return plan
+
 def _build_route_path(
     template: str,
     params: dict[str, Any],
@@ -38,25 +75,28 @@ def _build_route_path(
     ViewRouteException
         If a placeholder has no matching value in *params*.
     """
-    pieces: list[str] = []
-    used: set[str] = set()
-    cursor = 0
+    literals, names = (
+        _ROUTE_PLAN_CACHE.get(template) or _compile_route_template(template)
+    )
 
-    for match in _ROUTE_PARAM_RE.finditer(template):
-        key = match.group(1)
-        if key not in params:
+    # Routes without placeholders need no interpolation at all.
+    if not names:
+        return literals[0], params
+
+    pieces: list[str] = []
+    for index, key in enumerate(names):
+        value = params.get(key, _MISSING)
+        if value is _MISSING:
             error_msg = (
                 f"Missing value for route parameter '{key}' "
                 f"while building '{template}'."
             )
             raise ViewRouteException(error_msg)
-        pieces.append(template[cursor:match.start()])
-        pieces.append(quote(str(params[key]), safe=""))
-        cursor = match.end()
-        used.add(key)
+        pieces.append(literals[index])
+        pieces.append(quote(str(value), safe=""))
 
-    pieces.append(template[cursor:])
-    extra = {key: value for key, value in params.items() if key not in used}
+    pieces.append(literals[-1])
+    extra = {key: value for key, value in params.items() if key not in names}
     return "".join(pieces), extra
 
 async def _load_named_routes(app: IApplication) -> dict[str, str]:

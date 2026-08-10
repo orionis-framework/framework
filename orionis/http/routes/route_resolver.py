@@ -6,7 +6,7 @@ from orionis.http.routes.contracts.route_resolver import IRouteResolver
 from orionis.http.routes.entities.resolved_route import ResolvedRoute
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
-from orionis.http.routes.functions import normalizeRequestPath, stripRegexAnchors
+from orionis.http.routes.functions import normalize_request_path, strip_regex_anchors
 
 if TYPE_CHECKING:
     from orionis.http.routes.entities.compiled_route import CompiledRoute
@@ -60,7 +60,7 @@ class _DepthBucket:
         self.entries = entries
         self.marker_to_entry = marker_to_entry
 
-def _pathAllowedForMethod(
+def _path_allowed_for_method(
     static_table: dict[str, ResolvedRoute] | None,
     dynamic_table: dict[int, _DepthBucket] | None,
     path: str,
@@ -98,7 +98,7 @@ def _pathAllowedForMethod(
     bucket = dynamic_table.get(depth)
     return bucket is not None and bucket.pattern.match(path) is not None
 
-def _pathAllowedForMethodCrossDepth(
+def _path_allowed_for_method_cross_depth(
     static_table: dict[str, ResolvedRoute] | None,
     dynamic_table: dict[int, _DepthBucket] | None,
     path: str,
@@ -123,7 +123,7 @@ def _pathAllowedForMethodCrossDepth(
     bool
         Return ``True`` when at least one route matches ``path``.
     """
-    if _pathAllowedForMethod(static_table, dynamic_table, path, depth):
+    if _path_allowed_for_method(static_table, dynamic_table, path, depth):
         return True
 
     if dynamic_table is None:
@@ -134,7 +134,7 @@ def _pathAllowedForMethodCrossDepth(
             return True
     return False
 
-def _buildExtractors(
+def _build_extractors(
     converters: dict[str, ParamConverter],
     prefix: str,
     groupindex: dict[str, int],
@@ -161,7 +161,7 @@ def _buildExtractors(
         for name, conv in converters.items()
     ]
 
-def _buildDepthBucket(routes: list[CompiledRoute]) -> _DepthBucket:
+def _build_depth_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
     """
     Build a matching bucket for dynamic routes at one depth.
 
@@ -177,7 +177,7 @@ def _buildDepthBucket(routes: list[CompiledRoute]) -> _DepthBucket:
     """
     if len(routes) == 1:
         route = routes[0]
-        extractors = _buildExtractors(
+        extractors = _build_extractors(
             route.converters,
             "",
             route.regex.groupindex,
@@ -190,7 +190,7 @@ def _buildDepthBucket(routes: list[CompiledRoute]) -> _DepthBucket:
     group_offset = 0
 
     for index, route in enumerate(routes):
-        raw_pattern = stripRegexAnchors(route.regex.pattern)
+        raw_pattern = strip_regex_anchors(route.regex.pattern)
         prefix = f"_r{index}_"
         prefixed_pattern = _GROUP_NAME_RE.sub(
             lambda match, _prefix=prefix: f"(?P<{_prefix}{match.group(1)}>",
@@ -212,7 +212,7 @@ def _buildDepthBucket(routes: list[CompiledRoute]) -> _DepthBucket:
     groupindex = combined_pattern.groupindex
     entries = [
         (
-            _buildExtractors(route.converters, f"_r{index}_", groupindex),
+            _build_extractors(route.converters, f"_r{index}_", groupindex),
             route,
         )
         for index, route in enumerate(routes)
@@ -223,7 +223,7 @@ def _buildDepthBucket(routes: list[CompiledRoute]) -> _DepthBucket:
         marker_to_entry=marker_to_entry,
     )
 
-def _extractResult(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute:
+def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute:
     """
     Extract a resolved route from a combined-regex match.
 
@@ -341,7 +341,7 @@ class RouteResolver(IRouteResolver):
                 global_patterns.setdefault(depth, set()).add(
                     _GROUP_NAME_RE.sub(
                         "(?:",
-                        stripRegexAnchors(route.regex.pattern),
+                        strip_regex_anchors(route.regex.pattern),
                     ),
                 )
                 # ``.+`` inside a param group can consume extra segments.
@@ -351,7 +351,7 @@ class RouteResolver(IRouteResolver):
             method_cross_depth[method] = has_cross_depth
 
             dynamic[method] = {
-                depth: _buildDepthBucket(depth_routes)
+                depth: _build_depth_bucket(depth_routes)
                 for depth, depth_routes in grouped_routes.items()
             }
 
@@ -418,7 +418,7 @@ class RouteResolver(IRouteResolver):
             upper = method.upper()
             canonical = _METHOD_MAP.get(upper, upper)
         method = canonical
-        path = normalizeRequestPath(path)
+        path = normalize_request_path(path)
 
         tables = self._tables.get(method)
         if tables is not None:
@@ -441,7 +441,7 @@ class RouteResolver(IRouteResolver):
                 if bucket is not None:
                     match = bucket.pattern.match(path)
                     if match is not None:
-                        result = _extractResult(match, bucket)
+                        result = _extract_result(match, bucket)
                         if cache_key is not None:
                             self.__storeCache(cache_key, result)
                         return result
@@ -469,7 +469,7 @@ class RouteResolver(IRouteResolver):
         list[str]
             Sorted list of methods valid for the path.
         """
-        path = normalizeRequestPath(path)
+        path = normalize_request_path(path)
         depth = path.count("/") if path != "/" else 0
 
         static_tables = self._static
@@ -479,14 +479,14 @@ class RouteResolver(IRouteResolver):
             method
             for method in self._all_methods
             if (
-                _pathAllowedForMethodCrossDepth(
+                _path_allowed_for_method_cross_depth(
                     static_tables.get(method),
                     dynamic_tables.get(method),
                     path,
                     depth,
                 )
                 if method_cross_depth.get(method, False)
-                else _pathAllowedForMethod(
+                else _path_allowed_for_method(
                     static_tables.get(method),
                     dynamic_tables.get(method),
                     path,

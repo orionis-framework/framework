@@ -7,6 +7,10 @@ from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundExc
 # Template extension appended when the identifier carries no extension
 _DEFAULT_EXT: str = ".html"
 
+# Memoised template identifier to loader path mapping; the set of template
+# names an application renders is bounded and stable at runtime.
+_PATH_CACHE: dict[str, str] = {}
+
 class Jinja2Engine(IViewEngine):
     """
     Jinja2-based implementation of :class:`IViewEngine`.
@@ -19,7 +23,7 @@ class Jinja2Engine(IViewEngine):
 
     # ruff: noqa: TC001
 
-    __slots__ = ("_environment",)
+    __slots__ = ("_environment", "_jinja")
 
     def __init__(self, environment: IViewEnvironment) -> None:
         """
@@ -36,6 +40,9 @@ class Jinja2Engine(IViewEngine):
         None
         """
         self._environment: IViewEnvironment = environment
+        # The environment instance is built once and mutated in place, so the
+        # reference stays valid for the whole application lifetime.
+        self._jinja: jinja2.Environment = environment.getJinjaEnvironment()
 
     async def render(self, template: str, context: dict[str, Any]) -> str:
         """
@@ -67,9 +74,9 @@ class Jinja2Engine(IViewEngine):
             When Jinja2 raises any error during rendering.
         """
         # Normalise template identifier to a filesystem path
-        _path: str = self._normalisePath(template)
+        _path: str = _PATH_CACHE.get(template) or self._normalisePath(template)
 
-        _jinja: jinja2.Environment = self._environment.getJinjaEnvironment()
+        _jinja: jinja2.Environment = self._jinja
 
         try:
             _tmpl: jinja2.Template = _jinja.get_template(_path)
@@ -117,4 +124,5 @@ class Jinja2Engine(IViewEngine):
         # Append default extension only when none is present
         if "." not in _path.rsplit("/", 1)[-1]:
             _path += _DEFAULT_EXT
+        _PATH_CACHE[template] = _path
         return _path

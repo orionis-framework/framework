@@ -49,8 +49,9 @@ class ViewFactory(IViewFactory):
         -------
         PendingView
             Awaitable proxy that renders the template on ``await`` and
-            accepts chained response mutators such as ``withFlash()``,
-            ``withCookie()`` or ``withoutCookie()``.
+            accepts chained response mutators such as ``withInput()``,
+            ``withErrors()``, ``withFlash()``, ``withCookie()`` or
+            ``withoutCookie()``.
 
         Raises
         ------

@@ -19,30 +19,36 @@ def _global_old(app: IApplication) -> Any:
     Returns
     -------
     Any
-        Async callable that reads flashed values from the session.
+        Async callable that reads the previously submitted form input.
     """
     async def old(key: str, default: Any = None) -> Any:
         """
-        Return a value flashed during the previous request.
+        Return the value submitted for *key* in the previous request.
+
+        Reads the payload flashed with ``withInput()``.  Status messages
+        and validation errors are **not** reachable here; use the
+        ``flash()`` and ``errors`` globals instead.
 
         Parameters
         ----------
         key : str
-            Flash data key, as passed to ``Response.withFlash()``.
+            Form field name.
         default : Any, optional
-            Fallback value when the key is absent or no session exists.
+            Fallback value when the field was not submitted.
 
         Returns
         -------
         Any
-            The flashed value, or *default*.
+            The previously submitted value, ``default``, or an empty
+            string when both are ``None``.
         """
         try:
             session: ISession = await app.make(ISession)
         except Exception:
-            return default
+            value: Any = default
+        else:
+            value = session.getOldInput(key, default)
 
-        value: Any = session.getOld(key, default)
         return "" if value is None else value
 
     return old

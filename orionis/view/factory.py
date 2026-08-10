@@ -64,8 +64,13 @@ class ViewFactory(IViewFactory):
             When rendering fails for any reason.
         """
         try:
-            _html: str = await self._engine.render(template, context)
-            return HTMLResponse(content=_html, headers={"X-Orionis-Render": "SSR"})
+            response_html: str = await self._engine.render(template, context)
+            return HTMLResponse(
+                content=response_html,
+                headers={
+                    "X-Orionis-Render": "SSR",
+                },
+            )
         except Exception as e:
             detail: str = _LOCALS_QUALNAME.sub("", str(e))
             exc_msg: str = f"Failed to render view '{template}': {detail}"

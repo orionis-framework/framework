@@ -8,9 +8,9 @@ from orionis.http.routes.exceptions.fallback_route_already_registered import (
 )
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.functions import (
-    flattenMiddleware,
-    normalizePath,
-    parseAction,
+    flatten_middleware,
+    normalize_path,
+    parse_action,
 )
 
 if TYPE_CHECKING:
@@ -108,7 +108,7 @@ class Router(IRouter):
         """
         # Normalise path before any duplicate check so that '/users' and
         # '/users/' are treated as the same route.
-        normalized_path = normalizePath(path)
+        normalized_path = normalize_path(path)
         method_upper = method.upper()
 
         # Replace default system routes when the user re-registers them.
@@ -358,7 +358,7 @@ class Router(IRouter):
             )
             raise FallbackRouteAlreadyRegisteredException(error_msg)
 
-        _callable, _handler = parseAction(action)
+        _callable, _handler = parse_action(action)
         if _callable and _handler is None:
             self.__fallback = (None, _callable)
         else:
@@ -420,7 +420,7 @@ class Router(IRouter):
 
         try:
             group_middleware = (
-                flattenMiddleware(middleware) if middleware else None
+                flatten_middleware(middleware) if middleware else None
             )
         except TypeError as exc:
             error_msg = (
@@ -431,7 +431,7 @@ class Router(IRouter):
 
         try:
             group_without_middleware = (
-                flattenMiddleware(without_middleware)
+                flatten_middleware(without_middleware)
                 if without_middleware
                 else None
             )

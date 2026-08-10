@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 class BaseMiddleware(IBaseMiddleware):
     """Base class for HTTP middleware implementations."""
 
+    __slots__ = ()
+
     async def handle(
         self,
         request: Request,

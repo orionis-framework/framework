@@ -1,887 +1,150 @@
-<!DOCTYPE html>
-<html lang="{{ config('app.locale') }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name') }}</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Share+Tech+Mono&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-deep:    #060a13;
-            --bg-panel:   #0b1022;
-            --bg-card:    #0d1429;
-            --bg-right:   #070d1c;
-            --cyan:       #00e5ff;
-            --cyan-dim:   rgba(0, 229, 255, 0.10);
-            --cyan-glow:  rgba(0, 229, 255, 0.35);
-            --yellow:     #f2c230;
-            --yellow-dim: rgba(242, 194, 48, 0.10);
-            --yellow-glow:rgba(242, 194, 48, 0.35);
-            --green:      #00ff88;
-            --green-dim:  rgba(0, 255, 136, 0.10);
-            --green-glow: rgba(0, 255, 136, 0.35);
-            --red:        #ff3b3b;
-            --red-glow:   rgba(255, 59, 59, 0.35);
-            --purple:     #c084fc;
-            --text-primary:   rgba(255, 255, 255, 0.92);
-            --text-secondary: rgba(255, 255, 255, 0.52);
-            --text-dim:       rgba(255, 255, 255, 0.26);
-            --border:         rgba(0, 229, 255, 0.09);
-            --font-display: 'Orbitron', sans-serif;
-            --font-mono:    'Share Tech Mono', monospace;
-            --font-code:    'Fira Code', monospace;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
-
-        body {
-            font-family: var(--font-mono);
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        /* ===== DOT GRID ===== */
-        .grid-bg {
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(circle at 1.5px 1.5px, rgba(0,229,255,0.05) 1px, transparent 0);
-            background-size: 32px 32px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ===== SCANLINE ===== */
-        .scanline-overlay {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.01) 2px, rgba(0,229,255,0.01) 4px);
-            pointer-events: none;
-            z-index: 9999;
-            animation: scanShift 8s linear infinite;
-        }
-
-        @keyframes scanShift {
-            0%   { transform: translateY(0);  }
-            100% { transform: translateY(4px); }
-        }
-
-        /* ===== NOISE ===== */
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9998;
-            opacity: 0.018;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-            background-size: 256px 256px;
-        }
-
-        /* ===== PARTICLES ===== */
-        .particle {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            animation: pfloat linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes pfloat {
-            0%   { opacity: 0; transform: translateY(0) scale(0.5); }
-            10%  { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-100vh) scale(1); }
-        }
-
-        /* ===== TOPBAR / NAV ===== */
-        .topbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 200;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 28px;
-            background: rgba(6, 10, 19, 0.85);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .topbar-brand {
-            font-family: var(--font-display);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.28em;
-            color: var(--cyan);
-            text-shadow: 0 0 12px var(--cyan-glow);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .topbar-brand-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 7px var(--green-glow);
-            animation: pdot 2.2s ease-in-out infinite;
-        }
-
-        @keyframes pdot {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.3; }
-        }
-
-        .topbar-time {
-            font-size: 10px;
-            letter-spacing: 0.12em;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-        }
-
-        .topbar-nav {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .nav-btn {
-            display: inline-block;
-            padding: 6px 16px;
-            font-family: var(--font-display);
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            transition: all 0.22s ease;
-        }
-
-        .nav-btn:hover {
-            color: var(--cyan);
-            border-color: rgba(0,229,255,0.22);
-            background: var(--cyan-dim);
-        }
-
-        .nav-btn.primary {
-            color: var(--cyan);
-            border-color: rgba(0,229,255,0.25);
-            background: var(--cyan-dim);
-        }
-
-        /* ===== WRAPPER ===== */
-        .page-wrapper {
-            position: relative;
-            z-index: 10;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 56px 20px 28px;
-        }
-
-        /* ===== MAIN CARD (two-column, like Laravel) ===== */
-        .main-card {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 900px;
-            border: 1px solid var(--border);
-            position: relative;
-            animation: cardIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.45);
-        }
-
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(24px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* Corner brackets on main card */
-        .main-card::before, .main-card::after {
-            content: '';
-            position: absolute;
-            width: 18px; height: 18px;
-            border-style: solid;
-            border-color: var(--cyan);
-            z-index: 5;
-        }
-
-        .main-card::before {
-            top: -1px; left: -1px;
-            border-width: 2px 0 0 2px;
-        }
-
-        .main-card::after {
-            top: -1px; right: -1px;
-            border-width: 2px 2px 0 0;
-        }
-
-        .main-card-bottom::before, .main-card-bottom::after {
-            content: '';
-            position: absolute;
-            width: 18px; height: 18px;
-            border-style: solid;
-            border-color: var(--cyan);
-            z-index: 5;
-        }
-
-        .main-card-bottom::before {
-            bottom: -1px; left: -1px;
-            border-width: 0 0 2px 2px;
-        }
-
-        .main-card-bottom::after {
-            bottom: -1px; right: -1px;
-            border-width: 0 2px 2px 0;
-        }
-
-        .main-card-bottom {
-            display: flex;
-            flex: 1;
-            width: 100%;
-            min-height: 0;
-        }
-
-        /* ===== LEFT PANEL ===== */
-        .panel-left {
-            flex: 1;
-            background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-panel) 100%);
-            padding: 44px 40px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-width: 0;
-        }
-
-
-
-        .app-label {
-            font-family: var(--font-display);
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 6px;
-        }
-
-        .app-name {
-            font-family: var(--font-display);
-            font-size: clamp(1.1rem, 3vw, 1.55rem);
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            line-height: 1.2;
-            color: var(--text-primary);
-            margin-bottom: 28px;
-            overflow-wrap: break-word;
-        }
-
-        /* Getting started heading */
-        .gs-heading {
-            font-family: var(--font-display);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .gs-sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 28px;
-            letter-spacing: 0.02em;
-        }
-
-        /* Resource list */
-        .resource-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            margin-bottom: 36px;
-        }
-
-        .resource-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
-
-        .resource-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Connector line between items */
-        .resource-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 34px;
-            bottom: -14px;
-            width: 1px;
-            background: var(--border);
-        }
-
-        .resource-dot-wrap {
-            flex-shrink: 0;
-            padding-top: 2px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .resource-dot {
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .resource-dot-inner {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: var(--text-dim);
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-
-        .resource-item:hover .resource-dot-inner {
-            background: var(--cyan);
-            box-shadow: 0 0 6px var(--cyan-glow);
-        }
-
-
-
-        .resource-text {
-            font-size: 12.5px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            letter-spacing: 0.02em;
-        }
-
-        .resource-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 500;
-            color: var(--cyan);
-            text-decoration: none;
-            transition: color 0.2s, text-shadow 0.2s;
-            margin-left: 4px;
-        }
-
-        .resource-link:hover {
-            color: #fff;
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-
-        .resource-link svg {
-            width: 10px; height: 10px;
-            flex-shrink: 0;
-        }
-
-        /* CTA row */
-        .cta-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 9px 20px;
-            font-family: var(--font-display);
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            text-decoration: none;
-            border: 1px solid;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            background: transparent;
-        }
-
-        .btn-cta.solid {
-            color: var(--bg-deep);
-            background: var(--cyan);
-            border-color: var(--cyan);
-        }
-
-        .btn-cta.solid:hover {
-            box-shadow: 0 0 20px var(--cyan-glow);
-            transform: translateY(-1px);
-        }
-
-        .btn-cta.ghost {
-            color: var(--text-secondary);
-            border-color: var(--border);
-        }
-
-        .btn-cta.ghost:hover {
-            color: var(--cyan);
-            border-color: rgba(0,229,255,0.25);
-            background: var(--cyan-dim);
-        }
-
-        .btn-cta svg { width: 12px; height: 12px; }
-
-        /* Version row */
-        .version-row {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .version-text {
-            font-size: 10.5px;
-            color: var(--text-dim);
-            letter-spacing: 0.08em;
-        }
-
-        .version-text strong { color: var(--text-secondary); }
-
-        .changelog-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 10.5px;
-            color: var(--cyan);
-            text-decoration: none;
-            letter-spacing: 0.06em;
-            transition: color 0.2s;
-        }
-
-        .changelog-link:hover { color: #fff; }
-        .changelog-link svg { width: 9px; height: 9px; }
-
-        /* ===== RIGHT PANEL ===== */
-        .panel-right {
-            width: 340px;
-            flex-shrink: 0;
-            background: var(--bg-right);
-            border-left: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 32px;
-        }
-
-        /* Radial glow behind logo */
-        .panel-right-glow {
-            position: absolute;
-            width: 340px; height: 340px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
-            pointer-events: none;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Dot grid on right panel */
-        .panel-right-grid {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 1.5px 1.5px, rgba(0,229,255,0.06) 1px, transparent 0);
-            background-size: 24px 24px;
-            pointer-events: none;
-        }
-
-        /* Orionis logo text */
-        .logo-area {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .logo-text {
-            font-family: var(--font-display);
-            font-size: clamp(2.2rem, 5vw, 3rem);
-            font-weight: 900;
-            letter-spacing: 0.22em;
-            line-height: 1;
-            background: linear-gradient(135deg, var(--cyan) 0%, #00aacc 45%, var(--green) 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 22px rgba(0,229,255,0.3));
-            animation: logoGlow 3.5s ease-in-out infinite;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        @keyframes logoGlow {
-            0%, 100% { filter: drop-shadow(0 0 22px rgba(0,229,255,0.30)); }
-            50%       { filter: drop-shadow(0 0 34px rgba(0,229,255,0.55)); }
-        }
-
-        .logo-sub {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            letter-spacing: 0.32em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 36px;
-        }
-
-        /* Animated ring around logo */
-        .logo-ring-wrap {
-            position: absolute;
-            inset: -60px;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .logo-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid;
-            top: 50%; left: 50%;
-        }
-
-        .logo-ring:nth-child(1) {
-            width: 180px; height: 180px;
-            border-color: rgba(0,229,255,0.10);
-            transform: translate(-50%,-50%);
-            animation: rspin1 20s linear infinite;
-        }
-
-        .logo-ring:nth-child(2) {
-            width: 260px; height: 260px;
-            border-color: rgba(0,255,136,0.06);
-            transform: translate(-50%,-50%);
-            animation: rspin1 35s linear infinite reverse;
-        }
-
-        .logo-ring:nth-child(3) {
-            width: 360px; height: 360px;
-            border-color: rgba(242,194,48,0.04);
-            transform: translate(-50%,-50%);
-            animation: rspin1 55s linear infinite;
-        }
-
-        @keyframes rspin1 {
-            to { transform: translate(-50%,-50%) rotate(360deg); }
-        }
-
-        /* Status indicators */
-        .status-list {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            background: rgba(0,229,255,0.03);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .status-item::before {
-            content: '';
-            width: 3px; height: 100%;
-            position: absolute;
-            left: 0; top: 0;
-        }
-
-        .status-item:nth-child(1) { border-left: 2px solid var(--cyan);   }
-        .status-item:nth-child(2) { border-left: 2px solid var(--green);  }
-        .status-item:nth-child(3) { border-left: 2px solid var(--yellow); }
-
-        .status-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .status-item:nth-child(1) .status-dot { background: var(--cyan);   box-shadow: 0 0 5px var(--cyan-glow);   animation: pdot 2s   ease-in-out infinite; }
-        .status-item:nth-child(2) .status-dot { background: var(--green);  box-shadow: 0 0 5px var(--green-glow);  animation: pdot 2.5s ease-in-out infinite; }
-        .status-item:nth-child(3) .status-dot { background: var(--yellow); box-shadow: 0 0 5px var(--yellow-glow); animation: pdot 3s   ease-in-out infinite; }
-
-        .status-label {
-            font-size: 9.5px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            flex: 1;
-        }
-
-        .status-value {
-            font-family: var(--font-display);
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .status-item:nth-child(1) .status-value { color: var(--cyan);   }
-        .status-item:nth-child(2) .status-value { color: var(--green);  }
-        .status-item:nth-child(3) .status-value { color: var(--yellow); }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            position: relative;
-            z-index: 10;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top: 1px solid var(--border);
-            background: rgba(6,10,19,0.7);
-            backdrop-filter: blur(8px);
-            font-size: 10px;
-            letter-spacing: 0.15em;
-            color: var(--text-dim);
-            gap: 20px;
-            flex-wrap: wrap;
-            padding: 0 20px;
-        }
-
-        .footer a {
-            color: var(--text-dim);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer a:hover { color: var(--cyan); }
-
-        .footer-sep {
-            opacity: 0.3;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 780px) {
-            .main-card-bottom { flex-direction: column; }
-            .panel-right {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--border);
-                padding: 36px 28px;
-                min-height: 260px;
-            }
-            .status-list { flex-direction: row; flex-wrap: wrap; }
-            .status-item { flex: 1; min-width: 120px; }
-            .panel-left { padding: 32px 28px 28px; }
-        }
-
-        @media (max-width: 480px) {
-            .topbar { padding: 0 16px; }
-            .topbar-time { display: none; }
-            .panel-left { padding: 24px 20px 20px; }
-            .cta-row { flex-direction: column; align-items: stretch; }
-            .btn-cta { justify-content: center; }
-            .page-wrapper { padding: 52px 12px 20px; }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="grid-bg"></div>
-    <div class="noise-overlay"></div>
-    <div class="scanline-overlay"></div>
-    <div id="particles"></div>
-
-    <!-- ===== TOPBAR ===== -->
-    <header class="topbar">
-        <div class="topbar-brand">
-            <div class="topbar-brand-dot"></div>
-            ORIONIS
-        </div>
-        <span class="topbar-time" id="sysTime"></span>
-    </header>
-
-    <!-- ===== PAGE ===== -->
-    <div class="page-wrapper">
-        <div class="main-card">
-            <div class="main-card-bottom">
-
-                <!-- LEFT PANEL -->
-                <div class="panel-left">
-                    <div class="panel-left-top">
-                        <p class="app-label">Your Application</p>
-                        <h1 class="app-name">{{ config('app.name') }}</h1>
-
-                        <p class="gs-heading">Let's get started</p>
-                        <p class="gs-sub">Your Orionis application is ready.<br>Here are a few things to help you get off the ground:</p>
-
-                        <ul class="resource-list">
-                            <li class="resource-item">
-                                <div class="resource-dot-wrap">
-                                    <div class="resource-dot"><div class="resource-dot-inner"></div></div>
-                                </div>
-                                <div class="resource-content">
-                                    <span class="resource-text">Read the
-                                        <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="resource-link">
-                                            Documentation
-                                            <svg fill="none" viewBox="0 0 10 11" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="square" d="M7.708 6.958V2.792H3.542M2.5 8l5-4.999"/></svg>
-                                        </a>
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="resource-item">
-                                <div class="resource-dot-wrap">
-                                    <div class="resource-dot"><div class="resource-dot-inner"></div></div>
-                                </div>
-                                <div class="resource-content">
-                                    <span class="resource-text">Run your app with
-                                        <a href="https://docs.orionis-framework.com/en/console/reactor/" target="_blank" rel="noopener noreferrer" class="resource-link">
-                                            Reactor CLI
-                                            <svg fill="none" viewBox="0 0 10 11" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="square" d="M7.708 6.958V2.792H3.542M2.5 8l5-4.999"/></svg>
-                                        </a>
-                                        <code style="font-family:var(--font-code);font-size:11px;color:var(--yellow);background:rgba(242,194,48,0.07);padding:1px 6px;border:1px solid rgba(242,194,48,0.15);">python reactor serve</code>
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="resource-item">
-                                <div class="resource-dot-wrap">
-                                    <div class="resource-dot"><div class="resource-dot-inner"></div></div>
-                                </div>
-                                <div class="resource-content">
-                                    <span class="resource-text">Browse the source on
-                                        <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer" class="resource-link">
-                                            GitHub
-                                            <svg fill="none" viewBox="0 0 10 11" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="square" d="M7.708 6.958V2.792H3.542M2.5 8l5-4.999"/></svg>
-                                        </a>
-                                    </span>
-                                </div>
-                            </li>
-                        </ul>
-
-                        <div class="cta-row">
-                            <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn-cta solid">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                Read Docs
-                            </a>
-                            <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer" class="btn-cta ghost">
-                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                                GitHub
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="version-row">
-                        <span class="version-text">Orionis <strong>v{{ framework_version() }}</strong> &mdash; Python {{ python_version() }}</span>
-                    </div>
-                </div>
-
-                <!-- RIGHT PANEL -->
-                <div class="panel-right">
-                    <div class="panel-right-grid"></div>
-                    <div class="panel-right-glow"></div>
-
-                    <div class="logo-area">
-                        <div class="logo-ring-wrap">
-                            <div class="logo-ring"></div>
-                            <div class="logo-ring"></div>
-                            <div class="logo-ring"></div>
-                        </div>
-                        <span class="logo-text">ORIONIS</span>
-                        <p class="logo-sub">Async-First Framework</p>
-                    </div>
-
-                    <div class="status-list">
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span class="status-label">Framework</span>
-                            <span class="status-value">v{{ framework_version() }}</span>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span class="status-label">Runtime</span>
-                            <span class="status-value">{{ python_version() }}</span>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span class="status-label">Environment</span>
-                            <span class="status-value">{{ config('app.env')|upper }}</span>
-                        </div>
-                    </div>
-                </div>
-
+{% extends "layouts/app.html" %}
+
+{% block title %}
+{{ __('Welcome') }}
+{% endblock %}
+
+{% block content %}
+  <div class="page page-center">
+    <div class="container container-normal py-4">
+      <div class="card card-md overflow-hidden">
+        <div class="row g-0">
+
+          <!-- LEFT PANEL -->
+          <div class="col-lg-7">
+            <div class="card-body p-4 p-lg-5">
+              <div class="text-uppercase text-secondary fw-bold mb-1" style="letter-spacing: .18em; font-size: .7rem;">{{ __('Your Application') }}</div>
+              <h1 class="h2 mb-4">{{ config('app.name') }}</h1>
+
+              <h2 class="h3 mb-1">{{ __("Let's get started") }}</h2>
+              <p class="text-secondary mb-4">
+                {{ __('Your Orionis application is ready.') }}<br>
+                {{ __('Here are a few things to help you get off the ground:') }}
+              </p>
+
+              <ul class="steps steps-vertical mb-4">
+                <li class="step-item">
+                  <div class="h4 m-0">{{ __('Read the documentation') }}</div>
+                  <div class="text-secondary">
+                    {{ __('Learn the framework at') }}
+                    <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">
+                      docs.orionis-framework.com
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <div class="h4 m-0">{{ __('Run your app with Reactor CLI') }}</div>
+                  <div class="text-secondary">
+                    {{ __('Start the development server with') }} <code>python reactor serve</code>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <div class="h4 m-0">{{ __('Browse the source') }}</div>
+                  <div class="text-secondary">
+                    {{ __('The code lives on') }}
+                    <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer">
+                      GitHub
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+
+              <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url('/login') }}" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path>
+                    <path d="M9 12h12l-3 -3"></path>
+                    <path d="M18 15l3 -3"></path>
+                  </svg>
+                  {{ __('Sign in') }}
+                </a>
+                <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
+                    <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
+                    <path d="M3 6l0 13"></path>
+                    <path d="M12 6l0 13"></path>
+                    <path d="M21 6l0 13"></path>
+                  </svg>
+                  {{ __('Read Docs') }}
+                </a>
+                <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer" class="btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-2">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+                  </svg>
+                  GitHub
+                </a>
+              </div>
+
+              <hr class="my-4">
+
+              <div class="text-secondary small">
+                Orionis <strong>v{{ framework_version() }}</strong> &mdash; Python {{ python_version() }}
+              </div>
             </div>
+          </div>
+
+          <!-- RIGHT PANEL -->
+          <div class="col-lg-5 border-start">
+            <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center h-100">
+              <div class="text-center mb-4">
+                <div class="display-6 fw-bold text-primary" style="letter-spacing: .2em;">ORIONIS</div>
+                <div class="text-uppercase text-secondary" style="letter-spacing: .28em; font-size: .7rem;">{{ __('Async-First Framework') }}</div>
+              </div>
+
+              <div class="list-group list-group-flush">
+                <div class="list-group-item">
+                  <div class="row align-items-center">
+                    <div class="col-auto"><span class="badge bg-primary"></span></div>
+                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Framework') }}</div>
+                    <div class="col-auto fw-bold">v{{ framework_version() }}</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <div class="row align-items-center">
+                    <div class="col-auto"><span class="badge bg-green"></span></div>
+                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Runtime') }}</div>
+                    <div class="col-auto fw-bold">{{ python_version() }}</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <div class="row align-items-center">
+                    <div class="col-auto"><span class="badge bg-yellow"></span></div>
+                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Environment') }}</div>
+                    <div class="col-auto fw-bold">{{ config('app.env')|upper }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
-    </div>
+      </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <span>Orionis Framework &mdash; MIT License</span>
-        <span class="footer-sep">/</span>
-        <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">Documentation</a>
-        <span class="footer-sep">/</span>
+      <div class="text-center text-secondary mt-3 small">
+        Orionis Framework &mdash; {{ __('MIT License') }}
+        <span class="mx-1">&middot;</span>
+        <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">{{ __('Documentation') }}</a>
+        <span class="mx-1">&middot;</span>
         <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <span class="footer-sep">/</span>
+        <span class="mx-1">&middot;</span>
         <a href="https://pypi.org/project/orionis/" target="_blank" rel="noopener noreferrer">PyPI</a>
-    </footer>
-
-    <script>
-        /* ===== CLOCK ===== */
-        (function() {
-            var el = document.getElementById('sysTime');
-            function tick() {
-                var now = new Date();
-                el.textContent = now.toUTCString().split(' ').slice(4).join(' ').replace(' GMT', ' UTC');
-            }
-            tick();
-            setInterval(tick, 1000);
-        })();
-
-        /* ===== PARTICLES ===== */
-        (function() {
-            var c = document.getElementById('particles');
-            var cols = ['var(--cyan)', 'var(--green)', 'rgba(255,255,255,0.3)', 'var(--yellow)'];
-            var glws = ['var(--cyan-glow)', 'var(--green-glow)', 'rgba(255,255,255,0.15)', 'var(--yellow-glow)'];
-            function secureRandom() {
-                var bytes = new Uint32Array(1);
-                window.crypto.getRandomValues(bytes);
-                return bytes[0] / 4294967296;
-            }
-            for (var i = 0; i < 14; i++) {
-                var p = document.createElement('div');
-                p.className = 'particle';
-                var s = secureRandom() * 2.2 + 0.7;
-                var ci = Math.floor(secureRandom() * cols.length);
-                p.style.cssText = 'width:'+s+'px;height:'+s+'px;left:'+(secureRandom()*100)+'%;bottom:-8px;background:'+cols[ci]+';box-shadow:0 0 '+(s*2.5)+'px '+glws[ci]+';animation-duration:'+(secureRandom()*16+10)+'s;animation-delay:'+(secureRandom()*10)+'s';
-                c.appendChild(p);
-            }
-        })();
-    </script>
-</body>
-</html>
+      </div>
+    </div>
+  </div>
+{% endblock %}

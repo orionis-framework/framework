@@ -1,11 +1,11 @@
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.routes.functions import (
-    flattenMiddleware,
-    isValidHandler,
-    normalizePath,
-    normalizeRequestPath,
-    parseAction,
-    stripRegexAnchors,
+    flatten_middleware,
+    is_valid_handler,
+    normalize_path,
+    normalize_request_path,
+    parse_action,
+    strip_regex_anchors,
 )
 from orionis.test import TestCase
 
@@ -36,11 +36,11 @@ class _ConcreteMiddleware(BaseMiddleware):
         return await call_next()
 
 # ---------------------------------------------------------------------------
-# normalizePath
+# normalize_path
 # ---------------------------------------------------------------------------
 
 class TestNormalizePath(TestCase):
-    """Unit tests for the normalizePath route utility."""
+    """Unit tests for the normalize_path route utility."""
 
     def testSimplePathUnchanged(self) -> None:
         """
@@ -48,7 +48,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that '/users/me' passes through without modification.
         """
-        self.assertEqual(normalizePath("/users/me"), "/users/me")
+        self.assertEqual(normalize_path("/users/me"), "/users/me")
 
     def testLeadingSlashAdded(self) -> None:
         """
@@ -56,7 +56,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that 'users' becomes '/users'.
         """
-        self.assertEqual(normalizePath("users"), "/users")
+        self.assertEqual(normalize_path("users"), "/users")
 
     def testTrailingSlashRemoved(self) -> None:
         """
@@ -64,7 +64,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that '/users/' becomes '/users'.
         """
-        self.assertEqual(normalizePath("/users/"), "/users")
+        self.assertEqual(normalize_path("/users/"), "/users")
 
     def testRootPathPreserved(self) -> None:
         """
@@ -72,7 +72,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that rstrip does not produce an empty string for root.
         """
-        self.assertEqual(normalizePath("/"), "/")
+        self.assertEqual(normalize_path("/"), "/")
 
     def testConsecutiveSlashesCollapsed(self) -> None:
         """
@@ -80,7 +80,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that '//users//me/' is normalised to '/users/me'.
         """
-        self.assertEqual(normalizePath("//users//me/"), "/users/me")
+        self.assertEqual(normalize_path("//users//me/"), "/users/me")
 
     def testLeadingWhitespaceStripped(self) -> None:
         """
@@ -88,7 +88,7 @@ class TestNormalizePath(TestCase):
 
         Confirms that '  /users  ' is normalised to '/users'.
         """
-        self.assertEqual(normalizePath("  /users  "), "/users")
+        self.assertEqual(normalize_path("  /users  "), "/users")
 
     def testDeepNestedPath(self) -> None:
         """
@@ -97,7 +97,7 @@ class TestNormalizePath(TestCase):
         Confirms a multi-segment path with no abnormalities passes
         through unchanged.
         """
-        self.assertEqual(normalizePath("/a/b/c/d"), "/a/b/c/d")
+        self.assertEqual(normalize_path("/a/b/c/d"), "/a/b/c/d")
 
 # ---------------------------------------------------------------------------
 # normalizeRequestPath
@@ -112,7 +112,7 @@ class TestNormalizeRequestPath(TestCase):
 
         Confirms the fast path for missing path values.
         """
-        self.assertEqual(normalizeRequestPath(""), "/")
+        self.assertEqual(normalize_request_path(""), "/")
 
     def testRootPreserved(self) -> None:
         """
@@ -120,7 +120,7 @@ class TestNormalizeRequestPath(TestCase):
 
         Confirms the root path is not mutated.
         """
-        self.assertEqual(normalizeRequestPath("/"), "/")
+        self.assertEqual(normalize_request_path("/"), "/")
 
     def testLeadingSlashAdded(self) -> None:
         """
@@ -128,7 +128,7 @@ class TestNormalizeRequestPath(TestCase):
 
         Confirms that 'users/me' becomes '/users/me'.
         """
-        self.assertEqual(normalizeRequestPath("users/me"), "/users/me")
+        self.assertEqual(normalize_request_path("users/me"), "/users/me")
 
     def testTrailingSlashRemoved(self) -> None:
         """
@@ -136,7 +136,7 @@ class TestNormalizeRequestPath(TestCase):
 
         Confirms that '/users/' becomes '/users'.
         """
-        self.assertEqual(normalizeRequestPath("/users/"), "/users")
+        self.assertEqual(normalize_request_path("/users/"), "/users")
 
     def testNonRootSingleSegment(self) -> None:
         """
@@ -144,7 +144,7 @@ class TestNormalizeRequestPath(TestCase):
 
         Confirms that '/ping' is returned unchanged.
         """
-        self.assertEqual(normalizeRequestPath("/ping"), "/ping")
+        self.assertEqual(normalize_request_path("/ping"), "/ping")
 
 # ---------------------------------------------------------------------------
 # stripRegexAnchors
@@ -159,7 +159,7 @@ class TestStripRegexAnchors(TestCase):
 
         Confirms that '^/users$' becomes '/users'.
         """
-        self.assertEqual(stripRegexAnchors("^/users$"), "/users")
+        self.assertEqual(strip_regex_anchors("^/users$"), "/users")
 
     def testOnlyStartAnchorRemoved(self) -> None:
         """
@@ -167,7 +167,7 @@ class TestStripRegexAnchors(TestCase):
 
         Confirms that '^/users' becomes '/users'.
         """
-        self.assertEqual(stripRegexAnchors("^/users"), "/users")
+        self.assertEqual(strip_regex_anchors("^/users"), "/users")
 
     def testOnlyEndAnchorRemoved(self) -> None:
         """
@@ -175,7 +175,7 @@ class TestStripRegexAnchors(TestCase):
 
         Confirms that '/users$' becomes '/users'.
         """
-        self.assertEqual(stripRegexAnchors("/users$"), "/users")
+        self.assertEqual(strip_regex_anchors("/users$"), "/users")
 
     def testNoAnchorsUnchanged(self) -> None:
         """
@@ -183,7 +183,7 @@ class TestStripRegexAnchors(TestCase):
 
         Confirms that '/users' is not modified.
         """
-        self.assertEqual(stripRegexAnchors("/users"), "/users")
+        self.assertEqual(strip_regex_anchors("/users"), "/users")
 
     def testEmptyStringUnchanged(self) -> None:
         """
@@ -191,7 +191,7 @@ class TestStripRegexAnchors(TestCase):
 
         Confirms the guard conditions handle empty input without error.
         """
-        self.assertEqual(stripRegexAnchors(""), "")
+        self.assertEqual(strip_regex_anchors(""), "")
 
 # ---------------------------------------------------------------------------
 # flattenMiddleware
@@ -206,7 +206,7 @@ class TestFlattenMiddleware(TestCase):
 
         Confirms the simplest usage with a lone class argument.
         """
-        result = flattenMiddleware(_ConcreteMiddleware)
+        result = flatten_middleware(_ConcreteMiddleware)
         self.assertEqual(result, [_ConcreteMiddleware])
 
     def testMultipleClassesPassed(self) -> None:
@@ -220,7 +220,7 @@ class TestFlattenMiddleware(TestCase):
             async def handle(self, _request, call_next):  # type: ignore[override]
                 return await call_next()
 
-        result = flattenMiddleware(_ConcreteMiddleware, _MW2)
+        result = flatten_middleware(_ConcreteMiddleware, _MW2)
         self.assertEqual(result, [_ConcreteMiddleware, _MW2])
 
     def testListWrappedMiddleware(self) -> None:
@@ -230,7 +230,7 @@ class TestFlattenMiddleware(TestCase):
         Confirms that passing [MiddlewareClass] is equivalent to passing
         MiddlewareClass directly.
         """
-        result = flattenMiddleware([_ConcreteMiddleware])
+        result = flatten_middleware([_ConcreteMiddleware])
         self.assertEqual(result, [_ConcreteMiddleware])
 
     def testTupleWrappedMiddleware(self) -> None:
@@ -239,7 +239,7 @@ class TestFlattenMiddleware(TestCase):
 
         Confirms that passing (MiddlewareClass,) is accepted.
         """
-        result = flattenMiddleware((_ConcreteMiddleware,))
+        result = flatten_middleware((_ConcreteMiddleware,))
         self.assertEqual(result, [_ConcreteMiddleware])
 
     def testSetWrappedMiddleware(self) -> None:
@@ -249,7 +249,7 @@ class TestFlattenMiddleware(TestCase):
         Confirms that set containers are accepted and produce a one-item
         list when only one class is present.
         """
-        result = flattenMiddleware({_ConcreteMiddleware})
+        result = flatten_middleware({_ConcreteMiddleware})
         self.assertEqual(result, [_ConcreteMiddleware])
 
     def testFrozensetWrappedMiddleware(self) -> None:
@@ -258,7 +258,7 @@ class TestFlattenMiddleware(TestCase):
 
         Confirms that frozenset containers are supported.
         """
-        result = flattenMiddleware(frozenset({_ConcreteMiddleware}))
+        result = flatten_middleware(frozenset({_ConcreteMiddleware}))
         self.assertEqual(result, [_ConcreteMiddleware])
 
     def testNonMiddlewareRaisesTypeError(self) -> None:
@@ -269,7 +269,7 @@ class TestFlattenMiddleware(TestCase):
         exception type.
         """
         with self.assertRaises(TypeError):
-            flattenMiddleware(object)  # type: ignore[arg-type]
+            flatten_middleware(object)  # type: ignore[arg-type]
 
     def testNonClassRaisesTypeError(self) -> None:
         """
@@ -278,7 +278,7 @@ class TestFlattenMiddleware(TestCase):
         Confirms that passing a function instead of a class is rejected.
         """
         with self.assertRaises(TypeError):
-            flattenMiddleware(_plain_handler)  # type: ignore[arg-type]
+            flatten_middleware(_plain_handler)  # type: ignore[arg-type]
 
 # ---------------------------------------------------------------------------
 # isValidHandler
@@ -293,7 +293,7 @@ class TestIsValidHandler(TestCase):
 
         Confirms that ordinary def functions return True.
         """
-        self.assertTrue(isValidHandler(_plain_handler))
+        self.assertTrue(is_valid_handler(_plain_handler))
 
     def testAsyncFunctionIsValid(self) -> None:
         """
@@ -301,7 +301,7 @@ class TestIsValidHandler(TestCase):
 
         Confirms that coroutine functions pass the callable check.
         """
-        self.assertTrue(isValidHandler(_async_handler))
+        self.assertTrue(is_valid_handler(_async_handler))
 
     def testLambdaIsInvalid(self) -> None:
         """
@@ -309,7 +309,7 @@ class TestIsValidHandler(TestCase):
 
         Confirms that anonymous lambdas return False.
         """
-        self.assertFalse(isValidHandler(lambda: None))
+        self.assertFalse(is_valid_handler(lambda: None))
 
     def testNonCallableIsInvalid(self) -> None:
         """
@@ -317,7 +317,7 @@ class TestIsValidHandler(TestCase):
 
         Confirms that integers and other non-callables return False.
         """
-        self.assertFalse(isValidHandler(42))  # type: ignore[arg-type]
+        self.assertFalse(is_valid_handler(42))  # type: ignore[arg-type]
 
     def testCoroutineObjectIsInvalid(self) -> None:
         """
@@ -328,7 +328,7 @@ class TestIsValidHandler(TestCase):
         """
         coro = _async_handler()
         try:
-            self.assertFalse(isValidHandler(coro))
+            self.assertFalse(is_valid_handler(coro))
         finally:
             coro.close()
 
@@ -338,7 +338,7 @@ class TestIsValidHandler(TestCase):
 
         Confirms that objects with __call__ defined pass the check.
         """
-        self.assertTrue(isValidHandler(_InvokableCtrl()))
+        self.assertTrue(is_valid_handler(_InvokableCtrl()))
 
 # ---------------------------------------------------------------------------
 # parseAction
@@ -353,7 +353,7 @@ class TestParseAction(TestCase):
 
         Confirms the two-tuple returned for the function branch.
         """
-        handler, method = parseAction(_plain_handler)
+        handler, method = parse_action(_plain_handler)
         self.assertIs(handler, _plain_handler)
         self.assertIsNone(method)
 
@@ -364,7 +364,7 @@ class TestParseAction(TestCase):
         Confirms that a class defining __call__ is accepted and returned
         in the first tuple position.
         """
-        handler, method = parseAction(_InvokableCtrl)
+        handler, method = parse_action(_InvokableCtrl)
         self.assertIs(handler, _InvokableCtrl)
         self.assertIsNone(method)
 
@@ -374,7 +374,7 @@ class TestParseAction(TestCase):
 
         Confirms the two-tuple returns the class and method string.
         """
-        ctrl, method = parseAction([_CtrlWithMethod, "index"])
+        ctrl, method = parse_action([_CtrlWithMethod, "index"])
         self.assertIs(ctrl, _CtrlWithMethod)
         self.assertEqual(method, "index")
 
@@ -385,7 +385,7 @@ class TestParseAction(TestCase):
         Confirms the guard for classes that lack an __call__ definition.
         """
         with self.assertRaises(TypeError):
-            parseAction(_CtrlNoCall)
+            parse_action(_CtrlNoCall)
 
     def testListWithWrongLengthRaisesValueError(self) -> None:
         """
@@ -394,10 +394,10 @@ class TestParseAction(TestCase):
         Confirms that only exactly [Controller, 'method'] is accepted.
         """
         with self.assertRaises(ValueError):
-            parseAction([_CtrlWithMethod])
+            parse_action([_CtrlWithMethod])
 
         with self.assertRaises(ValueError):
-            parseAction([_CtrlWithMethod, "index", "extra"])
+            parse_action([_CtrlWithMethod, "index", "extra"])
 
     def testListWithNonClassFirstElementRaisesTypeError(self) -> None:
         """
@@ -406,7 +406,7 @@ class TestParseAction(TestCase):
         Confirms that the first list element must be a concrete class.
         """
         with self.assertRaises(TypeError):
-            parseAction(["not_a_class", "index"])
+            parse_action(["not_a_class", "index"])
 
     def testListWithNonStringSecondElementRaisesTypeError(self) -> None:
         """
@@ -415,7 +415,7 @@ class TestParseAction(TestCase):
         Confirms that the second list element must be a string method name.
         """
         with self.assertRaises(TypeError):
-            parseAction([_CtrlWithMethod, 99])  # type: ignore[list-item]
+            parse_action([_CtrlWithMethod, 99])  # type: ignore[list-item]
 
     def testListWithMissingMethodRaisesValueError(self) -> None:
         """
@@ -424,7 +424,7 @@ class TestParseAction(TestCase):
         Confirms that the parser validates the method exists on the class.
         """
         with self.assertRaises(ValueError):
-            parseAction([_CtrlWithMethod, "nonexistent_method"])
+            parse_action([_CtrlWithMethod, "nonexistent_method"])
 
     def testLambdaRaisesTypeError(self) -> None:
         """
@@ -433,7 +433,7 @@ class TestParseAction(TestCase):
         Confirms that lambdas are rejected as invalid action types.
         """
         with self.assertRaises(TypeError):
-            parseAction(lambda: None)
+            parse_action(lambda: None)
 
     def testAsyncFunctionIsAccepted(self) -> None:
         """
@@ -441,7 +441,7 @@ class TestParseAction(TestCase):
 
         Confirms that coroutine functions are parsed to (function, None).
         """
-        handler, method = parseAction(_async_handler)
+        handler, method = parse_action(_async_handler)
         self.assertIs(handler, _async_handler)
         self.assertIsNone(method)
 
@@ -452,4 +452,4 @@ class TestParseAction(TestCase):
         Confirms that arbitrary objects are rejected.
         """
         with self.assertRaises(TypeError):
-            parseAction(12345)  # type: ignore[arg-type]
+            parse_action(12345)  # type: ignore[arg-type]

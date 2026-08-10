@@ -4,7 +4,7 @@ from orionis.session.contracts.session import ISession
 class Session(Facade):
 
     @classmethod
-    def getFacadeAccessor(cls) -> str:
+    def getFacadeAccessor(cls) -> type[ISession]:
         """
         Return the facade accessor string for the unit test contract.
 

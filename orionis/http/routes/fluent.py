@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.http.routes.contracts.fluent import IFluentRoute
 from orionis.http.routes.functions import (
-    flattenMiddleware,
-    normalizePath,
-    parseAction,
+    flatten_middleware,
+    normalize_path,
+    parse_action,
 )
 from orionis.http.routes.route_id import RouteID
 
@@ -76,7 +76,7 @@ class FluentRoute(IFluentRoute):
 
         # Initialize route attributes
         self.__method = method_upper
-        self.__path = normalizePath(path)
+        self.__path = normalize_path(path)
         self.__id = RouteID.next(method_upper, self.__path)
         self.__class: type | None = None
         self.__handler: str | None = None
@@ -87,7 +87,7 @@ class FluentRoute(IFluentRoute):
         self.__kind: str = "web"
 
         # Parse the action and set the appropriate handler attributes
-        _callable, _handler = parseAction(action)
+        _callable, _handler = parse_action(action)
         if _callable and _handler is None:
             self.__callable_handler = _callable
         else:
@@ -122,7 +122,7 @@ class FluentRoute(IFluentRoute):
         Self
             This FluentRoute instance for method chaining.
         """
-        _callable, _handler = parseAction([controller, handler])
+        _callable, _handler = parse_action([controller, handler])
         self.__class = _callable
         self.__handler = _handler
         self.__callable_handler = None
@@ -167,7 +167,7 @@ class FluentRoute(IFluentRoute):
         Self
             This FluentRoute instance for method chaining.
         """
-        self.__middleware.extend(flattenMiddleware(*middleware))
+        self.__middleware.extend(flatten_middleware(*middleware))
         return self
 
     def withOutMiddleware(
@@ -189,7 +189,7 @@ class FluentRoute(IFluentRoute):
         Self
             This FluentRoute instance for method chaining.
         """
-        self.__without_middleware.update(flattenMiddleware(*middleware))
+        self.__without_middleware.update(flatten_middleware(*middleware))
         return self
 
     def prefix(self, prefix: str) -> Self:
@@ -209,7 +209,7 @@ class FluentRoute(IFluentRoute):
         if not isinstance(prefix, str):
             error_msg = "Prefix must be a string"
             raise TypeError(error_msg)
-        self.__path = normalizePath(prefix.rstrip("/") + "/" + self.__path.lstrip("/"))
+        self.__path = normalize_path(prefix.rstrip("/") + "/" + self.__path.lstrip("/"))
         return self
 
     def _kind(self, kind: str) -> Self:

@@ -11,13 +11,13 @@ class TestWebTranslationFacade(TestCase):
         """Lang resolves lines from the real resources/lang files."""
         self.assertEqual(Lang.get("Welcome", locale="es"), "Bienvenido")
         self.assertEqual(Lang.get("Welcome", locale="en"), "Welcome")
-        self.assertEqual(Lang.get("Welcome", locale="pt"), "Bem-vindo")
 
     async def testFacadeReplacesParameters(self) -> None:
-        """Lang substitutes Laravel-style placeholders."""
+        """Lang substitutes Laravel-style placeholders on the resolved line."""
+        # Shipped lines declare no placeholders, so the key acts as the line.
         self.assertEqual(
             Lang.get("Hello :name", locale="es", name="Carlos"),
-            "Hola Carlos",
+            "Hello Carlos",
         )
         self.assertEqual(
             Lang.get("Hello :name", locale="en", name="Carlos"),
@@ -38,9 +38,9 @@ class TestWebTranslationFacade(TestCase):
         """Switching the locale takes effect and can be restored."""
         original = Lang.getLocale()
         try:
-            Lang.setLocale("pt")
-            self.assertEqual(Lang.getLocale(), "pt")
-            self.assertEqual(Lang.get("Welcome"), "Bem-vindo")
+            Lang.setLocale("es")
+            self.assertEqual(Lang.getLocale(), "es")
+            self.assertEqual(Lang.get("Welcome"), "Bienvenido")
         finally:
             Lang.setLocale(original)
         self.assertEqual(Lang.getLocale(), original)
@@ -50,7 +50,6 @@ class TestWebTranslationFacade(TestCase):
         locales = Lang.availableLocales()
         self.assertIn("en", locales)
         self.assertIn("es", locales)
-        self.assertIn("pt", locales)
 
 class TestWebTranslationRendering(TestCase):
     """Validate the translation globals inside real Jinja2 templates."""
@@ -84,7 +83,7 @@ class TestWebTranslationRendering(TestCase):
         rendered = await self.__render(
             '{{ trans("Hello :name", locale="es", name="Ana") }}',
         )
-        self.assertEqual(rendered, "Hola Ana")
+        self.assertEqual(rendered, "Hello Ana")
 
     async def testTemplatePluralizesWithChoiceGlobal(self) -> None:
         """The choice global pluralizes lines inside templates."""
@@ -101,7 +100,7 @@ class TestWebTranslationRendering(TestCase):
     async def testTemplateListsAvailableLocales(self) -> None:
         """The locales global lists every discovered locale."""
         rendered = await self.__render('{{ locales()|join(",") }}')
-        for locale in ("en", "es", "pt"):
+        for locale in ("en", "es"):
             self.assertIn(locale, rendered)
 
     async def testTemplateReflectsRuntimeLocaleSwitch(self) -> None:

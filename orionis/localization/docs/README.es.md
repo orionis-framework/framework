@@ -121,9 +121,9 @@ graph TD
   `ITranslationRepository`, `ITranslator`, `ILocalizationManager`), cada uno
   en su propio archivo; `contracts/__init__.py` los reexporta todos.
 - Los globals de plantillas Jinja2 (`__`, `trans`, `choice`, `locale`,
-  `locales`) se configuran en `orionis.view.globals` (fuera de este módulo)
-  a través de la fachada `Lang` fijada — este módulo solo provee el motor
-  de traducción subyacente.
+  `locales`) se configuran en `orionis.view.helpers.lang` (fuera de este
+  módulo) a través de la fachada `Lang` fijada — este módulo solo provee
+  el motor de traducción subyacente.
 
 ## Referencia de API
 

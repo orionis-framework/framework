@@ -117,9 +117,9 @@ graph TD
   `ITranslationRepository`, `ITranslator`, `ILocalizationManager`), each in
   its own file; `contracts/__init__.py` re-exports all four.
 - Jinja2 template globals (`__`, `trans`, `choice`, `locale`, `locales`) are
-  wired in `orionis.view.globals` (outside this module) through the pinned
-  `Lang` facade — this module only provides the underlying translation
-  engine.
+  wired in `orionis.view.helpers.lang` (outside this module) through the
+  pinned `Lang` facade — this module only provides the underlying
+  translation engine.
 
 ## API reference
 

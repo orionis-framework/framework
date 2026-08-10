@@ -15,6 +15,13 @@ from uuid import UUID
 import msgspec.json as _msgspec_json
 from orionis.http.contracts.response import IResponse
 from orionis.background.task import BackgroundTask
+from orionis.session.flash import (
+    ERRORS_KEY,
+    OLD_INPUT_KEY,
+    filter_input,
+    normalize_errors,
+    queue_bag,
+)
 
 if TYPE_CHECKING:
     from orionis.http.enums.status import HTTPStatus
@@ -501,23 +508,19 @@ class Response(IResponse):
         self.deleteCookie(key, path=path, domain=domain)
         return self
 
-    def withFlash(
-        self,
-        key: str | Mapping[str, Any],
-        value: Any = None,
-    ) -> Self:
+    def withFlash(self, key: str, value: Any = None) -> Self:
         """
-        Flash data into the session and return the response for chaining.
+        Flash a status message into the session and return the response.
 
-        The values survive for exactly one subsequent request and are read
-        back in templates through the ``old()`` global.
+        The value survives for exactly one subsequent request and is read
+        back in templates through the ``flash()`` global.
 
         Parameters
         ----------
-        key : str | Mapping[str, Any]
-            Flash data key, or a mapping of several key-value pairs.
+        key : str
+            Flash data key.
         value : Any, optional
-            Value to flash when *key* is a plain key.
+            Value to flash.
 
         Returns
         -------
@@ -528,11 +531,54 @@ class Response(IResponse):
         if flash is None:
             flash = self._flash = {}
 
-        if isinstance(key, Mapping):
-            flash.update(key)
-        else:
-            flash[key] = value
+        flash[key] = value
+        return self
 
+    def withInput(self, values: Mapping[str, Any]) -> Self:
+        """
+        Flash the submitted payload so the next request can repopulate it.
+
+        Values are read back in templates through the ``old()`` global.
+        Credential-like fields such as ``password`` are stripped.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted form payload to remember.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, OLD_INPUT_KEY, filter_input(values))
+        return self
+
+    def withErrors(self, errors: Mapping[str, Any] | Exception) -> Self:
+        """
+        Flash validation errors for the next request.
+
+        Errors are read back in templates through the ``errors`` global.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, ERRORS_KEY, normalize_errors(errors))
         return self
 
     def getFlashData(self) -> dict[str, Any] | None:

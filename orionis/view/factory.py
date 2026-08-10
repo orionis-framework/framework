@@ -1,7 +1,13 @@
+import re
 from typing import Any
 from orionis.http.response import HTMLResponse
 from orionis.view.contracts.engine import IViewEngine
 from orionis.view.contracts.factory import IViewFactory
+from orionis.view.exceptions import ViewRenderException
+
+# Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
+# errors raised inside template globals; irrelevant for the developer.
+_LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.") # NOSONAR
 
 class ViewFactory(IViewFactory):
     """
@@ -57,5 +63,10 @@ class ViewFactory(IViewFactory):
         ViewRenderException
             When rendering fails for any reason.
         """
-        _html: str = await self._engine.render(template, context)
-        return HTMLResponse(content=_html, headers={"X-Orionis-Render": "SSR"})
+        try:
+            _html: str = await self._engine.render(template, context)
+            return HTMLResponse(content=_html, headers={"X-Orionis-Render": "SSR"})
+        except Exception as e:
+            detail: str = _LOCALS_QUALNAME.sub("", str(e))
+            exc_msg: str = f"Failed to render template '{template}': {detail}"
+            raise ViewRenderException(exc_msg) from e

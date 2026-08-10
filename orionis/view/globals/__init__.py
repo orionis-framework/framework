@@ -13,6 +13,7 @@ from orionis.view.globals.lang import (
     _global_locales,
     _global_trans,
 )
+from orionis.view.globals.old import _global_old
 from orionis.view.globals.request import _global_request
 from orionis.view.globals.route import _global_route
 from orionis.view.globals.session import _global_session
@@ -39,6 +40,7 @@ __all__ = [
     "_global_locale",
     "_global_locales",
     "_global_now",
+    "_global_old",
     "_global_python_version",
     "_global_request",
     "_global_route",

@@ -10,6 +10,7 @@ from enum import Enum
 from http.cookies import SimpleCookie
 from pathlib import Path
 from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
+from urllib.parse import quote
 from uuid import UUID
 import msgspec.json as _msgspec_json
 from orionis.http.contracts.response import IResponse
@@ -35,7 +36,7 @@ class Response(IResponse):
     # Shared constant avoids per-instance allocation; always UTF-8
     charset: ClassVar[str] = "utf-8"
 
-    def __init__(
+    def __init__( # NOSONAR
         self,
         content: Any = None,
         status_code: HTTPStatus | int = 200,
@@ -90,12 +91,19 @@ class Response(IResponse):
         self._headers: MutableMapping[str, list[str]] = {}
 
         if headers:
-            if not isinstance(headers, Mapping):
+            # Plain dicts skip the ABC instance check on the response hot path
+            if type(headers) is not dict and not isinstance(headers, Mapping):
                 error_msg = "headers must be a mapping"
                 raise TypeError(error_msg)
 
+            store = self._headers
             for key, value in headers.items():
-                self.addHeader(key, value)
+                key_lower = key.lower()
+                existing = store.get(key_lower)
+                if existing is None:
+                    store[key_lower] = [value]
+                else:
+                    existing.append(value)
 
         if background is not None and not isinstance(background, BackgroundTask):
             error_msg = "background must be a BackgroundTask or None"
@@ -299,8 +307,12 @@ class Response(IResponse):
             This method does not return a value.
         """
         cookie = SimpleCookie()
-        cookie[key] = value
+        cookie[key] = ""
         morsel = cookie[key]
+
+        # Percent-encode the value ourselves: SimpleCookie would otherwise
+        # wrap values containing characters such as '@' in double quotes.
+        morsel.set(key, value, quote(value, safe=""))
 
         if max_age is not None:
             morsel["max-age"] = str(max_age)
@@ -864,7 +876,7 @@ class RedirectResponse(Response):
     def __init__(
         self,
         url: str,
-        status_code: HTTPStatus | int = 307,
+        status_code: HTTPStatus | int = 302,
         headers: Mapping[str, str] | None = None,
         background: BackgroundTask | None = None,
     ) -> None:

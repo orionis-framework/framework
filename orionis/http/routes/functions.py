@@ -13,7 +13,7 @@ _ACTION_LIST_LENGTH: int = 2
 # Matches one or more consecutive forward slashes anywhere in a path.
 _MULTI_SLASH_RE: re.Pattern = re.compile(r"/{2,}")
 
-def normalizePath(path: str) -> str:
+def normalize_path(path: str) -> str:
     """
     Normalise an HTTP route path to a canonical form.
 
@@ -42,7 +42,7 @@ def normalizePath(path: str) -> str:
         path = path.rstrip("/")
     return path
 
-def normalizeRequestPath(path: str) -> str:
+def normalize_request_path(path: str) -> str:
     """
     Normalise a request path for route resolution.
 
@@ -65,7 +65,7 @@ def normalizeRequestPath(path: str) -> str:
         path = path.rstrip("/") or "/"
     return path
 
-def stripRegexAnchors(pattern: str) -> str:
+def strip_regex_anchors(pattern: str) -> str:
     """
     Remove start and end anchors from a regex pattern.
 
@@ -85,7 +85,7 @@ def stripRegexAnchors(pattern: str) -> str:
         pattern = pattern[:-1]
     return pattern
 
-def flattenMiddleware(
+def flatten_middleware(
     *middleware: type[BaseMiddleware] | list | tuple | set | frozenset,
 ) -> list[type[BaseMiddleware]]:
     """
@@ -131,7 +131,7 @@ def flattenMiddleware(
             flat.append(m)
     return flat
 
-def isValidHandler(action: Callable) -> bool:
+def is_valid_handler(action: Callable) -> bool:
     """
     Validate whether an action qualifies as a valid route handler.
 
@@ -157,7 +157,7 @@ def isValidHandler(action: Callable) -> bool:
     # Reject plain lambdas; they cannot be used as route handlers.
     return not (inspect.isfunction(action) and action.__name__ == "<lambda>")
 
-def parseAction(
+def parse_action(
     action: Callable | list | type,
 ) -> tuple[Callable, None] | tuple[type, str]:
     """
@@ -205,7 +205,7 @@ def parseAction(
         return action, None
 
     # 2. Plain callable (function, coroutine function, …)
-    if isValidHandler(action):
+    if is_valid_handler(action):
         return action, None
 
     # 3. [ControllerClass, 'method_name'] list

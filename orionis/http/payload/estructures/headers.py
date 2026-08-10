@@ -21,11 +21,20 @@ class Headers(metaclass=Final):
         -------
         None
         """
-        self._items = list(raw)
+        # Adopt list inputs as-is; transports already hand over a fresh list.
+        items: list[tuple[str, str]] = (
+            raw if type(raw) is list else list(raw)
+        )
+        self._items: list[tuple[str, str]] = items
         # Build a lowercase-keyed index for O(1) single-value lookups.
         index: dict[str, list[str]] = {}
-        for k, v in self._items:
-            index.setdefault(k.lower(), []).append(v)
+        for k, v in items:
+            key = k.lower()
+            bucket = index.get(key)
+            if bucket is None:
+                index[key] = [v]
+            else:
+                bucket.append(v)
         self._index: dict[str, list[str]] = index
 
     def get(self, key: str, default: str | None = None) -> str | None:

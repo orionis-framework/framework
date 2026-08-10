@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from urllib.parse import unquote
 from orionis.support.patterns.final.meta import Final
 
 if TYPE_CHECKING:
@@ -40,7 +41,13 @@ class Cookies(metaclass=Final):
 
             # Split the pair into key and value.
             key, value = pair.split("=", 1)
-            self._data[key.strip()] = value.strip()
+            value = value.strip()
+
+            # Legacy clients may send the value wrapped in double quotes.
+            if len(value) > 1 and value[0] == '"' and value[-1] == '"':
+                value = value[1:-1]
+
+            self._data[key.strip()] = unquote(value)
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """

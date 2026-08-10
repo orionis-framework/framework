@@ -24,6 +24,7 @@ class Response(IResponse):
 
     __slots__ = (
         "_body",
+        "_flash",
         "_headers",
         "_stream",
         "background",
@@ -76,6 +77,9 @@ class Response(IResponse):
 
         self._body: bytes | None = None
         self._stream: AsyncIterable[bytes] | None = None
+
+        # Lazily allocated; most responses never flash anything
+        self._flash: dict[str, Any] | None = None
 
         # Duck-type check avoids ABC registry traversal on every request
         if hasattr(content, "__aiter__"):
@@ -484,6 +488,51 @@ class Response(IResponse):
         """
         self.deleteCookie(key, path=path, domain=domain)
         return self
+
+    def withFlash(
+        self,
+        key: str | Mapping[str, Any],
+        value: Any = None,
+    ) -> Self:
+        """
+        Flash data into the session and return the response for chaining.
+
+        The values survive for exactly one subsequent request and are read
+        back in templates through the ``old()`` global.
+
+        Parameters
+        ----------
+        key : str | Mapping[str, Any]
+            Flash data key, or a mapping of several key-value pairs.
+        value : Any, optional
+            Value to flash when *key* is a plain key.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        if isinstance(key, Mapping):
+            flash.update(key)
+        else:
+            flash[key] = value
+
+        return self
+
+    def getFlashData(self) -> dict[str, Any] | None:
+        """
+        Return the data queued by ``withFlash()`` for the session flash bag.
+
+        Returns
+        -------
+        dict[str, Any] | None
+            The queued key-value pairs, or None when nothing was queued.
+        """
+        return self._flash
 
     def getBody(self) -> bytes | None:
         """

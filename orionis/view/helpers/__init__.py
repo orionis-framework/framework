@@ -5,7 +5,7 @@ from orionis.view.helpers.cache import _global_cache
 from orionis.view.helpers.config import _global_config
 from orionis.view.helpers.csrf import _global_csrf_field, _global_csrf_token
 from orionis.view.helpers.datetime import _global_now, _global_today
-from orionis.view.helpers.dump import _global_dd
+from orionis.view.helpers.dump import _global_dump
 from orionis.view.helpers.lang import (
     _global_choice,
     _global_locale,
@@ -29,8 +29,8 @@ __all__ = [
     "_global_config",
     "_global_csrf_field",
     "_global_csrf_token",
-    "_global_dd",
     "_global_decrypt",
+    "_global_dump",
     "_global_encrypt",
     "_global_framework_version",
     "_global_locale",

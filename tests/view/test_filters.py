@@ -1,5 +1,8 @@
 from orionis.test import TestCase
-from orionis.view.filters import _jsonify, _markdown, buildViewFilters
+from orionis.view.filters import _filter_json, _filter_markdown
+
+_jsonify = _filter_json()
+_markdown = _filter_markdown()
 
 class TestJsonifyFilter(TestCase):
 
@@ -160,84 +163,49 @@ class TestMarkdownFilter(TestCase):
         self.assertIn("<em>", result)
 
 
-class TestBuildViewFilters(TestCase):
+class TestFilterBuilders(TestCase):
 
-    def testReturnsDict(self) -> None:
+    def testJsonBuilderReturnsCallable(self) -> None:
         """
-        Verify buildViewFilters returns a dictionary.
+        Verify _filter_json returns a callable filter.
 
-        Validates that the return type is a plain dict mapping filter
-        names to callable implementations.
+        Validates that Jinja2 can invoke the built filter with a
+        template value at render time without a TypeError.
         """
-        result = buildViewFilters()
-        self.assertIsInstance(result, dict)
+        self.assertTrue(callable(_filter_json()))
 
-    def testContainsJsonKey(self) -> None:
+    def testMarkdownBuilderReturnsCallable(self) -> None:
         """
-        Verify the 'json' filter key is present in the returned dict.
+        Verify _filter_markdown returns a callable filter.
 
-        Validates that templates can reference a 'json' filter by name
-        after the filters are registered with the environment.
+        Validates that Jinja2 can invoke the built filter with a
+        template value at render time without a TypeError.
         """
-        result = buildViewFilters()
-        self.assertIn("json", result)
+        self.assertTrue(callable(_filter_markdown()))
 
-    def testContainsMarkdownKey(self) -> None:
+    def testBuilderProducesIndependentCallables(self) -> None:
         """
-        Verify the 'markdown' filter key is present in the returned dict.
+        Confirm each call to _filter_json builds a new callable.
 
-        Validates that templates can reference a 'markdown' filter by
-        name after the filters are registered with the environment.
+        Validates that the builder does not share a cached closure
+        between registrations.
         """
-        result = buildViewFilters()
-        self.assertIn("markdown", result)
-
-    def testJsonValueIsCallable(self) -> None:
-        """
-        Confirm the 'json' filter value is a callable.
-
-        Validates that Jinja2 can invoke the filter with a template
-        value at render time without a TypeError.
-        """
-        result = buildViewFilters()
-        self.assertTrue(callable(result["json"]))
-
-    def testMarkdownValueIsCallable(self) -> None:
-        """
-        Confirm the 'markdown' filter value is a callable.
-
-        Validates that Jinja2 can invoke the filter with a template
-        value at render time without a TypeError.
-        """
-        result = buildViewFilters()
-        self.assertTrue(callable(result["markdown"]))
+        self.assertIsNot(_filter_json(), _filter_json())
 
     def testJsonFilterProducesSameOutputAsJsonify(self) -> None:
         """
-        Confirm the 'json' filter delegates to _jsonify.
+        Confirm a freshly built json filter matches the module callable.
 
-        Validates that the filter produces the same output as calling
-        _jsonify directly with the same argument.
+        Validates that the filter produces the same output as the
+        callable built at import time with the same argument.
         """
-        result = buildViewFilters()
-        self.assertEqual(result["json"](42), _jsonify(42))
+        self.assertEqual(_filter_json()(42), _jsonify(42))
 
     def testMarkdownFilterProducesSameOutputAsMarkdown(self) -> None:
         """
-        Confirm the 'markdown' filter delegates to _markdown.
+        Confirm a freshly built markdown filter matches the module callable.
 
-        Validates that the filter produces the same output as calling
-        _markdown directly with the same argument.
+        Validates that the filter produces the same output as the
+        callable built at import time with the same argument.
         """
-        result = buildViewFilters()
-        self.assertEqual(result["markdown"]("# Title"), _markdown("# Title"))
-
-    def testExactlyTwoFiltersRegistered(self) -> None:
-        """
-        Verify exactly two filters are registered by default.
-
-        Validates the expected filter count so new filters are noticed
-        when added without updating the test suite.
-        """
-        result = buildViewFilters()
-        self.assertEqual(len(result), 2)
+        self.assertEqual(_filter_markdown()("# Title"), _markdown("# Title"))

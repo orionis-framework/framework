@@ -1,6 +1,5 @@
 from typing import Any
-
-from orionis.http import HTMLResponse, Request
+from orionis.http import HTMLResponse, Request, RedirectResponse
 from orionis.http.base import BaseController
 from orionis.support.facades import View
 
@@ -17,7 +16,7 @@ class LoginController(BaseController):
         """
         return await View.make("auth.login")
 
-    async def login(self, request: Request) -> HTMLResponse:
+    async def login(self, request: Request) -> RedirectResponse:
         """
         Handle the login form submission.
 
@@ -28,14 +27,17 @@ class LoginController(BaseController):
 
         Returns
         -------
-        HTMLResponse
-            Rendered login page including the submitted credentials.
+        RedirectResponse
+            Redirect back to the login page with the submitted email.
         """
         credentials: dict[str, Any] = await request.data()
+        remember: bool = credentials.get("remember", "off") == "on"
+        email: str = credentials.get("email")
 
-        print(f"Received credentials: {credentials}")  # Debugging statement
-
-        return await View.make(
-            "auth.login",
-            email=credentials.get("email", ""),
+        return (
+            RedirectResponse("/login")
+                .withCookie("usrname", email if remember else "")
+                .withFlash({
+                    "email": email,
+                })
         )

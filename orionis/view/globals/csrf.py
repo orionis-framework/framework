@@ -31,6 +31,9 @@ def _global_csrf_token(app: IApplication) -> Any:
     Any
         Async callable that reads the CSRF token from the session.
     """
+    # Resolve the session key once: configuration is frozen after boot.
+    key: str = app.config("http.csrf.session_key") or _CSRF_SESSION_KEY
+
     async def csrf_token() -> str:
         """
         Return the CSRF token stored in the current session.
@@ -45,7 +48,6 @@ def _global_csrf_token(app: IApplication) -> Any:
             or no token has been issued yet.
         """
         session: ISession = await app.make(ISession)
-        key: str = app.config("http.csrf.session_key") or _CSRF_SESSION_KEY
         return session.get(key) or ""
 
     return csrf_token

@@ -9,7 +9,7 @@ from email.utils import format_datetime
 from enum import Enum
 from http.cookies import SimpleCookie
 from pathlib import Path
-from typing import Any, ClassVar, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 from uuid import UUID
 import msgspec.json as _msgspec_json
 from orionis.http.contracts.response import IResponse
@@ -373,6 +373,117 @@ class Response(IResponse):
             path=path,
             domain=domain,
         )
+
+    def withCookie( # NOSONAR
+        self,
+        key: str,
+        value: str = "",
+        *,
+        max_age: int | None = None,
+        expires: datetime | str | int | None = None,
+        path: str | None = "/",
+        domain: str | None = None,
+        secure: bool = False,
+        http_only: bool = False,
+        same_site: Literal["lax", "strict", "none"] | None = "lax",
+        partitioned: bool = False,
+    ) -> Self:
+        """
+        Attach a cookie and return the response for chaining.
+
+        Parameters
+        ----------
+        key : str
+            The cookie name.
+        value : str, optional
+            The cookie value. Defaults to an empty string.
+        max_age : int | None, optional
+            The maximum age of the cookie in seconds.
+        expires : datetime | str | int | None, optional
+            The expiration date of the cookie.
+        path : str | None, optional
+            The path for which the cookie is valid.
+        domain : str | None, optional
+            The domain for which the cookie is valid.
+        secure : bool, optional
+            Whether the cookie is secure.
+        http_only : bool, optional
+            Whether the cookie is HTTP only.
+        same_site : str | None, optional
+            The SameSite policy for the cookie.
+        partitioned : bool, optional
+            Whether the cookie is partitioned.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        self.setCookie(
+            key,
+            value,
+            max_age=max_age,
+            expires=expires,
+            path=path,
+            domain=domain,
+            secure=secure,
+            http_only=http_only,
+            same_site=same_site,
+            partitioned=partitioned,
+        )
+        return self
+
+    def withCookies(
+        self,
+        cookies: Mapping[str, str | Mapping[str, Any]],
+    ) -> Self:
+        """
+        Attach several cookies at once and return the response.
+
+        Parameters
+        ----------
+        cookies : Mapping[str, str | Mapping[str, Any]]
+            Mapping of cookie names to either a plain value or a mapping of
+            keyword arguments accepted by :meth:`setCookie`.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        for key, options in cookies.items():
+            if isinstance(options, Mapping):
+                self.setCookie(key, **options)
+            else:
+                self.setCookie(key, options)
+        return self
+
+    def withoutCookie(
+        self,
+        key: str,
+        *,
+        path: str = "/",
+        domain: str | None = None,
+    ) -> Self:
+        """
+        Expire a cookie and return the response for chaining.
+
+        Parameters
+        ----------
+        key : str
+            The name of the cookie to delete.
+        path : str, default="/"
+            The path for which the cookie is valid.
+        domain : str | None, optional
+            The domain for which the cookie is valid.
+
+        Returns
+        -------
+        Self
+            The same response instance, allowing fluent chaining.
+        """
+        self.deleteCookie(key, path=path, domain=domain)
+        return self
 
     def getBody(self) -> bytes | None:
         """

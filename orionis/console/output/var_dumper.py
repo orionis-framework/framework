@@ -7,10 +7,49 @@ from typing import Any, TypeVar
 from rich.console import Console
 from rich.panel import Panel
 from rich.pretty import Pretty
+from rich.terminal_theme import TerminalTheme
 from rich.theme import Theme
 from orionis.console.output.contracts.var_dumper import IVarDumper
 
 T = TypeVar("T")
+
+# Light palette applied only on HTML export; terminal output is untouched.
+# Pale ANSI slots (white, bright white) are mapped to dark ink so the dump
+# stays legible on a light page background.
+_HTML_TERMINAL_THEME = TerminalTheme(
+    (247, 248, 250),
+    (31, 41, 51),
+    [
+        (31, 41, 51),
+        (176, 32, 48),
+        (16, 112, 72),
+        (146, 96, 0),
+        (28, 84, 176),
+        (146, 48, 160),
+        (0, 108, 120),
+        (85, 96, 110),
+    ],
+    [
+        (108, 118, 132),
+        (200, 48, 64),
+        (24, 136, 88),
+        (168, 112, 0),
+        (40, 100, 200),
+        (168, 64, 184),
+        (0, 128, 140),
+        (55, 65, 81),
+    ],
+)
+
+# Embeddable fragment: light surface so dumps stay legible inside a page.
+_HTML_DUMP_FORMAT = (
+    '<pre style="margin:0;padding:12px;overflow:auto;'
+    "background-color:#f7f8fa;color:#1f2933;"
+    "border:1px solid #d9dee5;border-radius:6px;"
+    'font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;'
+    'font-size:13px;line-height:1.4"><code style="font-family:inherit">'
+    "{code}</code></pre>"
+)
 
 class VarDumper(IVarDumper):
 
@@ -45,6 +84,9 @@ class VarDumper(IVarDumper):
 
         # Store the line number for display in the header
         self.__line_number: int | None = None
+
+        # Set whether to print the module/line header before the panels
+        self.__show_header: bool = True
 
         # Set whether to force program exit after dumping
         self.__force_exit: bool = False
@@ -580,15 +622,18 @@ class VarDumper(IVarDumper):
             # Optionally insert a blank line before the dump output
             self.__printLine(insert_line=insert_line)
 
-            # Resolve caller information if not already set
-            self.__resolveCallerInfo()
+            if self.__show_header:
 
-            # Print header with module and line information
-            header = (
-                f"🐞 [white]Module([/white][bold blue]{self.__module_path}"
-                f"[/bold blue][white]) [/white][grey70]#{self.__line_number}[/grey70]"
-            )
-            self.__console.print(header)
+                # Resolve caller information if not already set
+                self.__resolveCallerInfo()
+
+                # Print header with module and line information
+                header = (
+                    f"🐞 [white]Module([/white][bold blue]{self.__module_path}"
+                    f"[/bold blue][white]) [/white]"
+                    f"[bright_black]#{self.__line_number}[/bright_black]"
+                )
+                self.__console.print(header)
 
             # Cache console.print and args list as locals: LOAD_FAST in the loop
             _console_print = self.__console.print
@@ -623,14 +668,25 @@ class VarDumper(IVarDumper):
         Returns
         -------
         str
-            HTML string containing the formatted dumped output.
+            HTML fragment containing the formatted dumped output.
 
         Notes
         -----
-        Calls the print method to prepare the output and then exports it as HTML.
+        Calls the print method to prepare the output and then exports it
+        with a light terminal palette and inline styles, so the dump is
+        readable and self-contained when embedded in a page. The module
+        and line header is omitted from the HTML output.
         """
         # Print the output to prepare for HTML conversion
-        self.print(insert_line=insert_line)
+        self.__show_header = False
+        try:
+            self.print(insert_line=insert_line)
+        finally:
+            self.__show_header = True
 
         # Export and return the recorded output as HTML
-        return self.__console.export_html()
+        return self.__console.export_html(
+            theme=_HTML_TERMINAL_THEME,
+            code_format=_HTML_DUMP_FORMAT,
+            inline_styles=True,
+        )

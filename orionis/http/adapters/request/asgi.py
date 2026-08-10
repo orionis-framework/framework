@@ -137,13 +137,10 @@ class ASGITransportAdapter(TransportAdapter):
             Return decoded and indexed request headers.
         """
         # Decode raw byte pairs to latin-1 strings.
-        headers = Headers([
+        return Headers([
             (k.decode("latin-1"), v.decode("latin-1"))
             for k, v in self.__raw_headers
         ])
-        # Expose parsed headers through override state.
-        self.__overrides["headers"] = headers
-        return headers
 
     def client(self) -> str | None:
         """
@@ -299,7 +296,6 @@ class ASGITransportAdapter(TransportAdapter):
             result = "application/json" in lower or "+json" in lower
 
         self.__wants_json = result
-        self.__overrides["wants_json"] = result
         return result
 
     def getScope(self) -> dict:

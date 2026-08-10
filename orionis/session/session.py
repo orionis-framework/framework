@@ -1,7 +1,16 @@
 from __future__ import annotations
 import secrets
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from orionis.session.contracts.session import ISession
+from orionis.session.flash import (
+    ERRORS_KEY,
+    OLD_INPUT_KEY,
+    filter_input,
+    normalize_errors,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 # Flash-bag keys defined at module level to avoid per-call string allocation.
 _FLASH_NEW: str = "_flash_new"
@@ -236,8 +245,8 @@ class Session(ISession):
         No-op when *key* already holds the same flash value, avoiding
         unnecessary dirty-marking and store writes.
 
-        Flash data is available via ``getFlash()`` during the next
-        request and is automatically discarded by ``_ageFlashData()``
+        Flash data is readable via ``getFlash()`` for the rest of this
+        request and the next one, and is discarded by ``_ageFlashData()``
         at the start of the request after that.
 
         Parameters
@@ -262,30 +271,12 @@ class Session(ISession):
 
     def getFlash(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
         """
-        Return the flash value for *key* set during the previous request.
+        Return the flash value for *key*.
 
-        Parameters
-        ----------
-        key : str
-            Flash data key.
-        default : Any, optional
-            Fallback value when the key is absent.
-
-        Returns
-        -------
-        Any
-            The flash value, or *default*.
-        """
-        old_flash = self._data.get(_FLASH_OLD)
-        return old_flash.get(key, default) if old_flash is not None else default
-
-    def getOld(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
-        """
-        Return a flash value written in this request or the previous one.
-
-        Unlike ``getFlash()``, values flashed during the current request
-        are visible immediately, so a handler that re-renders its own view
-        can read back what it just flashed.
+        Values flashed during the current request take precedence over the
+        ones inherited from the previous one, so a handler that re-renders
+        its own view reads back what it just flashed instead of having to
+        redirect first.
 
         Parameters
         ----------
@@ -306,22 +297,108 @@ class Session(ISession):
         old_flash = self._data.get(_FLASH_OLD)
         return old_flash.get(key, default) if old_flash is not None else default
 
-    def hasFlash(self, key: str) -> bool:
+    def __mergeReservedBag(
+        self,
+        key: str,
+        values: dict[str, Any],
+    ) -> dict[str, Any]:
         """
-        Return ``True`` when a flash value for *key* is available.
+        Merge *values* with the reserved bag already flashed in this request.
+
+        Only the *new* flash bag is consulted so values inherited from the
+        previous request never leak into the one being written.
 
         Parameters
         ----------
         key : str
-            Flash data key.
+            Reserved bag key.
+        values : dict[str, Any]
+            Entries to merge into the bag.
 
         Returns
         -------
-        bool
-            ``True`` if the flash key is present from the previous request.
+        dict[str, Any]
+            The resulting bag content.
         """
-        old_flash = self._data.get(_FLASH_OLD)
-        return old_flash is not None and key in old_flash
+        new_flash = self._data.get(_FLASH_NEW)
+        current = new_flash.get(key) if new_flash is not None else None
+        if isinstance(current, dict):
+            merged = dict(current)
+            merged.update(values)
+            return merged
+        return values
+
+    def flashInput(self, values: Mapping[str, Any]) -> None:
+        """
+        Flash a submitted form payload so the next request can repopulate it.
+
+        Credential-like fields are stripped before storing.  Repeated calls
+        during the same request merge instead of replacing.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted payload to remember.
+
+        Returns
+        -------
+        None
+        """
+        self.flash(
+            OLD_INPUT_KEY,
+            self.__mergeReservedBag(OLD_INPUT_KEY, filter_input(values)),
+        )
+
+    def getOldInput(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+        """
+        Return the value submitted for *key* in the previous request.
+
+        Parameters
+        ----------
+        key : str
+            Form field name.
+        default : Any, optional
+            Fallback value when the field was not submitted.
+
+        Returns
+        -------
+        Any
+            The previously submitted value, or *default*.
+        """
+        bag = self.getFlash(OLD_INPUT_KEY)
+        return bag.get(key, default) if isinstance(bag, dict) else default
+
+    def flashErrors(self, errors: Mapping[str, Any] | Exception) -> None:
+        """
+        Flash validation errors for the next request.
+
+        Repeated calls during the same request merge instead of replacing.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
+
+        Returns
+        -------
+        None
+        """
+        self.flash(
+            ERRORS_KEY,
+            self.__mergeReservedBag(ERRORS_KEY, normalize_errors(errors)),
+        )
+
+    def getErrors(self) -> dict[str, list[str]]:
+        """
+        Return the validation errors flashed for this request.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Field-indexed error messages, empty when none were flashed.
+        """
+        bag = self.getFlash(ERRORS_KEY)
+        return bag if isinstance(bag, dict) else {}
 
     def regenerate(self) -> None:
         """
@@ -370,7 +447,7 @@ class Session(ISession):
         """Advance the flash lifecycle: new → old; discard previous old.
 
         Called by ``SessionManager.start()`` at the beginning of each
-        request.  Flash values written in the previous request become
+        request.  Flash values written in the previous request remain
         readable via ``getFlash()`` and are removed after this request.
 
         Sets ``_dirty`` when the flash state changes so the aged layout

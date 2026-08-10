@@ -1,13 +1,7 @@
-import re
 from typing import Any
-from orionis.http.response import HTMLResponse
 from orionis.view.contracts.engine import IViewEngine
 from orionis.view.contracts.factory import IViewFactory
-from orionis.view.exceptions import ViewRenderException
-
-# Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
-# errors raised inside template globals; irrelevant for the developer.
-_LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.") # NOSONAR
+from orionis.view.pending import PendingView
 
 class ViewFactory(IViewFactory):
     """
@@ -39,9 +33,9 @@ class ViewFactory(IViewFactory):
         """
         self._engine: IViewEngine = engine
 
-    async def make(self, template: str, **context: Any) -> HTMLResponse:
+    def make(self, template: str, **context: Any) -> PendingView:
         """
-        Render a template and wrap the result in an :class:`HTMLResponse`.
+        Prepare a template render as an awaitable, chainable response.
 
         Parameters
         ----------
@@ -53,11 +47,10 @@ class ViewFactory(IViewFactory):
 
         Returns
         -------
-        HTMLResponse
-            An HTTP response whose body is the rendered HTML content.
-            Cookies and flash data can be attached fluently on the returned
-            response via ``withCookie()`` / ``withCookies()`` /
-            ``withoutCookie()`` / ``withFlash()``.
+        PendingView
+            Awaitable proxy that renders the template on ``await`` and
+            accepts chained response mutators such as ``withFlash()``,
+            ``withCookie()`` or ``withoutCookie()``.
 
         Raises
         ------
@@ -66,15 +59,4 @@ class ViewFactory(IViewFactory):
         ViewRenderException
             When rendering fails for any reason.
         """
-        try:
-            response_html: str = await self._engine.render(template, context)
-            return HTMLResponse(
-                content=response_html,
-                headers={
-                    "X-Orionis-Render": "SSR",
-                },
-            )
-        except Exception as e:
-            detail: str = _LOCALS_QUALNAME.sub("", str(e))
-            exc_msg: str = f"Failed to render view '{template}': {detail}"
-            raise ViewRenderException(exc_msg) from e
+        return PendingView(self._engine, template, context)

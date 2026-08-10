@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock
 from markupsafe import Markup, escape
 from orionis.test import TestCase
-from orionis.view import helpers
-from orionis.view.helpers import (
+from orionis.view import globals as view_globals
+from orionis.view.globals import (
     _global_app,
     _global_config,
     _global_csrf_field,
@@ -428,8 +428,8 @@ class TestHelpersPackage(TestCase):
         Validates that the provider can invoke each builder to obtain
         the template global it registers.
         """
-        for name in helpers.__all__:
-            builder = getattr(helpers, name)
+        for name in view_globals.__all__:
+            builder = getattr(view_globals, name)
             self.assertTrue(callable(builder), msg=f"'{name}' is not callable")
 
     def testExportedNamesUseSnakeCasePrefix(self) -> None:
@@ -439,7 +439,7 @@ class TestHelpersPackage(TestCase):
         Validates that all helpers are exposed with the ``_global_``
         prefix expected by the view service provider.
         """
-        for name in helpers.__all__:
+        for name in view_globals.__all__:
             self.assertTrue(
                 name.startswith("_global_"),
                 msg=f"'{name}' does not follow the '_global_' convention",

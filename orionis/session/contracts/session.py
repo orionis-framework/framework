@@ -163,6 +163,24 @@ class ISession(ABC):
         """
 
     @abstractmethod
+    def getOld(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+        """
+        Return a flash value written in this request or the previous one.
+
+        Parameters
+        ----------
+        key : str
+            Flash data key.
+        default : Any, optional
+            Fallback value when the key is absent from both bags.
+
+        Returns
+        -------
+        Any
+            The flash value, or *default*.
+        """
+
+    @abstractmethod
     def hasFlash(self, key: str) -> bool:
         """
         Return ``True`` when a flash value for *key* is available.

@@ -65,6 +65,12 @@ class StartSessionMiddleware(BaseMiddleware):
         # Unpin Session Facade.
         Session.unpin()
 
+        # Move data queued with ``Response.withFlash()`` into the flash bag.
+        flash_data = response.getFlashData()
+        if flash_data:
+            for key, value in flash_data.items():
+                session.flash(key, value)
+
         # Persist the session and set the cookie only when it was used.
         await self._manager.save(response, session)
 

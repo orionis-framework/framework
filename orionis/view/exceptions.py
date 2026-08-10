@@ -24,3 +24,11 @@ class ViewTemplateNotFoundException(ViewException):
     Wraps a Jinja2 :class:`TemplateNotFound` and preserves the original
     cause as the ``__cause__`` of the exception chain.
     """
+
+class ViewRouteException(ViewException):
+    """
+    Raised when the ``route()`` template global cannot build a URL.
+
+    Signals either an unknown route name or a path parameter left
+    without a value.
+    """

@@ -25,7 +25,7 @@ handling — is configured once, at application boot, through
    - [`Jinja2Engine`](#jinja2engine-orionisviewenginejinja2engine)
    - [`ViewFactory`](#viewfactory-orionisviewfactoryviewfactory)
    - [`OrionisBytecodeCache`](#orionisbytecodecache-orionisviewcacheorionisbytecodecache)
-   - [`buildViewFilters`, `buildViewGlobals`, `buildViewExtensions`](#buildviewfilters-buildviewglobals-buildviewextensions)
+   - [`buildViewFilters`, `helpers`, `buildViewExtensions`](#buildviewfilters-helpers-buildviewextensions)
    - [Exceptions](#exceptions)
    - [`ViewServiceProvider`](#viewserviceprovider-orionisviewproviderviewserviceprovider)
    - [Contracts (`IViewEngine`, `IViewEnvironment`, `IViewFactory`)](#contracts-iviewengine-iviewenvironment-iviewfactory)
@@ -62,7 +62,7 @@ pip install orionis
 | `ViewFactory` | [factory.py](../factory.py) | The controller-facing entry point: renders a template and wraps the HTML in an `HTMLResponse`. |
 | `OrionisBytecodeCache` | [cache.py](../cache.py) | A `jinja2.bccache.FileSystemBytecodeCache` subclass that produces human-readable cache filenames instead of Jinja2's default hashed names. |
 | `buildViewFilters` | [filters.py](../filters.py) | Returns the built-in filter mapping (`json`, `markdown`) registered at boot. |
-| `buildViewGlobals` | [globals.py](../globals.py) | Returns the built-in template globals (`config`, `app`, `request`, `session`, `python_version`, `framework_version`, plus localization globals) bound to the running `Application`. |
+| `_global_*` builders | [helpers/](../helpers/) | One module per global category (`app`, `asset`, `bcrypt`, `cache`, `config`, `csrf`, `datetime`, `dump`, `lang`, `request`, `route`, `session`, `url`, `version`), each exporting `_global_<name>` builders re-exported by `helpers/__init__.py` and wired by the provider. |
 | `buildViewExtensions` | [extensions.py](../extensions.py) | Returns the list of Jinja2 extension classes to register (empty by default; extend this list to add custom extensions). |
 | `ViewException`, `ViewRenderException`, `ViewTemplateNotFoundException` | [exceptions.py](../exceptions.py) | The view-system exception hierarchy. |
 | `ViewServiceProvider` | [provider.py](../provider.py) | Registers `IViewEnvironment`/`IViewEngine`/`IViewFactory` as singletons, wires globals/filters/extensions at boot, and pins the `View` facade. |
@@ -156,7 +156,7 @@ by `ViewEnvironment` whenever `cache_path` is configured.
 | `get_cache_key` | `get_cache_key(name: str, filename: str \| None = None) -> str` | Converts a template name (e.g. `"users/index.html"`) into a readable cache key by replacing `/`/`\` with `.` and stripping a trailing extension (`.html`, `.htm`, `.jinja`, `.jinja2`, `.j2`) if present. |
 | `_get_cache_filename` | `_get_cache_filename(bucket: Bucket) -> str` | Returns `"<cache_dir>/<bucket.key>.cache"` — an override of Jinja2's default hashed filename scheme. |
 
-### `buildViewFilters`, `buildViewGlobals`, `buildViewExtensions`
+### `buildViewFilters`, `helpers`, `buildViewExtensions`
 
 These are plain functions (not classes) invoked once by
 `ViewServiceProvider.boot()`:
@@ -164,7 +164,7 @@ These are plain functions (not classes) invoked once by
 | Function | Signature | Description |
 |---|---|---|
 | `buildViewFilters` | `buildViewFilters() -> dict[str, Callable[..., Any]]` | Returns `{"json": <jsonify>, "markdown": <markdown>}`. `json` serialises any value with `msgspec.json` (optionally pretty-printed via an `indent` argument), falling back to `str(value)` on `TypeError`/`ValueError`/`msgspec.EncodeError`. `markdown` renders a Markdown string to HTML via the `markdown` package with the `extra`, `codehilite`, and `toc` extensions enabled. |
-| `buildViewGlobals` | `buildViewGlobals(app: IApplication) -> dict[str, Any]` | Returns the built-in globals bound to `app`: `config(key, default=None)` (reads `app.config(key)`, returns `default` on any exception), `app()` (returns the `IApplication` instance), `request()` (async; resolves `IRequest` via `app.make`, returns `None` on any exception), `session()` (async; resolves `ISession` via `app.make`, returns `None` on any exception), `python_version()` (`"X.Y.Z"` string), `framework_version()` (`orionis.metadata.VERSION`), plus the localization globals `__`/`trans`, `choice`, `locale`, `locales` (all backed by the `Lang` facade). |
+| `orionis.view.helpers` | `_global_<name>(app: IApplication) -> Any` | Each builder returns the callable registered as a template global: `app`, `asset`, `secure_asset`, `url`, `secure_url`, `route`, `csrf_token`, `csrf_field`, `config`, `cache`, `encrypt`, `decrypt`, `dd`, `now`, `today`, `request`, `session`, `python_version`, `framework_version`, plus the localization globals `__`/`trans`, `choice`, `locale`, `locales` (backed by the `Lang` facade). Builders with no application dependency (`dd`, `now`, `today`, versions, localization) take no arguments. |
 | `buildViewExtensions` | `buildViewExtensions() -> list[Any]` | Returns the ordered list of Jinja2 `Extension` classes (or dotted paths) to register. Empty by default. |
 
 ### Exceptions
@@ -184,7 +184,7 @@ Extends `orionis.container.providers.service_provider.ServiceProvider`.
 | Method | Signature | Description |
 |---|---|---|
 | `register` | `register(self) -> None` | Binds `IViewEnvironment → ViewEnvironment`, `IViewEngine → Jinja2Engine`, and `IViewFactory → ViewFactory` as **singletons** in the application container. |
-| `boot` | `async boot(self) -> None` | Resolves the `IViewEnvironment` singleton, registers every entry from `buildViewGlobals(self.app)` via `addGlobal`, every entry from `buildViewFilters()` via `addFilter`, and every extension from `buildViewExtensions()` via `addExtension`; finally awaits `ViewFacade.pin()` so the `View` facade resolves with no further container lookups. |
+| `boot` | `async boot(self) -> None` | Resolves the `IViewEnvironment` singleton, builds every template global from the `orionis.view.helpers` builders and registers it via `addGlobal`, every entry from `buildViewFilters()` via `addFilter`, and every extension from `buildViewExtensions()` via `addExtension`; finally awaits `ViewFacade.pin()` so the `View` facade resolves with no further container lookups. |
 
 ### Contracts (`IViewEngine`, `IViewEnvironment`, `IViewFactory`)
 
@@ -298,11 +298,12 @@ async def render_safely(template: str, **context) -> str:
   I/O; `request`/`session` perform a container resolution
   (`await app.make(...)`) on every access, which has the normal cost of
   the framework's DI resolution path.
-- The `request`/`session`/`config` globals all swallow exceptions with a
-  bare `except Exception` and return `None` (for `request`/`session`) or
-  `default` (for `config`) instead of propagating — a template can
-  safely call these even outside of an active HTTP request/session
-  scope, at the cost of silently hiding the underlying error.
+- The `request`/`session` globals swallow exceptions with a
+  bare `except Exception` and return `None` instead of propagating — a
+  template can safely call these even outside of an active HTTP
+  request/session scope, at the cost of silently hiding the underlying
+  error. The same applies to the base URL lookup behind
+  `url`/`secure_url`/`route`, which falls back to a relative path.
 - `Jinja2Engine`, `ViewEnvironment`, and `ViewFactory` are all
   `__slots__`-based, keeping their per-instance memory footprint to
   exactly the one dependency they hold (`_environment`, `_jinja_env`,
@@ -329,11 +330,12 @@ async def render_safely(template: str, **context) -> str:
   slash-to-dot conversion of the template name, making cached
   `.cache` files on disk directly traceable back to their source
   template.
-- **Convention-over-configuration extension points**: `buildViewFilters`,
-  `buildViewGlobals`, and `buildViewExtensions` are plain functions
-  returning a dict/list, invoked once during `ViewServiceProvider.boot()`
-  — adding a project-wide filter, global, or extension means extending
-  the list/dict these functions return.
+- **Convention-over-configuration extension points**: `buildViewFilters`
+  and `buildViewExtensions` are plain functions returning a dict/list,
+  invoked once during `ViewServiceProvider.boot()`; template globals
+  live in `orionis/view/helpers/`, one module per category, exported
+  from `helpers/__init__.py` and registered by the provider — adding a
+  project-wide filter, global, or extension means extending those.
 - **Facade pinning**: like other framework subsystems, `ViewServiceProvider.boot()`
   ends with `await ViewFacade.pin()`, so subsequent `View.make(...)`
   calls resolve the bound `IViewFactory` singleton without going

@@ -26,7 +26,7 @@ configura una sola vez, al arrancar la aplicación, a través de
    - [`Jinja2Engine`](#jinja2engine-orionisviewenginejinja2engine)
    - [`ViewFactory`](#viewfactory-orionisviewfactoryviewfactory)
    - [`OrionisBytecodeCache`](#orionisbytecodecache-orionisviewcacheorionisbytecodecache)
-   - [`buildViewFilters`, `buildViewGlobals`, `buildViewExtensions`](#buildviewfilters-buildviewglobals-buildviewextensions)
+   - [`buildViewFilters`, `helpers`, `buildViewExtensions`](#buildviewfilters-helpers-buildviewextensions)
    - [Excepciones](#excepciones)
    - [`ViewServiceProvider`](#viewserviceprovider-orionisviewproviderviewserviceprovider)
    - [Contratos (`IViewEngine`, `IViewEnvironment`, `IViewFactory`)](#contratos-iviewengine-iviewenvironment-iviewfactory)
@@ -63,7 +63,7 @@ pip install orionis
 | `ViewFactory` | [factory.py](../factory.py) | El punto de entrada de cara al controlador: renderiza una plantilla y envuelve el HTML en un `HTMLResponse`. |
 | `OrionisBytecodeCache` | [cache.py](../cache.py) | Una subclase de `jinja2.bccache.FileSystemBytecodeCache` que produce nombres de archivo de caché legibles en lugar de los nombres hasheados por defecto de Jinja2. |
 | `buildViewFilters` | [filters.py](../filters.py) | Devuelve el mapeo de filtros integrados (`json`, `markdown`) registrado en el arranque. |
-| `buildViewGlobals` | [globals.py](../globals.py) | Devuelve los globals de plantilla integrados (`config`, `app`, `request`, `session`, `python_version`, `framework_version`, más los globals de localización) vinculados a la `Application` en ejecución. |
+| Constructores `_global_*` | [helpers/](../helpers/) | Un módulo por categoría de global (`app`, `asset`, `bcrypt`, `cache`, `config`, `csrf`, `datetime`, `dump`, `lang`, `request`, `route`, `session`, `url`, `version`), cada uno exportando constructores `_global_<nombre>` reexportados por `helpers/__init__.py` y conectados por el provider. |
 | `buildViewExtensions` | [extensions.py](../extensions.py) | Devuelve la lista de clases de extensión de Jinja2 a registrar (vacía por defecto; se extiende esta lista para añadir extensiones personalizadas). |
 | `ViewException`, `ViewRenderException`, `ViewTemplateNotFoundException` | [exceptions.py](../exceptions.py) | La jerarquía de excepciones del sistema de vistas. |
 | `ViewServiceProvider` | [provider.py](../provider.py) | Registra `IViewEnvironment`/`IViewEngine`/`IViewFactory` como singletons, conecta globals/filtros/extensiones en el arranque, y fija (pin) la facade `View`. |
@@ -159,7 +159,7 @@ configurado.
 | `get_cache_key` | `get_cache_key(name: str, filename: str \| None = None) -> str` | Convierte un nombre de plantilla (p. ej. `"users/index.html"`) en una clave de caché legible reemplazando `/`/`\` por `.` y quitando una extensión final (`.html`, `.htm`, `.jinja`, `.jinja2`, `.j2`) si está presente. |
 | `_get_cache_filename` | `_get_cache_filename(bucket: Bucket) -> str` | Devuelve `"<cache_dir>/<bucket.key>.cache"` — una sobrescritura del esquema de nombres hasheados por defecto de Jinja2. |
 
-### `buildViewFilters`, `buildViewGlobals`, `buildViewExtensions`
+### `buildViewFilters`, `helpers`, `buildViewExtensions`
 
 Son funciones planas (no clases) invocadas una sola vez por
 `ViewServiceProvider.boot()`:
@@ -167,7 +167,7 @@ Son funciones planas (no clases) invocadas una sola vez por
 | Función | Firma | Descripción |
 |---|---|---|
 | `buildViewFilters` | `buildViewFilters() -> dict[str, Callable[..., Any]]` | Devuelve `{"json": <jsonify>, "markdown": <markdown>}`. `json` serializa cualquier valor con `msgspec.json` (opcionalmente con formato legible vía un argumento `indent`), recurriendo a `str(value)` ante `TypeError`/`ValueError`/`msgspec.EncodeError`. `markdown` renderiza una cadena Markdown a HTML vía el paquete `markdown` con las extensiones `extra`, `codehilite` y `toc` habilitadas. |
-| `buildViewGlobals` | `buildViewGlobals(app: IApplication) -> dict[str, Any]` | Devuelve los globals integrados vinculados a `app`: `config(key, default=None)` (lee `app.config(key)`, devuelve `default` ante cualquier excepción), `app()` (devuelve la instancia `IApplication`), `request()` (async; resuelve `IRequest` vía `app.make`, devuelve `None` ante cualquier excepción), `session()` (async; resuelve `ISession` vía `app.make`, devuelve `None` ante cualquier excepción), `python_version()` (cadena `"X.Y.Z"`), `framework_version()` (`orionis.metadata.VERSION`), más los globals de localización `__`/`trans`, `choice`, `locale`, `locales` (todos respaldados por la facade `Lang`). |
+| `orionis.view.helpers` | `_global_<nombre>(app: IApplication) -> Any` | Cada constructor devuelve el callable registrado como global de plantilla: `app`, `asset`, `secure_asset`, `url`, `secure_url`, `route`, `csrf_token`, `csrf_field`, `config`, `cache`, `encrypt`, `decrypt`, `dd`, `now`, `today`, `request`, `session`, `python_version`, `framework_version`, más los globals de localización `__`/`trans`, `choice`, `locale`, `locales` (respaldados por la facade `Lang`). Los constructores sin dependencia de la aplicación (`dd`, `now`, `today`, versiones, localización) no reciben argumentos. |
 | `buildViewExtensions` | `buildViewExtensions() -> list[Any]` | Devuelve la lista ordenada de clases `Extension` de Jinja2 (o rutas de importación) a registrar. Vacía por defecto. |
 
 ### Excepciones
@@ -187,7 +187,7 @@ Extiende `orionis.container.providers.service_provider.ServiceProvider`.
 | Método | Firma | Descripción |
 |---|---|---|
 | `register` | `register(self) -> None` | Vincula `IViewEnvironment → ViewEnvironment`, `IViewEngine → Jinja2Engine`, y `IViewFactory → ViewFactory` como **singletons** en el contenedor de la aplicación. |
-| `boot` | `async boot(self) -> None` | Resuelve el singleton `IViewEnvironment`, registra cada entrada de `buildViewGlobals(self.app)` vía `addGlobal`, cada entrada de `buildViewFilters()` vía `addFilter`, y cada extensión de `buildViewExtensions()` vía `addExtension`; finalmente espera `ViewFacade.pin()` para que la facade `View` se resuelva sin más búsquedas en el contenedor. |
+| `boot` | `async boot(self) -> None` | Resuelve el singleton `IViewEnvironment`, construye cada global de plantilla a partir de los constructores de `orionis.view.helpers` y lo registra vía `addGlobal`, cada entrada de `buildViewFilters()` vía `addFilter`, y cada extensión de `buildViewExtensions()` vía `addExtension`; finalmente espera `ViewFacade.pin()` para que la facade `View` se resuelva sin más búsquedas en el contenedor. |
 
 ### Contratos (`IViewEngine`, `IViewEnvironment`, `IViewFactory`)
 
@@ -305,12 +305,13 @@ async def render_safely(template: str, **context) -> str:
   `request`/`session` realizan una resolución del contenedor
   (`await app.make(...)`) en cada acceso, con el costo normal de la vía
   de resolución de DI del framework.
-- Los globals `request`/`session`/`config` atrapan excepciones con un
-  `except Exception` genérico y devuelven `None` (para
-  `request`/`session`) o `default` (para `config`) en lugar de
-  propagar — una plantilla puede llamarlos de forma segura incluso
-  fuera de un scope activo de petición/sesión HTTP, al costo de ocultar
-  silenciosamente el error subyacente.
+- Los globals `request`/`session` atrapan excepciones con un
+  `except Exception` genérico y devuelven `None` en lugar de propagar
+  — una plantilla puede llamarlos de forma segura incluso fuera de un
+  scope activo de petición/sesión HTTP, al costo de ocultar
+  silenciosamente el error subyacente. Lo mismo aplica a la búsqueda de
+  la URL base detrás de `url`/`secure_url`/`route`, que cae en una ruta
+  relativa.
 - `Jinja2Engine`, `ViewEnvironment` y `ViewFactory` están todos basados
   en `__slots__`, manteniendo su huella de memoria por instancia
   exactamente en la única dependencia que mantienen (`_environment`,
@@ -340,11 +341,13 @@ async def render_safely(template: str, **context) -> str:
   plantilla, haciendo que los archivos `.cache` en disco sean
   directamente rastreables hasta su plantilla de origen.
 - **Puntos de extensión por convención sobre configuración**:
-  `buildViewFilters`, `buildViewGlobals` y `buildViewExtensions` son
-  funciones planas que devuelven un dict/lista, invocadas una sola vez
-  durante `ViewServiceProvider.boot()` — añadir un filtro, global o
-  extensión a nivel de proyecto significa extender la lista/dict que
-  devuelven estas funciones.
+  `buildViewFilters` y `buildViewExtensions` son funciones planas que
+  devuelven un dict/lista, invocadas una sola vez durante
+  `ViewServiceProvider.boot()`; los globals de plantilla viven en
+  `orionis/view/helpers/`, un módulo por categoría, exportados desde
+  `helpers/__init__.py` y registrados por el provider — añadir un
+  filtro, global o extensión a nivel de proyecto significa extender
+  esos puntos.
 - **Fijado (pin) de facade**: como otros subsistemas del framework,
   `ViewServiceProvider.boot()` termina con `await ViewFacade.pin()`,
   así que las llamadas posteriores a `View.make(...)` resuelven el

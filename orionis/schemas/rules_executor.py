@@ -16,6 +16,10 @@ _PLAN_CACHE: dict[type, tuple] = {}
 # Avoids global dict lookup on every nested validation call.
 _cache_get = _PLAN_CACHE.get
 
+# Shared empty mapping returned for schemas without Orionis metadata.
+# Reused instead of allocating a fresh dict on every plan build.
+_EMPTY_META: dict[str, list[object]] = {}
+
 def _type_contains_nested(tp: object) -> bool:
     """
     Check whether a type annotation contains a nested Orionis schema.
@@ -107,7 +111,9 @@ def _build_plan(klass: type) -> tuple:
         ``Rule`` instance nor supported validation metadata.
     """
     # Read per-field Orionis metadata attached to the schema class.
-    orionis_meta: dict[str, list[object]] = getattr(klass, "__orionis_meta__", {})
+    orionis_meta: dict[str, list[object]] = getattr(
+        klass, "__orionis_meta__", _EMPTY_META,
+    )
 
     # Collect compiled plan entries for fields that require work at runtime.
     plan: list = []
@@ -166,6 +172,38 @@ def _build_plan(klass: type) -> tuple:
     # Return the plan for use in the current validation call.
     return result
 
+def _collect_nested(
+    value: object,
+    prefix: str,
+    failures: list,
+) -> None:
+    """
+    Validate a nested schema value using its own cached plan.
+
+    Parameters
+    ----------
+    value : object
+        Nested schema instance held by the parent field.
+    prefix : str
+        Dot-terminated path prefix already qualified with the parent field.
+    failures : list
+        Accumulator receiving every ``ValidationFailure`` found.
+
+    Returns
+    -------
+    None
+        Return ``None`` after running the nested plan, if any.
+    """
+    # Resolve the child schema plan, building it only on a cache miss.
+    child_klass = type(value)
+    child_plan = _cache_get(child_klass)
+    if child_plan is None:
+        child_plan = _build_plan(child_klass)
+
+    # Skip schemas that declare neither rules nor further nesting.
+    if child_plan:
+        _collect_with_plan(child_plan, value, prefix, failures)
+
 def _collect_with_plan(
     plan: tuple,
     instance: object,
@@ -198,6 +236,9 @@ def _collect_with_plan(
     None
         Return ``None`` after running every rule in the plan.
     """
+    # Bind the accumulator method once instead of resolving it per failure.
+    append = failures.append
+
     # Iterate over each field in the plan, which may have custom
     # rules and/or nested schemas.
     for field_name, field_name_dot, getter, validators, is_nested in plan:
@@ -205,31 +246,24 @@ def _collect_with_plan(
         # Read the current field value from the instance.
         value = getter(instance)
 
-        # Build the fully-qualified field path.
-        qualified = prefix + field_name
+        # Recursively validate the nested object.
         if is_nested and value is not None:
+            _collect_nested(value, prefix + field_name_dot, failures)
 
-            # Resolve the child schema plan for nested validation.
-            child_klass = type(value)
-            child_plan = _cache_get(child_klass)
-            if child_plan is None:
-                child_plan = _build_plan(child_klass)
-            if child_plan:
+        # Skip fields that only exist in the plan for nested traversal.
+        if not validators:
+            continue
 
-                # Recursively validate the nested object.
-                _collect_with_plan(
-                    child_plan, value, prefix + field_name_dot, failures,
-                )
-
-        # Execute each custom rule validator for this field, if any.
+        # Build the fully-qualified field path only when a rule needs it.
+        qualified = prefix + field_name
         for validate in validators:
 
             # Run each validator for the current field.
             failure = validate(qualified, value, instance)
-            if failure is not None:
 
-                # Keep going so sibling rules and fields are reported too.
-                failures.append(failure)
+            # Keep going so sibling rules and fields are reported too.
+            if failure is not None:
+                append(failure)
 
 def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
     """
@@ -283,6 +317,9 @@ def _execute(instance: object, _prefix: str = "") -> None:
         _execute_with_plan(plan, instance, _prefix)
 
 class RulesExecutor:
+
+    # Prevent per-instance dictionaries; the class is used statically.
+    __slots__ = ()
 
     # Exposed for external inspection; backed by the module-level _PLAN_CACHE.
     _cache = _PLAN_CACHE

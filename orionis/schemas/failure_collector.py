@@ -97,6 +97,9 @@ def _field_plan(schema: type) -> tuple:
 
 class FailureCollector:
 
+    # Prevent per-instance dictionaries; the class is used statically.
+    __slots__ = ()
+
     @classmethod
     def collect(
         cls,

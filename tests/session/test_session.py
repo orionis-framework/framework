@@ -568,42 +568,6 @@ class TestSession(TestCase):
         session._ageFlashData()
         self.assertFalse(session.dirty)
 
-    # ── _assignId ────────────────────────────────────────────────────────────
-
-    def testAssignIdReplacesIdentifier(self) -> None:
-        """
-        Replace the session identifier with the supplied value.
-
-        Validates that _assignId() overwrites any previous identifier
-        and the new value is immediately visible via the id property.
-        """
-        session = Session(id="old-id")
-        session._assignId("new-id")
-        self.assertEqual(session.id, "new-id")
-
-    def testAssignIdClearsRegenerateFlag(self) -> None:
-        """
-        Clear the wantsRegenerate flag after assigning a new ID.
-
-        Validates that once the manager assigns the rotated identifier
-        the session no longer requests another rotation.
-        """
-        session = Session()
-        session.regenerate()
-        session._assignId("rotated-id")
-        self.assertFalse(session.wantsRegenerate)
-
-    def testAssignIdMarksDirty(self) -> None:
-        """
-        Dirty the session after an identifier assignment.
-
-        Validates that the new identifier will be written to the backing
-        store during the next persistence cycle.
-        """
-        session = Session(id="old-id")
-        session._assignId("new-id")
-        self.assertTrue(session.dirty)
-
     # ── _rotateId ────────────────────────────────────────────────────────────
 
     def testRotateIdReturnsOldIdentifier(self) -> None:

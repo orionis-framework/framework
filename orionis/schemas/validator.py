@@ -18,6 +18,9 @@ _ValidationError = msgspec.ValidationError
 
 class Schema:
 
+    # Prevent per-instance dictionaries; the class is used statically.
+    __slots__ = ()
+
     @staticmethod
     def validate(payload: object, schema: type[Schema]) -> Schema:
         """

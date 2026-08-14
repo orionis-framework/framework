@@ -36,10 +36,10 @@ class TestValidationException(TestCase):
 
     def testErrorReturnsDict(self) -> None:
         """
-        Return a dict from the error() method.
+        Return a Laravel-style payload from the error() method.
 
-        Validates that error() delegates to failure.toDict() and returns
-        a plain dictionary with the expected keys.
+        Validates that error() exposes a summary message and the field
+        errors indexed by field name.
         """
         failure = ValidationFailure(
             field="name",
@@ -49,13 +49,12 @@ class TestValidationException(TestCase):
         exc = ValidationException(failure)
         result = exc.error()
         self.assertIsInstance(result, dict)
-        self.assertEqual(result["field"], "name")
-        self.assertEqual(result["rule"], "required")
         self.assertEqual(result["message"], "Name is required.")
+        self.assertEqual(result["errors"], {"name": ["Name is required."]})
 
-    def testErrorDictContainsExactlyThreeKeys(self) -> None:
+    def testErrorDictContainsExactlyTwoKeys(self) -> None:
         """
-        Ensure error() dict contains exactly the three expected keys.
+        Ensure error() dict contains exactly the two expected keys.
 
         Validates that no extra or missing keys appear in the dictionary
         returned by the error() method.
@@ -67,7 +66,38 @@ class TestValidationException(TestCase):
         )
         exc = ValidationException(failure)
         result = exc.error()
-        self.assertEqual(set(result.keys()), {"field", "rule", "message"})
+        self.assertEqual(set(result.keys()), {"message", "errors"})
+
+    def testMultipleFailuresAreGroupedByField(self) -> None:
+        """
+        Group every failure message under its own field name.
+
+        Validates that two failures on the same field are reported as a
+        list of messages, and that distinct fields get their own entry.
+        """
+        exc = ValidationException([
+            ValidationFailure(field="email", rule="pattern", message="Bad."),
+            ValidationFailure(field="email", rule="min_length", message="Short."),
+            ValidationFailure(field="age", rule="ge", message="Too young."),
+        ])
+        self.assertEqual(
+            exc.errors,
+            {"email": ["Bad.", "Short."], "age": ["Too young."]},
+        )
+
+    def testSummaryMessageCountsRemainingErrors(self) -> None:
+        """
+        Suffix the summary message with the remaining error count.
+
+        Validates that the top-level message mirrors the Laravel format
+        when more than one failure is collected.
+        """
+        exc = ValidationException([
+            ValidationFailure(field="a", rule="type", message="First."),
+            ValidationFailure(field="b", rule="type", message="Second."),
+            ValidationFailure(field="c", rule="type", message="Third."),
+        ])
+        self.assertEqual(str(exc), "First. (and 2 more errors)")
 
     def testIsInstanceOfException(self) -> None:
         """

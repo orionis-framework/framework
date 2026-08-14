@@ -23,6 +23,9 @@ SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset({
     "password_confirmation",
 })
 
+# Hoisted so the isinstance check does not rebuild the tuple on every field.
+_SEQUENCE_TYPES: tuple[type, ...] = (list, tuple, set, frozenset)
+
 def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
     """
     Drop credential-like fields from a form payload before flashing it.
@@ -38,6 +41,10 @@ def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
         Copy of *values* without any field listed in
         :data:`SENSITIVE_INPUT_FIELDS`.
     """
+    # Most payloads carry no credential field at all: copy them wholesale.
+    if SENSITIVE_INPUT_FIELDS.isdisjoint(values):
+        return dict(values)
+
     return {
         key: value
         for key, value in values.items()
@@ -89,7 +96,7 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:
     for field, value in errors.items():
         if isinstance(value, str):
             normalized[field] = [value]
-        elif isinstance(value, (list, tuple, set, frozenset)):
+        elif isinstance(value, _SEQUENCE_TYPES):
             normalized[field] = [str(item) for item in value]
         else:
             normalized[field] = [str(value)]

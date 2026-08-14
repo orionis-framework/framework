@@ -4,6 +4,7 @@ from orionis.failure.contracts.handler import IBaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.http.default.responses import DefaultResponses
+from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import Request
 from orionis.http.request import UnsupportedMediaTypeException
@@ -19,6 +20,7 @@ _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
     MethodNotAllowed: (405, "Method not allowed"),
     PayloadTooLargeException: (413, "Payload too large"),
     UnsupportedMediaTypeException: (415, "Unsupported media type"),
+    CSRFTokenMismatchException: (419, "CSRF token mismatch"),
 }
 
 class BaseExceptionHandler(IBaseExceptionHandler):

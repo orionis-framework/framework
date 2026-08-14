@@ -173,10 +173,9 @@ class SessionManager:
         -------
         None
         """
-        # Register the session in the application container so that it can be
-        # injected into any service that needs it.
+        # Bind the request-scoped session under its contract so any service
+        # (and the Session facade) can resolve it through the container.
         self._app.instance(ISession, session)
-        self._app.instance(Session, session)
 
     def __resolveStore(
         self,

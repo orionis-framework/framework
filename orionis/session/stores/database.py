@@ -16,7 +16,12 @@ if TYPE_CHECKING:
 # Default table name used when the session config does not override it.
 _DEFAULT_TABLE = "sessions"
 
-def _buildSessionsTable(table: str) -> TableDefinition:
+# Codecs built once: msgspec resolves its internal state at construction time
+# instead of on every encode/decode call.
+_ENCODER = _msgjson.Encoder()
+_DECODER = _msgjson.Decoder()
+
+def _build_sessions_table(table: str) -> TableDefinition:
     """
     Build the table definition for the sessions table.
 
@@ -73,7 +78,17 @@ class DatabaseSessionStore(ISessionStore):
         ``'sessions'``.
     """
 
-    __slots__ = ("_connection", "_ready", "_ready_lock", "_table")
+    __slots__ = (
+        "_connection",
+        "_ready",
+        "_ready_lock",
+        "_sql_delete",
+        "_sql_gc",
+        "_sql_insert",
+        "_sql_select",
+        "_sql_update",
+        "_table",
+    )
 
     def __init__(self, connection: IConnection, table: str = _DEFAULT_TABLE) -> None:
         """
@@ -95,6 +110,21 @@ class DatabaseSessionStore(ISessionStore):
         self._ready = False
         self._ready_lock = asyncio.Lock()
 
+        # Statements only depend on the table name: build them once instead of
+        # formatting a new SQL string on every session operation.
+        self._sql_select: str = (
+            f"SELECT payload, expires_at FROM {table} WHERE id = :id"  # noqa: S608
+        )
+        self._sql_update: str = (
+            f"UPDATE {table} SET payload = :p, expires_at = :e WHERE id = :id"  # noqa: S608
+        )
+        self._sql_insert: str = (
+            f"INSERT INTO {table} (id, payload, expires_at) "  # noqa: S608
+            "VALUES (:id, :p, :e)"
+        )
+        self._sql_delete: str = f"DELETE FROM {table} WHERE id = :id"  # noqa: S608
+        self._sql_gc: str = f"DELETE FROM {table} WHERE expires_at <= :now"  # noqa: S608
+
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
     async def _ensureSchema(self) -> None:
@@ -110,7 +140,7 @@ class DatabaseSessionStore(ISessionStore):
         async with self._ready_lock:
             if self._ready:
                 return
-            await self._connection.createTable(_buildSessionsTable(self._table))
+            await self._connection.createTable(_build_sessions_table(self._table))
             self._ready = True
 
     # ── ISessionStore ────────────────────────────────────────────────────────
@@ -132,8 +162,7 @@ class DatabaseSessionStore(ISessionStore):
         """
         await self._ensureSchema()
         rows = await self._connection.select(
-            f"SELECT payload, expires_at FROM {self._table} "  # noqa: S608
-            "WHERE id = :id",
+            self._sql_select,
             {"id": session_id},
         )
         if not rows:
@@ -180,8 +209,7 @@ class DatabaseSessionStore(ISessionStore):
         payload = self.__encode(record.data)
 
         updated = await self._connection.execute(
-            f"UPDATE {self._table} SET payload = :p, expires_at = :e "  # noqa: S608
-            "WHERE id = :id",
+            self._sql_update,
             {"p": payload, "e": expiration, "id": record.id},
         )
         if not updated:
@@ -211,15 +239,13 @@ class DatabaseSessionStore(ISessionStore):
         """
         try:
             await self._connection.execute(
-                f"INSERT INTO {self._table} "  # noqa: S608
-                "(id, payload, expires_at) VALUES (:id, :p, :e)",
+                self._sql_insert,
                 {"id": session_id, "p": payload, "e": expiration},
             )
         except QueryException:
             # Another writer inserted the row first; retry as an update.
             await self._connection.execute(
-                f"UPDATE {self._table} SET payload = :p, "  # noqa: S608
-                "expires_at = :e WHERE id = :id",
+                self._sql_update,
                 {"p": payload, "e": expiration, "id": session_id},
             )
 
@@ -238,7 +264,7 @@ class DatabaseSessionStore(ISessionStore):
         """
         await self._ensureSchema()
         await self._connection.execute(
-            f"DELETE FROM {self._table} WHERE id = :id",  # noqa: S608
+            self._sql_delete,
             {"id": session_id},
         )
 
@@ -255,7 +281,7 @@ class DatabaseSessionStore(ISessionStore):
         """
         await self._ensureSchema()
         await self._connection.execute(
-            f"DELETE FROM {self._table} WHERE expires_at <= :now",  # noqa: S608
+            self._sql_gc,
             {"now": time.time()},
         )
 
@@ -275,7 +301,7 @@ class DatabaseSessionStore(ISessionStore):
         str
             UTF-8 decoded JSON payload.
         """
-        return _msgjson.encode(data).decode()
+        return _ENCODER.encode(data).decode()
 
     def __decode(self, raw: str | bytes | None) -> dict[str, Any] | None:
         """
@@ -295,6 +321,6 @@ class DatabaseSessionStore(ISessionStore):
             return None
         data = raw.encode() if isinstance(raw, str) else raw
         try:
-            return _msgjson.decode(data)
+            return _DECODER.decode(data)
         except msgspec.DecodeError:
             return None

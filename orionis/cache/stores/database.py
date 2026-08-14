@@ -14,8 +14,7 @@ if TYPE_CHECKING:
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
 
-# Default lock table used when the config does not declare one explicitly
-# (mirrors Laravel's 'DB_CACHE_LOCK_TABLE' default of 'cache_locks').
+# Default lock table used when the config does not declare one explicitly.
 _DEFAULT_LOCK_TABLE = "cache_locks"
 
 
@@ -94,7 +93,7 @@ class DatabaseCacheBackend:
     """
     Cache backend that stores entries in a relational database table.
 
-    Mirrors Laravel's ``database`` cache store: entries live in a
+    Mirrors ``database`` cache store: entries live in a
     dedicated table (``cache_key`` / ``cache_value`` / ``expiration``)
     resolved through the ``cache.stores.database`` configuration, and
     atomic locks used by ``Cache::lock()`` are kept in a separate
@@ -198,7 +197,7 @@ class DatabaseCacheBackend:
         Return the cached value for *key*, or *default* when absent/expired.
 
         Expired entries are deleted on first read (lazy eviction),
-        mirroring Laravel's ``DatabaseStore::get()``.
+        mirroring ``DatabaseStore::get()``.
 
         Parameters
         ----------
@@ -470,7 +469,7 @@ class DatabaseCacheBackend:
 
         Creates the key with value *delta* if it does not exist. The
         read/modify/write cycle runs inside a single database
-        transaction, mirroring Laravel's ``DatabaseStore::increment()``.
+        transaction, mirroring ``DatabaseStore::increment()``.
 
         Parameters
         ----------
@@ -551,7 +550,7 @@ class DatabaseCacheBackend:
         Attempt to acquire the row-based lock for *key* in a single try.
 
         Inserts a fresh row for the lock, or steals an expired or
-        self-owned row when the insert conflicts, mirroring Laravel's
+        self-owned row when the insert conflicts, mirroring
         ``DatabaseLock::acquire()``.
 
         Parameters

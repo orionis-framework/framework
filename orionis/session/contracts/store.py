@@ -23,6 +23,8 @@ class ISessionStore(ABC):
     - Enforcing expiry policy (the manager does that).
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def read(self, session_id: str) -> SessionRecord | None:
         """

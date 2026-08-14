@@ -20,6 +20,8 @@ class ISession(ABC):
     responsibility of the ``SessionManager``.
     """
 
+    __slots__ = ()
+
     # ── Read-only properties ────────────────────────────────────────────────────
 
     @property

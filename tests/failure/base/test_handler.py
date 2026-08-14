@@ -4,6 +4,7 @@ from orionis.failure.base.handler import BaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import UnsupportedMediaTypeException
+from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.test import TestCase
@@ -408,6 +409,25 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         mock_responses.error.assert_called_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 415)
+
+    async def testCsrfTokenMismatchReturns419(self) -> None:
+        """
+        Return a 419 error response for CSRFTokenMismatchException.
+
+        Validates that a rejected CSRF token is reported as an expired
+        page instead of an unhandled server error.
+        """
+        mock_responses = MagicMock()
+        mock_responses.error.return_value = MagicMock(status_code=419)
+        handler = BaseExceptionHandler(default_responses=mock_responses)
+
+        exc = CSRFTokenMismatchException("token mismatch")
+        req = self._make_request_mock()
+        await handler.handleHTTP(exc, req)
+
+        mock_responses.error.assert_called_once()
+        call_kwargs = mock_responses.error.call_args[1]
+        self.assertEqual(call_kwargs["status_code"], 419)
 
     async def testReturnsNoneForIgnoredException(self) -> None:
         """

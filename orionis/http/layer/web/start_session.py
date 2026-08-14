@@ -8,6 +8,14 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
     from orionis.http.request import Request
     from orionis.http.response import Response
+    from orionis.session.contracts.session import ISession
+
+# Only plain navigations are worth remembering as the "previous page".
+_NAVIGATION_METHODS: frozenset[str] = frozenset({"GET", "HEAD"})
+
+# Status range that marks a response as a redirection.
+_REDIRECT_MIN: int = 300
+_REDIRECT_MAX: int = 400
 
 class StartSessionMiddleware(BaseMiddleware):
 
@@ -71,8 +79,48 @@ class StartSessionMiddleware(BaseMiddleware):
         if flash_data:
             apply_flash(session, flash_data)
 
+        # Remember this page so a later failed submission can redirect back.
+        self.__storeCurrentUrl(request, response, session)
+
         # Persist the session and set the cookie only when it was used.
         await self._manager.save(response, session)
 
         # Return the response to the client.
         return response
+
+    @staticmethod
+    def __storeCurrentUrl(
+        request: Request,
+        response: Response,
+        session: ISession,
+    ) -> None:
+        """
+        Record the current URL as the page to redirect back to.
+
+        Only successful, non-AJAX navigations are stored, so redirects,
+        background calls and form submissions never overwrite it.
+
+        Parameters
+        ----------
+        request : Request
+            Incoming HTTP request.
+        response : Response
+            Outgoing HTTP response.
+        session : ISession
+            Active session for this request.
+
+        Returns
+        -------
+        None
+        """
+        if request.method not in _NAVIGATION_METHODS:
+            return
+        if request.isAjax() or request.wantsJson():
+            return
+
+        # Redirections are transient; keep the page the user actually saw.
+        status = response.getStatusCode()
+        if _REDIRECT_MIN <= status < _REDIRECT_MAX:
+            return
+
+        session.setPreviousUrl(request.url)

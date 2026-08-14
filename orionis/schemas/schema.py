@@ -244,59 +244,6 @@ class SchemaMeta(_StructMeta):
         return _annotate
 
     @staticmethod
-    def _compile(annotation: object) -> object:
-        """
-        Rewrite one ``Annotated`` hint with compiled msgspec metadata.
-
-        Extract ``ValidationMetadata`` instances and compile them into a single
-        ``msgspec.Meta`` via ``MetaCompiler``. Keep non-validation metadata
-        inside ``Annotated`` so it remains inspectable and can be harvested by
-        ``_collect``.
-
-        Parameters
-        ----------
-        annotation :
-            The raw ``Annotated`` type hint from the class body.
-
-        Returns
-        -------
-        object
-            Return the rewritten ``Annotated`` hint, or the original
-            annotation when no ``ValidationMetadata`` is present.
-        """
-        # Split Annotated[...] into base type + metadata tuple.
-        args = get_args(annotation)
-
-        # Read the original declared field type.
-        base_type: object = args[0]
-
-        # Extract every metadata entry after the base type.
-        metadata: tuple[object, ...] = args[1:]
-
-        # Keep only validation metadata.
-        validation_meta: list[ValidationMetadata] = [
-            m for m in metadata if isinstance(m, ValidationMetadata)
-        ]
-
-        # Build the list that will be compiled into msgspec.Meta.
-        # Keep non-validation metadata untouched.
-        custom_meta: list[object] = [
-            m for m in metadata if not isinstance(m, ValidationMetadata)
-        ]
-
-        # Preserve Orionis-specific metadata for later collection.
-        if not validation_meta:
-
-            # Skip rewrite when there is nothing to compile.
-            return annotation
-
-        # Compile validation metadata into one msgspec.Meta.
-        compiled: msgspec.Meta = MetaCompiler.compile(validation_meta)
-
-        # Rebuild Annotated with compiled + custom metadata.
-        return Annotated[(base_type, compiled, *custom_meta)]
-
-    @staticmethod
     def _collect(klass: type) -> dict[str, list[object]]:
         """
         Collect custom non-msgspec metadata from a freshly created struct.

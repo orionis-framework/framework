@@ -27,6 +27,7 @@ from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.loader import RouteLoader
 from orionis.http.routes.route_resolver import RouteResolver
+from orionis.http.validation import validation_response
 from orionis.schemas.exceptions.validation import ValidationException
 
 if TYPE_CHECKING:
@@ -476,7 +477,7 @@ class KernelHTTP(IKernelHTTP):
 
         Runs StartSessionMiddleware then CSRFTokenMiddleware through a
         single-allocation iterative pipeline before delegating to
-        ``__requestLayer``.
+        ``__webTerminal``.
 
         Parameters
         ----------
@@ -494,9 +495,37 @@ class KernelHTTP(IKernelHTTP):
         pipeline = _MiddlewarePipeline(
             instances=self.__web_middleware,
             request=request,
-            terminal=partial(self.__requestLayer, request, resolved_route),
+            terminal=partial(self.__webTerminal, request, resolved_route),
         )
         return await pipeline()
+
+    async def __webTerminal(
+        self,
+        request: Request,
+        resolved_route: ResolvedRoute,
+    ) -> Response:
+        """
+        Run the route pipeline and translate validation failures for the web.
+
+        Validation errors are caught here, inside the session middleware, so
+        the resulting redirect still gets its flash bag persisted.
+
+        Parameters
+        ----------
+        request : Request
+            Incoming HTTP request.
+        resolved_route : ResolvedRoute
+            Resolved route metadata.
+
+        Returns
+        -------
+        Response
+            Handler response, or a redirect back carrying the errors.
+        """
+        try:
+            return await self.__requestLayer(request, resolved_route)
+        except ValidationException as exc:
+            return await validation_response(exc, request, self.__default_responses)
 
     async def __requestLayer(
         self,
@@ -645,11 +674,12 @@ class KernelHTTP(IKernelHTTP):
             Appropriate HTTP response for the given exception type.
         """
         if isinstance(exc, ValidationException):
-            # Return 422 with structured field errors for schema failures.
+            # API routes always answer with the structured field errors; web
+            # routes never reach this point (see __webTerminal).
             return self.__default_responses.error(
                 status_code=422,
                 content=exc.error(),
-                expects_json=request.wantsJson(),  # type: ignore[union-attr]
+                expects_json=True,
             )
         if isinstance(exc, RouteNotFound) and self.__fallback is not None:
             # Delegate unmatched routes to the registered fallback handler.

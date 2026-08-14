@@ -666,3 +666,52 @@ class TestSession(TestCase):
         self.assertTrue(session.dirty)
         session._markClean()
         self.assertFalse(session.dirty)
+
+    # ── previous URL ─────────────────────────────────────────────────────────
+
+    def testGetPreviousUrlDefaultsToNone(self) -> None:
+        """
+        Return None when no page has been recorded yet.
+
+        Validates the initial state of a brand-new session.
+        """
+        self.assertIsNone(Session().getPreviousUrl())
+
+    def testSetPreviousUrlIsReadBack(self) -> None:
+        """
+        Store and read back the last visited page.
+
+        Validates the round trip used to redirect back after a failed
+        form submission.
+        """
+        session = Session()
+        session.setPreviousUrl("http://orionis.test/users/create")
+        self.assertEqual(
+            session.getPreviousUrl(),
+            "http://orionis.test/users/create",
+        )
+
+    def testSetPreviousUrlActivatesSession(self) -> None:
+        """
+        Activate the session when the previous page is recorded.
+
+        Validates that the value is persisted like any other session
+        entry.
+        """
+        session = Session()
+        session.setPreviousUrl("http://orionis.test/login")
+        self.assertTrue(session.started)
+        self.assertTrue(session.dirty)
+
+    def testSetPreviousUrlTwiceWithSameValueKeepsSessionClean(self) -> None:
+        """
+        Skip a redundant write when revisiting the same page.
+
+        Validates that browsing the same URL again does not schedule an
+        extra store write.
+        """
+        session = Session()
+        session.setPreviousUrl("http://orionis.test/login")
+        session._markClean()
+        session.setPreviousUrl("http://orionis.test/login")
+        self.assertFalse(session.dirty)

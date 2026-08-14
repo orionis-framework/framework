@@ -5,6 +5,9 @@ from orionis.cache.contracts.repository import ICacheRepository
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
 
+# Namespace prefix keeping session entries away from unrelated cache keys.
+_KEY_PREFIX: str = "session:"
+
 class CacheSessionStore(ISessionStore):
     """
     Session store backed by the framework's cache system.
@@ -24,8 +27,6 @@ class CacheSessionStore(ISessionStore):
     # ruff: noqa: TC001
 
     __slots__ = ("_repository",)
-
-    _KEY_PREFIX: str = "session:"
 
     def __init__(self, cache: ICacheManager, store: str | None = None) -> None:
         """
@@ -60,7 +61,7 @@ class CacheSessionStore(ISessionStore):
             The stored record, or ``None`` when absent or expired.
         """
         payload: dict[str, Any] | None = await self._repository.get(
-            self._buildKey(session_id),
+            _KEY_PREFIX + session_id,
         )
 
         if payload is None:
@@ -99,7 +100,7 @@ class CacheSessionStore(ISessionStore):
             "data": record.data,
             "expires_at": record.expires_at,
         }
-        await self._repository.set(self._buildKey(record.id), payload, ttl=ttl)
+        await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ttl)
 
     async def delete(self, session_id: str) -> None:
         """
@@ -114,7 +115,7 @@ class CacheSessionStore(ISessionStore):
         -------
         None
         """
-        await self._repository.delete(self._buildKey(session_id))
+        await self._repository.delete(_KEY_PREFIX + session_id)
 
     async def gc(self) -> None:
         """
@@ -125,18 +126,3 @@ class CacheSessionStore(ISessionStore):
         None
         """
 
-    def _buildKey(self, session_id: str) -> str:
-        """
-        Build the namespaced cache key for *session_id*.
-
-        Parameters
-        ----------
-        session_id : str
-            Unique session identifier.
-
-        Returns
-        -------
-        str
-            The namespaced cache key.
-        """
-        return f"{self._KEY_PREFIX}{session_id}"

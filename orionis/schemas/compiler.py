@@ -1,6 +1,6 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 import msgspec
-from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.metadata import (
     Description,
     Examples,
@@ -21,26 +21,8 @@ from orionis.schemas.constraints import (
     TimezoneNaive,
 )
 
-def _get[MetaT: ValidationMetadata](
-    seen: dict[type[ValidationMetadata], ValidationMetadata],
-    key: type[MetaT],
-) -> MetaT | None:
-    """
-    Return the metadata instance associated with ``key``.
-
-    Parameters
-    ----------
-    seen : dict[type[ValidationMetadata], ValidationMetadata]
-        Mapping of metadata classes to metadata instances.
-    key : type[MetaT]
-        Metadata class to look up.
-
-    Returns
-    -------
-    MetaT | None
-        Matched metadata instance, or ``None`` when the class is not present.
-    """
-    return seen.get(key) # type: ignore[return-value]
+if TYPE_CHECKING:
+    from orionis.schemas.meta.validation import ValidationMetadata
 
 class MetadataConflictError(ValueError):
     """
@@ -250,7 +232,7 @@ class MetaCompiler:
 
         Built in a single pass over *seen* to avoid allocating intermediate
         dictionaries.  All fourteen ``msgspec.Meta`` parameters are populated
-        here in one go, each guarded by an O(1) dict look-up via ``_get``.
+        here in one go, each guarded by an O(1) dict look-up.
 
         Parameters
         ----------
@@ -278,14 +260,14 @@ class MetaCompiler:
         ex_m    = _s(Examples)
         exj_m   = _s(ExtraJsonSchema)
         ext_m   = _s(Extra)
-        tz = next(
-            (
-                v
-                for cls, v in ((TimezoneAware, True), (TimezoneNaive, False))
-                if cls in seen
-            ),
-            None,
-        )
+
+        # Resolve the timezone flag from the two mutually exclusive markers.
+        tz: bool | None = None
+        if TimezoneAware in seen:
+            tz = True
+        elif TimezoneNaive in seen:
+            tz = False
+
         return msgspec.Meta(
             gt           = gt_m.value        if gt_m    is not None else None,
             ge           = ge_m.value        if ge_m    is not None else None,

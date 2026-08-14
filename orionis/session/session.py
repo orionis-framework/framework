@@ -5,6 +5,7 @@ from orionis.session.contracts.session import ISession
 from orionis.session.flash import (
     ERRORS_KEY,
     OLD_INPUT_KEY,
+    PREVIOUS_URL_KEY,
     filter_input,
     normalize_errors,
 )
@@ -399,6 +400,37 @@ class Session(ISession):
         """
         bag = self.getFlash(ERRORS_KEY)
         return bag if isinstance(bag, dict) else {}
+
+    def setPreviousUrl(self, url: str) -> None:
+        """
+        Remember the page the user is currently viewing.
+
+        Parameters
+        ----------
+        url : str
+            Absolute URL of the current page.
+
+        Returns
+        -------
+        None
+        """
+        self.put(PREVIOUS_URL_KEY, url)
+
+    def getPreviousUrl(self, default: str | None = None) -> str | None:
+        """
+        Return the last page the user navigated to.
+
+        Parameters
+        ----------
+        default : str | None, optional
+            Fallback returned when no page has been recorded yet.
+
+        Returns
+        -------
+        str | None
+            The stored URL, or *default*.
+        """
+        return self.get(PREVIOUS_URL_KEY, default)
 
     def regenerate(self) -> None:
         """

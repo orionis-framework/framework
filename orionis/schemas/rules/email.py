@@ -46,6 +46,10 @@ class Email(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
+        # Leave non-string values to the type layer, which already reports them.
+        if not isinstance(value, str):
+            return True
+
         # Reject addresses exceeding the maximum length allowed by RFC 5321.
         if len(value) > _MAX_LENGTH:
             return False
@@ -53,6 +57,6 @@ class Email(Rule):
         if _EMAIL_PATTERN.match(value) is None:
             return False
 
-        # The local part is capped independently of the whole address.
-        local_part, _, _ = value.partition("@")
-        return len(local_part) <= _MAX_LOCAL_LENGTH
+        # The local part is capped independently of the whole address; the
+        # pattern guarantees a single separator, so its index is that length.
+        return value.index("@") <= _MAX_LOCAL_LENGTH

@@ -57,7 +57,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         related_key: str | None,
     ) -> None:
         """
-        Bind the relationship, resolving its keys by Laravel convention.
+        Bind the relationship.
 
         Parameters
         ----------

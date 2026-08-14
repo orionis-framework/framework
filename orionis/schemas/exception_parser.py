@@ -86,21 +86,55 @@ class ValidationErrorParser:
         ValidationFailure
             Return a single validation failure describing the parsed error.
         """
+        return cls.parseAt(error, schema, "")
+
+    @classmethod
+    def parseAt(
+        cls,
+        error: msgspec.ValidationError,
+        schema: type | None,
+        base: str,
+    ) -> ValidationFailure:
+        """
+        Parse a msgspec validation error raised while converting a sub-value.
+
+        Parameters
+        ----------
+        error : msgspec.ValidationError
+            Provide the original validation exception.
+        schema : type | None
+            Root schema class used to look up custom constraint messages.
+        base : str
+            Dotted path of the value being converted, relative to the root
+            schema (``""`` when the error comes from the root payload).
+
+        Returns
+        -------
+        ValidationFailure
+            Return a single validation failure with a fully-qualified field.
+        """
         text = str(error)
 
         match = PATH_RE.match(text)
 
         if match is None:
             missing = MISSING_FIELD_RE.search(text)
-            field = missing.group("field") if missing else ""
-            return ValidationFailure(
-                field=field,
-                rule="invalid",
-                message=text,
-            )
 
-        raw_message = match.group("message")
-        field = match.group("path").lstrip(".")
+            # Missing fields carry their own name instead of a path suffix.
+            if missing is not None:
+                return ValidationFailure(
+                    field=cls._joinPath(base, missing.group("field")),
+                    rule="missing",
+                    message=text,
+                )
+
+            # Errors on the converted value itself report no path at all.
+            raw_message = text
+            field = base
+        else:
+            raw_message = match.group("message")
+            field = cls._joinPath(base, match.group("path").lstrip("."))
+
         constraint_key = cls._matchConstraintKey(raw_message)
         rule = constraint_key if constraint_key is not None else "type"
 
@@ -116,6 +150,33 @@ class ValidationErrorParser:
             rule=rule,
             message=message,
         )
+
+    @staticmethod
+    def _joinPath(base: str, relative: str) -> str:
+        """
+        Concatenate a base field path with a relative msgspec path.
+
+        Parameters
+        ----------
+        base : str
+            Dotted path of the value being converted.
+        relative : str
+            Path reported by msgspec, relative to that value.
+
+        Returns
+        -------
+        str
+            Fully-qualified dotted field path.
+        """
+        if not base:
+            return relative
+        if not relative:
+            return base
+
+        # Sequence indices are appended without a separating dot.
+        if relative[0] == "[":
+            return base + relative
+        return base + "." + relative
 
     @classmethod
     def _customMessage(

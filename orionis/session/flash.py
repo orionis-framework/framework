@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 OLD_INPUT_KEY: str = "_old_input"
 ERRORS_KEY: str = "_errors"
 
+# Reserved session key holding the last page the user navigated to.
+PREVIOUS_URL_KEY: str = "_previous_url"
+
 # Never carried over when repopulating a form.
 SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset({
     "_csrf",
@@ -65,13 +68,17 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:
         If *errors* is neither a mapping nor a validation exception.
     """
     # Duck-typed so the session layer never imports the schemas package.
-    failure = getattr(errors, "failure", None)
-    if failure is not None:
-        field = getattr(failure, "field", "") or ""
-        message = getattr(failure, "message", "") or ""
-        return {field: [message]}
-
     if not isinstance(errors, Mapping):
+        bag = getattr(errors, "errors", None)
+        if isinstance(bag, Mapping):
+            return {field: list(messages) for field, messages in bag.items()}
+
+        failure = getattr(errors, "failure", None)
+        if failure is not None:
+            field = getattr(failure, "field", "") or ""
+            message = getattr(failure, "message", "") or ""
+            return {field: [message]}
+
         error_msg = (
             "errors must be a mapping of field to message(s) "
             "or a validation exception"

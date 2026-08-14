@@ -143,9 +143,11 @@ class Request(IRequest):
         scope = self.__scope
 
         scheme: str = scope["scheme"]
-        host: str = scope["server"]
         path: str = scope["path"]
         query: str = scope["query_string"]
+
+        # The Host header carries the origin the client actually used.
+        host: str = self.headers.get("host") or scope["server"]
 
         if query:
             return f"{scheme}://{host}{path}?{query}"
@@ -209,7 +211,9 @@ class Request(IRequest):
             The base URL (scheme://host).
         """
         scheme: str = self.__scope["scheme"]
-        host: str = self.__scope["server"]
+
+        # The Host header carries the origin the client actually used.
+        host: str = self.headers.get("host") or self.__scope["server"]
 
         return f"{scheme}://{host}"
 

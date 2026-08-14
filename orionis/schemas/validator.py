@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import msgspec
-from orionis.schemas.exception_parser import ValidationErrorParser
 from orionis.schemas.exceptions.validation import ValidationException
-from orionis.schemas.rules_executor import _cache_get, _build_plan, _execute_with_plan
+from orionis.schemas.failure_collector import FailureCollector
+from orionis.schemas.rules_executor import _cache_get, _build_plan, _collect_with_plan
 
 if TYPE_CHECKING:
     from orionis.schemas.schema import Schema
@@ -38,16 +38,20 @@ class Schema:
         Raises
         ------
         ValidationException
-            If payload conversion fails or schema rules raise validation errors.
+            If payload conversion fails or schema rules raise validation
+            errors. The exception carries every failure found, indexed by
+            field name.
         """
-        # Convert the payload into a schema instance using msgspec.
+        # Convert the payload into a schema instance using msgspec. A single
+        # C-level call handles the successful path; only when it fails is the
+        # payload re-inspected field by field to report every error.
         try:
             instance = _convert(payload, type=schema)
 
         # Catch msgspec validation errors and re-raise them as framework exceptions.
         except _ValidationError as exc:
             raise ValidationException(
-                ValidationErrorParser.parse(exc, schema),
+                FailureCollector.collect(payload, schema, exc),
             ) from exc
 
         # Use the known schema type directly — avoids a redundant type(instance)
@@ -57,6 +61,9 @@ class Schema:
         if plan is None:
             plan = _build_plan(schema)
         if plan:
-            _execute_with_plan(plan, instance, "")
+            failures: list = []
+            _collect_with_plan(plan, instance, "", failures)
+            if failures:
+                raise ValidationException(failures)
 
         return instance

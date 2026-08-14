@@ -27,7 +27,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         owner_key: str | None,
     ) -> None:
         """
-        Bind the relationship, resolving its keys by Laravel convention.
+        Bind the relationship.
 
         Parameters
         ----------

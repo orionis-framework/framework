@@ -5,7 +5,7 @@ class Rule(IRule):
 
     # Use __slots__ to optimize memory usage
     # by preventing the creation of __dict__ for each instance.
-    __slots__ = ("_message", "_resolved_code", "_resolved_default_message")
+    __slots__ = ("_code", "_message")
 
     def __init__(self, *, message: str | None = None) -> None:
         """
@@ -19,15 +19,15 @@ class Rule(IRule):
         Returns
         -------
         None
-            Return ``None`` after storing the provided message.
+            Return ``None`` after resolving the code and message to report.
         """
-        # Store the provided message for use during validation failures.
-        self._message = message
-
-        # Resolve class-level attributes once at construction time.
+        # Resolve class-level attributes once at construction time, so the
+        # failure path only reads two slots.
         klass = type(self)
-        self._resolved_code: str = getattr(klass, "__code__", klass.__name__.lower())
-        self._resolved_default_message: str | None = getattr(klass, "__message__", None)
+        self._code: str = getattr(klass, "__code__", klass.__name__.lower())
+        self._message: str | None = (
+            message if message is not None else getattr(klass, "__message__", None)
+        )
 
     def enforce(
         self,
@@ -82,8 +82,8 @@ class Rule(IRule):
         if not self.enforce(field, value, instance):
             return ValidationFailure(
                 field=field,
-                rule=self._resolved_code,
-                message=self._message or self._resolved_default_message,
+                rule=self._code,
+                message=self._message,
             )
 
         # If validation passes, return None to indicate success.

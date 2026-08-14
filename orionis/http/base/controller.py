@@ -1,4 +1,3 @@
-# Base controller class following Laravel-style conventions.
 class BaseController:
     """
     Provide a base class for HTTP controllers.

@@ -46,9 +46,10 @@ class StrongPassword(Rule):
         if len(value) < _MIN_LENGTH:
             return False
 
-        # Use sets to check for character types efficiently
-        chars = frozenset(value)
-
-        # Check for the presence of at least one uppercase letter,
-        # one lowercase letter, and one digit
-        return bool(chars & _UPPER) and bool(chars & _LOWER) and bool(chars & _DIGIT)
+        # Check for the presence of at least one uppercase letter, one lowercase
+        # letter and one digit, short-circuiting on the first character found.
+        return (
+            not _UPPER.isdisjoint(value)
+            and not _LOWER.isdisjoint(value)
+            and not _DIGIT.isdisjoint(value)
+        )

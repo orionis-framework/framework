@@ -9,6 +9,6 @@ class CSRFTokenMismatchException(Exception):
 
     This exception is thrown by ``CSRFTokenMiddleware`` on any unsafe
     HTTP method (POST, PUT, PATCH, DELETE) where CSRF validation fails.
-    The application exception handler should map it to an HTTP 419
-    (or 403) response.
+    ``BaseExceptionHandler`` maps it to an HTTP 419 (Page Expired)
+    response.
     """

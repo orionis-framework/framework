@@ -32,7 +32,7 @@ class Translator(ITranslator):
 
     The translator performs O(1) lookups against the in-memory
     repository, falls back to the configured fallback locale, applies
-    Laravel-style ``:name`` parameter replacement, and selects
+    style ``:name`` parameter replacement, and selects
     pluralized segments through :meth:`choice`.
     """
 
@@ -386,7 +386,7 @@ class Translator(ITranslator):
 
     def __applyReplacements(self, line: str, replace: dict[str, object]) -> str:
         """
-        Substitute Laravel-style placeholders into a translation line.
+        Substitute placeholders into a translation line.
 
         Each parameter replaces its ``:key``, ``:Key``, and ``:KEY``
         variants with the raw, capitalized, and uppercased value

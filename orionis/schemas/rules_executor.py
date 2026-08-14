@@ -166,13 +166,19 @@ def _build_plan(klass: type) -> tuple:
     # Return the plan for use in the current validation call.
     return result
 
-def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
+def _collect_with_plan(
+    plan: tuple,
+    instance: object,
+    prefix: str,
+    failures: list,
+) -> None:
     """
     Inner validation loop: execute a pre-resolved plan against an instance.
 
     This function is the true hot path. It is separated from ``_execute`` so
     that callers who already hold the plan (e.g. ``Schema.validate``) can
-    skip the redundant cache lookup and ``type()`` call.
+    skip the redundant cache lookup and ``type()`` call. Every failure is
+    accumulated so the caller can report all of them at once.
 
     Parameters
     ----------
@@ -184,11 +190,13 @@ def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
         Dot-terminated path prefix for nested field names, e.g.
         ``"address."`` so that child fields report ``"address.zip"``.
         Pass ``""`` at the top level.
+    failures : list
+        Accumulator receiving every ``ValidationFailure`` found.
 
-    Raises
-    ------
-    ValidationException
-        Raised on the first rule failure encountered.
+    Returns
+    -------
+    None
+        Return ``None`` after running every rule in the plan.
     """
     # Iterate over each field in the plan, which may have custom
     # rules and/or nested schemas.
@@ -209,7 +217,9 @@ def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
             if child_plan:
 
                 # Recursively validate the nested object.
-                _execute_with_plan(child_plan, value, prefix + field_name_dot)
+                _collect_with_plan(
+                    child_plan, value, prefix + field_name_dot, failures,
+                )
 
         # Execute each custom rule validator for this field, if any.
         for validate in validators:
@@ -218,8 +228,31 @@ def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
             failure = validate(qualified, value, instance)
             if failure is not None:
 
-                # Stop at the first validation failure.
-                raise ValidationException(failure)
+                # Keep going so sibling rules and fields are reported too.
+                failures.append(failure)
+
+def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
+    """
+    Execute a pre-resolved plan and raise when any rule fails.
+
+    Parameters
+    ----------
+    plan : tuple
+        Non-empty plan produced by ``_build_plan`` for this instance's type.
+    instance : object
+        Schema instance to validate.
+    prefix : str
+        Dot-terminated path prefix for nested field names.
+
+    Raises
+    ------
+    ValidationException
+        Raised with every rule failure found.
+    """
+    failures: list = []
+    _collect_with_plan(plan, instance, prefix, failures)
+    if failures:
+        raise ValidationException(failures)
 
 def _execute(instance: object, _prefix: str = "") -> None:
     """

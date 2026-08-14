@@ -12,7 +12,7 @@ class Database(BaseEntity):
     """
     Represent the configuration entity for a database-backed cache store.
 
-    Mirrors Laravel's ``database`` cache store configuration array,
+    Mirrors ``database`` cache store configuration array,
     supporting a dedicated connection/table for cache entries and an
     independent connection/table for the atomic locks used by
     ``Cache::lock()``.

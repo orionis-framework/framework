@@ -11,7 +11,7 @@ class JoinClause:
 
     Handed to the callback form of the join helpers so several ON
     conditions can be combined, mirroring the fluent join syntax of
-    Laravel query builders.
+    query builders.
     """
 
     __slots__ = ("_conditions",)

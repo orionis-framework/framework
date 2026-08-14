@@ -252,7 +252,7 @@ Para validaciones que `msgspec.Meta` no puede expresar, se subclasifica
 
 ```python
 class Rule(IRule):
-    __slots__ = ("_message", "_resolved_code", "_resolved_default_message")
+    __slots__ = ("_code", "_message")
     def __init__(self, *, message: str | None = None) -> None: ...
     def enforce(self, field: str, value: object, instance: object) -> bool: ...
     def validate(self, field: str, value: object, instance: object) -> ValidationFailure | None: ...
@@ -260,7 +260,7 @@ class Rule(IRule):
 
 | Miembro | Descripción |
 | --- | --- |
-| `__init__(*, message=None)` | Guarda un mensaje de sobrescritura opcional por instancia; resuelve los atributos de clase `__code__`/`__message__` una sola vez. |
+| `__init__(*, message=None)` | Resuelve una sola vez, en tiempo de construcción, el mensaje de fallo efectivo (la sobrescritura por instancia o el `__message__` de clase) y el atributo de clase `__code__`. |
 | `enforce(field, value, instance)` | **Debe sobrescribirse** en las subclases. Devuelve `True` cuando `value` es válido, `False` en caso contrario. La implementación base lanza `NotImplementedError`. |
 | `validate(field, value, instance)` | Llama a `enforce(...)`; en caso de fallo, devuelve un `ValidationFailure(field=field, rule=<código resuelto>, message=<message o el por defecto>)`; devuelve `None` si tiene éxito. Normalmente no se sobrescribe. |
 | `__code__` (atributo de clase, opcional) | Identificador de regla legible por máquina usado como `ValidationFailure.rule`; por defecto es el nombre de la clase en minúsculas si no se establece. |

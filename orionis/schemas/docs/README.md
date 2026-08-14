@@ -233,7 +233,7 @@ For validations `msgspec.Meta` cannot express, subclass `Rule`:
 
 ```python
 class Rule(IRule):
-    __slots__ = ("_message", "_resolved_code", "_resolved_default_message")
+    __slots__ = ("_code", "_message")
     def __init__(self, *, message: str | None = None) -> None: ...
     def enforce(self, field: str, value: object, instance: object) -> bool: ...
     def validate(self, field: str, value: object, instance: object) -> ValidationFailure | None: ...
@@ -241,7 +241,7 @@ class Rule(IRule):
 
 | Member | Description |
 | --- | --- |
-| `__init__(*, message=None)` | Stores an optional per-instance override message; resolves `__code__`/`__message__` class attributes once. |
+| `__init__(*, message=None)` | Resolves the effective failure message (per-instance override or the class-level `__message__`) and the `__code__` class attribute once, at construction time. |
 | `enforce(field, value, instance)` | **Must be overridden** by subclasses. Return `True` when `value` is valid, `False` otherwise. Base implementation raises `NotImplementedError`. |
 | `validate(field, value, instance)` | Calls `enforce(...)`; on failure, returns a `ValidationFailure(field=field, rule=<resolved code>, message=<message or default>)`; returns `None` on success. Not usually overridden. |
 | `__code__` (class attribute, optional) | Machine-readable rule identifier used as `ValidationFailure.rule`; defaults to the lowercase class name if unset. |

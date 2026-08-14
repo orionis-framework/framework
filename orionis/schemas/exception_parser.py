@@ -7,8 +7,11 @@ from typing import Union, get_args, get_origin
 from orionis.schemas.entities.failure import ValidationFailure
 
 # Regular expressions for parsing msgspec error messages.
-PATH_RE = re.compile(r"(?P<message>.+) - at `\$(?P<path>[^`]*)`$")
 MISSING_FIELD_RE = re.compile(r"missing required field `(?P<field>[^`]+)`")
+
+# Suffix msgspec appends to report the location of the offending value.
+_PATH_MARKER = " - at `$"
+_PATH_MARKER_LEN = len(_PATH_MARKER)
 
 # Ordered patterns for identifying constraint types from msgspec error messages.
 _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
@@ -24,13 +27,6 @@ _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
     (" < ", "lt"),
     ("Expected", "type"),
 )
-
-# Index for efficient constraint key lookup: first character → list of (substring, key).
-_CONSTRAINT_INDEX: dict[str, tuple[tuple[str, str], ...]] = {}
-for _pat, _key in _CONSTRAINT_PATTERNS:
-    _fc = _pat[0]
-    _CONSTRAINT_INDEX[_fc] = (*_CONSTRAINT_INDEX.get(_fc, ()), (_pat, _key))
-del _pat, _key, _fc
 
 # Sentinel for distinguishing "not in cache" from "cached result is None".
 _MISSING: object = object()
@@ -64,6 +60,9 @@ def _get_fields_map(schema: type) -> dict[str, object]:
     return m
 
 class ValidationErrorParser:
+
+    # Prevent per-instance dictionaries; the class is used statically.
+    __slots__ = ()
 
     @classmethod
     def parse(
@@ -115,9 +114,17 @@ class ValidationErrorParser:
         """
         text = str(error)
 
-        match = PATH_RE.match(text)
-
-        if match is None:
+        # Split "<message> - at `$<path>`" with plain string scans instead of a
+        # backtracking regex, which also avoids allocating a match object.
+        marker = text.rfind(_PATH_MARKER)
+        if (
+            marker > 0
+            and text.endswith("`")
+            and "`" not in (path := text[marker + _PATH_MARKER_LEN : -1])
+        ):
+            raw_message = text[:marker]
+            field = cls._joinPath(base, path.lstrip("."))
+        else:
             missing = MISSING_FIELD_RE.search(text)
 
             # Missing fields carry their own name instead of a path suffix.
@@ -131,9 +138,6 @@ class ValidationErrorParser:
             # Errors on the converted value itself report no path at all.
             raw_message = text
             field = base
-        else:
-            raw_message = match.group("message")
-            field = cls._joinPath(base, match.group("path").lstrip("."))
 
         constraint_key = cls._matchConstraintKey(raw_message)
         rule = constraint_key if constraint_key is not None else "type"
@@ -310,13 +314,11 @@ class ValidationErrorParser:
             The constraint key (e.g. ``"min_length"``, ``"gt"``), or
             ``None`` when no known pattern matches.
         """
-        # Use the first character of the message to narrow down which patterns to check,
-        # since msgspec messages have fairly consistent phrasing.
-        for ch, bucket in _CONSTRAINT_INDEX.items():
-            if ch in message:
-                for substring, key in bucket:
-                    if substring in message:
-                        return key
+        # Scan the ordered patterns and stop at the first phrase present in the
+        # message; the ordering encodes the precedence between constraints.
+        for substring, key in _CONSTRAINT_PATTERNS:
+            if substring in message:
+                return key
 
         # No known pattern matched: return None to indicate a generic "type" error.
         return None

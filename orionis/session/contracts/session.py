@@ -229,6 +229,37 @@ class ISession(ABC):
         """
 
     @abstractmethod
+    def setPreviousUrl(self, url: str) -> None:
+        """
+        Remember the page the user is currently viewing.
+
+        Parameters
+        ----------
+        url : str
+            Absolute URL of the current page.
+
+        Returns
+        -------
+        None
+        """
+
+    @abstractmethod
+    def getPreviousUrl(self, default: str | None = None) -> str | None:
+        """
+        Return the last page the user navigated to.
+
+        Parameters
+        ----------
+        default : str | None, optional
+            Fallback returned when no page has been recorded yet.
+
+        Returns
+        -------
+        str | None
+            The stored URL, or *default*.
+        """
+
+    @abstractmethod
     def regenerate(self) -> None:
         """
         Request a session ID rotation (e.g. immediately after login).

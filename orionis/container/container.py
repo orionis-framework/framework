@@ -1320,10 +1320,7 @@ class Container(IContainer):
         data = await request.data()
 
         # Validate and deserialize the data using the specified schema
-        return Schema.validate(
-            payload=data,
-            schema=argument.type,
-        )
+        return Schema.validate(data, argument.type)
 
     async def __resolveArgument(
         self,

@@ -1,5 +1,6 @@
 from typing import Annotated
 from orionis.schemas.constraints import (
+    Email,
     GreaterThan,
     GreaterThanOrEqual,
     LessThan,
@@ -53,6 +54,10 @@ class _NestedAddress(Schema):
 class _NestedPersonSchema(Schema):
     address: _NestedAddress
     age: int
+
+class _CredentialsSchema(Schema):
+    email: Annotated[str, MinLength(5), Email()]
+    password: Annotated[str, MinLength(8)]
 
 class TestValidatorBasic(TestCase):
 
@@ -291,16 +296,102 @@ class TestValidatorNestedSchema(TestCase):
         """
         Return a dict from ValidationException.error() for nested errors.
 
-        Validates that the error() method surfaces field, rule, and message
-        for validation failures in nested schema fields.
+        Validates that the error() method surfaces a summary message and
+        the dotted field path of failures in nested schema fields.
         """
         payload = {"address": {"zip_code": 99}, "age": 1}
         with self.assertRaises(ValidationException) as ctx:
             Validator.validate(payload, _NestedPersonSchema)
         err = ctx.exception.error()
-        self.assertIn("field", err)
-        self.assertIn("rule", err)
         self.assertIn("message", err)
+        self.assertIn("errors", err)
+        self.assertIn("address.zip_code", err["errors"])
+
+class TestValidatorMultipleErrors(TestCase):
+
+    def testEveryInvalidFieldIsReported(self) -> None:
+        """
+        Report every invalid field instead of stopping at the first one.
+
+        Validates that a payload breaking two constraints produces one
+        entry per offending field.
+        """
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate({"score": 500, "tag": "x"}, _ConstrainedSchema)
+        self.assertEqual(
+            set(ctx.exception.errors.keys()),
+            {"score", "tag"},
+        )
+
+    def testMissingFieldsAreAllReported(self) -> None:
+        """
+        Report every missing required field at once.
+
+        Validates that an empty payload lists all required fields rather
+        than only the first one detected by msgspec.
+        """
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate({}, _PersonSchema)
+        self.assertEqual(set(ctx.exception.errors.keys()), {"name", "age"})
+
+    def testNestedAndRootErrorsAreCombined(self) -> None:
+        """
+        Combine nested schema errors with root-level errors.
+
+        Validates that failures inside a nested schema are reported with a
+        dotted path alongside failures of the parent schema.
+        """
+        payload = {"address": {"zip_code": 99}, "age": "old"}
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate(payload, _NestedPersonSchema)
+        self.assertEqual(
+            set(ctx.exception.errors.keys()),
+            {"address.zip_code", "age"},
+        )
+
+    def testMessagesAreListsOfStrings(self) -> None:
+        """
+        Expose every field error as a list of message strings.
+
+        Validates the response contract consumed by the HTTP layer, where
+        each field maps to an array of messages.
+        """
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate({"name": 1, "age": "x"}, _PersonSchema)
+        for messages in ctx.exception.errors.values():
+            self.assertIsInstance(messages, list)
+            for message in messages:
+                self.assertIsInstance(message, str)
+
+    def testCustomRulesRunWhenAnotherFieldFailsConversion(self) -> None:
+        """
+        Run custom rules even when a sibling field breaks a constraint.
+
+        Validates that a rule such as ``Email`` still reports its failure
+        when msgspec aborts the whole-payload conversion because of another
+        field.
+        """
+        payload = {"email": "not-an-email", "password": "123"}
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate(payload, _CredentialsSchema)
+        self.assertEqual(
+            set(ctx.exception.errors.keys()),
+            {"email", "password"},
+        )
+
+    def testCustomRuleIsSkippedWhenItsOwnFieldIsInvalid(self) -> None:
+        """
+        Skip a custom rule when its own field failed conversion.
+
+        Validates that only the constraint failure is reported, since the
+        rule has no converted value to inspect.
+        """
+        payload = {"email": "a@b", "password": "12345678"}
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate(payload, _CredentialsSchema)
+        messages = ctx.exception.errors["email"]
+        self.assertEqual(len(messages), 1)
+        self.assertNotIn("email address", messages[0])
 
 class TestValidatorGreaterThan(TestCase):
 

@@ -190,7 +190,8 @@ class Session(ISession):
         current = self._data.get(key, _MISSING)
         if current is not _MISSING and current == value:
             return
-        self.__activate()
+        if not self._started:
+            self.__activate()
         self._data[key] = value
         self._dirty = True
 
@@ -262,12 +263,19 @@ class Session(ISession):
         None
         """
         flash_bag = self._data.get(_FLASH_NEW)
-        if flash_bag is not None:
-            current = flash_bag.get(key, _MISSING)
-            if current is not _MISSING and current == value:
-                return
-        self.__activate()
-        self._data.setdefault(_FLASH_NEW, {})[key] = value
+        if flash_bag is None:
+            if not self._started:
+                self.__activate()
+            self._data[_FLASH_NEW] = {key: value}
+            self._dirty = True
+            return
+
+        current = flash_bag.get(key, _MISSING)
+        if current is not _MISSING and current == value:
+            return
+        if not self._started:
+            self.__activate()
+        flash_bag[key] = value
         self._dirty = True
 
     def getFlash(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
@@ -444,7 +452,8 @@ class Session(ISession):
         None
         """
         self._regenerate = True
-        self.__activate()
+        if not self._started:
+            self.__activate()
         self._dirty = True
 
     def invalidate(self) -> None:
@@ -496,24 +505,6 @@ class Session(ISession):
             self._data[_FLASH_OLD] = new_flash
         if new_flash is not None or had_old:
             self._dirty = True
-
-    def _assignId(self, new_id: str) -> None:
-        """Replace the current identifier with *new_id*.
-
-        Used exclusively by ``SessionManager`` during ID regeneration.
-
-        Parameters
-        ----------
-        new_id : str
-            The replacement session identifier.
-
-        Returns
-        -------
-        None
-        """
-        self._id = new_id
-        self._regenerate = False
-        self._dirty = True
 
     def _rotateId(self) -> str | None:
         """

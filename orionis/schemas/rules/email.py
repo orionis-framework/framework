@@ -46,9 +46,6 @@ class Email(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
-        if not isinstance(value, str):
-            return True
-
         # Reject addresses exceeding the maximum length allowed by RFC 5321.
         if len(value) > _MAX_LENGTH:
             return False

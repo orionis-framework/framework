@@ -10,7 +10,7 @@ class ITranslator(ABC):
     Define the contract for the translation service.
 
     The translator resolves lines for the active locale, falls back to
-    the configured fallback locale, applies Laravel-style parameter
+    the configured fallback locale, applies parameter
     replacement, and selects pluralized segments.
     """
 

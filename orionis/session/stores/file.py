@@ -12,7 +12,7 @@ from orionis.session.entities.record import SessionRecord
 if TYPE_CHECKING:
     from pathlib import Path
 
-class _SessionPayload(msgspec.Struct, frozen=True):
+class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
     """
     Represent the serialized payload stored for a session.
 
@@ -29,6 +29,11 @@ class _SessionPayload(msgspec.Struct, frozen=True):
     id: str
     expires_at: datetime
     data: dict[str, Any]
+
+# Codecs built once: msgspec resolves the struct layout at construction time
+# instead of on every encode/decode call.
+_ENCODER = _msgspec_json.Encoder()
+_DECODER = _msgspec_json.Decoder(_SessionPayload)
 
 class FileSessionStore(ISessionStore):
     """
@@ -115,7 +120,7 @@ class FileSessionStore(ISessionStore):
             expires_at=record.expires_at,
             data=record.data,
         )
-        return _msgspec_json.encode(payload)
+        return _ENCODER.encode(payload)
 
     def _deserialize(self, raw: bytes) -> SessionRecord | None:
         """
@@ -135,7 +140,7 @@ class FileSessionStore(ISessionStore):
             Deserialised record, or ``None`` on any decode error.
         """
         try:
-            payload = _msgspec_json.decode(raw, type=_SessionPayload)
+            payload = _DECODER.decode(raw)
             return SessionRecord(
                 id=payload.id,
                 data=payload.data,
@@ -200,6 +205,51 @@ class FileSessionStore(ISessionStore):
         """
         path.unlink(missing_ok=True)
 
+    def _readRecord(self, path: Path) -> SessionRecord | None:
+        """
+        Load, decode and validate the record stored at *path*.
+
+        Runs entirely on a worker thread: file I/O, JSON decoding and the
+        eviction of an expired or corrupt file happen in a single hop.
+
+        Parameters
+        ----------
+        path : Path
+            Session file to load.
+
+        Returns
+        -------
+        SessionRecord | None
+            The live record, or ``None`` when absent, expired or corrupt.
+        """
+        raw = self._readFile(path)
+        if raw is None:
+            return None
+
+        record = self._deserialize(raw)
+        if record is None or record.expires_at <= datetime.now(UTC):
+            self._deleteFile(path)
+            return None
+
+        return record
+
+    def _writeRecord(self, path: Path, record: SessionRecord) -> None:
+        """
+        Serialise *record* and store it atomically at *path*.
+
+        Parameters
+        ----------
+        path : Path
+            Destination session file.
+        record : SessionRecord
+            The record to persist.
+
+        Returns
+        -------
+        None
+        """
+        self._writeFile(path, self._serialize(record))
+
     def _gcSweep(self) -> None:
         """
         Scan the store directory and remove stale or corrupt files.
@@ -221,7 +271,7 @@ class FileSessionStore(ISessionStore):
                 try:
                     with open(entry.path, "rb") as fh:  # noqa: PTH123
                         raw = fh.read()
-                    payload = _msgspec_json.decode(raw, type=_SessionPayload)
+                    payload = _DECODER.decode(raw)
                     if payload.expires_at <= now:
                         os.unlink(entry.path)  # noqa: PTH108
                 except (ValueError, msgspec.DecodeError, OSError):
@@ -249,23 +299,7 @@ class FileSessionStore(ISessionStore):
         SessionRecord | None
             The live record, or ``None`` when absent, expired, or corrupt.
         """
-        path = self._path(session_id)
-        raw: bytes | None = await asyncio.to_thread(self._readFile, path)
-
-        if raw is None:
-            return None
-
-        record = self._deserialize(raw)
-
-        if record is None:
-            await asyncio.to_thread(self._deleteFile, path)
-            return None
-
-        if record.expires_at <= datetime.now(UTC):
-            await asyncio.to_thread(self._deleteFile, path)
-            return None
-
-        return record
+        return await asyncio.to_thread(self._readRecord, self._path(session_id))
 
     async def write(self, record: SessionRecord) -> None:
         """
@@ -280,9 +314,7 @@ class FileSessionStore(ISessionStore):
         -------
         None
         """
-        path = self._path(record.id)
-        content = self._serialize(record)
-        await asyncio.to_thread(self._writeFile, path, content)
+        await asyncio.to_thread(self._writeRecord, self._path(record.id), record)
 
     async def delete(self, session_id: str) -> None:
         """

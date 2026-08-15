@@ -1,4 +1,4 @@
-from orionis.schemas.constraints import Email, MinLength
+from orionis.schemas.constraints import Email, MinLength, Unique
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 from orionis.schemas import Schema
@@ -16,6 +16,11 @@ class RegisterSchema(Schema):
         Message("Email must be a string."),
         MinLength(5, message="Email must be at least 5 characters long."),
         Email(message="Email must be a valid email address."),
+        Unique(
+            table="users",
+            column="email",
+            message="Email already exists. Please use a different email address.",
+        ),
     ]
 
     password: Field[
@@ -27,6 +32,9 @@ class RegisterSchema(Schema):
     password_confirmation: Field[
         str,
         Message("Password confirmation must be a string."),
-        MinLength(8, message="Password confirmation must be at least 8 characters long."),
+        MinLength(
+            8,
+            message="Password confirmation must be at least 8 characters long.",
+        ),
     ]
 

@@ -304,6 +304,17 @@ class Schema(msgspec.Struct, metaclass=SchemaMeta):
     metadata on the resulting class.
     """
 
+    def toDict(self) -> dict[str, object]:
+        """
+        Convert the schema instance into a dictionary.
+
+        Returns
+        -------
+        dict[str, object]
+            Dictionary containing the schema fields and their values.
+        """
+        return msgspec.structs.asdict(self)
+
 __all__: list[str] = [
     "Schema",
     "SchemaMeta",

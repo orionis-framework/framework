@@ -1223,7 +1223,12 @@ class SQLCompiler:
             "comment": definition.comment_text,
         }
         if definition.hasDefault():
-            options["default"] = definition.default_value
+            value = definition.default_value
+            options["default"] = value
+            # Static defaults are also emitted in the DDL, so rows written
+            # without the column still receive the declared value.
+            if value is not None and not callable(value):
+                options["server_default"] = sqlalchemy.literal(value, args[1])
 
         return SqlColumn(*args, **options)
 

@@ -4,6 +4,7 @@ from orionis.console.scheduler_provider import ScheduleProvider
 from orionis.database.provider import ConnectionManagerProvider
 from orionis.database.schema_provider import SchemaProvider
 from orionis.failure.provider import CatchProvider
+from orionis.hashing.provider import HashProvider
 from orionis.http.routes.provider import RouterProvider
 from orionis.localization.provider import LocalizationProvider
 from orionis.logging.provider import LoggerProvider
@@ -26,6 +27,7 @@ def get_core_providers_mapping() -> tuple:
         CacheProvider,
         CatchProvider,
         ConnectionManagerProvider,
+        HashProvider,
         LocalizationProvider,
         LoggerProvider,
         QueryBuilderProvider,

@@ -4,6 +4,7 @@ from orionis.support.facades.catch import Catch
 from orionis.support.facades.datetime import DateTime
 from orionis.support.facades.db import DB
 from orionis.support.facades.encrypter import Crypt
+from orionis.support.facades.hash import Hash
 from orionis.support.facades.lang import Lang
 from orionis.support.facades.logger import Log
 from orionis.support.facades.reactor import Reactor
@@ -22,6 +23,7 @@ __all__ = [
     "Catch",
     "Crypt",
     "DateTime",
+    "Hash",
     "Lang",
     "Log",
     "Reactor",

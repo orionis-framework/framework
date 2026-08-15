@@ -35,11 +35,6 @@ class RegisterController(BaseController):
 
         try:
 
-            existing_user = await User.where("email", request.email).first()
-            if existing_user:
-                exc_msg = "Email already exists. Please use a different email address."
-                raise ValueError(exc_msg)
-
             user = User()
             user.name = request.name.strip()
             user.email = request.email.strip().lower()

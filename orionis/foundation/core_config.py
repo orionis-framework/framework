@@ -6,6 +6,7 @@ from orionis.foundation.config.auth.entities.auth import Auth
 from orionis.foundation.config.cache.entities.cache import Cache
 from orionis.foundation.config.database.entities.database import Database
 from orionis.foundation.config.filesystems.entitites.filesystems import Filesystems
+from orionis.foundation.config.hashing.entities.hashing import Hashing
 from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.logging.entities.logging import Logging
 from orionis.foundation.config.mail.entities.mail import Mail
@@ -31,6 +32,7 @@ def get_core_config_mapping() -> MappingProxyType:
         "cache": asdict(Cache()),
         "database": asdict(Database()),
         "filesystems": asdict(Filesystems()),
+        "hashing": asdict(Hashing()),
         "http": asdict(HTTP()),
         "logging": asdict(Logging()),
         "mail": asdict(Mail()),

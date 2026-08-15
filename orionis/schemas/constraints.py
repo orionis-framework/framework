@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from orionis.schemas.meta.constraint import ConstraintMetadata
 from orionis.schemas.rules.email import Email
 from orionis.schemas.rules.strong_password import StrongPassword
+from orionis.schemas.rules.unique import Unique
 
 # ---------------------------------------------------------------------------
 # Numeric constraints
@@ -191,4 +192,5 @@ __all__: list[str] = [
     "StrongPassword",
     "TimezoneAware",
     "TimezoneNaive",
+    "Unique",
 ]

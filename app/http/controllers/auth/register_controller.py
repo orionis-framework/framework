@@ -1,40 +1,66 @@
-from typing import Any
-
-from orionis.http import HTMLResponse, Request
+from app.models.user import User
+from orionis.http import response, HttpResponse
+from app.http.schemas.auth.register import RegisterSchema
 from orionis.http.base import BaseController
-from orionis.support.facades import View
+from orionis.support.facades import DB, Hash
 
 class RegisterController(BaseController):
 
-    async def index(self) -> HTMLResponse:
+    async def index(self) -> HttpResponse:
         """
         Return the registration page response.
 
         Returns
         -------
-        HTMLResponse
+        HttpResponse
             Rendered response for the registration page.
         """
-        return await View.make("auth.register")
+        return await response.view("auth.register")
 
-    async def register(self, request: Request) -> HTMLResponse:
+    async def register(self, request: RegisterSchema) -> HttpResponse:
         """
         Handle the registration form submission.
 
         Parameters
         ----------
-        request : Request
+        request : RegisterSchema
             Incoming request carrying the submitted account data.
 
         Returns
         -------
-        HTMLResponse
+        HttpResponse
             Rendered registration page including the submitted data.
         """
-        account: dict[str, Any] = await request.data()
+        await DB.beginTransaction()
 
-        return await View.make(
-            "auth.register",
-            name=account.get("name", ""),
-            email=account.get("email", ""),
-        )
+        try:
+
+            existing_user = await User.where("email", request.email).first()
+            if existing_user:
+                exc_msg = "Email already exists. Please use a different email address."
+                raise ValueError(exc_msg)
+
+            user = User()
+            user.name = request.name.strip()
+            user.email = request.email.strip().lower()
+            user.password = Hash.make(request.password.strip())
+            await user.save()
+
+            await DB.commit()
+            return (
+                response.redirect("/login")
+                        .withFlash(
+                            "success", "Account created successfully. Please log in.",
+                        )
+            )
+
+        except Exception as e:
+
+            await DB.rollback()
+            return await (
+                response.view("auth.register")
+                        .withErrors({
+                            "registration": str(e),
+                        })
+                        .withInput(request.toDict())
+            )

@@ -37,4 +37,3 @@ class RegisterSchema(Schema):
             message="Password confirmation must be at least 8 characters long.",
         ),
     ]
-

@@ -15,6 +15,9 @@
       <div class="card card-md">
         <div class="card-body">
           <h2 class="h2 text-center mb-4">{{ __('Create new account') }}</h2>
+          {% if errors.any() %}
+            <div class="alert alert-danger" role="alert">{{ errors.first() }}</div>
+          {% endif %}
           <form action="{{ route('register') }}" method="post" autocomplete="off" novalidate="">
             {% csrf %}
             <div class="mb-3">

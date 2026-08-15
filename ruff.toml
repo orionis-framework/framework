@@ -23,6 +23,7 @@ exclude = [
     "TC001",
     "TC002",
     "ARG002",
+    "BLE001"
 ]
 "app/console/commands/**" = [
     "RUF012",

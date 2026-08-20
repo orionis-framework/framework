@@ -1,4 +1,5 @@
 from __future__ import annotations
+from types import MappingProxyType
 from typing import Any
 from orionis.session.flash import (
     ERRORS_KEY,
@@ -16,7 +17,7 @@ from orionis.test import TestCase
 class _FakeFailure:
     """Minimal stand-in for a single validation failure."""
 
-    def __init__(self, field: str, message: str) -> None:
+    def __init__(self, field: str | None, message: str | None) -> None:
         self.field = field
         self.message = message
 
@@ -25,7 +26,7 @@ class _FakeValidationException(Exception):
 
     def __init__(
         self,
-        errors: dict[str, Any] | None = None,
+        errors: object | None = None,
         failure: _FakeFailure | None = None,
     ) -> None:
         super().__init__("invalid")
@@ -108,6 +109,27 @@ class TestFilterInput(TestCase):
         """
         self.assertEqual(filter_input({}), {})
 
+    def testAcceptsAnyMappingOnTheFastPath(self) -> None:
+        """
+        Copy a read-only mapping into a plain dictionary.
+
+        Validates that the credential-free fast path does not assume the
+        payload is a mutable dict.
+        """
+        payload = MappingProxyType({"email": "a@b.c"})
+        result = filter_input(payload)
+        self.assertEqual(result, {"email": "a@b.c"})
+        self.assertIsInstance(result, dict)
+
+    def testAcceptsAnyMappingOnTheFilteredPath(self) -> None:
+        """
+        Filter a read-only mapping containing credentials.
+
+        Validates that the slow path also accepts non-dict mappings.
+        """
+        payload = MappingProxyType({"email": "a@b.c", "password": "x"})
+        self.assertEqual(filter_input(payload), {"email": "a@b.c"})
+
 class TestNormalizeErrors(TestCase):
     """Unit tests for normalize_errors()."""
 
@@ -181,6 +203,39 @@ class TestNormalizeErrors(TestCase):
         exc = _FakeValidationException(failure=_FakeFailure("email", "invalid"))
         self.assertEqual(normalize_errors(exc), {"email": ["invalid"]})
 
+    def testNonMappingErrorsAttributeFallsBackToFailure(self) -> None:
+        """
+        Ignore an ``errors`` attribute that is not a mapping.
+
+        Validates that the failure attribute still drives the result
+        when the richer bag is unusable.
+        """
+        exc = _FakeValidationException(
+            errors=["not", "a", "mapping"],
+            failure=_FakeFailure("email", "invalid"),
+        )
+        self.assertEqual(normalize_errors(exc), {"email": ["invalid"]})
+
+    def testFailureWithoutFieldOrMessageYieldsEmptyStrings(self) -> None:
+        """
+        Tolerate a failure exposing empty attributes.
+
+        Validates that ``None`` values are coerced to empty strings
+        instead of leaking into the flash bag.
+        """
+        exc = _FakeValidationException(failure=_FakeFailure(None, None))
+        self.assertEqual(normalize_errors(exc), {"": [""]})
+
+    def testExceptionWithoutErrorBagRaisesTypeError(self) -> None:
+        """
+        Reject an exception carrying no error information.
+
+        Validates that an unrelated exception cannot be flashed as if it
+        were a validation failure.
+        """
+        with self.assertRaises(TypeError):
+            normalize_errors(_FakeValidationException())
+
     def testUnsupportedPayloadRaisesTypeError(self) -> None:
         """
         Reject payloads that are neither mappings nor exceptions.
@@ -189,6 +244,17 @@ class TestNormalizeErrors(TestCase):
         """
         with self.assertRaises(TypeError):
             normalize_errors("boom")
+
+    def testReadOnlyMappingIsSupported(self) -> None:
+        """
+        Accept any mapping implementation as the error bag.
+
+        Validates that the normaliser never assumes a mutable dict.
+        """
+        self.assertEqual(
+            normalize_errors(MappingProxyType({"email": "required"})),
+            {"email": ["required"]},
+        )
 
 class TestQueueBag(TestCase):
     """Unit tests for queue_bag()."""
@@ -285,3 +351,31 @@ class TestApplyFlash(TestCase):
         session = Session()
         apply_flash(session, {})
         self.assertFalse(session.started)
+
+    def testRoutesExceptionErrorsThroughFlashErrors(self) -> None:
+        """
+        Normalise a validation exception queued as the errors bag.
+
+        Validates that responses may queue the raised exception itself
+        instead of a pre-built mapping.
+        """
+        session = Session()
+        apply_flash(
+            session,
+            {ERRORS_KEY: _FakeValidationException({"email": ["invalid"]})},
+        )
+        self.assertEqual(session.getErrors(), {"email": ["invalid"]})
+
+    def testPreviousUrlKeyIsFlashedVerbatim(self) -> None:
+        """
+        Treat the previous-url key as an ordinary flash entry.
+
+        Validates that only the input and error bags receive special
+        routing.
+        """
+        session = Session()
+        apply_flash(session, {PREVIOUS_URL_KEY: "http://orionis.test/login"})
+        self.assertEqual(
+            session.getFlash(PREVIOUS_URL_KEY),
+            "http://orionis.test/login",
+        )

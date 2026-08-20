@@ -1,10 +1,26 @@
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock
 import jinja2
+from orionis.foundation.config.view.entities.view import View as ViewConfig
 from orionis.test import TestCase
 from orionis.view.environment import ViewEnvironment
 from orionis.view.exceptions import ViewException
+from orionis.view.extensions import CsrfExtension
+
+class _StubApp:
+    """Application double exposing view configuration and a base path."""
+
+    __slots__ = ("basePath", "requested", "view_config")
+
+    def __init__(self, view_config: object, base_path: Path) -> None:
+        self.view_config: object = view_config
+        self.basePath: Path = base_path
+        self.requested: list[str] = []
+
+    def config(self, key: str) -> object:
+        """Return the stubbed view configuration for the requested key."""
+        self.requested.append(key)
+        return self.view_config
 
 class TestViewEnvironment(TestCase):
 
@@ -31,9 +47,9 @@ class TestViewEnvironment(TestCase):
         *,
         paths: list | None = None,
         cache_path_str: str | None = None,
-    ) -> MagicMock:
+    ) -> _StubApp:
         """
-        Build a mock IApplication configured for the view environment.
+        Build a stub application configured for the view environment.
 
         Parameters
         ----------
@@ -44,21 +60,21 @@ class TestViewEnvironment(TestCase):
 
         Returns
         -------
-        MagicMock
-            A mock application whose config and basePath are set up.
+        _StubApp
+            A stub application whose config and basePath are set up.
         """
         resolved_paths = paths if paths is not None else [self._tmpdir.name]
-        app = MagicMock()
-        app.config.return_value = {
-            "paths": resolved_paths,
-            "cache_size": 100,
-            "cache_path": cache_path_str,
-            "auto_reload": False,
-            "autoescape": True,
-            "enable_async": True,
-        }
-        app.basePath = Path(self._tmpdir.name)
-        return app
+        return _StubApp(
+            {
+                "paths": resolved_paths,
+                "cache_size": 100,
+                "cache_path": cache_path_str,
+                "auto_reload": False,
+                "autoescape": True,
+                "enable_async": True,
+            },
+            Path(self._tmpdir.name),
+        )
 
     def _buildEnv(
         self,
@@ -242,3 +258,153 @@ class TestViewEnvironment(TestCase):
         """
         env = self._buildEnv()
         self.assertIs(env.getJinjaEnvironment(), env.getJinjaEnvironment())
+
+    def testConfigurationIsReadFromTheViewSection(self) -> None:
+        """
+        Read the environment configuration from the view section.
+
+        Validates that the container is queried exactly once with the
+        expected configuration key.
+        """
+        app = self._buildApp()
+        ViewEnvironment(app)
+        self.assertEqual(app.requested, ["view"])
+
+    def testConfigurationEntityIsAcceptedAsIs(self) -> None:
+        """
+        Accept an already built configuration entity.
+
+        Validates that the environment does not require a raw mapping
+        when the container returns the typed configuration object.
+        """
+        config = ViewConfig(
+            paths=[self._tmpdir.name],
+            cache_size=25,
+            cache_path=None,
+            auto_reload=False,
+            autoescape=False,
+        )
+        env = ViewEnvironment(_StubApp(config, Path(self._tmpdir.name)))
+        jinja_env = env.getJinjaEnvironment()
+        self.assertEqual(jinja_env.cache.capacity, 25)
+
+    def testRelativePathIsResolvedAgainstBasePath(self) -> None:
+        """
+        Resolve a relative template path against the application base.
+
+        Validates that configuration files can declare portable paths
+        such as ``resources/views``.
+        """
+        views_dir = Path(self._tmpdir.name) / "resources"
+        views_dir.mkdir()
+        env = self._buildEnv(paths=["resources"])
+        loader = env.getJinjaEnvironment().loader
+        self.assertEqual(loader.searchpath, [str(views_dir)])
+
+    def testAbsolutePathIsUsedVerbatim(self) -> None:
+        """
+        Use an absolute template path without prefixing the base path.
+
+        Validates that deployments pointing at directories outside the
+        project root keep working.
+        """
+        absolute = Path(self._tmpdir.name).resolve()
+        env = self._buildEnv(paths=[str(absolute)])
+        loader = env.getJinjaEnvironment().loader
+        self.assertEqual(loader.searchpath, [str(absolute)])
+
+    def testRelativeCachePathIsResolvedAgainstBasePath(self) -> None:
+        """
+        Create the bytecode cache directory under the application base.
+
+        Validates that a relative cache path is anchored to the project
+        root instead of the current working directory.
+        """
+        self._buildEnv(cache_path_str="storage/views")
+        expected = Path(self._tmpdir.name) / "storage" / "views"
+        self.assertTrue(expected.is_dir())
+
+    def testAbsoluteCachePathIsUsedVerbatim(self) -> None:
+        """
+        Create the bytecode cache directory at an absolute location.
+
+        Validates that an absolute cache path is never prefixed with the
+        application base path.
+        """
+        absolute = Path(self._tmpdir.name).resolve() / "absolute_cache"
+        self._buildEnv(cache_path_str=str(absolute))
+        self.assertTrue(absolute.is_dir())
+
+    def testAutoescapeIsTakenFromConfiguration(self) -> None:
+        """
+        Propagate the autoescape flag from the configuration.
+
+        Validates that HTML escaping honours the declared setting.
+        """
+        env = self._buildEnv()
+        self.assertTrue(env.getJinjaEnvironment().autoescape)
+
+    def testAutoReloadIsTakenFromConfiguration(self) -> None:
+        """
+        Propagate the auto_reload flag from the configuration.
+
+        Validates that template reloading honours the declared setting.
+        """
+        env = self._buildEnv()
+        self.assertFalse(env.getJinjaEnvironment().auto_reload)
+
+    def testCacheSizeIsTakenFromConfiguration(self) -> None:
+        """
+        Propagate the compiled-template cache size from configuration.
+
+        Validates that the LRU cache is sized as declared.
+        """
+        env = self._buildEnv()
+        self.assertEqual(env.getJinjaEnvironment().cache.capacity, 100)
+
+    def testTrailingNewlineIsPreserved(self) -> None:
+        """
+        Keep the trailing newline of every rendered template.
+
+        Validates that generated markup is byte-faithful to the source
+        template file.
+        """
+        env = self._buildEnv()
+        self.assertTrue(env.getJinjaEnvironment().keep_trailing_newline)
+
+    def testUndefinedPolicyIsTheLenientOne(self) -> None:
+        """
+        Use the lenient Undefined policy for missing variables.
+
+        Validates that absent template variables render as empty output
+        instead of raising.
+        """
+        env = self._buildEnv()
+        self.assertIs(env.getJinjaEnvironment().undefined, jinja2.Undefined)
+
+    def testAddExtensionRegistersTheExtension(self) -> None:
+        """
+        Register a valid Jinja2 extension with the environment.
+
+        Validates that the extension becomes available to every template
+        compiled afterwards.
+        """
+        env = self._buildEnv()
+        env.addExtension(CsrfExtension)
+        extensions = env.getJinjaEnvironment().extensions
+        self.assertIn(
+            f"{CsrfExtension.__module__}.{CsrfExtension.__name__}",
+            extensions,
+        )
+
+    def testAddExtensionPreservesChainedCause(self) -> None:
+        """
+        Preserve the original error when extension registration fails.
+
+        Validates that the ViewException keeps the underlying Jinja2 or
+        import failure as its cause.
+        """
+        env = self._buildEnv()
+        with self.assertRaises(ViewException) as ctx:
+            env.addExtension("invalid.module.Extension")
+        self.assertIsNotNone(ctx.exception.__cause__)

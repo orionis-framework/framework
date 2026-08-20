@@ -1,8 +1,15 @@
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock
 from orionis.test import TestCase
 from orionis.view.cache import OrionisBytecodeCache
+
+class _StubBucket:
+    """Bytecode bucket double exposing only the cache key."""
+
+    __slots__ = ("key",)
+
+    def __init__(self, key: str) -> None:
+        self.key: str = key
 
 class TestOrionisBytecodeCache(TestCase):
 
@@ -157,8 +164,7 @@ class TestOrionisBytecodeCache(TestCase):
         cache directory and ends with the .cache suffix.
         """
         cache = self._make()
-        bucket = MagicMock()
-        bucket.key = "users.index"
+        bucket = _StubBucket("users.index")
         result = cache._get_cache_filename(bucket)
         expected = str(Path(self._cache_dir) / "users.index.cache")
         self.assertEqual(result, expected)
@@ -171,8 +177,7 @@ class TestOrionisBytecodeCache(TestCase):
         provided bucket, preserving any dot-separated structure.
         """
         cache = self._make()
-        bucket = MagicMock()
-        bucket.key = "admin.dashboard.j2"
+        bucket = _StubBucket("admin.dashboard.j2")
         result = cache._get_cache_filename(bucket)
         self.assertIn("admin.dashboard.j2.cache", result)
 
@@ -184,8 +189,7 @@ class TestOrionisBytecodeCache(TestCase):
         with the .cache extension.
         """
         cache = self._make()
-        bucket = MagicMock()
-        bucket.key = "emails.welcome"
+        bucket = _StubBucket("emails.welcome")
         result = cache._get_cache_filename(bucket)
         self.assertTrue(result.endswith(".cache"))
 
@@ -197,7 +201,26 @@ class TestOrionisBytecodeCache(TestCase):
         cache directory path so writes land in the expected location.
         """
         cache = self._make()
-        bucket = MagicMock()
-        bucket.key = "some.template"
+        bucket = _StubBucket("some.template")
         result = cache._get_cache_filename(bucket)
         self.assertTrue(result.startswith(self._cache_dir))
+
+    def testGetCacheKeyStripsOnlyTheMatchingExtension(self) -> None:
+        """
+        Strip a single recognised extension from the cache key.
+
+        Validates that the sanitisation loop stops at the first match so
+        chained suffixes are not removed twice.
+        """
+        cache = self._make()
+        self.assertEqual(cache.get_cache_key("page.html.j2"), "page.html")
+
+    def testGetCacheKeyOnEmptyNameReturnsEmptyString(self) -> None:
+        """
+        Return an empty key for an empty template name.
+
+        Validates that the sanitisation step never fails on a degenerate
+        template identifier.
+        """
+        cache = self._make()
+        self.assertEqual(cache.get_cache_key(""), "")

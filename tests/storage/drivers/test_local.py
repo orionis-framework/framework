@@ -129,7 +129,7 @@ class TestLocalStorageDriver(TestCase):
         async with self._driver.open("s.bin", "rb") as stream:
             self.assertEqual(await stream.read(), b"streamed")
 
-    async def testOpenRejectsTextModes(self) -> None:
+    def testOpenRejectsTextModes(self) -> None:
         """
         Reject non-binary stream modes.
 

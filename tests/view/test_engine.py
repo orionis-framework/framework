@@ -1,10 +1,84 @@
-from unittest.mock import AsyncMock, MagicMock
 import jinja2
 from orionis.test import TestCase
+from orionis.view import engine as engine_module
 from orionis.view.engine import Jinja2Engine
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 
+class _StubTemplate:
+    """Template double recording the context passed to render_async."""
+
+    __slots__ = ("calls", "error", "html")
+
+    def __init__(
+        self,
+        html: str = "",
+        error: Exception | None = None,
+    ) -> None:
+        self.html: str = html
+        self.error: Exception | None = error
+        self.calls: list[dict[str, object]] = []
+
+    async def render_async(self, **context: object) -> str:
+        """Return the canned HTML or raise the configured error."""
+        self.calls.append(context)
+        if self.error is not None:
+            raise self.error
+        return self.html
+
+class _StubJinjaEnvironment:
+    """Jinja2 environment double resolving a single stubbed template."""
+
+    __slots__ = ("error", "requested", "template")
+
+    def __init__(
+        self,
+        template: _StubTemplate | None = None,
+        error: Exception | None = None,
+    ) -> None:
+        self.template: _StubTemplate | None = template
+        self.error: Exception | None = error
+        self.requested: list[str] = []
+
+    def get_template(self, path: str) -> _StubTemplate | None:
+        """Return the stubbed template or raise the configured error."""
+        self.requested.append(path)
+        if self.error is not None:
+            raise self.error
+        return self.template
+
+class _StubViewEnvironment:
+    """View environment double exposing a stubbed Jinja2 environment."""
+
+    __slots__ = ("calls", "jinja")
+
+    def __init__(self, jinja: _StubJinjaEnvironment) -> None:
+        self.jinja: _StubJinjaEnvironment = jinja
+        self.calls: int = 0
+
+    def getJinjaEnvironment(self) -> _StubJinjaEnvironment:
+        """Return the stubbed Jinja2 environment."""
+        self.calls += 1
+        return self.jinja
+
 class TestJinja2EngineNormalisePath(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Clear the module-level path cache before each test.
+
+        Keeps every case deterministic regardless of the order in which
+        templates were normalised by previous tests.
+        """
+        engine_module._PATH_CACHE.clear()
+
+    def tearDown(self) -> None:
+        """
+        Clear the module-level path cache after each test.
+
+        Prevents memoised entries from leaking into unrelated test
+        modules sharing the same process.
+        """
+        engine_module._PATH_CACHE.clear()
 
     def testDotNotationConvertsToSlashPath(self) -> None:
         """
@@ -86,36 +160,77 @@ class TestJinja2EngineNormalisePath(TestCase):
         result = Jinja2Engine._normalisePath("emails/welcome.txt")
         self.assertEqual(result, "emails/welcome.txt")
 
+    def testNormalisePathMemoisesTheResult(self) -> None:
+        """
+        Memoise the normalised path for later lookups.
+
+        Validates that the identifier to path translation is computed
+        only once per template name.
+        """
+        Jinja2Engine._normalisePath("users.index")
+        self.assertEqual(
+            engine_module._PATH_CACHE["users.index"],
+            "users/index.html",
+        )
+
 class TestJinja2EngineRender(TestCase):
 
-    def _buildEnv(
+    def setUp(self) -> None:
+        """
+        Clear the module-level path cache before each test.
+
+        Guarantees that cache-hit assertions observe only the entries
+        produced by the test itself.
+        """
+        engine_module._PATH_CACHE.clear()
+
+    def tearDown(self) -> None:
+        """
+        Clear the module-level path cache after each test.
+
+        Prevents memoised entries from leaking into unrelated test
+        modules sharing the same process.
+        """
+        engine_module._PATH_CACHE.clear()
+
+    def _buildEngine(
         self,
         html: str = "",
-    ) -> tuple[MagicMock, MagicMock, MagicMock]:
+        error: Exception | None = None,
+        lookup_error: Exception | None = None,
+    ) -> tuple[Jinja2Engine, _StubJinjaEnvironment, _StubTemplate]:
         """
-        Build a triple of (env_mock, jinja_env_mock, template_mock).
-
-        Returns mocks wired so env_mock.getJinjaEnvironment() returns
-        jinja_env_mock and jinja_env_mock.get_template() returns
-        template_mock whose render_async yields the given html string.
+        Build an engine wired to stubbed Jinja2 collaborators.
 
         Parameters
         ----------
         html : str
-            HTML string the template mock's render_async will return.
+            HTML returned by the stubbed template.
+        error : Exception or None
+            Error raised while rendering the stubbed template.
+        lookup_error : Exception or None
+            Error raised while looking the template up.
 
         Returns
         -------
-        tuple[MagicMock, MagicMock, MagicMock]
-            (env_mock, jinja_env_mock, template_mock)
+        tuple[Jinja2Engine, _StubJinjaEnvironment, _StubTemplate]
+            The engine under test and both stubbed collaborators.
         """
-        env_mock = MagicMock()
-        jinja_env = MagicMock()
-        env_mock.getJinjaEnvironment.return_value = jinja_env
-        template_mock = MagicMock()
-        template_mock.render_async = AsyncMock(return_value=html)
-        jinja_env.get_template.return_value = template_mock
-        return env_mock, jinja_env, template_mock
+        template = _StubTemplate(html=html, error=error)
+        jinja = _StubJinjaEnvironment(template=template, error=lookup_error)
+        engine = Jinja2Engine(_StubViewEnvironment(jinja))
+        return engine, jinja, template
+
+    def testEngineResolvesJinjaEnvironmentOnce(self) -> None:
+        """
+        Resolve the Jinja2 environment a single time on construction.
+
+        Validates that the environment reference is cached instead of
+        being fetched on every render.
+        """
+        view_env = _StubViewEnvironment(_StubJinjaEnvironment())
+        Jinja2Engine(view_env)
+        self.assertEqual(view_env.calls, 1)
 
     async def testRenderReturnsRenderedHtml(self) -> None:
         """
@@ -124,8 +239,7 @@ class TestJinja2EngineRender(TestCase):
         Validates that the engine delegates to the Jinja2 template's
         render_async and returns the resulting HTML unchanged.
         """
-        env_mock, _, _ = self._buildEnv(html="<h1>Hello</h1>")
-        engine = Jinja2Engine(env_mock)
+        engine, _, _ = self._buildEngine(html="<h1>Hello</h1>")
         result = await engine.render("users.index", {"name": "World"})
         self.assertEqual(result, "<h1>Hello</h1>")
 
@@ -136,10 +250,21 @@ class TestJinja2EngineRender(TestCase):
         Validates that the engine translates dot notation to a file path
         before calling get_template on the Jinja2 environment.
         """
-        env_mock, jinja_env, _ = self._buildEnv()
-        engine = Jinja2Engine(env_mock)
+        engine, jinja, _ = self._buildEngine()
         await engine.render("users.index", {})
-        jinja_env.get_template.assert_called_once_with("users/index.html")
+        self.assertEqual(jinja.requested, ["users/index.html"])
+
+    async def testRenderReusesTheMemoisedPath(self) -> None:
+        """
+        Reuse the memoised path instead of normalising it again.
+
+        Validates that the module-level cache short-circuits the
+        identifier translation on subsequent renders.
+        """
+        engine, jinja, _ = self._buildEngine()
+        engine_module._PATH_CACHE["users.index"] = "cached/path.html"
+        await engine.render("users.index", {})
+        self.assertEqual(jinja.requested, ["cached/path.html"])
 
     async def testRenderForwardsContextAsKeywordArgs(self) -> None:
         """
@@ -148,12 +273,9 @@ class TestJinja2EngineRender(TestCase):
         Validates that all variables in the context mapping are passed
         through to the Jinja2 template during rendering.
         """
-        env_mock, _, template_mock = self._buildEnv(html="<p>ok</p>")
-        engine = Jinja2Engine(env_mock)
+        engine, _, template = self._buildEngine(html="<p>ok</p>")
         await engine.render("page.index", {"title": "Home", "count": 3})
-        template_mock.render_async.assert_called_once_with(
-            title="Home", count=3,
-        )
+        self.assertEqual(template.calls, [{"title": "Home", "count": 3}])
 
     async def testRenderRaisesViewTemplateNotFoundOnMissingTemplate(self) -> None:
         """
@@ -162,13 +284,9 @@ class TestJinja2EngineRender(TestCase):
         Validates that a Jinja2 TemplateNotFound error is wrapped and
         re-raised as the framework's ViewTemplateNotFoundException.
         """
-        env_mock = MagicMock()
-        jinja_env = MagicMock()
-        env_mock.getJinjaEnvironment.return_value = jinja_env
-        jinja_env.get_template.side_effect = jinja2.TemplateNotFound(
-            "users/index.html",
+        engine, _, _ = self._buildEngine(
+            lookup_error=jinja2.TemplateNotFound("users/index.html"),
         )
-        engine = Jinja2Engine(env_mock)
         with self.assertRaises(ViewTemplateNotFoundException):
             await engine.render("users.index", {})
 
@@ -179,10 +297,9 @@ class TestJinja2EngineRender(TestCase):
         Validates that a Jinja2 TemplateError raised by render_async is
         wrapped and re-raised as the framework's ViewRenderException.
         """
-        env_mock, _, template_mock = self._buildEnv()
-        jinja_err = jinja2.TemplateError("syntax error")
-        template_mock.render_async = AsyncMock(side_effect=jinja_err)
-        engine = Jinja2Engine(env_mock)
+        engine, _, _ = self._buildEngine(
+            error=jinja2.TemplateError("syntax error"),
+        )
         with self.assertRaises(ViewRenderException):
             await engine.render("users.index", {})
 
@@ -193,12 +310,8 @@ class TestJinja2EngineRender(TestCase):
         Validates that the ViewTemplateNotFoundException chains the
         original TemplateNotFound exception via the from clause.
         """
-        env_mock = MagicMock()
-        jinja_env = MagicMock()
-        env_mock.getJinjaEnvironment.return_value = jinja_env
         original = jinja2.TemplateNotFound("missing.html")
-        jinja_env.get_template.side_effect = original
-        engine = Jinja2Engine(env_mock)
+        engine, _, _ = self._buildEngine(lookup_error=original)
         with self.assertRaises(ViewTemplateNotFoundException) as ctx:
             await engine.render("missing", {})
         self.assertIs(ctx.exception.__cause__, original)
@@ -210,10 +323,8 @@ class TestJinja2EngineRender(TestCase):
         Validates that the ViewRenderException chains the original
         TemplateError exception via the from clause.
         """
-        env_mock, _, template_mock = self._buildEnv()
         original = jinja2.TemplateError("bad syntax")
-        template_mock.render_async = AsyncMock(side_effect=original)
-        engine = Jinja2Engine(env_mock)
+        engine, _, _ = self._buildEngine(error=original)
         with self.assertRaises(ViewRenderException) as ctx:
             await engine.render("broken.template", {})
         self.assertIs(ctx.exception.__cause__, original)
@@ -225,7 +336,6 @@ class TestJinja2EngineRender(TestCase):
         Validates that passing an empty dict does not cause errors and
         the engine returns the expected HTML string.
         """
-        env_mock, _, _ = self._buildEnv(html="<p>static</p>")
-        engine = Jinja2Engine(env_mock)
+        engine, _, _ = self._buildEngine(html="<p>static</p>")
         result = await engine.render("static.page", {})
         self.assertEqual(result, "<p>static</p>")

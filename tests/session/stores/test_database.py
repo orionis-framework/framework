@@ -1,6 +1,9 @@
 from __future__ import annotations
+import asyncio
 from datetime import UTC, datetime, timedelta
 from orionis.database.connection import Connection
+from orionis.orm.schema.table import TableDefinition
+from orionis.orm.schema.types import BigInteger, String, Text
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.database import DatabaseSessionStore
 from orionis.test import TestCase
@@ -32,6 +35,31 @@ def _make_record(
         expires_at=datetime.now(UTC) + timedelta(seconds=offset_seconds),
     )
 
+def _relaxed_sessions_table(table: str) -> TableDefinition:
+    """
+    Build a sessions table whose payload and expiry accept NULL.
+
+    Parameters
+    ----------
+    table : str
+        Physical table name to create.
+
+    Returns
+    -------
+    TableDefinition
+        Definition mirroring the production layout, except that
+        ``payload`` and ``expires_at`` are nullable so the defensive
+        read guards can be exercised.
+    """
+    columns = {
+        "id": String(255).primary(),
+        "payload": Text().nullable(),
+        "expires_at": BigInteger().nullable(),
+    }
+    for name, column in columns.items():
+        column.name = name
+    return TableDefinition(name=table, columns=columns, primary_key="id")
+
 class TestDatabaseSessionStore(TestCase):
     """Unit tests for the database-backed DatabaseSessionStore."""
 
@@ -60,6 +88,57 @@ class TestDatabaseSessionStore(TestCase):
         """
         await self._connection.disconnect()
 
+    async def _relaxedStore(self, table: str) -> DatabaseSessionStore:
+        """
+        Create a store bound to a table accepting NULL columns.
+
+        Parameters
+        ----------
+        table : str
+            Physical table name to create.
+
+        Returns
+        -------
+        DatabaseSessionStore
+            Store already flagged as ready, so the relaxed schema is not
+            replaced by the production one.
+        """
+        await self._connection.createTable(_relaxed_sessions_table(table))
+        store = DatabaseSessionStore(connection=self._connection, table=table)
+        store._ready = True
+        return store
+
+    async def _insertRelaxedRow(
+        self,
+        table: str,
+        session_id: str,
+        payload: str | None,
+        expiration: float | None,
+    ) -> None:
+        """
+        Insert a raw row into a relaxed sessions table.
+
+        Parameters
+        ----------
+        table : str
+            Physical table name.
+        session_id : str
+            Primary-key value of the row.
+        payload : str | None
+            Raw JSON payload, or ``None`` to leave the column empty.
+        expiration : float | None
+            Expiry in epoch seconds, or ``None`` to leave it empty.
+
+        Returns
+        -------
+        None
+        """
+        await self._connection.execute(
+            f"INSERT INTO {table} (id, payload, expires_at) "  # noqa: S608
+            "VALUES (:id, :p, :e)",
+            {"id": session_id, "p": payload, "e": expiration},
+        )
+
     # ── read ─────────────────────────────────────────────────────────────────
 
     async def testReadAbsentKeyReturnsNone(self) -> None:
@@ -86,18 +165,6 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(result.id, "abc")  # type: ignore[union-attr]
         self.assertEqual(result.data, {"k": "v"})  # type: ignore[union-attr]
 
-    async def testReadReturnsNoneForExpiredRecord(self) -> None:
-        """
-        Evict and return None for an expired session record.
-
-        Validates that a record whose expires_at is in the past is
-        treated as a miss and removed from the table.
-        """
-        record = _make_record("expired", offset_seconds=-10)
-        await self._store.write(record)
-        result = await self._store.read("expired")
-        self.assertIsNone(result)
-
     async def testReadPreservesDataPayload(self) -> None:
         """
         Return the exact data payload stored with the session record.
@@ -114,6 +181,90 @@ class TestDatabaseSessionStore(TestCase):
         result = await self._store.read("data-test")
         self.assertIsNotNone(result)
         self.assertEqual(result.data, {"user_id": 42, "role": "admin"})  # type: ignore[union-attr]
+
+    async def testReadRestoresExpiryAsUtcDatetime(self) -> None:
+        """
+        Rebuild the expiry column as a timezone-aware datetime.
+
+        Validates that the epoch seconds stored in the table are decoded
+        back into UTC.
+        """
+        record = _make_record("tz")
+        await self._store.write(record)
+        result = await self._store.read("tz")
+        self.assertIsNotNone(result)
+        self.assertEqual(result.expires_at.tzinfo, UTC)  # type: ignore[union-attr]
+        self.assertAlmostEqual(
+            result.expires_at.timestamp(),  # type: ignore[union-attr]
+            record.expires_at.timestamp(),
+            places=3,
+        )
+
+    async def testReadDeletesExpiredRow(self) -> None:
+        """
+        Evict the row when an expired record is read.
+
+        Validates the lazy eviction that keeps the table from growing
+        without bound.
+        """
+        await self._store.write(_make_record("gone"))
+        await self._store._connection.execute(
+            "UPDATE sessions SET expires_at = :e WHERE id = :id",
+            {"e": 1.0, "id": "gone"},
+        )
+        self.assertIsNone(await self._store.read("gone"))
+        rows = await self._store._connection.select(
+            "SELECT id FROM sessions WHERE id = :id",
+            {"id": "gone"},
+        )
+        self.assertEqual(rows, [])
+
+    async def testReadReturnsNoneForCorruptPayload(self) -> None:
+        """
+        Treat an undecodable payload as a miss.
+
+        Validates that malformed JSON never escapes the store as a
+        decode error.
+        """
+        await self._store.write(_make_record("corrupt"))
+        await self._store._connection.execute(
+            "UPDATE sessions SET payload = :p WHERE id = :id",
+            {"p": "{not json", "id": "corrupt"},
+        )
+        self.assertIsNone(await self._store.read("corrupt"))
+
+    async def testReadReturnsNoneWhenExpiryIsNull(self) -> None:
+        """
+        Treat a row without expiry as expired.
+
+        Validates the defensive guard protecting the store from a
+        pre-existing table whose expiry column accepts NULL.
+        """
+        table = "relaxed_sessions"
+        store = await self._relaxedStore(table)
+        await self._insertRelaxedRow(table, "no-expiry", "{}", None)
+
+        self.assertIsNone(await store.read("no-expiry"))
+
+        rows = await self._connection.select(
+            f"SELECT id FROM {table} WHERE id = :id",  # noqa: S608
+            {"id": "no-expiry"},
+        )
+        self.assertEqual(rows, [])
+
+    async def testReadReturnsNoneWhenPayloadIsNull(self) -> None:
+        """
+        Treat a row without payload as a miss.
+
+        Validates the defensive guard protecting the store from a row
+        whose JSON column was never populated.
+        """
+        table = "relaxed_payload_sessions"
+        store = await self._relaxedStore(table)
+        expiration = (datetime.now(UTC) + timedelta(hours=1)).timestamp()
+        await self._insertRelaxedRow(table, "no-payload", None, expiration)
+
+        self.assertIsNone(await store.read("no-payload"))
 
     # ── write ────────────────────────────────────────────────────────────────
 
@@ -168,6 +319,56 @@ class TestDatabaseSessionStore(TestCase):
         self.assertIsNotNone(r2)
         self.assertEqual(r1.id, "s1")  # type: ignore[union-attr]
         self.assertEqual(r2.id, "s2")  # type: ignore[union-attr]
+
+    async def testInsertFallsBackToUpdateOnConflict(self) -> None:
+        """
+        Recover from a concurrent insert by retrying as an update.
+
+        Validates the portable upsert strategy used instead of a
+        dialect-specific ``ON CONFLICT`` clause.
+        """
+        await self._store.write(_make_record("conflict"))
+        expiration = (datetime.now(UTC) + timedelta(hours=2)).timestamp()
+
+        await self._store._DatabaseSessionStore__insertOrRetryUpdate(
+            "conflict",
+            '{"k": "updated"}',
+            expiration,
+        )
+
+        result = await self._store.read("conflict")
+        self.assertIsNotNone(result)
+        self.assertEqual(result.data, {"k": "updated"})  # type: ignore[union-attr]
+
+    # ── schema bootstrap ─────────────────────────────────────────────────────
+
+    async def testSchemaIsCreatedOnFirstUseOnly(self) -> None:
+        """
+        Create the table once and flag the store as ready.
+
+        Validates that repeated calls short-circuit instead of issuing
+        redundant DDL statements.
+        """
+        self.assertFalse(self._store._ready)
+        await self._store._ensureSchema()
+        self.assertTrue(self._store._ready)
+        await self._store._ensureSchema()
+        self.assertTrue(self._store._ready)
+
+    async def testConcurrentBootstrapCreatesSchemaOnce(self) -> None:
+        """
+        Serialise concurrent bootstraps behind the readiness lock.
+
+        Validates that the second waiter observes the flag set by the
+        first one and skips the redundant DDL statement.
+        """
+        await asyncio.gather(
+            self._store._ensureSchema(),
+            self._store._ensureSchema(),
+        )
+        self.assertTrue(self._store._ready)
+        await self._store.write(_make_record("after-bootstrap"))
+        self.assertIsNotNone(await self._store.read("after-bootstrap"))
 
     # ── delete ───────────────────────────────────────────────────────────────
 

@@ -2,6 +2,7 @@ from orionis.test import TestCase
 from orionis.view.exceptions import (
     ViewException,
     ViewRenderException,
+    ViewRouteException,
     ViewTemplateNotFoundException,
 )
 
@@ -146,4 +147,48 @@ class TestViewExceptions(TestCase):
             raise ViewTemplateNotFoundException(msg) from original
         self.assertIs(ctx.exception.__cause__, original)
 
+    def testViewRouteExceptionInheritsFromViewException(self) -> None:
+        """
+        Verify ViewRouteException is a subclass of ViewException.
 
+        Validates the inheritance chain so callers can catch both the
+        specific route error and the base view error type.
+        """
+        self.assertTrue(issubclass(ViewRouteException, ViewException))
+
+    def testRaiseViewRouteExceptionWithMessage(self) -> None:
+        """
+        Raise ViewRouteException and verify the message is preserved.
+
+        Validates that ViewRouteException stores its message correctly
+        and is catchable at its own type level.
+        """
+        msg = "route 'users.show' is not defined"
+        with self.assertRaises(ViewRouteException) as ctx:
+            raise ViewRouteException(msg)
+        self.assertEqual(str(ctx.exception), msg)
+
+    def testCatchViewRouteExceptionAsViewException(self) -> None:
+        """
+        Catch ViewRouteException using the ViewException base class.
+
+        Validates polymorphic catching: callers handling ViewException
+        will also intercept ViewRouteException.
+        """
+        msg = "missing route parameter"
+        with self.assertRaises(ViewException):
+            raise ViewRouteException(msg)
+
+    def testExceptionTypesAreDistinct(self) -> None:
+        """
+        Verify the specialised view errors are unrelated to each other.
+
+        Validates that catching one specialised type never intercepts a
+        sibling error type.
+        """
+        self.assertFalse(
+            issubclass(ViewRouteException, ViewRenderException),
+        )
+        self.assertFalse(
+            issubclass(ViewTemplateNotFoundException, ViewRenderException),
+        )

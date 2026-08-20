@@ -236,8 +236,8 @@ class TestingEngine(ITestingEngine):
         None
             This method does not return a value.
         """
-        # If JSON caching is disabled or cache folder is not set, skip saving.
-        if not self.__json_cache or not self.__cache_folder:
+        # If JSON caching is disabled, skip saving.
+        if not self.__json_cache:
             return
 
         # Ensure the cache folder exists

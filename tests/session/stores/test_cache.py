@@ -71,7 +71,7 @@ class TestCacheSessionStore(TestCase):
 
     # ── construction ─────────────────────────────────────────────────────────
 
-    async def testConstructorRequestsDefaultStoreByDefault(self) -> None:
+    def testConstructorRequestsDefaultStoreByDefault(self) -> None:
         """
         Request the default cache store when none is specified.
 
@@ -82,7 +82,7 @@ class TestCacheSessionStore(TestCase):
         CacheSessionStore(cache=manager)
         self.assertIsNone(manager.requested_store)
 
-    async def testConstructorForwardsNamedStore(self) -> None:
+    def testConstructorForwardsNamedStore(self) -> None:
         """
         Forward an explicit store name to ``ICacheManager.store()``.
 
@@ -132,6 +132,20 @@ class TestCacheSessionStore(TestCase):
         store = CacheSessionStore(cache=manager)
         await store.write(_make_record("ns"))
         self.assertIn("session:ns", manager.repository.data)
+
+    async def testReadRebuildsExpiryFromPayload(self) -> None:
+        """
+        Restore the expiry timestamp carried by the cached payload.
+
+        Validates that the record handed back to the manager is complete
+        and not merely the stored data bag.
+        """
+        store = CacheSessionStore(cache=_FakeCacheManager())
+        record = _make_record("expiry")
+        await store.write(record)
+        result = await store.read("expiry")
+        self.assertIsNotNone(result)
+        self.assertEqual(result.expires_at, record.expires_at)  # type: ignore[union-attr]
 
     # ── write ────────────────────────────────────────────────────────────────
 
@@ -213,6 +227,18 @@ class TestCacheSessionStore(TestCase):
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         await store.delete("ghost")
+
+    async def testDeleteUsesNamespacedKey(self) -> None:
+        """
+        Remove the namespaced entry rather than the raw identifier.
+
+        Validates that eviction targets the same key used on write.
+        """
+        manager = _FakeCacheManager()
+        store = CacheSessionStore(cache=manager)
+        await store.write(_make_record("ns-delete"))
+        await store.delete("ns-delete")
+        self.assertNotIn("session:ns-delete", manager.repository.data)
 
     # ── gc ───────────────────────────────────────────────────────────────────
 

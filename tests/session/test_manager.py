@@ -3,11 +3,14 @@ import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+from orionis.database.connection_manager import ConnectionManager
+from orionis.orm.resolver import ConnectionResolver
 from orionis.session.contracts.session import ISession
 from orionis.session.entities.record import SessionRecord
 from orionis.session.manager import SessionManager
 from orionis.session.session import Session
 from orionis.session.stores.cache import CacheSessionStore
+from orionis.session.stores.database import DatabaseSessionStore
 from orionis.session.stores.file import FileSessionStore
 from orionis.session.stores.memory import MemorySessionStore
 from orionis.test import TestCase
@@ -39,6 +42,55 @@ class _FakeCacheManager:
     def store(self, name: str | None = None) -> _FakeCacheRepository:
         self.requested_store = name
         return self.repository
+
+class _StubDatabaseApp:
+    """Application stub exposing an in-memory SQLite configuration."""
+
+    def config(self, key: str) -> dict[str, Any]:  # noqa: ARG002
+        return {
+            "default": "sqlite",
+            "connections": {
+                "sqlite": {
+                    "driver": "sqlite",
+                    "database": ":memory:",
+                    "prefix": "",
+                },
+            },
+        }
+
+def _make_config(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
+    """
+    Build a complete session configuration payload.
+
+    Parameters
+    ----------
+    overrides : dict[str, Any] | None
+        Entries replacing the defaults.
+
+    Returns
+    -------
+    dict[str, Any]
+        Configuration mapping accepted by the session entity.
+    """
+    config: dict[str, Any] = {
+        "driver": "memory",
+        "lifetime": 120,
+        "expire_on_close": False,
+        "files": "storage/framework/sessions",
+        "connection": None,
+        "table": "sessions",
+        "cache": None,
+        "cookie": "sessionid",
+        "path": "/",
+        "domain": None,
+        "secure": False,
+        "http_only": True,
+        "same_site": "lax",
+        "partitioned": False,
+    }
+    if overrides:
+        config.update(overrides)
+    return config
 
 class _FakeRequest:
     """Request stub exposing only the cookie jar the manager reads."""
@@ -140,24 +192,7 @@ class TestSessionManager(TestCase):
         tuple[SessionManager, _FakeApplication]
             The manager under test and the application stub it uses.
         """
-        config: dict[str, Any] = {
-            "driver": "memory",
-            "lifetime": 120,
-            "expire_on_close": False,
-            "files": "storage/framework/sessions",
-            "connection": None,
-            "table": "sessions",
-            "cache": None,
-            "cookie": "sessionid",
-            "path": "/",
-            "domain": None,
-            "secure": False,
-            "http_only": True,
-            "same_site": "lax",
-            "partitioned": False,
-        }
-        if overrides:
-            config.update(overrides)
+        config: dict[str, Any] = _make_config(overrides)
         app = _FakeApplication(config, self._base_path)
         manager = SessionManager(app, cache or _FakeCacheManager())
         return manager, app
@@ -432,6 +467,45 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.delete_calls[0][0], "sessionid")
         self.assertEqual(response.set_calls, [])
 
+    async def testSaveInvalidatedSessionWithoutIdentifierSkipsStore(self) -> None:
+        """
+        Expire the cookie without touching the store when no ID exists.
+
+        Validates that a session invalidated before it ever received an
+        identifier issues no delete against the backing store.
+        """
+        manager, _ = self._makeManager()
+        store = _RecordingStore()
+        manager._store = store
+        session = Session(started=True)
+        session.invalidate()
+        response = _FakeResponse()
+
+        await manager.save(response, session)
+
+        self.assertEqual(store.deleted, [])
+        self.assertEqual(response.delete_calls[0][0], "sessionid")
+
+    async def testSaveRotationWithoutPreviousIdentifierSkipsDelete(self) -> None:
+        """
+        Rotate without deleting when no previous record existed.
+
+        Validates that the manager only removes a stale record when the
+        session actually had an identifier.
+        """
+        manager, _ = self._makeManager()
+        store = _RecordingStore()
+        manager._store = store
+        session = Session(started=True)
+        session.regenerate()
+        response = _FakeResponse()
+
+        await manager.save(response, session)
+
+        self.assertEqual(store.deleted, [])
+        self.assertIsNotNone(session.id)
+        self.assertEqual(response.set_calls[0][1], session.id)
+
     async def testSaveForwardsCookieAttributes(self) -> None:
         """
         Propagate every configured cookie attribute.
@@ -478,3 +552,78 @@ class TestSessionManager(TestCase):
 
         self.assertEqual(restored.get("user_id"), 42)
         self.assertFalse(restored.isNew)
+
+class TestSessionManagerDatabaseDriver(TestCase):
+    """Unit tests for the database-backed store resolution."""
+
+    async def asyncSetUp(self) -> None:
+        """
+        Install an isolated in-memory connection manager.
+
+        Returns
+        -------
+        None
+        """
+        self._connections = ConnectionManager(_StubDatabaseApp())
+        self._previous_manager = ConnectionResolver._manager
+        ConnectionResolver.setManager(self._connections)
+        self._tmp = tempfile.TemporaryDirectory()
+        self._base_path = Path(self._tmp.name)
+
+    async def asyncTearDown(self) -> None:
+        """
+        Restore the previously installed connection manager.
+
+        Returns
+        -------
+        None
+        """
+        await self._connections.disconnect()
+        ConnectionResolver._manager = self._previous_manager
+        self._tmp.cleanup()
+
+    def _makeManager(self, overrides: dict[str, Any]) -> SessionManager:
+        """
+        Build a manager backed by the in-memory SQLite connection.
+
+        Parameters
+        ----------
+        overrides : dict[str, Any]
+            Session configuration entries overriding the defaults.
+
+        Returns
+        -------
+        SessionManager
+            The manager under test.
+        """
+        app = _FakeApplication(_make_config(overrides), self._base_path)
+        return SessionManager(app, _FakeCacheManager())
+
+    def testDatabaseDriverResolvesToDatabaseStore(self) -> None:
+        """
+        Select the database store for the database driver.
+
+        Validates that the connection is resolved through the ORM
+        resolver and that the configured table name is honoured.
+        """
+        manager = self._makeManager({
+            "driver": "database",
+            "connection": "sqlite",
+            "table": "user_sessions",
+        })
+        self.assertIsInstance(manager._store, DatabaseSessionStore)
+        self.assertEqual(manager._store._table, "user_sessions")
+
+    def testDatabaseDriverFallsBackToDefaultTable(self) -> None:
+        """
+        Use the built-in table name when the configuration omits one.
+
+        Validates the ``sessions`` default applied by the manager.
+        """
+        manager = self._makeManager({
+            "driver": "database",
+            "connection": "sqlite",
+            "table": None,
+        })
+        self.assertEqual(manager._store._table, "sessions")
+

@@ -110,7 +110,7 @@ class TestMemoryStorageDriver(TestCase):
         with self.assertRaises(StorageFileNotFoundException):
             await stream.read()
 
-    async def testOpenRejectsTextModes(self) -> None:
+    def testOpenRejectsTextModes(self) -> None:
         """
         Reject non-binary stream modes.
 

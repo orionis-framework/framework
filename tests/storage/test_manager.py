@@ -1,8 +1,13 @@
 from __future__ import annotations
 import tempfile
 from pathlib import Path
-from orionis.container.providers.deferrable_provider import DeferrableProvider
-from orionis.container.providers.service_provider import ServiceProvider
+from typing import TYPE_CHECKING
+from orionis.foundation.config.filesystems.entitites.disks import Disks
+from orionis.foundation.config.filesystems.entitites.filesystems import (
+    Filesystems,
+)
+from orionis.foundation.config.filesystems.entitites.local import Local
+from orionis.storage.contracts.disk import IDisk
 from orionis.storage.contracts.manager import IStorageManager
 from orionis.storage.contracts.uploaded_file import IUploadedFile
 from orionis.storage.disk import Disk
@@ -16,23 +21,20 @@ from orionis.storage.exceptions import (
     DriverNotSupportedException,
 )
 from orionis.storage.manager import StorageManager
-from orionis.storage.provider import StorageProvider
 from orionis.test import TestCase
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+# Relative root shipped by the framework, already present in the repo.
+_RELATIVE_ROOT: str = "storage/app/private"
+
 class _StubApp:
-    """Minimal application stub exposing config and base path."""
+    """Application double exposing a base path and raw configuration."""
 
-    def __init__(self, base_path: Path, config: dict) -> None:
-        """
-        Initialize the stub with its base path and configuration.
+    __slots__ = ("_base_path", "_config")
 
-        Parameters
-        ----------
-        base_path : Path
-            Directory acting as the application base path.
-        config : dict
-            Mapping of configuration keys to raw dictionaries.
-        """
+    def __init__(self, base_path: Path, config: object) -> None:
         self._base_path = base_path
         self._config = config
 
@@ -48,39 +50,38 @@ class _StubApp:
         """
         return self._base_path
 
-    def config(self, key: str) -> dict:
+    def config(self, key: str) -> object:
         """
-        Return the raw configuration stored under *key*.
+        Return the configuration stored under *key*.
 
         Parameters
         ----------
         key : str
-            Configuration key to resolve.
+            Configuration key requested by the manager.
 
         Returns
         -------
-        dict
-            Raw configuration dictionary.
+        object
+            Raw dictionary or validated entity for the key.
+
+        Raises
+        ------
+        KeyError
+            If an unexpected configuration key is requested.
         """
-        return self._config[key]
+        if key != "filesystems":
+            raise KeyError(key)
+        return self._config
 
 class _FakeUpload:
-    """Duck-typed multipart payload used to exercise uploaded()."""
+    """Duck-typed multipart payload produced by the HTTP layer."""
+
+    __slots__ = ("content_type", "extension", "filename", "payload")
 
     def __init__(self, filename: str, data: bytes) -> None:
-        """
-        Initialize the fake payload.
-
-        Parameters
-        ----------
-        filename : str
-            Client-supplied file name.
-        data : bytes
-            Buffered payload content.
-        """
         self.filename = filename
         self.content_type = "application/octet-stream"
-        self._data = data
+        self.payload = data
         dot = filename.rfind(".")
         self.extension = filename[dot:].lower() if dot > 0 else ""
 
@@ -94,20 +95,20 @@ class _FakeUpload:
         int
             Byte count of the buffered data.
         """
-        return len(self._data)
+        return len(self.payload)
 
     def read(self) -> bytes:
         """
-        Return the full payload.
+        Return the full buffered payload.
 
         Returns
         -------
         bytes
             Buffered content.
         """
-        return self._data
+        return self.payload
 
-    def chunks(self, size: int = 65536):
+    def chunks(self, size: int = 65536) -> Iterator[bytes]:
         """
         Yield the payload in fixed-size chunks.
 
@@ -115,200 +116,459 @@ class _FakeUpload:
         ----------
         size : int
             Maximum number of bytes per yielded chunk.
+
+        Yields
+        ------
+        bytes
+            The next chunk of the buffered payload.
         """
-        for start in range(0, len(self._data), size):
-            yield self._data[start:start + size]
+        for start in range(0, len(self.payload), size):
+            yield self.payload[start:start + size]
 
     def close(self) -> None:
-        """Release the fake buffer (no-op)."""
+        """Release the buffered payload (no-op for the double)."""
 
-class TestStorageManager(TestCase):
+def build_manager(
+    base_path: Path,
+    disks: dict[str, dict[str, object]],
+    default: str = "local",
+) -> StorageManager:
+    """
+    Build a manager over a stubbed application.
+
+    Parameters
+    ----------
+    base_path : Path
+        Directory acting as the application base path.
+    disks : dict[str, dict[str, object]]
+        Raw disk declarations merged into the configuration.
+    default : str
+        Name of the disk configured as default.
+
+    Returns
+    -------
+    StorageManager
+        Manager wired to the supplied configuration.
+    """
+    config = {"default": default, "disks": disks}
+    return StorageManager(_StubApp(base_path, config))  # type: ignore[arg-type]
+
+class TestStorageManagerConfiguration(TestCase):
 
     def setUp(self) -> None:
         """
-        Build a manager over a temporary base path before each test.
+        Create an isolated base path before each test.
 
-        The configuration mirrors config/filesystems.py with disk
-        roots isolated inside a temporary directory.
+        Keeps disk roots contained inside a temporary directory.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
-        base = Path(self._tmpdir.name)
-        config = {
-            "filesystems": {
-                "default": "local",
-                "disks": {
-                    "local": {
-                        "driver": "local",
-                        "path": str(base / "private"),
-                    },
-                    "public": {
-                        "driver": "local",
-                        "path": str(base / "public"),
-                        "url": "/static",
-                    },
-                    "s3": {
-                        "driver": "aws",
-                        "region": "us-east-1",
-                    },
-                },
-            },
-        }
-        self._app = _StubApp(base, config)
-        self._manager = StorageManager(self._app)  # type: ignore[arg-type]
+        self._base = Path(self._tmpdir.name)
 
     def tearDown(self) -> None:
         """
         Remove the temporary base path after each test.
 
-        Ensures disk roots created by the manager are cleaned up.
+        Ensures roots created by the manager are cleaned up.
         """
         self._tmpdir.cleanup()
 
-    # ── Disk resolution ──────────────────────────────────────────────────────
-
-    async def testDefaultReturnsConfiguredDefaultDisk(self) -> None:
+    def testImplementsTheManagerContract(self) -> None:
         """
-        Resolve the disk declared as default in the configuration.
+        Expose the manager through its published contract.
 
-        Validates default() and its disk name.
+        Validates the type bound by the service provider.
         """
-        disk = self._manager.default()
-        self.assertIsInstance(disk, Disk)
-        self.assertEqual(disk.name(), "local")
+        manager = build_manager(
+            self._base,
+            {"local": {"driver": "local", "path": str(self._base / "p")}},
+        )
+        self.assertIsInstance(manager, IStorageManager)
 
-    async def testDiskBuildsLocalDriverForLocalDisks(self) -> None:
+    def testRawDictionaryConfigurationIsValidated(self) -> None:
         """
-        Bind local disks to the local storage driver.
+        Convert raw configuration dictionaries into the entity.
 
-        Validates driver selection from the disk configuration.
+        Validates the normalization performed at construction time.
         """
-        disk = self._manager.disk("local")
-        self.assertIsInstance(disk._driver, LocalStorageDriver)
+        manager = build_manager(
+            self._base,
+            {"local": {"driver": "local", "path": str(self._base / "p")}},
+        )
+        self.assertIsInstance(manager._config, Filesystems)
+        self.assertEqual(manager._default, "local")
 
-    async def testDiskInstancesAreCachedPerName(self) -> None:
+    def testValidatedEntityConfigurationIsUsedAsIs(self) -> None:
+        """
+        Accept an already validated configuration entity.
+
+        Validates the branch skipping entity construction.
+        """
+        entity = Filesystems(
+            default="public",
+            disks=Disks(local=Local(path=str(self._base / "p"))),
+        )
+        manager = StorageManager(_StubApp(self._base, entity))  # type: ignore[arg-type]
+        self.assertIs(manager._config, entity)
+        self.assertEqual(manager._default, "public")
+
+class TestStorageManagerDiskResolution(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Build a manager with two local disks before each test.
+
+        Mirrors the shape of the shipped filesystems configuration.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._base = Path(self._tmpdir.name)
+        self._manager = build_manager(
+            self._base,
+            {
+                "local": {
+                    "driver": "local",
+                    "path": str(self._base / "private"),
+                },
+                "public": {
+                    "driver": "local",
+                    "path": str(self._base / "public"),
+                    "url": "/static",
+                },
+            },
+        )
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary base path after each test.
+
+        Ensures roots created by the manager are cleaned up.
+        """
+        self._tmpdir.cleanup()
+
+    def testDiskResolvesTheRequestedName(self) -> None:
+        """
+        Resolve the disk declared under the requested name.
+
+        Validates the primary entry point of the manager.
+        """
+        disk = self._manager.disk("public")
+        self.assertIsInstance(disk, IDisk)
+        self.assertEqual(disk.name(), "public")
+
+    def testDiskFallsBackToTheDefaultName(self) -> None:
+        """
+        Resolve the default disk when no name is supplied.
+
+        Validates the optional argument of disk().
+        """
+        self.assertEqual(self._manager.disk().name(), "local")
+
+    def testDefaultDelegatesToDisk(self) -> None:
+        """
+        Resolve the default disk through the dedicated accessor.
+
+        Validates that default() and disk() share one cache.
+        """
+        self.assertIs(self._manager.default(), self._manager.disk())
+
+    def testDisksAreCachedPerName(self) -> None:
         """
         Reuse the disk instance built on first access.
 
         Validates the manager-level disk cache.
         """
-        self.assertIs(self._manager.disk("public"), self._manager.disk("public"))
+        self.assertIs(
+            self._manager.disk("public"), self._manager.disk("public"),
+        )
 
-    async def testUnknownDiskRaisesDiskNotFound(self) -> None:
+    def testUnknownDiskRaisesDiskNotFound(self) -> None:
         """
-        Raise DiskNotFoundException for undeclared disk names.
+        Reject disk names absent from the configuration.
 
         Validates the failure contract of disk().
         """
-        with self.assertRaises(DiskNotFoundException):
+        with self.assertRaises(DiskNotFoundException) as ctx:
             self._manager.disk("dropbox")
+        self.assertIn("dropbox", str(ctx.exception))
 
-    async def testUnimplementedDriverRaisesDriverNotSupported(self) -> None:
+    def testResolvedDisksAreConcreteDiskObjects(self) -> None:
         """
-        Raise DriverNotSupportedException for unknown driver names.
+        Build concrete Disk objects for every configured name.
 
-        Validates the failure contract when a disk references a
-        driver that has no implementation and no custom factory.
+        Validates the object bound to each configured driver.
         """
-        base = Path(self._tmpdir.name)
-        manager = StorageManager(
-            _StubApp(
-                base,
-                {
-                    "filesystems": {
-                        "default": "local",
-                        "disks": {
-                            "local": {
-                                "driver": "local",
-                                "path": str(base / "private"),
-                            },
-                            "s3": {"driver": "dropbox"},
-                        },
-                    },
-                },
-            ),  # type: ignore[arg-type]
+        self.assertIsInstance(self._manager.disk("local"), Disk)
+
+    async def testResolvedDisksWriteInsideTheirRoot(self) -> None:
+        """
+        Anchor every write inside the configured disk root.
+
+        Validates end-to-end persistence through the manager.
+        """
+        await self._manager.disk("local").put("inner/data.txt", "ok")
+        stored = self._base / "private" / "inner" / "data.txt"
+        self.assertEqual(stored.read_text(encoding="utf-8"), "ok")
+
+class TestStorageManagerDriverSelection(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Create an isolated base path before each test.
+
+        Keeps disk roots contained inside a temporary directory.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._base = Path(self._tmpdir.name)
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary base path after each test.
+
+        Ensures roots created by the manager are cleaned up.
+        """
+        self._tmpdir.cleanup()
+
+    def testLocalDriverKeepsAbsoluteRoots(self) -> None:
+        """
+        Bind local disks declaring an absolute path as is.
+
+        Validates the absolute branch of the local driver builder.
+        """
+        root = self._base / "private"
+        manager = build_manager(
+            self._base, {"local": {"driver": "local", "path": str(root)}},
         )
-        with self.assertRaises(DriverNotSupportedException):
-            manager.disk("s3")
+        driver = manager.disk("local")._driver
+        self.assertIsInstance(driver, LocalStorageDriver)
+        self.assertEqual(driver._root, root.resolve())
 
-    async def testCloudDisksBuildOfficialSdkDrivers(self) -> None:
+    def testLocalDriverAnchorsRelativeRootsToTheBasePath(self) -> None:
+        """
+        Anchor relative disk roots at the application base path.
+
+        Validates the relative branch of the local driver builder.
+        """
+        manager = build_manager(
+            self._base,
+            {"local": {"driver": "local", "path": _RELATIVE_ROOT}},
+        )
+        driver = manager.disk("local")._driver
+        self.assertEqual(driver._root, (self._base / _RELATIVE_ROOT).resolve())
+
+    def testLocalDriverReceivesTheConfiguredUrl(self) -> None:
+        """
+        Forward the configured base URL to the local driver.
+
+        Validates URL support on public local disks.
+        """
+        manager = build_manager(
+            self._base,
+            {
+                "public": {
+                    "driver": "local",
+                    "path": str(self._base / "public"),
+                    "url": "/static/",
+                },
+            },
+            default="public",
+        )
+        self.assertEqual(manager.default()._driver._base_url, "/static")
+
+    def testMemoryDriverIsBuiltFromItsDriverName(self) -> None:
+        """
+        Bind disks declaring the memory driver to the memory backend.
+
+        Validates the in-process branch of the driver builder.
+        """
+        manager = build_manager(
+            self._base,
+            {
+                "public": {
+                    "driver": "memory",
+                    "path": str(self._base / "public"),
+                    "url": "/media",
+                },
+            },
+            default="public",
+        )
+        driver = manager.default()._driver
+        self.assertIsInstance(driver, MemoryStorageDriver)
+        self.assertEqual(driver._base_url, "/media")
+
+    def testCloudDriversAreBuiltWithoutTheirSdk(self) -> None:
         """
         Bind cloud disks to their official-SDK driver classes.
 
-        Driver construction is lazy, so no cloud SDK needs to be
-        installed for the disks to resolve.
+        Driver construction is lazy, so no cloud SDK is required.
         """
+        manager = build_manager(
+            self._base,
+            {
+                "s3": {"driver": "aws", "region": "us-east-1"},
+                "azure": {"driver": "azure"},
+                "gcs": {"driver": "gcs"},
+            },
+            default="s3",
+        )
+        self.assertIsInstance(manager.disk("s3")._driver, S3StorageDriver)
         self.assertIsInstance(
-            self._manager.disk("s3")._driver, S3StorageDriver,
+            manager.disk("azure")._driver, AzureStorageDriver,
         )
         self.assertIsInstance(
-            self._manager.disk("azure")._driver, AzureStorageDriver,
-        )
-        self.assertIsInstance(
-            self._manager.disk("gcs")._driver, GoogleStorageDriver,
+            manager.disk("gcs")._driver, GoogleStorageDriver,
         )
 
-    async def testExtendRegistersCustomDriverFactory(self) -> None:
+    def testCloudDriverAliasesAreAccepted(self) -> None:
         """
-        Resolve disks through custom factories registered at runtime.
+        Accept the alternative names of the cloud drivers.
 
-        Validates the extend() extension point using the memory
-        driver as an s3 stand-in.
+        Validates the ``s3`` and ``google`` driver aliases.
+        """
+        manager = build_manager(
+            self._base,
+            {
+                "s3": {"driver": "s3", "region": "us-east-1"},
+                "gcs": {"driver": "google"},
+            },
+            default="s3",
+        )
+        self.assertIsInstance(manager.disk("s3")._driver, S3StorageDriver)
+        self.assertIsInstance(
+            manager.disk("gcs")._driver, GoogleStorageDriver,
+        )
+
+    def testUnknownDriverRaisesDriverNotSupported(self) -> None:
+        """
+        Reject disks referencing a driver without implementation.
+
+        Validates the failure contract of the driver builder.
+        """
+        manager = build_manager(
+            self._base,
+            {"s3": {"driver": "dropbox", "region": "us-east-1"}},
+            default="s3",
+        )
+        with self.assertRaises(DriverNotSupportedException) as ctx:
+            manager.disk("s3")
+        self.assertIn("StorageManager.extend()", str(ctx.exception))
+
+class TestStorageManagerExtension(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Build a manager with a cloud disk before each test.
+
+        Provides a disk whose builtin driver can be overridden.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._base = Path(self._tmpdir.name)
+        self._manager = build_manager(
+            self._base,
+            {
+                "local": {
+                    "driver": "local",
+                    "path": str(self._base / "private"),
+                },
+                "s3": {"driver": "aws", "region": "us-east-1"},
+            },
+        )
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary base path after each test.
+
+        Ensures roots created by the manager are cleaned up.
+        """
+        self._tmpdir.cleanup()
+
+    async def testCustomFactoryTakesPrecedenceOverBuiltins(self) -> None:
+        """
+        Resolve disks through factories registered at runtime.
+
+        Validates the extend() extension point.
         """
         self._manager.extend("aws", lambda _config: MemoryStorageDriver())
         disk = self._manager.disk("s3")
+        self.assertIsInstance(disk._driver, MemoryStorageDriver)
         await disk.put("f.txt", b"x")
         self.assertTrue(await disk.exists("f.txt"))
 
-    async def testPublicDiskExposesConfiguredUrl(self) -> None:
+    def testCustomFactoryReceivesTheDiskConfiguration(self) -> None:
         """
-        Build public URLs from the disk configuration.
+        Hand the disk configuration entity to the factory.
 
-        Validates that the url option reaches the driver.
+        Validates the argument contract of extend().
         """
-        disk = self._manager.disk("public")
-        file = await disk.put("logo.svg", b"<svg/>")
-        self.assertEqual(await file.url(), "/static/logo.svg")
+        received: list[object] = []
 
-    async def testWritesLandInsideConfiguredRoot(self) -> None:
+        def factory(config: object) -> MemoryStorageDriver:
+            """Build a memory driver recording its configuration."""
+            received.append(config)
+            return MemoryStorageDriver()
+
+        self._manager.extend("aws", factory)
+        self._manager.disk("s3")
+        self.assertEqual(getattr(received[0], "region", None), "us-east-1")
+
+    def testExtendInvalidatesPreviouslyCachedDisks(self) -> None:
         """
-        Anchor disk roots at the configured filesystem paths.
+        Drop cached disks when a new factory is registered.
 
-        Validates end-to-end persistence through the resolved disk.
+        Validates that extend() never leaves stale drivers behind.
         """
-        await self._manager.disk("local").put("inner/data.txt", "ok")
-        stored = Path(self._tmpdir.name) / "private" / "inner" / "data.txt"
-        self.assertEqual(stored.read_text(encoding="utf-8"), "ok")
+        first = self._manager.disk("local")
+        self._manager.extend("local", lambda _config: MemoryStorageDriver())
+        second = self._manager.disk("local")
+        self.assertIsNot(first, second)
+        self.assertIsInstance(second._driver, MemoryStorageDriver)
 
-    # ── Uploaded files ───────────────────────────────────────────────────────
+class TestStorageManagerUploads(TestCase):
 
-    async def testUploadedWrapsPayloadForStorage(self) -> None:
+    def setUp(self) -> None:
         """
-        Wrap an HTTP payload and persist it onto a managed disk.
+        Build a manager backed by a temporary local disk.
 
-        Validates uploaded() together with storeAs().
+        Provides a persistence target for uploaded payloads.
         """
-        upload = self._manager.uploaded(_FakeUpload("photo.png", b"png-bytes"))  # type: ignore[arg-type]
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._base = Path(self._tmpdir.name)
+        self._manager = build_manager(
+            self._base,
+            {
+                "local": {
+                    "driver": "local",
+                    "path": str(self._base / "private"),
+                },
+            },
+        )
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary base path after each test.
+
+        Ensures roots created by the manager are cleaned up.
+        """
+        self._tmpdir.cleanup()
+
+    def testUploadedWrapsThePayload(self) -> None:
+        """
+        Wrap an HTTP payload into a storable uploaded file.
+
+        Validates the type returned by uploaded().
+        """
+        upload = self._manager.uploaded(
+            _FakeUpload("photo.png", b"png-bytes"),  # type: ignore[arg-type]
+        )
         self.assertIsInstance(upload, IUploadedFile)
 
-        stored = await upload.storeAs("avatars", "user.png")
+    async def testUploadedFilesPersistOnManagedDisks(self) -> None:
+        """
+        Persist a wrapped payload through the resolved disk.
+
+        Validates the wiring between uploads and the manager.
+        """
+        upload = self._manager.uploaded(
+            _FakeUpload("photo.png", b"png-bytes"),  # type: ignore[arg-type]
+        )
+        stored = await upload.storeAs("avatars", "user.png", "local")
         self.assertEqual(stored.path(), "avatars/user.png")
         self.assertEqual(await stored.read(), b"png-bytes")
-
-class TestStorageProvider(TestCase):
-
-    async def testProviderInheritsFrameworkBases(self) -> None:
-        """
-        Extend both ServiceProvider and DeferrableProvider.
-
-        Validates the provider class hierarchy.
-        """
-        self.assertTrue(issubclass(StorageProvider, ServiceProvider))
-        self.assertTrue(issubclass(StorageProvider, DeferrableProvider))
-
-    async def testProvidesExposesManagerContract(self) -> None:
-        """
-        Advertise IStorageManager as the provided service.
-
-        Validates the deferred-provider contract.
-        """
-        self.assertEqual(StorageProvider.provides(), [IStorageManager])

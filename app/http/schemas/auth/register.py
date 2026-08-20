@@ -1,4 +1,4 @@
-from orionis.schemas.constraints import Email, MinLength, Unique
+from orionis.schemas.constraints import ConfirmPassword, Email, MinLength, Unique
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 from orionis.schemas import Schema
@@ -35,5 +35,9 @@ class RegisterSchema(Schema):
         MinLength(
             8,
             message="Password confirmation must be at least 8 characters long.",
+        ),
+        ConfirmPassword(
+            "password",
+            message="Password confirmation does not match the password.",
         ),
     ]

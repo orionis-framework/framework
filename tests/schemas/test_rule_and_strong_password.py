@@ -1,7 +1,13 @@
+from types import SimpleNamespace
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.rule import Rule
+from orionis.schemas.rules.confirm_password import ConfirmPassword
 from orionis.schemas.rules.strong_password import StrongPassword
 from orionis.test import TestCase
+
+# Sample values shared by the ConfirmPassword tests.
+_CREDENTIAL = "Secure1!"
+_OTHER = "Other1!"
 
 # ---------------------------------------------------------------------------
 # Minimal concrete Rule subclass for testing the abstract base
@@ -254,3 +260,99 @@ class TestStrongPassword(TestCase):
         in ValidationFailure.rule.
         """
         self.assertEqual(StrongPassword.__code__, "strong_password")
+
+class TestConfirmPassword(TestCase):
+
+    def testMatchingConfirmationPasses(self) -> None:
+        """
+        Return True when the confirmation equals the password field.
+
+        Validates the success path against the default sibling field.
+        """
+        rule = ConfirmPassword()
+        instance = SimpleNamespace(password=_CREDENTIAL)
+        self.assertTrue(rule.enforce("password_confirmation", _CREDENTIAL, instance))
+
+    def testMismatchedConfirmationFails(self) -> None:
+        """
+        Return False when the confirmation differs from the password.
+
+        Validates that any difference, including case, rejects the value.
+        """
+        rule = ConfirmPassword()
+        instance = SimpleNamespace(password=_CREDENTIAL)
+        self.assertFalse(rule.enforce("password_confirmation", _OTHER, instance))
+        self.assertFalse(rule.enforce("password_confirmation", "secure1!", instance))
+
+    def testCustomSiblingFieldIsCompared(self) -> None:
+        """
+        Compare against the sibling field supplied at construction time.
+
+        Validates that the default field name can be overridden.
+        """
+        rule = ConfirmPassword("new_password")
+        instance = SimpleNamespace(new_password=_CREDENTIAL, password=_OTHER)
+        self.assertTrue(rule.enforce("confirmation", _CREDENTIAL, instance))
+        self.assertFalse(rule.enforce("confirmation", _OTHER, instance))
+
+    def testMissingSiblingPasses(self) -> None:
+        """
+        Return True when the compared field is absent from the instance.
+
+        Validates that type reporting is delegated to the type layer.
+        """
+        rule = ConfirmPassword()
+        empty = SimpleNamespace()
+        self.assertTrue(rule.enforce("password_confirmation", _CREDENTIAL, empty))
+
+    def testPresentNoneSiblingIsStillCompared(self) -> None:
+        """
+        Compare a sibling field that is present and holds None.
+
+        Validates that an absent field is distinguished from a None value.
+        """
+        rule = ConfirmPassword()
+        instance = SimpleNamespace(password=None)
+        self.assertTrue(rule.enforce("password_confirmation", None, instance))
+        self.assertFalse(rule.enforce("password_confirmation", _CREDENTIAL, instance))
+
+    def testEmptyFieldNameRaises(self) -> None:
+        """
+        Raise ValueError when no sibling field name is supplied.
+
+        Validates that the rule refuses a configuration with no target.
+        """
+        with self.assertRaises(ValueError):
+            ConfirmPassword("")
+
+    def testValidateReturnsNoneForMatchingValue(self) -> None:
+        """
+        Return None from validate when both values match.
+
+        Validates the full validate path for the success case.
+        """
+        rule = ConfirmPassword()
+        instance = SimpleNamespace(password=_CREDENTIAL)
+        self.assertIsNone(rule.validate("password_confirmation", _CREDENTIAL, instance))
+
+    def testValidateReturnsFailureWithCustomMessage(self) -> None:
+        """
+        Return a ValidationFailure carrying the overridden message.
+
+        Validates the rule code and the custom message resolution.
+        """
+        rule = ConfirmPassword(message="Passwords do not match.")
+        instance = SimpleNamespace(password=_CREDENTIAL)
+        result = rule.validate("password_confirmation", _OTHER, instance)
+        self.assertIsInstance(result, ValidationFailure)
+        self.assertEqual(result.rule, "confirm_password")
+        self.assertEqual(result.message, "Passwords do not match.")
+
+    def testCodeAttributeIsConfirmPassword(self) -> None:
+        """
+        Confirm the __code__ class attribute is 'confirm_password'.
+
+        Validates that the rule code matches the expected string used
+        in ValidationFailure.rule.
+        """
+        self.assertEqual(ConfirmPassword.__code__, "confirm_password")

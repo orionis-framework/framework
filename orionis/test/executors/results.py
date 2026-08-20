@@ -411,7 +411,9 @@ class TestResultProcessor(unittest.TestResult):
 
         # Retrieve the actual test method docstring from the class.
         test_method_fn = getattr(cls, method_name, None) if method_name else None
-        doc_string: str | None = inspect.getdoc(test_method_fn)
+        doc_string: str | None = (
+            inspect.getdoc(test_method_fn) if test_method_fn is not None else None
+        )
 
         # Construct and return the TestResult with metadata resolved via direct access.
         return TestResult(

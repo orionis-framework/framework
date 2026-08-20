@@ -8,13 +8,12 @@ class RegisterSchema(Schema):
     name: Field[
         str,
         Message("Name must be a string."),
-        MinLength(2, message="Name must be at least 2 characters long."),
+        MinLength(6, message="Name must be at least 6 characters long."),
     ]
 
     email: Field[
         str,
         Message("Email must be a string."),
-        MinLength(5, message="Email must be at least 5 characters long."),
         Email(message="Email must be a valid email address."),
         Unique(
             table="users",
@@ -32,12 +31,5 @@ class RegisterSchema(Schema):
     password_confirmation: Field[
         str,
         Message("Password confirmation must be a string."),
-        MinLength(
-            8,
-            message="Password confirmation must be at least 8 characters long.",
-        ),
-        ConfirmPassword(
-            "password",
-            message="Password confirmation does not match the password.",
-        ),
+        ConfirmPassword(message="Password confirmation does not match the password."),
     ]

@@ -402,3 +402,16 @@ class TestFileSessionStore(TestCase):
         other_file.write_text("documentation", encoding="utf-8")
         await store.gc()
         self.assertTrue(other_file.exists())
+
+    async def testGcIgnoresDirectories(self) -> None:
+        """
+        Leave sub-directories untouched during the gc sweep.
+
+        Validates that a directory whose name ends in ``.json`` is
+        skipped instead of being treated as a session file.
+        """
+        store = self._store()
+        nested = self._directory / "nested.json"
+        nested.mkdir()
+        await store.gc()
+        self.assertTrue(nested.is_dir())

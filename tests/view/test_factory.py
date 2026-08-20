@@ -1,28 +1,79 @@
-from unittest.mock import AsyncMock, MagicMock
+from typing import Any
 from orionis.http.response import HTMLResponse
 from orionis.test import TestCase
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 from orionis.view.factory import ViewFactory
+from orionis.view.pending import PendingView
+
+# Failure messages hoisted out of the raise statements (EM101).
+_MISSING_TEMPLATE: str = "template not found"
+_RENDER_FAILURE: str = "render failed"
+
+class _StubEngine:
+    """View engine double recording calls and returning canned output."""
+
+    __slots__ = ("calls", "error", "html")
+
+    def __init__(
+        self,
+        html: str = "<html></html>",
+        error: Exception | None = None,
+    ) -> None:
+        self.html: str = html
+        self.error: Exception | None = error
+        self.calls: list[tuple[str, dict[str, Any]]] = []
+
+    async def render(self, template: str, context: dict[str, Any]) -> str:
+        """Return the canned HTML or raise the configured error."""
+        self.calls.append((template, context))
+        if self.error is not None:
+            raise self.error
+        return self.html
 
 class TestViewFactory(TestCase):
 
-    def _buildEngine(self, html: str = "<html></html>") -> MagicMock:
+    def _buildEngine(
+        self,
+        html: str = "<html></html>",
+        error: Exception | None = None,
+    ) -> _StubEngine:
         """
-        Build a mock IViewEngine whose render returns the given html.
+        Build a stub engine returning the given html or raising an error.
 
         Parameters
         ----------
         html : str
-            HTML string the mock engine's render method will return.
+            HTML string the stub engine's render method will return.
+        error : Exception or None
+            Error raised instead of returning the HTML.
 
         Returns
         -------
-        MagicMock
-            A mock object with render set up as an AsyncMock.
+        _StubEngine
+            A stub engine recording every render call it receives.
         """
-        engine = MagicMock()
-        engine.render = AsyncMock(return_value=html)
-        return engine
+        return _StubEngine(html=html, error=error)
+
+    def testMakeReturnsPendingView(self) -> None:
+        """
+        Return a PendingView from make instead of a rendered response.
+
+        Validates that response mutators can be chained on the value
+        returned by the factory.
+        """
+        factory = ViewFactory(self._buildEngine())
+        self.assertIsInstance(factory.make("users.index"), PendingView)
+
+    def testMakeDefersRendering(self) -> None:
+        """
+        Skip every engine call until the pending view is awaited.
+
+        Validates that building a view is free of I/O so it can be
+        chained safely inside controllers.
+        """
+        engine = self._buildEngine()
+        ViewFactory(engine).make("users.index")
+        self.assertEqual(engine.calls, [])
 
     async def testMakeReturnsHtmlResponse(self) -> None:
         """
@@ -46,7 +97,7 @@ class TestViewFactory(TestCase):
         engine = self._buildEngine(html="<p>Rendered</p>")
         factory = ViewFactory(engine)
         response = await factory.make("users.index")
-        self.assertIn(b"<p>Rendered</p>", response._body)
+        self.assertEqual(response.getBody(), b"<p>Rendered</p>")
 
     async def testMakePassesTemplateNameToEngine(self) -> None:
         """
@@ -58,9 +109,7 @@ class TestViewFactory(TestCase):
         engine = self._buildEngine()
         factory = ViewFactory(engine)
         await factory.make("users.index")
-        engine.render.assert_called_once()
-        call_args = engine.render.call_args
-        self.assertEqual(call_args[0][0], "users.index")
+        self.assertEqual(engine.calls, [("users.index", {})])
 
     async def testMakePassesContextToEngine(self) -> None:
         """
@@ -72,8 +121,10 @@ class TestViewFactory(TestCase):
         engine = self._buildEngine()
         factory = ViewFactory(engine)
         await factory.make("users.index", name="World", count=5)
-        call_args = engine.render.call_args
-        self.assertEqual(call_args[0][1], {"name": "World", "count": 5})
+        self.assertEqual(
+            engine.calls,
+            [("users.index", {"name": "World", "count": 5})],
+        )
 
     async def testMakeSetsOrionisRenderHeader(self) -> None:
         """
@@ -82,8 +133,7 @@ class TestViewFactory(TestCase):
         Validates that the factory marks SSR responses with the
         X-Orionis-Render header so clients can identify server rendering.
         """
-        engine = self._buildEngine()
-        factory = ViewFactory(engine)
+        factory = ViewFactory(self._buildEngine())
         response = await factory.make("users.index")
         self.assertTrue(response.hasHeader("x-orionis-render"))
 
@@ -94,12 +144,20 @@ class TestViewFactory(TestCase):
         Validates that the header carries the expected SSR marker value
         identifying server-side rendering.
         """
-        engine = self._buildEngine()
-        factory = ViewFactory(engine)
+        factory = ViewFactory(self._buildEngine())
         response = await factory.make("users.index")
-        header_values = response.getHeader("x-orionis-render")
-        self.assertIsNotNone(header_values)
-        self.assertIn("SSR", header_values)
+        self.assertEqual(response.getHeader("x-orionis-render"), ["SSR"])
+
+    async def testMakeSupportsChainedResponseMutators(self) -> None:
+        """
+        Apply response mutators chained on the pending view.
+
+        Validates the fluent contract documented for the factory, where
+        mutators are replayed on the rendered response.
+        """
+        factory = ViewFactory(self._buildEngine())
+        response = await factory.make("users.index").addHeader("X-Demo", "1")
+        self.assertEqual(response.getHeader("x-demo"), ["1"])
 
     async def testMakePropagatesToViewTemplateNotFoundException(self) -> None:
         """
@@ -108,10 +166,8 @@ class TestViewFactory(TestCase):
         Validates that the factory does not swallow template-not-found
         errors raised by the rendering engine.
         """
-        err_msg = "template not found"
-        engine = MagicMock()
-        engine.render = AsyncMock(
-            side_effect=ViewTemplateNotFoundException(err_msg),
+        engine = self._buildEngine(
+            error=ViewTemplateNotFoundException(_MISSING_TEMPLATE),
         )
         factory = ViewFactory(engine)
         with self.assertRaises(ViewTemplateNotFoundException):
@@ -124,9 +180,7 @@ class TestViewFactory(TestCase):
         Validates that the factory does not swallow render errors raised
         by the underlying Jinja2 engine.
         """
-        err_msg = "render failed"
-        engine = MagicMock()
-        engine.render = AsyncMock(side_effect=ViewRenderException(err_msg))
+        engine = self._buildEngine(error=ViewRenderException(_RENDER_FAILURE))
         factory = ViewFactory(engine)
         with self.assertRaises(ViewRenderException):
             await factory.make("broken.template")
@@ -138,8 +192,6 @@ class TestViewFactory(TestCase):
         Validates that an empty context is forwarded correctly without
         causing errors in the engine call.
         """
-        engine = self._buildEngine(html="<p>static</p>")
-        factory = ViewFactory(engine)
+        factory = ViewFactory(self._buildEngine(html="<p>static</p>"))
         response = await factory.make("static.page")
-        self.assertIsInstance(response, HTMLResponse)
-        self.assertIn(b"<p>static</p>", response._body)
+        self.assertEqual(response.getBody(), b"<p>static</p>")

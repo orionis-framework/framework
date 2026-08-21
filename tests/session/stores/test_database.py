@@ -187,18 +187,36 @@ class TestDatabaseSessionStore(TestCase):
         Rebuild the expiry column as a timezone-aware datetime.
 
         Validates that the epoch seconds stored in the table are decoded
-        back into UTC.
+        back into UTC, truncated to the whole second the column holds.
         """
         record = _make_record("tz")
         await self._store.write(record)
         result = await self._store.read("tz")
         self.assertIsNotNone(result)
         self.assertEqual(result.expires_at.tzinfo, UTC)  # type: ignore[union-attr]
-        self.assertAlmostEqual(
+        self.assertEqual(
             result.expires_at.timestamp(),  # type: ignore[union-attr]
-            record.expires_at.timestamp(),
-            places=3,
+            float(int(record.expires_at.timestamp())),
         )
+
+    async def testExpiryIsStoredAsWholeSeconds(self) -> None:
+        """
+        Persist the expiry as an integer, as the column declares.
+
+        Validates that no fractional epoch value reaches the database,
+        since a strict driver rejects a float bound to a BIGINT column.
+        """
+        record = _make_record("int-expiry")
+        await self._store.write(record)
+
+        rows = await self._connection.select(
+            "SELECT expires_at FROM sessions WHERE id = :id",
+            {"id": "int-expiry"},
+        )
+        stored = rows[0]["expires_at"]
+
+        self.assertIsInstance(stored, int)
+        self.assertEqual(stored, int(record.expires_at.timestamp()))
 
     async def testReadDeletesExpiredRow(self) -> None:
         """

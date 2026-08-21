@@ -8,6 +8,8 @@ class IBackgroundTask(ABC):
     that executes the task asynchronously.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def run(self) -> None:
         """
@@ -18,4 +20,3 @@ class IBackgroundTask(ABC):
         None
             This method does not return a value.
         """
-        await self()

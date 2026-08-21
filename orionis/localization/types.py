@@ -1,8 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+# Callable is imported at runtime so the aliases below stay introspectable.
 
 # Flat mapping of translation key to translated text for a single locale.
 type TranslationMap = dict[str, str]

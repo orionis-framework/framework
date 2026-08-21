@@ -134,9 +134,9 @@ class ILogger(ABC):
         """
         Switch to a different logging channel.
 
-        Acquire the initialization lock, close current handlers, clear caches,
-        and create a new handler for the specified channel. Only one channel
-        is active at a time.
+        Initialize the logger when needed, close current handlers, clear
+        caches, and create a new handler for the specified channel. Only one
+        channel is active at a time.
 
         Parameters
         ----------
@@ -195,5 +195,3 @@ class ILogger(ABC):
         list[str]
             List of all configured channel names.
         """
-        # Extract channel names from configuration dictionary
-        return list(self.__config.get("channels", {}).keys())

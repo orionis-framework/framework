@@ -17,6 +17,8 @@ class IDisk(ABC):
     that always delegate to those objects.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def name(self) -> str:
         """

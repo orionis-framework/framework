@@ -22,6 +22,8 @@ class IStorageDriver(ABC):
     a driver directly.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def read(self, path: str) -> bytes:
         """

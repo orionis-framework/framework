@@ -14,6 +14,8 @@ class ITranslator(ABC):
     replacement, and selects pluralized segments.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get(
         self,

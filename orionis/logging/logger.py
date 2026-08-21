@@ -46,9 +46,21 @@ class Logger(ILogger):
 
     def __initializeLogger(self) -> None:
         """
-        Ultra-fast logger initialization with caching and optimizations.
+        Build the standard library logger for the default channel.
 
-        This method combines all the best optimizations for maximum speed.
+        Configure the shared logger, create the handler declared by the
+        default channel and cache it. Fall back to a basic file handler when
+        the default channel is not present in the configuration.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+
+        Raises
+        ------
+        RuntimeError
+            If the logger cannot be initialized.
         """
         try:
 
@@ -73,8 +85,10 @@ class Logger(ILogger):
 
             if default_channel_name in channels:
 
-                # Create handler for the default channel
-                channel_config: dict = channels[default_channel_name]
+                # Normalize once: setLevel below requires an integer level
+                channel_config: dict = self.__normalizeChannelConfig(
+                    channels[default_channel_name],
+                )
 
                 # Ultra-fast path for stack handler (most common case)
                 if default_channel_name == "stack":
@@ -87,10 +101,9 @@ class Logger(ILogger):
                     handler = logging.FileHandler(log_path, encoding="utf-8")
                 else:
                     # Use factory for complex handlers (rotating, etc.)
-                    normalized_config = self.__normalizeChannelConfig(channel_config)
                     handler = RotatingHandlerFactory.createHandler(
                         channel_name=default_channel_name,
-                        channel_config=normalized_config,
+                        channel_config=channel_config,
                         app_root=app_root,
                     )
 
@@ -359,9 +372,10 @@ class Logger(ILogger):
             # Acquire lock to ensure thread safety during reload
             with self.__init_lock:
 
-                # Close existing handlers and remove them from the logger
+                # Close existing handlers and remove them from the logger.
+                # Iterate over a copy: removeHandler mutates the same list.
                 if self.__logger:
-                    for handler in self.__logger.handlers:
+                    for handler in self.__logger.handlers[:]:
                         handler.close()
                         self.__logger.removeHandler(handler)
 
@@ -386,9 +400,9 @@ class Logger(ILogger):
         """
         Switch to a different logging channel.
 
-        Acquire the initialization lock, close current handlers, clear caches,
-        and create a new handler for the specified channel. Only one channel
-        is active at a time.
+        Initialize the logger when needed, close current handlers, clear
+        caches, and create a new handler for the specified channel. Only one
+        channel is active at a time.
 
         Parameters
         ----------
@@ -401,17 +415,22 @@ class Logger(ILogger):
             True if the switch was successful, False otherwise.
         """
         try:
-            with self.__init_lock:
-                # Check if channel exists in configuration
-                channels: dict = self.__config.get("channels", {})
-                if channel_name not in channels:
-                    return False
+            # Check if channel exists in configuration
+            channels: dict = self.__config.get("channels", {})
+            if channel_name not in channels:
+                return False
 
-                # Close current handlers and remove from logger
-                if self.__logger:
-                    for handler in self.__logger.handlers:
-                        handler.close()
-                        self.__logger.removeHandler(handler)
+            # Initialize outside the lock: __init_lock is not reentrant
+            if self.__logger is None:
+                self.__ensureLoggerReady()
+
+            with self.__init_lock:
+
+                # Close current handlers and remove from logger.
+                # Iterate over a copy: removeHandler mutates the same list.
+                for handler in self.__logger.handlers[:]:
+                    handler.close()
+                    self.__logger.removeHandler(handler)
 
                 # Clear cached handlers
                 for handler in self.__handlers_cache.values():
@@ -461,8 +480,9 @@ class Logger(ILogger):
             # Close and remove handlers from the main logger
             if self.__logger:
 
-                # Close and remove all handlers from the logger
-                for handler in self.__logger.handlers:
+                # Close and remove all handlers from the logger.
+                # Iterate over a copy: removeHandler mutates the same list.
+                for handler in self.__logger.handlers[:]:
                     with suppress(OSError, RuntimeError, ValueError):
                         handler.close()
                     self.__logger.removeHandler(handler)

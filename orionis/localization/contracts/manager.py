@@ -14,6 +14,8 @@ class ILocalizationManager(ABC):
     translator instance.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def translator(self) -> ITranslator:
         """

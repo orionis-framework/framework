@@ -115,8 +115,8 @@ class ITestingEngine(ABC):
         """
         Run the discovered test suite asynchronously.
 
-        Adds discovered tests to the suite, sets verbosity, and executes the tests
-        using a thread pool to avoid blocking. Saves results to cache if enabled.
+        Discovers the tests, sets verbosity, and executes them using a thread
+        pool to avoid blocking. Saves results to cache if enabled.
 
         Returns
         -------

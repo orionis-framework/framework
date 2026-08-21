@@ -18,6 +18,8 @@ class IFile(ABC):
     which physical medium (local, memory, S3...) backs it.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def path(self) -> str:
         """

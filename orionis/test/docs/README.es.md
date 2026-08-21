@@ -611,8 +611,11 @@ class TestPricing(TestCase):
 ### 5. Integración con el comando CLI
 
 `orionis.console.commands.test.test_command.TestCommand` es un envoltorio
-delgado: resuelve `ITestingEngine` por DI, aplica las banderas de la CLI sobre
-los valores configurados y traduce los resultados a un código de salida.
+delgado: resuelve `ITestingEngine` por DI y aplica cada opción siguiendo la
+cadena **bandera de la CLI → configuración `testing.*` → default del motor**
+(una opción que nadie resuelve no se aplica, así que el motor conserva su
+propio valor). Devuelve `1` si algún resultado es `FAILED` o `ERRORED`, y `0`
+en caso contrario; el reactor usa ese valor como código de salida del proceso.
 
 ```bash
 python reactor test --start-dir="tests/app" --verbosity=2

@@ -599,8 +599,11 @@ class TestPricing(TestCase):
 ### 5. Integrating with the CLI command
 
 `orionis.console.commands.test.test_command.TestCommand` is a thin wrapper: it
-resolves `ITestingEngine` by DI, applies the CLI flags over the configured
-defaults and maps the results to an exit code.
+resolves `ITestingEngine` by DI and applies each option following the chain
+**CLI flag → `testing.*` configuration → engine default** (an option nobody
+resolves is never applied, so the engine keeps its own value). It returns `1`
+when any result is `FAILED` or `ERRORED`, and `0` otherwise; the reactor uses
+that value as the process exit code.
 
 ```bash
 python reactor test --start-dir="tests/app" --verbosity=2

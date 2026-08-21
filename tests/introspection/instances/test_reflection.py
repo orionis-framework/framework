@@ -8,6 +8,7 @@ class SampleReflected:
 
     public_attr: int
     _protected_attr: str
+    __private_attr: str # NOSONAR
 
     def __init__(self, x: int = 10) -> None:
         """
@@ -30,7 +31,7 @@ class SampleReflected:
 
     # --- instance methods ---
 
-    def public_method(self) -> int:
+    def publicMethod(self) -> int:
         """
         Return the value of public_attr.
 
@@ -41,7 +42,7 @@ class SampleReflected:
         """
         return self.public_attr
 
-    async def public_async_method(self) -> int: # NOSONAR
+    async def publicAsyncMethod(self) -> int: # NOSONAR
         """
         Return the value of public_attr asynchronously.
 
@@ -52,7 +53,7 @@ class SampleReflected:
         """
         return self.public_attr
 
-    def _protected_method(self) -> str:
+    def _protectedMethod(self) -> str:
         """
         Return the value of _protected_attr.
 
@@ -63,7 +64,7 @@ class SampleReflected:
         """
         return self._protected_attr
 
-    async def _protected_async_method(self) -> str: # NOSONAR
+    async def _protectedAsyncMethod(self) -> str: # NOSONAR
         """
         Return the value of _protected_attr asynchronously.
 
@@ -74,7 +75,7 @@ class SampleReflected:
         """
         return self._protected_attr
 
-    def __private_method(self) -> str: # NOSONAR
+    def __privateMethod(self) -> str: # NOSONAR
         """
         Return the value of __private_attr.
 
@@ -85,7 +86,7 @@ class SampleReflected:
         """
         return self.__private_attr
 
-    async def __private_async_method(self) -> str: # NOSONAR
+    async def __privateAsyncMethod(self) -> str: # NOSONAR
         """
         Return the value of __private_attr asynchronously.
 
@@ -99,7 +100,7 @@ class SampleReflected:
     # --- class methods ---
 
     @classmethod
-    def public_class_method(cls) -> str:
+    def publicClassMethod(cls) -> str:
         """
         Return the class name.
 
@@ -111,7 +112,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    async def public_async_class_method(cls) -> str:
+    async def publicAsyncClassMethod(cls) -> str:
         """
         Return the class name asynchronously.
 
@@ -123,7 +124,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    def _protected_class_method(cls) -> str:
+    def _protectedClassMethod(cls) -> str:
         """
         Return the class name (protected).
 
@@ -135,7 +136,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    async def _protected_async_class_method(cls) -> str:
+    async def _protectedAsyncClassMethod(cls) -> str:
         """
         Return the class name asynchronously (protected).
 
@@ -147,7 +148,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    def __private_class_method(cls) -> str: # NOSONAR
+    def __privateClassMethod(cls) -> str: # NOSONAR
         """
         Return the class name (private).
 
@@ -159,7 +160,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    async def __private_async_class_method(cls) -> str: # NOSONAR
+    async def __privateAsyncClassMethod(cls) -> str: # NOSONAR
         """
         Return the class name asynchronously (private).
 
@@ -173,7 +174,7 @@ class SampleReflected:
     # --- static methods ---
 
     @staticmethod
-    def public_static_method() -> str:
+    def publicStaticMethod() -> str:
         """
         Return a static string identifier.
 
@@ -185,7 +186,7 @@ class SampleReflected:
         return "static"
 
     @staticmethod
-    async def public_async_static_method() -> str:
+    async def publicAsyncStaticMethod() -> str:
         """
         Return a static string identifier asynchronously.
 
@@ -197,7 +198,7 @@ class SampleReflected:
         return "async_static"
 
     @staticmethod
-    def _protected_static_method() -> str:
+    def _protectedStaticMethod() -> str:
         """
         Return a protected static string identifier.
 
@@ -209,7 +210,7 @@ class SampleReflected:
         return "prot_static"
 
     @staticmethod
-    async def _protected_async_static_method() -> str:
+    async def _protectedAsyncStaticMethod() -> str:
         """
         Return a protected static string identifier asynchronously.
 
@@ -221,7 +222,7 @@ class SampleReflected:
         return "prot_async_static"
 
     @staticmethod
-    def __private_static_method() -> str: # NOSONAR
+    def __privateStaticMethod() -> str: # NOSONAR
         """
         Return a private static string identifier.
 
@@ -233,7 +234,7 @@ class SampleReflected:
         return "priv_static"
 
     @staticmethod
-    async def __private_async_static_method() -> str: # NOSONAR
+    async def __privateAsyncStaticMethod() -> str: # NOSONAR
         """
         Return a private static string identifier asynchronously.
 
@@ -247,7 +248,7 @@ class SampleReflected:
     # --- properties ---
 
     @property
-    def public_property(self) -> int:
+    def publicProperty(self) -> int:
         """
         Return the value of public_attr.
 
@@ -259,7 +260,7 @@ class SampleReflected:
         return self.public_attr
 
     @property
-    def _protected_property(self) -> str:
+    def _protectedProperty(self) -> str:
         """
         Return the value of _protected_attr.
 
@@ -271,7 +272,7 @@ class SampleReflected:
         return self._protected_attr
 
     @property
-    def __private_property(self) -> str:
+    def __privateProperty(self) -> str:
         """
         Return the value of __private_attr.
 
@@ -297,7 +298,7 @@ def _make_mutable_instance() -> ReflectionInstance:
     class MutableSample:
         """Mutable sample class for mutation-based tests."""
 
-        def to_remove(self) -> str:
+        def toRemove(self) -> str:
             """
             Return a removable string marker.
 
@@ -320,6 +321,92 @@ def _make_mutable_instance() -> ReflectionInstance:
             return 0
 
     return ReflectionInstance(MutableSample())
+
+class _DunderPropertySample:
+    """Class whose only property uses a dunder name."""
+
+    @property
+    def __weird__(self) -> int:
+        """
+        Return a fixed integer.
+
+        Returns
+        -------
+        int
+            Always returns 0.
+        """
+        return 0
+
+def _make_moduleless_instance() -> ReflectionInstance:
+    """
+    Return a reflection wrapper over a class with an unresolvable module.
+
+    Returns
+    -------
+    ReflectionInstance
+        Reflection wrapper whose class points at a missing module.
+    """
+    klass = type(
+        "_ModulelessSample",
+        (),
+        {"__module__": "orionis_missing_module_xyz"},
+    )
+    return ReflectionInstance(klass())
+
+def _replacement_method(self) -> int:  # noqa: ARG001
+    """
+    Return a fixed integer used when injecting methods at runtime.
+
+    Returns
+    -------
+    int
+        Always returns 3.
+    """
+    return 3
+
+# Accessors that trigger the lazy single-pass member scan on first use
+_SCAN_TRIGGERING_GETTERS = (
+    "getAttributes",
+    "getPublicAttributes",
+    "getProtectedAttributes",
+    "getPrivateAttributes",
+    "getDunderAttributes",
+    "getMagicAttributes",
+    "getMethods",
+    "getPublicMethods",
+    "getPublicSyncMethods",
+    "getPublicAsyncMethods",
+    "getProtectedMethods",
+    "getProtectedSyncMethods",
+    "getProtectedAsyncMethods",
+    "getPrivateMethods",
+    "getPrivateSyncMethods",
+    "getPrivateAsyncMethods",
+    "getPublicClassMethods",
+    "getPublicClassSyncMethods",
+    "getPublicClassAsyncMethods",
+    "getProtectedClassMethods",
+    "getProtectedClassSyncMethods",
+    "getProtectedClassAsyncMethods",
+    "getPrivateClassMethods",
+    "getPrivateClassSyncMethods",
+    "getPrivateClassAsyncMethods",
+    "getPublicStaticMethods",
+    "getPublicStaticSyncMethods",
+    "getPublicStaticAsyncMethods",
+    "getProtectedStaticMethods",
+    "getProtectedStaticSyncMethods",
+    "getProtectedStaticAsyncMethods",
+    "getPrivateStaticMethods",
+    "getPrivateStaticSyncMethods",
+    "getPrivateStaticAsyncMethods",
+    "getDunderMethods",
+    "getMagicMethods",
+    "getProperties",
+    "getPublicProperties",
+    "getProtectedProperties",
+    "getPrivateProperties",
+)
 
 class TestReflectionInstanceInit(TestCase):
 
@@ -591,7 +678,7 @@ class TestReflectionInstanceSourceCode(TestCase):
         None
             Raises AssertionError on failure.
         """
-        src = self.ri.getSourceCode("public_method")
+        src = self.ri.getSourceCode("publicMethod")
         self.assertIsInstance(src, str)
         self.assertGreater(len(src), 0)
 
@@ -656,6 +743,19 @@ class TestReflectionInstanceAnnotations(TestCase):
         annotations = self.ri.getAnnotations()
         self.assertIn("public_attr", annotations)
         self.assertEqual(annotations["public_attr"], int)
+
+    def testGetAnnotationsUnmanglesPrivateNames(self) -> None:
+        """
+        Assert that private class annotations lose the mangling prefix.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        annotations = self.ri.getAnnotations()
+        self.assertIn("__private_attr", annotations)
+        self.assertEqual(annotations["__private_attr"], str)
 
 class TestReflectionInstancePublicAttributes(TestCase):
 
@@ -921,7 +1021,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
             Raises AssertionError on failure.
         """
         ri = ReflectionInstance(SampleReflected())
-        ri.setAttribute("temp_attr", "to_remove")
+        ri.setAttribute("temp_attr", "toRemove")
         result = ri.removeAttribute("temp_attr")
         self.assertTrue(result)
         self.assertFalse(hasattr(ri.getInstance(), "temp_attr"))
@@ -935,8 +1035,8 @@ class TestReflectionInstanceAttributeOps(TestCase):
         None
             Raises AssertionError on failure.
         """
-        # public_method has a docstring; retrieve it via instance attribute path
-        doc = self.ri.getAttributeDocstring("public_method")
+        # publicMethod has a docstring; retrieve it via instance attribute path
+        doc = self.ri.getAttributeDocstring("publicMethod")
         self.assertIsInstance(doc, (str, type(None)))
 
 class TestReflectionInstancePublicMethods(TestCase):
@@ -965,47 +1065,47 @@ class TestReflectionInstancePublicMethods(TestCase):
 
     def testGetPublicMethodsContainsPublicMethod(self) -> None:
         """
-        Assert that getPublicMethods includes 'public_method'.
+        Assert that getPublicMethods includes 'publicMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_method", self.ri.getPublicMethods())
+        self.assertIn("publicMethod", self.ri.getPublicMethods())
 
     def testGetPublicSyncMethodsContainsPublicMethod(self) -> None:
         """
-        Assert that getPublicSyncMethods includes 'public_method'.
+        Assert that getPublicSyncMethods includes 'publicMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_method", self.ri.getPublicSyncMethods())
+        self.assertIn("publicMethod", self.ri.getPublicSyncMethods())
 
     def testGetPublicAsyncMethodsContainsAsyncMethod(self) -> None:
         """
-        Assert that getPublicAsyncMethods includes 'public_async_method'.
+        Assert that getPublicAsyncMethods includes 'publicAsyncMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_async_method", self.ri.getPublicAsyncMethods())
+        self.assertIn("publicAsyncMethod", self.ri.getPublicAsyncMethods())
 
     def testHasMethodReturnsTrueForPublicMethod(self) -> None:
         """
-        Assert that hasMethod returns True for 'public_method'.
+        Assert that hasMethod returns True for 'publicMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertTrue(self.ri.hasMethod("public_method"))
+        self.assertTrue(self.ri.hasMethod("publicMethod"))
 
 class TestReflectionInstanceProtectedMethods(TestCase):
 
@@ -1033,18 +1133,18 @@ class TestReflectionInstanceProtectedMethods(TestCase):
 
     def testGetProtectedMethodsContainsProtectedMethod(self) -> None:
         """
-        Assert that getProtectedMethods includes '_protected_method'.
+        Assert that getProtectedMethods includes '_protectedMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("_protected_method", self.ri.getProtectedMethods())
+        self.assertIn("_protectedMethod", self.ri.getProtectedMethods())
 
     def testGetProtectedAsyncMethodsContainsAsyncMethod(self) -> None:
         """
-        Assert that getProtectedAsyncMethods includes '_protected_async_method'.
+        Assert that getProtectedAsyncMethods includes '_protectedAsyncMethod'.
 
         Returns
         -------
@@ -1052,7 +1152,7 @@ class TestReflectionInstanceProtectedMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "_protected_async_method",
+            "_protectedAsyncMethod",
             self.ri.getProtectedAsyncMethods(),
         )
 
@@ -1082,14 +1182,14 @@ class TestReflectionInstancePrivateMethods(TestCase):
 
     def testGetPrivateMethodsContainsUnmangledName(self) -> None:
         """
-        Assert that getPrivateMethods includes '__private_method' (unmangled).
+        Assert that getPrivateMethods includes '__privateMethod' (unmangled).
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("__private_method", self.ri.getPrivateMethods())
+        self.assertIn("__privateMethod", self.ri.getPrivateMethods())
 
     def testGetPrivateAsyncMethodsContainsUnmangledAsyncName(self) -> None:
         """
@@ -1100,7 +1200,7 @@ class TestReflectionInstancePrivateMethods(TestCase):
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("__private_async_method", self.ri.getPrivateAsyncMethods())
+        self.assertIn("__privateAsyncMethod", self.ri.getPrivateAsyncMethods())
 
 class TestReflectionInstanceClassMethods(TestCase):
 
@@ -1117,29 +1217,29 @@ class TestReflectionInstanceClassMethods(TestCase):
 
     def testGetPublicClassMethodsContainsPublicClassMethod(self) -> None:
         """
-        Assert that getPublicClassMethods includes 'public_class_method'.
+        Assert that getPublicClassMethods includes 'publicClassMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_class_method", self.ri.getPublicClassMethods())
+        self.assertIn("publicClassMethod", self.ri.getPublicClassMethods())
 
     def testGetPublicClassSyncMethodsContainsSyncClassMethod(self) -> None:
         """
-        Assert that getPublicClassSyncMethods includes 'public_class_method'.
+        Assert that getPublicClassSyncMethods includes 'publicClassMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_class_method", self.ri.getPublicClassSyncMethods())
+        self.assertIn("publicClassMethod", self.ri.getPublicClassSyncMethods())
 
     def testGetPublicClassAsyncMethodsContainsAsyncClassMethod(self) -> None:
         """
-        Assert that getPublicClassAsyncMethods includes 'public_async_class_method'.
+        Assert that getPublicClassAsyncMethods includes 'publicAsyncClassMethod'.
 
         Returns
         -------
@@ -1147,13 +1247,13 @@ class TestReflectionInstanceClassMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "public_async_class_method",
+            "publicAsyncClassMethod",
             self.ri.getPublicClassAsyncMethods(),
         )
 
     def testGetProtectedClassMethodsContainsProtectedClassMethod(self) -> None:
         """
-        Assert that getProtectedClassMethods includes '_protected_class_method'.
+        Assert that getProtectedClassMethods includes '_protectedClassMethod'.
 
         Returns
         -------
@@ -1161,7 +1261,7 @@ class TestReflectionInstanceClassMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "_protected_class_method",
+            "_protectedClassMethod",
             self.ri.getProtectedClassMethods(),
         )
 
@@ -1175,7 +1275,7 @@ class TestReflectionInstanceClassMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "_protected_async_class_method",
+            "_protectedAsyncClassMethod",
             self.ri.getProtectedClassAsyncMethods(),
         )
 
@@ -1188,7 +1288,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("__private_class_method", self.ri.getPrivateClassMethods())
+        self.assertIn("__privateClassMethod", self.ri.getPrivateClassMethods())
 
     def testGetPrivateClassAsyncMethodsContainsUnmangledAsyncName(self) -> None:
         """
@@ -1200,7 +1300,7 @@ class TestReflectionInstanceClassMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "__private_async_class_method",
+            "__privateAsyncClassMethod",
             self.ri.getPrivateClassAsyncMethods(),
         )
 
@@ -1219,29 +1319,29 @@ class TestReflectionInstanceStaticMethods(TestCase):
 
     def testGetPublicStaticMethodsContainsPublicStaticMethod(self) -> None:
         """
-        Assert that getPublicStaticMethods includes 'public_static_method'.
+        Assert that getPublicStaticMethods includes 'publicStaticMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_static_method", self.ri.getPublicStaticMethods())
+        self.assertIn("publicStaticMethod", self.ri.getPublicStaticMethods())
 
     def testGetPublicStaticSyncMethodsContainsSyncStaticMethod(self) -> None:
         """
-        Assert that getPublicStaticSyncMethods includes 'public_static_method'.
+        Assert that getPublicStaticSyncMethods includes 'publicStaticMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_static_method", self.ri.getPublicStaticSyncMethods())
+        self.assertIn("publicStaticMethod", self.ri.getPublicStaticSyncMethods())
 
     def testGetPublicStaticAsyncMethodsContainsAsyncStaticMethod(self) -> None:
         """
-        Assert that getPublicStaticAsyncMethods includes 'public_async_static_method'.
+        Assert that getPublicStaticAsyncMethods includes 'publicAsyncStaticMethod'.
 
         Returns
         -------
@@ -1249,13 +1349,13 @@ class TestReflectionInstanceStaticMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "public_async_static_method",
+            "publicAsyncStaticMethod",
             self.ri.getPublicStaticAsyncMethods(),
         )
 
     def testGetProtectedStaticMethodsContainsProtectedStaticMethod(self) -> None:
         """
-        Assert that getProtectedStaticMethods includes '_protected_static_method'.
+        Assert that getProtectedStaticMethods includes '_protectedStaticMethod'.
 
         Returns
         -------
@@ -1263,7 +1363,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "_protected_static_method",
+            "_protectedStaticMethod",
             self.ri.getProtectedStaticMethods(),
         )
 
@@ -1277,7 +1377,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "_protected_async_static_method",
+            "_protectedAsyncStaticMethod",
             self.ri.getProtectedStaticAsyncMethods(),
         )
 
@@ -1290,7 +1390,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("__private_static_method", self.ri.getPrivateStaticMethods())
+        self.assertIn("__privateStaticMethod", self.ri.getPrivateStaticMethods())
 
     def testGetPrivateStaticAsyncMethodsContainsUnmangledAsyncName(self) -> None:
         """
@@ -1302,7 +1402,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
             Raises AssertionError on failure.
         """
         self.assertIn(
-            "__private_async_static_method",
+            "__privateAsyncStaticMethod",
             self.ri.getPrivateStaticAsyncMethods(),
         )
 
@@ -1404,9 +1504,9 @@ class TestReflectionInstanceMethodOps(TestCase):
             Raises AssertionError on failure.
         """
         ri = _make_mutable_instance()
-        self.assertTrue(ri.hasMethod("to_remove"))
-        ri.removeMethod("to_remove")
-        self.assertFalse(hasattr(ri.getInstance().__class__, "to_remove"))
+        self.assertTrue(ri.hasMethod("toRemove"))
+        ri.removeMethod("toRemove")
+        self.assertFalse(hasattr(ri.getInstance().__class__, "toRemove"))
 
     def testRemoveMethodOnNonExistingRaisesAttributeError(self) -> None:
         """
@@ -1431,7 +1531,7 @@ class TestReflectionInstanceMethodOps(TestCase):
             Raises AssertionError on failure.
         """
         ri = ReflectionInstance(SampleReflected())
-        sig = ri.getMethodSignature("public_method")
+        sig = ri.getMethodSignature("publicMethod")
         self.assertIsInstance(sig, inspect.Signature)
 
     def testGetMethodDocstringReturnsString(self) -> None:
@@ -1444,7 +1544,7 @@ class TestReflectionInstanceMethodOps(TestCase):
             Raises AssertionError on failure.
         """
         ri = ReflectionInstance(SampleReflected())
-        doc = ri.getMethodDocstring("public_method")
+        doc = ri.getMethodDocstring("publicMethod")
         self.assertIsInstance(doc, str)
 
     def testGetMethodDocstringForNonExistingRaisesAttributeError(self) -> None:
@@ -1486,58 +1586,58 @@ class TestReflectionInstanceProperties(TestCase):
 
     def testGetPropertiesContainsPublicProperty(self) -> None:
         """
-        Assert that getProperties includes 'public_property'.
+        Assert that getProperties includes 'publicProperty'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_property", self.ri.getProperties())
+        self.assertIn("publicProperty", self.ri.getProperties())
 
     def testGetPublicPropertiesContainsPublicProperty(self) -> None:
         """
-        Assert that getPublicProperties includes 'public_property'.
+        Assert that getPublicProperties includes 'publicProperty'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("public_property", self.ri.getPublicProperties())
+        self.assertIn("publicProperty", self.ri.getPublicProperties())
 
     def testGetProtectedPropertiesContainsProtectedProperty(self) -> None:
         """
-        Assert that getProtectedProperties includes '_protected_property'.
+        Assert that getProtectedProperties includes '_protectedProperty'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("_protected_property", self.ri.getProtectedProperties())
+        self.assertIn("_protectedProperty", self.ri.getProtectedProperties())
 
     def testGetPrivatePropertiesContainsUnmangledName(self) -> None:
         """
-        Assert that getPrivateProperties includes '__private_property' (unmangled).
+        Assert that getPrivateProperties includes '__privateProperty' (unmangled).
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("__private_property", self.ri.getPrivateProperties())
+        self.assertIn("__privateProperty", self.ri.getPrivateProperties())
 
     def testGetPropertyReturnsValue(self) -> None:
         """
-        Assert that getProperty returns the value of 'public_property'.
+        Assert that getProperty returns the value of 'publicProperty'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertEqual(self.ri.getProperty("public_property"), 10)
+        self.assertEqual(self.ri.getProperty("publicProperty"), 10)
 
     def testGetPropertyNonExistingRaisesAttributeError(self) -> None:
         """
@@ -1560,19 +1660,19 @@ class TestReflectionInstanceProperties(TestCase):
         None
             Raises AssertionError on failure.
         """
-        sig = self.ri.getPropertySignature("public_property")
+        sig = self.ri.getPropertySignature("publicProperty")
         self.assertIsInstance(sig, inspect.Signature)
 
     def testGetPropertyDocstringReturnsString(self) -> None:
         """
-        Assert that getPropertyDocstring returns a string for 'public_property'.
+        Assert that getPropertyDocstring returns a string for 'publicProperty'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        doc = self.ri.getPropertyDocstring("public_property")
+        doc = self.ri.getPropertyDocstring("publicProperty")
         self.assertIsInstance(doc, str)
 
 class TestReflectionInstanceDependencies(TestCase):
@@ -1614,14 +1714,14 @@ class TestReflectionInstanceDependencies(TestCase):
 
     def testMethodSignatureReturnsSignature(self) -> None:
         """
-        Assert that methodSignature for 'public_method' returns a Signature.
+        Assert that methodSignature for 'publicMethod' returns a Signature.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        sig = self.ri.methodSignature("public_method")
+        sig = self.ri.methodSignature("publicMethod")
         self.assertIsInstance(sig, Signature)
 
     def testMethodSignatureForNonExistingRaisesAttributeError(self) -> None:
@@ -1672,3 +1772,445 @@ class TestReflectionInstanceClearCache(TestCase):
         self.ri["sentinel"] = "value"
         self.ri.clearCache()
         self.assertNotIn("sentinel", self.ri)
+
+class TestReflectionInstanceLazyScan(TestCase):
+
+    def testEveryAccessorTriggersTheLazyScanOnItsOwn(self) -> None:
+        """
+        Assert that each accessor populates the member cache by itself.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        A brand-new reflection wrapper is used for every accessor so that
+        the lazy scan is triggered from that accessor and not from a
+        previous call.
+        """
+        for getter in _SCAN_TRIGGERING_GETTERS:
+            reflection = ReflectionInstance(SampleReflected())
+            result = getattr(reflection, getter)()
+            self.assertIsInstance(result, (dict, list), msg=getter)
+
+class TestReflectionInstancePrivateAccess(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectionInstance for private member access tests.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.ri = ReflectionInstance(SampleReflected())
+
+    def testGetSourceCodeResolvesPrivateMethodNames(self) -> None:
+        """
+        Assert that private method sources are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        source = self.ri.getSourceCode("__privateMethod")
+        self.assertIn("def __privateMethod", source)
+
+    def testGetMethodSignatureResolvesPrivateNames(self) -> None:
+        """
+        Assert that private method signatures are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        signature = self.ri.getMethodSignature("__privateMethod")
+        self.assertIsInstance(signature, inspect.Signature)
+
+    def testGetMethodDocstringResolvesPrivateNames(self) -> None:
+        """
+        Assert that private method docstrings are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        docstring = self.ri.getMethodDocstring("__privateMethod")
+        self.assertIn("__private_attr", docstring)
+
+    def testGetPropertyResolvesPrivateNames(self) -> None:
+        """
+        Assert that private property values are readable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertEqual(self.ri.getProperty("__privateProperty"), "priv")
+
+    def testGetPropertySignatureResolvesPrivateNames(self) -> None:
+        """
+        Assert that private property signatures are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        signature = self.ri.getPropertySignature("__privateProperty")
+        self.assertIsInstance(signature, inspect.Signature)
+
+    def testGetPropertyDocstringResolvesPrivateNames(self) -> None:
+        """
+        Assert that private property docstrings are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        docstring = self.ri.getPropertyDocstring("__privateProperty")
+        self.assertIn("__private_attr", docstring)
+
+    def testMethodSignatureResolvesPrivateNames(self) -> None:
+        """
+        Assert that private method dependency signatures are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIsNotNone(self.ri.methodSignature("__privateMethod"))
+
+    def testGetAttributeDocstringResolvesPrivateNames(self) -> None:
+        """
+        Assert that private attribute docstrings are reachable.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIsInstance(
+            self.ri.getAttributeDocstring("__private_attr"),
+            str,
+        )
+
+    def testSetAndRemovePrivateAttribute(self) -> None:
+        """
+        Assert that private attributes are mangled on write and delete.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        reflection = _make_mutable_instance()
+        self.assertTrue(reflection.setAttribute("__hidden", 5))
+        self.assertIn("__hidden", reflection.getPrivateAttributes())
+        reflection.removeAttribute("__hidden")
+        self.assertNotIn("__hidden", reflection.getPrivateAttributes())
+
+    def testSetPrivateMethodResolvesMangledName(self) -> None:
+        """
+        Assert that injected private methods use the mangled name.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        ``setMethod`` binds the callable on the instance, so the injected
+        member surfaces through the instance variable scan.
+        """
+        reflection = _make_mutable_instance()
+        self.assertTrue(reflection.setMethod("__injected", _replacement_method))
+        self.assertIn("__injected", reflection.getPrivateAttributes())
+
+class TestReflectionInstanceMemoization(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectionInstance for memoization tests.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.ri = ReflectionInstance(SampleReflected())
+
+    def testClassSourceCodeIsMemoized(self) -> None:
+        """
+        Assert that getSourceCode returns the cached class source.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(self.ri.getSourceCode(), self.ri.getSourceCode())
+
+    def testMethodSourceCodeIsMemoized(self) -> None:
+        """
+        Assert that getSourceCode returns the cached method source.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.getSourceCode("publicMethod"),
+            self.ri.getSourceCode("publicMethod"),
+        )
+
+    def testFileIsMemoized(self) -> None:
+        """
+        Assert that getFile returns the cached path.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(self.ri.getFile(), self.ri.getFile())
+
+    def testAnnotationsAreMemoized(self) -> None:
+        """
+        Assert that getAnnotations returns the cached mapping.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(self.ri.getAnnotations(), self.ri.getAnnotations())
+
+    def testAttributesAreMemoized(self) -> None:
+        """
+        Assert that getAttributes returns the cached mapping.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(self.ri.getAttributes(), self.ri.getAttributes())
+
+    def testMethodSignatureIsMemoized(self) -> None:
+        """
+        Assert that getMethodSignature returns the cached signature.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.getMethodSignature("publicMethod"),
+            self.ri.getMethodSignature("publicMethod"),
+        )
+
+    def testMethodDocstringIsMemoized(self) -> None:
+        """
+        Assert that getMethodDocstring returns the cached docstring.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.getMethodDocstring("publicMethod"),
+            self.ri.getMethodDocstring("publicMethod"),
+        )
+
+    def testPropertySignatureIsMemoized(self) -> None:
+        """
+        Assert that getPropertySignature returns the cached signature.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.getPropertySignature("publicProperty"),
+            self.ri.getPropertySignature("publicProperty"),
+        )
+
+    def testPropertyDocstringIsMemoized(self) -> None:
+        """
+        Assert that getPropertyDocstring returns the cached docstring.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.getPropertyDocstring("publicProperty"),
+            self.ri.getPropertyDocstring("publicProperty"),
+        )
+
+    def testConstructorDependenciesAreMemoized(self) -> None:
+        """
+        Assert that constructorSignature returns the cached analysis.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.constructorSignature(),
+            self.ri.constructorSignature(),
+        )
+
+    def testMethodDependenciesAreMemoized(self) -> None:
+        """
+        Assert that methodSignature returns the cached analysis.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIs(
+            self.ri.methodSignature("publicMethod"),
+            self.ri.methodSignature("publicMethod"),
+        )
+
+class TestReflectionInstanceErrorBranches(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectionInstance for error branch tests.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.ri = ReflectionInstance(SampleReflected())
+
+    def testInitRejectsInstancesDeclaredInMainModule(self) -> None:
+        """
+        Assert that instances belonging to '__main__' are rejected.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        klass = type("_MainScoped", (), {"__module__": "__main__"})
+        with self.assertRaises(ValueError):
+            ReflectionInstance(klass())
+
+    def testGetSourceCodeReturnsNoneWhenUnavailable(self) -> None:
+        """
+        Assert that classes without locatable source return None.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        reflection = _make_moduleless_instance()
+        self.assertIsNone(reflection.getSourceCode())
+
+    def testGetFileReturnsNoneWhenUnavailable(self) -> None:
+        """
+        Assert that classes with an unresolvable module expose no file.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        reflection = _make_moduleless_instance()
+        self.assertIsNone(reflection.getFile())
+
+    def testGetMethodSignatureRaisesForUnknownName(self) -> None:
+        """
+        Assert that unknown method names raise AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(AttributeError):
+            self.ri.getMethodSignature("ghostMethod")
+
+    def testGetPropertySignatureRaisesForUnknownName(self) -> None:
+        """
+        Assert that unknown property names raise AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(AttributeError):
+            self.ri.getPropertySignature("ghostProperty")
+
+    def testGetPropertyDocstringRaisesForUnknownName(self) -> None:
+        """
+        Assert that unknown property docstrings raise AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(AttributeError):
+            self.ri.getPropertyDocstring("ghostProperty")
+
+    def testGetAttributeDocstringRaisesForUnknownName(self) -> None:
+        """
+        Assert that unknown attribute docstrings raise AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(AttributeError):
+            self.ri.getAttributeDocstring("ghost_attr")
+
+    def testRemoveAttributeRaisesForUnknownName(self) -> None:
+        """
+        Assert that removing an unknown attribute raises AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(AttributeError):
+            self.ri.removeAttribute("ghost_attr")
+
+    def testDunderPropertiesAreIgnoredByTheScan(self) -> None:
+        """
+        Assert that dunder properties never appear in the property lists.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        reflection = ReflectionInstance(_DunderPropertySample())
+        self.assertEqual(reflection.getProperties(), [])
+

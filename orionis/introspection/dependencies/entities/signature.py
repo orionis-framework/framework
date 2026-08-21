@@ -193,30 +193,6 @@ class Signature(BaseEntity):
         """
         return dict(self.unresolved)
 
-    def keywordOnlyToDict(self) -> dict[str, Argument]:
-        """
-        Return keyword-only parameters as a plain dictionary.
-
-        Returns
-        -------
-        dict[str, Argument]
-            Subset of ordered containing only keyword-only arguments.
-        """
-        return {k: v for k, v in self.ordered.items() if v.is_keyword_only}
-
-    def positionalOnlyToDict(self) -> dict[str, Argument]:
-        """
-        Return positional-only parameters as a plain dictionary.
-
-        Returns
-        -------
-        dict[str, Argument]
-            Subset of ordered excluding keyword-only arguments.
-        """
-        return {
-            k: v for k, v in self.ordered.items() if not v.is_keyword_only
-        }
-
     # ------------------------------------------------------------------
     # Iteration helpers
     # ------------------------------------------------------------------
@@ -224,17 +200,6 @@ class Signature(BaseEntity):
     def arguments(self) -> dict_items[str, Argument]:
         """
         Return an iterable view of all parameters in declaration order.
-
-        Returns
-        -------
-        dict_items[str, Argument]
-            Iterable of (name, Argument) pairs from ``ordered``.
-        """
-        return self.ordered.items()
-
-    def items(self) -> dict_items[str, Argument]:
-        """
-        Return an iterable view of all parameters (alias for arguments).
 
         Returns
         -------

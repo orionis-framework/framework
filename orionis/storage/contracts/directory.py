@@ -14,6 +14,8 @@ class IDirectory(ABC):
     methods always return domain objects — never plain strings.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def path(self) -> str:
         """

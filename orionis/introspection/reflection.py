@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 class Reflection:
 
-    # ruff: noqa : ANN401, SLF001, PLC0415
+    # ruff: noqa: ANN401, PLC0415
 
     @staticmethod
     def instance(instance: Any) -> IReflectionInstance:
@@ -534,22 +534,13 @@ class Reflection:
         bool
             True if the type is generic, otherwise False.
         """
-        # Check for generic alias in Python 3.7+.
-        if hasattr(typing, "get_origin") and typing.get_origin(obj) is not None:
+        # Parameterized generics expose an origin either through the public
+        # helper or, for bare typing constructs, the __origin__ attribute.
+        if typing.get_origin(obj) is not None or hasattr(obj, "__origin__"):
             return True
 
-        # Check for older style generic types.
-        if hasattr(obj, "__origin__"):
-            return True
-
-        # Check if it's a typing construct.
-        if hasattr(typing, "_GenericAlias") and isinstance(obj, typing._GenericAlias):
-            return True
-
-        # Check for type variables.
-        return (
-            hasattr(typing, "TypeVar") and isinstance(obj, typing.TypeVar)
-        )
+        # Type variables are generic placeholders as well.
+        return isinstance(obj, typing.TypeVar)
 
     @staticmethod
     def isProtocol(obj: Any) -> bool:
@@ -567,16 +558,11 @@ class Reflection:
             True if `obj` is a class that is a subclass of `typing.Protocol`
             (but not `Protocol` itself), otherwise False.
         """
-        # Retrieve the Protocol base class from the typing module, if available
-        protocol: type | None = getattr(typing, "Protocol", None)
-
-        # Protocol is not available in this Python version
-        if protocol is None:
-            return False
-
         # Return the condition directly
-        return isinstance(obj, type) and (
-            issubclass(obj, protocol) and obj is not protocol
+        return (
+            isinstance(obj, type)
+            and issubclass(obj, typing.Protocol)
+            and obj is not typing.Protocol
         )
 
     @staticmethod

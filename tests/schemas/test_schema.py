@@ -7,7 +7,6 @@ from orionis.schemas.constraints import (
 )
 from orionis.schemas.metadata import Description, Message, Title
 from orionis.schemas.schema import Schema, SchemaMeta
-from orionis.schemas.rule import Rule
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
@@ -40,6 +39,12 @@ class _NestedChild(Schema):
 class _ParentWithNested(Schema):
     child: _NestedChild
     count: int
+
+class _FieldlessSchema(Schema):
+    pass
+
+class _DoubleMessageSchema(Schema):
+    code: Annotated[str, Message("First message."), Message("Second message.")]
 
 class TestSchemaMeta(TestCase):
 
@@ -165,6 +170,26 @@ class TestSchemaMeta(TestCase):
         self.assertTrue(hasattr(_ParentWithNested, "__orionis_meta__"))
         self.assertTrue(hasattr(_ParentWithNested, "__orionis_constraints__"))
 
+    def testSchemaWithoutAnnotationsIsBuilt(self) -> None:
+        """
+        Build a schema declaring no annotated field at all.
+
+        Validates that the metaclass tolerates a missing annotation
+        callback instead of assuming every class declares fields.
+        """
+        self.assertEqual(_FieldlessSchema.__orionis_meta__, {})
+        self.assertEqual(_FieldlessSchema.__orionis_constraints__, {})
+        self.assertEqual(msgspec.structs.fields(_FieldlessSchema), ())
+
+    def testOnlyTheFirstMessageMetadataIsKept(self) -> None:
+        """
+        Keep the first Message annotation when several are declared.
+
+        Validates the single-pass classification of field metadata.
+        """
+        constraints = _DoubleMessageSchema.__orionis_constraints__
+        self.assertEqual(constraints["code"]["type"], "First message.")
+
 class TestSchemaInstantiation(TestCase):
 
     def testDirectInstantiationWithKeywordArguments(self) -> None:
@@ -208,24 +233,30 @@ class TestSchemaInvalidCustomRule(TestCase):
             class _BadSchema(Schema):
                 field: Annotated[str, _BadMeta()]
 
-    def testSubclassingRuleWithoutEnforceIsAbstract(self) -> None:
+class TestSchemaToDict(TestCase):
+
+    def testToDictReturnsEveryField(self) -> None:
         """
-        Prevent instantiating Rule subclasses that do not implement enforce.
+        Convert a schema instance into a plain dictionary.
 
-        Validates that a subclass that does not override enforce still
-        raises NotImplementedError when enforce is called.
+        Validates that every declared field reaches the returned mapping.
         """
+        result = _BasicSchema(name="Alice", age=30).toDict()
+        self.assertEqual(result, {"name": "Alice", "age": 30})
 
-        class _PartialRule(Rule):
-            def enforce(
-                self,
-                field: str,
-                value: object,
-                instance: object,
-            ) -> bool:
-                error_msg = "Subclasses must implement the enforce method."
-                raise NotImplementedError(error_msg)
+    def testToDictReflectsDefaultValues(self) -> None:
+        """
+        Include default field values in the converted dictionary.
 
-        rule = _PartialRule()
-        with self.assertRaises(NotImplementedError):
-            rule.enforce("f", "v", object())
+        Validates that unset fields are exported with their fallback.
+        """
+        self.assertEqual(_DefaultSchema().toDict(), {"label": "default", "count": 0})
+
+    def testToDictKeepsNestedSchemasAsInstances(self) -> None:
+        """
+        Keep nested schema values as instances in the dictionary.
+
+        Validates that the conversion is shallow by design.
+        """
+        instance = _ParentWithNested(child=_NestedChild(city="Lima"), count=1)
+        self.assertIsInstance(instance.toDict()["child"], _NestedChild)

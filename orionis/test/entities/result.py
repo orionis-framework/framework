@@ -23,8 +23,8 @@ class TestResult(BaseEntity):
         Time taken to execute the test, in seconds.
     error_message : str | None, optional
         Error message if the test failed, otherwise None.
-    traceback : str | None, optional
-        Traceback information if an error occurred, otherwise None.
+    traceback : list[str] | None, optional
+        Formatted traceback lines if an error occurred, otherwise None.
     class_name : str | None, optional
         Name of the class containing the test, if applicable.
     method : str | None, optional
@@ -35,8 +35,8 @@ class TestResult(BaseEntity):
         Path to the file containing the test, if applicable.
     doc_string : str | None, optional
         Docstring of the test, if applicable.
-    exception : BaseException | None, optional
-        The exception instance if an error occurred, otherwise None.
+    exception : str | None, optional
+        Name of the raised exception class if an error occurred, otherwise None.
     line_no : int | None, optional
         Line number in the source file where the test is defined, if applicable.
 
@@ -89,11 +89,11 @@ class TestResult(BaseEntity):
     )
 
     # Traceback information if an error occurred, otherwise None
-    traceback: str | None = field(
+    traceback: list[str] | None = field(
         default=None,
         metadata={
             "description": (
-                "Traceback information if an error occurred, otherwise None."
+                "Formatted traceback lines if an error occurred, otherwise None."
             ),
         },
     )
@@ -148,12 +148,13 @@ class TestResult(BaseEntity):
         },
     )
 
-    # The exception instance if an error occurred, otherwise None
-    exception: BaseException | None = field(
+    # The exception class name if an error occurred, otherwise None
+    exception: str | None = field(
         default=None,
         metadata={
             "description": (
-                "The exception instance if an error occurred, otherwise None."
+                "Name of the raised exception class if an error occurred, "
+                "otherwise None."
             ),
         },
     )

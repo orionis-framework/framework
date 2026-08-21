@@ -42,8 +42,8 @@ class ITranslationLoader(ABC):
         Raises
         ------
         TranslationSyntaxException
-            If a translation file contains invalid JSON or its root
-            element is not an object.
+            If a translation file is not UTF-8 encoded, contains
+            invalid JSON, or its root element is not an object.
         """
 
     @abstractmethod

@@ -247,3 +247,15 @@ class TestArgument(TestCase):
         arg1 = _make_argument()
         arg2 = _make_argument()
         self.assertEqual(arg1, arg2)
+
+    def testIsHashable(self) -> None:
+        """
+        Assert that a frozen Argument instance can be hashed.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertEqual(hash(_make_argument()), hash(_make_argument()))
+

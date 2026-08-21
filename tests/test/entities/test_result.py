@@ -201,7 +201,7 @@ class TestTestResultConstruction(TestCase):
         source = [(10, "    self.fail()"), (11, "")]
         result = _make_result(
             error_message="assertion failed",
-            traceback="Traceback (most recent call last)",
+            traceback=["Traceback (most recent call last)\n"],
             class_name="TestSample",
             method="testSample",
             module="tests.sample",
@@ -235,6 +235,30 @@ class TestTestResultConstruction(TestCase):
                 source,
             ],
         )
+
+    def testDiagnosticsDeclareTheStoredShapes(self) -> None:
+        """
+        Declare the diagnostic fields with the shapes actually stored.
+
+        Validates that the traceback holds formatted lines and that the
+        exception holds the raised class name.
+        """
+        declared = {
+            field.name: str(field.type)
+            for field in dataclasses.fields(TestResult)
+        }
+        self.assertEqual(declared["traceback"], "list[str] | None")
+        self.assertEqual(declared["exception"], "str | None")
+
+    def testTracebackStoresFormattedLines(self) -> None:
+        """
+        Store the traceback as the list of formatted lines.
+
+        Validates the payload produced by the result processor for a
+        failed test.
+        """
+        lines = ["Traceback (most recent call last)\n", "AssertionError\n"]
+        self.assertEqual(_make_result(traceback=lines).traceback, lines)
 
 class TestTestResultImmutability(TestCase):
 

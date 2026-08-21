@@ -44,27 +44,13 @@ def _bind_console(processor: TestResultProcessor, width: int) -> io.StringIO:
 class _ProcessorTestCase(TestCase):
     """Base scenario providing processors bound to an in-memory console."""
 
-    def setUp(self) -> None:
-        """
-        Capture the shared reporting verbosity before each scenario.
-
-        Guarantees that console output of the surrounding run is not
-        affected by the verbosity levels exercised here.
-        """
-        self._verbosity = TestResultProcessor._print_verbosity
-
-    def tearDown(self) -> None:
-        """
-        Restore the shared reporting verbosity after each scenario.
-
-        Prevents class level state from leaking into the tests executed
-        afterwards.
-        """
-        TestResultProcessor._print_verbosity = self._verbosity
-
-    def _makeProcessor(self, width: int = 120) -> TestResultProcessor:
+    def _makeProcessor(
+        self,
+        width: int = 120,
+        verbosity: int | None = None,
+    ) -> TestResultProcessor:
         """Build a processor writing to an in-memory console."""
-        processor = TestResultProcessor()
+        processor = TestResultProcessor(verbosity=verbosity)
         self._buffer = _bind_console(processor, width)
         return processor
 
@@ -128,28 +114,33 @@ class TestTestResultProcessorDefinition(_ProcessorTestCase):
         processor = self._makeProcessor()
         self.assertIs(processor.getTestResults(), processor.getTestResults())
 
-    def testPrintVerbosityIsStored(self) -> None:
+    def testPrintVerbosityIsStoredPerInstance(self) -> None:
         """
-        Store the requested reporting verbosity at class level.
+        Store the requested reporting verbosity on the instance.
 
         Validates the switch used by the engine to control console
         output detail.
         """
         for verbosity in (0, 1, 2):
-            TestResultProcessor.setPrintVerbosity(verbosity)
-            self.assertEqual(TestResultProcessor._print_verbosity, verbosity)
+            processor = TestResultProcessor(verbosity=verbosity)
+            self.assertEqual(
+                processor._TestResultProcessor__print_verbosity,
+                verbosity,
+            )
+
+    def testProcessorsDoNotShareTheirVerbosity(self) -> None:
+        """
+        Keep the reporting verbosity isolated between processors.
+
+        Validates that two runs executing at the same time never
+        overwrite the output detail of each other.
+        """
+        quiet = self._makeProcessor(verbosity=0)
+        verbose = TestResultProcessor(verbosity=2)
+        self.assertEqual(quiet._TestResultProcessor__print_verbosity, 0)
+        self.assertEqual(verbose._TestResultProcessor__print_verbosity, 2)
 
 class TestTestResultProcessorOutcomes(_ProcessorTestCase):
-
-    def setUp(self) -> None:
-        """
-        Silence the console before recording outcomes.
-
-        Guarantees that outcome scenarios assert on the produced reports
-        rather than on rendered text.
-        """
-        super().setUp()
-        TestResultProcessor.setPrintVerbosity(0)
 
     def testSuccessIsRecorded(self) -> None:
         """
@@ -329,16 +320,6 @@ class TestTestResultProcessorOutcomes(_ProcessorTestCase):
 
 class TestTestResultProcessorDefaultRendering(_ProcessorTestCase):
 
-    def setUp(self) -> None:
-        """
-        Reset the reporting verbosity to its unconfigured state.
-
-        Reproduces a processor used directly, without the engine having
-        published a verbosity level.
-        """
-        super().setUp()
-        TestResultProcessor._print_verbosity = None
-
     def testUnsetVerbosityRendersNothing(self) -> None:
         """
         Render no output when no reporting verbosity was configured.
@@ -358,8 +339,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
         Validates that embedded runs can execute without touching the
         console.
         """
-        TestResultProcessor.setPrintVerbosity(0)
-        self._addSuccess(self._makeProcessor())
+        self._addSuccess(self._makeProcessor(verbosity=0))
         self.assertEqual(self._output(), "")
 
     def testCompactVerbosityRendersASingleLine(self) -> None:
@@ -368,8 +348,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
 
         Validates the summary format used during regular runs.
         """
-        TestResultProcessor.setPrintVerbosity(1)
-        result = self._addSuccess(self._makeProcessor())
+        result = self._addSuccess(self._makeProcessor(verbosity=1))
         output = self._output()
         self.assertIn("PASSED", output)
         self.assertIn(result.name, output)
@@ -382,8 +361,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
         Validates that narrow consoles never produce wrapped summary
         lines.
         """
-        TestResultProcessor.setPrintVerbosity(1)
-        result = self._addSuccess(self._makeProcessor(width=40))
+        result = self._addSuccess(self._makeProcessor(width=40, verbosity=1))
         output = self._output()
         self.assertIn("...", output)
         self.assertNotIn(result.name, output)
@@ -394,8 +372,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
 
         Validates the diagnostic format used while investigating a run.
         """
-        TestResultProcessor.setPrintVerbosity(2)
-        self._addSuccess(self._makeProcessor())
+        self._addSuccess(self._makeProcessor(verbosity=2))
         output = self._output()
         self.assertIn("ID:", output)
         self.assertIn("Class:", output)
@@ -409,8 +386,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
         Validates that the panel highlights the offending statement and
         trims overly long source lines.
         """
-        TestResultProcessor.setPrintVerbosity(2)
-        self._addOutcome(self._makeProcessor(), errored=False)
+        self._addOutcome(self._makeProcessor(verbosity=2), errored=False)
         output = self._output()
         self.assertIn("❌", output)
         self.assertIn("AssertionError", output)
@@ -424,8 +400,7 @@ class TestTestResultProcessorRendering(_ProcessorTestCase):
         Validates that unexpected exceptions are visually separated from
         assertion failures.
         """
-        TestResultProcessor.setPrintVerbosity(2)
-        self._addOutcome(self._makeProcessor(), errored=True)
+        self._addOutcome(self._makeProcessor(verbosity=2), errored=True)
         output = self._output()
         self.assertIn("💥", output)
         self.assertIn("RuntimeError", output)

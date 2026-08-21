@@ -1,47 +1,99 @@
-from __future__ import annotations
 import gzip
 import logging
-import tempfile
+import os
+from contextlib import redirect_stderr
+from datetime import datetime, timedelta
+from io import StringIO
 from logging import LogRecord
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.logging.handlers.advanced_rotating_file_handler import (
     AdvancedRotatingFileHandler,
 )
-from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
-from orionis.logging.handlers.hourly_suffix_resolver import HourlySuffixResolver
 from orionis.test import TestCase
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+# Template shared by every handler built in this module.
+_PATH_TEMPLATE = "logs/app_{suffix}.log"
+
+# Directory, relative to the application root, holding the produced files.
+_LOG_DIR = "logs"
+
+# Number of distinct suffixes required to overflow the internal path cache.
+_CACHE_OVERFLOW = 52
+
+class _FixedSuffixResolver(SuffixResolver):
+    """Rotation strategy returning a suffix controlled by the test."""
+
+    __slots__ = ("suffix",)
+
+    def __init__(self, suffix: str = "fixed") -> None:
+        """Store the suffix reported to the handler."""
+        self.suffix = suffix
+
+    def getSuffix(self, _dt: object = None) -> str:
+        """Return the suffix currently configured."""
+        return self.suffix
+
+    def getNextRotationTime(self, current_time: datetime) -> datetime:
+        """Return the moment one hour after the supplied one."""
+        return current_time + timedelta(hours=1)
+
+class _ExplodingStream:
+    """Stream double failing on every write attempt."""
+
+    __slots__ = ("attempts", "closed")
+
+    def __init__(self) -> None:
+        """Prepare the counters inspected by the assertions."""
+        self.attempts: int = 0
+        self.closed: bool = False
+
+    def write(self, _line: str) -> int:
+        """Fail instead of writing the supplied line."""
+        self.attempts += 1
+        error_msg = "the stream is not writable"
+        raise OSError(error_msg)
+
+    def close(self) -> None:
+        """Mark the stream as closed."""
+        self.closed = True
+
+class _ExplodingPattern:
+    """Pattern double failing on every file name inspection."""
+
+    __slots__ = ()
+
+    def match(self, _name: str) -> None:
+        """Fail instead of matching the supplied file name."""
+        error_msg = "the file name cannot be inspected"
+        raise OSError(error_msg)
 
 def _make_handler(  # noqa: PLR0913
-    tmp_dir: str,
+    root: str,
     *,
-    path_template: str = "logs/app_{suffix}.log",
-    resolver: object | None = None,
+    resolver: SuffixResolver | None = None,
+    path_template: str = _PATH_TEMPLATE,
     max_bytes: int | None = None,
     backup_count: int = 5,
     delay: bool = True,
     compress_rotated: bool = False,
 ) -> AdvancedRotatingFileHandler:
-    """Return a configured AdvancedRotatingFileHandler for tests."""
-    if resolver is None:
-        resolver = HourlySuffixResolver()
+    """Return a rotating handler anchored to the given application root."""
     return AdvancedRotatingFileHandler(
         path_template=path_template,
-        suffix_resolver=resolver,
+        suffix_resolver=resolver or _FixedSuffixResolver(),
         max_bytes=max_bytes,
         backup_count=backup_count,
         delay=delay,
         compress_rotated=compress_rotated,
-        app_root=tmp_dir,
+        app_root=root,
     )
 
-def _make_record(message: str = "test message") -> LogRecord:
-    """Return a minimal LogRecord for use in tests."""
+def _make_record(message: str = "log record") -> LogRecord:
+    """Return a minimal informational record."""
     return LogRecord(
-        name="test",
+        name="tests.logging",
         level=logging.INFO,
         pathname=__file__,
         lineno=1,
@@ -50,424 +102,598 @@ def _make_record(message: str = "test message") -> LogRecord:
         exc_info=None,
     )
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerInit
-# ---------------------------------------------------------------------------
+def _seed_file(directory: Path, name: str, mtime: float) -> Path:
+    """Create a file with a deterministic modification time."""
+    path = directory / name
+    path.write_text("seeded content", encoding="utf-8")
+    os.utime(path, (mtime, mtime))
+    return path
 
-class TestAdvancedRotatingFileHandlerInit(TestCase):
+class TestAdvancedRotatingFileHandlerInitialisation(TestCase):
 
-    def testInitWithDelayDoesNotOpenStream(self) -> None:
+    def setUp(self) -> None:
+        """Create a temporary application root and the handler registry."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handlers: list[AdvancedRotatingFileHandler] = []
+
+    def tearDown(self) -> None:
+        """Close every built handler and delete the temporary root."""
+        for handler in self._handlers:
+            handler.close()
+        self._tmp.cleanup()
+
+    def testDelayedHandlerKeepsTheStreamClosed(self) -> None:
         """
-        Leave stream as None when delay=True.
+        Postpone opening the file until the first record.
 
-        Validates that the handler defers file creation until the first log
-        record is emitted when constructed with delay=True.
+        Validates that configuring a channel never creates an empty log file.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            try:
-                self.assertIsNone(handler.stream)
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        self.assertIsNone(handler.stream)
 
-    def testInitWithoutDelayOpensStream(self) -> None:
+    def testEagerHandlerOpensTheStreamImmediately(self) -> None:
         """
-        Open the stream immediately when delay=False.
+        Open the file as soon as the handler is built.
 
-        Validates that the handler opens the underlying file as soon as it is
-        constructed when delay=False.
+        Validates the eager mode used when logging must never be delayed.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=False)
-            try:
-                self.assertIsNotNone(handler.stream)
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name, delay=False)
+        self._handlers.append(handler)
+        self.assertIsNotNone(handler.stream)
 
-    def testInitSetsPathTemplate(self) -> None:
+    def testConstructorStoresTheRotationSettings(self) -> None:
         """
-        Store the path_template attribute from the constructor argument.
+        Keep every rotation setting supplied to the constructor.
 
-        Validates that the handler correctly records the supplied path_template.
+        Validates that the factory options survive untouched in the handler.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, path_template="logs/custom_{suffix}.log")
-            try:
-                self.assertEqual(handler.path_template, "logs/custom_{suffix}.log")
-            finally:
-                handler.close()
+        handler = _make_handler(
+            self._tmp.name,
+            path_template="logs/custom_{suffix}.log",
+            max_bytes=1024,
+            backup_count=10,
+            compress_rotated=True,
+        )
+        self._handlers.append(handler)
+        self.assertEqual(handler.path_template, "logs/custom_{suffix}.log")
+        self.assertEqual(handler.max_bytes, 1024)
+        self.assertEqual(handler.backup_count, 10)
+        self.assertTrue(handler.compress_rotated)
 
-    def testInitSetsBackupCount(self) -> None:
+    def testConstructorAnchorsTheApplicationRoot(self) -> None:
         """
-        Preserve the backup_count passed to the constructor.
+        Convert the application root into a path object.
 
-        Validates that backup_count is stored without modification.
+        Validates that relative templates are always resolved from the project
+        directory.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, backup_count=10)
-            try:
-                self.assertEqual(handler.backup_count, 10)
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        self.assertEqual(handler.app_root, Path(self._tmp.name))
 
-    def testInitSetsMaxBytes(self) -> None:
+    def testConstructorCompilesTheCleanupPattern(self) -> None:
         """
-        Store the max_bytes parameter from the constructor.
+        Compile the pattern matching the files owned by the channel.
 
-        Validates that the max_bytes attribute is correctly initialised
-        for chunked (size-based) rotation.
+        Validates that only the files produced by this template are eligible
+        for removal.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, max_bytes=1024)
-            try:
-                self.assertEqual(handler.max_bytes, 1024)
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        self.assertTrue(handler._cleanup_pattern.match("app_2025-04-09.log"))
+        self.assertIsNone(handler._cleanup_pattern.match("other.log"))
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerResolvePath
-# ---------------------------------------------------------------------------
+class TestAdvancedRotatingFileHandlerPathResolution(TestCase):
 
-class TestAdvancedRotatingFileHandlerResolvePath(TestCase):
+    def setUp(self) -> None:
+        """Create a temporary application root and a delayed handler."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handler = _make_handler(self._tmp.name)
 
-    def testResolvePathReplacesSuffixPlaceholder(self) -> None:
+    def tearDown(self) -> None:
+        """Close the handler and delete the temporary root."""
+        self._handler.close()
+        self._tmp.cleanup()
+
+    def testResolvedPathReplacesThePlaceholder(self) -> None:
         """
-        Replace the {suffix} placeholder with the provided suffix string.
+        Replace the suffix placeholder of the configured template.
 
-        Validates that _resolvePath produces a path where {suffix} is
-        substituted with the given suffix value.
+        Validates the file name produced for a given rotation window.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(
-                tmp,
-                path_template="logs/app_{suffix}.log",
-            )
-            try:
-                result = handler._resolvePath("2025-04-09_14")
-                self.assertIn("2025-04-09_14", result)
-                self.assertNotIn("{suffix}", result)
-            finally:
-                handler.close()
+        resolved = self._handler._resolvePath("2025-04-09_14")
+        self.assertEqual(Path(resolved).name, "app_2025-04-09_14.log")
 
-    def testResolvePathCreatesParentDirectory(self) -> None:
+    def testResolvedPathIsAnchoredToTheApplicationRoot(self) -> None:
         """
-        Create any missing parent directories for the resolved log path.
+        Resolve the template against the application root.
 
-        Validates that _resolvePath calls mkdir(parents=True) so the log
-        file can be opened without a FileNotFoundError.
+        Validates that relative templates never depend on the working
+        directory.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(
-                tmp,
-                path_template="deep/nested/logs/app_{suffix}.log",
-            )
-            try:
-                handler._resolvePath("test-suffix")
-                expected_dir = Path(tmp) / "deep" / "nested" / "logs"
-                self.assertTrue(expected_dir.is_dir())
-            finally:
-                handler.close()
+        resolved = Path(self._handler._resolvePath("anchored"))
+        self.assertEqual(resolved.parent, Path(self._tmp.name) / _LOG_DIR)
 
-    def testResolvePathReturnsCachedResult(self) -> None:
+    def testResolvedPathCreatesTheParentDirectory(self) -> None:
         """
-        Return the cached path on a subsequent call with the same suffix.
+        Create the directory tree required by the resolved path.
 
-        Validates that _resolvePath populates the internal cache so that
-        repeated calls with the same suffix return the identical string.
+        Validates that a missing folder never prevents the file from opening.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(
-                tmp,
-                path_template="logs/app_{suffix}.log",
-            )
-            try:
-                first = handler._resolvePath("my-suffix")
-                second = handler._resolvePath("my-suffix")
-                self.assertEqual(first, second)
-            finally:
-                handler.close()
+        handler = _make_handler(
+            self._tmp.name,
+            path_template="deep/nested/logs/app_{suffix}.log",
+        )
+        try:
+            handler._resolvePath("nested")
+            expected = Path(self._tmp.name) / "deep" / "nested" / "logs"
+            self.assertTrue(expected.is_dir())
+        finally:
+            handler.close()
 
-    def testResolvePathReturnsDifferentPathForDifferentSuffix(self) -> None:
+    def testResolvedPathIsCachedPerSuffix(self) -> None:
         """
-        Produce distinct paths for different suffixes.
+        Reuse the cached path when the suffix has not changed.
 
-        Validates that two different suffix values yield two different
-        resolved paths.
+        Validates the cache that keeps the hot logging path free of filesystem
+        work.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(
-                tmp,
-                path_template="logs/app_{suffix}.log",
-            )
-            try:
-                path_a = handler._resolvePath("2025-04-09_14")
-                path_b = handler._resolvePath("2025-04-09_15")
-                self.assertNotEqual(path_a, path_b)
-            finally:
-                handler.close()
+        first = self._handler._resolvePath("cached")
+        second = self._handler._resolvePath("cached")
+        self.assertIs(first, second)
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerShouldRotate
-# ---------------------------------------------------------------------------
-
-class TestAdvancedRotatingFileHandlerShouldRotate(TestCase):
-
-    def testShouldRotateWhenSuffixChanges(self) -> None:
+    def testDifferentSuffixesResolveToDifferentPaths(self) -> None:
         """
-        Signal rotation when the current suffix differs from the stored one.
+        Produce one path per rotation window.
 
-        Validates that _shouldRotate returns True after the suffix resolver
-        would produce a new suffix compared to handler.current_suffix.
+        Validates that the cache never mixes two different suffixes.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            # Use a DailySuffixResolver pinned to a fixed datetime via emit
-            handler = _make_handler(
-                tmp,
-                resolver=DailySuffixResolver(),
-            )
-            try:
-                # Resolve the live suffix; stale stored suffix forces mismatch
-                current_suffix = handler.suffix_resolver.getSuffix()
-                handler.current_suffix = "1970-01-01"
-                self.assertTrue(handler._shouldRotate(current_suffix))
-            finally:
-                handler.close()
+        self.assertNotEqual(
+            self._handler._resolvePath("2025-04-09_14"),
+            self._handler._resolvePath("2025-04-09_15"),
+        )
 
-    def testShouldRotateWhenFileSizeExceedsMaxBytes(self) -> None:
+    def testPathCacheIsClearedWhenItGrowsTooMuch(self) -> None:
         """
-        Trigger rotation when file_size reaches or exceeds max_bytes.
+        Discard the cached paths once the cache grows beyond its limit.
 
-        Validates that _shouldRotate returns True when the current file
-        size is at or above the configured max_bytes threshold.
+        Validates the guard protecting size based rotation, which produces a
+        unique suffix on every chunk.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            resolver = HourlySuffixResolver()
-            handler = _make_handler(tmp, resolver=resolver, max_bytes=100)
-            try:
-                # Match suffix to prevent time-based rotation flag
-                current = resolver.getSuffix()
-                handler.current_suffix = current
-                handler.file_size = 100
-                self.assertTrue(handler._shouldRotate(current))
-            finally:
-                handler.close()
+        for index in range(_CACHE_OVERFLOW):
+            self._handler._resolvePath(f"suffix-{index}")
+        self.assertEqual(len(self._handler._path_cache), 1)
 
-    def testShouldNotRotateWhenSuffixMatchesAndBelowMaxBytes(self) -> None:
+class TestAdvancedRotatingFileHandlerRotationDecision(TestCase):
+
+    def setUp(self) -> None:
+        """Create a temporary application root and the handler registry."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handlers: list[AdvancedRotatingFileHandler] = []
+
+    def tearDown(self) -> None:
+        """Close every built handler and delete the temporary root."""
+        for handler in self._handlers:
+            handler.close()
+        self._tmp.cleanup()
+
+    def testRotationIsRequiredWhenTheSuffixChanges(self) -> None:
         """
-        Return False when the suffix is current and file_size is below max_bytes.
+        Rotate as soon as the rotation window changes.
 
-        Validates the steady-state (no rotation needed) path for a handler
-        that has both a matching suffix and a small file size.
+        Validates the time based rotation trigger.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            resolver = HourlySuffixResolver()
-            handler = _make_handler(tmp, resolver=resolver, max_bytes=1024 * 1024)
-            try:
-                current = resolver.getSuffix()
-                handler.current_suffix = current
-                handler.file_size = 0
-                self.assertFalse(handler._shouldRotate(current))
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        handler.current_suffix = "1970-01-01"
+        self.assertTrue(handler._shouldRotate("2025-04-09"))
 
-    def testShouldNotRotateWhenMaxBytesIsNoneAndSuffixMatches(self) -> None:
+    def testRotationIsRequiredWhenTheSizeReachesTheThreshold(self) -> None:
         """
-        Return False when max_bytes is None and the suffix is unchanged.
+        Rotate as soon as the file reaches the configured size.
 
-        Validates that a time-based handler with a matching suffix does not
-        signal rotation.
+        Validates the size based rotation trigger.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            resolver = HourlySuffixResolver()
-            handler = _make_handler(tmp, resolver=resolver, max_bytes=None)
-            try:
-                current = resolver.getSuffix()
-                handler.current_suffix = current
-                self.assertFalse(handler._shouldRotate(current))
-            finally:
-                handler.close()
+        handler = _make_handler(self._tmp.name, max_bytes=100)
+        self._handlers.append(handler)
+        handler.current_suffix = "stable"
+        handler.file_size = 100
+        self.assertTrue(handler._shouldRotate("stable"))
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerEmit
-# ---------------------------------------------------------------------------
+    def testRotationIsSkippedBelowTheThreshold(self) -> None:
+        """
+        Keep writing while the file stays below the configured size.
+
+        Validates the steady state of a size based channel.
+        """
+        handler = _make_handler(self._tmp.name, max_bytes=100)
+        self._handlers.append(handler)
+        handler.current_suffix = "stable"
+        handler.file_size = 99
+        self.assertFalse(handler._shouldRotate("stable"))
+
+    def testRotationIsSkippedWithoutASizeThreshold(self) -> None:
+        """
+        Keep writing when no size threshold is configured.
+
+        Validates the steady state of a purely time based channel.
+        """
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        handler.current_suffix = "stable"
+        handler.file_size = 10_000
+        self.assertFalse(handler._shouldRotate("stable"))
 
 class TestAdvancedRotatingFileHandlerEmit(TestCase):
 
-    def testEmitWritesMessageToFile(self) -> None:
-        """
-        Write an emitted log record to the underlying log file.
+    def setUp(self) -> None:
+        """Create a temporary application root and a delayed handler."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._resolver = _FixedSuffixResolver("emit")
+        self._handler = _make_handler(self._tmp.name, resolver=self._resolver)
 
-        Validates that the message text appears verbatim in the log file
-        after emit() is called.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            try:
-                record = _make_record("hello from test")
-                handler.emit(record)
-                self.assertIsNotNone(handler.current_path)
-                content = Path(handler.current_path).read_text(encoding="utf-8")
-                self.assertIn("hello from test", content)
-            finally:
-                handler.close()
+    def tearDown(self) -> None:
+        """Close the handler and delete the temporary root."""
+        self._handler.close()
+        self._tmp.cleanup()
 
-    def testEmitCreatesLogFile(self) -> None:
-        """
-        Create the log file on disk after the first emit call.
+    def _readLog(self) -> str:
+        """Return the content of the file currently written by the handler."""
+        return Path(self._tmp.name, _LOG_DIR, "app_emit.log").read_text(
+            encoding="utf-8",
+        )
 
-        Validates that no file exists before emit() and that it is created
-        after the first emit().
+    def testEmitCreatesTheLogFile(self) -> None:
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            try:
-                self.assertIsNone(handler.current_path)
-                handler.emit(_make_record("init"))
-                self.assertTrue(Path(handler.current_path).exists())
-            finally:
-                handler.close()
+        Create the log file on the first emitted record.
 
-    def testEmitUpdatesFileSize(self) -> None:
+        Validates the lazy stream opening performed by the handler.
         """
-        Increment file_size after each emit call.
+        self._handler.emit(_make_record())
+        self.assertTrue(Path(self._tmp.name, _LOG_DIR, "app_emit.log").exists())
 
-        Validates that the handler tracks the written byte count by
-        verifying that file_size is positive after one emit.
+    def testEmitWritesTheFormattedRecord(self) -> None:
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            try:
-                handler.emit(_make_record("size tracking"))
-                self.assertGreater(handler.file_size, 0)
-            finally:
-                handler.close()
+        Write the formatted message followed by a line break.
 
-    def testEmitAppendsMultipleRecords(self) -> None:
+        Validates the payload handed over to the underlying stream.
         """
-        Append successive log records to the same file.
+        self._handler.emit(_make_record("first message"))
+        self.assertEqual(self._readLog(), "first message\n")
 
-        Validates that multiple emit() calls do not truncate the file and
-        all messages are present in order.
+    def testEmitAppendsEveryRecord(self) -> None:
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            try:
-                handler.emit(_make_record("first"))
-                handler.emit(_make_record("second"))
-                content = Path(handler.current_path).read_text(encoding="utf-8")
-                self.assertIn("first", content)
-                self.assertIn("second", content)
-            finally:
-                handler.close()
+        Append each record to the file already opened.
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerClose
-# ---------------------------------------------------------------------------
+        Validates that the stream is reused instead of truncating the file.
+        """
+        self._handler.emit(_make_record("first message"))
+        self._handler.emit(_make_record("second message"))
+        self.assertEqual(self._readLog(), "first message\nsecond message\n")
+
+    def testEmitTracksTheWrittenSize(self) -> None:
+        """
+        Account for every written byte, including the line break.
+
+        Validates the counter driving size based rotation.
+        """
+        self._handler.emit(_make_record("12345"))
+        self.assertEqual(self._handler.file_size, 6)
+
+    def testEmitReportsWriteFailuresThroughTheHandlerHook(self) -> None:
+        """
+        Report a failing stream through the standard error hook.
+
+        Validates that a broken log file never propagates an exception into
+        the caller of the logging methods.
+        """
+        stream = _ExplodingStream()
+        self._handler.current_suffix = self._resolver.suffix
+        self._handler.current_path = str(
+            Path(self._tmp.name, _LOG_DIR, "app_emit.log"),
+        )
+        self._handler.stream = stream  # type: ignore[assignment]
+        buffer = StringIO()
+        with redirect_stderr(buffer):
+            self._handler.emit(_make_record("never written"))
+        self.assertEqual(stream.attempts, 1)
+        self.assertIn("--- Logging error ---", buffer.getvalue())
+
+class TestAdvancedRotatingFileHandlerRotation(TestCase):
+
+    def setUp(self) -> None:
+        """Create a temporary application root and the handler registry."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handlers: list[AdvancedRotatingFileHandler] = []
+
+    def tearDown(self) -> None:
+        """Close every built handler and delete the temporary root."""
+        for handler in self._handlers:
+            handler.close()
+        self._tmp.cleanup()
+
+    def testSuffixChangeOpensANewFile(self) -> None:
+        """
+        Write to a new file once the rotation window changes.
+
+        Validates that records never leak into the closed window.
+        """
+        resolver = _FixedSuffixResolver("first")
+        handler = _make_handler(self._tmp.name, resolver=resolver)
+        self._handlers.append(handler)
+        handler.emit(_make_record("first window"))
+        resolver.suffix = "second"
+        handler.emit(_make_record("second window"))
+        produced = sorted(
+            path.name
+            for path in Path(self._tmp.name, _LOG_DIR).glob("*.log")
+        )
+        self.assertEqual(produced, ["app_first.log", "app_second.log"])
+
+    def testRotationCompressesTheClosedFile(self) -> None:
+        """
+        Archive the closed file when compression is enabled.
+
+        Validates the size based channel policy of compressing every chunk.
+        """
+        resolver = _FixedSuffixResolver("first")
+        handler = _make_handler(
+            self._tmp.name,
+            resolver=resolver,
+            compress_rotated=True,
+        )
+        self._handlers.append(handler)
+        handler.emit(_make_record("first window"))
+        resolver.suffix = "second"
+        handler.emit(_make_record("second window"))
+        archive = Path(self._tmp.name, _LOG_DIR, "app_first.log.gz")
+        self.assertTrue(archive.exists())
+        self.assertFalse(Path(self._tmp.name, _LOG_DIR, "app_first.log").exists())
+
+    def testRotationResetsTheHandlerState(self) -> None:
+        """
+        Forget the current file once the rotation completes.
+
+        Validates that the next record reopens a stream from scratch.
+        """
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        handler.emit(_make_record())
+        handler._rotateFile()
+        self.assertIsNone(handler.stream)
+        self.assertIsNone(handler.current_path)
+        self.assertIsNone(handler.current_suffix)
+        self.assertEqual(handler.file_size, 0)
+
+    def testRotationWithoutAnOpenStreamDoesNotRaise(self) -> None:
+        """
+        Rotate an idle handler without raising.
+
+        Validates the guard protecting a rotation requested before the first
+        record.
+        """
+        handler = _make_handler(self._tmp.name)
+        self._handlers.append(handler)
+        handler._rotateFile()
+        self.assertIsNone(handler.current_path)
+
+    def testReopeningAWindowKeepsTheExistingSize(self) -> None:
+        """
+        Restore the size of a file written by a previous run.
+
+        Validates that an existing file is appended to instead of being
+        measured as empty, which would postpone size based rotation.
+        """
+        resolver = _FixedSuffixResolver("resumed")
+        first = _make_handler(self._tmp.name, resolver=resolver)
+        first.emit(_make_record("12345"))
+        first.close()
+        written = Path(self._tmp.name, _LOG_DIR, "app_resumed.log").stat().st_size
+        second = _make_handler(self._tmp.name, resolver=resolver)
+        self._handlers.append(second)
+        second.emit(_make_record("67890"))
+        self.assertEqual(second.file_size, written + len("67890\n"))
+
+class TestAdvancedRotatingFileHandlerCompression(TestCase):
+
+    def setUp(self) -> None:
+        """Create a temporary application root and a compressing handler."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handler = _make_handler(self._tmp.name, compress_rotated=True)
+
+    def tearDown(self) -> None:
+        """Close the handler and delete the temporary root."""
+        self._handler.close()
+        self._tmp.cleanup()
+
+    def testCompressionCreatesAGzipArchive(self) -> None:
+        """
+        Archive the supplied file next to the original one.
+
+        Validates the naming scheme of the produced archive.
+        """
+        source = Path(self._tmp.name) / "rotated.log"
+        source.write_text("archived content", encoding="utf-8")
+        self._handler._compressFile(str(source))
+        self.assertTrue(Path(self._tmp.name, "rotated.log.gz").exists())
+
+    def testCompressionRemovesTheOriginalFile(self) -> None:
+        """
+        Remove the original file once it has been archived.
+
+        Validates that compression never duplicates the stored data.
+        """
+        source = Path(self._tmp.name) / "rotated.log"
+        source.write_text("archived content", encoding="utf-8")
+        self._handler._compressFile(str(source))
+        self.assertFalse(source.exists())
+
+    def testArchiveContainsTheOriginalBytes(self) -> None:
+        """
+        Preserve the original content inside the archive.
+
+        Validates that the produced file is a readable gzip stream.
+        """
+        source = Path(self._tmp.name) / "rotated.log"
+        source.write_bytes(b"verifiable gzip content")
+        self._handler._compressFile(str(source))
+        with gzip.open(Path(self._tmp.name, "rotated.log.gz"), "rb") as archive:
+            self.assertEqual(archive.read(), b"verifiable gzip content")
+
+    def testMissingSourceIsIgnored(self) -> None:
+        """
+        Ignore a compression request for a missing file.
+
+        Validates that a failed rotation never interrupts logging.
+        """
+        missing = Path(self._tmp.name) / "ghost.log"
+        self._handler._compressFile(str(missing))
+        self.assertFalse(Path(self._tmp.name, "ghost.log.gz").exists())
+
+    def testFailedCompressionRemovesThePartialArchive(self) -> None:
+        """
+        Remove the archive left behind by a failed compression.
+
+        Validates that an unreadable source never leaves a truncated file
+        pretending to hold the rotated records.
+        """
+        unreadable = Path(self._tmp.name) / "rotated.log"
+        unreadable.mkdir()
+        archive = Path(self._tmp.name) / "rotated.log.gz"
+        archive.write_text("stale archive", encoding="utf-8")
+        self._handler._compressFile(str(unreadable))
+        self.assertFalse(archive.exists())
+        self.assertTrue(unreadable.is_dir())
+
+class TestAdvancedRotatingFileHandlerCleanup(TestCase):
+
+    def setUp(self) -> None:
+        """Create a temporary application root and the log directory."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._logs = Path(self._tmp.name) / _LOG_DIR
+        self._logs.mkdir(parents=True, exist_ok=True)
+        self._handlers: list[AdvancedRotatingFileHandler] = []
+
+    def tearDown(self) -> None:
+        """Close every built handler and delete the temporary root."""
+        for handler in self._handlers:
+            handler.close()
+        self._tmp.cleanup()
+
+    def _makeHandler(self, backup_count: int) -> AdvancedRotatingFileHandler:
+        """Return a tracked handler keeping the given number of files."""
+        handler = _make_handler(self._tmp.name, backup_count=backup_count)
+        self._handlers.append(handler)
+        return handler
+
+    def testCleanupIsSkippedWithoutAnActiveFile(self) -> None:
+        """
+        Skip the cleanup while no file has been opened.
+
+        Validates that an idle handler never inspects the log directory.
+        """
+        stale = _seed_file(self._logs, "app_stale.log", 1000)
+        self._makeHandler(1)._cleanupOldFiles()
+        self.assertTrue(stale.exists())
+
+    def testCleanupRemovesTheFilesBeyondTheBackupCount(self) -> None:
+        """
+        Keep only the newest files allowed by the backup count.
+
+        Validates the retention policy applied after every rotation.
+        """
+        newest = _seed_file(self._logs, "app_3.log", 3000)
+        middle = _seed_file(self._logs, "app_2.log", 2000)
+        oldest = _seed_file(self._logs, "app_1.log", 1000)
+        handler = self._makeHandler(2)
+        handler.current_path = str(newest)
+        handler._cleanupOldFiles()
+        self.assertTrue(newest.exists())
+        self.assertTrue(middle.exists())
+        self.assertFalse(oldest.exists())
+
+    def testCleanupRemovesTheArchiveOfADiscardedFile(self) -> None:
+        """
+        Remove the archive belonging to a discarded log file.
+
+        Validates that compressed rotations are subject to the same retention
+        policy, and that a file removed twice is silently ignored.
+        """
+        newest = _seed_file(self._logs, "app_keep.log", 3000)
+        discarded = _seed_file(self._logs, "app_drop.log", 2000)
+        archive = _seed_file(self._logs, "app_drop.log.gz", 1000)
+        handler = self._makeHandler(1)
+        handler.current_path = str(newest)
+        handler._cleanupOldFiles()
+        self.assertTrue(newest.exists())
+        self.assertFalse(discarded.exists())
+        self.assertFalse(archive.exists())
+
+    def testCleanupIgnoresFilesOwnedByAnotherChannel(self) -> None:
+        """
+        Preserve the files produced by another channel.
+
+        Validates that the compiled pattern scopes the retention policy to the
+        files of this template.
+        """
+        newest = _seed_file(self._logs, "app_1.log", 2000)
+        foreign = _seed_file(self._logs, "other.log", 1000)
+        handler = self._makeHandler(1)
+        handler.current_path = str(newest)
+        handler._cleanupOldFiles()
+        self.assertTrue(foreign.exists())
+
+    def testCleanupNeverPropagatesFilesystemErrors(self) -> None:
+        """
+        Swallow any error raised while inspecting the log directory.
+
+        Validates that a failing cleanup never breaks the logging pipeline.
+        """
+        stale = _seed_file(self._logs, "app_1.log", 1000)
+        handler = self._makeHandler(1)
+        handler.current_path = str(stale)
+        handler._cleanup_pattern = _ExplodingPattern()  # type: ignore[assignment]
+        handler._cleanupOldFiles()
+        self.assertTrue(stale.exists())
 
 class TestAdvancedRotatingFileHandlerClose(TestCase):
 
-    def testCloseReleasesStreamAfterEmit(self) -> None:
+    def setUp(self) -> None:
+        """Create a temporary application root and a delayed handler."""
+        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
+        self._handler = _make_handler(self._tmp.name)
+
+    def tearDown(self) -> None:
+        """Delete the temporary root."""
+        self._tmp.cleanup()
+
+    def testCloseReleasesTheStream(self) -> None:
         """
-        Set stream to None after close() is called.
+        Release the file descriptor held by the handler.
 
-        Validates that the handler's stream attribute is None once close()
-        completes, confirming the file descriptor is released.
+        Validates that a closed handler never keeps the log file locked.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            handler.emit(_make_record("closing test"))
-            self.assertIsNotNone(handler.stream)
-            handler.close()
-            self.assertIsNone(handler.stream)
+        self._handler.emit(_make_record())
+        self._handler.close()
+        self.assertIsNone(self._handler.stream)
 
-    def testCloseWithoutEmitDoesNotRaise(self) -> None:
+    def testCloseWithoutAnOpenStreamDoesNotRaise(self) -> None:
         """
-        Close a handler that has never emitted without raising an error.
+        Close an idle handler without raising.
 
-        Validates that calling close() on an idle handler (stream=None) is
-        a no-op and does not raise any exception.
+        Validates the guard protecting a handler that never emitted a record.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, delay=True)
-            # Should not raise
-            handler.close()
-            self.assertIsNone(handler.stream)
+        self._handler.close()
+        self.assertIsNone(self._handler.stream)
 
-# ---------------------------------------------------------------------------
-# TestAdvancedRotatingFileHandlerCompress
-# ---------------------------------------------------------------------------
-
-class TestAdvancedRotatingFileHandlerCompress(TestCase):
-
-    def testCompressFileCreatesGzFile(self) -> None:
+    def testCloseIsIdempotent(self) -> None:
         """
-        Create a gzip-compressed copy of the original log file.
+        Allow repeated close calls without raising.
 
-        Validates that _compressFile produces a '.gz' file adjacent to the
-        original log file.
+        Validates that shutting down an already closed handler is a no-op.
         """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, compress_rotated=True)
-            # Create a dummy log file to compress
-            log_path = Path(tmp) / "test.log"
-            log_path.write_text("hello compressed world", encoding="utf-8")
-            try:
-                handler._compressFile(str(log_path))
-                gz_path = Path(str(log_path) + ".gz")
-                self.assertTrue(gz_path.exists())
-            finally:
-                handler.close()
-
-    def testCompressFileRemovesOriginal(self) -> None:
-        """
-        Remove the original log file after successful compression.
-
-        Validates that the source file is deleted once the gzip archive has
-        been written successfully.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, compress_rotated=True)
-            log_path = Path(tmp) / "test.log"
-            log_path.write_text("data to compress", encoding="utf-8")
-            try:
-                handler._compressFile(str(log_path))
-                self.assertFalse(log_path.exists())
-            finally:
-                handler.close()
-
-    def testCompressFileResultIsValidGzip(self) -> None:
-        """
-        Produce a valid gzip archive that contains the original content.
-
-        Validates that the compressed file can be opened with gzip and
-        its decompressed content matches the original log content.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, compress_rotated=True)
-            original_content = b"verifiable gzip content"
-            log_path = Path(tmp) / "verify.log"
-            log_path.write_bytes(original_content)
-            try:
-                handler._compressFile(str(log_path))
-                gz_path = Path(str(log_path) + ".gz")
-                with gzip.open(gz_path, "rb") as f:
-                    decompressed = f.read()
-                self.assertEqual(decompressed, original_content)
-            finally:
-                handler.close()
-
-    def testCompressFileHandlesMissingSourceGracefully(self) -> None:
-        """
-        Handle a non-existent source file without raising an exception.
-
-        Validates that _compressFile silently ignores OSError when the
-        target file does not exist.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            handler = _make_handler(tmp, compress_rotated=True)
-            missing = str(Path(tmp) / "ghost.log")
-            try:
-                # Must not raise
-                handler._compressFile(missing)
-            finally:
-                handler.close()
+        self._handler.emit(_make_record())
+        self._handler.close()
+        self._handler.close()
+        self.assertIsNone(self._handler.stream)

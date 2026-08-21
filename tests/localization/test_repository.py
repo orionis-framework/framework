@@ -117,6 +117,18 @@ class TestTranslationRepositoryCaching(_RepositoryFixture):
         self.assertEqual(self._repository.get("en")["Welcome"], "Welcome")
         self.assertEqual(self._loader.calls, ["es", "en"])
 
+    def testGetReturnsTheCachedMappingItself(self) -> None:
+        """
+        Return the cached mapping instead of a defensive copy.
+
+        Validates the documented contract that mutating the returned
+        mapping mutates the cache for every consumer.
+        """
+        translations = self._repository.get("es")
+        translations["Welcome"] = "Hola"
+        self.assertEqual(self._repository.get("es")["Welcome"], "Hola")
+        self.assertEqual(self._loader.calls, ["es"])
+
 class TestTranslationRepositoryInspection(_RepositoryFixture):
     """Validate the introspection helpers of the cache."""
 

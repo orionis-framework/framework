@@ -25,23 +25,27 @@ class MsgspecSerializer(BaseSerializer):
         """
         return _msgjson.encode(value)
 
-    def loads(self, data: bytes | str | None) -> Any:
+    def loads(self, data: bytes | str | float | None) -> Any:
         """
         Deserialize JSON *data* back to a Python object.
 
         Parameters
         ----------
-        data : bytes | str | None
-            Raw bytes or string returned by the backend. Returns None
-            when *data* is None (key not found).
+        data : bytes | str | float | None
+            Raw payload returned by the backend. Returns None when *data*
+            is None (key not found).
 
         Returns
         -------
         Any
-            Decoded Python object, or None when *data* is None.
+            Decoded Python object, None when *data* is None, or *data*
+            unchanged when the backend stored a native value.
         """
         if data is None:
             return None
         if isinstance(data, str):
             data = data.encode()
+        elif not isinstance(data, (bytes, bytearray, memoryview)):
+            # SimpleMemoryCache.increment() stores raw ints, skipping dumps().
+            return data
         return _msgjson.decode(data)

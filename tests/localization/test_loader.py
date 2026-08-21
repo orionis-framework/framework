@@ -118,6 +118,21 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         self.assertEqual(loaded["Total"], "5")
         self.assertEqual(loaded["Ready"], "True")
 
+    def testDecodesUtf8EncodedSources(self) -> None:
+        """
+        Decode translation sources as UTF-8 text.
+
+        Validates that accented and non-Latin characters survive the
+        decoding step untouched.
+        """
+        write_source(
+            self._root / "es.json",
+            '{"Goodbye": "Adi\u00f3s", "Welcome": "\u3088\u3046\u3053\u305d"}',
+        )
+        loaded = self._loader.load("es")
+        self.assertEqual(loaded["Goodbye"], "Adi\u00f3s")
+        self.assertEqual(loaded["Welcome"], "\u3088\u3046\u3053\u305d")
+
 class TestTranslationLoaderGroupedFiles(_LoaderFixture):
     """Validate decoding of the grouped files of a locale."""
 
@@ -241,6 +256,19 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         as well.
         """
         write_source(self._root / "es" / "auth.json", '"Fallo"')
+        with self.assertRaises(TranslationSyntaxException):
+            self._loader.load("es")
+
+    def testNonUtf8FileRaisesSyntaxException(self) -> None:
+        """
+        Reject a translation file stored in another encoding.
+
+        Validates that a decoding failure surfaces as a localization
+        error instead of a bare UnicodeDecodeError.
+        """
+        (self._root / "es.json").write_bytes(
+            '{"Goodbye": "Adi\u00f3s"}'.encode("latin-1"),
+        )
         with self.assertRaises(TranslationSyntaxException):
             self._loader.load("es")
 

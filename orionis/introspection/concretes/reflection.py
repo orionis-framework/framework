@@ -164,7 +164,9 @@ class ReflectionConcrete(IReflectionConcrete):
         # Store the class and precompute string constants reused across methods
         self._concrete = concrete
         self._class_name: str = concrete.__name__
-        self._private_prefix: str = f"_{concrete.__name__}"
+        # Python strips the leading underscores of the class name when it
+        # mangles private members, so the prefix must be built the same way.
+        self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
         self._private_prefix_len: int = len(self._private_prefix)
         self._cache: dict = {}
 
@@ -676,12 +678,13 @@ class ReflectionConcrete(IReflectionConcrete):
             if cached is not None:
                 return cached
 
-            # Resolve private method name mangling before existence check
+            # Resolve private method name mangling before attribute access;
+            # hasMethod() indexes the demangled names produced by the scan.
             resolved = method
             if method.startswith("__") and not method.endswith("__"):
                 resolved = self._private_prefix + method
 
-            if not self.hasMethod(resolved):
+            if not self.hasMethod(method):
                 return None
 
             src = inspect.getsource(getattr(self._concrete, resolved))
@@ -1134,7 +1137,12 @@ class ReflectionConcrete(IReflectionConcrete):
             )
             raise ValueError(error_msg)
 
-        method = getattr(self._concrete, name, None)
+        # Resolve private method name mangling before attribute access
+        resolved = name
+        if name.startswith("__") and not name.endswith("__"):
+            resolved = self._private_prefix + name
+
+        method = getattr(self._concrete, resolved, None)
 
         # Ensure the retrieved attribute is callable
         if not callable(method):

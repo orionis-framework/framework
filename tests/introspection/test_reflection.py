@@ -32,6 +32,31 @@ class _ProtocolFixture(typing.Protocol):
         """Return a greeting."""
         ...
 
+class _SlottedFixture:
+    """Class with __slots__ used to obtain a member descriptor."""
+
+    __slots__ = ("slot_attr",)
+
+class _DescriptorFixture:
+    """Class exposing a pure-Python property descriptor."""
+
+    @property
+    def value(self) -> int:
+        """
+        Return a fixed integer.
+
+        Returns
+        -------
+        int
+            Always returns 0.
+        """
+        return 0
+
+class _OriginFixture:
+    """Class carrying a legacy __origin__ marker for isGeneric checks."""
+
+    __origin__ = list
+
 def _sync_gen():
     """Yield integers as a synchronous generator fixture."""
     yield 1
@@ -540,7 +565,7 @@ class TestIsBuiltIn(TestCase):
         None
             Raises AssertionError on failure.
         """
-        self.assertTrue(Reflection.isBuiltIn(len))
+        self.assertTrue(Reflection.isBuiltIn(print))
 
     def testPlainFunctionReturnsFalse(self) -> None:
         """
@@ -1116,6 +1141,34 @@ class TestIsGeneric(TestCase):
         T = typing.TypeVar("T")
         self.assertTrue(Reflection.isGeneric(T))
 
+    def testLegacyOriginAttributeReturnsTrue(self) -> None:
+        """
+        Assert that a bare typing construct exposing __origin__ is generic.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        ``typing.get_origin(typing.Union)`` is None, so the fallback branch
+        based on the ``__origin__`` attribute is the one that answers here.
+        """
+        self.assertIsNone(typing.get_origin(typing.Union))
+        self.assertTrue(Reflection.isGeneric(typing.Union))
+
+    def testCustomOriginAttributeReturnsTrue(self) -> None:
+        """
+        Assert that user classes declaring __origin__ are treated as generic.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertTrue(Reflection.isGeneric(_OriginFixture))
+
     def testConcreteClassReturnsFalse(self) -> None:
         """
         Assert that isGeneric returns False for a plain concrete class.
@@ -1401,3 +1454,133 @@ class TestIsTraceback(TestCase):
             Raises AssertionError on failure.
         """
         self.assertFalse(Reflection.isTraceback(_plain_fn))
+
+# ---------------------------------------------------------------------------
+# isFrame
+# ---------------------------------------------------------------------------
+
+class TestIsFrame(TestCase):
+
+    def testLiveFrameReturnsTrue(self) -> None:
+        """
+        Assert that isFrame returns True for a live frame object.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertTrue(Reflection.isFrame(inspect.currentframe()))
+
+    def testFunctionReturnsFalse(self) -> None:
+        """
+        Assert that isFrame returns False for a plain function.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertFalse(Reflection.isFrame(_plain_fn))
+
+    def testNoneReturnsFalse(self) -> None:
+        """
+        Assert that isFrame returns False for None.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertFalse(Reflection.isFrame(None))
+
+# ---------------------------------------------------------------------------
+# isGetSetDescriptor
+# ---------------------------------------------------------------------------
+
+class TestIsGetSetDescriptor(TestCase):
+
+    def testFunctionDunderDictReturnsTrue(self) -> None:
+        """
+        Assert that a getset descriptor is recognised.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        ``function.__dict__`` is implemented as a getset descriptor by CPython.
+        """
+        descriptor = types.FunctionType.__dict__["__dict__"]
+        self.assertTrue(Reflection.isGetSetDescriptor(descriptor))
+
+    def testPlainPropertyReturnsFalse(self) -> None:
+        """
+        Assert that a pure-Python property is not a getset descriptor.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertFalse(Reflection.isGetSetDescriptor(_DescriptorFixture.value))
+
+# ---------------------------------------------------------------------------
+# isMemberDescriptor
+# ---------------------------------------------------------------------------
+
+class TestIsMemberDescriptor(TestCase):
+
+    def testSlotEntryReturnsTrue(self) -> None:
+        """
+        Assert that a slot descriptor is recognised as a member descriptor.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        descriptor = _SlottedFixture.__dict__["slot_attr"]
+        self.assertTrue(Reflection.isMemberDescriptor(descriptor))
+
+    def testPlainPropertyReturnsFalse(self) -> None:
+        """
+        Assert that a pure-Python property is not a member descriptor.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertFalse(Reflection.isMemberDescriptor(_DescriptorFixture.value))
+
+# ---------------------------------------------------------------------------
+# isMethodDescriptor
+# ---------------------------------------------------------------------------
+
+class TestIsMethodDescriptor(TestCase):
+
+    def testBuiltinMethodDescriptorReturnsTrue(self) -> None:
+        """
+        Assert that an unbound C method is recognised as a method descriptor.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertTrue(Reflection.isMethodDescriptor(str.upper))
+
+    def testPlainFunctionReturnsFalse(self) -> None:
+        """
+        Assert that a Python function is not a method descriptor.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertFalse(Reflection.isMethodDescriptor(_plain_fn))
+

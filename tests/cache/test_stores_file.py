@@ -367,3 +367,98 @@ class TestFileCacheBackend(TestCase):
         await self._backend.set("kB", "B")
         self.assertEqual(await self._backend.get("kA"), "A")
         self.assertEqual(await self._backend.get("kB"), "B")
+
+
+class TestFileCacheBackendConcurrency(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Create a temporary directory and a FileCacheBackend before each test.
+
+        Provides an isolated directory so concurrent writes never touch
+        files produced by another test.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._path = Path(self._tmpdir.name)
+        self._backend = FileCacheBackend(self._path)
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary directory after each test.
+
+        Ensures every file written by the concurrent tasks is cleaned up.
+        """
+        self._tmpdir.cleanup()
+
+    async def testConcurrentWritesToTheSamePathNeverMixPayloads(self) -> None:
+        """
+        Keep every concurrent write of one key internally consistent.
+
+        Validates that the staging file is unique per write, so the entry
+        published at the end is one complete payload and never a blend of
+        two writers.
+        """
+        payloads = [{"writer": index, "data": "x" * 500} for index in range(20)]
+        await asyncio.gather(
+            *(self._backend.set("shared", payload) for payload in payloads),
+        )
+
+        stored = await self._backend.get("shared")
+        self.assertIn(stored, payloads)
+        self.assertEqual(list(self._path.glob("*.tmp")), [])
+
+    async def testConcurrentAddElectsASingleWinner(self) -> None:
+        """
+        Allow exactly one caller to win a contended add.
+
+        Validates that add is an exclusive create and therefore usable as
+        a mutual-exclusion primitive.
+        """
+        async def attempt(index: int) -> bool:
+            try:
+                return await self._backend.add("only-once", index)
+            except ValueError:
+                return False
+
+        results = await asyncio.gather(*(attempt(index) for index in range(10)))
+
+        self.assertEqual(sum(results), 1)
+        self.assertIn(await self._backend.get("only-once"), range(10))
+
+    async def testConcurrentIncrementsDoNotLoseUpdates(self) -> None:
+        """
+        Apply every concurrent increment to the counter.
+
+        Validates that the read-modify-write cycle is serialised, so no
+        update is lost when tasks run interleaved on the same loop.
+        """
+        await asyncio.gather(*(self._backend.increment("hits") for _ in range(25)))
+        self.assertEqual(await self._backend.get("hits"), 25)
+
+    async def testIncrementPreservesTheExistingExpiry(self) -> None:
+        """
+        Keep the original TTL when a counter is incremented.
+
+        Validates that increment updates only the value, so the entry
+        still expires at the deadline set by the initial write.
+        """
+        await self._backend.set("ttl_counter", 1, ttl=0.05)
+        self.assertEqual(await self._backend.increment("ttl_counter"), 2)
+
+        await asyncio.sleep(0.1)
+        self.assertIsNone(await self._backend.get("ttl_counter"))
+
+    async def testIncrementOverAnExpiredKeyRestartsWithoutExpiry(self) -> None:
+        """
+        Restart the counter from zero once the previous entry expired.
+
+        Validates that a stale deadline is dropped instead of being
+        carried over to the fresh value.
+        """
+        await self._backend.set("stale", 7, ttl=0.05)
+        await asyncio.sleep(0.1)
+
+        self.assertEqual(await self._backend.increment("stale", 3), 3)
+        await asyncio.sleep(0.1)
+        self.assertEqual(await self._backend.get("stale"), 3)
+

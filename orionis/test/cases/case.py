@@ -3,6 +3,7 @@ import fnmatch
 import functools
 import re
 import unittest
+from contextvars import ContextVar
 from typing import TYPE_CHECKING
 from orionis.support.facades.application import Application
 
@@ -20,11 +21,15 @@ _LIFECYCLE_HOOKS: frozenset[str] = frozenset({
 # Precompiled regex for the default glob pattern avoids repeated fnmatch compilation.
 _DEFAULT_PATTERN: re.Pattern[str] = re.compile(fnmatch.translate("test*"))
 
+# Context-local pattern: a value set by one run is never seen by another run
+# executing in a different task or thread.
+_METHOD_PATTERN: ContextVar[re.Pattern[str]] = ContextVar(
+    "orionis_test_method_pattern",
+    default=_DEFAULT_PATTERN,
+)
+
 
 class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
-
-    # Class-level compiled regex; updated by setMethodPattern.
-    _method_regex: re.Pattern[str] = _DEFAULT_PATTERN
 
     @classmethod
     def setMethodPattern(cls, pattern: str) -> None:
@@ -35,9 +40,15 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         ----------
         pattern : str
             The glob pattern to match test method names (e.g., "test*").
+
+        Returns
+        -------
+        None
+            This method stores the compiled pattern in the current context and
+            returns None.
         """
-        # Store the raw pattern and compile it once for all future lookups.
-        cls._method_regex = re.compile(fnmatch.translate(pattern))
+        # Compile once and publish it to the current context only.
+        _METHOD_PATTERN.set(re.compile(fnmatch.translate(pattern)))
 
     def __init__(self, method_name: str = "runTest") -> None:
         """
@@ -52,7 +63,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
 
         # Wrap the single test method once at construction instead of
         # intercepting every attribute access via __getattribute__.
-        _regex: re.Pattern[str] = getattr(type(self), "_method_regex", _DEFAULT_PATTERN)
+        _regex: re.Pattern[str] = _METHOD_PATTERN.get()
         if (
             not method_name.startswith("_")
             and method_name not in _LIFECYCLE_HOOKS

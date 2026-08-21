@@ -85,7 +85,9 @@ class ReflectionAbstract(IReflectionAbstract):
         abstract_name: str = abstract.__name__
         self._abstract_name: str = abstract_name
         self._abstract_module: str = abstract.__module__
-        self._private_prefix: str = f"_{abstract_name}"
+        # Python strips the leading underscores of the class name when it
+        # mangles private members, so the prefix must be built the same way.
+        self._private_prefix: str = f"_{abstract_name.lstrip('_')}"
         self._cache: dict = {}
         self._scanned: bool = False
 
@@ -626,8 +628,8 @@ class ReflectionAbstract(IReflectionAbstract):
         Raises
         ------
         ValueError
-            If the source code cannot be retrieved due to file system errors or
-            other unexpected exceptions.
+            If the source code cannot be retrieved because the class has no
+            reachable definition or no importable module file.
         """
         cache = self._cache
         if (v := cache.get("source_code")) is not None:
@@ -635,17 +637,11 @@ class ReflectionAbstract(IReflectionAbstract):
         # Attempt to retrieve source code and cache it; handle common errors gracefully
         try:
             result: str = inspect.getsource(self._abstract)
-            cache["source_code"] = result
-            return result
-        except OSError as e:
+        except (OSError, TypeError) as e:
             msg = f"Could not retrieve source code for '{self._abstract_name}': {e}"
             raise ValueError(msg) from e
-        except Exception as e:
-            msg = (
-                f"An unexpected error occurred while retrieving source code for "
-                f"'{self._abstract_name}': {e}"
-            )
-            raise ValueError(msg) from e
+        cache["source_code"] = result
+        return result
 
     def getFile(self) -> str:
         """
@@ -663,25 +659,19 @@ class ReflectionAbstract(IReflectionAbstract):
         Raises
         ------
         ValueError
-            If the file path cannot be retrieved due to type errors or other
-            unexpected exceptions.
+            If the file path cannot be retrieved because the class does not
+            belong to an importable module file.
         """
         cache = self._cache
         if (v := cache.get("file_path")) is not None:
             return v
         try:
             result: str = inspect.getfile(self._abstract)
-            cache["file_path"] = result
-            return result
         except TypeError as e:
             msg = f"Could not retrieve file for '{self._abstract_name}': {e}"
             raise ValueError(msg) from e
-        except Exception as e:
-            msg = (
-                f"An unexpected error occurred while retrieving file for "
-                f"'{self._abstract_name}': {e}"
-            )
-            raise ValueError(msg) from e
+        cache["file_path"] = result
+        return result
 
     def getAnnotations(self) -> dict:
         """
@@ -994,8 +984,12 @@ class ReflectionAbstract(IReflectionAbstract):
         if not self.hasMethod(name):
             msg = f"Method '{name}' does not exist in class '{self._abstract_name}'."
             raise ValueError(msg)
+        # Reconstruct the mangled name for private methods before lookup
+        resolved = name
+        if name.startswith("__") and not name.endswith("__"):
+            resolved = f"{self._private_prefix}{name}"
         # getattr correctly resolves descriptors for signature inspection
-        method = getattr(self._abstract, name, None)
+        method = getattr(self._abstract, resolved, None)
         if not callable(method):
             msg = f"'{name}' is not callable in class '{self._abstract_name}'."
             raise TypeError(msg)

@@ -69,7 +69,9 @@ class ReflectionInstance(IReflectionInstance):
         self._cls: type = cls
         self._class_name: str = cls.__name__
         self._module_name: str = module
-        self._private_prefix: str = f"_{cls.__name__}"
+        # Python strips the leading underscores of the class name when it
+        # mangles private members, so the prefix must be built the same way.
+        self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
         self._memory_cache: dict[str, Any] = {}
 
     def __getitem__(self, key: str) -> object | None:
@@ -556,18 +558,19 @@ class ReflectionInstance(IReflectionInstance):
             if pre_key in cache:
                 return cache[pre_key]
 
-            # Apply name mangling for private method lookup
-            if method.startswith("__") and not method.endswith("__"):
-                method = f"{self._private_prefix}{method}"
-
-            # Verify the method exists before retrieving source
+            # Verify the method exists before retrieving source; hasMethod()
+            # indexes the demangled names produced by the member scan
             if not self.hasMethod(method):
                 return None
 
+            # Apply name mangling for private method attribute lookup
+            resolved = method
+            if method.startswith("__") and not method.endswith("__"):
+                resolved = f"{self._private_prefix}{method}"
+
             # Retrieve and cache the source code of the specified method
-            cache_key = f"{method}_source_code"
-            cache[cache_key] = inspect.getsource(getattr(self._cls, method))
-            return cache[cache_key]
+            cache[pre_key] = inspect.getsource(getattr(self._cls, resolved))
+            return cache[pre_key]
 
         except (TypeError, OSError):
             # Return None if the source code cannot be retrieved

@@ -1,112 +1,68 @@
-# Orionis Introspection Toolkit (`orionis.introspection`)
+# orionis.introspection
 
-> Unified, cached reflection API over abstract classes, concrete classes, object instances, modules, and callables.
->
-> 🇪🇸 Versión en español: [README.es.md](README.es.md)
-
-`orionis.introspection` is the reflection engine that powers the Orionis
-dependency-injection container, the router's auto-wiring, and the
-framework's configuration/module discovery at boot time. It wraps Python's
-`inspect`, `typing` and `ast` modules behind a small set of purpose-built
-classes that classify class members by **visibility** (public / protected /
-private / dunder), **kind** (instance / class / static method, attribute,
-property) and **sync vs. async**, and that resolve constructor/method
-**parameter dependencies** for automatic dependency injection.
-
----
+> Cached reflection toolkit that classifies class members and resolves callable dependencies for the Orionis container.
 
 ## Table of contents
 
-1. [Requirements](#requirements)
-2. [Module overview](#module-overview)
-3. [Architecture](#architecture)
-4. [API reference](#api-reference)
-   - [`Reflection` (facade)](#reflection-orionisintrospectionreflectionreflection)
-   - [`ReflectionAbstract`](#reflectionabstract-orionisintrospectionabstractreflectionreflectionabstract)
-   - [`ReflectionConcrete`](#reflectionconcrete-orionisintrospectionconcretesreflectionreflectionconcrete)
-   - [`ReflectionInstance`](#reflectioninstance-orionisintrospectioninstancesreflectionreflectioninstance)
-   - [`ReflectionCallable`](#reflectioncallable-orionisintrospectioncallablesreflectionreflectioncallable)
-   - [`ReflectionModule`](#reflectionmodule-orionisintrospectionmodulesreflectionreflectionmodule)
-   - [`ReflectDependencies`](#reflectdependencies-orionisintrospectiondependenciesreflectionreflectdependencies)
-   - [`ModuleInspector`](#moduleinspector-orionisintrospectionmodulesinspectormoduleinspector)
-   - [Entities: `Argument`, `Signature`](#entities-argument-signature)
-   - [The visibility × kind × sync/async classification API](#the-visibility--kind--syncasync-classification-api)
-5. [Usage examples](#usage-examples)
-6. [Performance and concurrency considerations](#performance-and-concurrency-considerations)
-7. [Design notes](#design-notes)
-8. [Compatibility notes](#compatibility-notes)
+- [Functional description](#functional-description)
+  - [Where it fits in the framework](#where-it-fits-in-the-framework)
+  - [Reflection pipeline](#reflection-pipeline)
+  - [File map](#file-map)
+  - [Design decisions](#design-decisions)
+- [API reference](#api-reference)
+  - [Reflection](#reflection)
+  - [ReflectionAbstract](#reflectionabstract)
+  - [ReflectionConcrete](#reflectionconcrete)
+  - [ReflectionInstance](#reflectioninstance)
+  - [ReflectionCallable](#reflectioncallable)
+  - [ReflectionModule](#reflectionmodule)
+  - [ReflectDependencies](#reflectdependencies)
+  - [Argument](#argument)
+  - [Signature](#signature)
+  - [ModuleInspector](#moduleinspector)
+  - [Contracts](#contracts)
+  - [Member classification API](#member-classification-api)
+- [Usage examples](#usage-examples)
+  - [Classifying the members of a class](#classifying-the-members-of-a-class)
+  - [Resolving constructor dependencies](#resolving-constructor-dependencies)
+  - [Reflecting an object instance](#reflecting-an-object-instance)
+  - [Handling reflection errors](#handling-reflection-errors)
+  - [Discovering modules and frozen dataclasses](#discovering-modules-and-frozen-dataclasses)
+- [Performance and concurrency considerations](#performance-and-concurrency-considerations)
+- [Compatibility notes](#compatibility-notes)
 
 ---
 
-## Requirements
+## Functional description
 
-No installation beyond the framework itself is required:
+`orionis.introspection` wraps the standard library `inspect`, `typing`, `ast`
+and `importlib` modules behind purpose-built classes that answer two questions
+the framework asks constantly:
 
-```bash
-pip install orionis
-```
+1. **What members does this class/instance/module expose?** — classified by
+   *visibility* (public / protected / private / dunder), *kind* (instance,
+   class, static method, attribute, property) and *sync vs. async*.
+2. **What does this callable need in order to be built?** — every parameter is
+   turned into an `Argument` and split into resolved / unresolved buckets that
+   the IoC container consumes directly.
 
-- **Python:** 3.14 or newer.
-- **Runtime dependency:** [`msgspec`](https://pypi.org/project/msgspec/)
-  (`msgspec>=0.21.1`, a core, non-optional dependency of the framework) is
-  used to detect whether a resolved parameter type is a `msgspec.Struct`
-  schema (`Argument.is_schema`), which the container/router use to decide
-  whether a parameter should be populated from an HTTP request body.
-- No optional extras are required to use this module.
+### Where it fits in the framework
 
-## Module overview
+| Consumer | What it uses |
+| --- | --- |
+| `orionis/container/container.py` | `ReflectionCallable`, `ReflectionConcrete`, `Argument`, `Signature` to autowire `make`, `build`, `invoke` and `call`. |
+| `orionis/console/core/loader.py` | `ModuleInspector`, `ReflectionModule` to discover CLI commands. |
+| `orionis/database/migrations/migrator.py` | `ModuleInspector`, `ReflectionModule` to discover migration classes. |
+| `orionis/foundation/application.py` | `ModuleInspector` to discover configuration entities at boot. |
+| `orionis/console/commands/schedule/work_command.py` | `ReflectionInstance`. |
 
-Building an IoC container, an HTTP router with auto-wired handlers, or a
-configuration loader that discovers dataclasses across the codebase all
-require the same underlying capability: **looking at a piece of code and
-describing it precisely** — what attributes and methods it has, what their
-visibility is, whether they are synchronous or asynchronous, and what
-parameters a constructor or method needs to be called correctly.
-`orionis.introspection` centralises this capability so the rest of the
-framework does not repeat `inspect`/`typing` boilerplate:
+The package has no service provider and no facade: the classes are imported and
+instantiated directly.
 
-- **`Reflection`** — a static factory/predicate facade. Use it to obtain the
-  right reflection object (`Reflection.instance(obj)`,
-  `Reflection.abstract(cls)`, `Reflection.concrete(cls)`,
-  `Reflection.module("pkg.mod")`, `Reflection.callable(fn)`) or to run a
-  quick type predicate (`Reflection.isAbstract`, `Reflection.isCoroutineFunction`,
-  `Reflection.isProtocol`, etc.) without instantiating anything.
-- **`ReflectionAbstract` / `ReflectionConcrete` / `ReflectionInstance`** —
-  three parallel reflectors, one for abstract base classes, one for
-  concrete (instantiable) classes, and one for live object instances. All
-  three expose the same **visibility × kind × sync/async** classification
-  API (see below) plus class metadata (docstring, source code, file,
-  annotations, base classes) and constructor/method dependency signatures.
-  `ReflectionConcrete` and `ReflectionInstance` additionally allow **mutating**
-  the reflected target (`setAttribute`, `setMethod`, `removeAttribute`,
-  `removeMethod`).
-- **`ReflectionCallable`** — reflects a single function, method, or lambda:
-  name, module, docstring, source, file, `inspect.Signature`, and resolved
-  dependency `Signature`.
-- **`ReflectionModule`** — reflects an importable module: its classes,
-  functions and constants, each split by visibility, plus the module's
-  imports, file, and source code. Also allows injecting/removing classes at
-  runtime (`setClass`/`removeClass`), which the framework uses in tests and
-  dynamic wiring scenarios.
-- **`ReflectDependencies`** — the shared engine behind
-  `constructorSignature()` / `methodSignature()` / `callableSignature()` on
-  every reflector above. Inspects an `inspect.Signature` and classifies each
-  parameter as *resolved* (has a non-builtin type annotation or a default
-  value) or *unresolved* (no annotation and no default, or a bare builtin
-  annotation), which is exactly the information the DI container needs to
-  decide whether it can auto-construct a parameter or must ask the caller
-  for it.
-- **`ModuleInspector`** — a lower-level, purely static utility used by the
-  framework's own bootstrap process to discover Python modules under a
-  directory tree, dynamically load a class by dotted path, check whether a
-  file imports a given module (via `ast`, without importing it), and
-  discover frozen dataclasses across a set of modules (used to find
-  configuration entities).
-
-## Architecture
+### Reflection pipeline
 
 ```mermaid
-graph TD
+flowchart LR
     A[Reflection facade] -->|instance| B[ReflectionInstance]
     A -->|abstract| C[ReflectionAbstract]
     A -->|concrete| D[ReflectionConcrete]
@@ -116,518 +72,714 @@ graph TD
     C --> G
     D --> G
     F --> G
-    G --> H[Argument / Signature entities]
-    I[ModuleInspector] -.independent utility, used at framework boot.-> J[Config/module discovery]
+    G --> H[Signature + Argument]
 ```
 
-- `Reflection` (`orionis/introspection/reflection.py`) is a stateless
-  facade: every factory method **lazily imports** the concrete reflector
-  class inside the method body and returns a fresh instance — no reflector
-  module is imported until it is actually needed.
-- `ReflectionAbstract`, `ReflectionConcrete`, `ReflectionInstance`, and
-  `ReflectionCallable` each own a private cache dict (`__slots__`-based) and
-  delegate dependency-signature computation to `ReflectDependencies`
-  (`orionis/introspection/dependencies/reflection.py`), which in turn
-  builds `Argument`/`Signature` entities
-  (`orionis/introspection/dependencies/entities/`).
-- `ModuleInspector` (`orionis/introspection/modules/inspector.py`) does not
-  depend on the reflector classes; it is a standalone static-method utility
-  consumed directly by framework bootstrap code (e.g. configuration
-  discovery), not through the `Reflection` facade.
-- Every reflector class has a matching contract in its `contracts/`
-  subpackage (`IReflectionAbstract`, `IReflectionConcrete`,
-  `IReflectionInstance`, `IReflectionCallable`, `IReflectionModule`,
-  `IReflectDependencies`), and the concrete class always references the
-  contract type in public signatures (e.g. `Reflection.instance(...) ->
-  IReflectionInstance`).
+`ReflectionAbstract`, `ReflectionConcrete` and `ReflectionInstance` run a
+**single-pass scan** over the class namespace the first time any classification
+accessor is called, then serve every subsequent accessor from an internal
+cache. `ReflectDependencies` is a thin, stateful wrapper around two module-level
+`functools.lru_cache` functions, so repeated inspections of the same target are
+free.
+
+### File map
+
+| Path | Contents |
+| --- | --- |
+| `reflection.py` | `Reflection` — static facade: 5 factory methods plus 26 predicates. |
+| `abstract/reflection.py` | `ReflectionAbstract` for `abc` classes. |
+| `concretes/reflection.py` | `ReflectionConcrete` for ordinary classes. |
+| `instances/reflection.py` | `ReflectionInstance` for object instances. |
+| `callables/reflection.py` | `ReflectionCallable` for functions, methods and lambdas. |
+| `modules/reflection.py` | `ReflectionModule` for imported modules. |
+| `modules/inspector.py` | `ModuleInspector` — filesystem/AST discovery helpers. |
+| `dependencies/reflection.py` | `ReflectDependencies` and the cached resolution functions. |
+| `dependencies/entities/argument.py` | `Argument` frozen dataclass. |
+| `dependencies/entities/signature.py` | `Signature` frozen dataclass. |
+| `*/contracts/reflection.py` | `abc.ABC` interfaces implemented by each reflector. |
+
+### Design decisions
+
+- **Static facade with lazy imports** — `Reflection` only holds `@staticmethod`s
+  and imports each concrete reflector inside the factory method, so importing
+  `Reflection` does not pull the whole package into memory.
+- **Single-pass scan + dictionary cache** — the visibility × kind × sync/async
+  buckets are computed once per reflector instance; every `get*` accessor is a
+  dictionary lookup afterwards.
+- **Mapping-like cache protocol** — `ReflectionAbstract`, `ReflectionConcrete`,
+  `ReflectionInstance`, `ReflectionCallable` and `ReflectionModule` implement
+  `__getitem__`, `__setitem__`, `__contains__` and `__delitem__` over that same
+  cache, so callers can store their own derived values next to the built-in ones.
+- **Frozen entities** — `Argument` is `@dataclass(slots=True, kw_only=True,
+  frozen=True)`; `Signature` is `@dataclass(frozen=True, kw_only=True)` and
+  extends `orionis.support.entities.base.BaseEntity`.
+- **Name mangling is hidden** — private members are returned with the
+  `_ClassName` prefix stripped (`__seal`, not `_Repository__seal`), and the
+  accessors that take a member name re-apply the mangling internally.
+
+---
 
 ## API reference
 
-### `Reflection` (`orionis.introspection.reflection.Reflection`)
+### Reflection
 
-A class of `@staticmethod`s only — never instantiated. Two families of
-methods:
+`orionis.introspection.reflection.Reflection` — static facade, never
+instantiated.
 
-**Factory methods** (each lazily imports and returns a new reflector):
+**Factory methods**
+
+```python
+@staticmethod
+def instance(instance: Any) -> IReflectionInstance: ...
+
+@staticmethod
+def abstract(abstract: type) -> IReflectionAbstract: ...
+
+@staticmethod
+def concrete(concrete: type) -> IReflectionConcrete: ...
+
+@staticmethod
+def module(module: str) -> IReflectionModule: ...
+
+@staticmethod
+def callable(fn: Callable) -> IReflectionCallable: ...
+```
+
+Each factory forwards its argument to the matching reflector constructor and
+therefore propagates the same exceptions (see each class below).
+
+**Predicates** — all are `@staticmethod`, take a single `obj: Any` and return
+`bool`.
+
+| Predicate | Backed by |
+| --- | --- |
+| `isAbstract` | `inspect.isabstract` |
+| `isAsyncGen` | `inspect.isasyncgen` |
+| `isAsyncGenFunction` | `inspect.isasyncgenfunction` |
+| `isAwaitable` | `inspect.isawaitable` |
+| `isBuiltIn` | `inspect.isbuiltin` |
+| `isClass` | `inspect.isclass` |
+| `isCode` | `inspect.iscode` |
+| `isCoroutine` | `inspect.iscoroutine` |
+| `isCoroutineFunction` | `inspect.iscoroutinefunction` |
+| `isDataDescriptor` | `inspect.isdatadescriptor` |
+| `isFrame` | `inspect.isframe` |
+| `isFunction` | `inspect.isfunction` |
+| `isGenerator` | `inspect.isgenerator` |
+| `isGeneratorFunction` | `inspect.isgeneratorfunction` |
+| `isGetSetDescriptor` | `inspect.isgetsetdescriptor` |
+| `isMemberDescriptor` | `inspect.ismemberdescriptor` |
+| `isMethod` | `inspect.ismethod` |
+| `isMethodDescriptor` | `inspect.ismethoddescriptor` |
+| `isModule` | `inspect.ismodule` |
+| `isRoutine` | `inspect.isroutine` |
+| `isTraceback` | `inspect.istraceback` |
+
+Five predicates implement their own rules:
+
+- `isConcreteClass(obj)` — `True` when `obj` is a `type` that is **not**
+  built-in, abstract, generic, a `Protocol`, a typing construct, does not list
+  `abc.ABC` among its direct bases and has an `__init__`. Verified behaviour:
+  `Reflection.isConcreteClass(int)` returns `True`, because `inspect.isbuiltin`
+  is `False` for classes.
+- `isGeneric(obj)` — `True` when `typing.get_origin(obj)` is not `None`, when
+  `obj` exposes `__origin__`, or when `obj` is a `typing.TypeVar`.
+- `isProtocol(obj)` — `True` when `obj` is a class, is a subclass of
+  `typing.Protocol` and is not `Protocol` itself.
+- `isInstance(obj)` — `True` when `obj` is not a class and the module of its
+  type is neither `builtins` nor `abc`.
+- `isTypingConstruct(obj)` — `True` when `type(obj).__name__` matches one of the
+  19 hardcoded names (`Any`, `Union`, `Optional`, `List`, `Dict`, `Set`,
+  `Tuple`, `Callable`, `TypeVar`, `Generic`, `Protocol`, `Literal`, `Final`,
+  `TypedDict`, `NewType`, `Deque`, `DefaultDict`, `Counter`, `ChainMap`).
+
+### ReflectionAbstract
+
+```python
+class ReflectionAbstract(IReflectionAbstract):
+    def __init__(self, abstract: type) -> None: ...
+```
+
+Raises `TypeError` when `inspect.isabstract(abstract)` is `False`
+(`"The class 'Repository' is not an abstract base class."`).
+
+Beyond the [member classification API](#member-classification-api) it exposes:
 
 | Method | Returns | Notes |
 | --- | --- | --- |
-| `Reflection.instance(instance: Any)` | `IReflectionInstance` | Wraps an object instance. Raises if `instance` is a class, a built-in/abc instance, or from `__main__`. |
-| `Reflection.abstract(abstract: type)` | `IReflectionAbstract` | Wraps an abstract base class. Raises `TypeError` if `abstract` is not abstract (`inspect.isabstract`). |
-| `Reflection.concrete(concrete: type)` | `IReflectionConcrete` | Wraps a concrete, instantiable class. Raises `TypeError` if not a concrete user-defined class (see `isConcreteClass`). |
-| `Reflection.module(module: str)` | `IReflectionModule` | Imports `module` by dotted name and wraps it. Raises `TypeError` if the name is invalid or the import fails. |
-| `Reflection.callable(fn: Callable)` | `IReflectionCallable` | Wraps a function, bound method, or lambda. Raises `TypeError` for anything else. |
+| `getClass()` | `type` | The reflected class. |
+| `getClassName()` | `str` | |
+| `getModuleName()` | `str` | |
+| `getModuleWithClassName()` | `str` | `module.ClassName`. |
+| `getDocstring()` | `str \| None` | |
+| `getBaseClasses()` | `list[type]` | Direct bases, as a list. |
+| `getSourceCode()` | `str` | Raises `ValueError` when the source cannot be located. |
+| `getFile()` | `str` | Raises `ValueError` when the class has no importable module file. |
+| `getAnnotations()` | `dict` | Class annotations with the mangling prefix stripped. |
+| `hasAttribute(attribute)` | `bool` | |
+| `getAttribute(attribute)` | `object \| None` | |
+| `setAttribute(name, value)` | `bool` | `ValueError` for invalid identifiers/keywords, `TypeError` for callables. |
+| `removeAttribute(name)` | `bool` | `ValueError` when the attribute is absent. |
+| `hasMethod(name)` | `bool` | Accepts the demangled private name. |
+| `removeMethod(name)` | `bool` | `ValueError` when the method is absent. |
+| `getMethodSignature(name)` | `inspect.Signature` | `ValueError` if absent, `TypeError` if not callable. |
+| `getPropertySignature(name)` | `inspect.Signature` | `ValueError` if absent, `TypeError` if not a property. |
+| `getPropertyDocstring(name)` | `str \| None` | Same exceptions as above. |
+| `constructorSignature()` | `Signature` | Delegates to `ReflectDependencies`. |
+| `methodSignature(method_name)` | `Signature` | `AttributeError` when the method is absent. |
+| `clearCache()` | `None` | Empties the internal cache. |
 
-**Type predicates** — thin, allocation-free wrappers over `inspect`/`typing`
-(all take `obj: Any` and return `bool`, unless noted):
-
-`isAbstract`, `isConcreteClass`, `isAsyncGen`, `isAsyncGenFunction`,
-`isAwaitable`, `isBuiltIn`, `isClass`, `isCode`, `isCoroutine`,
-`isCoroutineFunction`, `isDataDescriptor`, `isFrame`, `isFunction`,
-`isGenerator`, `isGeneratorFunction`, `isGetSetDescriptor`,
-`isMemberDescriptor`, `isMethod`, `isMethodDescriptor`, `isModule`,
-`isRoutine`, `isTraceback`, `isGeneric`, `isProtocol`, `isInstance`,
-`isTypingConstruct`.
-
-Notable predicates:
-
-- `isConcreteClass(obj)` — `True` only if `obj` is a `type`, is **not**
-  built-in, abstract, generic, a `Protocol`, or a typing construct, does not
-  directly inherit `abc.ABC`, and defines `__init__`.
-- `isInstance(obj)` — `True` if `obj` is an object (not a `type`) whose
-  class is defined outside `builtins`/`abc`.
-- `isProtocol(obj)` — `True` if `obj` is a class that subclasses
-  `typing.Protocol` (and is not `Protocol` itself).
-
-### `ReflectionAbstract` (`orionis.introspection.abstract.reflection.ReflectionAbstract`)
+### ReflectionConcrete
 
 ```python
-def __init__(self, abstract: type) -> None
+class ReflectionConcrete(IReflectionConcrete):
+    def __init__(self, concrete: type) -> None: ...
 ```
 
-Wraps an **abstract base class** (`inspect.isabstract(abstract)` must be
-`True`, otherwise raises `TypeError`). Exposes `setAttribute` /
-`removeAttribute` / `removeMethod` (class-level mutation), but not
-`setMethod` — only `ReflectionConcrete`/`ReflectionInstance` can add new
-methods to the reflected target.
+Raises `TypeError` when `Reflection.isConcreteClass(concrete)` is `False`
+(`"Argument 'concrete' must be a class type, got 'ABCMeta' instead."`).
 
-Class metadata: `getClass()`, `getClassName()`, `getModuleName()`,
-`getModuleWithClassName()`, `getDocstring()`, `getBaseClasses()`,
-`getSourceCode()`, `getFile()`, `getAnnotations()`.
+It offers the same surface as `ReflectionAbstract` plus:
 
-Attribute/method/property classification: see the
-[shared classification API](#the-visibility--kind--syncasync-classification-api)
-below. Also provides `hasAttribute`, `getAttribute`, `setAttribute`,
-`removeAttribute`, `hasMethod`, `removeMethod`, `getMethodSignature`,
-`getPropertySignature`, `getPropertyDocstring`.
-
-Dependencies and cache: `constructorSignature() -> Signature`,
-`methodSignature(method_name: str) -> Signature`, `clearCache() -> None`.
-
-### `ReflectionConcrete` (`orionis.introspection.concretes.reflection.ReflectionConcrete`)
-
-```python
-def __init__(self, concrete: type) -> None
-```
-
-Wraps a **concrete, instantiable class** (validated with
-`Reflection.isConcreteClass`; raises `TypeError` otherwise). Adds mutation
-and instance-oriented capabilities on top of the shared classification API:
-
-| Method | Signature | Description |
+| Method | Returns | Notes |
 | --- | --- | --- |
-| `setMethod` | `(name: str, method: Callable) -> bool` | Adds a new method to the class. Handles private-name mangling. Raises `ValueError` if the name already exists, is invalid, or `method` is not callable. |
-| `getProperty` | `(name: str) -> Any` | Invokes a property's getter against the class and returns its value. Raises `ValueError`/`TypeError` if missing or not a property. |
-| `getSourceCode` | `(method: str | None = None) -> str | None` | Returns the class source, or a single method's source if `method` is given. |
-| `getAttribute` | `(name: str, default: Any = None) -> Any` | Unlike `ReflectionAbstract.getAttribute`, accepts a `default` fallback instead of raising. |
-| `getConstructorSignature` | `() -> inspect.Signature` | Raw `inspect.Signature` of `__init__` (not the resolved `Signature` dependency entity). |
-| `constructorSignature` / `methodSignature` | `() -> Signature` / `(name: str) -> Signature` | Delegate to `ReflectDependencies(self._concrete)`. |
+| `getSourceCode(method=None)` | `str \| None` | Whole class when `method` is `None`; returns `None` instead of raising when the source cannot be read or the method does not exist. |
+| `getFile()` | `str` | Raises `ValueError` when the class has no importable module file. |
+| `getAttribute(name, default=None)` | `Any` | Supports a fallback value. |
+| `setMethod(name, method)` | `bool` | `AttributeError` for invalid names, `TypeError` for non-callables. |
+| `getProperty(name)` | `Any` | Invokes the getter with the class as receiver. |
+| `getConstructorSignature()` | `inspect.Signature` | Raw `__init__` signature. |
+| `constructorSignature()` | `Signature` | Dependency analysis of `__init__`. |
+| `removeMethod(name)` | `bool` | |
 
-Plus all members shared with `ReflectionAbstract`: class metadata,
-`hasAttribute`/`setAttribute`/`removeAttribute`, `hasMethod`/`removeMethod`/
-`getMethodSignature`, the full classification API, `getPropertySignature`,
-`getPropertyDocstring`, `clearCache`.
-
-### `ReflectionInstance` (`orionis.introspection.instances.reflection.ReflectionInstance`)
+### ReflectionInstance
 
 ```python
-def __init__(self, instance: Any) -> None
+class ReflectionInstance(IReflectionInstance):
+    def __init__(self, instance: Any) -> None: ...
 ```
 
-Wraps a **live object instance**. Raises `TypeError` if `instance` is a
-class, or an instance of a built-in/`abc` class; raises `ValueError` if the
-instance's class was defined in `__main__` (reflecting `__main__` objects is
-unsupported because the module cannot be safely re-imported).
+Constructor guards, in order:
 
-| Method | Signature | Description |
+| Condition | Exception |
+| --- | --- |
+| `instance` is a class | `TypeError: The provided instance must be an object instance, not a class.` |
+| its type lives in `builtins` or `abc` | `TypeError: Cannot reflect on instances of built-in or abstract base classes.` |
+| its type lives in `__main__` | `ValueError: Cannot reflect on instances from '__main__'.` |
+
+Differences from the class-level reflectors:
+
+| Method | Returns | Notes |
 | --- | --- | --- |
-| `getInstance` | `() -> Any` | Returns the wrapped object itself. |
-| `setMethod` | `(name: str, method: Callable) -> bool` | Adds a method to the instance's class. |
-| `removeMethod` | `(name: str) -> None` | Removes a method from the instance's class via `delattr`. Raises `AttributeError` if it does not exist. **Note:** returns `None`, unlike the `bool` returned by `ReflectionAbstract.removeMethod`/`ReflectionConcrete.removeMethod`. |
-| `getMethodDocstring` | `(name: str) -> str | None` | Docstring of a specific method. |
-| `getProperty` | `(name: str) -> Any` | Same behavior as `ReflectionConcrete.getProperty`. |
-| `getPropertyDocstring` | `(name: str) -> str` | Non-optional return type in the contract (in practice returns the getter's docstring). |
-| `getBaseClasses` | `() -> tuple[type, ...]` | Returns a **tuple** (the abstract/concrete reflectors return a `list`). |
+| `getInstance()` | `Any` | The wrapped object. |
+| `getBaseClasses()` | `tuple[type, ...]` | A **tuple**, not a list. |
+| `getAttributes()` and its visibility variants | `dict[str, Any]` | Read **instance** variables (`vars(instance)`), not class attributes. |
+| `getAnnotations()` | `dict[str, type]` | Class annotations, demangled. |
+| `getAttributeDocstring(name)` | `str \| None` | `AttributeError` when the attribute is absent. |
+| `getMethodDocstring(name)` | `str \| None` | |
+| `getSourceCode(method=None)` | `str \| None` | Returns `None` on failure. |
+| `getFile()` | `str \| None` | Returns `None` on failure. |
+| `removeMethod(name)` | `None` | Returns nothing, unlike `ReflectionConcrete.removeMethod`. |
+| `getPropertyDocstring(name)` | `str` | `AttributeError` when the property is absent. |
+| `setMethod(name, method)` | `bool` | Binds the callable on the **instance**, so it surfaces through the instance-variable scan, not through `getMethods()`. |
 
-Plus class metadata, the full classification API, `hasAttribute`/
-`getAttribute(name, default=None)`/`setAttribute`/`removeAttribute`,
-`hasMethod`/`getMethodSignature`, `getPropertySignature`,
-`constructorSignature`/`methodSignature`, `clearCache`.
-
-### `ReflectionCallable` (`orionis.introspection.callables.reflection.ReflectionCallable`)
+### ReflectionCallable
 
 ```python
-def __init__(self, fn: callable) -> None
+class ReflectionCallable(IReflectionCallable):
+    def __init__(self, fn: callable) -> None: ...
 ```
 
-Wraps a single function, bound method, or lambda. Raises `TypeError` if
-`fn` is not a `FunctionType`/`MethodType` (or a callable with `__code__`).
+Accepts `types.FunctionType`, `types.MethodType` or any callable exposing
+`__code__`; anything else raises
+`TypeError: Expected a function, method, or lambda, got builtin_function_or_method`.
 
-| Method | Returns | Description |
+| Method | Returns | Notes |
 | --- | --- | --- |
-| `getCallable()` | `callable` | The wrapped callable. |
-| `getName()` | `str` | `fn.__name__`, pre-computed at construction. |
-| `getModuleName()` | `str` | `fn.__module__`, pre-computed at construction. |
-| `getModuleWithCallableName()` | `str` | `"{module}.{name}"`. |
-| `getDocstring()` | `str` | `fn.__doc__ or ""`. |
-| `getSourceCode()` | `str` | `inspect.getsource(fn)`, cached. Raises `AttributeError` on `OSError` (e.g. built-ins). |
-| `getFile()` | `str` | Absolute source file path. Raises `TypeError` if unavailable. |
-| `getSignature()` | `inspect.Signature` | Raw parameter signature. |
-| `getDependencies()` | `Signature` | Resolved/unresolved dependency signature (cached), via `ReflectDependencies`. |
-| `clearCache()` | `None` | Clears the internal cache dict. |
+| `getCallable()` | `callable` | |
+| `getName()` | `str` | Precomputed in `__init__`. |
+| `getModuleName()` | `str` | Precomputed in `__init__`. |
+| `getModuleWithCallableName()` | `str` | `module.name`. |
+| `getDocstring()` | `str` | Empty string when absent. |
+| `getSourceCode()` | `str` | `AttributeError` when the source is unavailable. |
+| `getFile()` | `str` | Propagates `TypeError` from `inspect.getfile`. |
+| `getSignature()` | `inspect.Signature` | Cached. |
+| `getDependencies()` | `Signature` | Cached dependency analysis. |
+| `clearCache()` | `None` | |
 
-### `ReflectionModule` (`orionis.introspection.modules.reflection.ReflectionModule`)
+### ReflectionModule
 
 ```python
-def __init__(self, module: str) -> None
+class ReflectionModule(IReflectionModule):
+    def __init__(self, module: str) -> None: ...
 ```
 
-Imports `module` (`importlib.import_module`) and wraps it. Raises
-`TypeError` if `module` is not a non-empty string or the import fails.
+Raises `TypeError` for a non-string, an empty/blank string
+(`"Module name must be a non-empty string, got ''"`) or an import failure
+(`"Failed to import module 'x': ..."`).
 
-| Method | Returns | Description |
+| Method | Returns | Notes |
 | --- | --- | --- |
 | `getModule()` | `object` | The imported module object. |
-| `hasClass(class_name)` / `getClass(class_name)` | `bool` / `type \| None` | Look up a class defined in the module. |
-| `setClass(class_name, cls)` / `removeClass(class_name)` | `bool` | Inject or remove a class attribute on the module object. Raises `ValueError` on invalid names/types. |
-| `getClasses()` / `getPublicClasses()` / `getProtectedClasses()` / `getPrivateClasses()` | `dict` | Classes defined in the module, split by visibility. |
-| `getConstant(name)` / `getConstants()` / `getPublicConstants()` / `getProtectedConstants()` / `getPrivateConstants()` | `object \| None` / `dict` | Module-level non-callable, non-class values. |
-| `getFunctions()` / `getPublicFunctions()` / `getPublicSyncFunctions()` / `getPublicAsyncFunctions()` / `getProtectedFunctions()` / `getProtectedSyncFunctions()` / `getProtectedAsyncFunctions()` / `getPrivateFunctions()` / `getPrivateSyncFunctions()` / `getPrivateAsyncFunctions()` | `dict` | Module-level functions, split by visibility and sync/async. |
-| `getImports()` | `dict` | Names imported into the module's namespace. |
-| `getFile()` | `str` | Module's file path. |
-| `getSourceCode()` | `str` | Module source. Raises `ValueError` if it cannot be read. |
-| `clearCache()` | `None` | Clears the internal cache dict. |
+| `getClasses()` | `dict` | Every class found in the module namespace, including imported ones. |
+| `getPublicClasses()` / `getProtectedClasses()` / `getPrivateClasses()` | `dict` | Filtered by name prefix. |
+| `hasClass(class_name)` | `bool` | |
+| `getClass(class_name)` | `type \| None` | |
+| `setClass(class_name, cls)` | `bool` | `ValueError` for invalid names/keywords, `TypeError` when `cls` is not a class. |
+| `removeClass(class_name)` | `bool` | `ValueError` when absent. |
+| `getConstants()` | `dict` | Non-callable attributes whose name is uppercase. |
+| `getPublicConstants()` / `getProtectedConstants()` / `getPrivateConstants()` | `dict` | |
+| `getConstant(constant_name)` | `object \| None` | |
+| `getFunctions()` | `dict` | Only `types.FunctionType` values. |
+| `getPublicFunctions()` / `getPublicSyncFunctions()` / `getPublicAsyncFunctions()` | `dict` | Same trio for `Protected` and `Private`. |
+| `getImports()` | `dict` | Module-typed attributes. |
+| `getFile()` | `str` | Propagates `TypeError` from `inspect.getfile` for in-memory modules. |
+| `getSourceCode()` | `str` | Raises `ValueError` when the file cannot be read. |
+| `clearCache()` | `None` | |
 
-### `ReflectDependencies` (`orionis.introspection.dependencies.reflection.ReflectDependencies`)
+Every accessor above memoizes its result; calling it twice returns the very same
+object.
+
+### ReflectDependencies
 
 ```python
-def __init__(self, target: Any | None = None) -> None
+class ReflectDependencies(IReflectDependencies):
+    __slots__ = ("_target",)
+
+    def __init__(self, target: Any | None = None) -> None: ...
+    def constructorSignature(self) -> Signature: ...
+    def methodSignature(self, method_name: str) -> Signature: ...
+    def callableSignature(self) -> Signature: ...
 ```
 
-The shared dependency-resolution engine used internally by every reflector
-above (they each construct `ReflectDependencies(self._target_object)` on
-demand rather than subclassing it).
+- `constructorSignature()` inspects `target.__init__`.
+- `methodSignature(name)` inspects `getattr(target, name)`; a missing name
+  propagates `AttributeError`.
+- `callableSignature()` raises
+  `TypeError: Target 42 is not callable and cannot have a signature.` when the
+  target is not callable, and `ValueError: Unable to inspect signature of ...`
+  when `inspect.signature` fails (for example on `min`).
 
-| Method | Returns | Description |
+**Classification rules applied to every parameter**
+
+| Situation | Bucket | `type` / `class_name` |
 | --- | --- | --- |
-| `constructorSignature()` | `Signature` | Inspects `target.__init__` (raises `ValueError` if the signature cannot be inspected). |
-| `methodSignature(method_name: str)` | `Signature` | Inspects `getattr(target, method_name)`. |
-| `callableSignature()` | `Signature` | Inspects `target` directly. Raises `TypeError` if `target` is not callable. |
+| Named `self`, `cls`, `args` or `kwargs`, or declared as `*args` / `**kwargs` | skipped | — |
+| No annotation and no default | `unresolved` | `type(typing.Any)` → `typing._AnyMeta` |
+| Has a default value | `resolved` | `type(default)` — the default wins over the annotation |
+| Annotated with a `builtins` type, no default | `unresolved` | the annotated type |
+| Annotated with a non-`builtins` type, no default | `resolved` | the annotated type; `is_schema=True` when it is a `msgspec.Struct` subclass |
+| Annotated with a string (forward reference) | `resolved` | module `typing`, `class_name` is the literal string, `type` is `str` |
 
-Classification rule applied to every parameter (skipping `self`, `cls`,
-`*args`, `**kwargs`):
+### Argument
 
-- **Unresolved**: no annotation *and* no default value, **or** an
-  annotation that resolves to a builtin type (`module == "builtins"`,
-  e.g. `str`, `int`) with no default.
-- **Resolved**: has a default value (the `Argument.type` is inferred from
-  `type(default)`), **or** has a non-builtin type annotation. When the
-  annotation is itself a `msgspec.Struct` subclass, `Argument.is_schema` is
-  set to `True`.
-- String (forward-reference) annotations are treated as resolved to
-  `typing.<name>` unless the referenced name happens to be a plain
-  `builtins` type name — the resolver does not evaluate forward references.
+```python
+@dataclass(slots=True, kw_only=True, frozen=True)
+class Argument:
+    name: str
+    resolved: bool
+    module_name: str
+    class_name: str
+    type: type[Any]
+    full_class_path: str
+    is_keyword_only: bool = False
+    is_schema: bool = False
+    default: Any | None = None
+```
 
-### `ModuleInspector` (`orionis.introspection.modules.inspector.ModuleInspector`)
+`__post_init__` raises `TypeError` when `module_name`, `class_name` or
+`full_class_path` is not a `str`, and `ValueError` when `type` is `None` while
+no `default` was supplied.
 
-A `@staticmethod`/`@classmethod`-only utility class (never instantiated),
-independent from the `Reflection` facade and used by framework bootstrap
-code for module/config discovery:
+### Signature
 
-| Method | Signature | Description |
+```python
+@dataclass(frozen=True, kw_only=True)
+class Signature(BaseEntity):
+    resolved: dict[str, Argument]
+    unresolved: dict[str, Argument]
+    ordered: dict[str, Argument]
+```
+
+`__post_init__` raises `TypeError` when any of the three fields is not a `dict`.
+
+| Method | Returns | Notes |
 | --- | --- | --- |
-| `discoverModules` | `(base_path: Path, tarjet_path: Path) -> set[str]` | Recursively finds `*.py` files under `tarjet_path` and converts their paths into dotted module names relative to `base_path`, stripping `venv`/`site-packages` segments. |
-| `loadClass` | `(module_path: str \| None = None, class_name: str \| None = None, *, metadata: dict[str, str] \| None = None) -> type` | Imports a module and returns a class by name, with a per-process resolved-class cache (`__cache_resolved_classes`). Accepts either explicit arguments or a `metadata` dict with `"module"`/`"class"` keys. Raises `ImportError`, `AttributeError`, or `TypeError`. |
-| `fileImportsAny` | `(file_path: Path, target_modules: set[str]) -> bool` | Uses `ast.parse`/`ast.walk` (no import) to check whether a file imports any of `target_modules`. Returns `False` on `SyntaxError`/`UnicodeDecodeError` or a missing file. |
-| `discoverFrozenDataclasses` | `(modules: set[str]) -> set[tuple[str, str, str, type]]` | Imports each module in `modules` and collects `(file_stem, module_path, class_name, class)` tuples for every **frozen** dataclass defined directly in that module. Raises `RuntimeError` if a module fails to import. |
+| `hasParameters()` | `bool` | `True` when `ordered` is non-empty. |
+| `noArgumentsRequired()` | `bool` | Inverse of `hasParameters()`. |
+| `hasUnresolvedArguments()` | `bool` | |
+| `getResolved()` / `getUnresolved()` / `getAllOrdered()` | `dict[str, Argument]` | Return the **stored** dictionaries. |
+| `resolvedToDict()` / `unresolvedToDict()` / `toDict()` | `dict[str, Argument]` | Return **copies**. |
+| `getPositionalOnly()` / `getKeywordOnly()` | `dict[str, Argument]` | New dicts filtered by `is_keyword_only`. |
+| `arguments()` | `dict_items[str, Argument]` | Iterable view over `ordered`; this is what the container consumes. |
 
-### Entities: `Argument`, `Signature`
+### ModuleInspector
 
-Both live in `orionis.introspection.dependencies.entities` and are consumed
-as the return type of every `constructorSignature`/`methodSignature`/
-`callableSignature`/`getDependencies` method above.
+Static/class-method utility with a process-wide class-level cache of resolved
+classes.
 
-**`Argument`** — `@dataclass(slots=True, kw_only=True, frozen=True)`:
+```python
+@staticmethod
+def discoverModules(base_path: Path, target_path: Path) -> set[str]: ...
 
-| Field | Type | Description |
+@classmethod
+def loadClass(
+    cls: type,
+    module_path: str | None = None,
+    class_name: str | None = None,
+    *,
+    metadata: dict[str, str] | None = None,
+) -> type: ...
+
+@staticmethod
+def fileImportsAny(file_path: Path, target_modules: set[str]) -> bool: ...
+
+@staticmethod
+def discoverFrozenDataclasses(
+    modules: set[str],
+) -> set[tuple[str, str, str, type[Any]]]: ...
+```
+
+- `discoverModules` walks `target_path` for `*.py` files, converts the parent
+  directory to dotted notation relative to `base_path`, strips `site-packages`
+  and virtualenv segments, and skips entries that collapse to an empty string
+  (files sitting directly in `base_path`).
+- `loadClass` accepts either explicit `module_path`/`class_name` or a `metadata`
+  mapping with the keys `module` and `class` (`dict` or `MappingProxyType`).
+  Raises `ImportError`, `AttributeError` or `TypeError` (attribute is not a
+  class). Successful lookups are cached by `"module.Class"`.
+- `fileImportsAny` parses the file with `ast` and returns `False` when the file
+  is missing, has a syntax error, or cannot be decoded as UTF-8.
+- `discoverFrozenDataclasses` returns
+  `(file_stem, module_path, class_name, class_object)` tuples for frozen
+  dataclasses **defined in** each module, and wraps any import failure in
+  `RuntimeError`.
+
+### Contracts
+
+Each reflector implements an `abc.ABC` interface located in the sibling
+`contracts` package:
+
+| Contract | Abstract methods | Declares `__slots__ = ()` |
 | --- | --- | --- |
-| `name` | `str` | Parameter name. |
-| `resolved` | `bool` | Whether this parameter was classified as resolved. |
-| `module_name` | `str` | Module of the parameter's type. |
-| `class_name` | `str` | Name of the parameter's type. |
-| `type` | `type[Any]` | The resolved Python type object. |
-| `full_class_path` | `str` | `"{module_name}.{class_name}"`. |
-| `is_keyword_only` | `bool` (default `False`) | Whether the parameter is keyword-only. |
-| `is_schema` | `bool` (default `False`) | Whether `type` is a `msgspec.Struct` subclass. |
-| `default` | `Any \| None` (default `None`) | The parameter's default value, if any. |
+| `IReflectionAbstract` | 61 | no |
+| `IReflectionConcrete` | 64 | no |
+| `IReflectionInstance` | 65 | no |
+| `IReflectionModule` | 28 | no |
+| `IReflectionCallable` | 10 | yes |
+| `IReflectDependencies` | 3 | yes |
 
-Raises `TypeError` in `__post_init__` if `module_name`, `class_name`, or
-`full_class_path` are not strings, and `ValueError` if `type` is `None`
-with no `default` provided.
+Because four of the six contracts do not declare empty slots, only
+`ReflectionCallable` and `ReflectDependencies` instances are free of a
+per-instance `__dict__`; `ReflectionAbstract`, `ReflectionConcrete`,
+`ReflectionInstance` and `ReflectionModule` instances still carry one.
 
-**`Signature`** — `@dataclass(frozen=True, kw_only=True)`, extends
-`orionis.support.entities.base.BaseEntity`:
+### Member classification API
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `resolved` | `dict[str, Argument]` | Parameters classified as resolved. |
-| `unresolved` | `dict[str, Argument]` | Parameters classified as unresolved. |
-| `ordered` | `dict[str, Argument]` | All parameters, in original declaration order. |
-
-Helper methods: `hasParameters()`, `noArgumentsRequired()`,
-`hasUnresolvedArguments()`, `getResolved()`, `getUnresolved()`,
-`getAllOrdered()`, `getPositionalOnly()`, `getKeywordOnly()`, `toDict()`,
-`resolvedToDict()`, `unresolvedToDict()`, `keywordOnlyToDict()`,
-`positionalOnlyToDict()`, `arguments()` / `items()` (both return
-`dict_items[str, Argument]` over `ordered`). `Signature` also inherits
-`toDict()`-style dataclass serialization helpers from `BaseEntity`.
-
-### The visibility × kind × sync/async classification API
-
-`ReflectionAbstract`, `ReflectionConcrete`, and `ReflectionInstance` all
-expose the **same naming pattern** for classifying class members. Names
-follow the template:
+`ReflectionAbstract`, `ReflectionConcrete` and `ReflectionInstance` share the
+same accessor naming scheme:
 
 ```
 get[Public|Protected|Private][Class|Static|""][Sync|Async|""]Methods() -> list[str]
+get[Public|Protected|Private]Attributes() -> dict
+get[Public|Protected|Private]Properties() -> list[str]
+getDunderMethods() / getMagicMethods() -> list[str]
+getDunderAttributes() / getMagicAttributes() -> dict
 ```
 
-- **Visibility**: `Public` (no leading underscore), `Protected` (single
-  leading underscore, not name-mangled), `Private` (name-mangled
-  `_ClassName__name`, returned with the mangling prefix stripped), or none
-  (dunder methods, handled separately).
-- **Kind**: plain instance methods, `Class` methods (`@classmethod`), or
+- **Visibility** — `Public` (no leading underscore), `Protected` (single leading
+  underscore), `Private` (name-mangled, returned with the `_ClassName` prefix
+  removed), plus the separate dunder accessors.
+- **Kind** — plain instance methods, `Class` methods (`@classmethod`) or
   `Static` methods (`@staticmethod`).
-- **Sync/Async**: every kind × visibility combination has an `All`
-  (implied — no suffix), `Sync`, and `Async` variant, determined via
-  `inspect.iscoroutinefunction`.
+- **Sync/async** — the `Sync`/`Async` infix splits the list by
+  `inspect.iscoroutinefunction`; omitting it returns both.
+- `getMagicMethods()` and `getMagicAttributes()` are aliases of the `Dunder`
+  variants.
+- `getMethods()` aggregates instance, class and static methods of all three
+  visibilities.
 
-This produces the following method families (all return `list[str]`,
-available on all three reflectors):
-
-| Visibility | Instance methods | Class methods | Static methods |
-| --- | --- | --- | --- |
-| Public | `getPublicMethods`, `getPublicSyncMethods`, `getPublicAsyncMethods` | `getPublicClassMethods`, `getPublicClassSyncMethods`, `getPublicClassAsyncMethods` | `getPublicStaticMethods`, `getPublicStaticSyncMethods`, `getPublicStaticAsyncMethods` |
-| Protected | `getProtectedMethods`, `getProtectedSyncMethods`, `getProtectedAsyncMethods` | `getProtectedClassMethods`, `getProtectedClassSyncMethods`, `getProtectedClassAsyncMethods` | `getProtectedStaticMethods`, `getProtectedStaticSyncMethods`, `getProtectedStaticAsyncMethods` |
-| Private | `getPrivateMethods`, `getPrivateSyncMethods`, `getPrivateAsyncMethods` | `getPrivateClassMethods`, `getPrivateClassSyncMethods`, `getPrivateClassAsyncMethods` | `getPrivateStaticMethods`, `getPrivateStaticSyncMethods`, `getPrivateStaticAsyncMethods` |
-
-Plus, on every reflector: `getMethods()` (aggregate of all of the above),
-`getDunderMethods()` / `getMagicMethods()` (alias), and the analogous
-**attribute** family — `getAttributes()`, `getPublicAttributes()`,
-`getProtectedAttributes()`, `getPrivateAttributes()`,
-`getDunderAttributes()`, `getMagicAttributes()` (dicts of name → value,
-excluding callables, static/class methods and properties) — and
-**property** family — `getProperties()`, `getPublicProperties()`,
-`getProtectedProperties()`, `getPrivateProperties()`, plus
-`getPropertySignature(name)` and `getPropertyDocstring(name)`.
-
-All classification results are computed by a **single-pass class scan**
-(`_scanClass`) the first time any classification method is called, then
-served from an internal cache dict until `clearCache()` is invoked or the
-target is mutated (`setAttribute`/`removeAttribute`/`setMethod`/
-`removeMethod`), which invalidates the cache automatically.
+---
 
 ## Usage examples
 
-### Reflecting a concrete class for DI-style introspection
+All examples below assume this module exists as `app/services/catalog.py`:
 
 ```python
+from abc import ABC, abstractmethod
+
+
+class CatalogContract(ABC):
+    """Contract for catalog services."""
+
+    @abstractmethod
+    def search(self, term: str) -> list[str]:
+        """Search the catalog."""
+
+
+class Catalog:
+    """In-memory catalog service."""
+
+    limit: int = 25
+    _cursor: str = "0"
+    __token: str = "secret"
+
+    def __init__(self, dsn: str = "sqlite://") -> None:
+        self.dsn = dsn
+
+    def search(self, term: str) -> list[str]:
+        """Return the matching entries."""
+        return [term]
+
+    async def searchAsync(self, term: str) -> list[str]:
+        """Return the matching entries asynchronously."""
+        return [term]
+
+    def _reset(self) -> None:
+        """Reset the internal cursor."""
+
+    def __seal(self) -> None:
+        """Seal the catalog."""
+
+    @classmethod
+    def build(cls) -> "Catalog":
+        """Build a catalog with defaults."""
+        return cls()
+
+    @staticmethod
+    def ping() -> bool:
+        """Return True when the service is reachable."""
+        return True
+
+    @property
+    def cursor(self) -> str:
+        """Return the current cursor."""
+        return self._cursor
+```
+
+### Classifying the members of a class
+
+```python
+from app.services.catalog import Catalog
 from orionis.introspection import Reflection
 
-class WelcomeService:
-    """Example service with mixed visibility members."""
+reflection = Reflection.concrete(Catalog)
 
-    greeting: str = "Hello"
+print(reflection.getPublicMethods())        # ['search', 'searchAsync']
+print(reflection.getPublicSyncMethods())    # ['search']
+print(reflection.getPublicAsyncMethods())   # ['searchAsync']
+print(reflection.getProtectedMethods())     # ['_reset']
+print(reflection.getPrivateMethods())       # ['__seal']
+print(reflection.getPublicClassMethods())   # ['build']
+print(reflection.getPublicStaticMethods())  # ['ping']
+print(reflection.getPublicProperties())     # ['cursor']
+print(reflection.getPublicAttributes())     # {'limit': 25}
+print(reflection.getPrivateAttributes())    # {'__token': 'secret'}
+print(reflection.getMethodSignature("__seal"))  # (self) -> None
+```
 
-    def __init__(self, name: str, retries: int = 3) -> None:
-        self._name = name
+### Resolving constructor dependencies
+
+```python
+import msgspec
+
+from orionis.introspection import ReflectDependencies
+
+
+class Payload(msgspec.Struct):
+    name: str
+
+
+class Repo:
+    pass
+
+
+class Service:
+    def __init__(self, repo: Repo, payload: Payload, retries: int, *, tag="x") -> None:
+        self.repo = repo
+        self.payload = payload
         self.retries = retries
+        self.tag = tag
 
-    def greet(self) -> str:
-        return f"{self.greeting}, {self._name}!"
 
-    async def greetAsync(self) -> str:
-        return self.greet()
+signature = ReflectDependencies(Service).constructorSignature()
 
-    def _protectedHelper(self) -> None:
-        ...
+print(signature.hasParameters())          # True
+print(list(signature.getResolved()))      # ['repo', 'payload', 'tag']
+print(list(signature.getUnresolved()))    # ['retries']
+print(list(signature.getKeywordOnly()))   # ['tag']
 
-    def __privateHelper(self) -> None:  # noqa: PLW3201 (illustrative only)
-        ...
-
-reflection = Reflection.concrete(WelcomeService)
-
-reflection.getClassName()               # "WelcomeService"
-reflection.getModuleWithClassName()     # "<module>.WelcomeService"
-reflection.getPublicMethods()           # ["greet", "greetAsync"]
-reflection.getPublicSyncMethods()       # ["greet"]
-reflection.getPublicAsyncMethods()      # ["greetAsync"]
-reflection.getProtectedMethods()        # ["_protectedHelper"]
-reflection.getPrivateMethods()          # ["__privateHelper"] (mangling stripped)
-reflection.getPublicAttributes()        # {"greeting": "Hello"}
-
-signature = reflection.constructorSignature()
-signature.hasUnresolvedArguments()      # True: "name" has no annotation/default
-list(signature.getUnresolved())         # ["name"]
-list(signature.getResolved())           # ["retries"] (has a default value)
+for name, argument in signature.arguments():
+    print(name, argument.class_name, argument.resolved, argument.is_schema)
+# repo Repo True False
+# payload Payload True True
+# retries int False False
+# tag str True False
 ```
 
-### Reflecting a live instance and mutating it
+`retries: int` lands in `unresolved` because a bare builtin annotation carries no
+information the container can use to build a value.
+
+### Reflecting an object instance
 
 ```python
-from orionis.introspection import Reflection
+from app.services.catalog import Catalog
+from orionis.introspection import ReflectionInstance
 
-instance = WelcomeService(name="Ada")
-ri = Reflection.instance(instance)
+reflection = ReflectionInstance(Catalog("postgres://"))
 
-ri.getAttribute("retries", default=0)   # 3
-ri.setAttribute("retries", 5)
-ri.setMethod("shout", lambda self: ri.getAttribute("greeting").upper())
-ri.hasMethod("shout")                   # True
-ri.clearCache()                         # forces a fresh member scan on next access
+print(reflection.getClassName())          # Catalog
+print(reflection.getAttributes())         # {'dsn': 'postgres://'}
+print(reflection.getAnnotations())        # {'limit': <class 'int'>, ...}
+print(reflection.getMethodDocstring("search"))
+print(reflection.getPropertyDocstring("cursor"))
+print(reflection.getProperty("cursor"))   # 0
+print(type(reflection.getBaseClasses()))  # <class 'tuple'>
 ```
 
-### Reflecting a callable's dependencies
+`getAttributes()` reads instance variables, so `limit`, `_cursor` and `__token`
+(class attributes) are not listed; they show up in `getAnnotations()` instead.
+
+### Handling reflection errors
 
 ```python
-from orionis.introspection import Reflection
+from app.services.catalog import Catalog, CatalogContract
+from orionis.introspection import (
+    ReflectDependencies,
+    ReflectionAbstract,
+    ReflectionCallable,
+    ReflectionConcrete,
+    ReflectionInstance,
+    ReflectionModule,
+)
 
-def send_email(to: str, subject: str = "Hello") -> None:
-    ...
+try:
+    ReflectionAbstract(Catalog)
+except TypeError as exc:
+    print(exc)  # The class 'Catalog' is not an abstract base class.
 
-rc = Reflection.callable(send_email)
-deps = rc.getDependencies()
-deps.getUnresolved()   # {"to": Argument(...)}  -- no annotation, no default
-deps.getResolved()     # {"subject": Argument(...)}  -- has a default value
+try:
+    ReflectionConcrete(CatalogContract)
+except TypeError as exc:
+    print(exc)  # Argument 'concrete' must be a class type, got 'ABCMeta' instead.
+
+try:
+    ReflectionInstance(Catalog)
+except TypeError as exc:
+    print(exc)  # The provided instance must be an object instance, not a class.
+
+try:
+    ReflectionInstance(42)
+except TypeError as exc:
+    print(exc)  # Cannot reflect on instances of built-in or abstract base classes.
+
+try:
+    ReflectionCallable(len)
+except TypeError as exc:
+    print(exc)  # Expected a function, method, or lambda, got builtin_function_or_method
+
+try:
+    ReflectionModule("")
+except TypeError as exc:
+    print(exc)  # Module name must be a non-empty string, got ''
+
+try:
+    ReflectDependencies(min).callableSignature()
+except ValueError as exc:
+    print(exc)  # Unable to inspect signature of <built-in function min>: ...
 ```
 
-### Reflecting a module
+`ReflectionInstance` also rejects objects whose class is defined in `__main__`
+with `ValueError`, so run the snippets above as a module (`python -m ...`) or
+import the classes from a package.
 
-```python
-from orionis.introspection import Reflection
-
-rm = Reflection.module("orionis.support.entities.base")
-rm.getPublicClasses()      # {"BaseEntity": <class ...>}
-rm.getPublicFunctions()    # {} (none defined at module scope in this example)
-rm.getFile()               # absolute path to base.py
-```
-
-### Discovering modules and frozen configuration dataclasses
+### Discovering modules and frozen dataclasses
 
 ```python
 from pathlib import Path
-from orionis.introspection.modules.inspector import ModuleInspector
 
-base = Path("/path/to/project")
-modules = ModuleInspector.discoverModules(base, base / "config")
-entities = ModuleInspector.discoverFrozenDataclasses(modules)
-for file_name, module_path, class_name, cls in entities:
-    print(file_name, module_path, class_name, cls)
+from orionis.introspection import ModuleInspector, ReflectionModule
+
+base = Path.cwd()
+modules = ModuleInspector.discoverModules(base, base / "app")
+print(sorted(modules)[:3])
+
+Path_ = ModuleInspector.loadClass(metadata={"module": "pathlib", "class": "Path"})
+print(Path_.__name__)  # Path
+
+frozen = ModuleInspector.discoverFrozenDataclasses(
+    {"orionis.introspection.dependencies.entities.argument"},
+)
+print(sorted(entry[2] for entry in frozen))  # ['Argument']
+
+reflection = ReflectionModule("orionis.introspection.reflection")
+print(list(reflection.getPublicClasses()))   # ['Any', 'Reflection']
+print(list(reflection.getConstants()))       # ['TYPE_CHECKING']
+print(list(reflection.getImports()))         # ['abc', 'inspect', 'typing']
 ```
 
-### Using the `Reflection` type predicates
+`getPublicClasses()` reports `Any` because `ReflectionModule` inspects whatever
+is bound in the module namespace, including imported names.
 
-```python
-from orionis.introspection import Reflection
-
-async def handler() -> None:
-    ...
-
-Reflection.isCoroutineFunction(handler)  # True
-Reflection.isConcreteClass(WelcomeService)  # True
-Reflection.isAbstract(WelcomeService)        # False
-```
+---
 
 ## Performance and concurrency considerations
 
-- **Single-pass scanning + caching**: `ReflectionAbstract`, `ReflectionConcrete`,
-  and `ReflectionInstance` scan the class dictionary **once** (`_scanClass`)
-  on first member access, bucketing every attribute/method/property in a
-  single loop, and cache the results in a per-instance dict. Repeated calls
-  to any classification getter (`getPublicMethods()`, etc.) are O(1) cache
-  reads until `clearCache()` is called or the target is mutated.
-- **`__slots__` everywhere**: `ReflectionAbstract`, `ReflectionCallable`, and
-  the internal `_ScanBuffers`/`_Flags` helpers declare `__slots__`, removing
-  per-instance `__dict__` allocation and speeding up attribute access. This
-  is an existing design choice, not something to change.
-- **Module-level LRU caches in `ReflectDependencies`**: `_get_signature` and
-  `_get_resolved_signature` are wrapped in `functools.lru_cache(maxsize=1024)`
-  **at module scope**, so the resolved dependency `Signature` for a given
-  callable/constructor/method is computed once **per process**, shared
-  across every `ReflectDependencies`/reflector instance that inspects the
-  same target — not just within one reflector instance. Because the cache
-  key is the target object itself, keep this in mind if you dynamically
-  rebuild functions/classes with the same identity across the process
-  lifetime (the cached signature will not be recomputed).
-- **`ModuleInspector.__cache_resolved_classes`**: a plain class-level `dict`
-  (no lock) caching `loadClass` results by `"module.Class"` key. Reads and
-  writes rely on the GIL for atomicity; this is adequate for the
-  bootstrap-time, mostly-write-once usage pattern the framework applies it
-  to.
-- **Reflection objects are not designed to be shared/mutated concurrently**
-  across threads for the same target — if two threads call `setAttribute`/
-  `setMethod`/`removeMethod` on the same reflector (or on two reflectors
-  wrapping the same class) at the same time, the underlying class dict
-  mutations and cache invalidation are not synchronized with a lock. In
-  practice, reflection is primarily used at application boot (DI wiring,
-  config discovery) rather than on the hot request path, where this is not
-  a concern.
-- **No I/O beyond source/file lookups**: `getSourceCode()`/`getFile()`
-  perform synchronous file-system reads via `inspect` the first time they
-  are called (then cache the result); avoid calling them in a tight loop on
-  a hot path.
+- **One scan per reflector instance.** `ReflectionAbstract`, `ReflectionConcrete`
+  and `ReflectionInstance` walk the class namespace once, on the first
+  classification call, and then answer from a dictionary. Reuse the reflector
+  instead of building a new one per query.
+- **Process-wide LRU caches.** `orionis/introspection/dependencies/reflection.py`
+  caches `inspect.signature` and the resolved `Signature` per target with
+  `functools.lru_cache(maxsize=1024)`. Cached entries are keyed by the target
+  object itself, so the target must be hashable; failures are not cached and are
+  re-raised on every call.
+- **Process-wide class cache.** `ModuleInspector.loadClass` stores resolved
+  classes in a class-level dictionary keyed by `"module.Class"`. It is never
+  invalidated during the process lifetime.
+- **Mutation invalidates the cache.** `setAttribute`, `removeAttribute`,
+  `setMethod` and `removeMethod` refresh or clear the internal caches. Mutating
+  the reflected class directly (with `setattr`/`delattr`) does **not**, so the
+  reflector may keep serving stale member lists.
+- **`ReflectionModule` invalidates only the `classes` entry.** `setClass` and
+  `removeClass` drop the `"classes"` cache key, but the derived views
+  (`getPublicClasses`, `getProtectedClasses`, `getPrivateClasses`) keep whatever
+  they had already memoized. Call `clearCache()` after mutating a module if you
+  need those views refreshed.
+- **No locks anywhere.** No class in this package uses `threading` or `asyncio`
+  primitives. Concurrent readers of the same reflector are safe once the scan has
+  completed; concurrent first-use may run the scan more than once, which is
+  wasteful but produces the same result. Mutating a reflector from several
+  threads is not synchronised.
+- **`asyncio`.** No method in the package is a coroutine; the sync/async
+  distinction refers to the *inspected* members, not to the API itself.
+- **I/O.** `getSourceCode`, `getFile`, `discoverModules`, `fileImportsAny` and
+  `discoverFrozenDataclasses` touch the filesystem, and `loadClass` /
+  `discoverFrozenDataclasses` / `ReflectionModule.__init__` may import modules,
+  executing their top-level code.
 
-## Design notes
-
-- **Facade + lazy imports**: `Reflection` never imports a reflector module
-  at import time — each factory method imports its target class inside the
-  method body. This keeps `import orionis.introspection` cheap even if only
-  one reflector kind is ever used.
-- **Contracts (`contracts/reflection.py`) per reflector**: every concrete
-  reflector implements a matching `ABC` contract
-  (`IReflectionAbstract`, `IReflectionConcrete`, `IReflectionInstance`,
-  `IReflectionCallable`, `IReflectionModule`, `IReflectDependencies`), and
-  public APIs elsewhere in the framework type-hint against the contract,
-  not the concrete class.
-- **Dataclass entities for dependency metadata**: `Argument` is
-  `frozen=True, slots=True, kw_only=True`; `Signature` is `frozen=True,
-  kw_only=True` and extends `BaseEntity` (shared serialization helpers used
-  across `orionis` config/data entities). Both validate their own field
-  types in `__post_init__`.
-- **Cache-as-dict-protocol**: `ReflectionAbstract`, `ReflectionConcrete`,
-  `ReflectionInstance`, `ReflectionCallable`, and `ReflectionModule` all
-  implement `__getitem__`/`__setitem__`/`__contains__`/`__delitem__` against
-  their internal cache dict, giving callers (and tests) a uniform,
-  dict-like way to inspect or seed cached values without reaching into
-  private attributes.
-- **Consistent error types, no custom exception hierarchy**: this module
-  intentionally raises plain built-in exceptions (`TypeError`, `ValueError`,
-  `AttributeError`, `ImportError`, `RuntimeError`) rather than defining
-  its own exception classes — validation failures use `TypeError`/
-  `ValueError`, missing members use `AttributeError`, and import failures
-  use `ImportError`/`RuntimeError`.
-- **Deliberate asymmetries between reflectors** (not bugs to "fix"):
-  - `ReflectionInstance.removeMethod()` returns `None`, while
-    `ReflectionAbstract.removeMethod()`/`ReflectionConcrete.removeMethod()`
-    return `bool`.
-  - `ReflectionInstance.getBaseClasses()` returns a `tuple[type, ...]`, while
-    the abstract/concrete reflectors return a `list[type]`.
-  - `ReflectionAbstract.getAttribute(name)` has no `default` parameter and
-    raises when the attribute is missing, while
-    `ReflectionConcrete`/`ReflectionInstance`'s `getAttribute(name, default=None)`
-    accept a fallback value instead.
-  - Only `ReflectionConcrete` exposes `getConstructorSignature()` returning
-    a raw `inspect.Signature`, in addition to the `Signature`-typed
-    `constructorSignature()` shared by all reflectors.
+---
 
 ## Compatibility notes
 
-- **Minimum Python version:** 3.14 (per `pyproject.toml`,
-  `requires-python = ">=3.14"`), matching the rest of the framework.
-- **Required dependency:** `msgspec>=0.21.1` (core dependency, used only for
-  `msgspec.Struct` schema detection in `ReflectDependencies`).
-- Everything else in this module relies solely on the Python standard
-  library (`inspect`, `typing`, `ast`, `importlib`, `functools`, `keyword`,
-  `dataclasses`, `pathlib`).
-- No platform-specific behavior; the module works identically on Windows,
-  Linux, and macOS.
+- **Python `>= 3.14`** (`requires-python` in `pyproject.toml`). The package
+  relies on PEP 649 semantics for annotations: `getAnnotations()` reads
+  `__annotations__` directly, so a class defined in a module that uses
+  `from __future__ import annotations` yields **strings**, while a class defined
+  without it yields real type objects.
+- **Dependencies.** Only the standard library (`abc`, `ast`, `dataclasses`,
+  `functools`, `importlib`, `inspect`, `keyword`, `pathlib`, `re`, `sys`,
+  `types`, `typing`) plus `msgspec>=0.21.1`, which is already a base dependency
+  of Orionis and is used solely to flag `is_schema` on `Argument`.
+- **No provider, no facade.** Import the classes directly; there is nothing to
+  register in the container and nothing to `pin()`.
+- **Private-name convention.** All accessors exchange the *demangled* name
+  (`__seal`). Passing the mangled form (`_Catalog__seal`) is not supported by
+  `hasMethod`, `getMethodSignature`, `removeMethod` or `methodSignature`.
+- **Asymmetries between reflectors are intentional and observable.**
+  `ReflectionInstance.getBaseClasses()` returns a `tuple` while the class-level
+  reflectors return a `list`; `ReflectionInstance.removeMethod()` returns `None`
+  while `ReflectionConcrete.removeMethod()` returns `bool`;
+  `ReflectionAbstract.getSourceCode()` raises `ValueError` while the concrete and
+  instance variants return `None`.
+- **Spanish version:** [README.es.md](README.es.md).

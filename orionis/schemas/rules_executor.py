@@ -4,12 +4,11 @@ import operator
 import types
 import msgspec.structs
 from orionis.schemas.rule import Rule
-from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.meta.validation import ValidationMetadata
 
 # Cache of validation plans for schema types. Keys are schema classes;
 # values are tuples of field validation plans as returned by _build_plan().
-# Populated on demand by _execute and _build
+# Populated on demand by _build_plan and warmed at class creation time.
 _PLAN_CACHE: dict[type, tuple] = {}
 
 # Alias for faster local access in hot path.
@@ -213,10 +212,10 @@ def _collect_with_plan(
     """
     Inner validation loop: execute a pre-resolved plan against an instance.
 
-    This function is the true hot path. It is separated from ``_execute`` so
-    that callers who already hold the plan (e.g. ``Schema.validate``) can
-    skip the redundant cache lookup and ``type()`` call. Every failure is
-    accumulated so the caller can report all of them at once.
+    This function is the true hot path. It takes the plan as a parameter so
+    that callers who already hold it (e.g. ``Schema.validate``) skip the
+    cache lookup and the ``type()`` call. Every failure is accumulated so
+    the caller can report all of them at once.
 
     Parameters
     ----------
@@ -264,89 +263,3 @@ def _collect_with_plan(
             # Keep going so sibling rules and fields are reported too.
             if failure is not None:
                 append(failure)
-
-def _execute_with_plan(plan: tuple, instance: object, prefix: str) -> None:
-    """
-    Execute a pre-resolved plan and raise when any rule fails.
-
-    Parameters
-    ----------
-    plan : tuple
-        Non-empty plan produced by ``_build_plan`` for this instance's type.
-    instance : object
-        Schema instance to validate.
-    prefix : str
-        Dot-terminated path prefix for nested field names.
-
-    Raises
-    ------
-    ValidationException
-        Raised with every rule failure found.
-    """
-    failures: list = []
-    _collect_with_plan(plan, instance, prefix, failures)
-    if failures:
-        raise ValidationException(failures)
-
-def _execute(instance: object, _prefix: str = "") -> None:
-    """
-    Validate an instance recursively using cached field rules.
-
-    Parameters
-    ----------
-    instance : object
-        Schema instance to validate.
-    _prefix : str, default ""
-        Dot-separated path prefix used to qualify nested field names.
-
-    Returns
-    -------
-    None
-        Return ``None`` when validation succeeds.
-
-    Raises
-    ------
-    ValidationException
-        Raise when a rule validation fails.
-    """
-    klass = type(instance)
-    plan = _cache_get(klass)
-    if plan is None:
-        plan = _build_plan(klass)
-    if plan:
-        _execute_with_plan(plan, instance, _prefix)
-
-class RulesExecutor:
-
-    # Prevent per-instance dictionaries; the class is used statically.
-    __slots__ = ()
-
-    # Exposed for external inspection; backed by the module-level _PLAN_CACHE.
-    _cache = _PLAN_CACHE
-
-    @staticmethod
-    def execute(instance: object, *, _prefix: str = "") -> None:
-        """
-        Validate an instance using its declared metadata rules.
-
-        Parameters
-        ----------
-        instance : object
-            Instance whose fields and rules will be validated.
-        _prefix : str
-            Internal dot-separated path prefix used when recursing into
-            nested schemas (e.g. ``"address"`` so that failures report
-            ``"address.code"`` instead of just ``"code"``).
-            Callers should not set this parameter directly.
-
-        Returns
-        -------
-        None
-            Return ``None`` when validation succeeds.
-
-        Raises
-        ------
-        ValidationException
-            Raise when one or more validation failures are found.
-        """
-        _execute(instance, _prefix)

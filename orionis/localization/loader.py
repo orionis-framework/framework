@@ -21,6 +21,13 @@ class TranslationLoader(ITranslationLoader):
     as ``validation.required``. Decoding is performed with ``msgspec``
     for maximum throughput. The loader holds no cache: that concern
     belongs to the repository.
+
+    Notes
+    -----
+    Translation files are read as raw bytes and decoded as UTF-8 JSON.
+    A source stored in any other encoding raises
+    :class:`TranslationSyntaxException`, like any other unusable
+    payload.
     """
 
     __slots__ = ("_path",)
@@ -61,8 +68,8 @@ class TranslationLoader(ITranslationLoader):
         Raises
         ------
         TranslationSyntaxException
-            If a translation file contains invalid JSON or its root
-            element is not an object.
+            If a translation file is not UTF-8 encoded, contains
+            invalid JSON, or its root element is not an object.
         """
         translations: TranslationMap = {}
 
@@ -125,18 +132,18 @@ class TranslationLoader(ITranslationLoader):
         TranslationFileNotFoundException
             If the file does not exist.
         TranslationSyntaxException
-            If the payload is invalid JSON or its root element is not
-            an object.
+            If the payload is not UTF-8 encoded, is invalid JSON, or
+            its root element is not an object.
         """
         # Guard against files removed between discovery and read.
         if not file.is_file():
             error_msg = f"Translation file not found: {file}"
             raise TranslationFileNotFoundException(error_msg)
 
-        # Decode the raw bytes with msgspec for maximum throughput.
+        # Decode the raw UTF-8 bytes with msgspec for maximum throughput.
         try:
             decoded = msgspec.json.decode(file.read_bytes())
-        except msgspec.DecodeError as exc:
+        except (msgspec.DecodeError, UnicodeDecodeError) as exc:
             error_msg = f"Invalid JSON in translation file: {file} ({exc})"
             raise TranslationSyntaxException(error_msg) from exc
 

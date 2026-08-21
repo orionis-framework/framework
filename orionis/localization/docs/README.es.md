@@ -1,334 +1,415 @@
 # Orionis Localization (`orionis.localization`)
 
-> Carga, caché y pluralización de traducciones al estilo Laravel para el framework Orionis.
->
-> 🇬🇧 English version: [README.md](README.md)
+> Lee archivos JSON de traducción, los cachea por locale, interpola marcadores `:name` y selecciona segmentos plurales.
 
-`orionis.localization` resuelve líneas de traducción para el locale activo
-de la aplicación. Lee archivos de traducción JSON desde disco, mantiene una
-caché en memoria por locale, sustituye placeholders `:name` y selecciona la
-forma plural correcta de una traducción según un contador — el mismo modelo
-mental que usa la fachada `Lang` de Laravel, adaptado a Python usando
-`msgspec` para una decodificación JSON rápida.
-
----
+🇬🇧 English version: [README.md](README.md)
 
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Descripción funcional del módulo](#descripción-funcional-del-módulo)
-3. [Arquitectura](#arquitectura)
-4. [Referencia de API](#referencia-de-api)
-   - [`TranslationLoader`](#translationloader-orionislocalizationloadertranslationloader)
-   - [`TranslationRepository`](#translationrepository-orionislocalizationrepositorytranslationrepository)
-   - [`Translator`](#translator-orionislocalizationtranslatortranslator)
-   - [`LocalizationManager`](#localizationmanager-orionislocalizationmanagerlocalizationmanager)
-   - [`LocalizationProvider`](#localizationprovider-orionislocalizationproviderlocalizationprovider)
-   - [Excepciones](#excepciones)
-   - [Tipos](#tipos)
-   - [Contratos](#contratos)
-5. [Ejemplos de uso](#ejemplos-de-uso)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de diseño](#notas-de-diseño)
-8. [Notas de compatibilidad](#notas-de-compatibilidad)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja](#dónde-encaja)
+  - [Flujo de resolución](#flujo-de-resolución)
+  - [Mapa de archivos](#mapa-de-archivos)
+  - [Disposición de los archivos de traducción](#disposición-de-los-archivos-de-traducción)
+  - [Decisiones de diseño](#decisiones-de-diseño)
+- [Referencia de API](#referencia-de-api)
+  - [`TranslationLoader`](#translationloader)
+  - [`TranslationRepository`](#translationrepository)
+  - [`Translator`](#translator)
+  - [`LocalizationManager`](#localizationmanager)
+  - [`LocalizationProvider`](#localizationprovider)
+  - [Excepciones](#excepciones)
+  - [Alias de tipos](#alias-de-tipos)
+  - [Contratos](#contratos)
+  - [Claves de configuración](#claves-de-configuración)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [Pila de traducción independiente](#pila-de-traducción-independiente)
+  - [Archivos agrupados y formas plurales](#archivos-agrupados-y-formas-plurales)
+  - [Manejo de errores](#manejo-de-errores)
+  - [Claves ausentes e invalidación de caché](#claves-ausentes-e-invalidación-de-caché)
+  - [Dentro del framework](#dentro-del-framework)
+  - [Plantillas](#plantillas)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
----
+## Descripción funcional
 
-## Requisitos
+`orionis.localization` convierte un directorio de archivos JSON en líneas
+traducidas para el locale activo. Tiene cuatro responsabilidades: leer las
+fuentes de traducción desde disco, cachearlas en memoria por locale, resolver
+una clave (locale activo → locale de respaldo → la propia clave) y seleccionar
+la forma plural adecuada para una cantidad.
 
-No se requiere ninguna instalación adicional a la del propio framework:
+### Dónde encaja
 
-```bash
-pip install orionis
-```
+| Vecino | Relación |
+| --- | --- |
+| `orionis.foundation.application` | Aporta `config("app.locale")`, `config("app.fallback_locale")`, `config("app.language_path")` y `basePath`, que consume `LocalizationManager`. |
+| `orionis.container.providers.service_provider` | Clase base de `LocalizationProvider`. |
+| `orionis.foundation.core_providers` | Registra `LocalizationProvider` en `CORE_PROVIDERS`. |
+| `orionis.support.facades.lang.Lang` | Fachada cuyo accessor es `ITranslator`; la fija `LocalizationProvider.boot()`. |
+| `orionis.view.globals.lang` | Construye los globals de plantilla `trans`, `__`, `choice`, `locale` y `locales` sobre la fachada `Lang`. |
+| `msgspec` | Decodifica cada archivo de traducción (`msgspec.json.decode`). |
 
-- **Python:** 3.14 o superior.
-- **Dependencia en tiempo de ejecución:** [`msgspec`](https://pypi.org/project/msgspec/)
-  (`msgspec>=0.21.1`, dependencia central y no opcional del framework) es
-  usada por `TranslationLoader` para decodificar los archivos JSON de
-  traducción con el máximo rendimiento posible.
-- Las fuentes de traducción son simples **archivos JSON** ubicados bajo el
-  directorio configurado en `app.language_path` (ver
-  [Descripción funcional del módulo](#descripción-funcional-del-módulo)).
-  No se requiere ningún otro paso de instalación.
-
-## Descripción funcional del módulo
-
-Cualquier aplicación que sirva más de un idioma necesita tres cosas: un
-lugar de donde leer el texto traducido, una forma rápida de evitar releer
-ese texto en cada petición, y una manera de interpolar valores y elegir
-entre formas singular y plural. `orionis.localization` ofrece las tres
-cosas, divididas en colaboradores pequeños y de responsabilidad única:
-
-- **`TranslationLoader`** lee las fuentes de traducción de un locale dado
-  desde disco y devuelve un `dict[str, str]` plano. Soporta dos formatos de
-  archivo:
-  - **Archivos raíz** — `{language_path}/{locale}.json` — cuyas claves son
-    el **texto fuente literal** (estilo Laravel de "cadenas de traducción
-    como claves"), p. ej. `{"Welcome back": "Bienvenido de nuevo"}`.
-  - **Archivos agrupados** — `{language_path}/{locale}/{group}.json` —
-    aplanados en claves con notación de punto como `validation.required`.
-  - Ante colisiones de claves, **gana el archivo raíz** sobre los archivos
-    agrupados (las entradas raíz se fusionan al final).
-  - El loader en sí **no mantiene caché** — cada llamada a `load()` vuelve a
-    leer los archivos desde disco.
-- **`TranslationRepository`** envuelve un loader con una caché en memoria
-  indexada por locale, de modo que el mapa de traducciones de cada locale se
-  lee de disco **como máximo una vez** por instancia del repositorio.
-- **`Translator`** es el punto de entrada principal que usan las
-  aplicaciones: resuelve una clave de traducción contra el locale activo
-  (recurriendo a un locale de respaldo configurado, y luego a la propia
-  clave), sustituye placeholders `:name` y selecciona un segmento
-  pluralizado mediante `choice()`.
-- **`LocalizationManager`** lee `app.locale`, `app.fallback_locale` y
-  `app.language_path` de la configuración de la aplicación y conecta el
-  loader, el repositorio y el traductor, cacheando una única instancia
-  compartida de `Translator`.
-- **`LocalizationProvider`** es el `ServiceProvider` del framework que
-  registra `ILocalizationManager` como singleton, construye el traductor en
-  el arranque, lo vincula bajo `ITranslator` y "fija" (pin) la fachada `Lang`
-  (`orionis.support.facades.lang.Lang`, fuera de este módulo) para un acceso
-  a atributos sin sobrecarga a partir de ese momento.
-
-## Arquitectura
+### Flujo de resolución
 
 ```mermaid
-graph TD
+graph LR
     A[app.locale / app.fallback_locale / app.language_path] --> B[LocalizationManager]
     B -->|construye| C[TranslationLoader]
     B -->|construye| D[TranslationRepository]
     B -->|construye| E[Translator]
-    C --> D
-    D --> E
-    F[LocalizationProvider] -->|register singleton| B
-    F -->|boot: vincula ITranslator + fija fachada| G[Fachada Lang]
-    G -->|resuelve| E
+    C -->|carga por locale| D
+    D -->|TranslationMap cacheado| E
+    F[LocalizationProvider] -->|register| B
+    F -->|boot: bind ITranslator + pin| G[Fachada Lang]
+    G --> E
 ```
 
-- `LocalizationManager` (`orionis/localization/manager.py`) es el único
-  colaborador que interactúa con el contenedor/configuración de la
-  aplicación; `Translator`, `TranslationRepository` y `TranslationLoader`
-  son clases simples, agnósticas de DI, que solo necesitan los argumentos
-  pasados a sus constructores.
-- `LocalizationProvider` (`orionis/localization/provider.py`) es un
-  `ServiceProvider` del framework (de
-  `orionis.container.providers.service_provider`). En `register()` vincula
-  `ILocalizationManager` → `LocalizationManager` como singleton; en
-  `boot()` resuelve el manager, llama a `manager.translator()`, vincula el
-  resultado bajo `ITranslator`, y fija la fachada `Lang`.
-- Cada clase concreta implementa un contrato equivalente en
-  `orionis/localization/contracts/` (`ITranslationLoader`,
-  `ITranslationRepository`, `ITranslator`, `ILocalizationManager`), cada uno
-  en su propio archivo; `contracts/__init__.py` los reexporta todos.
-- Los globals de plantillas Jinja2 (`__`, `trans`, `choice`, `locale`,
-  `locales`) se configuran en `orionis.view.helpers.lang` (fuera de este
-  módulo) a través de la fachada `Lang` fijada — este módulo solo provee
-  el motor de traducción subyacente.
+Una llamada a `get()` recorre la cadena en este orden:
+
+1. Validar el locale cuando se pasa explícitamente (`InvalidLocaleException`
+   si falla).
+2. Pedir al repositorio el mapa de traducciones del locale destino; el
+   repositorio solo lee de disco cuando falla la caché.
+3. Si la clave no existe y el destino no es el locale de respaldo, repetir la
+   búsqueda contra el locale de respaldo.
+4. Si la clave sigue sin aparecer, invocar el manejador de claves ausentes;
+   si no hay ninguno, o no devuelve un `str`, se usa la propia clave.
+5. Sustituir los marcadores cuando se han pasado parámetros por palabra clave.
+
+### Mapa de archivos
+
+| Archivo | Contenido |
+| --- | --- |
+| `__init__.py` | Reexporta las cuatro excepciones más `TranslationLoader`, `TranslationRepository`, `Translator` y `LocalizationManager`. |
+| `loader.py` | `TranslationLoader`: lee y aplana las fuentes JSON, descubre locales. |
+| `repository.py` | `TranslationRepository`: caché en memoria indexada por locale. |
+| `translator.py` | `Translator`: búsqueda, respaldo, marcadores, pluralización y validación de locale. |
+| `manager.py` | `LocalizationManager`: arma la pila desde la configuración de la aplicación. |
+| `provider.py` | `LocalizationProvider`: bindings del contenedor y fijado de la fachada. |
+| `exceptions.py` | `TranslationException` y sus tres especializaciones. |
+| `types.py` | Alias PEP 695 `TranslationMap`, `LocaleCache`, `MissingKeyHandler`. |
+| `contracts/` | `ITranslationLoader`, `ITranslationRepository`, `ITranslator`, `ILocalizationManager`. |
+
+### Disposición de los archivos de traducción
+
+Bajo la ruta de idiomas configurada conviven dos disposiciones:
+
+```text
+resources/lang/
+├── en.json                 # archivo raíz: las claves son el texto literal
+├── es.json
+└── es/                     # archivos agrupados: prefijados con el nombre base
+    ├── validation.json     # -> "validation.required"
+    └── auth.json           # -> "auth.failed"
+```
+
+- Los archivos agrupados se mezclan primero, en el orden `sorted()` de su
+  nombre, y los objetos anidados se aplanan con notación de punto
+  (`{"size": {"string": "..."}}` dentro de `validation.json` se convierte en
+  `validation.size.string`).
+- El archivo raíz se mezcla al final, así que **las entradas raíz ganan** ante
+  una colisión de claves. Un objeto anidado declarado en el archivo raíz se
+  aplana bajo su propia clave.
+- Las hojas que no son cadenas se almacenan como `str(value)`.
+
+### Decisiones de diseño
+
+- Cada colaborador implementa un ABC de `contracts/` que declara
+  `__slots__ = ()`, y cada clase concreta declara sus propios `__slots__`, de
+  modo que las instancias no arrastran `__dict__`.
+- El loader no cachea y el repositorio no hace E/S: cachear y leer son
+  deliberadamente objetos distintos.
+- `Translator` es el único límite que valida códigos de locale, lo que
+  mantiene el path traversal fuera del loader y del repositorio.
+- `LocalizationManager` es la única clase que conoce el contenedor de la
+  aplicación; las otras tres son objetos simples construidos con los
+  argumentos de su constructor.
+- `manager.py` **no** usa `from __future__ import annotations` a propósito: el
+  contenedor resuelve las dependencias del constructor a partir de
+  anotaciones evaluadas (documentado en el docstring de la clase).
+- Todo el módulo es síncrono; el único `async def` es
+  `LocalizationProvider.boot()`.
 
 ## Referencia de API
 
-### `TranslationLoader` (`orionis.localization.loader.TranslationLoader`)
+### `TranslationLoader`
+
+`orionis/localization/loader.py` — implementa `ITranslationLoader`,
+`__slots__ = ("_path",)`.
 
 ```python
-class TranslationLoader(ITranslationLoader):
-    __slots__ = ("_path",)
-    def __init__(self, path: Path) -> None: ...
+def __init__(self, path: Path) -> None: ...
+def load(self, locale: str) -> TranslationMap: ...
+def availableLocales(self) -> tuple[str, ...]: ...
 ```
 
-Lee las fuentes de traducción de un locale directamente desde disco. No
-mantiene caché.
+**`__init__(path)`** — `path` es el directorio absoluto (o ya resuelto) que
+contiene las fuentes de traducción. Se guarda tal cual; el loader nunca lo
+crea.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `load` | `(locale: str) -> TranslationMap` | Fusiona primero los archivos agrupados `{path}/{locale}/{group}.json` (aplanados como `group.key`) y luego el archivo raíz `{path}/{locale}.json` (claves literales) — las entradas raíz ganan en caso de colisión. Devuelve `{}` si no existe nada para el locale. |
-| `availableLocales` | `() -> tuple[str, ...]` | Tupla ordenada de todos los locales descubiertos a partir de archivos raíz `*.json` y subdirectorios agrupados que contienen al menos un archivo `*.json`. Devuelve `()` si el directorio de idiomas no existe. |
+**`load(locale)`** — devuelve un `dict[str, str]` plano que mezcla
+`{path}/{locale}/*.json` (aplanado, ordenado por nombre de archivo) y
+`{path}/{locale}.json` (mezclado al final, por lo que gana en colisiones).
+Devuelve un mapa vacío cuando no existe ninguna fuente. Cada llamada relee el
+disco: el loader no tiene caché.
 
-**Lanza:**
+- Lanza `TranslationSyntaxException` cuando un archivo no está codificado en
+  UTF-8, no es JSON válido o su elemento raíz no es un objeto JSON.
+- Lanza `TranslationFileNotFoundException` desde la guarda del método privado
+  `__readFile` cuando un archivo desaparece entre el descubrimiento y la
+  lectura.
+- Efectos secundarios: lecturas bloqueantes del sistema de archivos
+  (`Path.is_dir`, `Path.glob`, `Path.is_file`, `Path.read_bytes`).
 
-- `TranslationFileNotFoundException` — si un archivo se elimina entre el
-  descubrimiento y la lectura (protección ante condición de carrera).
-- `TranslationSyntaxException` — si un archivo contiene JSON inválido, o su
-  elemento raíz no es un objeto JSON.
+**`availableLocales()`** — recorre un solo nivel de directorio y devuelve los
+códigos de locale ordenados: el nombre base de cada archivo `*.json` más el
+nombre de cada directorio que contenga al menos un `*.json`. Devuelve `()`
+cuando la ruta configurada no es un directorio.
 
-### `TranslationRepository` (`orionis.localization.repository.TranslationRepository`)
+### `TranslationRepository`
+
+`orionis/localization/repository.py` — implementa `ITranslationRepository`,
+`__slots__ = ("_cache", "_loader")`.
 
 ```python
-class TranslationRepository(ITranslationRepository):
-    __slots__ = ("_cache", "_loader")
-    def __init__(self, loader: ITranslationLoader) -> None: ...
+def __init__(self, loader: ITranslationLoader) -> None: ...
+def get(self, locale: str) -> TranslationMap: ...
+def has(self, locale: str) -> bool: ...
+def forget(self, locale: str) -> bool: ...
+def flush(self) -> None: ...
+def loadedLocales(self) -> tuple[str, ...]: ...
 ```
 
-Caché en memoria de mapas de traducción indexados por locale; cada locale
-se carga desde disco **exactamente una vez**.
+**`get(locale)`** — devuelve el mapa de traducciones cacheado, cargándolo a
+través del loader en la primera petición. Los resultados vacíos también se
+cachean, así que un locale desconocido se lee de disco una sola vez. El objeto
+devuelto es el propio `dict` cacheado, no una copia. Propaga cualquier
+excepción lanzada por el loader.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `get` | `(locale: str) -> TranslationMap` | Devuelve el mapa cacheado, cargándolo mediante el loader si hay un fallo de caché (cache miss). |
-| `has` | `(locale: str) -> bool` | `True` si `locale` ya está cacheado (**no** dispara una carga). |
-| `forget` | `(locale: str) -> bool` | Elimina la entrada de caché de `locale`. Devuelve `True` si se eliminó una entrada. |
-| `flush` | `() -> None` | Vacía toda la caché. |
-| `loadedLocales` | `() -> tuple[str, ...]` | Locales actualmente presentes en la caché. |
+**`has(locale)`** — `True` cuando el locale ya está en la caché; nunca dispara
+una carga.
 
-### `Translator` (`orionis.localization.translator.Translator`)
+**`forget(locale)`** — elimina una entrada de caché y devuelve `True` cuando
+se eliminó algo, `False` en caso contrario.
+
+**`flush()`** — limpia todas las entradas de la caché.
+
+**`loadedLocales()`** — códigos de locale cacheados en orden de inserción.
+
+### `Translator`
+
+`orionis/localization/translator.py` — implementa `ITranslator`,
+`__slots__ = ("_fallback", "_loader", "_locale", "_missing", "_repository")`.
 
 ```python
-class Translator(ITranslator):
-    __slots__ = ("_fallback", "_loader", "_locale", "_missing", "_repository")
-    def __init__(
-        self, *, locale: str, fallback: str,
-        loader: ITranslationLoader, repository: ITranslationRepository,
-    ) -> None: ...
+def __init__(
+    self,
+    *,
+    locale: str,
+    fallback: str,
+    loader: ITranslationLoader,
+    repository: ITranslationRepository,
+) -> None: ...
+def get(self, key: str, locale: str | None = None, **replace: object) -> str: ...
+def has(
+    self,
+    key: str,
+    locale: str | None = None,
+    *,
+    fallback: bool = True,
+) -> bool: ...
+def choice(
+    self,
+    key: str,
+    count: int,
+    locale: str | None = None,
+    **replace: object,
+) -> str: ...
+def setLocale(self, locale: str) -> None: ...
+def getLocale(self) -> str: ...
+def availableLocales(self) -> tuple[str, ...]: ...
+def reload(self, locale: str | None = None) -> None: ...
+def forget(self, locale: str) -> bool: ...
+def flush(self) -> None: ...
+def missing(self, handler: MissingKeyHandler | None) -> None: ...
 ```
 
-La API principal orientada al consumidor. Lanza `InvalidLocaleException`
-desde `__init__` si `locale` o `fallback` está mal formado.
+**Constructor** — solo admite argumentos por palabra clave. `locale` y
+`fallback` se validan de inmediato y lanzan `InvalidLocaleException` si están
+mal formados. `loader` solo se usa en `availableLocales()`; todas las búsquedas
+pasan por `repository`.
 
-**Resolución de traducciones**
+**Validación de locale** — se acepta un locale cuando es `str` y coincide con
+`^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$` (por ejemplo `en`, `en_US`, `en-US`,
+`zh-Hant-TW`). Cualquier otra cosa — cadena vacía, `../etc`, `es/es`,
+`es.json`, un valor que no sea cadena — lanza `InvalidLocaleException`. La
+comprobación se ejecuta en el constructor, en `setLocale`, en `forget`, en
+`reload` cuando se indica un locale, y en `get`/`has`/`choice` cuando se pasa
+un `locale=` explícito.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `get` | `(key: str, locale: str \| None = None, **replace: object) -> str` | Busca `key` en `locale` (o el locale activo), luego en el locale de respaldo, y finalmente recurre al handler de claves faltantes o a la propia clave. Sustituye placeholders `:name` a partir de `**replace` cuando se proporcionan. |
-| `has` | `(key: str, locale: str \| None = None, *, fallback: bool = True) -> bool` | `True` si existe una línea de traducción registrada para `key`. Usa `fallback=False` para omitir la comprobación del locale de respaldo. |
-| `choice` | `(key: str, count: int, locale: str \| None = None, **replace: object) -> str` | Resuelve `key` vía `get()`, lo divide por `\|` en segmentos plurales, selecciona el segmento correspondiente (ver [reglas de pluralización](#reglas-de-pluralización)), y siempre expone un placeholder `:count` igual a `count` (salvo que se sobrescriba explícitamente en `**replace`). |
+**`get(key, locale=None, **replace)`** — resuelve `key` contra el locale
+destino, luego contra el de respaldo, luego con el manejador de claves
+ausentes y finalmente devuelve la propia clave. La sustitución de marcadores
+solo se ejecuta cuando `replace` no está vacío. Por cada parámetro, procesado
+del nombre más largo al más corto, se reemplazan tres variantes:
 
-**Gestión de locales**
-
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `setLocale` | `(locale: str) -> None` | Cambia el locale activo. Lanza `InvalidLocaleException` si está mal formado. |
-| `getLocale` | `() -> str` | Devuelve el locale activo. |
-| `availableLocales` | `() -> tuple[str, ...]` | Delega en `loader.availableLocales()`. |
-
-**Gestión de caché**
-
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `reload` | `(locale: str \| None = None) -> None` | Descarta la caché de `locale`, o toda la caché si `locale is None`, forzando una nueva lectura desde disco en el próximo acceso. |
-| `forget` | `(locale: str) -> bool` | Descarta la caché de un único locale. Devuelve `True` si se eliminó una entrada. |
-| `flush` | `() -> None` | Descarta toda la caché. |
-| `missing` | `(handler: MissingKeyHandler \| None) -> None` | Registra un invocable `(key: str, locale: str) -> str \| None` que se llama cuando una clave no puede resolverse; si devuelve `None` (o no hay handler registrado), se usa la propia clave como traducción. |
-
-Todos los parámetros de locale se validan con la misma expresión regular
-usada internamente (`^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$`); un código
-inválido lanza `InvalidLocaleException` en cualquier método que acepte un
-locale.
-
-#### Sustitución de placeholders
-
-Los placeholders `:name` se sustituyen usando tres variantes de
-mayúsculas/minúsculas, aplicadas desde el **nombre de parámetro más largo al
-más corto** (así `:name` nunca queda "tapado" por un placeholder más corto
-como `:na` definido al mismo tiempo):
-
-- `:name` → el valor en su forma de cadena original.
-- `:Name` → el valor capitalizado (`str.capitalize()`).
-- `:NAME` → el valor en mayúsculas.
-
-#### Reglas de pluralización
-
-`choice(key, count)` divide la línea resuelta por `|` en segmentos y elige
-uno, en este orden:
-
-1. **Condición exacta explícita** — un segmento prefijado con
-   `{condición}`, p. ej. `{0} no hay manzanas|{1} una manzana|{*} :count manzanas`.
-   `{*}` siempre coincide; `{n}` coincide solo cuando `count == n`.
-2. **Condición de rango explícita** — un segmento prefijado con
-   `[min,max]`, p. ej. `[2,4] pocas manzanas|[5,*] muchas manzanas`.
-   Cualquiera de los límites puede ser `*` (sin límite en ese lado).
-3. **Recurso posicional** — si ninguna condición explícita coincide: se
-   usa el **primer** segmento cuando `count == 1`, y el **segundo** en
-   cualquier otro caso. Una línea con un único segmento siempre se
-   devuelve tal cual.
-
-### `LocalizationManager` (`orionis.localization.manager.LocalizationManager`)
-
-```python
-class LocalizationManager(ILocalizationManager):
-    __slots__ = ("_app", "_translator")
-    def __init__(self, app: IApplication) -> None: ...
-```
-
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `translator` | `() -> ITranslator` | Devuelve el `Translator` compartido, construyéndolo en la primera llamada a partir de `app.config("app.locale")` (por defecto `"en"`), `app.config("app.fallback_locale")` (por defecto: el locale resuelto), y `app.config("app.language_path")` (por defecto `"resources/lang/"`, resuelto contra `app.basePath` si es relativo). Lanza `InvalidLocaleException` si el locale/respaldo configurado está mal formado. |
-
-### `LocalizationProvider` (`orionis.localization.provider.LocalizationProvider`)
-
-```python
-class LocalizationProvider(ServiceProvider):
-    def register(self) -> None: ...
-    async def boot(self) -> None: ...
-```
-
-| Método | Descripción |
+| Marcador | Se sustituye por |
 | --- | --- |
-| `register()` | Vincula `ILocalizationManager` → `LocalizationManager` como singleton mediante `self.app.singleton(...)`. |
-| `boot()` | Resuelve `ILocalizationManager` (`await self.app.make(...)`), llama a `manager.translator()`, vincula el resultado bajo `ITranslator` mediante `self.app.instance(...)`, y fija la fachada `Lang` (`await LangFacade.pin()`) para un acceso directo a atributos sin DI a partir de ese momento. |
+| `:NAME` | `str(value).upper()` |
+| `:Name` | `str(value).capitalize()` |
+| `:name` | `str(value)` |
+
+Ordenar por longitud evita que `:name` eclipse a `:name_full`.
+
+**`has(key, locale=None, *, fallback=True)`** — comprueba el locale destino y,
+salvo que `fallback=False` o que el destino ya sea el locale de respaldo,
+también el de respaldo.
+
+**`choice(key, count, locale=None, **replace)`** — resuelve la línea con
+`get(key, locale)` (sin sustituciones) y la divide por `|`. Los segmentos se
+seleccionan en este orden:
+
+1. **Condición exacta explícita** `{n}` — coincide cuando `n` es igual a
+   `count`; `{*}` coincide con cualquier cantidad.
+2. **Condición de rango explícita** `[a,b]` — coincide cuando `count >= a` y
+   `count <= b`; cualquiera de los límites puede ser `*`. Los límites no
+   numéricos nunca coinciden.
+3. **Regla posicional** — el primer segmento cuando hay un único segmento o
+   `count == 1`, y el segundo en cualquier otro caso. Se elimina cualquier
+   condición explícita que siguiera presente.
+
+El segmento seleccionado se recorta con `str.strip()`, `count` siempre queda
+disponible como marcador `:count` y los parámetros extra se sustituyen con las
+mismas reglas que en `get()`.
+
+`count` se usa exactamente como se recibe: las condiciones explícitas lo
+comparan contra sus límites numéricos y la regla posicional evalúa
+`count == 1`. No se aplica conversión ni validación, así que una cantidad no
+numérica propaga el `TypeError` de comparación que lanza Python.
+
+**`setLocale(locale)` / `getLocale()`** — cambian y leen el locale activo. La
+instancia vinculada a `ITranslator` se comparte en todo el proceso, así que
+`setLocale` afecta a todas las búsquedas posteriores de todas las tareas.
+
+**`availableLocales()`** — delega en `loader.availableLocales()`.
+
+**`reload(locale=None)`** — `flush()` sobre el repositorio cuando
+`locale is None`; en caso contrario, `forget(locale)`.
+
+**`forget(locale)` / `flush()`** — validan (solo `forget`) y delegan en el
+repositorio.
+
+**`missing(handler)`** — registra un `Callable[[str, str], str | None]` que se
+invoca con `(clave, locale_destino)` cuando una clave no puede resolverse. Su
+valor de retorno solo se usa si es un `str`; cualquier otra cosa (incluido
+`None`) hace que se devuelva la clave. Pasar `None` elimina el manejador.
+
+### `LocalizationManager`
+
+`orionis/localization/manager.py` — implementa `ILocalizationManager`,
+`__slots__ = ("_app", "_translator")`.
+
+```python
+def __init__(self, app: IApplication) -> None: ...
+def translator(self) -> ITranslator: ...
+```
+
+**`translator()`** — construye el translator en la primera llamada y lo
+cachea, de modo que toda la aplicación comparte un translator y una caché de
+traducciones. El método privado `__buildTranslator` lee:
+
+| Ajuste | Respaldo aplicado por el manager |
+| --- | --- |
+| `app.locale` | `"en"` |
+| `app.fallback_locale` | el `locale` ya resuelto |
+| `app.language_path` | `"resources/lang/"` |
+
+Los valores se convierten con `str(...)`. Una ruta de idiomas relativa se
+resuelve contra `app.basePath`; una ruta absoluta se usa tal cual. Lanza
+`InvalidLocaleException` cuando el locale configurado o el de respaldo están
+mal formados.
+
+### `LocalizationProvider`
+
+`orionis/localization/provider.py` — extiende
+`orionis.container.providers.service_provider.ServiceProvider`.
+
+```python
+def register(self) -> None: ...
+async def boot(self) -> None: ...
+```
+
+**`register()`** — vincula `ILocalizationManager` → `LocalizationManager` como
+singleton. No se vincula nada más en esta fase.
+
+**`boot()`** — resuelve `ILocalizationManager`, llama a `manager.translator()`,
+vincula la instancia resultante bajo `ITranslator` con `app.instance(...)` y
+espera `Lang.pin()` para que el acceso a atributos de la fachada sea directo.
+
+El provider figura en `orionis.foundation.core_providers.CORE_PROVIDERS` y no
+es diferible. `register()` se ejecuta durante `Application.create()`; `boot()`
+se ejecuta después, cuando arranca el runtime HTTP o CLI. Por eso, en un script
+que solo importa `bootstrap.app`, `ITranslator` **no** está vinculado todavía y
+la fachada `Lang` **no** está fijada — véase
+[Dentro del framework](#dentro-del-framework).
 
 ### Excepciones
 
-Todas definidas en `orionis.localization.exceptions`, y todas heredan de
-`TranslationException(Exception)`:
+`orionis/localization/exceptions.py`.
 
 | Excepción | Se lanza cuando |
 | --- | --- |
-| `TranslationException` | Clase base de todo error de localización. |
-| `InvalidLocaleException` | Un código de locale está vacío, mal formado o no es seguro (falla la expresión regular de locale). |
-| `TranslationFileNotFoundException` | No se encuentra un archivo de traducción en disco (condición de carrera entre el descubrimiento y la lectura). |
-| `TranslationSyntaxException` | Un archivo de traducción contiene JSON inválido, o su elemento raíz no es un objeto JSON. |
+| `TranslationException(Exception)` | Clase base; nunca se lanza directamente. |
+| `InvalidLocaleException` | Un código de locale está vacío, mal formado, no es cadena o es inseguro para usarse en rutas. Solo la lanza `Translator`. |
+| `TranslationFileNotFoundException` | Un archivo de traducción no existe cuando `TranslationLoader.__readFile` lo abre (carrera entre descubrimiento y lectura). |
+| `TranslationSyntaxException` | Un archivo de traducción no está codificado en UTF-8, contiene JSON inválido, o su elemento raíz no es un objeto JSON. |
 
-### Tipos
+Las cuatro se reexportan desde `orionis.localization`.
 
-Definidos en `orionis.localization.types` usando alias `type` de PEP 695:
+### Alias de tipos
 
-| Alias | Definición | Descripción |
-| --- | --- | --- |
-| `TranslationMap` | `dict[str, str]` | Mapa plano de clave de traducción → texto traducido para un locale. |
-| `LocaleCache` | `dict[str, TranslationMap]` | Asocia un código de locale con su mapa de traducciones. |
-| `MissingKeyHandler` | `Callable[[str, str], str \| None]` | Handler invocado con `(key, locale)` ante una clave faltante; puede devolver una línea de reemplazo o `None`. |
+`orionis/localization/types.py`, declarados con sentencias `type` de PEP 695.
+
+```python
+type TranslationMap = dict[str, str]
+type LocaleCache = dict[str, TranslationMap]
+type MissingKeyHandler = Callable[[str, str], str | None]
+```
+
+`Callable` se importa en tiempo de ejecución (no bajo `TYPE_CHECKING`) para que
+`MissingKeyHandler.__value__` pueda evaluarse desde herramientas de
+introspección.
 
 ### Contratos
 
-Un archivo por interfaz en `orionis.localization.contracts`, todos
-reexportados desde `contracts/__init__.py`:
+`orionis/localization/contracts/` — cuatro clases `abc.ABC`, cada una con
+`__slots__ = ()`; `contracts/__init__.py` las reexporta todas.
 
-| Contrato | Implementado por |
+| Contrato | Métodos abstractos |
 | --- | --- |
-| `ITranslationLoader` | `TranslationLoader` |
-| `ITranslationRepository` | `TranslationRepository` |
-| `ITranslator` | `Translator` |
-| `ILocalizationManager` | `LocalizationManager` |
+| `ITranslationLoader` | `load`, `availableLocales` |
+| `ITranslationRepository` | `get`, `has`, `forget`, `flush`, `loadedLocales` |
+| `ITranslator` | `get`, `has`, `choice`, `setLocale`, `getLocale`, `availableLocales`, `reload`, `forget`, `flush`, `missing` |
+| `ILocalizationManager` | `translator` |
+
+### Claves de configuración
+
+Las lee `LocalizationManager` mediante `app.config(...)`; se declaran en
+`config/app.py`.
+
+| Clave | Variable de entorno | Valor por defecto |
+| --- | --- | --- |
+| `app.locale` | `APP_LOCALE` | `en` |
+| `app.fallback_locale` | `APP_FALLBACK_LOCALE` | `en` |
+| `app.language_path` | `APP_LANGUAGE_PATH` | `resources/lang/` |
 
 ## Ejemplos de uso
 
-### Configuración de los archivos de traducción
+### Pila de traducción independiente
 
-```
-resources/lang/
-├── en.json                 # archivo raíz: texto fuente literal como claves
-├── es.json
-├── en/
-│   └── validation.json     # archivo agrupado: aplanado como "validation.<clave>"
-└── es/
-    └── validation.json
-```
-
-```json
-// resources/lang/en.json
-{"Welcome back, :name!": "Welcome back, :name!"}
-```
-
-```json
-// resources/lang/es.json
-{"Welcome back, :name!": "¡Bienvenido de nuevo, :name!"}
-```
-
-```json
-// resources/lang/en/validation.json
-{"required": "The :field field is required.|The :field fields are required."}
-```
-
-### Usar `Translator` directamente
+Cablear los tres colaboradores a mano, sin contenedor de aplicación.
 
 ```python
 from pathlib import Path
@@ -343,144 +424,284 @@ translator = Translator(
     repository=repository,
 )
 
-translator.get("Welcome back, :name!", name="Ada")
-# "¡Bienvenido de nuevo, Ada!"
-
-translator.has("Welcome back, :name!")   # True
-translator.setLocale("en")
-translator.getLocale()                   # "en"
-translator.availableLocales()            # ("en", "es")
+print(translator.get("Welcome"))
+print(translator.get("Hello :name", name="Carlos"))
+print(translator.choice("There is one apple|There are :count apples", 1))
+print(translator.choice("There is one apple|There are :count apples", 5))
+print(translator.availableLocales())
+print(translator.has("Welcome"), translator.has("Missing key"))
 ```
 
-### Pluralización con `choice`
-
-```python
-translator.setLocale("en")
-translator.choice("validation.required", 1, field="name")
-# "The name field is required."
-translator.choice("validation.required", 3, field="name")
-# "The name fields are required."
+```text
+Bienvenido
+Hello Carlos
+There is one apple
+There are 5 apples
+('en', 'es')
+True False
 ```
 
-### Manejo de claves faltantes y control de caché
+`"Hello :name"` no está declarada en `resources/lang`, así que se devuelve la
+propia clave y solo se sustituye el marcador.
+
+### Archivos agrupados y formas plurales
 
 ```python
-translator.missing(lambda key, locale: f"[missing: {key}]")
-translator.get("no.such.key")   # "[missing: no.such.key]"
+import tempfile
+from pathlib import Path
+from orionis.localization import TranslationLoader, TranslationRepository, Translator
 
-translator.reload("es")   # fuerza a releer "es" desde disco
-translator.flush()        # descarta todos los locales cacheados
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "es").mkdir()
+    (root / "es" / "validation.json").write_text(
+        '{"required": "El campo :attribute es obligatorio",'
+        ' "size": {"string": "Maximo :max caracteres"}}',
+        encoding="utf-8",
+    )
+    (root / "es.json").write_text('{"Save": "Guardar"}', encoding="utf-8")
+
+    loader = TranslationLoader(root)
+    print(loader.load("es"))
+
+    translator = Translator(
+        locale="es",
+        fallback="es",
+        loader=loader,
+        repository=TranslationRepository(loader),
+    )
+    print(translator.get("validation.required", attribute="email"))
+    print(translator.get("validation.size.string", max=10))
+    print(translator.choice("{0} Sin archivos|{1} Un archivo|[2,*] :count archivos", 0))
+    print(translator.choice("{0} Sin archivos|{1} Un archivo|[2,*] :count archivos", 4))
 ```
 
-### A través del contenedor de la aplicación (gestionado por el framework)
+```text
+{'validation.required': 'El campo :attribute es obligatorio', 'validation.size.string': 'Maximo :max caracteres', 'Save': 'Guardar'}
+El campo email es obligatorio
+Maximo 10 caracteres
+Sin archivos
+4 archivos
+```
+
+### Manejo de errores
 
 ```python
+import tempfile
+from pathlib import Path
+from orionis.localization import (
+    InvalidLocaleException,
+    TranslationLoader,
+    TranslationRepository,
+    TranslationSyntaxException,
+    Translator,
+)
+
+loader = TranslationLoader(Path("resources/lang"))
+translator = Translator(
+    locale="en",
+    fallback="en",
+    loader=loader,
+    repository=TranslationRepository(loader),
+)
+
+try:
+    translator.setLocale("../etc/passwd")
+except InvalidLocaleException as exc:
+    print(f"{type(exc).__name__}: {exc}")
+
+with tempfile.TemporaryDirectory() as tmp:
+    (Path(tmp) / "es.json").write_text("{broken", encoding="utf-8")
+    try:
+        TranslationLoader(Path(tmp)).load("es")
+    except TranslationSyntaxException as exc:
+        print(type(exc).__name__)
+```
+
+```text
+InvalidLocaleException: Invalid locale code: '../etc/passwd'
+TranslationSyntaxException
+```
+
+Ambas excepciones derivan de `TranslationException`, así que una sola cláusula
+`except TranslationException` atrapa cualquier fallo de localización.
+
+### Claves ausentes e invalidación de caché
+
+```python
+import tempfile
+from pathlib import Path
+from orionis.localization import TranslationLoader, TranslationRepository, Translator
+
+missing_keys = []
+
+
+def report(key: str, locale: str) -> str | None:
+    """Collect untranslated keys and let the translator echo them."""
+    missing_keys.append((key, locale))
+    return None
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "es.json").write_text('{"Save": "Guardar"}', encoding="utf-8")
+
+    loader = TranslationLoader(root)
+    repository = TranslationRepository(loader)
+    translator = Translator(
+        locale="es",
+        fallback="es",
+        loader=loader,
+        repository=repository,
+    )
+    translator.missing(report)
+
+    print(translator.get("Cancel"), missing_keys)
+    print(repository.loadedLocales())
+
+    (root / "es.json").write_text('{"Save": "Guardar cambios"}', encoding="utf-8")
+    print(translator.get("Save"))
+    translator.reload("es")
+    print(translator.get("Save"))
+```
+
+```text
+Cancel [('Cancel', 'es')]
+('es',)
+Guardar
+Guardar cambios
+```
+
+El segundo `print` muestra la caché en acción: editar el archivo no cambia nada
+hasta que `reload()` descarta el locale cacheado.
+
+### Dentro del framework
+
+Una vez arrancado el runtime HTTP o CLI, `ITranslator` está vinculado y `Lang`
+está fijada, así que `await app.make(ITranslator)` y `Lang.get(...)` funcionan.
+El script siguiente se ejecuta fuera de ese ciclo de vida, donde solo está
+disponible `ILocalizationManager`, y reproduce a mano los dos bindings.
+
+```python
+import asyncio
+from bootstrap.app import app
+from orionis.localization.contracts.manager import ILocalizationManager
+from orionis.localization.contracts.translator import ITranslator
+from orionis.support.facades.lang import Lang
+
+
+async def main() -> None:
+    """Resolve the shared translator through the container."""
+    manager = await app.make(ILocalizationManager)
+    translator = manager.translator()
+    print(translator.get("Welcome", locale="es"))
+    print(translator is manager.translator())
+
+    app.instance(ITranslator, translator)
+    await Lang.pin()
+    print(Lang.get("Welcome", locale="es"))
+    print(Lang.choice("There is one apple|There are :count apples", 5))
+    print(Lang.getLocale(), Lang.availableLocales())
+
+
+asyncio.run(main())
+```
+
+```text
+Bienvenido
+True
+Bienvenido
+There are 5 apples
+es ('en', 'es')
+```
+
+Sin `app.instance(ITranslator, ...)`, `await app.make(ITranslator)` lanza
+`TypeError: Argument 'concrete' must be a class type, got 'ABCMeta' instead.`,
+y un `Lang.get("Welcome")` sin fijar devuelve un objeto `_FacadeDispatch` en
+lugar de una cadena.
+
+En el código de aplicación — controladores, comandos, middleware — se inyecta
+el contrato o se usa la fachada ya fijada:
+
+```python
+from orionis.http import HttpResponse, response
 from orionis.localization.contracts.translator import ITranslator
 
-# Normalmente se resuelve mediante el contenedor de DI una vez que
-# LocalizationProvider ha arrancado (ver orionis.container para `make`/`build`).
-translator: ITranslator = await app.make(ITranslator)
-translator.get("Welcome back, :name!", name="Ada")
+
+class GreetingController:
+
+    async def index(self, translator: ITranslator) -> HttpResponse:
+        """Return a greeting translated into the active locale."""
+        return response.json({"message": translator.get("Welcome")})
 ```
 
-Una vez que `LocalizationProvider.boot()` se ha ejecutado, el mismo
-traductor también es accesible a través de la fachada `Lang` fijada
-(`orionis.support.facades.lang.Lang`, fuera de este módulo) y de los
-globals de Jinja2 `__`, `trans`, `choice`, `locale`, `locales` usados en las
-plantillas de vistas.
+### Plantillas
+
+`orionis.view.provider.ViewServiceProvider.boot()` registra cinco globals de
+Jinja2 construidos en `orionis.view.globals.lang` sobre la fachada `Lang`:
+`trans`, su alias `__`, `choice`, `locale` y `locales`. Aceptan los mismos
+argumentos que los métodos equivalentes del translator.
+
+```jinja
+<html lang="{{ locale() }}">
+  <h1>{{ __("Welcome") }}</h1>
+  <p>{{ trans("Hello :name", name=user.name) }}</p>
+  <p>{{ choice("There is one apple|There are :count apples", basket.size) }}</p>
+  <ul>
+    {% for code in locales() %}<li>{{ code }}</li>{% endfor %}
+  </ul>
+</html>
+```
 
 ## Consideraciones de rendimiento y concurrencia
 
-- **Búsquedas O(1) después de la primera carga**: `TranslationRepository`
-  lee los archivos de cada locale desde disco **como máximo una vez**; cada
-  llamada posterior a `get()` (desde `Translator.get`/`has`/`choice`) es una
-  simple búsqueda en un diccionario.
-- **`TranslationLoader` en sí es sin estado y sin caché** — llamar a
-  `loader.load(locale)` directamente (sin pasar por el repositorio) siempre
-  vuelve a leer de disco y a decodificar el JSON con `msgspec`. En el
-  código de la aplicación, prefiere pasar por
-  `TranslationRepository`/`Translator`.
-- **`__slots__` en todas las clases concretas** (`TranslationLoader`,
-  `TranslationRepository`, `Translator`, `LocalizationManager`) elimina la
-  sobrecarga de `__dict__` por instancia — es una decisión de diseño
-  existente.
-- **Un único `Translator` compartido por aplicación**:
-  `LocalizationManager` construye el traductor una sola vez
-  (`translator()` cachea la instancia en `self._translator`) y
-  `LocalizationProvider` lo vincula como una instancia `ITranslator` en el
-  contenedor, de modo que toda la aplicación comparte una única caché de
-  `TranslationRepository`.
-- **Sin bloqueos alrededor de la caché**: `TranslationRepository._cache` es
-  un `dict` simple sin bloqueo. En el uso normal del framework (manejo de
-  peticiones síncrono respaldado por `asyncio`, sin escritores
-  multi-hilo concurrentes sobre el mismo repositorio), esto no supone un
-  problema; si construyes patrones de acceso concurrente personalizados
-  sobre un `TranslationRepository` compartido, ten en cuenta que las cargas
-  simultáneas de un mismo locale desde distintos hilos no están
-  sincronizadas.
-- **La validación de locale es una comprobación de frontera con expresión
-  regular compilada**, realizada únicamente en `Translator`
-  (`_LOCALE_PATTERN`); `TranslationLoader`/`TranslationRepository` confían
-  en que la cadena de locale que reciben ya ha sido validada por quien la
-  llama (`Translator`).
-- **La decodificación JSON usa `msgspec.json.decode`**, elegido por su
-  rendimiento frente al módulo estándar `json`; esto afecta únicamente a
-  las lecturas de archivo subyacentes de `TranslationLoader.load` y
-  `availableLocales` (no a cada búsqueda cacheada repetida).
-
-## Notas de diseño
-
-- **Colaboradores en capas, de responsabilidad única**: la carga
-  (`TranslationLoader`), el cacheo (`TranslationRepository`) y la
-  resolución/formateo (`Translator`) son intencionalmente clases separadas
-  conectadas por `LocalizationManager`, en lugar de una única clase
-  monolítica — cada una puede probarse, reemplazarse o reutilizarse de
-  forma independiente (el paquete `contracts/` hace explícita esta
-  sustitución).
-- **Superficie de API inspirada en Laravel**: archivos raíz de traducción
-  con texto literal como clave, archivos agrupados con notación de punto,
-  sintaxis de placeholders `:name` con variantes automáticas
-  `:Name`/`:NAME`, y pluralización con `choice()` mediante condiciones
-  `{n}`/`[a,b]`, todo ello reflejando las convenciones de `Lang`/
-  `trans_choice()` de Laravel, adaptadas a Python.
-- **Orden de fusión "gana la raíz"**: dentro de `TranslationLoader.load()`,
-  los archivos agrupados se fusionan primero y el archivo raíz se fusiona
-  al final, específicamente para que las claves de texto literal del
-  archivo raíz tengan precedencia sobre claves agrupadas del mismo nombre —
-  es una regla de colisión deliberada, no un accidente del orden de
-  iteración.
-- **Sin recuperación de excepciones personalizada dentro del loader/repositorio**:
-  solo `Translator` centraliza la validación del código de locale
-  (`InvalidLocaleException` se lanza como comprobación de frontera);
-  `TranslationLoader`/`TranslationRepository` asumen que la cadena de
-  locale ya es válida, manteniendo simple su lógica interna.
-- **`LocalizationManager` requiere anotaciones evaluadas (no en forma de
-  cadena)**: el módulo deliberadamente **no** usa
-  `from __future__ import annotations` (documentado en su propio
-  docstring) porque el contenedor de DI resuelve las dependencias del
-  constructor (`app: IApplication`) a partir de anotaciones de tipo
-  evaluadas vía `orionis.introspection`; anotaciones en forma de cadena
-  romperían la inyección del constructor para esta clase.
-- **Fijado (pin) de la fachada en el arranque**:
-  `LocalizationProvider.boot()` llama a `await LangFacade.pin()` después de
-  vincular `ITranslator`, de modo que las llamadas posteriores a la fachada
-  `Lang` omiten la resolución por contenedor y despachan directamente a la
-  instancia de traductor vinculada.
+- **El disco solo se toca cuando falla la caché.**
+  `TranslationRepository.get()` es una única búsqueda en `dict` una vez que el
+  locale se ha cargado; `TranslationLoader.load()` relee y vuelve a decodificar
+  todos los archivos en cada llamada y es la única operación cara.
+- **E/S bloqueante.** El loader usa llamadas síncronas de `pathlib`. Como el
+  translator se construye normalmente durante `LocalizationProvider.boot()`,
+  ese coste se paga al arrancar y no por petición — salvo que se llame a
+  `reload()`, `forget()` o `flush()` en caliente, lo que devuelve la siguiente
+  carga al hilo del llamante (incluido un event loop de `asyncio`).
+- **Sin locks en ninguna parte.** El módulo no contiene ninguna primitiva de
+  `threading` ni de `asyncio`. Dos tareas concurrentes que fallen la caché del
+  mismo locale pueden llamar ambas a `loader.load()`; gana la última
+  asignación y ambas reciben un mapa válido. Esta garantía está declarada en
+  los docstrings de clase de `TranslationRepository` y `Translator`.
+- **Estado mutable compartido.** `LocalizationProvider` vincula una única
+  instancia de `Translator` para todo el proceso, así que `setLocale()`,
+  `missing()`, `reload()`, `forget()` y `flush()` son efectos globales. Para
+  seleccionar idioma por petición o por llamada, pasar `locale=` a `get`, `has`
+  o `choice` en lugar de cambiar el locale activo.
+- **El mapa cacheado no se copia.** `TranslationRepository.get()` devuelve el
+  propio `dict` cacheado; mutarlo muta la caché para todos los consumidores.
+- **Coste de la sustitución.** Cada parámetro realiza hasta tres pasadas de
+  `str.replace` sobre la línea, y los nombres de parámetro se ordenan en cada
+  llamada que los aporte; las líneas sin parámetros se saltan la sustitución
+  por completo.
+- **Acceso por fachada.** Tras `Lang.pin()` (ejecutado en `boot()`), las
+  llamadas a la fachada son acceso directo y síncrono a atributos, sin
+  resolución del contenedor.
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14 (según `pyproject.toml`,
-  `requires-python = ">=3.14"`), igual que el resto del framework. El
-  módulo `types.py` usa la sentencia `type` de PEP 695, que requiere esta
-  versión.
-- **Dependencia obligatoria:** `msgspec>=0.21.1` (dependencia central,
-  usada para la decodificación JSON rápida de los archivos de traducción).
-- **Dependencias internas del framework:** `LocalizationManager` depende
-  de `orionis.foundation.contracts.application.IApplication`;
-  `LocalizationProvider` depende de
-  `orionis.container.providers.service_provider.ServiceProvider` y de
-  `orionis.support.facades.lang.Lang`. Estas forman parte del framework y
-  no requieren instalación por separado.
-- Sin comportamiento específico de plataforma; los archivos de traducción
-  se leen con las APIs estándar de `pathlib`/`Path` y funcionan de forma
-  idéntica en Windows, Linux y macOS.
+- **Python:** `>= 3.14` (`requires-python` en `pyproject.toml`). `types.py`
+  usa sentencias de alias `type` de PEP 695.
+- **Dependencias:** `msgspec>=0.21.1`, dependencia base del framework; no hace
+  falta instalar nada más allá de `pip install orionis`.
+- **Codificación:** los archivos de traducción deben ser JSON codificado en
+  UTF-8. Se leen como bytes con `Path.read_bytes()` y los decodifica
+  `msgspec.json.decode`; un archivo guardado en cualquier otra codificación
+  lanza `TranslationSyntaxException`.
+- **`from __future__ import annotations`:** lo usan `loader.py`,
+  `repository.py`, `translator.py`, `provider.py`, `types.py` y todos los
+  contratos, pero **no** `manager.py`, cuyo constructor reflecciona el
+  contenedor de inyección de dependencias.
+- **Slots:** los cuatro contratos declaran `__slots__ = ()` y las cuatro clases
+  concretas declaran sus propios `__slots__`, así que sus instancias no tienen
+  `__dict__`. Una subclase que necesite atributos extra debe declarar sus
+  propios `__slots__` o un `__dict__`.
+- **Seguridad de rutas:** los códigos de locale se validan contra un patrón
+  estricto antes de llegar al sistema de archivos, lo que rechaza separadores y
+  segmentos `..`.

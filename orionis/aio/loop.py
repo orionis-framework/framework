@@ -233,6 +233,12 @@ class Loop:
         ------
         TypeError
             If *coro* is not a coroutine object.
+        RuntimeError
+            Propagated from asyncio when a loop is already running in the
+            calling thread. The message belongs to the standard library and
+            differs between the ``asyncio.Runner`` and ``asyncio.run``
+            branches; *coro* is left unconsumed. Use :meth:`runSync` to
+            bridge into a loop that is already running.
         """
         if not isinstance(coro, types.CoroutineType):
             error_msg = "A coroutine object is required"

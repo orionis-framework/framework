@@ -1,83 +1,170 @@
-# Gestor de Bucle Asíncrono de Orionis (`orionis.aio`)
+# `orionis.aio`
 
-> Gestor de bucle de eventos de `asyncio` thread-safe y consciente de la
-> plataforma, para el Orionis Framework.
->
-> 🇬🇧 English version: [README.md](README.md)
+> Gestor del bucle de eventos de `asyncio`, seguro entre hilos y consciente de la plataforma, expuesto en una única clase totalmente estática.
 
-`orionis.aio` centraliza todo lo relacionado con el ciclo de vida del bucle
-de eventos que una aplicación construida sobre Orionis necesita: elegir la
-implementación de bucle más rápida disponible en la plataforma actual,
-almacenar en caché un bucle por hilo, permitir el puente entre código
-síncrono y asíncrono sin bloqueos mutuos (deadlocks), y limpiar las tareas
-pendientes al finalizar. Todo el módulo se expone a través de una única
-clase, `Loop`, que se usa exclusivamente mediante métodos de clase/estáticos
-— nunca se crea una instancia.
-
----
+🇬🇧 English version: [README.md](README.md)
 
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Qué problema resuelve](#qué-problema-resuelve)
-3. [Referencia de API](#referencia-de-api)
-   - [`Loop.getEventLoop()`](#loopgeteventloop)
-   - [`Loop.run(coro)`](#loopruncoro)
-   - [`Loop.runSync(coro)`](#looprunsynccoro)
-   - [`Loop.execute(func, *args, **kwargs)`](#loopexecutefunc-args-kwargs)
-   - [`Loop.createTask(coro, *, name=None)`](#loopcreatetaskcoro-name-none)
-   - [`Loop.eventLoopContext()`](#loopeventloopcontext)
-   - [`Loop.isLoopRunning()`](#loopisrunning)
-4. [Ejemplos de uso](#ejemplos-de-uso)
-5. [Notas de diseño](#notas-de-diseño)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de compatibilidad](#notas-de-compatibilidad)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja en el framework](#dónde-encaja-en-el-framework)
+  - [Mapa del módulo](#mapa-del-módulo)
+  - [Resolución de la factoría de loops](#resolución-de-la-factoría-de-loops)
+  - [Decisiones de diseño](#decisiones-de-diseño)
+- [Referencia de API](#referencia-de-api)
+  - [`Loop`](#loop)
+  - [Estado de clase](#estado-de-clase)
+  - [`Loop.getEventLoop()`](#loopgeteventloop)
+  - [`Loop.run()`](#looprun)
+  - [`Loop.runSync()`](#looprunsync)
+  - [`Loop.execute()`](#loopexecute)
+  - [`Loop.createTask()`](#loopcreatetask)
+  - [`Loop.eventLoopContext()`](#loopeventloopcontext)
+  - [`Loop.isLoopRunning()`](#loopislooprunning)
+  - [Helpers internos](#helpers-internos)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [1. Punto de entrada de la aplicación](#1-punto-de-entrada-de-la-aplicación)
+  - [2. Llamar a código async desde código síncrono](#2-llamar-a-código-async-desde-código-síncrono)
+  - [3. Ejecutar una función bloqueante desde una corrutina](#3-ejecutar-una-función-bloqueante-desde-una-corrutina)
+  - [4. Programar una tarea en segundo plano](#4-programar-una-tarea-en-segundo-plano)
+  - [5. Gestionar el ciclo de vida de un loop con limpieza](#5-gestionar-el-ciclo-de-vida-de-un-loop-con-limpieza)
+  - [6. Argumentos rechazados](#6-argumentos-rechazados)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
----
+## Descripción funcional
 
-## Requisitos
+`orionis.aio` es el dueño del ciclo de vida del bucle de eventos dentro del
+framework: elige la implementación más rápida disponible en la plataforma
+actual, cachea un loop por hilo, hace de puente entre código síncrono y
+asíncrono en ambos sentidos y cancela las tareas pendientes cuando se sale de
+un contexto gestionado. Todo se expone en una sola clase, `Loop`, cuyos
+miembros son siempre `@staticmethod` o `@classmethod`.
 
-No se necesita ningún paso de instalación adicional además del propio
-framework:
+### Dónde encaja en el framework
 
-```bash
-pip install orionis
+`orionis/aio/loop.py` importa únicamente la biblioteca estándar (`asyncio`,
+`concurrent.futures`, `functools`, `inspect`, `sys`, `threading`, `types`,
+`contextlib`, `typing`); **no depende de ningún otro módulo de Orionis**, lo
+que permite importarlo desde cualquier punto sin riesgo de import circular.
+
+Consumidores directos dentro del framework:
+
+| Consumidor | Miembro usado | Propósito |
+| --- | --- | --- |
+| `reactor` (punto de entrada de la CLI, en la raíz del repositorio) | `Loop.run(...)` | Ejecuta `app.handleCommand(sys.argv)` y entrega el resultado a `sys.exit`. |
+| `orionis/schemas/rules/unique.py` | `Loop.runSync(...)` | Puentea el pipeline síncrono de reglas de validación hacia el ORM asíncrono. |
+
+El módulo **no** se registra en el contenedor y **no tiene facade ni service
+provider**: se importa y se usa directamente.
+
+### Mapa del módulo
+
+| Archivo | Contenido |
+| --- | --- |
+| `orionis/aio/__init__.py` | Reexporta `Loop`; `__all__ == ["Loop"]`. |
+| `orionis/aio/loop.py` | La clase `Loop`: estado de clase, cuatro helpers internos y siete miembros públicos. |
+
+### Resolución de la factoría de loops
+
+`_getLoopFactory()` resuelve la factoría **una sola vez por proceso** y cachea
+el resultado:
+
+1. `uvloop.new_event_loop` — solo cuando `_IS_WIN32` es `False` y el `import
+   uvloop` tiene éxito.
+2. `asyncio.ProactorEventLoop` — solo cuando `_IS_WIN32` es `True`; protegido
+   con `contextlib.suppress(AttributeError)` para que un runtime que no lo
+   exponga siga adelante.
+3. `None` — significa «que decida asyncio»; quien llama usa entonces
+   `asyncio.new_event_loop()`.
+
+Comportamiento observado en la plataforma de este repositorio
+(`sys.platform == "win32"`, CPython 3.14):
+
+```text
+Loop._IS_WIN32:      True
+Loop._detectUvloop(): None
+Loop._getLoopFactory(): <class 'asyncio.windows_events.ProactorEventLoop'>
+Loop.getEventLoop():  ProactorEventLoop instance
 ```
 
-- **Python:** 3.14 o superior (el módulo usa la sintaxis genérica de PEP 695,
-  por ejemplo `def run[T](...)`).
-- **Acelerador opcional:** [`uvloop`](https://pypi.org/project/uvloop/) es
-  una dependencia normal del framework en plataformas distintas de Windows
-  (`uvloop>=0.22.1 ; sys_platform != 'win32'`) y se detecta y usa
-  automáticamente cuando está presente — no requiere configuración manual.
-- En Windows se selecciona automáticamente `asyncio.ProactorEventLoop`
-  (con retorno al bucle por defecto de asyncio si no está disponible).
+### Decisiones de diseño
 
-## Qué problema resuelve
+Estas notas describen decisiones que ya están en el código; son informativas,
+no recomendaciones.
 
-Combinar código síncrono y asíncrono de forma segura en una aplicación
-multihilo y multiplataforma es propenso a errores: cada plataforma favorece
-una implementación de bucle distinta, crear un bucle nuevo en cada llamada
-es costoso, y llamar a `asyncio.run()` desde dentro de un bucle que ya está
-corriendo lanza un `RuntimeError`. `Loop` resuelve todo esto detrás de una
-API estática y compacta:
-
-- Selecciona la fábrica de bucle óptima una sola vez (`uvloop` →
-  `ProactorEventLoop` → valor por defecto de la librería estándar) y
-  almacena en caché la decisión.
-- Mantiene un **bucle independiente por hilo**, de modo que los bucles nunca
-  se comparten entre hilos.
-- Permite que código síncrono invoque código asíncrono (`runSync`) y que
-  código asíncrono invoque código síncrono (`execute`) sin producir
-  bloqueos mutuos.
-- Cancela y drena las tareas pendientes cuando un contexto gestionado
-  finaliza.
+- **La clase como espacio de nombres, sin instancias.** Todos los atributos son
+  `ClassVar` y todos los miembros son `@staticmethod`/`@classmethod`, así que
+  la propia clase es el gestor compartido. `Loop` no declara `__init__` ni
+  `__slots__`, de modo que `Loop()` sí funciona y produce un objeto con
+  `__dict__` — esa instancia simplemente no aporta nada frente a la clase.
+- **Un loop por hilo.** `_loop_local` es un `threading.local()`, así que un
+  loop creado en un hilo nunca se entrega a otro.
+- **Doble comprobación con lock, dos veces.** `_detectUvloop()` (import del
+  módulo) y `_getSyncExecutor()` (creación del pool) leen el guard fuera del
+  lock y lo releen dentro, de forma que la operación cara ocurre como máximo
+  una vez aunque varios hilos compitan en la primera llamada.
+- **Pool puente de un solo worker.** `runSync()` usa un
+  `ThreadPoolExecutor(max_workers=1, thread_name_prefix="orionis-sync")` para
+  ejecutar la corrutina en su propio loop cuando quien llama ya está dentro de
+  uno.
+- **API pública en lugar de internos.** `_getRunningLoop()` envuelve
+  `asyncio.get_running_loop()` en un `try/except RuntimeError` en vez de leer
+  detalles internos de CPython.
+- **La limpieza nunca lanza.** `eventLoopContext()` agrupa las tareas
+  canceladas con `return_exceptions=True` dentro de
+  `contextlib.suppress(RuntimeError, asyncio.CancelledError)`, así el bloque
+  `finally` no puede enmascarar la excepción que salió del `with`.
 
 ## Referencia de API
 
-Todos los miembros descritos a continuación están declarados como
-`@staticmethod` o `@classmethod`. Se invocan directamente sobre la clase,
-por ejemplo `Loop.run(main())` — no se debe instanciar `Loop`.
+### `Loop`
+
+```python
+class Loop:
+    ...
+```
+
+Se importa desde el paquete o desde el módulo de implementación:
+
+```python
+from orionis.aio import Loop
+from orionis.aio.loop import Loop
+```
+
+Todos los miembros se invocan sobre la clase (`Loop.run(...)`). La clase guarda
+todo su estado a nivel de clase, por lo que ese estado lo comparte el proceso
+entero.
+
+### Estado de clase
+
+Declarado literalmente así:
+
+```python
+_IS_WIN32: ClassVar[bool] = sys.platform == "win32"
+_loop_local: ClassVar[threading.local] = threading.local()
+_uvloop_factory: ClassVar[Callable[[], asyncio.AbstractEventLoop] | None] = None
+_uvloop_checked: ClassVar[bool] = False
+_loop_lock: ClassVar[threading.Lock] = threading.Lock()
+_loop_factory_resolved: ClassVar[bool] = False
+_loop_factory_cached: ClassVar[
+    Callable[[], asyncio.AbstractEventLoop] | None
+] = None
+_sync_executor: ClassVar[concurrent.futures.ThreadPoolExecutor | None] = None
+_sync_executor_lock: ClassVar[threading.Lock] = threading.Lock()
+```
+
+| Atributo | Alcance | Lo escribe |
+| --- | --- | --- |
+| `_IS_WIN32` | Proceso | Se evalúa una vez al definir la clase. |
+| `_loop_local` | Hilo | `getEventLoop()` guarda el loop creado como `_loop_local.loop`. |
+| `_uvloop_factory`, `_uvloop_checked` | Proceso | `_detectUvloop()`. |
+| `_loop_factory_cached`, `_loop_factory_resolved` | Proceso | `_getLoopFactory()`. |
+| `_sync_executor` | Proceso | `_getSyncExecutor()`. |
+| `_loop_lock`, `_sync_executor_lock` | Proceso | Nunca se reasignan; protegen las dos detecciones. |
+
+Ni los loops cacheados por hilo ni `_sync_executor` los cierra o apaga nunca
+este módulo.
 
 ### `Loop.getEventLoop()`
 
@@ -86,157 +173,153 @@ por ejemplo `Loop.run(main())` — no se debe instanciar `Loop`.
 def getEventLoop(cls) -> asyncio.AbstractEventLoop
 ```
 
-Devuelve el bucle de eventos del hilo actual, creando uno si es necesario.
+Devuelve el bucle de eventos del hilo que llama, creándolo si hace falta.
 
-- Si ya hay un bucle corriendo en el hilo que llama, se devuelve ese mismo
-  bucle de inmediato.
-- En caso contrario, se devuelve el bucle almacenado en caché para el hilo
-  actual, si aún existe y no está cerrado.
-- Si no existe un bucle utilizable, se crea uno nuevo con la fábrica óptima
-  para la plataforma (`uvloop` / `ProactorEventLoop` / valor por defecto),
-  se registra mediante `asyncio.set_event_loop`, se guarda en caché para el
-  hilo y se devuelve.
+Orden de resolución:
+
+1. El loop que ya está corriendo en este hilo, si lo hay.
+2. `_loop_local.loop`, si existe y su `is_closed()` es `False`.
+3. Un loop nuevo construido con la factoría resuelta, o con
+   `asyncio.new_event_loop()` cuando la factoría es `None`.
 
 **Parámetros:** ninguno.
 
 **Devuelve:** `asyncio.AbstractEventLoop`.
 
-**Excepciones:** ninguna.
+**Lanza:** nada propio.
 
----
+**Efectos secundarios:** en la rama 3 llama a `asyncio.set_event_loop(loop)` y
+guarda el loop en `_loop_local`. El módulo nunca cierra ese loop.
 
-### `Loop.run(coro)`
+### `Loop.run()`
 
 ```python
 @staticmethod
 def run[T](coro: Coroutine[Any, Any, T]) -> T
 ```
 
-Ejecuta una corrutina como **punto de entrada de la aplicación**. Está
-pensado para invocarse desde un contexto en el que **no** hay ningún bucle
-de eventos corriendo (por ejemplo, un bloque `if __name__ == "__main__":`
-de una CLI).
+Ejecuta una corrutina como punto de entrada de la aplicación, desde un hilo
+**sin** loop en marcha. Usa `asyncio.Runner(loop_factory=...)` cuando hay una
+factoría resuelta y, si no, `asyncio.run(coro)`.
 
-- Usa `asyncio.Runner(loop_factory=...)` cuando existe una fábrica óptima
-  (`uvloop` o `ProactorEventLoop`); en caso contrario recurre a
-  `asyncio.run(coro)`.
-- `KeyboardInterrupt` se captura internamente y se convierte en un valor de
-  retorno `0`, de modo que `Ctrl+C` no se propaga como una excepción sin
-  gestionar.
-
-**Parámetros:**
-
-| Nombre | Tipo | Descripción |
+| Parámetro | Tipo | Descripción |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | El objeto corrutina a ejecutar. |
+| `coro` | `Coroutine[Any, Any, T]` | Objeto corrutina a ejecutar. |
 
-**Devuelve:** el valor producido por `coro`, o `0` si se interrumpe con
-`Ctrl+C`.
+**Devuelve:** el valor producido por `coro`. Si la corrutina lanza
+`KeyboardInterrupt`, la excepción se absorbe y se devuelve el literal `0` (un
+`int`) en su lugar, sea cual sea `T`.
 
-**Excepciones:** `TypeError` si `coro` no es un objeto corrutina.
+**Lanza:**
 
-> ⚠️ Llamar a `Loop.run()` desde dentro de un bucle de eventos que ya está
-> corriendo lanzará una excepción, igual que haría `asyncio.run()` — en ese
-> caso use `Loop.runSync()`.
+- `TypeError("A coroutine object is required")` cuando
+  `isinstance(coro, types.CoroutineType)` es `False` — una *función* corrutina
+  también se rechaza.
+- `RuntimeError` propagado desde asyncio cuando ya hay un loop corriendo en el
+  hilo que llama; en ese caso `coro` queda sin consumir. Usa `Loop.runSync()`
+  para puentear hacia un loop en marcha. El mensaje pertenece a la biblioteca
+  estándar y difiere entre las ramas `asyncio.Runner` y `asyncio.run` —
+  observado en CPython 3.14 / Windows: `Cannot run the event loop while another
+  loop is running`.
+- Cualquier otra excepción lanzada dentro de la corrutina se propaga sin
+  cambios.
 
----
+**Efectos secundarios:** crea y cierra un loop dedicado a esa llamada; no usa
+ni rellena la caché por hilo.
 
-### `Loop.runSync(coro)`
+### `Loop.runSync()`
 
 ```python
 @classmethod
 def runSync[T](cls, coro: Coroutine[Any, Any, T]) -> T
 ```
 
-Ejecuta una corrutina hasta su finalización de forma **síncrona**,
-independientemente de si ya hay un bucle corriendo en el hilo que llama.
+Ejecuta una corrutina hasta el final de forma síncrona desde cualquier
+contexto.
 
-- Si no hay ningún bucle corriendo, delega directamente en `Loop.run(coro)`.
-- Si **sí** hay un bucle corriendo (por ejemplo, el llamador está dentro de
-  un manejador ASGI/RSGI u otro framework asíncrono), la corrutina se
-  despacha a un pool de hilos compartido de un solo trabajador, donde se
-  ejecuta con su propio bucle de eventos mediante `Loop.run`, y el
-  resultado se espera de forma síncrona con `.result()`.
+- Sin loop corriendo en el hilo que llama → delega en `Loop.run(coro)`.
+- Con un loop corriendo → envía `Loop.run` al ejecutor compartido de un solo
+  worker y bloquea en `.result()`, de modo que la corrutina obtiene su propio
+  loop en otro hilo en lugar de bloquear al llamante.
 
-**Parámetros:**
-
-| Nombre | Tipo | Descripción |
+| Parámetro | Tipo | Descripción |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | La corrutina a ejecutar. |
+| `coro` | `Coroutine[Any, Any, T]` | Objeto corrutina a ejecutar. |
 
-**Devuelve:** el valor producido por `coro`.
+**Devuelve:** el valor producido por `coro` (o `0` cuando la corrutina lanza
+`KeyboardInterrupt`, heredado de `Loop.run`).
 
-**Excepciones:** propaga cualquier excepción lanzada dentro de `coro`
-(expuesta a través de `concurrent.futures.Future.result()` cuando se
-despacha al hilo en segundo plano), además del mismo `TypeError` que
-`Loop.run()` cuando `coro` no es válida.
+**Lanza:** lo que lance `coro`, relanzado en el hilo llamante por
+`concurrent.futures.Future.result()`; además del mismo `TypeError` que
+`Loop.run()` ante un argumento inválido.
 
-> Este método **bloquea el hilo que lo invoca** hasta que la corrutina
-> finaliza. No lo llame desde dentro del mismo bucle que está intentando
-> puentear, o podría terminar serializando trabajo que de otro modo sería
-> concurrente en ese único hilo trabajador.
+**Efectos secundarios:** bloquea el hilo llamante hasta que la corrutina
+termina y puede crear el ejecutor puente del proceso en el primer uso.
 
----
-
-### `Loop.execute(func, *args, **kwargs)`
+### `Loop.execute()`
 
 ```python
 @staticmethod
-async def execute(func: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Any
+async def execute(
+    func: Callable[..., Any],
+    /,
+    *args: Any,
+    **kwargs: Any,
+) -> Any
 ```
 
-Ejecuta de forma transparente un invocable **síncrono o asíncrono** desde
-dentro de una función `async def`, para que el código que llama no tenga
-que distinguir entre ambos casos.
+Invoca un callable que puede ser síncrono o asíncrono desde dentro de una
+corrutina, sin que quien llama tenga que ramificar según su naturaleza.
 
-- Si `func` es una función corrutina (`inspect.iscoroutinefunction`), se
-  espera (`await`) directamente.
-- En caso contrario, `func` se delega al executor por defecto del bucle
-  mediante `loop.run_in_executor`, de modo que no bloquea el hilo del
-  bucle de eventos.
-- Si la llamada síncrona devuelve inesperadamente un objeto esperable
-  (tiene `__await__`), ese objeto también se espera antes de devolver el
-  resultado.
+- `inspect.iscoroutinefunction(func)` → se hace `await` directamente sobre el
+  loop en marcha.
+- En caso contrario → se envuelve en `functools.partial(func, *args, **kwargs)`
+  y se envía al ejecutor **por defecto** del loop mediante
+  `loop.run_in_executor(None, ...)`.
+- Si la llamada síncrona devuelve un objeto con `__await__`, ese objeto se
+  awaitea antes de retornar.
 
-**Parámetros:**
-
-| Nombre | Tipo | Descripción |
+| Parámetro | Tipo | Descripción |
 | --- | --- | --- |
-| `func` | `Callable[..., Any]` | La función o función corrutina a invocar. Solo posicional. |
+| `func` | `Callable[..., Any]` | Callable a invocar; solo posicional. |
 | `*args` | `Any` | Argumentos posicionales reenviados a `func`. |
-| `**kwargs` | `Any` | Argumentos con nombre reenviados a `func`. |
+| `**kwargs` | `Any` | Argumentos nombrados reenviados a `func`. |
 
-**Devuelve:** lo que produzca `func` (o el resultado esperado, si aplica).
+**Devuelve:** el resultado de `func`, o el resultado de awaitarlo cuando es
+awaitable.
 
-**Excepciones:** `TypeError` si `func` no es invocable. Debe llamarse desde
-dentro de un bucle de eventos en ejecución (internamente llama a
-`asyncio.get_running_loop()`).
+**Lanza:** `TypeError("The provided object is not callable")` cuando `func` no
+es invocable; los errores de `func` se propagan sin cambios. Llama a
+`asyncio.get_running_loop()` en la rama síncrona, así que debe awaitarse desde
+un loop en marcha.
 
----
-
-### `Loop.createTask(coro, *, name=None)`
+### `Loop.createTask()`
 
 ```python
 @staticmethod
-async def createTask[T](coro: Coroutine[Any, Any, T], *, name: str | None = None) -> asyncio.Task[T]
+async def createTask[T](
+    coro: Coroutine[Any, Any, T],
+    *,
+    name: str | None = None,
+) -> asyncio.Task[T]
 ```
 
-Crea y programa una nueva `asyncio.Task` para `coro` en el bucle
-actualmente en ejecución.
+Programa `coro` en el loop en marcha mediante
+`asyncio.get_running_loop().create_task(coro, name=name)`.
 
-**Parámetros:**
-
-| Nombre | Tipo | Descripción |
+| Parámetro | Tipo | Descripción |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | La corrutina a programar. |
-| `name` | `str \| None` | Nombre descriptivo opcional para la tarea (solo por palabra clave). |
+| `coro` | `Coroutine[Any, Any, T]` | Corrutina a programar. |
+| `name` | `str \| None` | Nombre opcional de la tarea; solo por nombre, por defecto `None`. |
 
 **Devuelve:** `asyncio.Task[T]`.
 
-**Excepciones:** propaga el `RuntimeError` de `asyncio.get_running_loop()`
-si se llama sin ningún bucle en ejecución.
+**Lanza:** el `RuntimeError` que emite `asyncio.get_running_loop()` cuando no
+hay ningún loop corriendo.
 
----
+Ten en cuenta que el propio miembro es una función corrutina: la tarea se
+obtiene con `task = await Loop.createTask(...)` y se awaitea una segunda vez
+para recoger su resultado.
 
 ### `Loop.eventLoopContext()`
 
@@ -246,25 +329,23 @@ si se llama sin ningún bucle en ejecución.
 def eventLoopContext() -> Generator[asyncio.AbstractEventLoop]
 ```
 
-Gestor de contexto que entrega el bucle devuelto por
-`Loop.getEventLoop()` y realiza una limpieza cooperativa al salir:
+Gestor de contexto que cede `Loop.getEventLoop()` y realiza una limpieza
+cooperativa al salir.
 
-- Si el bucle **no** está en ejecución y todavía tiene tareas pendientes
-  cuando el bloque `with` finaliza, todas esas tareas se cancelan y luego
-  se esperan en conjunto mediante
-  `asyncio.gather(*pending, return_exceptions=True)`, de modo que ninguna
-  excepción de cancelación escapa del bloque `finally`.
-- `RuntimeError` y `asyncio.CancelledError` producidas durante la limpieza
-  se suprimen.
+La limpieza solo se ejecuta si, al salir, el loop **no** está corriendo *y*
+`asyncio.all_tasks(loop)` no está vacío. En ese caso se cancela cada tarea
+pendiente y después se esperan todas con `asyncio.gather(*pending,
+return_exceptions=True)` a través de `loop.run_until_complete(...)`.
 
 **Parámetros:** ninguno.
 
-**Entrega (yield):** `asyncio.AbstractEventLoop`.
+**Cede:** `asyncio.AbstractEventLoop`.
 
-**Excepciones:** ninguna (los errores de limpieza se descartan de forma
-intencional).
+**Lanza:** nada — los `RuntimeError` y `asyncio.CancelledError` que surjan
+durante la limpieza se suprimen por diseño.
 
----
+**Efectos secundarios:** cancela las tareas pendientes del loop cedido. El loop
+**no** se cierra, así que sigue cacheado para el hilo.
 
 ### `Loop.isLoopRunning()`
 
@@ -273,16 +354,47 @@ intencional).
 def isLoopRunning() -> bool
 ```
 
-Devuelve `True` si hay un bucle de eventos corriendo actualmente en el hilo
-que llama.
+Informa de si hay un bucle de eventos corriendo en el hilo que llama.
 
 **Parámetros:** ninguno.
 
-**Devuelve:** `bool`.
+**Devuelve:** `bool` — `True` cuando `_getRunningLoop()` no es `None`.
 
-**Excepciones:** ninguna.
+**Lanza:** nada.
+
+### Helpers internos
+
+Se documentan porque definen las garantías de caché de los miembros públicos;
+no forman parte de la superficie soportada.
+
+```python
+@staticmethod
+def _getRunningLoop() -> asyncio.AbstractEventLoop | None
+
+@classmethod
+def _detectUvloop(cls) -> Callable[[], asyncio.AbstractEventLoop] | None
+
+@classmethod
+def _getLoopFactory(cls) -> Callable[[], asyncio.AbstractEventLoop] | None
+
+@classmethod
+def _getSyncExecutor(cls) -> concurrent.futures.ThreadPoolExecutor
+```
+
+- `_getRunningLoop()` — `asyncio.get_running_loop()` envuelto en
+  `try/except RuntimeError`, devolviendo `None` en lugar de lanzar.
+- `_detectUvloop()` — importa `uvloop` como máximo una vez por proceso y solo
+  fuera de Windows; el `ImportError` se absorbe y el resultado se cachea en
+  `_uvloop_factory`.
+- `_getLoopFactory()` — aplica el orden de resolución descrito arriba y cachea
+  la respuesta en `_loop_factory_cached`.
+- `_getSyncExecutor()` — crea el pool puente de un solo worker en el primer uso
+  y devuelve siempre la misma instancia después.
 
 ## Ejemplos de uso
+
+Cada fragmento siguiente es un script completo que se puede ejecutar tal cual
+con `python <archivo>.py`.
 
 ### 1. Punto de entrada de la aplicación
 
@@ -290,155 +402,221 @@ que llama.
 import asyncio
 from orionis.aio import Loop
 
+
 async def main() -> int:
-    print("Aplicación iniciada")
+    print("Application started")
     await asyncio.sleep(0.1)
     return 0
 
-if __name__ == "__main__":
-    exit_code = Loop.run(main())
-    raise SystemExit(exit_code)
+
+exit_code = Loop.run(main())
+print("exit code:", exit_code)
 ```
 
-### 2. Invocar código asíncrono desde código síncrono (por ejemplo, un comando de CLI o un manejador de señales)
+Salida:
+
+```text
+Application started
+exit code: 0
+```
+
+Este es el patrón que usa la CLI `reactor`, que pasa el valor devuelto
+directamente a `sys.exit(...)`.
+
+### 2. Llamar a código async desde código síncrono
 
 ```python
 from orionis.aio import Loop
 
-async def fetch_greeting() -> str:
-    return "Hola desde una tarea asíncrona"
 
-def sync_entrypoint() -> None:
-    # Funciona tanto si ya hay un bucle en ejecución como si no.
-    message = Loop.runSync(fetch_greeting())
-    print(message)
+async def fetch_greeting() -> str:
+    return "Hello from an async task"
+
+
+def sync_entrypoint() -> str:
+    # Same call works with or without a loop already running in this thread.
+    return Loop.runSync(fetch_greeting())
+
+
+async def async_entrypoint() -> str:
+    return Loop.runSync(fetch_greeting())
+
+
+print("no loop running:", sync_entrypoint())
+print("loop running:", Loop.run(async_entrypoint()))
 ```
 
-### 3. Invocar una función bloqueante desde código asíncrono sin detener el bucle
+Salida:
+
+```text
+no loop running: Hello from an async task
+loop running: Hello from an async task
+```
+
+### 3. Ejecutar una función bloqueante desde una corrutina
 
 ```python
 import time
 from orionis.aio import Loop
 
+
 def slow_blocking_call(seconds: float) -> str:
-    time.sleep(seconds)  # simula E/S bloqueante
-    return "listo"
+    time.sleep(seconds)
+    return "blocking call finished"
+
 
 async def handler() -> None:
-    result = await Loop.execute(slow_blocking_call, 0.5)
-    print(result)
+    print(await Loop.execute(slow_blocking_call, 0.2))
+    print(await Loop.execute(slow_blocking_call, seconds=0.1))
+
+
+Loop.run(handler())
 ```
 
-### 4. Programar una tarea en segundo plano e inspeccionar el estado del bucle
+Salida:
+
+```text
+blocking call finished
+blocking call finished
+```
+
+### 4. Programar una tarea en segundo plano
 
 ```python
 import asyncio
 from orionis.aio import Loop
 
-async def background_job() -> None:
-    await asyncio.sleep(1)
-    print("tarea en segundo plano finalizada")
+
+async def background_job() -> str:
+    await asyncio.sleep(0.05)
+    return "background job finished"
+
 
 async def controller() -> None:
-    print("bucle en ejecución:", Loop.isLoopRunning())  # True
+    print("loop running:", Loop.isLoopRunning())
     task = await Loop.createTask(background_job(), name="warmup")
-    await task
+    print("task name:", task.get_name())
+    print("task result:", await task)
+
+
+Loop.run(controller())
 ```
 
-### 5. Gestionar explícitamente el ciclo de vida de un bucle con limpieza
+Salida:
+
+```text
+loop running: True
+task name: warmup
+task result: background job finished
+```
+
+### 5. Gestionar el ciclo de vida de un loop con limpieza
+
+```python
+import asyncio
+from orionis.aio import Loop
+
+
+async def pending_forever() -> None:
+    await asyncio.sleep(3600)
+
+
+def run_batch() -> None:
+    with Loop.eventLoopContext() as loop:
+        leftover = loop.create_task(pending_forever())
+        loop.run_until_complete(asyncio.sleep(0))
+    print("leftover cancelled:", leftover.cancelled())
+    print("loop closed:", loop.is_closed())
+
+
+run_batch()
+```
+
+Salida:
+
+```text
+leftover cancelled: True
+loop closed: False
+```
+
+### 6. Argumentos rechazados
 
 ```python
 from orionis.aio import Loop
 
-def run_batch(coro) -> None:
-    with Loop.eventLoopContext() as loop:
-        loop.run_until_complete(coro)
-        # Cualquier tarea que aún quede pendiente aquí se cancela y se
-        # drena automáticamente al salir del bloque `with`.
+
+async def noop() -> None:
+    return None
+
+
+try:
+    Loop.run(noop)
+except TypeError as error:
+    print("run:", error)
+
+
+async def guard() -> None:
+    try:
+        await Loop.execute(42)
+    except TypeError as error:
+        print("execute:", error)
+
+
+Loop.run(guard())
 ```
 
-## Notas de diseño
+Salida:
 
-Las siguientes notas describen decisiones de diseño **ya existentes** con
-fines exclusivamente informativos — no son propuestas de cambio.
-
-- **Sin instancias, solo estado de clase.** `Loop` almacena todo su estado
-  como atributos `ClassVar` (`_loop_local`, `_uvloop_factory`,
-  `_sync_executor`, etc.) y expone únicamente miembros
-  `@staticmethod`/`@classmethod`. Esto refleja un patrón de tipo
-  singleton/namespace: la propia clase actúa como el gestor compartido.
-- **Caché de bucle por hilo.** `_loop_local` es una instancia de
-  `threading.local()`, de modo que `getEventLoop()` nunca filtra un bucle
-  creado en un hilo hacia otro hilo distinto.
-- **Bloqueo de doble verificación (double-checked locking).** Tanto
-  `_detectUvloop()` (detección de uvloop) como `_getSyncExecutor()`
-  (creación del executor compartido) usan una comprobación booleana fuera
-  de un lock y la vuelven a comprobar dentro de él, de modo que la
-  operación costosa (importación del módulo / creación del pool de hilos)
-  se ejecuta como máximo una vez, incluso ante llamadas concurrentes en la
-  primera invocación.
-- **Orden de resolución de la fábrica de bucle.** `_getLoopFactory()`
-  prefiere `uvloop` (fuera de Windows) primero, luego
-  `asyncio.ProactorEventLoop` (Windows), y finalmente recurre a `None`, lo
-  que significa "dejar que asyncio decida" mediante
-  `asyncio.new_event_loop()`.
-- **Pool de un solo trabajador para el puente síncrono/asíncrono.**
-  `runSync()` se apoya en un
-  `concurrent.futures.ThreadPoolExecutor(max_workers=1)` para ejecutar una
-  corrutina en su propio bucle cuando se invoca desde dentro de un bucle ya
-  en ejecución, evitando el clásico bloqueo mutuo de "no se puede ejecutar
-  un bucle mientras otro bucle está en ejecución".
-- **Apagado cooperativo.** `eventLoopContext()` cancela las tareas
-  pendientes y las espera con `return_exceptions=True`, de modo que la
-  limpieza nunca lanza una excepción ni oculta la excepción original del
-  bloque `with`, si la hubiera.
+```text
+run: A coroutine object is required
+execute: The provided object is not callable
+```
 
 ## Consideraciones de rendimiento y concurrencia
 
-Estas son notas informativas sobre el comportamiento existente, no
-recomendaciones de optimización:
-
-- La ruta rápida de `getEventLoop()` (`asyncio.get_running_loop()` dentro
-  de un `try/except`) tiene un coste despreciable cuando ya hay un bucle en
-  ejecución, que es el caso habitual dentro de los manejadores de
-  solicitudes.
-- La detección de `uvloop` y la resolución de la fábrica de bucle ocurren
-  **como máximo una vez por proceso** (los resultados se almacenan en
-  atributos de clase), por lo que llamadas repetidas a `getEventLoop()` o
-  `run()` no vuelven a ejecutar la detección de plataforma.
-- `runSync()` **bloquea el hilo que lo invoca** hasta que la corrutina
-  finaliza. Dado que el executor de puente tiene exactamente **un**
-  trabajador, las llamadas concurrentes a `runSync()` realizadas mientras
-  ya hay un bucle en ejecución se serializan en ese único hilo trabajador
-  — no se ejecutan en paralelo entre sí.
-- `execute()` delega los invocables síncronos al executor **por defecto**
-  del bucle (no al pool dedicado de un solo trabajador que usa
-  `runSync()`), por lo que su nivel de concurrencia está determinado por
-  el tamaño por defecto del executor de `asyncio`.
-- `eventLoopContext()` solo cancela y drena las tareas pendientes cuando el
-  bucle **no** está en ejecución en el momento de salir; si el bucle sigue
-  en ejecución, la limpieza se omite en esa invocación.
-- En plataformas distintas de Windows con `uvloop` instalado, tanto
-  `getEventLoop()` como `run()` usan la implementación de bucle de
-  `uvloop`, que habitualmente ofrece menor latencia de E/S que la
-  implementación por defecto de la librería estándar; en Windows se usa en
-  su lugar `ProactorEventLoop`, que admite operaciones de subprocesos y
-  named pipes que el bucle selector por defecto no admite.
+- **La detección de plataforma ocurre una sola vez.** `_detectUvloop()` y
+  `_getLoopFactory()` cachean su resultado en atributos de clase, así que las
+  llamadas repetidas a `getEventLoop()`, `run()` o `runSync()` nunca repiten el
+  import ni la comprobación de plataforma.
+- **Camino rápido cuando ya hay un loop.** `getEventLoop()` e
+  `isLoopRunning()` resuelven con una única llamada a
+  `asyncio.get_running_loop()` dentro de un `try/except`, que es el caso normal
+  dentro de un manejador de peticiones.
+- **Aislamiento por hilo.** La caché de loops vive en un `threading.local()`,
+  así que dos hilos que llamen a `getEventLoop()` reciben dos loops distintos;
+  en ese camino no se toma ningún lock.
+- **`runSync()` bloquea y serializa.** Bloquea el hilo llamante hasta que la
+  corrutina termina, y el pool puente tiene exactamente **un** worker, así que
+  varias llamadas concurrentes a `runSync()` hechas desde dentro de un loop en
+  marcha se encolan una detrás de otra en vez de ejecutarse en paralelo.
+- **`execute()` usa el ejecutor por defecto de asyncio**, no el pool puente de
+  un worker, de modo que su paralelismo es el que provea el ejecutor por
+  defecto del loop en marcha.
+- **La limpieza es condicional.** `eventLoopContext()` cancela tareas solo si
+  el loop está inactivo al salir; si el loop sigue corriendo, el bloque termina
+  sin tocar ninguna tarea.
+- **`run()` construye un loop nuevo por llamada.** Nunca reutiliza el loop del
+  hilo, así que está pensado para puntos de entrada y no para caminos
+  calientes.
+- **Nada se desmonta.** Ni los loops por hilo ni el ejecutor puente los cierra
+  este módulo; viven hasta que el proceso termina.
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14 (el módulo depende de la sintaxis
-  genérica de PEP 695: `def run[T](...)`, `def createTask[T](...)`,
-  `def runSync[T](...)`).
-- **Dependencias:**
-  - Solo librería estándar: `asyncio`, `concurrent.futures`, `functools`,
-    `inspect`, `sys`, `threading`, `types`, `contextlib`, `typing`.
-  - `uvloop` — opcional a nivel de Python, pero declarada como dependencia
-    normal del proyecto para plataformas distintas de Windows; se usa
-    automáticamente cuando es importable, y se ignora silenciosamente en
-    caso contrario (se captura el `ImportError`).
-- **El comportamiento por plataforma difiere de forma intencional:** la
-  implementación de bucle seleccionada en Windows (`ProactorEventLoop`)
-  difiere de la seleccionada en Linux/macOS (`uvloop` o valor por defecto
-  de la librería estándar) — esto es intencional y está documentado, no es
-  un defecto.
+- **Python:** `>= 3.14`, tal como declara `pyproject.toml`. El módulo usa la
+  sintaxis genérica del PEP 695 (`def run[T](...)`, `def createTask[T](...)`,
+  `def runSync[T](...)`), que es un error de sintaxis en intérpretes
+  anteriores.
+- **Dependencias:** solo biblioteca estándar. `uvloop>=0.22.1` es una
+  dependencia base del framework restringida a `sys_platform != 'win32'`, así
+  que no hay que instalar nada extra; cuando es importable se usa
+  automáticamente y, cuando no lo es, el `ImportError` se absorbe.
+- **El comportamiento por plataforma difiere a propósito:** Windows resuelve a
+  `asyncio.ProactorEventLoop`, el resto de plataformas a `uvloop` cuando está
+  disponible y al valor por defecto de asyncio en caso contrario.
+- **Anotaciones de tipo:** el módulo usa `from __future__ import annotations`,
+  así que sus anotaciones son cadenas en tiempo de ejecución; la clase nunca la
+  construye el contenedor de inyección de dependencias, que resuelve de forma
+  ansiosa las anotaciones de los constructores.
+- **Superficie pública:** `orionis/aio/__init__.py` exporta exactamente `Loop`
+  (`__all__ == ["Loop"]`).

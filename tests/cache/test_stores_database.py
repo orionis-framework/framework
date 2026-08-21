@@ -1,5 +1,7 @@
 from __future__ import annotations
 import asyncio
+import tempfile
+from pathlib import Path
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.database.connection import Connection
 from orionis.test import TestCase
@@ -338,3 +340,146 @@ class TestDatabaseCacheBackend(TestCase):
         await self._backend.releaseLock("res5", "owner-a")
         acquired = await self._backend.acquireLock("res5", "owner-b", lease=5)
         self.assertTrue(acquired)
+
+    # ── expiration column ────────────────────────────────────────────────────
+
+    async def testEntryExpirationKeepsSubSecondPrecision(self) -> None:
+        """
+        Store a fractional TTL without losing its decimals.
+
+        Validates that the expiration column is wide enough for the
+        floating point TTL the public API accepts, so an integer column
+        can never silently round it.
+        """
+        await self._backend.set("fractional", "v", ttl=0.25)
+
+        rows = await self._connection.select(
+            "SELECT expiration FROM cache WHERE cache_key = :k",
+            {"k": "fractional"},
+        )
+        stored = rows[0]["expiration"]
+
+        self.assertIsInstance(stored, float)
+        self.assertNotEqual(stored % 1, 0.0)
+
+    async def testLockExpirationKeepsSubSecondPrecision(self) -> None:
+        """
+        Store a fractional lease without losing its decimals.
+
+        Validates that a short lease is honoured with the granularity it
+        was requested with, instead of being widened to a whole second.
+        """
+        await self._backend.acquireLock("res6", "owner-a", lease=0.25)
+
+        rows = await self._connection.select(
+            "SELECT expiration FROM cache_locks WHERE cache_key = :k",
+            {"k": "res6"},
+        )
+        stored = rows[0]["expiration"]
+
+        self.assertIsInstance(stored, float)
+        self.assertNotEqual(stored % 1, 0.0)
+
+class TestDatabaseCacheBackendConcurrency(TestCase):
+    """Atomicity tests for the operations several callers may race on.
+
+    These run against a file database on purpose: an in-memory SQLite
+    database is served by a ``StaticPool``, so every task shares a single
+    connection and one task's rollback undoes another task's insert,
+    which hides the very behaviour under test.
+    """
+
+    async def asyncSetUp(self) -> None:
+        """
+        Create a file-backed database and a ready backend per test.
+
+        Gives every concurrent task its own connection, so the database
+        arbitrates the race instead of the pool.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._connection = Connection(
+            "sqlite",
+            {
+                "driver": "sqlite",
+                "database": str(Path(self._tmpdir.name) / "cache.sqlite"),
+                "prefix": "",
+            },
+        )
+        self._backend = DatabaseCacheBackend(
+            connection=self._connection,
+            table="cache",
+        )
+        await self._backend._ensureSchema()
+
+    async def asyncTearDown(self) -> None:
+        """
+        Dispose the engine and remove the temporary database file.
+
+        Releases the file handle before the directory is cleaned up.
+        """
+        await self._connection.disconnect()
+        self._tmpdir.cleanup()
+
+    async def testConcurrentAddGrantsASingleWinner(self) -> None:
+        """
+        Let exactly one concurrent caller create the key.
+
+        Validates that add() decides the winner through the primary key
+        instead of a check-then-act pair, which every caller could pass
+        before any of them inserted.
+        """
+        results = await asyncio.gather(
+            *(self._backend.add("race", f"value-{n}") for n in range(10)),
+            return_exceptions=True,
+        )
+
+        granted = [r for r in results if r is True]
+        rejected = [r for r in results if isinstance(r, ValueError)]
+
+        self.assertEqual(len(granted), 1)
+        self.assertEqual(len(rejected), 9)
+
+    async def testConcurrentIncrementsAreNotLost(self) -> None:
+        """
+        Apply every concurrent increment to the same counter.
+
+        Validates the compare-and-swap retry: a plain read-modify-write
+        lets simultaneous writers overwrite each other and the counter
+        ends far below the number of calls.
+        """
+        await self._backend.set("hits", 0)
+
+        await asyncio.gather(
+            *(self._backend.increment("hits") for _ in range(10)),
+        )
+
+        self.assertEqual(await self._backend.get("hits"), 10)
+
+    async def testConcurrentIncrementsCreateTheCounterOnce(self) -> None:
+        """
+        Reach the exact total when the counter does not exist yet.
+
+        Validates that the creation path is retried instead of letting
+        two callers both believe they initialised the counter.
+        """
+        await asyncio.gather(
+            *(self._backend.increment("fresh") for _ in range(10)),
+        )
+
+        self.assertEqual(await self._backend.get("fresh"), 10)
+
+    async def testConcurrentLockAttemptsGrantASingleOwner(self) -> None:
+        """
+        Hand the lock row to one owner when several race for it.
+
+        Validates that the row-based lock keeps mutual exclusion when
+        every contender reaches the table at the same time.
+        """
+        results = await asyncio.gather(
+            *(
+                self._backend.acquireLock("hot", f"owner-{n}", lease=5)
+                for n in range(10)
+            ),
+        )
+
+        self.assertEqual(sum(1 for granted in results if granted), 1)

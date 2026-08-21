@@ -9,6 +9,8 @@ _DEFAULT_EXT: str = ".html"
 
 # Memoised template identifier to loader path mapping; the set of template
 # names an application renders is bounded and stable at runtime.
+# Lock-free on purpose: entries are pure functions of their key, so a racing
+# writer can only store the value another thread would have computed.
 _PATH_CACHE: dict[str, str] = {}
 
 class Jinja2Engine(IViewEngine):

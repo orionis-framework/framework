@@ -43,15 +43,33 @@ class TestOrionisBytecodeCache(TestCase):
         """
         return OrionisBytecodeCache(self._cache_dir)
 
+    @staticmethod
+    def _stem(key: str) -> str:
+        """
+        Drop the disambiguating digest appended to a cache key.
+
+        Parameters
+        ----------
+        key : str
+            Key returned by ``get_cache_key``.
+
+        Returns
+        -------
+        str
+            The readable portion of the key, without the trailing digest.
+        """
+        return key.rsplit(".", 1)[0]
+
     def testGetCacheKeyStripsHtmlExtension(self) -> None:
         """
         Strip the .html extension from the cache key.
 
         Validates that a template name ending in .html produces a key
-        without the extension appended.
+        whose readable stem carries no extension.
         """
         cache = self._make()
-        self.assertEqual(cache.get_cache_key("users/index.html"), "users.index")
+        key = cache.get_cache_key("users/index.html")
+        self.assertEqual(self._stem(key), "users.index")
 
     def testGetCacheKeyStripsHtmExtension(self) -> None:
         """
@@ -61,7 +79,8 @@ class TestOrionisBytecodeCache(TestCase):
         without the extension.
         """
         cache = self._make()
-        self.assertEqual(cache.get_cache_key("pages/about.htm"), "pages.about")
+        key = cache.get_cache_key("pages/about.htm")
+        self.assertEqual(self._stem(key), "pages.about")
 
     def testGetCacheKeyStripsJinjaExtension(self) -> None:
         """
@@ -71,9 +90,8 @@ class TestOrionisBytecodeCache(TestCase):
         without the extension.
         """
         cache = self._make()
-        self.assertEqual(
-            cache.get_cache_key("layout/base.jinja"), "layout.base",
-        )
+        key = cache.get_cache_key("layout/base.jinja")
+        self.assertEqual(self._stem(key), "layout.base")
 
     def testGetCacheKeyStripsJinja2Extension(self) -> None:
         """
@@ -84,7 +102,7 @@ class TestOrionisBytecodeCache(TestCase):
         """
         cache = self._make()
         key = cache.get_cache_key("emails/welcome.jinja2")
-        self.assertEqual(key, "emails.welcome")
+        self.assertEqual(self._stem(key), "emails.welcome")
 
     def testGetCacheKeyStripsJ2Extension(self) -> None:
         """
@@ -94,9 +112,8 @@ class TestOrionisBytecodeCache(TestCase):
         without the extension.
         """
         cache = self._make()
-        self.assertEqual(
-            cache.get_cache_key("admin/dashboard.j2"), "admin.dashboard",
-        )
+        key = cache.get_cache_key("admin/dashboard.j2")
+        self.assertEqual(self._stem(key), "admin.dashboard")
 
     def testGetCacheKeyConvertsSlashesToDots(self) -> None:
         """
@@ -107,7 +124,7 @@ class TestOrionisBytecodeCache(TestCase):
         """
         cache = self._make()
         key = cache.get_cache_key("deep/nested/path/template.html")
-        self.assertEqual(key, "deep.nested.path.template")
+        self.assertEqual(self._stem(key), "deep.nested.path.template")
 
     def testGetCacheKeyConvertsBackslashesToDots(self) -> None:
         """
@@ -118,7 +135,7 @@ class TestOrionisBytecodeCache(TestCase):
         """
         cache = self._make()
         key = cache.get_cache_key("partials\\nav.html")
-        self.assertEqual(key, "partials.nav")
+        self.assertEqual(self._stem(key), "partials.nav")
 
     def testGetCacheKeyPreservesUnknownExtension(self) -> None:
         """
@@ -128,9 +145,8 @@ class TestOrionisBytecodeCache(TestCase):
         in the returned key without stripping.
         """
         cache = self._make()
-        self.assertEqual(
-            cache.get_cache_key("styles/main.css"), "styles.main.css",
-        )
+        key = cache.get_cache_key("styles/main.css")
+        self.assertEqual(self._stem(key), "styles.main.css")
 
     def testGetCacheKeyNoExtension(self) -> None:
         """
@@ -140,7 +156,44 @@ class TestOrionisBytecodeCache(TestCase):
         passes through the sanitisation step unmodified.
         """
         cache = self._make()
-        self.assertEqual(cache.get_cache_key("no_extension"), "no_extension")
+        key = cache.get_cache_key("no_extension")
+        self.assertEqual(self._stem(key), "no_extension")
+
+    def testGetCacheKeyIsDeterministic(self) -> None:
+        """
+        Return the same key for the same template name.
+
+        Validates that the appended digest is derived from the name and
+        never from per-instance or random state.
+        """
+        first = self._make().get_cache_key("users/index.html")
+        second = self._make().get_cache_key("users/index.html")
+        self.assertEqual(first, second)
+
+    def testGetCacheKeyDisambiguatesDifferentExtensions(self) -> None:
+        """
+        Keep templates sharing a stem in separate cache entries.
+
+        Validates that mail/welcome.html and mail/welcome.j2 no longer
+        normalise to the same key and therefore never share a file.
+        """
+        cache = self._make()
+        html = cache.get_cache_key("mail/welcome.html")
+        jinja = cache.get_cache_key("mail/welcome.j2")
+        self.assertEqual(self._stem(html), self._stem(jinja))
+        self.assertNotEqual(html, jinja)
+
+    def testGetCacheKeyDisambiguatesDottedNames(self) -> None:
+        """
+        Keep dotted names apart from their slash-delimited counterpart.
+
+        Validates that users/index.html and users.index.html produce
+        different keys even though both flatten to the same stem.
+        """
+        cache = self._make()
+        nested = cache.get_cache_key("users/index.html")
+        dotted = cache.get_cache_key("users.index.html")
+        self.assertNotEqual(nested, dotted)
 
     def testGetCacheKeyIgnoresFilenameArgument(self) -> None:
         """
@@ -213,14 +266,14 @@ class TestOrionisBytecodeCache(TestCase):
         chained suffixes are not removed twice.
         """
         cache = self._make()
-        self.assertEqual(cache.get_cache_key("page.html.j2"), "page.html")
+        self.assertEqual(self._stem(cache.get_cache_key("page.html.j2")), "page.html")
 
-    def testGetCacheKeyOnEmptyNameReturnsEmptyString(self) -> None:
+    def testGetCacheKeyOnEmptyNameReturnsDigestOnly(self) -> None:
         """
-        Return an empty key for an empty template name.
+        Return a digest-only key for an empty template name.
 
         Validates that the sanitisation step never fails on a degenerate
         template identifier.
         """
         cache = self._make()
-        self.assertEqual(cache.get_cache_key(""), "")
+        self.assertEqual(self._stem(cache.get_cache_key("")), "")

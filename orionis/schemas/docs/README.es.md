@@ -1,578 +1,844 @@
 # Orionis Schemas (`orionis.schemas`)
 
-> Esquemas de datos tipados y validados construidos sobre `msgspec.Struct`, con restricciones declarativas, reglas personalizadas y errores de validación estructurados.
->
-> 🇬🇧 English version: [README.md](README.md)
-
-`orionis.schemas` permite declarar formas de datos tipadas (cuerpos de
-peticiones HTTP, DTOs, objetos de valor anidados) como clases simples y
-anotadas, obteniendo tanto **coerción de tipos** como **validación** de
-forma gratuita — impulsado por [`msgspec`](https://jcristharif.com/msgspec/)
-por debajo, pero expuesto mediante una API específica de Orionis,
-agnóstica del framework subyacente. Es la capa de esquemas que usa el
-contenedor de DI para poblar y validar automáticamente los cuerpos de
-peticiones HTTP, y puede usarse de forma independiente para cualquier
-necesidad de validación de datos estructurados.
-
----
+> Capa de validación declarativa construida sobre `msgspec`: conversión de tipos, restricciones, reglas personalizadas y reporte de múltiples errores para cuerpos HTTP y cualquier dato crudo.
 
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Descripción funcional del módulo](#descripción-funcional-del-módulo)
-3. [Arquitectura](#arquitectura)
-4. [Referencia de API](#referencia-de-api)
-   - [`Schema` / `SchemaMeta`](#schema--schemameta-orionisschemasschemaschema)
-   - [Alias de tipos de campo (`fields.py`)](#alias-de-tipos-de-campo-fieldspy)
-   - [Metadatos de documentación (`metadata.py`)](#metadatos-de-documentación-metadatapy)
-   - [Restricciones de validación (`constraints.py`)](#restricciones-de-validación-constraintspy)
-   - [Reglas personalizadas: `Rule`, `IRule`, `StrongPassword`](#reglas-personalizadas-rule-irule-strongpassword)
-   - [El punto de entrada del validador: `Schema.validate` (`validator.py`)](#el-punto-de-entrada-del-validador-schemavalidate-validatorpy)
-   - [Manejo de errores: `ValidationFailure`, `ValidationException`, `ValidationErrorParser`](#manejo-de-errores-validationfailure-validationexception-validationerrorparser)
-   - [`MetaCompiler` / `MetadataConflictError`](#metacompiler--metadataconflicterror)
-5. [Ejemplos de uso](#ejemplos-de-uso)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de diseño](#notas-de-diseño)
-8. [Notas de compatibilidad](#notas-de-compatibilidad)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja](#dónde-encaja)
+  - [Pipeline de validación](#pipeline-de-validación)
+  - [Mapa de archivos](#mapa-de-archivos)
+- [Referencia de API](#referencia-de-api)
+  - [`Schema` — clase base (`orionis.schemas.schema`)](#schema--clase-base-orionisschemasschema)
+  - [`SchemaMeta` (`orionis.schemas.schema`)](#schemameta-orionisschemasschema)
+  - [`Schema.validate` — punto de entrada del validador (`orionis.schemas.validator`)](#schemavalidate--punto-de-entrada-del-validador-orionisschemasvalidator)
+  - [Alias de campo (`orionis.schemas.fields`)](#alias-de-campo-orionisschemasfields)
+  - [Metadatos de restricción (`orionis.schemas.constraints`)](#metadatos-de-restricción-orionisschemasconstraints)
+  - [Metadatos de documentación (`orionis.schemas.metadata`)](#metadatos-de-documentación-orionisschemasmetadata)
+  - [`MetaCompiler` y `MetadataConflictError` (`orionis.schemas.compiler`)](#metacompiler-y-metadataconflicterror-orionisschemascompiler)
+  - [`Rule` e `IRule`](#rule-e-irule)
+  - [Reglas incorporadas (`orionis.schemas.rules`)](#reglas-incorporadas-orionisschemasrules)
+  - [Módulos auxiliares de reglas](#módulos-auxiliares-de-reglas)
+  - [`ValidationFailure` (`orionis.schemas.entities.failure`)](#validationfailure-orionisschemasentitiesfailure)
+  - [`ValidationException` (`orionis.schemas.exceptions.validation`)](#validationexception-orionisschemasexceptionsvalidation)
+  - [`ValidationErrorParser` (`orionis.schemas.exception_parser`)](#validationerrorparser-orionisschemasexception_parser)
+  - [`FailureCollector` (`orionis.schemas.failure_collector`)](#failurecollector-orionisschemasfailure_collector)
+  - [Plan de validación (`orionis.schemas.rules_executor`)](#plan-de-validación-orionisschemasrules_executor)
+  - [Marcadores de metadatos (`orionis.schemas.meta`)](#marcadores-de-metadatos-orionisschemasmeta)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [Declarar y validar un esquema](#declarar-y-validar-un-esquema)
+  - [Reportar todos los errores a la vez](#reportar-todos-los-errores-a-la-vez)
+  - [Esquemas anidados y mensajes personalizados](#esquemas-anidados-y-mensajes-personalizados)
+  - [Escribir una regla personalizada](#escribir-una-regla-personalizada)
+  - [Validación automática del cuerpo de una petición HTTP](#validación-automática-del-cuerpo-de-una-petición-http)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
----
+## Descripción funcional
 
-## Requisitos
+`orionis.schemas` convierte la declaración de una clase en un objeto tipado y
+validado. Un esquema declara sus campos con anotaciones estándar de Python; la
+metaclase compila los metadatos de esas anotaciones en restricciones
+`msgspec.Meta`, y el validador convierte un payload crudo (`dict`, JSON
+decodificado, datos de formulario) en una instancia del esquema, reportando
+**todos** los fallos a la vez en lugar de detenerse en el primero.
 
-No se requiere ninguna instalación adicional a la del propio framework:
+### Dónde encaja
 
-```bash
-pip install orionis
-```
+- **`orionis.container`** — `Container.__resolveSchemaArgument` lee el cuerpo de
+  la petición actual (`await request.data()`) y llama a
+  `Schema.validate(data, argument.type)` cuando un parámetro del handler está
+  anotado con una subclase de `msgspec.Struct` (`Argument.is_schema`, resuelto
+  por `orionis.introspection`). Eso es lo que hace que los parámetros de un
+  controlador se validen automáticamente.
+- **`orionis.http`** — `KernelHTTP` captura `ValidationException` y delega en
+  `orionis.http.validation.validation_response`, que devuelve `422` con
+  `exc.error()` para clientes JSON/AJAX, o un redirect `302` de vuelta con los
+  errores y el input anterior en el flash de sesión para navegadores.
+- **`orionis.orm` / `orionis.database`** — solo los usa la regla `Unique`, que
+  ejecuta una consulta de una sola fila contra una conexión configurada.
+- **`orionis.support.facades.datetime.DateTime`** — lo usan las reglas
+  temporales (`After`, `Before`, `DateFormat`, …) para resolver momentos en la
+  zona horaria de la aplicación.
+- **`orionis.support.entities.BaseEntity`** — `ValidationFailure` la extiende.
 
-- **Python:** 3.14 o superior — **requerido**, no solo como mínimo del
-  framework: `SchemaMeta` depende del protocolo de anotaciones perezosas
-  de PEP 649 (`__annotate_func__`), introducido en Python 3.14, para
-  compilar los metadatos de campo.
-- **Dependencia en tiempo de ejecución:** [`msgspec`](https://pypi.org/project/msgspec/)
-  (`msgspec>=0.21.1`, dependencia central y no opcional del framework)
-  provee la clase base `Struct` subyacente, la coerción de tipos, y la
-  aplicación de restricciones de bajo nivel (`msgspec.Meta`).
-
-## Descripción funcional del módulo
-
-Validar datos entrantes (un cuerpo JSON de HTTP, un payload de
-configuración, un objeto de valor anidado) normalmente requiere dos
-cosas: convertir datos crudos en valores Python tipados, y rechazar
-valores que no cumplan las reglas de negocio. `orionis.schemas` combina
-ambas en una sola declaración:
-
-- **`Schema`** (`orionis.schemas.schema.Schema`) — la clase base que
-  extiende cada esquema. Es una subclase de `msgspec.Struct` construida a
-  través de la metaclase `SchemaMeta`, que compila los metadatos de
-  Orionis (restricciones, documentación, reglas personalizadas) adjuntos
-  a cada campo vía `Annotated` en descriptores `msgspec.Meta`, de modo que
-  el decodificador nativo de `msgspec` (respaldado por Rust) aplica la
-  coerción de tipos **y** las restricciones incorporadas.
-- **Alias de tipos de campo** (`fields.py`) — nombres cortos (`Field`,
-  `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias`, `Static`) para los
-  constructos estándar de `typing` usados para declarar campos, de modo
-  que las clases de esquema se lean como dataclasses simples sin
-  importar `typing` directamente.
-- **Restricciones** (`constraints.py`) — reglas de valor declarativas
-  (`MinLength`, `MaxLength`, `Pattern`, `GreaterThan`, `LessThan`, ...)
-  que se compilan en argumentos de palabra clave de `msgspec.Meta`,
-  aplicadas de forma nativa durante la decodificación — la ruta de
-  validación más rápida.
-- **Reglas personalizadas** (`rule.py`, `rules/strong_password.py`) —
-  para comprobaciones que `msgspec.Meta` no puede expresar
-  (comprobaciones entre campos, lógica arbitraria en Python), se
-  subclasifica `Rule` y se implementa `enforce()`; las reglas se ejecutan
-  en una segunda pasada, tras una decodificación de tipo/restricción
-  exitosa.
-- **Metadatos de documentación** (`metadata.py`) — anotaciones que no
-  validan (`Title`, `Description`, `Examples`, `ExtraJsonSchema`,
-  `Extra`, `Message`) para generación de JSON Schema/OpenAPI y texto de
-  error personalizado.
-- **El punto de entrada del validador** (`validator.py`) — una pequeña
-  clase utilitaria, **también llamada `Schema`**, cuyo método estático
-  `validate(payload, schema)` convierte un payload crudo en una instancia
-  de esquema y ejecuta cualquier comprobación de `Rule` personalizada. Es
-  lo que llama internamente el contenedor de DI para resolver parámetros
-  anotados con `msgspec.Struct` (p. ej. cuerpos de petición HTTP) — ver
-  [Notas de diseño](#notas-de-diseño) sobre el choque de nombres con el
-  `Schema` de `schema.py`.
-- **Errores estructurados** (`entities/failure.py`,
-  `exceptions/validation.py`, `exception_parser.py`) — tanto los errores
-  de validación nativos de `msgspec` como los fallos de `Rule`
-  personalizados se normalizan en una única forma `ValidationFailure`
-  (`field`, `rule`, `message`) y se lanzan como una única
-  `ValidationException`, que `orionis.http.kernel` captura y convierte en
-  una respuesta JSON `422`.
-
-## Arquitectura
+### Pipeline de validación
 
 ```mermaid
-graph TD
-    A["class MiEsquema(Schema): ..."] -->|SchemaMeta.__new__| B[Compila metadatos Annotated]
-    B --> C[msgspec.Meta por campo vía MetaCompiler]
-    B --> D["__orionis_meta__ (reglas custom, docs)"]
-    B --> E["__orionis_constraints__ (mensajes custom)"]
-    D --> F["_build_plan() -> plan de validación (cacheado)"]
-    G["Schema.validate(payload, MiEsquema)"] -->|msgspec.convert| H[Instancia tipada]
-    H -->|msgspec.ValidationError?| I[ValidationErrorParser.parse]
-    H -->|reglas custom| J["_execute_with_plan() -> Rule.validate()"]
-    I --> K[ValidationFailure]
-    J --> K
-    K --> L[ValidationException]
-    L -->|capturada por| M[orionis.http.kernel -> respuesta JSON 422]
+flowchart TD
+    A["class MySchema(Schema)"] -->|SchemaMeta.__new__| B["Metadatos Annotated compilados\na msgspec.Meta + plan cacheado"]
+    C["Schema.validate(payload, MySchema)"] --> D["msgspec.convert (una llamada C)"]
+    D -->|ok| E["Ejecuta el plan de reglas cacheado"]
+    E -->|fallos| G["ValidationException"]
+    E -->|sin fallos| F["Instancia del esquema"]
+    D -->|msgspec.ValidationError| H["FailureCollector.collect\n(reconversión campo a campo)"]
+    H --> G
 ```
 
-- `SchemaMeta` (en `schema.py`) intercepta la creación de clase de cada
-  subclase de `Schema`: envuelve `__annotate_func__` para que cada campo
-  `Annotated[...]` se reescriba con un `msgspec.Meta` compilado (vía
-  `MetaCompiler`), recopila los metadatos que no son `msgspec.Meta`
-  (`Rule` personalizadas, `Message`, metadatos de documentación) en
-  `__orionis_meta__`, registra los mensajes de restricción personalizados
-  por campo en `__orionis_constraints__`, y precompila el plan de
-  validación de campos (`rules_executor._build_plan`) en el momento de
-  definir la clase.
-- `Schema.validate(payload, schema)` de `validator.py` es el punto de
-  entrada en tiempo de ejecución: `msgspec.convert(payload, type=schema)`
-  realiza la coerción de tipos y aplica de forma nativa cada restricción
-  `msgspec.Meta` compilada; en caso de fallo,
-  `ValidationErrorParser.parse(...)` convierte el texto de error crudo de
-  `msgspec` en un `ValidationFailure`. Si tiene éxito, el plan cacheado de
-  `rules_executor` ejecuta cada `Rule` personalizada (incluso de forma
-  recursiva para campos `Schema` anidados), lanzando `ValidationException`
-  ante el primer fallo.
-- `orionis.container.container.Container` importa `validator.Schema`
-  directamente y llama a `Schema.validate(...)` al auto-resolver un
-  parámetro anotado con una subclase de `msgspec.Struct` (detectado vía
-  `Argument.is_schema`, de `orionis.introspection`) — así es como los
-  parámetros de controladores HTTP tipados con una subclase de `Schema`
-  se pueblan y validan automáticamente desde el cuerpo de la petición.
-- `orionis.http.kernel` importa `ValidationException` y la convierte en
-  una respuesta `422` con el payload estructurado
-  `{"field", "rule", "message"}` de `exc.error()`.
+Existen dos caminos distintos:
+
+- **Camino feliz** — una llamada a `msgspec.convert` (nivel C) más el plan de
+  reglas cacheado. Cuando el esquema no declara ninguna `Rule` personalizada, no
+  se ejecuta ningún bucle de validación en Python.
+- **Camino de error** — se entra solo después de que `msgspec.convert` ya haya
+  fallado. `FailureCollector` reconvierte el payload campo a campo para reportar
+  todos los errores de tipo y de restricción, y luego ejecuta las reglas
+  personalizadas sobre los valores que convirtieron bien. Una regla asociada a
+  un campo cuyo propio valor falló la conversión **no** se ejecuta (no hay valor
+  que inspeccionar); una regla cuyo campo hermano falló **sí** se ejecuta.
+
+### Mapa de archivos
+
+| Ruta | Contenido |
+|---|---|
+| `__init__.py` | Reexporta la clase base `Schema`. |
+| `schema.py` | Metaclase `SchemaMeta` y clase base `Schema`. |
+| `validator.py` | Clase utilitaria `Schema` que expone el estático `validate`. |
+| `fields.py` | Alias de typing (`Field`, `Choice`, `Nullable`, …). |
+| `constraints.py` | Dataclasses de restricción + reexportación de todas las reglas. |
+| `metadata.py` | Metadatos de documentación (`Title`, `Description`, `Message`, …). |
+| `compiler.py` | `MetaCompiler`, `MetadataConflictError`. |
+| `rule.py` | Clase base `Rule` para reglas personalizadas. |
+| `rules_executor.py` | Constructor/caché del plan y bucle de ejecución de reglas. |
+| `failure_collector.py` | Reconversión campo a campo en el camino de error. |
+| `exception_parser.py` | `ValidationErrorParser` para el texto de error de `msgspec`. |
+| `contracts/constraint.py` | Contrato abstracto `IRule`. |
+| `entities/failure.py` | Entidad `ValidationFailure`. |
+| `exceptions/validation.py` | `ValidationException`. |
+| `meta/` | Marcadores base: `ValidationMetadata`, `ConstraintMetadata`, `DocumentMetadata`. |
+| `rules/` | 37 reglas incorporadas + los auxiliares `measure`, `temporal` e `image_probe`. |
 
 ## Referencia de API
 
-### `Schema` / `SchemaMeta` (`orionis.schemas.schema.Schema`)
+### `Schema` — clase base (`orionis.schemas.schema`)
 
 ```python
-class SchemaMeta(type(msgspec.Struct)): ...
-
 class Schema(msgspec.Struct, metaclass=SchemaMeta):
-    """Clase base para las declaraciones de esquema de Orionis."""
+
+    def toDict(self) -> dict[str, object]:
+        ...
 ```
 
-Exportada en la raíz del paquete: `from orionis.schemas import Schema`.
+Clase base de la que hereda todo esquema de la aplicación. Es un
+`msgspec.Struct` normal, así que la declaración de campos, los valores por
+defecto, las reglas de orden y el encoding siguen la semántica de `msgspec`.
 
-Esta es la clase que extiende cada **definición** de esquema. No aporta
-métodos públicos de instancia propios más allá de los que ofrece
-`msgspec.Struct` (acceso a campos, `__init__`, igualdad, etc.); todo el
-comportamiento vive en la metaclase, que se ejecuta una vez por subclase
-en el momento de crear la clase:
+- `toDict()` — devuelve `msgspec.structs.asdict(self)`, es decir, un
+  diccionario superficial de nombres de campo a valores.
 
-| Comportamiento de la metaclase | Descripción |
-| --- | --- |
-| Compila metadatos `Annotated[...]` | Cada instancia de `ValidationMetadata` encontrada en los argumentos `Annotated[...]` de un campo se compila en un único `msgspec.Meta` vía `MetaCompiler.compile(...)`, reemplazando la anotación cruda. |
-| `__orionis_meta__` | Atributo de clase: `dict[str, list[object]]` que mapea nombre de campo → metadatos personalizados que no son `msgspec.Meta` (instancias `Rule` personalizadas, metadatos de documentación) declarados en ese campo. |
-| `__orionis_constraints__` | Atributo de clase: `dict[str, dict[str, str]]` que mapea nombre de campo → `{clave_restricción: mensaje_personalizado}`, construido a partir de cualquier argumento `message=...` pasado a una restricción o metadato `Message(...)`. |
-| Precompilación del plan de validación | Llama al `rules_executor._build_plan(klass)` interno en el momento de crear la clase, para que la primera llamada a `Schema.validate(...)` de esa clase nunca pague el costo de una construcción en frío. |
+Atributos que la metaclase agrega a cada subclase:
 
-**Lanza:** `MetadataConflictError` (de `compiler.py`) en el **momento de
-definir la clase**, no en el de validar, si se declaran dos restricciones
-en conflicto en el mismo campo (ver
-[`MetaCompiler`](#metacompiler--metadataconflicterror)).
+| Atributo | Tipo | Contenido |
+|---|---|---|
+| `__orionis_meta__` | `dict[str, list[object]]` | Metadatos que no son `msgspec.Meta`, por campo (instancias de `Rule` personalizadas y cualquier otro objeto dejado en `Annotated`). Los campos sin metadatos personalizados se omiten. |
+| `__orionis_constraints__` | `dict[str, dict[str, str]]` | Mensajes personalizados por campo, indexados por nombre de restricción (`min_length`, `ge`, …, más la clave reservada `type` que produce `Message`). |
 
-### Alias de tipos de campo (`fields.py`)
+> Nota de importación: `orionis.schemas.Schema` (esta clase base) y
+> `orionis.schemas.validator.Schema` (la utilidad validadora) comparten nombre.
+> El código de aplicación que necesita ambas importa la segunda con alias, por
+> ejemplo `from orionis.schemas.validator import Schema as Validator`.
 
-Nombres cortos y específicos del framework que reexportan constructos
-estándar de `typing`, de modo que las declaraciones de campo de esquema
-no necesitan `import typing` directamente:
-
-| Alias | Constructo `typing` subyacente | Uso típico |
-| --- | --- | --- |
-| `Field` | `Annotated` | `name: Field[str, MinLength(3)]` — adjuntar metadatos a un campo. |
-| `Choice` | `Literal` | `status: Choice["active", "inactive"]` — restringir a valores fijos. |
-| `Nullable` | `Optional` | `middle_name: Nullable[str]` — permitir `None`. |
-| `AnyOf` | `Union` | `id: AnyOf[int, str]` — aceptar uno de varios tipos. |
-| `Constant` | `Final` | `VERSION: Constant[str] = "1.0"` — atributo de clase no sobrescribible. |
-| `Alias` | `TypeAlias` | Declarar un alias de tipo reutilizable para campos de esquema. |
-| `Static` | `ClassVar` | Marcar un atributo de esquema como de nivel de clase (excluido de los campos del struct). |
-
-### Metadatos de documentación (`metadata.py`)
-
-Todos subclasifican `DocumentMetadata` (un marcador `ValidationMetadata`
-que **no** participa en la validación de valores) y son
-`@dataclass(frozen=True, slots=True)`. Se usan dentro de
-`Field[...]`/`Annotated[...]` junto con restricciones:
-
-| Clase | Campos | Propósito |
-| --- | --- | --- |
-| `Title` | `value: str` | Título legible del campo para JSON Schema/OpenAPI. |
-| `Description` | `value: str` | Descripción legible del campo. |
-| `Examples` | `values: list[object]` | Valores de ejemplo para la salida de esquema generada. |
-| `ExtraJsonSchema` | `data: dict[str, object]` | Propiedades JSON Schema crudas fusionadas en el esquema generado (p. ej. `readOnly`, `deprecated`, `x-*`). |
-| `Extra` | `data: dict[str, object]` | Datos arbitrarios específicos de la aplicación, no interpretados por la generación de esquemas. |
-| `Message` | `text: str` | Mensaje de error personalizado mostrado cuando falla la validación de **tipo** en este campo — la única forma de sobrescribir un mensaje de discordancia de tipo simple (p. ej. `Field[str, Message("Debe ser una cadena.")]`). |
-
-### Restricciones de validación (`constraints.py`)
-
-Todas subclasifican `ConstraintMetadata` (un marcador `ValidationMetadata`
-que **sí** participa en la validación) y son `@dataclass(frozen=True,
-slots=True)`. Cada una acepta un `message: str | None` opcional y
-keyword-only, usado como texto de error personalizado cuando la
-restricción falla:
-
-| Clase | Campos | Aplica a | Se compila en la clave `msgspec.Meta` |
-| --- | --- | --- | --- |
-| `GreaterThan` | `value: int \| float` | Números | `gt` |
-| `GreaterThanOrEqual` | `value: int \| float` | Números | `ge` |
-| `LessThan` | `value: int \| float` | Números | `lt` |
-| `LessThanOrEqual` | `value: int \| float` | Números | `le` |
-| `MultipleOf` | `value: int \| float` | Números | `multiple_of` |
-| `Pattern` | `regex: str` | Cadenas | `pattern` |
-| `MinLength` | `value: int` | Cadenas/colecciones | `min_length` |
-| `MaxLength` | `value: int` | Cadenas/colecciones | `max_length` |
-| `TimezoneAware` | — | `datetime`/`time` | `tz_aware` |
-| `TimezoneNaive` | — | `datetime`/`time` | `tz_naive` |
-
-`StrongPassword` (en realidad definida en `rules/strong_password.py`, una
-subclase de `Rule` — ver más abajo) se reexporta en el `__all__` de
-`constraints.py` por conveniencia, ya que se usa habitualmente junto a
-estas restricciones.
-
-Estas restricciones se aplican **de forma nativa dentro del
-decodificador de `msgspec`** en el momento de decodificar (sin bucle
-adicional a nivel de Python por cada restricción) — ver
-[Consideraciones de rendimiento](#consideraciones-de-rendimiento-y-concurrencia).
-
-### Reglas personalizadas: `Rule`, `IRule`, `StrongPassword`
-
-Para validaciones que `msgspec.Meta` no puede expresar, se subclasifica
-`Rule`:
+### `SchemaMeta` (`orionis.schemas.schema`)
 
 ```python
-class Rule(IRule):
-    __slots__ = ("_code", "_message")
-    def __init__(self, *, message: str | None = None) -> None: ...
-    def enforce(self, field: str, value: object, instance: object) -> bool: ...
-    def validate(self, field: str, value: object, instance: object) -> ValidationFailure | None: ...
+class SchemaMeta(type(msgspec.Struct)):
+
+    def __new__(
+        cls,
+        name: str,
+        bases: tuple[type, ...],
+        namespace: dict[str, object],
+        **kwargs: object,
+    ) -> SchemaMeta:
+        ...
 ```
 
-| Miembro | Descripción |
-| --- | --- |
-| `__init__(*, message=None)` | Resuelve una sola vez, en tiempo de construcción, el mensaje de fallo efectivo (la sobrescritura por instancia o el `__message__` de clase) y el atributo de clase `__code__`. |
-| `enforce(field, value, instance)` | **Debe sobrescribirse** en las subclases. Devuelve `True` cuando `value` es válido, `False` en caso contrario. La implementación base lanza `NotImplementedError`. |
-| `validate(field, value, instance)` | Llama a `enforce(...)`; en caso de fallo, devuelve un `ValidationFailure(field=field, rule=<código resuelto>, message=<message o el por defecto>)`; devuelve `None` si tiene éxito. Normalmente no se sobrescribe. |
-| `__code__` (atributo de clase, opcional) | Identificador de regla legible por máquina usado como `ValidationFailure.rule`; por defecto es el nombre de la clase en minúsculas si no se establece. |
-| `__message__` (atributo de clase, opcional) | Mensaje de fallo por defecto usado cuando no se proporcionó un `message=` por instancia. |
+Se ejecuta una vez por definición de clase y realiza cuatro tareas:
 
-`IRule` (`orionis.schemas.contracts.constraint.IRule`) es el contrato
-`ABC` que implementa `Rule` (`__init__`, `enforce`, `validate`).
+1. Envuelve `__annotate_func__` (el callback de anotaciones perezosas de PEP
+   649) para que cada campo `Annotated` tenga sus elementos `ValidationMetadata`
+   compilados en un único `msgspec.Meta` mediante `MetaCompiler.compile`,
+   dejando intacto cualquier otro metadato.
+2. Extrae los mensajes personalizados: el keyword `message=` de cada restricción
+   y el texto de un marcador `Message(...)` (guardado bajo la clave reservada
+   `type`) hacia `__orionis_constraints__`.
+3. Recolecta los metadatos restantes en `__orionis_meta__`.
+4. Llama a `_build_plan(klass)` para que el plan de validación quede cacheado
+   antes de la primera petición.
 
-**`StrongPassword`** (`orionis.schemas.rules.strong_password.StrongPassword`)
-— una `Rule` incorporada: requiere una cadena de al menos 8 caracteres que
-contenga al menos una letra mayúscula, una minúscula y un dígito. Los
-valores que no son cadenas se tratan como válidos (`True`) para que los
-errores de tipo los reporte la propia comprobación de tipo del campo.
-`__code__ = "strong_password"`.
+**Lanza**
 
-Las reglas personalizadas se adjuntan a un campo junto a su tipo,
-exactamente igual que las restricciones:
+- `MetadataConflictError` — propagado desde `MetaCompiler.compile` cuando las
+  anotaciones de un campo están duplicadas, son ambiguas, imposibles o
+  inválidas.
+- `TypeError` — desde `_build_plan` cuando un campo lleva metadatos
+  personalizados que no son ni `Rule` ni `ValidationMetadata`; el mensaje es
+  `Field '<name>' on '<Class>': '<type>' is not a valid custom rule. Custom
+  rules must subclass 'orionis.schemas.rule.Rule'.`
+
+Ambos errores aparecen en **tiempo de definición de clase**, es decir, al
+importar, nunca durante una petición.
+
+### `Schema.validate` — punto de entrada del validador (`orionis.schemas.validator`)
 
 ```python
-zip_code: Field[str, ZipCode(message="Código postal inválido.")]
-```
-
-### El punto de entrada del validador: `Schema.validate` (`validator.py`)
-
-```python
-# orionis/schemas/validator.py
 class Schema:
+
+    __slots__ = ()
+
     @staticmethod
-    def validate(payload: object, schema: type[Schema]) -> Schema: ...
+    def validate(payload: object, schema: type[Schema]) -> Schema:
+        ...
 ```
 
-> **Nota sobre el nombre:** esta clase también se llama `Schema`, pero es
-> una clase **diferente** de `orionis.schemas.schema.Schema` (la clase
-> base que extienden tus definiciones de esquema). El `Schema` de este
-> módulo tiene un único `@staticmethod` y nunca se subclasifica ni se
-> instancia — existe únicamente para exponer `validate(...)`. El propio
-> código del framework lo importa bajo un alias para evitar confusión,
-> p. ej. `from orionis.schemas.validator import Schema as Validator`.
+- `payload` — entrada cruda. Cualquier objeto aceptado por `msgspec.convert`;
+  los mappings son el caso para el que está optimizado el camino de error.
+- `schema` — la clase de esquema a la que convertir.
+- **Devuelve** una instancia de `schema`.
+- **Lanza** `ValidationException` con todos los fallos encontrados.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `validate` | `(payload: object, schema: type[Schema]) -> Schema` (`@staticmethod`) | Convierte `payload` en `schema` vía `msgspec.convert(...)`, y luego ejecuta el plan de validación de reglas personalizadas cacheado del esquema (de forma recursiva, para campos `Schema` anidados). Devuelve la instancia completamente validada y tipada. |
+Comportamiento: una llamada `msgspec.convert(payload, type=schema)`; si tiene
+éxito, el plan cacheado ejecuta las reglas personalizadas y, si alguna falló, se
+lanza una única `ValidationException` con todas. Si la conversión falla, la
+excepción se construye con `FailureCollector.collect(payload, schema, exc)`.
 
-**Lanza:** `ValidationException` — ya sea a partir de un
-`msgspec.ValidationError` durante la conversión (convertido en un
-`ValidationFailure` vía `ValidationErrorParser`), o a partir de la
-primera `Rule` personalizada que falle.
+Efectos secundarios: ninguno más allá de poblar las cachés de planes a nivel de
+módulo.
 
-### Manejo de errores: `ValidationFailure`, `ValidationException`, `ValidationErrorParser`
+### Alias de campo (`orionis.schemas.fields`)
 
-**`ValidationFailure`** (`orionis.schemas.entities.failure.ValidationFailure`)
-— `@dataclass(slots=True, frozen=True)`, extiende
-`orionis.support.entities.base.BaseEntity`:
+Reexportaciones ligeras de nombres de `typing` para que un esquema se lea como
+una declaración y no como fontanería de tipos. Son alias, no envoltorios: el
+comportamiento es exactamente el de la construcción `typing` subyacente.
 
-| Campo | Tipo | Descripción |
-| --- | --- | --- |
-| `field` | `str` | Ruta separada por puntos del campo que falló (p. ej. `"address.zip_code"`). |
-| `rule` | `str` | Identificador de regla/restricción legible por máquina (p. ej. `"min_length"`, `"strong_password"`, `"type"`, `"invalid"`). |
-| `message` | `str` | Mensaje de fallo legible por humanos (personalizado, si está configurado; si no, el mensaje crudo de `msgspec`/la regla). |
+| Alias | Nombre subyacente |
+|---|---|
+| `Field` | `typing.Annotated` |
+| `Choice` | `typing.Literal` |
+| `Nullable` | `typing.Optional` |
+| `AnyOf` | `typing.Union` |
+| `Constant` | `typing.Final` |
+| `Alias` | `typing.TypeAlias` |
+| `Static` | `typing.ClassVar` |
 
-`toDict() -> dict` está sobrescrito (evitando la implementación genérica
-basada en `asdict` de `BaseEntity`) para construir
-`{"field", "rule", "message"}` directamente, ya que todos los campos ya
-son `str` planos.
+### Metadatos de restricción (`orionis.schemas.constraints`)
 
-**`ValidationException`** (`orionis.schemas.exceptions.validation.ValidationException`)
-— subclase de `Exception` que envuelve exactamente un `ValidationFailure`:
+Dataclasses frozen con slots que heredan de `ConstraintMetadata`. Se colocan
+dentro de `Field[...]` y se compilan a `msgspec.Meta`, así que las aplica
+`msgspec` durante la conversión, no código Python.
 
-| Miembro | Firma | Descripción |
-| --- | --- | --- |
-| `__init__` | `(failure: ValidationFailure) -> None` | Guarda `failure` y llama a `super().__init__(failure.message)`. |
-| `failure` | `ValidationFailure` (atributo) | El fallo envuelto. |
-| `error` | `() -> dict` | Devuelve `failure.toDict()` — la forma que `orionis.http.kernel` envía de vuelta como cuerpo de la respuesta `422`. |
+```python
+@dataclass(frozen=True, slots=True)
+class GreaterThan(ConstraintMetadata):
+    value: int | float
+    message: str | None = field(default=None, kw_only=True)
+```
 
-**`ValidationErrorParser`** (`orionis.schemas.exception_parser.ValidationErrorParser`)
-— traduce el texto crudo de `msgspec.ValidationError` en un
-`ValidationFailure`:
+| Restricción | Firma | Clave de `msgspec.Meta` |
+|---|---|---|
+| `GreaterThan` | `GreaterThan(value, *, message=None)` | `gt` |
+| `GreaterThanOrEqual` | `GreaterThanOrEqual(value, *, message=None)` | `ge` |
+| `LessThan` | `LessThan(value, *, message=None)` | `lt` |
+| `LessThanOrEqual` | `LessThanOrEqual(value, *, message=None)` | `le` |
+| `MultipleOf` | `MultipleOf(value, *, message=None)` | `multiple_of` |
+| `Pattern` | `Pattern(regex, *, message=None)` | `pattern` |
+| `MinLength` | `MinLength(value, *, message=None)` | `min_length` |
+| `MaxLength` | `MaxLength(value, *, message=None)` | `max_length` |
+| `TimezoneAware` | `TimezoneAware(*, message=None)` | `tz=True` |
+| `TimezoneNaive` | `TimezoneNaive(*, message=None)` | `tz=False` |
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `parse` | `(error: msgspec.ValidationError, schema: type \| None = None) -> ValidationFailure` (`@classmethod`) | Analiza el mensaje de error de `msgspec` para extraer la ruta del campo y la restricción que falló (`min_length`, `max_length`, `pattern`, `multiple_of`, `tz_naive`, `tz_aware`, `ge`, `le`, `gt`, `lt`, o `type`), y luego — si se proporciona `schema` — busca un mensaje personalizado en `__orionis_constraints__` (incluso a través de campos de esquema anidados) y lo sustituye si está presente. |
+El keyword `message` lo consume `SchemaMeta`: se guarda en
+`__orionis_constraints__` y reemplaza el texto por defecto de `msgspec` cuando
+esa es la restricción que falló.
 
-### `MetaCompiler` / `MetadataConflictError`
+El módulo además reexporta todas las reglas incorporadas, de modo que un esquema
+puede importar restricciones y reglas desde un único lugar — es el estilo de
+importación que usan los esquemas de la aplicación en `app/http/schemas/`.
+
+### Metadatos de documentación (`orionis.schemas.metadata`)
+
+Dataclasses frozen con slots que heredan de `DocumentMetadata`. No validan nada;
+alimentan las propiedades de JSON Schema / OpenAPI de `msgspec.Meta`.
+
+| Clase | Firma | Efecto |
+|---|---|---|
+| `Title` | `Title(value: str)` | `msgspec.Meta(title=...)`. |
+| `Description` | `Description(value: str)` | `msgspec.Meta(description=...)`. |
+| `Examples` | `Examples(values: list[object])` | `msgspec.Meta(examples=...)`. |
+| `ExtraJsonSchema` | `ExtraJsonSchema(data: dict[str, object])` | Se fusiona en el objeto JSON Schema generado. |
+| `Extra` | `Extra(data: dict[str, object])` | Se propaga sin interpretar. |
+| `Message` | `Message(text: str)` | Mensaje personalizado de **error de tipo**; se guarda bajo la clave reservada `type` de `__orionis_constraints__`. |
+
+`Message` es la única forma de sobrescribir el error `Expected <type>, got
+<type>` de un campo simple. Solo se conserva el primer `Message` encontrado en
+un campo.
+
+### `MetaCompiler` y `MetadataConflictError` (`orionis.schemas.compiler`)
 
 ```python
 class MetaCompiler:
+
     __slots__ = ()
+
     @staticmethod
-    def compile(metadata: list[ValidationMetadata]) -> msgspec.Meta: ...
+    def compile(metadata: list[ValidationMetadata]) -> msgspec.Meta:
+        ...
+
+
+class MetadataConflictError(ValueError):
+    ...
 ```
 
-Usado internamente por `SchemaMeta` (y disponible para uso directo) para
-convertir una lista de instancias `ValidationMetadata` en un único
-`msgspec.Meta`.
+`compile` indexa los metadatos por tipo concreto, valida la combinación y
+construye un único `msgspec.Meta` poblando `gt`, `ge`, `lt`, `le`,
+`multiple_of`, `pattern`, `min_length`, `max_length`, `tz`, `title`,
+`description`, `examples`, `extra_json_schema` y `extra`.
 
-| Método | Descripción |
-| --- | --- |
-| `compile(metadata)` | Indexa los metadatos por tipo concreto (rechazando duplicados), valida conflictos semánticos, y construye el descriptor `msgspec.Meta`. |
+`MetadataConflictError` se lanza en cuatro categorías:
 
-**`MetadataConflictError`** (subclase de `ValueError`) se lanza —
-siempre en el **momento de definir la clase de esquema**, no en el de
-validar — por:
+| Categoría | Ejemplo |
+|---|---|
+| Tipos duplicados | dos `MinLength` en el mismo campo |
+| Límites ambiguos | `GreaterThan` + `GreaterThanOrEqual`, `LessThan` + `LessThanOrEqual`, `TimezoneAware` + `TimezoneNaive` |
+| Rangos imposibles | `MinLength(10)` + `MaxLength(5)`; un límite inferior numérico que no queda por debajo del superior |
+| Valores inválidos | `MultipleOf(0)` o negativo, `MinLength(-1)`, `MaxLength(-5)` |
 
-- **Tipos duplicados**: la misma clase de metadato usada dos veces en un
-  campo (p. ej. dos `MinLength`).
-- **Límites ambiguos**: un límite exclusivo e inclusivo en el mismo lado
-  (p. ej. `GreaterThan` + `GreaterThanOrEqual`).
-- **Rangos lógicamente imposibles**: p. ej. `MinLength(100)` con
-  `MaxLength(10)`, o `TimezoneAware` con `TimezoneNaive` en el mismo
-  campo.
-- **Valores individuales inválidos**: p. ej. `MultipleOf(0)`,
-  `MinLength(-1)`.
+### `Rule` e `IRule`
+
+```python
+class Rule(IRule):
+
+    __slots__ = ("_code", "_message")
+
+    def __init__(self, *, message: str | None = None) -> None:
+        ...
+
+    def enforce(self, field: str, value: object, instance: object) -> bool:
+        ...
+
+    def validate(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> ValidationFailure | None:
+        ...
+```
+
+`Rule` es la clase base para validaciones que no pueden expresarse como una
+restricción de `msgspec`. Las subclases **solo sobrescriben `enforce`**:
+
+- `enforce` devuelve `True` cuando el valor pasa. La implementación base lanza
+  `NotImplementedError` con el mensaje
+  `Subclasses must implement the enforce method.`
+- `validate` es el punto de entrada que llama el ejecutor; envuelve a `enforce`
+  y construye un `ValidationFailure(field=..., rule=self._code,
+  message=self._message)` cuando devuelve `False`. No está pensado para
+  sobrescribirse.
+- `__init__` resuelve, una sola vez, los atributos de clase `__code__`
+  (respaldo: `type(self).__name__.lower()`) y `__message__`, y permite que el
+  keyword `message=` sobrescriba este último.
+
+`IRule` (`orionis.schemas.contracts.constraint`) es el `abc.ABC` correspondiente
+con `__slots__ = ()`, que declara `__init__`, `enforce` y `validate` como
+abstractos.
+
+Convención que siguen todas las reglas incorporadas: cuando el valor no es del
+tipo Python esperado, `enforce` devuelve `True` y deja que la capa de tipos
+reporte el desajuste, de modo que un mismo valor erróneo nunca produce dos
+errores.
+
+### Reglas incorporadas (`orionis.schemas.rules`)
+
+Todas son importables desde `orionis.schemas.rules` o desde
+`orionis.schemas.constraints`. Todos los constructores aceptan el keyword-only
+`message` para sobrescribir el texto por defecto.
+
+| Regla | Constructor | Código `rule` | Comprueba |
+|---|---|---|---|
+| `Accepted` | `Accepted(*, message=None)` | `accepted` | `True`, `1`, o `"yes"`/`"on"`/`"1"`/`"true"` (sin distinguir mayúsculas). |
+| `ActiveUrl` | `ActiveUrl(*, message=None)` | `active_url` | Que el hostname de la URL resuelva mediante `socket.getaddrinfo`. |
+| `After` | `After(reference=None, *, message=None)` | `after` | Fecha estrictamente posterior al momento de referencia. |
+| `AfterOrEqual` | `AfterOrEqual(reference=None, *, message=None)` | `after_or_equal` | Fecha igual o posterior al momento de referencia. |
+| `Alpha` | `Alpha(*, ascii_only=False, message=None)` | `alpha` | Solo caracteres alfabéticos. |
+| `Ascii` | `Ascii(*, message=None)` | `ascii` | Solo caracteres ASCII de 7 bits. |
+| `Before` | `Before(reference=None, *, message=None)` | `before` | Fecha estrictamente anterior al momento de referencia. |
+| `BeforeOrEqual` | `BeforeOrEqual(reference=None, *, message=None)` | `before_or_equal` | Fecha igual o anterior al momento de referencia. |
+| `Between` | `Between(minimum, maximum, *, message=None)` | `between` | Tamaño medido dentro de los límites inclusivos. Lanza `ValueError` si `minimum > maximum`. |
+| `ConfirmPassword` | `ConfirmPassword(other_field="password", *, message=None)` | `confirm_password` | Que coincida con el campo hermano de contraseña. |
+| `DateFormat` | `DateFormat(*formats, message=None)` | `date_format` | Cadena de fecha que coincide con uno de los formatos aceptados. |
+| `DecimalPlaces` | `DecimalPlaces(minimum, maximum=None, *, message=None)` | `decimal` | Número de decimales requerido. |
+| `Different` | `Different(*values, message=None)` | `different` | Que difiera de todos los valores indicados. |
+| `Dimensions` | `Dimensions(*, min_width=None, max_width=None, min_height=None, max_height=None, width=None, height=None, ratio=None, min_ratio=None, max_ratio=None, message=None)` | `dimensions` | Imagen subida que cumple las restricciones de dimensión. |
+| `DoesntEndWith` | `DoesntEndWith(*suffixes, message=None)` | `doesnt_end_with` | Que no termine con ninguno de los sufijos prohibidos. |
+| `DoesntStartWith` | `DoesntStartWith(*prefixes, message=None)` | `doesnt_start_with` | Que no empiece con ninguno de los prefijos prohibidos. |
+| `Email` | `Email(*, message=None)` | `email` | Dirección con forma RFC, ≤ 254 caracteres, parte local ≤ 64. |
+| `Encoding` | `Encoding(encoding="utf-8", *, message=None)` | `encoding` | Representable en el códec indicado. |
+| `EndsWith` | `EndsWith(*suffixes, message=None)` | `ends_with` | Que termine con uno de los sufijos permitidos. |
+| `File` | `File(*, message=None)` | `file` | Que el valor exponga el protocolo de archivo subido. |
+| `GreaterThanOrEqualField` | `GreaterThanOrEqualField(other_field, *, message=None)` | `gte` | Mayor o igual que un campo hermano. |
+| `Image` | `Image(*, message=None)` | `image` | Que el archivo subido sea un ráster PNG, JPEG, GIF, BMP o WebP. |
+| `Integer` | `Integer(*, message=None)` | `integer` | Que represente un número entero. |
+| `IpAddress` | `IpAddress(version=4, *, message=None)` | `ip` | Dirección IP válida; `version` acepta `4`, `6` o `None` (cualquier familia), otros valores lanzan `ValueError`. |
+| `Json` | `Json(*, message=None)` | `json` | Documento JSON sintácticamente válido. |
+| `LessThanOrEqualField` | `LessThanOrEqualField(other_field, *, message=None)` | `lte` | Menor o igual que un campo hermano. |
+| `Lowercase` | `Lowercase(*, message=None)` | `lowercase` | Sin caracteres en mayúscula. |
+| `MacAddress` | `MacAddress(*, message=None)` | `mac_address` | Dirección MAC válida. |
+| `MaxDigits` | `MaxDigits(maximum, *, message=None)` | `max_digits` | Como mucho el número de dígitos indicado. |
+| `MimeTypes` | `MimeTypes(*mime_types, message=None)` | `mimetypes` | Archivo subido que declara uno de los tipos MIME aceptados. |
+| `Size` | `Size(size, *, message=None)` | `size` | Tamaño medido exacto. |
+| `StartsWith` | `StartsWith(*prefixes, message=None)` | `starts_with` | Que empiece con uno de los prefijos permitidos. |
+| `StrongPassword` | `StrongPassword(*, message=None)` | `strong_password` | Al menos 8 caracteres con una mayúscula, una minúscula y un dígito. |
+| `Ulid` | `Ulid(*, message=None)` | `ulid` | ULID válido. |
+| `Unique` | `Unique(table, column, *, ignore=None, ignore_column="id", connection=None, message=None)` | `unique` | Que ninguna fila almacenada tenga el valor. |
+| `Uppercase` | `Uppercase(*, message=None)` | `uppercase` | Sin caracteres en minúscula. |
+| `Uuid` | `Uuid(version=None, *, message=None)` | `uuid` | Identificador RFC 9562; `version` acepta `1`, `3`, `4`, `5`, `6`, `7`, `8` o `None`, otros valores lanzan `ValueError`. |
+
+Reglas con efectos secundarios que conviene destacar:
+
+- **`Unique`** — construye un plan de `RawQueryBuilder` limitado a una fila y lo
+  ejecuta a través de `Loop.runSync`. Cuando ya hay un event loop en marcha (una
+  petición HTTP) crea una `Connection` desechable, consulta y siempre hace
+  `disconnect()` en un `finally`; la conexión pooled no puede reutilizarse
+  porque pertenece al loop del llamante. Sin loop en marcha usa la conexión
+  compartida que resuelve `ConnectionResolver`. El hilo llamante se bloquea
+  hasta que la consulta termina. `ignore`/`ignore_column` excluyen la fila que
+  se está actualizando.
+- **`ActiveUrl`** — realiza una resolución DNS bloqueante en el hilo llamante.
+- **`File`, `Image`, `Dimensions`, `MimeTypes`, `Size`, `Between`** — inspeccionan
+  archivos subidos. La detección es estructural: cualquier objeto que exponga
+  `read`, `size` y `filename`, de modo que el módulo nunca importa el paquete de
+  payload HTTP.
+
+### Módulos auxiliares de reglas
+
+Auxiliares a nivel de módulo (`snake_case`) que comparten las reglas anteriores;
+forman parte de la superficie del módulo pero no son reglas.
+
+| Módulo | Auxiliares públicos |
+|---|---|
+| `rules/measure.py` | `KILOBYTE`, `is_file(value) -> bool`, `read_content(value) -> bytes \| None`, `measure(value) -> float \| None` |
+| `rules/temporal.py` | `to_datetime(value)`, `parse_moment(text)`, `resolve_moment(reference, instance)` |
+| `rules/image_probe.py` | `probe_image(data: bytes) -> tuple[str, int, int] \| None` |
+
+- `measure(value)` devuelve el propio número para números, `len()` para valores
+  con tamaño, `size / 1024` para archivos subidos y `None` para booleanos o
+  cualquier cosa sin tamaño comparable.
+- `parse_moment` entiende las palabras clave `now`, `today`, `tomorrow` y
+  `yesterday`, y en el resto de casos delega en
+  `DateTime.parse(text, strict=False)`.
+- `resolve_moment` trata una referencia de tipo cadena primero como nombre de un
+  campo hermano, y solo después intenta interpretarla como fecha.
+- `probe_image` lee las dimensiones directamente de la cabecera del archivo para
+  PNG, JPEG, GIF, BMP y WebP: no hace falta ninguna librería de imágenes.
+
+### `ValidationFailure` (`orionis.schemas.entities.failure`)
+
+```python
+@dataclass(slots=True, frozen=True)
+class ValidationFailure(BaseEntity):
+    field: str
+    rule: str
+    message: str
+
+    def toDict(self) -> dict:
+        ...
+```
+
+Descripción inmutable de un fallo. `field` es la ruta con puntos
+(`"address.zip_code"`, `""` para un error sobre el propio payload), `rule` es la
+clave de restricción (`min_length`, `ge`, `type`, `missing`) o el `__code__` de
+la regla que falló, y `message` es el texto final que ve el cliente. `toDict()`
+sobrescribe `BaseEntity.toDict()` con un diccionario literal de tres claves.
+
+### `ValidationException` (`orionis.schemas.exceptions.validation`)
+
+```python
+class ValidationException(Exception):
+
+    def __init__(
+        self,
+        failures: ValidationFailure | Sequence[ValidationFailure],
+        message: str | None = None,
+    ) -> None:
+        ...
+
+    def error(self) -> dict:
+        ...
+```
+
+Acepta un fallo suelto o una `list`/`tuple` de ellos y expone:
+
+| Atributo | Tipo | Contenido |
+|---|---|---|
+| `failures` | `tuple[ValidationFailure, ...]` | Todos los fallos, en el orden en que se recolectaron. |
+| `failure` | `ValidationFailure \| None` | El primero, o `None` si se construyó vacía. |
+| `errors` | `dict[str, list[str]]` | Mensajes agrupados por nombre de campo. |
+| `message` | `str` | El argumento `message`, o el mensaje del primer fallo con el sufijo `(and N more error[s])`. Sin fallos: `The given data was invalid.` |
+
+`error()` devuelve `{"message": self.message, "errors": self.errors}`, que es
+exactamente el cuerpo que se envía con el HTTP `422`.
+
+### `ValidationErrorParser` (`orionis.schemas.exception_parser`)
+
+```python
+class ValidationErrorParser:
+
+    __slots__ = ()
+
+    @classmethod
+    def parse(
+        cls,
+        error: msgspec.ValidationError,
+        schema: type | None = None,
+    ) -> ValidationFailure:
+        ...
+
+    @classmethod
+    def parseAt(
+        cls,
+        error: msgspec.ValidationError,
+        schema: type | None,
+        base: str,
+    ) -> ValidationFailure:
+        ...
+```
+
+Convierte el texto de una `msgspec.ValidationError` en un `ValidationFailure`:
+
+- Separa el sufijo `<message> - at `$<path>`` con búsquedas de cadena simples y
+  une la ruta con `base` (los índices de secuencia como `[0]` se añaden sin
+  punto).
+- Reconoce `missing required field \`x\`` y reporta `rule="missing"`.
+- Mapea el mensaje a una clave de restricción mediante una lista ordenada de
+  frases (`of length >=` → `min_length`, ` >= ` → `ge`, `Expected` → `type`, …);
+  si no coincide ninguna, `rule` es `"type"`.
+- Recorre la jerarquía del esquema siguiendo la ruta con puntos para localizar
+  el esquema hoja y sustituye el mensaje por el personalizado declarado en
+  `__orionis_constraints__`, si existe.
+
+`parse(error, schema)` equivale a `parseAt(error, schema, "")`.
+
+Dos cachés a nivel de módulo mantienen barato el camino de error:
+`_STRUCT_FIELDS_MAP` (esquema → tipos de campo) y `_NESTED_TYPE_CACHE`
+(`(schema, field)` → esquema anidado o `None`).
+
+### `FailureCollector` (`orionis.schemas.failure_collector`)
+
+```python
+class FailureCollector:
+
+    __slots__ = ()
+
+    @classmethod
+    def collect(
+        cls,
+        payload: object,
+        schema: type,
+        error: msgspec.ValidationError,
+    ) -> tuple[ValidationFailure, ...]:
+        ...
+```
+
+Se ejecuta solo después de que haya fallado la conversión del payload completo.
+Para un payload de tipo `Mapping` convierte cada campo declarado por separado,
+de modo que:
+
+- Los campos obligatorios ausentes se reportan con `rule="missing"` y el mensaje
+  ``Object missing required field `x` ``.
+- Cada campo que falla la conversión aporta su propio fallo (recursando en los
+  esquemas anidados, que reportan sus errores con rutas separadas por puntos).
+- Los campos que convirtieron bien siguen ejecutando sus reglas personalizadas,
+  recibiendo un `types.SimpleNamespace` construido con los valores convertidos
+  correctamente: eso es lo que mantiene utilizables las reglas entre campos
+  cuando no existe ninguna instancia del esquema.
+
+Cuando ningún campo declarado puede ser culpado (payload que no es mapping,
+campos desconocidos, hooks personalizados), el error originalmente parseado se
+inserta en la posición 0.
+
+Su plan por esquema se cachea en `_FIELD_PLAN_CACHE` y reutiliza el plan de
+reglas construido por `rules_executor`, así que las reglas se declaran en un
+único lugar.
+
+### Plan de validación (`orionis.schemas.rules_executor`)
+
+Módulo interno (todos sus nombres llevan el prefijo `_`), documentado porque
+define comportamiento observable: **cuándo** se ejecutan las reglas
+personalizadas y en **qué orden** se producen los fallos.
+
+| Nombre | Propósito |
+|---|---|
+| `_PLAN_CACHE` | `dict[type, tuple]`, a nivel de proceso, una entrada por clase de esquema. |
+| `_build_plan(klass) -> tuple` | Construye y cachea el plan; las entradas son `(field_name, field_name_dot, getter, validators, is_nested)`. Solo conserva campos con reglas o con esquema anidado, así que un plan vacío significa "no hay nada que hacer". Lanza `TypeError` con metadatos no soportados. |
+| `_collect_with_plan(plan, instance, prefix, failures) -> None` | El bucle caliente: lee cada campo con un `operator.attrgetter` precompilado, recursa primero en los esquemas anidados y luego ejecuta los validadores del campo, acumulando cada fallo. |
+
+Consecuencias visibles desde fuera: los fallos anidados de un campo se reportan
+antes que los fallos de las reglas de ese mismo campo, y el plan de un esquema
+anidado se precalienta al construir el plan del padre, así que no ocurre ninguna
+construcción en frío a mitad de una petición.
+
+### Marcadores de metadatos (`orionis.schemas.meta`)
+
+| Clase | Módulo | Rol |
+|---|---|---|
+| `ValidationMetadata` | `meta/validation.py` | Marcador raíz (`__slots__ = ()`) de todo lo que puede anotar un campo de esquema. |
+| `ConstraintMetadata` | `meta/constraint.py` | Marcador de los metadatos que participan en la validación de valores. |
+| `DocumentMetadata` | `meta/document.py` | Marcador de los metadatos que solo alimentan la salida de documentación. |
+
+Declaran `__slots__ = ()` para que las subclases dataclass frozen con
+`slots=True` no choquen con un conflicto entre `__dict__` y slots.
 
 ## Ejemplos de uso
 
-### Definir un esquema con restricciones, documentación y un mensaje personalizado
+### Declarar y validar un esquema
 
 ```python
 from orionis.schemas import Schema
+from orionis.schemas.constraints import (
+    Email,
+    GreaterThanOrEqual,
+    LessThanOrEqual,
+    MinLength,
+)
+from orionis.schemas.fields import Field, Nullable
+from orionis.schemas.validator import Schema as Validator
+
+
+class RegisterSchema(Schema):
+    name: Field[str, MinLength(3)]
+    email: Field[str, Email()]
+    age: Field[int, GreaterThanOrEqual(18), LessThanOrEqual(120)]
+    nickname: Nullable[str] = None
+
+
+user = Validator.validate(
+    {"name": "Ada", "email": "ada@example.com", "age": 36},
+    RegisterSchema,
+)
+
+print(user.name, user.age)
+print(user.toDict())
+```
+
+Salida:
+
+```text
+Ada 36
+{'name': 'Ada', 'email': 'ada@example.com', 'age': 36, 'nickname': None}
+```
+
+### Reportar todos los errores a la vez
+
+Continuación del fragmento anterior:
+
+```python
+from orionis.schemas.exceptions.validation import ValidationException
+
+try:
+    Validator.validate({"name": "Al", "email": "nope", "age": 12}, RegisterSchema)
+except ValidationException as exc:
+    print(exc.message)
+    print(exc.errors)
+    for failure in exc.failures:
+        print(failure.field, "|", failure.rule, "|", failure.message)
+```
+
+Salida:
+
+```text
+Expected `str` of length >= 3 (and 2 more errors)
+{'name': ['Expected `str` of length >= 3'], 'age': ['Expected `int` >= 18'], 'email': ['Value must be a valid email address.']}
+name | min_length | Expected `str` of length >= 3
+age | ge | Expected `int` >= 18
+email | email | Value must be a valid email address.
+```
+
+Los errores de tipo y de restricción van primero, en el orden de declaración de
+los campos; los fallos de reglas van después, porque se ejecutan una vez que se
+conocen todos los valores.
+
+### Esquemas anidados y mensajes personalizados
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import MinLength, StrongPassword
+from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
-from orionis.schemas.constraints import MinLength, StrongPassword
+from orionis.schemas.validator import Schema as Validator
 
-class StoreUserSchema(Schema):
+
+class Address(Schema):
+    city: Field[str, MinLength(2, message="City is too short.")]
+    zip_code: Field[str, Message("The zip code must be text.")]
+
+
+class Account(Schema):
+    address: Address
+    password: Field[str, StrongPassword(message="Choose a stronger password.")]
+
+
+try:
+    Validator.validate(
+        {"address": {"city": "X", "zip_code": 1000}, "password": "weak"},
+        Account,
+    )
+except ValidationException as exc:
+    print(exc.errors)
+```
+
+Salida:
+
+```text
+{'address.city': ['City is too short.'], 'address.zip_code': ['The zip code must be text.'], 'password': ['Choose a stronger password.']}
+```
+
+### Escribir una regla personalizada
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.exceptions.validation import ValidationException
+from orionis.schemas.fields import Field
+from orionis.schemas.rule import Rule
+from orionis.schemas.validator import Schema as Validator
+
+
+class EvenNumber(Rule):
+
+    __code__ = "even"
+    __message__ = "Value must be an even number."
+
+    def enforce(self, field: str, value: object, instance: object) -> bool:
+        return isinstance(value, int) and value % 2 == 0
+
+
+class Ticket(Schema):
+    seats: Field[int, EvenNumber()]
+
+
+print(Validator.validate({"seats": 4}, Ticket).toDict())
+
+try:
+    Validator.validate({"seats": 3}, Ticket)
+except ValidationException as exc:
+    print(exc.errors, exc.failures[0].rule)
+```
+
+Salida:
+
+```text
+{'seats': 4}
+{'seats': ['Value must be an even number.']} even
+```
+
+### Validación automática del cuerpo de una petición HTTP
+
+Basta con anotar un parámetro del controlador con un esquema: el contenedor lee
+el cuerpo, lo valida e inyecta la instancia tipada. Si la validación falla, el
+controlador nunca se ejecuta — `KernelHTTP` transforma la `ValidationException`
+en un payload `422` para clientes JSON o en un redirect de vuelta con los
+errores en el flash para navegadores.
+
+```python
+from orionis.http import HttpResponse, response
+from orionis.http.base import BaseController
+from orionis.schemas import Schema
+from orionis.schemas.constraints import ConfirmPassword, Email, MinLength, Unique
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Message
+
+
+class RegisterSchema(Schema):
+
     name: Field[
         str,
         Message("Name must be a string."),
-        MinLength(8, message="Name must be at least 8 characters long."),
+        MinLength(6, message="Name must be at least 6 characters long."),
     ]
-    email: Field[str, Message("Email must be a string.")]
-    password: Field[
+
+    email: Field[
         str,
-        StrongPassword(message="Min 8 chars with uppercase, lowercase, and a digit."),
+        Message("Email must be a string."),
+        Email(message="Email must be a valid email address."),
+        Unique(table="users", column="email", message="Email already exists."),
     ]
-```
 
-### Esquemas anidados y una regla personalizada
+    password: Field[str, MinLength(8)]
 
-```python
-from orionis.schemas import Schema
-from orionis.schemas.fields import Field
-from orionis.schemas.rule import Rule
+    password_confirmation: Field[
+        str,
+        ConfirmPassword(message="Password confirmation does not match."),
+    ]
 
-class ZipCode(Rule):
-    __message__ = "Invalid ZIP code format."
-    __code__ = "zipcode"
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
-        return (
-            isinstance(value, str)
-            and len(value) == 5
-            and value.isdigit()
-            and 501 <= int(value) <= 99950
-        )
+class RegisterController(BaseController):
 
-class AddressSchema(Schema):
-    city: Field[str, MinLength(2)]
-    zip_code: Field[str, ZipCode(message="ZIP code must be exactly 5 digits.")]
-
-class StoreUserSchema(Schema):
-    name: Field[str, MinLength(8)]
-    address: AddressSchema  # validado de forma recursiva
-```
-
-### Validar un payload crudo directamente
-
-```python
-from orionis.schemas.validator import Schema as Validator
-from orionis.schemas.exceptions.validation import ValidationException
-
-payload = {
-    "name": "Ada Lovelace",
-    "email": "ada@example.com",
-    "password": "Str0ngPass!",
-}
-
-try:
-    user = Validator.validate(payload, StoreUserSchema)
-except ValidationException as exc:
-    print(exc.error())  # {"field": "...", "rule": "...", "message": "..."}
-else:
-    print(user.name, user.email)
-```
-
-### Validación automática de cuerpos de peticiones HTTP
-
-Cualquier parámetro de un controlador HTTP anotado con una subclase de
-`Schema` se valida automáticamente mediante el contenedor de DI antes de
-que se ejecute tu handler (detectado vía el `Argument.is_schema` de
-`orionis.introspection`):
-
-```python
-from app.http.schemas.store_user import StoreUserSchema
-
-async def store(self, payload: StoreUserSchema) -> Response:
-    # payload ya es aquí una instancia StoreUserSchema validada;
-    # una petición inválida nunca llega a esta línea — el contenedor lanza
-    # ValidationException, que orionis.http.kernel convierte en un 422.
-    ...
+    async def register(self, payload: RegisterSchema) -> HttpResponse:
+        return response.json({"email": payload.email})
 ```
 
 ## Consideraciones de rendimiento y concurrencia
 
-- **Las restricciones se ejecutan de forma nativa dentro del
-  decodificador de `msgspec`**: `MinLength`, `MaxLength`, `Pattern`,
-  `GreaterThan`, etc. se compilan en argumentos de palabra clave de
-  `msgspec.Meta`, por lo que las aplica el decodificador de `msgspec`
-  (respaldado por C/Rust) durante `msgspec.convert(...)` — no hay un
-  bucle adicional a nivel de Python para estas comprobaciones.
-- **Las `Rule` personalizadas se ejecutan en una segunda pasada
-  precompilada**: `SchemaMeta` construye un **plan de validación** una
-  sola vez por clase de esquema, en el momento de definir la clase
-  (`rules_executor._build_plan`), cacheando para cada campo: un
-  `operator.attrgetter` vinculado, la tupla de invocables `rule.validate`
-  vinculados, y si el campo contiene un esquema anidado.
-  `Schema.validate(...)` reutiliza este plan cacheado en cada llamada —
-  no hay reflexión ni búsqueda de nombre de atributo por llamada.
-- **Caché de planes global indexada por clase**:
-  `rules_executor._PLAN_CACHE` es un `dict[type, tuple]` a nivel de
-  módulo, compartido en todo el proceso; los planes de esquemas anidados
-  se "precalientan" de forma anticipada (`_warm_child_plan`) cuando se
-  construye el plan padre, de modo que la primera validación real de un
-  campo anidado nunca provoca una construcción en frío del plan.
-- **Los campos sin reglas personalizadas ni esquema anidado no cuestan
-  nada extra**: dichos campos **no** se añaden en absoluto al plan —
-  `Schema.validate` realiza solo la decodificación `msgspec` simple, y
-  luego una pasada de validación sobre un plan vacío (o más corto).
-- **El primer fallo detiene la validación**: `_execute_with_plan` (y la
-  decodificación `msgspec` subyacente) lanzan ante el **primer** fallo
-  encontrado — este módulo reporta un único `ValidationFailure` por
-  llamada a `validate()`, no un agregado de todos los campos que fallan.
-- **Sin bloqueos alrededor de las cachés a nivel de módulo**:
-  `_PLAN_CACHE` y `_STRUCT_FIELDS_MAP`/`_NESTED_TYPE_CACHE` del parser son
-  diccionarios simples sin bloqueo; en CPython, las lecturas/escrituras
-  simples de diccionario son atómicas bajo el GIL, lo cual es suficiente
-  para el patrón de uso del framework (los planes se construyen una vez
-  por clase, típicamente durante el arranque de la aplicación / primer
-  uso, no repetidamente bajo una fuerte presión de escritura concurrente).
-- **El costo de compilación de metadatos de `SchemaMeta` se paga una sola
-  vez**, en el momento de importar, cuando se ejecuta el cuerpo de la
-  clase de esquema — no en cada llamada a `Schema.validate(...)`.
-
-## Notas de diseño
-
-- **Dos clases distintas se llaman ambas `Schema`**:
-  `orionis.schemas.schema.Schema` (la clase base que extiendes para
-  *definir* un esquema) y `orionis.schemas.validator.Schema` (una clase
-  utilitaria que expone el punto de entrada estático `validate(...)`).
-  Es una división intencional y existente entre las responsabilidades de
-  "declaración" y "validación en tiempo de ejecución", no un error de
-  nomenclatura a corregir — importa la segunda bajo un alias
-  (`from orionis.schemas.validator import Schema as Validator`) para
-  evitar ambigüedad en código que necesite ambas.
-- **Jerarquía de marcadores `ValidationMetadata`**: `ValidationMetadata`
-  (raíz, `__slots__ = ()`) → `ConstraintMetadata` (valida valores; clases
-  de `constraints.py`) y `DocumentMetadata` (solo documentación; clases
-  de `metadata.py`) son dos ramas paralelas que no se solapan, que es
-  cómo `SchemaMeta`/`MetaCompiler` distinguen "compilar en `msgspec.Meta`"
-  de "recopilar para inspección posterior" sin una cadena de
-  `isinstance` por cada tipo concreto.
-- **Anotaciones perezosas de PEP 649, por diseño**: `SchemaMeta` envuelve
-  `__annotate_func__` (en lugar de leer `__annotations__` de forma
-  ansiosa) para que la compilación de metadatos ocurra de forma perezosa
-  y exactamente una vez, coherente con la evaluación diferida de
-  anotaciones de Python 3.14 — por esto 3.14 es un requisito estricto
-  para este módulo en particular, no solo un mínimo general del
-  framework.
-- **Dataclasses congeladas y con slots en todas partes**: cada
-  restricción (`constraints.py`), cada clase de metadato de
-  documentación (`metadata.py`), y `ValidationFailure` son
-  `@dataclass(frozen=True, slots=True)` — objetos de valor inmutables y
-  ligeros en memoria, coherentes con las convenciones de entidades del
-  resto del framework.
-- **La detección de conflictos ocurre al definir la clase, no al
-  validar**: `MetadataConflictError` aparece tan pronto como se *define*
-  una clase de esquema en conflicto (durante `SchemaMeta.__new__`), lo
-  que significa que un esquema con restricciones contradictorias falla
-  en el momento de la importación / arranque de la aplicación, en lugar
-  de comportarse mal silenciosamente en tiempo de petición.
-- **`Rule.validate()` es un envoltorio delgado, no pensado para
-  sobrescribirse**: se espera que las subclases sobrescriban únicamente
-  `enforce()`; la tarea de `validate()` (convertir un resultado `False`
-  en un `ValidationFailure` con el código/mensaje resuelto) está
-  centralizada en la clase base `Rule`, de modo que cada regla
-  personalizada obtiene un reporte de fallo consistente de forma
-  gratuita.
-- **`ValidationErrorParser` resuelve mensajes personalizados a través de
-  esquemas anidados**: `_resolveSchema` recorre una ruta de campo con
-  puntos (p. ej. `"address.zip_code"`) a través de clases `Schema`
-  anidadas para encontrar la entrada correcta de
-  `__orionis_constraints__`, de modo que un `message=...` personalizado
-  establecido en un campo de un esquema anidado se respeta incluso
-  cuando el fallo se origina desde la llamada de nivel superior a
-  `Schema.validate(...)`.
+- **Todo lo caro ocurre una sola vez, al importar.** Compilar los metadatos,
+  detectar conflictos y construir el plan de validación ocurre dentro de
+  `SchemaMeta.__new__`. Una petición solo paga `msgspec.convert` más, cuando el
+  esquema declara reglas personalizadas, una pasada sobre el plan cacheado.
+- **Un esquema sin reglas personalizadas cuesta exactamente una llamada C.**
+  `_build_plan` conserva solo los campos con reglas o con esquema anidado; un
+  plan vacío cortocircuita todo el bucle Python de `Schema.validate`.
+- **El camino multi-error se activa solo al fallar.** `FailureCollector`
+  reconvierte campo a campo, lo que es medible y notablemente más caro que una
+  única conversión, pero se ejecuta solo cuando el payload ya fue rechazado.
+- **Las cachés son de proceso y no tienen límite.** `_PLAN_CACHE`,
+  `_FIELD_PLAN_CACHE`, `_STRUCT_FIELDS_MAP` y `_NESTED_TYPE_CACHE` son `dict`s a
+  nivel de módulo, indexados por clase y sin desalojo. Cada valor almacenado es
+  función pura de su clave, así que una doble construcción concurrente guarda
+  datos idénticos; en la práctica lo que acota la memoria es el propio número de
+  clases.
+- **Las instancias de regla se comparten.** Una regla se construye una vez,
+  dentro de la anotación de la clase, y su `validate` se llama para cada payload
+  — incluso concurrentemente. Las reglas incorporadas solo leen sus slots de
+  configuración y no guardan estado mutable; las reglas personalizadas deben
+  hacer lo mismo.
+- **El pipeline es totalmente síncrono.** `Schema.validate` es una función
+  normal y bloquea el hilo llamante. Esto importa para las dos reglas con E/S:
+  `ActiveUrl` bloquea en DNS y `Unique` bloquea en un viaje a la base de datos.
+  `Unique` puentea el ORM async con `Loop.runSync`, que despacha a un hilo
+  worker cuando ya hay un event loop en marcha; como ese worker tiene su propio
+  loop, la regla abre y cierra una `Connection` dedicada por validación en lugar
+  de reutilizar la del pool.
+- **`__slots__` en todo el módulo.** `Rule`, `MetaCompiler`,
+  `ValidationErrorParser`, `FailureCollector`, `validator.Schema`, los
+  marcadores base, todas las reglas incorporadas y todas las dataclasses de
+  restricción declaran `__slots__`, así que no se reserva ningún `__dict__` por
+  instancia.
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14 (según `pyproject.toml`,
-  `requires-python = ">=3.14"`) — y, de forma única entre los módulos de
-  Orionis, aquí es un **requisito funcional estricto** (no solo el
-  mínimo del framework), porque `SchemaMeta` depende del protocolo de
-  anotaciones perezosas de PEP 649, disponible solo desde 3.14 en
-  adelante.
-- **Dependencia obligatoria:** `msgspec>=0.21.1` (dependencia central) —
-  provee `msgspec.Struct`, `msgspec.Meta`, `msgspec.convert`, y
-  `msgspec.ValidationError`, todos usados directamente por este módulo.
-- **Dependencias internas del framework:**
-  `orionis.support.entities.base.BaseEntity` (base de
-  `ValidationFailure`); tanto `orionis.container.container.Container`
-  como `orionis.http.kernel` dependen de este módulo (el punto de
-  entrada del validador y el manejo de excepciones, respectivamente),
-  pero este módulo **no** depende de ellos a su vez.
-- Sin comportamiento específico de plataforma; el módulo es Python puro
-  más `msgspec`, y se comporta de forma idéntica en Windows, Linux y
-  macOS.
+- **Python ≥ 3.14 es un requisito funcional, no solo un mínimo.** `SchemaMeta`
+  envuelve `__annotate_func__`, el callback de anotaciones diferidas de PEP 649,
+  que solo existe a partir de 3.14. El módulo no puede ejecutarse en versiones
+  anteriores.
+- **`msgspec >= 0.21.1`** viene como dependencia base del framework
+  (`pyproject.toml`), así que no hace falta ninguna instalación extra. Textos de
+  error como ``Expected `str` of length >= 3`` provienen de `msgspec`;
+  `ValidationErrorParser` los reconoce por frase, así que un cambio en la
+  redacción de `msgspec` afectaría a la clave `rule` detectada.
+- **Los esquemas son subclases de `msgspec.Struct`.** Las reglas de orden de
+  campos (los campos sin valor por defecto deben preceder a los que sí lo
+  tienen), la exclusión de `ClassVar` y el comportamiento de encoding los define
+  `msgspec`, no este módulo.
+- **`orionis.schemas.Schema` frente a `orionis.schemas.validator.Schema`.** Dos
+  clases distintas con el mismo nombre: la clase base de la que se hereda y la
+  utilidad estática que expone `validate`. Importar la segunda con alias es la
+  convención usada en todo el repositorio.
+- **La regla `Unique` arrastra `orionis.orm` / `orionis.database`** y necesita
+  una conexión configurada en el momento de validar; para motores distintos de
+  SQLite hay que instalar el extra del driver correspondiente
+  (`orionis[pgsql]`, `orionis[mysql]`, …). El resto de reglas solo dependen de
+  la biblioteca estándar, salvo las temporales, que usan `DateTime` (pendulum) y
+  por tanto la zona horaria de la aplicación.
+- **`orionis.http` entiende `ValidationException`.** Lanzarla fuera de una
+  petición es perfectamente válido; dentro de una se traduce automáticamente a
+  una respuesta `422` o a un redirect de vuelta.

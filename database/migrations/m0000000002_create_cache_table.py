@@ -15,7 +15,7 @@ class CreateCacheTable(Migration):
         async with Schema.create("cache") as table:
             table.string("cache_key", 255).primary().comment("Cache Key")
             table.text("cache_value").nullable().comment("Cache Value")
-            table.bigInteger("expiration").nullable().comment("Expiration")
+            table.double("expiration").nullable().comment("Expiration")
 
             table.comment("Table to store cache entries.")
 

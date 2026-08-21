@@ -65,26 +65,7 @@ class _ExplodingSuite:
         raise RuntimeError(_SUITE_FAILURE)
 
 class _RunnerTestCase(TestCase):
-    """Base scenario keeping the reporting verbosity under control."""
-
-    def setUp(self) -> None:
-        """
-        Silence the result processor before each scenario.
-
-        Guarantees that nested runs never write to the console of the
-        surrounding test session.
-        """
-        self._verbosity = TestResultProcessor._print_verbosity
-        TestResultProcessor.setPrintVerbosity(0)
-
-    def tearDown(self) -> None:
-        """
-        Restore the reporting verbosity after each scenario.
-
-        Prevents class level state from leaking into the tests executed
-        afterwards.
-        """
-        TestResultProcessor._print_verbosity = self._verbosity
+    """Base scenario running suite doubles through the runner."""
 
     def _run(self, runner: TestRunner, suite: object) -> TestResultProcessor:
         """Execute a suite double and return the produced result object."""
@@ -161,6 +142,24 @@ class TestTestRunnerExecution(_RunnerTestCase):
         result = self._run(runner, _StubSuite((TestStatus.PASSED,)))
         self.assertIsInstance(result, TestResultProcessor)
         self.assertEqual(len(result.getTestResults()), 1)
+
+    def testRunHandsItsVerbosityToTheResultProcessor(self) -> None:
+        """
+        Publish the runner verbosity on the processor it builds.
+
+        Validates that the reporting detail is scoped to a single run
+        instead of being shared by every processor of the process.
+        """
+        quiet = TestRunner(with_panel=False)
+        verbose = TestRunner(verbosity=2, with_panel=False)
+        self.assertEqual(
+            quiet._makeResult()._TestResultProcessor__print_verbosity,
+            0,
+        )
+        self.assertEqual(
+            verbose._makeResult()._TestResultProcessor__print_verbosity,
+            2,
+        )
 
     def testRunPropagatesRunnerConfigurationToTheResult(self) -> None:
         """

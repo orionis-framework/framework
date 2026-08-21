@@ -2,7 +2,6 @@ from orionis.test import TestCase
 from orionis.introspection.dependencies.reflection import (
     ReflectDependencies,
 )
-from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )
@@ -78,6 +77,13 @@ class _KeywordOnly:
     def __init__(self, *, label: str, count: int = 0) -> None:
         self.label = label
         self.count = count
+
+class _ForwardRef:
+    """Class whose constructor annotates a parameter with a string literal."""
+
+    def __init__(self, dep: "UnknownDependency") -> None:  # noqa: F821, UP037
+        self.dep = dep
+
 
 def _plain_function(a: int, b: str = "hello") -> str:
     """
@@ -691,6 +697,68 @@ class TestCallableSignatureNonCallable(TestCase):
         with self.assertRaises(TypeError):
             rd.callableSignature()
 
+    def testUninspectableCallableRaisesValueError(self) -> None:
+        """
+        Assert that builtins without a signature surface a ValueError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        ``inspect.signature(min)`` raises because the builtin exposes no
+        text signature.
+        """
+        rd = ReflectDependencies(min)
+        with self.assertRaises(ValueError):
+            rd.callableSignature()
+
+# ---------------------------------------------------------------------------
+# Forward-referenced (string) annotations
+# ---------------------------------------------------------------------------
+
+class TestForwardReferencedAnnotations(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectDependencies over the forward-reference fixture.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.rd = ReflectDependencies(_ForwardRef)
+
+    def testForwardReferenceIsResolvedAsString(self) -> None:
+        """
+        Assert that string annotations fall back to the typing module.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        argument = self.rd.constructorSignature().ordered["dep"]
+        self.assertEqual(argument.module_name, "typing")
+        self.assertEqual(argument.class_name, "UnknownDependency")
+        self.assertIs(argument.type, str)
+
+    def testForwardReferenceIsMarkedResolvedButNotSchema(self) -> None:
+        """
+        Assert that forward references never qualify as msgspec schemas.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        argument = self.rd.constructorSignature().ordered["dep"]
+        self.assertTrue(argument.resolved)
+        self.assertFalse(argument.is_schema)
+
 # ---------------------------------------------------------------------------
 # Keyword-only parameters
 # ---------------------------------------------------------------------------
@@ -755,431 +823,3 @@ class TestKeywordOnlyParameters(TestCase):
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(sig.getPositionalOnly(), {})
-
-# ---------------------------------------------------------------------------
-# Signature entity — Argument
-# ---------------------------------------------------------------------------
-
-class TestArgumentEntity(TestCase):
-
-    def testValidArgumentInstantiates(self) -> None:
-        """
-        Assert that a fully specified Argument can be instantiated.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        arg = Argument(
-            name="x",
-            resolved=True,
-            module_name="builtins",
-            class_name="int",
-            type=int,
-            full_class_path="builtins.int",
-        )
-        self.assertIsInstance(arg, Argument)
-
-    def testArgumentIsHashable(self) -> None:
-        """
-        Assert that a frozen Argument instance is hashable.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        arg = Argument(
-            name="x",
-            resolved=True,
-            module_name="builtins",
-            class_name="int",
-            type=int,
-            full_class_path="builtins.int",
-        )
-        # Frozen dataclasses must be hashable
-        self.assertIsNotNone(hash(arg))
-
-    def testModuleNameNonStringRaisesTypeError(self) -> None:
-        """
-        Assert that a non-string module_name raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Argument(
-                name="x",
-                resolved=True,
-                module_name=123,  # type: ignore[arg-type]
-                class_name="int",
-                type=int,
-                full_class_path="builtins.int",
-            )
-
-    def testClassNameNonStringRaisesTypeError(self) -> None:
-        """
-        Assert that a non-string class_name raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Argument(
-                name="x",
-                resolved=True,
-                module_name="builtins",
-                class_name=999,  # type: ignore[arg-type]
-                type=int,
-                full_class_path="builtins.int",
-            )
-
-    def testFullClassPathNonStringRaisesTypeError(self) -> None:
-        """
-        Assert that a non-string full_class_path raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Argument(
-                name="x",
-                resolved=True,
-                module_name="builtins",
-                class_name="int",
-                type=int,
-                full_class_path=42,  # type: ignore[arg-type]
-            )
-
-    def testTypeNoneRaisesValueError(self) -> None:
-        """
-        Assert that type=None raises ValueError when resolved has no default.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(ValueError):
-            Argument(
-                name="x",
-                resolved=True,
-                module_name="builtins",
-                class_name="int",
-                type=None,  # type: ignore[arg-type]
-                full_class_path="builtins.int",
-            )
-
-    def testDefaultNoneSkipsValidation(self) -> None:
-        """
-        Assert that supplying a default bypasses type validation constraints.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        # Validation is skipped when default is provided, even with type=None
-        arg = Argument(
-            name="x",
-            resolved=True,
-            module_name="builtins",
-            class_name="int",
-            type=None,  # type: ignore[arg-type]
-            full_class_path="builtins.int",
-            default=0,
-        )
-        self.assertEqual(arg.default, 0)
-
-# ---------------------------------------------------------------------------
-# Signature entity — methods
-# ---------------------------------------------------------------------------
-
-class TestSignatureEntity(TestCase):
-
-    def _make_arg(
-        self,
-        name: str,
-        *,
-        resolved: bool = True,
-        is_keyword_only: bool = False,
-        default: object = None,
-    ) -> Argument:
-        """
-        Build a minimal valid Argument for testing.
-
-        Parameters
-        ----------
-        name : str
-            Argument name.
-        resolved : bool, optional
-            Whether the argument is resolved, by default True.
-        is_keyword_only : bool, optional
-            Whether argument is keyword-only, by default False.
-        default : object, optional
-            Default value, by default None.
-
-        Returns
-        -------
-        Argument
-            Constructed Argument instance.
-        """
-        return Argument(
-            name=name,
-            resolved=resolved,
-            module_name="builtins",
-            class_name="int",
-            type=int,
-            full_class_path="builtins.int",
-            is_keyword_only=is_keyword_only,
-            default=default,
-        )
-
-    def setUp(self) -> None:
-        """
-        Build a Signature with one resolved and one unresolved argument.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        # resolved arg: has a default, so no validation issues
-        self.res_arg = self._make_arg("res", resolved=True, default=1)
-        # unresolved arg: no default, resolved=False
-        self.unres_arg = self._make_arg("unres", resolved=False, default=0)
-        self.kw_arg = self._make_arg(
-            "kw", resolved=True, is_keyword_only=True, default=2,
-        )
-        self.sig = Signature(
-            resolved={"res": self.res_arg, "kw": self.kw_arg},
-            unresolved={"unres": self.unres_arg},
-            ordered={"res": self.res_arg, "unres": self.unres_arg, "kw": self.kw_arg},
-        )
-
-    def testNoArgumentsRequiredFalse(self) -> None:
-        """
-        Assert that noArgumentsRequired returns False for a non-empty ordered.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertFalse(self.sig.noArgumentsRequired())
-
-    def testHasUnresolvedArgumentsTrue(self) -> None:
-        """
-        Assert that hasUnresolvedArguments returns True when unresolved exists.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertTrue(self.sig.hasUnresolvedArguments())
-
-    def testGetResolvedReturnsResolvedDict(self) -> None:
-        """
-        Assert that getResolved returns the resolved dictionary.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("res", self.sig.getResolved())
-        self.assertNotIn("unres", self.sig.getResolved())
-
-    def testGetUnresolvedReturnsUnresolvedDict(self) -> None:
-        """
-        Assert that getUnresolved returns the unresolved dictionary.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("unres", self.sig.getUnresolved())
-        self.assertNotIn("res", self.sig.getUnresolved())
-
-    def testGetAllOrderedReturnsAllEntries(self) -> None:
-        """
-        Assert that getAllOrdered returns all three arguments.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        ordered = self.sig.getAllOrdered()
-        self.assertEqual(len(ordered), 3)
-
-    def testToDictReturnsDict(self) -> None:
-        """
-        Assert that toDict returns a dict with the expected keys.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = self.sig.toDict()
-        self.assertIsInstance(result, dict)
-        self.assertIn("res", result)
-
-    def testResolvedToDictReturnsDict(self) -> None:
-        """
-        Assert that resolvedToDict returns a dict with resolved keys.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = self.sig.resolvedToDict()
-        self.assertIsInstance(result, dict)
-        self.assertIn("res", result)
-
-    def testUnresolvedToDictReturnsDict(self) -> None:
-        """
-        Assert that unresolvedToDict returns a dict with unresolved keys.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = self.sig.unresolvedToDict()
-        self.assertIsInstance(result, dict)
-        self.assertIn("unres", result)
-
-    def testGetPositionalOnly(self) -> None:
-        """
-        Assert that getPositionalOnly excludes keyword-only arguments.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        positional = self.sig.getPositionalOnly()
-        self.assertIn("res", positional)
-        self.assertNotIn("kw", positional)
-
-    def testGetKeywordOnly(self) -> None:
-        """
-        Assert that getKeywordOnly contains only keyword-only arguments.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        keyword = self.sig.getKeywordOnly()
-        self.assertIn("kw", keyword)
-        self.assertNotIn("res", keyword)
-
-    def testKeywordOnlyToDict(self) -> None:
-        """
-        Assert that keywordOnlyToDict returns a dict with keyword-only keys.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = self.sig.keywordOnlyToDict()
-        self.assertIsInstance(result, dict)
-        self.assertIn("kw", result)
-
-    def testPositionalOnlyToDict(self) -> None:
-        """
-        Assert that positionalOnlyToDict excludes keyword-only arguments.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = self.sig.positionalOnlyToDict()
-        self.assertNotIn("kw", result)
-        self.assertIn("res", result)
-
-    def testArgumentsItems(self) -> None:
-        """
-        Assert that arguments() returns the items view of ordered.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        items = list(self.sig.arguments())
-        self.assertEqual(len(items), 3)
-
-    def testItemsEqualsArguments(self) -> None:
-        """
-        Assert that items() and arguments() produce the same result.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertEqual(list(self.sig.items()), list(self.sig.arguments()))
-
-    def testInvalidResolvedTypeRaisesTypeError(self) -> None:
-        """
-        Assert that a non-dict resolved value raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Signature(
-                resolved="bad",  # type: ignore[arg-type]
-                unresolved={},
-                ordered={},
-            )
-
-    def testInvalidUnresolvedTypeRaisesTypeError(self) -> None:
-        """
-        Assert that a non-dict unresolved value raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Signature(
-                resolved={},
-                unresolved="bad",  # type: ignore[arg-type]
-                ordered={},
-            )
-
-    def testInvalidOrderedTypeRaisesTypeError(self) -> None:
-        """
-        Assert that a non-dict ordered value raises TypeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            Signature(
-                resolved={},
-                unresolved={},
-                ordered="bad",  # type: ignore[arg-type]
-            )

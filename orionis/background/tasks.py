@@ -13,6 +13,8 @@ class BackgroundTasks(BackgroundTask):
     and runs them one after another when invoked.
     """
 
+    __slots__ = ("tasks",)
+
     def __init__(self, tasks: Sequence[BackgroundTask] | None = None) -> None:
         """
         Initialize BackgroundTasks with an optional sequence of tasks.
@@ -65,15 +67,3 @@ class BackgroundTasks(BackgroundTask):
         # Await each task in the list
         for task in self.tasks:
             await task()
-
-    async def run(self) -> None:
-        """
-        Run all background tasks by invoking the instance.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        # Call the instance to execute all tasks
-        await self()

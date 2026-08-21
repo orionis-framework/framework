@@ -4,6 +4,7 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.enums.actions import ArgumentAction
 from orionis.foundation.contracts.application import IApplication
 from orionis.test.contracts.engine import ITestingEngine
+from orionis.test.enums.status import TestStatus
 
 # Values considered truthy for boolean CLI/config arguments
 _TRUTHY_VALUES: frozenset = frozenset({1, "1", "true", "True"})
@@ -12,7 +13,10 @@ _TRUTHY_VALUES: frozenset = frozenset({1, "1", "true", "True"})
 _VALID_VERBOSITY: frozenset = frozenset({0, 1, 2})
 
 # Test result statuses that indicate a non-passing outcome
-_FAILURE_STATUSES: frozenset = frozenset({"failed", "error"})
+_FAILURE_STATUSES: frozenset[TestStatus] = frozenset({
+    TestStatus.FAILED,
+    TestStatus.ERRORED,
+})
 
 class TestCommand(BaseCommand):
 
@@ -91,6 +95,48 @@ class TestCommand(BaseCommand):
         ),
     ]
 
+    def __resolveVerbosity(self, cli_value: object, app: IApplication) -> int | None:
+        """
+        Resolve the verbosity level requested for this run.
+
+        Parameters
+        ----------
+        cli_value : object
+            Value supplied through the --verbosity flag, or None when absent.
+        app : IApplication
+            Application instance providing the configured fallback.
+
+        Returns
+        -------
+        int | None
+            The validated verbosity level, or None when neither the CLI nor
+            the configuration provide one.
+
+        Raises
+        ------
+        ValueError
+            If the resolved verbosity is not 0, 1 or 2.
+        """
+        # Fall back to the application configuration when the flag is absent
+        verbosity = cli_value
+        if verbosity is None:
+            verbosity = app.config("testing.verbosity")
+
+        # Leave the decision to the engine when nothing was configured
+        if verbosity is None:
+            return None
+
+        # Ensure verbosity is an integer and validate its value
+        verbosity = int(verbosity)
+        if verbosity not in _VALID_VERBOSITY:
+            error_message = (
+                "Invalid verbosity level. Allowed values are 0 (silent), "
+                "1 (standard), 2 (detailed)."
+            )
+            raise ValueError(error_message)
+
+        return verbosity
+
     async def handle(
         self,
         app: IApplication,
@@ -99,65 +145,60 @@ class TestCommand(BaseCommand):
         """
         Execute the test command with configured parameters.
 
+        Every option resolves from the CLI first and from the application
+        configuration afterwards. An option that resolves to nothing is left
+        untouched so the engine keeps the default it already computed.
+
         Parameters
         ----------
         app : IApplication
             Application instance providing configuration and context.
+        test_engine : ITestingEngine
+            Testing engine resolved by the container and driven by this command.
 
         Returns
         -------
         int
             Exit code indicating success (0) or failure (1).
+
+        Raises
+        ------
+        ValueError
+            If the resolved verbosity is not 0, 1 or 2.
         """
         # Retrieve all parsed command-line arguments
         cli_args: dict = self.getArguments()
         _get = cli_args.get
 
         # Resolve verbosity from CLI args or fall back to the app configuration
-        verbosity = _get("verbosity")
-        if verbosity is None:
-            verbosity = app.config("testing.verbosity")
+        verbosity = self.__resolveVerbosity(_get("verbosity"), app)
+        if verbosity is not None:
+            test_engine.setVerbosity(verbosity)
 
-        # Ensure verbosity is an integer and validate its value
-        verbosity = int(verbosity)
-
-        if verbosity not in _VALID_VERBOSITY:
-            error_message = (
-                "Invalid verbosity level. Allowed values are 0 (silent), "
-                "1 (standard), 2 (detailed)."
-            )
-            raise ValueError(error_message)
-
-        # Resolve fail_fast from CLI args or fall back to the app configuration
-        fail_fast = (
-            (_get("fail_fast") or app.config("testing.fail_fast"))
-            in _TRUTHY_VALUES
-        )
+        # Resolve fail_fast from CLI args or fall back to the app configuration.
+        # The CLI wins even when it supplies a falsy value such as --fail-fast=0.
+        fail_fast = _get("fail_fast")
+        if fail_fast is None:
+            fail_fast = app.config("testing.fail_fast")
+        test_engine.setFailFast(fail_fast=fail_fast in _TRUTHY_VALUES)
 
         # Resolve the test discovery directory from CLI args or app configuration
         start_dir = _get("start_dir") or app.config("testing.start_dir")
+        if start_dir:
+            test_engine.setStartDir(start_dir)
 
         # Resolve the file pattern for test discovery from CLI args or app configuration
         file_pattern = _get("file_pattern") or app.config("testing.file_pattern")
+        if file_pattern:
+            test_engine.setFilePattern(file_pattern)
 
         # Resolve the method pattern for test filtering from CLI args or app config
         method_pattern = _get("method_pattern") or app.config("testing.method_pattern")
+        if method_pattern:
+            test_engine.setMethodPattern(method_pattern)
 
-        # Resolve whether to show Rich panels from CLI args or app configuration
-        with_panel_arg = _get("with_panel")
-        with_panel = (
-            with_panel_arg
-            if isinstance(with_panel_arg, bool)
-            else app.config("testing.with_panel") in _TRUTHY_VALUES
-        )
-
-        # Configure the testing engine with the resolved parameters
-        test_engine.setFailFast(fail_fast=fail_fast)
-        test_engine.setVerbosity(verbosity)
-        test_engine.setStartDir(start_dir)
-        test_engine.setFilePattern(file_pattern)
-        test_engine.setMethodPattern(method_pattern)
-        if not with_panel:
+        # The parser always resolves this flag through --panel / --no-panel
+        if _get("with_panel") is False:
             test_engine.withoutPanel()
 
         # Run the tests and collect results
@@ -165,7 +206,7 @@ class TestCommand(BaseCommand):
 
         # Return 1 if any result indicates a failure or error, otherwise 0
         for result in results:
-            if result.status.lower() in _FAILURE_STATUSES:
+            if result.status in _FAILURE_STATUSES:
                 return 1
 
         return 0

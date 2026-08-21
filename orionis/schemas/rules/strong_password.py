@@ -7,8 +7,16 @@ _LOWER: frozenset[str] = frozenset("abcdefghijklmnopqrstuvwxyz")
 _DIGIT: frozenset[str] = frozenset("0123456789")
 
 class StrongPassword(Rule):
+    """
+    Ensure a string is strong enough to be used as a password.
+
+    The value must be at least 8 characters long and contain an uppercase
+    letter, a lowercase letter and a digit.
+    """
 
     # ruff: noqa: ARG002
+
+    __slots__ = ()
 
     __message__ = (
         f"Password must be at least {_MIN_LENGTH} characters long, "

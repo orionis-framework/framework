@@ -53,7 +53,6 @@ class TestingEngine(ITestingEngine):
             app.path("storage") / "framework" / "cache" / "testing"
         )
         self.__with_panel: bool = True  # Default to showing the start panel
-        self.__suite: unittest.TestSuite = unittest.TestSuite()
 
     def setVerbosity(self, verbosity: int) -> Self:
         """
@@ -261,16 +260,16 @@ class TestingEngine(ITestingEngine):
         """
         Run the discovered test suite asynchronously.
 
-        Adds discovered tests to the suite, sets verbosity, and executes the tests
-        using a thread pool to avoid blocking. Saves results to cache if enabled.
+        Discovers the tests, sets verbosity, and executes them using a thread
+        pool to avoid blocking. Saves results to cache if enabled.
 
         Returns
         -------
         list[TestResult]
             List of TestResult objects containing test execution outcomes.
         """
-        # Add discovered tests to the suite.
-        self.__suite.addTests(self.discover())
+        # Build a fresh suite so consecutive runs never accumulate tests.
+        suite: unittest.TestSuite = self.discover()
 
         # Set verbosity level in TestResult for output formatting.
         TestResultProcessor.setPrintVerbosity(self.__verbosity)
@@ -285,7 +284,7 @@ class TestingEngine(ITestingEngine):
         # Offload the synchronous runner to a thread pool to avoid blocking the loop.
         loop = asyncio.get_running_loop()
         result: TestResultProcessor = await loop.run_in_executor(
-            None, runner.run, self.__suite,
+            None, runner.run, suite,
         )
         results = result.getTestResults()
         await self.__saveCache(results)

@@ -2,6 +2,9 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import os
+import secrets
+import threading
+import time
 import msgspec
 import msgspec.json as _msgspec_json
 from datetime import UTC, datetime
@@ -35,6 +38,13 @@ class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
 _ENCODER = _msgspec_json.Encoder()
 _DECODER = _msgspec_json.Decoder(_SessionPayload)
 
+# A staging file younger than this may still belong to an in-flight write.
+_STALE_TEMP_SECONDS: float = 3600.0
+
+# Windows refuses a rename while another process swaps the same destination.
+_REPLACE_ATTEMPTS: int = 3
+_REPLACE_BACKOFF_SECONDS: float = 0.005
+
 class FileSessionStore(ISessionStore):
     """
     Session store that persists each session as a JSON file on disk.
@@ -63,7 +73,7 @@ class FileSessionStore(ISessionStore):
         Path to the directory where session files are stored.
     """
 
-    __slots__ = ("_directory",)
+    __slots__ = ("_directory", "_rename_lock")
 
     def __init__(self, directory: Path) -> None:
         """
@@ -80,6 +90,10 @@ class FileSessionStore(ISessionStore):
         """
         self._directory = directory
         self._directory.mkdir(parents=True, exist_ok=True)
+
+        # Writes run on worker threads, so publishing two payloads for the
+        # same session must not overlap inside this process.
+        self._rename_lock = threading.Lock()
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -168,12 +182,32 @@ class FileSessionStore(ISessionStore):
         except FileNotFoundError:
             return None
 
+    @staticmethod
+    def _tempPath(path: Path) -> Path:
+        """
+        Build a unique staging path for an atomic write.
+
+        Parameters
+        ----------
+        path : Path
+            Final destination file.
+
+        Returns
+        -------
+        Path
+            Sibling path carrying a random infix, so concurrent writers of the
+            same session never share a staging file, and still ending in
+            ``.tmp`` so the sweep keeps telling both apart.
+        """
+        return path.with_name(f"{path.name}.{secrets.token_hex(8)}.tmp")
+
     def _writeFile(self, path: Path, content: bytes) -> None:
         """
         Atomically write *content* to *path*.
 
-        Writes to a ``.tmp`` sibling first, then renames over the
+        Writes to a unique ``.tmp`` sibling first, then renames over the
         destination to prevent partial reads from concurrent processes.
+        A failed write removes its own staging file before propagating.
 
         Parameters
         ----------
@@ -185,10 +219,55 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
+
+        Raises
+        ------
+        OSError
+            If the payload cannot be staged or renamed into place.
         """
-        tmp = path.with_suffix(".tmp")
-        tmp.write_bytes(content)
-        tmp.replace(path)
+        tmp = self._tempPath(path)
+        try:
+            tmp.write_bytes(content)
+            self._replace(tmp, path)
+        except OSError:
+            tmp.unlink(missing_ok=True)
+            raise
+
+    def _replace(self, tmp: Path, path: Path) -> None:
+        """
+        Publish *tmp* as *path*, retrying a transient sharing violation.
+
+        The rename is serialised per store instance, and retried when the
+        operating system refuses it because another process is swapping the
+        same destination.  POSIX never reaches the retry branch.
+
+        Parameters
+        ----------
+        tmp : Path
+            Staging file holding the serialised payload.
+        path : Path
+            Destination session file.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        OSError
+            If the rename keeps failing after the last attempt.
+        """
+        last = _REPLACE_ATTEMPTS - 1
+        for attempt in range(_REPLACE_ATTEMPTS):
+            try:
+                with self._rename_lock:
+                    tmp.replace(path)
+            except PermissionError:
+                if attempt == last:
+                    raise
+                time.sleep(_REPLACE_BACKOFF_SECONDS)
+            else:
+                return
 
     def _deleteFile(self, path: Path) -> None:
         """
@@ -255,19 +334,32 @@ class FileSessionStore(ISessionStore):
         Scan the store directory and remove stale or corrupt files.
 
         Uses :func:`os.scandir` for reduced object allocation and
-        filesystem cache reuse.  A file is removed when it is expired,
-        contains invalid JSON, is structurally incomplete, or cannot be
-        read due to an I/O error.
+        filesystem cache reuse.  A session file is removed when it is
+        expired, contains invalid JSON, is structurally incomplete, or
+        cannot be read due to an I/O error.  Staging files left behind by
+        an interrupted write are reclaimed once they are old enough that
+        no writer can still be filling them.
 
         Returns
         -------
         None
         """
         now = datetime.now(UTC)
+        stale_before = time.time() - _STALE_TEMP_SECONDS
         with os.scandir(self._directory) as it:
             for entry in it:
-                if not (entry.is_file() and entry.name.endswith(".json")):
+                if not entry.is_file():
                     continue
+
+                if entry.name.endswith(".tmp"):
+                    with contextlib.suppress(OSError):
+                        if entry.stat().st_mtime <= stale_before:
+                            os.unlink(entry.path)  # noqa: PTH108
+                    continue
+
+                if not entry.name.endswith(".json"):
+                    continue
+
                 try:
                     with open(entry.path, "rb") as fh:  # noqa: PTH123
                         raw = fh.read()

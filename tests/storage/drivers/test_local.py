@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import hashlib
 import tempfile
 from datetime import UTC, datetime
@@ -65,6 +66,47 @@ class TestLocalStorageDriver(TestCase):
         leftovers = [p.name for p in self._root.iterdir()]
         self.assertEqual(leftovers, ["clean.txt"])
 
+    async def testConcurrentWritesToTheSamePathNeverMixPayloads(self) -> None:
+        """
+        Publish a whole payload when writers race on the same path.
+
+        Validates that every write stages its bytes in its own temp
+        file, so a racing writer can neither publish a mix of two
+        payloads nor steal another writer's staging file. Windows may
+        still refuse a concurrent replace of the destination, which is
+        an operating system limitation and never a lost staging file.
+        """
+        payloads = [bytes([index]) * 4096 for index in range(1, 9)]
+        results = await asyncio.gather(
+            *[
+                self._driver.write("shared.bin", payload)
+                for payload in payloads
+            ],
+            return_exceptions=True,
+        )
+
+        for result in results:
+            if result is not None:
+                self.assertIsInstance(result, PermissionError)
+
+        self.assertIn(None, results)
+        self.assertIn(await self._driver.read("shared.bin"), payloads)
+        self.assertEqual(
+            [p.name for p in self._root.iterdir()], ["shared.bin"],
+        )
+
+    async def testFailedWriteRemovesItsTempFile(self) -> None:
+        """
+        Discard the staging file when the write cannot be committed.
+
+        Validates the cleanup path by targeting an existing directory,
+        which no platform can replace with a file.
+        """
+        (self._root / "busy").mkdir()
+        with self.assertRaises(OSError):
+            await self._driver.write("busy", b"x")
+        self.assertEqual([p.name for p in self._root.iterdir()], ["busy"])
+
     async def testReadMissingFileRaises(self) -> None:
         """
         Raise StorageFileNotFoundException when reading a missing file.
@@ -117,6 +159,24 @@ class TestLocalStorageDriver(TestCase):
             await self._driver.read("chunks/joined.txt"),
             b"onetwo",
         )
+
+    async def testFailedStreamWriteLeavesNothingBehind(self) -> None:
+        """
+        Discard the staging file when a streamed transfer fails.
+
+        Validates that an interrupted stream creates no destination
+        file and removes only its own temp file.
+        """
+        async def producer():
+            yield b"one"
+            error_msg = "producer exhausted unexpectedly"
+            raise RuntimeError(error_msg)
+
+        with self.assertRaises(RuntimeError):
+            await self._driver.writeStream("partial.bin", producer())
+
+        self.assertEqual(list(self._root.iterdir()), [])
+        self.assertFalse(await self._driver.exists("partial.bin"))
 
     async def testOpenWriteThenReadThroughStream(self) -> None:
         """

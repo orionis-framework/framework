@@ -61,7 +61,6 @@ class BootstrapFilesystems(Filesystems):
                 url=Env.get("S3_URL", None),
                 endpoint=Env.get("S3_ENDPOINT", None),
                 use_path_style_endpoint=Env.get("S3_USE_PATH_STYLE_ENDPOINT", False),
-                throw=False,
             ),
 
             # --------------------------------------------------------------------------

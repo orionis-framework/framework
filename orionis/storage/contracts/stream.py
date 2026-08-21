@@ -17,6 +17,8 @@ class IStorageStream(ABC):
             chunk = await stream.read(65536)
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def read(self, size: int = -1) -> bytes:
         """

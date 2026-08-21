@@ -1,4 +1,12 @@
+import io
 from orionis import storage
+from orionis.storage.contracts.directory import IDirectory
+from orionis.storage.contracts.disk import IDisk
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.file import IFile
+from orionis.storage.contracts.manager import IStorageManager
+from orionis.storage.contracts.stream import IStorageStream
+from orionis.storage.contracts.uploaded_file import IUploadedFile
 from orionis.storage.directory import Directory
 from orionis.storage.disk import Disk
 from orionis.storage.drivers.azure import AzureStorageDriver
@@ -30,6 +38,54 @@ _EXPECTED_EXPORTS: dict[str, type] = {
     "UploadedFile": UploadedFile,
     "Visibility": Visibility,
 }
+
+# Abstract contracts implemented by the concrete classes.
+_CONTRACTS: tuple[type, ...] = (
+    IDirectory,
+    IDisk,
+    IFile,
+    IStorageDriver,
+    IStorageManager,
+    IStorageStream,
+    IUploadedFile,
+)
+
+# Classes whose instances must never carry an attribute dictionary.
+_SLOTTED_CLASSES: tuple[type, ...] = (
+    AsyncStream,
+    AzureStorageDriver,
+    Directory,
+    Disk,
+    File,
+    FileInfo,
+    GoogleStorageDriver,
+    LocalStorageDriver,
+    MemoryStorageDriver,
+    S3StorageDriver,
+    StorageManager,
+    UploadedFile,
+)
+
+def ancestors_without_slots(klass: type) -> list[str]:
+    """
+    Return the ancestors of *klass* that would reintroduce ``__dict__``.
+
+    Parameters
+    ----------
+    klass : type
+        Class whose method resolution order is inspected.
+
+    Returns
+    -------
+    list[str]
+        Names of the ancestors not declaring ``__slots__``, excluding
+        ``object``, which never adds an attribute dictionary.
+    """
+    return [
+        base.__name__
+        for base in klass.__mro__
+        if base is not object and "__slots__" not in vars(base)
+    ]
 
 class TestStoragePackage(TestCase):
 
@@ -67,3 +123,47 @@ class TestStoragePackage(TestCase):
         """
         for name, expected in _EXPECTED_EXPORTS.items():
             self.assertIs(getattr(storage, name), expected)
+
+class TestStorageSlots(TestCase):
+
+    def testContractsDeclareEmptySlots(self) -> None:
+        """
+        Declare an empty ``__slots__`` on every storage contract.
+
+        Validates that the ABCs never reintroduce ``__dict__`` in the
+        concrete classes implementing them.
+        """
+        for contract in _CONTRACTS:
+            self.assertEqual(contract.__slots__, (), contract.__name__)
+
+    def testWholeHierarchyDeclaresSlots(self) -> None:
+        """
+        Declare ``__slots__`` at every level of each class hierarchy.
+
+        Validates the invariant for classes that cannot be built
+        without external resources, such as the cloud drivers.
+        """
+        for klass in _SLOTTED_CLASSES:
+            self.assertEqual(
+                ancestors_without_slots(klass), [], klass.__name__,
+            )
+
+    def testInstancesCarryNoAttributeDictionary(self) -> None:
+        """
+        Build domain objects without an instance dictionary.
+
+        Validates the memory footprint claimed by ``__slots__`` on the
+        objects created on every listing or file operation.
+        """
+        driver = MemoryStorageDriver()
+        instances = (
+            driver,
+            Disk(name="memory", driver=driver),
+            File(driver, "a.txt"),
+            Directory(driver, "a"),
+            AsyncStream(io.BytesIO),
+        )
+        for instance in instances:
+            self.assertFalse(
+                hasattr(instance, "__dict__"), type(instance).__name__,
+            )

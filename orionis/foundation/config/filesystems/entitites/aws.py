@@ -26,8 +26,6 @@ class S3(BaseEntity):
         The AWS S3 endpoint URL.
     use_path_style_endpoint : bool, default=False
         Whether to use a path-style endpoint.
-    throw : bool, default=False
-        Whether to raise an exception on errors.
 
     Returns
     -------
@@ -99,14 +97,6 @@ class S3(BaseEntity):
         },
     )
 
-    throw: bool = field(
-        default=False,
-        metadata={
-            "description": "Whether to raise an exception on errors.",
-            "default": False,
-        },
-    )
-
     def __post_init__(self) -> None:
         """
         Validate initialization of AWS filesystem entity attributes.
@@ -170,9 +160,4 @@ class S3(BaseEntity):
             error_msg = (
                 "The 'use_path_style_endpoint' attribute must be a boolean."
             )
-            raise TypeError(error_msg)
-
-        # Validate `throw` attribute type
-        if not isinstance(self.throw, bool):
-            error_msg = "The 'throw' attribute must be a boolean."
             raise TypeError(error_msg)

@@ -71,7 +71,8 @@ class ViewEnvironment(IViewEnvironment):
             _cache_dir.mkdir(parents=True, exist_ok=True)
             _bytecode_cache = OrionisBytecodeCache(str(_cache_dir))
 
-        # Construct the Jinja2 environment; async is always enabled
+        # Async rendering is not configurable: the engine only ever calls
+        # render_async and every template global is awaited by Jinja2.
         self._jinja_env: jinja2.Environment = jinja2.Environment(
             loader=_loader,
             enable_async=True,

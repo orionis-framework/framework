@@ -1,206 +1,117 @@
-from __future__ import annotations
 import inspect
 from abc import ABC
-from datetime import UTC, datetime
-from inspect import isabstract
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
+from orionis.logging.handlers.chunked_suffix_resolver import ChunkedSuffixResolver
+from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
+from orionis.logging.handlers.hourly_suffix_resolver import HourlySuffixResolver
+from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
+from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 from orionis.test import TestCase
 
-class _ConcreteSuffixResolver(SuffixResolver):
-    """Minimal concrete implementation used to verify the contract."""
+# Complete abstract surface published by the rotation contract.
+_ABSTRACT_MEMBERS = frozenset({"getSuffix", "getNextRotationTime"})
 
-    def getSuffix(self, dt: datetime | None = None) -> str:
-        if dt is None:
-            dt = datetime.now(tz=UTC)
-        return dt.strftime("%Y-%m-%d")
+# Every resolver strategy shipped with the framework.
+_SHIPPED_RESOLVERS = (
+    ChunkedSuffixResolver,
+    DailySuffixResolver,
+    HourlySuffixResolver,
+    MonthlySuffixResolver,
+    WeeklySuffixResolver,
+)
 
-    def getNextRotationTime(self, current_time: datetime) -> datetime:
-        from datetime import timedelta
-        return current_time + timedelta(days=1)
+class _IncompleteResolver(SuffixResolver):
+    """Resolver implementing a single member of the contract on purpose."""
 
+    __slots__ = ()
 
-class _PartialSuffixResolver(SuffixResolver):
-    """Subclass implementing only getSuffix — intentionally incomplete."""
-
-    def getSuffix(self, _dt: datetime | None = None) -> str:
+    def getSuffix(self, _dt: object = None) -> str:
+        """Return a constant suffix."""
         return "suffix"
-
-# ===========================================================================
-# TestSuffixResolverContract
-# ===========================================================================
 
 class TestSuffixResolverContract(TestCase):
 
-    def testInheritsFromABC(self) -> None:
+    def testIsAnAbstractContract(self) -> None:
         """
-        Assert that SuffixResolver inherits from ABC.
+        Expose the rotation contract as a non instantiable abstraction.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that handlers can only be configured with a concrete
+        strategy.
         """
         self.assertTrue(issubclass(SuffixResolver, ABC))
+        self.assertTrue(inspect.isabstract(SuffixResolver))
+        with self.assertRaises(TypeError):
+            SuffixResolver()
 
-    def testIsAbstractClass(self) -> None:
+    def testDeclaresTheCompleteAbstractSurface(self) -> None:
         """
-        Assert that inspect.isabstract identifies SuffixResolver as abstract.
+        Declare every member required from a rotation strategy.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the public contract shared by all suffix resolvers.
         """
-        self.assertTrue(isabstract(SuffixResolver))
+        self.assertEqual(SuffixResolver.__abstractmethods__, _ABSTRACT_MEMBERS)
 
-    def testCannotInstantiateDirectly(self) -> None:
+    def testDeclaresEmptySlots(self) -> None:
         """
-        Assert that instantiating SuffixResolver directly raises TypeError.
+        Declare empty slots on the abstraction.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that implementations keep their instances free of a
+        dictionary, as required by the framework conventions.
+        """
+        self.assertEqual(SuffixResolver.__slots__, ())
+
+    def testEveryAbstractMemberIsDocumented(self) -> None:
+        """
+        Document every member of the contract.
+
+        Validates that implementers always find the expected behaviour
+        described in the abstraction itself.
+        """
+        for member in sorted(_ABSTRACT_MEMBERS):
+            self.assertTrue(inspect.getdoc(getattr(SuffixResolver, member)))
+
+    def testIncompleteImplementationCannotBeInstantiated(self) -> None:
+        """
+        Reject a strategy missing part of the contract.
+
+        Validates that the abstraction is enforced at instantiation time.
         """
         with self.assertRaises(TypeError):
-            SuffixResolver()  # type: ignore[abstract]
+            _IncompleteResolver()
 
-    def testGetSuffixIsAbstractMethod(self) -> None:
+    def testEveryShippedResolverImplementsTheContract(self) -> None:
         """
-        Assert that 'getSuffix' is present in __abstractmethods__.
+        Bind every shipped strategy to the rotation contract.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that all resolvers can be injected into the rotating file
+        handler.
         """
-        self.assertIn("getSuffix", SuffixResolver.__abstractmethods__)
+        for resolver_class in _SHIPPED_RESOLVERS:
+            self.assertIsInstance(resolver_class(), SuffixResolver)
 
-    def testGetNextRotationTimeIsAbstractMethod(self) -> None:
+    def testEveryShippedResolverAvoidsInstanceDictionaries(self) -> None:
         """
-        Assert that 'getNextRotationTime' is present in __abstractmethods__.
+        Keep every shipped strategy free of an instance dictionary.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the declared slots are effective, which requires the
+        abstraction to declare empty slots as well.
         """
-        self.assertIn("getNextRotationTime", SuffixResolver.__abstractmethods__)
+        for resolver_class in _SHIPPED_RESOLVERS:
+            self.assertFalse(hasattr(resolver_class(), "__dict__"))
 
-    def testAbstractMethodsContainsTwoMembers(self) -> None:
+    def testEveryShippedResolverMatchesTheContractSignatures(self) -> None:
         """
-        Assert __abstractmethods__ contains exactly getSuffix and getNextRotationTime.
+        Keep every shipped strategy aligned with the contract signatures.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that resolvers remain interchangeable from the point of view
+        of the rotating file handler.
         """
-        self.assertEqual(
-            SuffixResolver.__abstractmethods__,
-            frozenset({"getSuffix", "getNextRotationTime"}),
-        )
-
-    def testPartialSubclassCannotBeInstantiated(self) -> None:
-        """
-        Assert that a subclass missing 'getNextRotationTime' cannot be instantiated.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            _PartialSuffixResolver()  # type: ignore[abstract]
-
-    def testConcreteSubclassCanBeInstantiated(self) -> None:
-        """
-        Assert that a fully implemented subclass can be created without error.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        instance = _ConcreteSuffixResolver()
-        self.assertIsInstance(instance, SuffixResolver)
-
-    def testGetSuffixReturnsString(self) -> None:
-        """
-        Assert that a concrete getSuffix returns a string.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        instance = _ConcreteSuffixResolver()
-        result = instance.getSuffix()
-        self.assertIsInstance(result, str)
-
-    def testGetSuffixAcceptsDatetime(self) -> None:
-        """
-        Assert that getSuffix accepts an explicit datetime argument.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        instance = _ConcreteSuffixResolver()
-        dt = datetime(2026, 3, 31, tzinfo=UTC)
-        result = instance.getSuffix(dt)
-        self.assertEqual(result, "2026-03-31")
-
-    def testGetNextRotationTimeReturnsDatetime(self) -> None:
-        """
-        Assert that getNextRotationTime returns a datetime.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        instance = _ConcreteSuffixResolver()
-        now = datetime.now(tz=UTC)
-        result = instance.getNextRotationTime(now)
-        self.assertIsInstance(result, datetime)
-
-    def testGetNextRotationTimeIsAfterCurrentTime(self) -> None:
-        """
-        Assert that the next rotation time is strictly after current_time.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        instance = _ConcreteSuffixResolver()
-        now = datetime.now(tz=UTC)
-        result = instance.getNextRotationTime(now)
-        self.assertGreater(result, now)
-
-    def testGetSuffixMethodAcceptsOptionalDtParam(self) -> None:
-        """
-        Assert that getSuffix has a dt parameter with None as default.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        sig = inspect.signature(SuffixResolver.getSuffix)
-        self.assertIn("dt", sig.parameters)
-        self.assertIsNone(sig.parameters["dt"].default)
-
-    def testGetNextRotationTimeAcceptsCurrentTimeParam(self) -> None:
-        """
-        Assert that getNextRotationTime has a current_time parameter.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        sig = inspect.signature(SuffixResolver.getNextRotationTime)
-        self.assertIn("current_time", sig.parameters)
+        for member in sorted(_ABSTRACT_MEMBERS):
+            expected = inspect.signature(getattr(SuffixResolver, member))
+            for resolver_class in _SHIPPED_RESOLVERS:
+                actual = inspect.signature(getattr(resolver_class, member))
+                self.assertEqual(
+                    list(actual.parameters),
+                    list(expected.parameters),
+                    msg=f"Signature drift on {resolver_class.__name__}.{member}.",
+                )

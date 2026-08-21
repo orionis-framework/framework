@@ -1,4 +1,5 @@
 from typing import Annotated
+import msgspec
 from orionis.schemas.constraints import (
     Email,
     GreaterThan,
@@ -58,6 +59,9 @@ class _NestedPersonSchema(Schema):
 class _CredentialsSchema(Schema):
     email: Annotated[str, MinLength(5), Email()]
     password: Annotated[str, MinLength(8)]
+
+class _PlainStruct(msgspec.Struct):
+    label: str
 
 class TestValidatorBasic(TestCase):
 
@@ -435,3 +439,27 @@ class TestValidatorGreaterThan(TestCase):
 
         with self.assertRaises(ValidationException):
             Validator.validate({"n": 10}, _LtSchema)
+
+class TestValidatorWithPlainStruct(TestCase):
+
+    def testPlanIsBuiltForAStructWithoutAPrebuiltPlan(self) -> None:
+        """
+        Validate a struct that the schema metaclass never processed.
+
+        Validates that the validation plan is built on demand instead of
+        assuming the class was prepared at definition time.
+        """
+        result = Validator.validate({"label": "raw"}, _PlainStruct)
+        self.assertIsInstance(result, _PlainStruct)
+        self.assertEqual(result.label, "raw")
+
+    def testNonMappingPayloadRaisesValidationException(self) -> None:
+        """
+        Raise ValidationException when the payload is not a mapping.
+
+        Validates that the original conversion error is still reported
+        when no declared field can be blamed for it.
+        """
+        with self.assertRaises(ValidationException) as ctx:
+            Validator.validate([1, 2], _PersonSchema)
+        self.assertEqual(len(ctx.exception.failures), 1)

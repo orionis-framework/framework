@@ -1,15 +1,16 @@
+import contextlib
+import io
 import json
 import shutil
 import sys
 import tempfile
 from pathlib import Path
 from orionis.test import TestCase
-from orionis.test.cases.case import TestCase as CoreTestCase
+from orionis.test.cases.case import _METHOD_PATTERN
 from orionis.test.contracts.engine import ITestingEngine
 from orionis.test.core.engine import TestingEngine
 from orionis.test.entities.result import TestResult
 from orionis.test.enums.status import TestStatus
-from orionis.test.executors.results import TestResultProcessor
 
 # Package name used for every generated module tree.
 _PACKAGE: str = "_orionis_probe_suite"
@@ -76,8 +77,25 @@ class _StubApp:
             self._config.update(config)
 
     def config(self, key: str) -> object:
-        """Return the configured value registered under the given key."""
-        return self._config[key]
+        """Return the configured value, or None when the key is unknown."""
+        return self._config.get(key)
+
+    def path(self, _key: str) -> Path:
+        """Return the storage directory regardless of the requested key."""
+        return self._storage
+
+class _BareApp:
+    """Application double whose testing configuration is entirely absent."""
+
+    __slots__ = ("_storage", "basePath")
+
+    def __init__(self, base_path: Path, storage: Path) -> None:
+        self.basePath: Path = base_path
+        self._storage: Path = storage
+
+    def config(self, _key: str) -> object:
+        """Return None for every key, as an application without the section."""
+        return None
 
     def path(self, _key: str) -> Path:
         """Return the storage directory regardless of the requested key."""
@@ -111,20 +129,17 @@ class _EngineTestCase(TestCase):
         self._suite_dir.mkdir(parents=True, exist_ok=True)
         self._storage = self._root / "storage"
         self._sys_path = list(sys.path)
-        self._verbosity = TestResultProcessor._print_verbosity
 
     def tearDown(self) -> None:
         """
         Discard every side effect produced by the scenario.
 
-        Restores the import machinery, the reporting verbosity and
-        removes the generated project tree.
+        Restores the import machinery and removes the generated project
+        tree.
         """
         sys.path[:] = self._sys_path
         for name in [n for n in sys.modules if n.startswith(_PACKAGE)]:
             sys.modules.pop(name, None)
-        TestResultProcessor._print_verbosity = self._verbosity
-        CoreTestCase.setMethodPattern("test*")
         shutil.rmtree(self._root, ignore_errors=True)
 
     def _makeEngine(self, config: dict[str, object] | None = None) -> TestingEngine:
@@ -205,6 +220,71 @@ class TestTestingEngineConfiguration(_EngineTestCase):
         """
         self.assertIs(_engine_state(self._makeEngine(), "with_panel"), True)
 
+class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
+
+    def _makeBareEngine(self) -> TestingEngine:
+        """Build an engine bound to an application without configuration."""
+        return TestingEngine(_BareApp(self._root, self._storage))  # type: ignore[arg-type]
+
+    def testMissingVerbosityFallsBackToTheDetailedLevel(self) -> None:
+        """
+        Report every test in detail when the verbosity is not configured.
+
+        Validates that an absent key never reaches the result processor
+        as a missing value.
+        """
+        self.assertEqual(_engine_state(self._makeBareEngine(), "verbosity"), 2)
+
+    def testSilentVerbosityIsNotReplacedByTheDefault(self) -> None:
+        """
+        Preserve the silent level even though it is a falsy value.
+
+        Validates that zero is treated as a configured level instead of
+        a missing one.
+        """
+        engine = self._makeEngine({"testing.verbosity": 0})
+        self.assertEqual(_engine_state(engine, "verbosity"), 0)
+
+    def testMissingStartDirFallsBackToTheTestsFolder(self) -> None:
+        """
+        Discover from the conventional folder when none is configured.
+
+        Validates that discovery never receives a missing directory.
+        """
+        self.assertEqual(_engine_state(self._makeBareEngine(), "start_dir"), "tests")
+
+    def testMissingPatternsFallBackToTheConventionalGlobs(self) -> None:
+        """
+        Match the conventional file and method names by default.
+
+        Validates that discovery keeps working without a testing
+        section in the configuration.
+        """
+        engine = self._makeBareEngine()
+        self.assertEqual(_engine_state(engine, "file_pattern"), "test_*.py")
+        self.assertEqual(_engine_state(engine, "method_pattern"), "test*")
+
+    def testMissingFlagsFallBackToDisabled(self) -> None:
+        """
+        Disable fail fast and report caching when they are not configured.
+
+        Validates that optional behaviours stay opt in.
+        """
+        engine = self._makeBareEngine()
+        self.assertIs(_engine_state(engine, "fail_fast"), False)
+        self.assertIs(_engine_state(engine, "json_cache"), False)
+
+    def testBareConfigurationStillDiscoversTests(self) -> None:
+        """
+        Discover tests through the fallback values end to end.
+
+        Validates that the defaults form a usable configuration instead
+        of only avoiding a crash.
+        """
+        _write_module(self._root / "tests", "test_passing", _PASSING_SOURCE)
+        engine = self._makeBareEngine().setStartDir(str(self._root / "tests"))
+        self.assertEqual(engine.discover().countTestCases(), 1)
+
 class TestTestingEngineSetters(_EngineTestCase):
 
     def testSetVerbosityStoresValueAndReturnsSelf(self) -> None:
@@ -269,8 +349,8 @@ class TestTestingEngineSetters(_EngineTestCase):
         methods are considered tests.
         """
         self._makeEngine().setMethodPattern("check*")
-        self.assertIsNotNone(CoreTestCase._method_regex.match("checkSomething"))
-        self.assertIsNone(CoreTestCase._method_regex.match("testSomething"))
+        self.assertIsNotNone(_METHOD_PATTERN.get().match("checkSomething"))
+        self.assertIsNone(_METHOD_PATTERN.get().match("testSomething"))
 
     def testWithoutPanelDisablesTheStartPanelAndReturnsSelf(self) -> None:
         """
@@ -442,14 +522,22 @@ class TestTestingEngineExecution(_EngineTestCase):
 
     async def testRunAppliesTheConfiguredVerbosity(self) -> None:
         """
-        Publish the configured verbosity to the result processor.
+        Render the console output demanded by the configured verbosity.
 
-        Validates that the console output detail level is controlled by
-        the engine configuration.
+        Validates that the detail level travels with the run instead of
+        being published as shared state.
         """
-        engine = self._makeEngine({"testing.verbosity": 0})
-        await engine.withoutPanel().run()
-        self.assertEqual(TestResultProcessor._print_verbosity, 0)
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        silent = io.StringIO()
+        with contextlib.redirect_stdout(silent):
+            await self._makeEngine({"testing.verbosity": 0}).withoutPanel().run()
+
+        compact = io.StringIO()
+        with contextlib.redirect_stdout(compact):
+            await self._makeEngine({"testing.verbosity": 1}).withoutPanel().run()
+
+        self.assertEqual(silent.getvalue(), "")
+        self.assertIn("PASSED", compact.getvalue())
 
     async def testRunWithoutCacheWritesNoReport(self) -> None:
         """

@@ -23,9 +23,6 @@ class View(BaseEntity):
         Typically ``True`` in development and ``False`` in production.
     autoescape : bool
         Enable automatic HTML escaping of all template variables.
-    enable_async : bool
-        Enable asynchronous template rendering.  Always ``True`` in Orionis
-        because the framework is async-first.
     """
 
     paths: list = field(
@@ -71,14 +68,6 @@ class View(BaseEntity):
         },
     )
 
-    enable_async: bool = field(
-        default=True,
-        metadata={
-            "description": "Enable async rendering.  Always True in Orionis.",
-            "default": True,
-        },
-    )
-
     def __post_init__(self) -> None:
         """
         Validate view configuration fields after dataclass initialisation.
@@ -118,8 +107,4 @@ class View(BaseEntity):
 
         if not isinstance(self.autoescape, bool):
             error_msg = "View 'autoescape' must be a boolean."
-            raise TypeError(error_msg)
-
-        if not isinstance(self.enable_async, bool):
-            error_msg = "View 'enable_async' must be a boolean."
             raise TypeError(error_msg)

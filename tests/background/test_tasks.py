@@ -1,167 +1,205 @@
-from __future__ import annotations
+from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask
 from orionis.background.tasks import BackgroundTasks
 from orionis.test import TestCase
 
+def noop() -> None:
+    """
+    Do nothing.
+
+    Returns
+    -------
+    None
+        This function does not return a value.
+    """
+
 class TestBackgroundTasksInitialization(TestCase):
+    """Validate how a collection stores the tasks it is seeded with."""
 
-    def testInitializesWithEmptyTaskListByDefault(self) -> None:
+    def testStartsEmptyWhenNoSequenceIsProvided(self) -> None:
         """
-        Start with an empty task list when no argument is provided.
+        Start with an empty collection by default.
 
-        Validates that a BackgroundTasks instance created without
-        arguments has an empty tasks list.
+        Validates that a collection built without arguments exposes an
+        empty task list ready to be filled.
         """
-        bt = BackgroundTasks()
-        self.assertEqual(bt.tasks, [])
+        self.assertEqual(BackgroundTasks().tasks, [])
 
-    def testInitializesWithNoneProducesEmptyList(self) -> None:
+    def testTreatsNoneAsAnEmptySequence(self) -> None:
         """
-        Treat None as an empty task sequence during initialization.
+        Accept None as the absence of initial tasks.
 
-        Validates that passing None explicitly yields an empty tasks list
-        identical to the no-argument case.
+        Validates that an explicit None behaves exactly like omitting the
+        argument altogether.
         """
-        bt = BackgroundTasks(None)
-        self.assertEqual(bt.tasks, [])
+        self.assertEqual(BackgroundTasks(None).tasks, [])
 
-    def testInitializesWithProvidedListOfTasks(self) -> None:
+    def testTreatsAnEmptySequenceAsNoTasks(self) -> None:
         """
-        Populate the task list from a list of BackgroundTask instances.
+        Accept an empty sequence as the absence of initial tasks.
 
-        Validates that the provided list is stored in the tasks attribute
-        with the same length and contents.
+        Validates that a falsy sequence takes the same branch as None and
+        yields an independent empty list.
         """
+        self.assertEqual(BackgroundTasks([]).tasks, [])
 
-        def noop() -> None:
-            pass
-
-        task1 = BackgroundTask(noop)
-        task2 = BackgroundTask(noop)
-        bt = BackgroundTasks([task1, task2])
-        self.assertEqual(len(bt.tasks), 2)
-
-    def testInitializesWithTupleConvertsToList(self) -> None:
+    def testStoresTheProvidedTasksInOrder(self) -> None:
         """
-        Convert a tuple of tasks to a mutable list during initialization.
+        Keep the seeded tasks and their order.
 
-        Validates that even when a tuple is supplied, the stored tasks
-        attribute is a list instance.
+        Validates that every task supplied at construction is stored
+        verbatim, without wrapping or reordering.
         """
+        first = BackgroundTask(noop)
+        second = BackgroundTask(noop)
 
-        def noop() -> None:
-            pass
+        collection = BackgroundTasks([first, second])
+        self.assertEqual(collection.tasks, [first, second])
 
-        bt = BackgroundTasks((BackgroundTask(noop),))
-        self.assertIsInstance(bt.tasks, list)
-
-    def testInitialTasksAreBackgroundTaskInstances(self) -> None:
+    def testConvertsAnyProvidedSequenceIntoAList(self) -> None:
         """
-        Store BackgroundTask instances verbatim when supplied at init.
+        Normalise the seeded sequence into a mutable list.
 
-        Validates that the objects placed in the tasks list at construction
-        are the exact same instances that were passed in.
+        Validates that immutable inputs such as tuples are converted so
+        further tasks can still be appended.
         """
+        collection = BackgroundTasks((BackgroundTask(noop),))
 
-        def noop() -> None:
-            pass
+        self.assertIsInstance(collection.tasks, list)
 
-        task = BackgroundTask(noop)
-        bt = BackgroundTasks([task])
-        self.assertIs(bt.tasks[0], task)
+    def testDoesNotAliasTheProvidedSequence(self) -> None:
+        """
+        Copy the seeded sequence instead of referencing it.
+
+        Validates that mutating the original container after construction
+        cannot alter the collection.
+        """
+        provided = [BackgroundTask(noop)]
+
+        collection = BackgroundTasks(provided)
+        provided.clear()
+        self.assertEqual(len(collection.tasks), 1)
+
+    def testDoesNotInitialiseTheSingleTaskState(self) -> None:
+        """
+        Skip the single-task state inherited from the parent class.
+
+        Validates that a collection never populates the callable and
+        argument slots used by an individual task.
+        """
+        collection = BackgroundTasks()
+
+        self.assertFalse(hasattr(collection, "_BackgroundTask__func"))
+        self.assertFalse(hasattr(collection, "_BackgroundTask__is_async"))
+
+    def testDeclaresSlotsInsteadOfAnInstanceDictionary(self) -> None:
+        """
+        Store the collection state in slots.
+
+        Validates that extending the task class does not reintroduce an
+        instance dictionary.
+        """
+        self.assertFalse(hasattr(BackgroundTasks(), "__dict__"))
 
 class TestBackgroundTasksAddTask(TestCase):
+    """Validate the incremental registration of callables."""
 
-    def testAddTaskAppendsOneEntry(self) -> None:
+    def testAppendsOneTaskPerCall(self) -> None:
         """
-        Increase the task count by one when addTask is called.
+        Append exactly one task on every call.
 
-        Validates that a new BackgroundTask is appended to the tasks list
-        after each addTask invocation.
+        Validates that the collection grows by a single entry each time a
+        callable is registered.
         """
-        bt = BackgroundTasks()
+        collection = BackgroundTasks()
 
-        def noop() -> None:
-            pass
+        collection.addTask(noop)
+        collection.addTask(noop)
+        self.assertEqual(len(collection.tasks), 2)
 
-        bt.addTask(noop)
-        self.assertEqual(len(bt.tasks), 1)
-
-    def testAddTaskCreatesBackgroundTaskInstance(self) -> None:
+    def testWrapsTheCallableInABackgroundTask(self) -> None:
         """
-        Wrap the callable in a BackgroundTask when addTask is called.
+        Wrap the registered callable in a background task.
 
-        Validates that the object appended to the task list is a
-        BackgroundTask instance.
+        Validates that callers may register raw callables and still obtain
+        a uniform collection of task objects.
         """
-        bt = BackgroundTasks()
+        collection = BackgroundTasks()
 
-        def noop() -> None:
-            pass
+        collection.addTask(noop)
+        self.assertIsInstance(collection.tasks[0], BackgroundTask)
 
-        bt.addTask(noop)
-        self.assertIsInstance(bt.tasks[0], BackgroundTask)
-
-    def testAddMultipleTasksGrowsListInOrder(self) -> None:
+    def testReportsNoValue(self) -> None:
         """
-        Append tasks in insertion order across multiple addTask calls.
+        Report no value when registering a callable.
 
-        Validates that the tasks list grows correctly and retains the
-        insertion sequence.
+        Validates that registration is a pure side effect on the internal
+        list, matching the declared None return type.
         """
-        bt = BackgroundTasks()
+        collection = BackgroundTasks()
 
-        def first() -> None:
-            pass
+        self.assertIsNone(collection.addTask(noop))
 
-        def second() -> None:
-            pass
-
-        bt.addTask(first)
-        bt.addTask(second)
-        self.assertEqual(len(bt.tasks), 2)
-
-    def testAddTaskWithPositionalArgs(self) -> None:
+    async def testForwardsPositionalArguments(self) -> None:
         """
-        Accept positional arguments when adding a task.
+        Forward positional arguments to the registered callable.
 
-        Validates that addTask stores the task so that positional args
-        are forwarded correctly on execution.
+        Validates that arguments captured during registration reach the
+        callable when the collection runs.
         """
-        bt = BackgroundTasks()
         received: list[tuple[int, int]] = []
 
-        def capture(a: int, b: int) -> None:
-            received.append((a, b))
+        def capture(first: int, second: int) -> None:
+            received.append((first, second))
 
-        bt.addTask(capture, 3, 7)
-        self.assertEqual(len(bt.tasks), 1)
-        self.assertIsInstance(bt.tasks[0], BackgroundTask)
+        collection = BackgroundTasks()
+        collection.addTask(capture, 3, 7)
+        await collection()
+        self.assertEqual(received, [(3, 7)])
 
-    def testAddTaskWithKeywordArgs(self) -> None:
+    async def testForwardsKeywordArguments(self) -> None:
         """
-        Accept keyword arguments when adding a task.
+        Forward keyword arguments to the registered callable.
 
-        Validates that addTask stores the task so that keyword args are
-        forwarded correctly on execution.
+        Validates that keyword arguments captured during registration are
+        applied when the collection runs.
         """
-        bt = BackgroundTasks()
         received: list[tuple[str, int]] = []
 
         def capture(name: str, value: int) -> None:
             received.append((name, value))
 
-        bt.addTask(capture, name="x", value=42)
-        self.assertEqual(len(bt.tasks), 1)
+        collection = BackgroundTasks()
+        collection.addTask(capture, name="report", value=42)
+        await collection()
+        self.assertEqual(received, [("report", 42)])
+
+    async def testAcceptsCoroutineFunctions(self) -> None:
+        """
+        Register coroutine functions alongside plain callables.
+
+        Validates that asynchronous callables are wrapped with the same
+        API and awaited when the collection runs.
+        """
+        calls: list[int] = []
+
+        async def async_func() -> None:
+            calls.append(1)
+
+        collection = BackgroundTasks()
+        collection.addTask(async_func)
+        await collection()
+        self.assertEqual(calls, [1])
 
 class TestBackgroundTasksExecution(TestCase):
+    """Validate the sequential execution of a task collection."""
 
-    async def testRunExecutesAllTasksSequentially(self) -> None:
+    async def testRunsEveryTaskInInsertionOrder(self) -> None:
         """
-        Execute every task in the collection in insertion order via run().
+        Execute the registered tasks in insertion order.
 
-        Validates that run() runs all tasks and their effects are
-        observable in the exact order they were added.
+        Validates that the collection preserves the order callers relied
+        on when registering their side effects.
         """
         results: list[int] = []
 
@@ -174,67 +212,61 @@ class TestBackgroundTasksExecution(TestCase):
         def third() -> None:
             results.append(3)
 
-        bt = BackgroundTasks()
-        bt.addTask(first)
-        bt.addTask(second)
-        bt.addTask(third)
-        await bt.run()
+        collection = BackgroundTasks()
+        collection.addTask(first)
+        collection.addTask(second)
+        collection.addTask(third)
+        await collection.run()
         self.assertEqual(results, [1, 2, 3])
 
-    async def testCallExecutesAllTasksSequentially(self) -> None:
+    async def testCallAndRunBehaveIdentically(self) -> None:
         """
-        Execute every task in the collection when the instance is called.
+        Produce the same effect from both invocation paths.
 
-        Validates that __call__ runs all tasks in insertion order and
-        all side-effects are observable.
+        Validates that invoking the collection directly and calling its
+        run method execute the very same work.
         """
         results: list[str] = []
 
-        async def first() -> None:
-            results.append("a")
+        def append_entry() -> None:
+            results.append("entry")
 
-        async def second() -> None:
-            results.append("b")
+        collection = BackgroundTasks()
+        collection.addTask(append_entry)
+        await collection()
+        await collection.run()
+        self.assertEqual(results, ["entry", "entry"])
 
-        bt = BackgroundTasks()
-        bt.addTask(first)
-        bt.addTask(second)
-        await bt()
-        self.assertEqual(results, ["a", "b"])
-
-    async def testEmptyCollectionRunsWithoutError(self) -> None:
+    async def testCompletesWithoutErrorWhenEmpty(self) -> None:
         """
-        Complete without error when the task collection is empty.
+        Complete silently when no task is registered.
 
-        Validates that run() on an empty BackgroundTasks instance is
-        a no-op that raises no exceptions.
+        Validates that an empty collection is a harmless no-op rather than
+        an error condition.
         """
-        bt = BackgroundTasks()
-        await bt.run()
+        self.assertIsNone(await BackgroundTasks().run())
 
-    async def testRunWithPreloadedTasksAtConstruction(self) -> None:
+    async def testRunsTasksProvidedAtConstruction(self) -> None:
         """
-        Execute tasks supplied at construction time via run().
+        Execute tasks supplied at construction time.
 
-        Validates that tasks passed during initialization are run
-        correctly when run() is later invoked.
+        Validates that seeded tasks are treated exactly like tasks added
+        afterwards.
         """
-        results: list[bool] = []
+        results: list[int] = []
 
-        def noop() -> None:
-            results.append(True)
+        def append_entry() -> None:
+            results.append(1)
 
-        task = BackgroundTask(noop)
-        bt = BackgroundTasks([task])
-        await bt.run()
-        self.assertEqual(results, [True])
+        await BackgroundTasks([BackgroundTask(append_entry)]).run()
+        self.assertEqual(results, [1])
 
-    async def testMixedSyncAndAsyncTasksRunInOrder(self) -> None:
+    async def testRunsSynchronousAndAsynchronousTasksAlike(self) -> None:
         """
-        Execute a mix of synchronous and asynchronous tasks in order.
+        Execute mixed callables within a single collection.
 
-        Validates that BackgroundTasks handles a collection containing
-        both sync and async callables, running them sequentially.
+        Validates that synchronous and asynchronous callables can be
+        combined while keeping the declared order.
         """
         results: list[str] = []
 
@@ -244,18 +276,58 @@ class TestBackgroundTasksExecution(TestCase):
         async def async_func() -> None:
             results.append("async")
 
-        bt = BackgroundTasks()
-        bt.addTask(sync_func)
-        bt.addTask(async_func)
-        await bt.run()
+        collection = BackgroundTasks()
+        collection.addTask(sync_func)
+        collection.addTask(async_func)
+        await collection.run()
         self.assertEqual(results, ["sync", "async"])
 
-    async def testExceptionInTaskHaltsExecution(self) -> None:
+    async def testRunsNestedCollections(self) -> None:
         """
-        Halt sequential execution when an intermediate task raises.
+        Execute collections nested inside another collection.
 
-        Validates that an exception raised by a task propagates to the
-        caller and prevents any subsequent tasks from running.
+        Validates that a collection is itself a valid task, so groups of
+        side effects can be composed.
+        """
+        results: list[str] = []
+
+        def inner_func() -> None:
+            results.append("inner")
+
+        def outer_func() -> None:
+            results.append("outer")
+
+        inner = BackgroundTasks()
+        inner.addTask(inner_func)
+        outer = BackgroundTasks([inner, BackgroundTask(outer_func)])
+        await outer.run()
+        self.assertEqual(results, ["inner", "outer"])
+
+    async def testRunsNestedCollectionsRegisteredWithAddTask(self) -> None:
+        """
+        Execute a collection registered as a regular callable.
+
+        Validates that nesting through the registration API awaits the
+        inner collection instead of dropping its coroutine in a thread.
+        """
+        results: list[str] = []
+
+        def inner_func() -> None:
+            results.append("inner")
+
+        inner = BackgroundTasks()
+        inner.addTask(inner_func)
+        outer = BackgroundTasks()
+        outer.addTask(inner)
+        await outer.run()
+        self.assertEqual(results, ["inner"])
+
+    async def testStopsAtTheFirstFailingTask(self) -> None:
+        """
+        Abort the sequence when a task raises.
+
+        Validates that the failure is propagated and that tasks queued
+        after the failing one are never executed.
         """
         results: list[int] = []
 
@@ -263,62 +335,89 @@ class TestBackgroundTasksExecution(TestCase):
             results.append(1)
 
         def failing() -> None:
-            error_msg = "task failed"
+            error_msg = "task failure"
             raise RuntimeError(error_msg)
 
         def third() -> None:
             results.append(3)
 
-        bt = BackgroundTasks()
-        bt.addTask(first)
-        bt.addTask(failing)
-        bt.addTask(third)
+        collection = BackgroundTasks()
+        collection.addTask(first)
+        collection.addTask(failing)
+        collection.addTask(third)
 
         with self.assertRaises(RuntimeError):
-            await bt.run()
+            await collection.run()
 
         self.assertEqual(results, [1])
 
-    async def testRunAndCallAreEquivalent(self) -> None:
+    async def testCanBeExecutedRepeatedly(self) -> None:
         """
-        Produce identical results from run() and __call__.
+        Allow a collection to be executed more than once.
 
-        Validates that both invocation paths execute all tasks and yield
-        the same side-effects.
+        Validates that running the collection does not consume or clear
+        the registered tasks.
         """
-        call_results: list[int] = []
-        run_results: list[int] = []
+        calls: list[int] = []
 
-        def call_func() -> None:
-            call_results.append(1)
+        def append_entry() -> None:
+            calls.append(1)
 
-        def run_func() -> None:
-            run_results.append(1)
+        collection = BackgroundTasks()
+        collection.addTask(append_entry)
+        await collection.run()
+        await collection.run()
+        self.assertEqual(len(calls), 2)
 
-        bt_call = BackgroundTasks()
-        bt_call.addTask(call_func)
-
-        bt_run = BackgroundTasks()
-        bt_run.addTask(run_func)
-
-        await bt_call()
-        await bt_run.run()
-        self.assertEqual(call_results, [1])
-        self.assertEqual(run_results, [1])
-
-    async def testSingleTaskExecutedOnce(self) -> None:
+    async def testPicksUpTasksAddedAfterAPreviousRun(self) -> None:
         """
-        Execute a single task exactly once when run() is called once.
+        Execute tasks registered after an earlier run.
 
-        Validates that the task list containing one entry results in
-        exactly one function invocation.
+        Validates that the collection reads its task list on every
+        invocation instead of caching it.
         """
-        call_count: list[int] = []
+        results: list[str] = []
 
-        def counting() -> None:
-            call_count.append(1)
+        def first() -> None:
+            results.append("first")
 
-        bt = BackgroundTasks()
-        bt.addTask(counting)
-        await bt.run()
-        self.assertEqual(len(call_count), 1)
+        def second() -> None:
+            results.append("second")
+
+        collection = BackgroundTasks()
+        collection.addTask(first)
+        await collection.run()
+        collection.addTask(second)
+        await collection.run()
+        self.assertEqual(results, ["first", "first", "second"])
+
+class TestBackgroundTasksSubstitutability(TestCase):
+    """Validate that a collection can replace a single task."""
+
+    def testExtendsTheSingleTaskImplementation(self) -> None:
+        """
+        Derive the collection from the single task class.
+
+        Validates that isinstance checks expecting a single task, such as
+        the one guarding HTTP responses, also accept a collection.
+        """
+        self.assertTrue(issubclass(BackgroundTasks, BackgroundTask))
+        self.assertIsInstance(BackgroundTasks(), BackgroundTask)
+
+    def testImplementsTheBackgroundTaskContract(self) -> None:
+        """
+        Satisfy the background task interface.
+
+        Validates that a collection is usable wherever the abstract
+        contract is required.
+        """
+        self.assertIsInstance(BackgroundTasks(), IBackgroundTask)
+
+    def testInheritsTheRunEntryPoint(self) -> None:
+        """
+        Reuse the run entry point defined by the parent class.
+
+        Validates that the collection does not duplicate the delegation
+        already implemented for a single task.
+        """
+        self.assertIs(BackgroundTasks.run, BackgroundTask.run)

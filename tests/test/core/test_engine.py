@@ -427,6 +427,19 @@ class TestTestingEngineExecution(_EngineTestCase):
         """
         self.assertEqual(await self._makeEngine().withoutPanel().run(), [])
 
+    async def testRepeatedRunsDoNotAccumulateTests(self) -> None:
+        """
+        Execute the same amount of tests when a run is repeated.
+
+        Validates that every run discovers a fresh suite instead of
+        appending to the previously executed one.
+        """
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        engine = self._makeEngine().withoutPanel()
+        first = await engine.run()
+        second = await engine.run()
+        self.assertEqual(len(second), len(first))
+
     async def testRunAppliesTheConfiguredVerbosity(self) -> None:
         """
         Publish the configured verbosity to the result processor.

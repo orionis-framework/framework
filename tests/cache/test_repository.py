@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from orionis.cache.repository import CacheRepository
 from orionis.cache.stores.file import FileCacheBackend
+from orionis.cache.stores.memory import build as build_memory
 from orionis.test import TestCase
 
 class TestCacheRepository(TestCase):
@@ -360,3 +361,50 @@ class TestCacheRepository(TestCase):
         lock = self._repo.lock("resource")
         async with lock:
             self.assertTrue(await self._repo.has("resource") or True)
+
+
+class TestCacheRepositoryOnMemoryBackend(TestCase):
+    """Tests for CacheRepository backed by the in-memory aiocache store."""
+
+    def setUp(self) -> None:
+        """
+        Create a CacheRepository over a fresh in-memory backend.
+
+        Provides a store whose values go through MsgspecSerializer, which
+        is the combination the aiocache backends are built with.
+        """
+        self._repo = CacheRepository(build_memory())
+
+    async def testCounterIsReadableAfterIncrement(self) -> None:
+        """
+        Read back a counter written through increment.
+
+        Validates that the native integer stored by the aiocache memory
+        backend survives the serializer on the way out.
+        """
+        self.assertEqual(await self._repo.increment("hits", 5), 5)
+        self.assertEqual(await self._repo.get("hits"), 5)
+
+    async def testCounterIsReadableAfterDecrement(self) -> None:
+        """
+        Read back a counter written through decrement.
+
+        Validates the negative-delta path of the same round trip.
+        """
+        await self._repo.increment("hits", 5)
+        self.assertEqual(await self._repo.decrement("hits", 2), 3)
+        self.assertEqual(await self._repo.get("hits"), 3)
+
+    async def testCounterIsReadableInBatchReads(self) -> None:
+        """
+        Include an incremented counter in a getMany result.
+
+        Validates that the batch read path decodes native values the same
+        way the single-key read does.
+        """
+        await self._repo.increment("hits")
+        await self._repo.set("name", "orionis")
+        self.assertEqual(
+            await self._repo.getMany(["hits", "name"]),
+            {"hits": 1, "name": "orionis"},
+        )

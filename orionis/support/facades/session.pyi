@@ -1,6 +1,6 @@
 
+from orionis.container.contracts.facade import IFacade
 from orionis.session.contracts.session import ISession
-from orionis.test.contracts.engine import ITestingEngine
 
-class Session(ITestingEngine, ISession):
-        ...
+class Session(ISession, IFacade):
+    ...

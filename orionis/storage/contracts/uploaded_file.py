@@ -14,6 +14,8 @@ class IUploadedFile(ABC):
     HTTP request object: it only consumes the buffered payload handle.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def originalName(self) -> str:
         """

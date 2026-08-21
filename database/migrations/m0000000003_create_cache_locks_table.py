@@ -15,7 +15,7 @@ class CreateCacheLocksTable(Migration):
         async with Schema.create("cache_locks") as table:
             table.string("cache_key", 255).primary().comment("Lock Key")
             table.string("owner", 255).nullable().comment("Lock Owner")
-            table.bigInteger("expiration").nullable().comment("Expiration")
+            table.double("expiration").nullable().comment("Expiration")
 
             table.comment("Table to store atomic cache locks.")
 

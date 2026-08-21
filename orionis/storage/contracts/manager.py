@@ -21,6 +21,8 @@ class IStorageManager(ABC):
     never performs file operations itself.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def disk(self, name: str | None = None) -> IDisk:
         """

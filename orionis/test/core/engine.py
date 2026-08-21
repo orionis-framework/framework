@@ -18,6 +18,13 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from orionis.test.entities.result import TestResult
 
+# Fallbacks mirroring orionis.foundation.config.testing.Testing, applied when a
+# configuration key is absent (app.config returns None for unknown keys).
+_DEFAULT_VERBOSITY: int = 2
+_DEFAULT_START_DIR: str = "tests"
+_DEFAULT_FILE_PATTERN: str = "test_*.py"
+_DEFAULT_METHOD_PATTERN: str = "test*"
+
 class TestingEngine(ITestingEngine):
 
     # ruff: noqa: TC001
@@ -29,6 +36,11 @@ class TestingEngine(ITestingEngine):
         """
         Initialize the TestingEngine with application configuration.
 
+        Every ``testing.*`` key that is absent from the application
+        configuration resolves to None and is replaced by the default declared
+        in ``orionis.foundation.config.testing.Testing``, so discovery never
+        receives a missing value.
+
         Parameters
         ----------
         app : IApplication
@@ -39,16 +51,27 @@ class TestingEngine(ITestingEngine):
         None
             This method does not return a value.
         """
+        # Verbosity needs an explicit check because 0 is a valid level.
+        verbosity = app.config("testing.verbosity")
+
         # Retrieve configuration values from the application instance.
         self.__base_path: Path = app.basePath
-        self.__verbosity: int = app.config("testing.verbosity")
+        self.__verbosity: int = (
+            _DEFAULT_VERBOSITY if verbosity is None else verbosity
+        )
         self.__fail_fast: bool = app.config("testing.fail_fast") in [
             1, True, "1", "true", "True",
         ]
-        self.__start_dir: str = app.config("testing.start_dir")
-        self.__file_pattern: str = app.config("testing.file_pattern")
-        self.__method_pattern: str = app.config("testing.method_pattern")
-        self.__json_cache: bool = app.config("testing.cache_results")
+        self.__start_dir: str = (
+            app.config("testing.start_dir") or _DEFAULT_START_DIR
+        )
+        self.__file_pattern: str = (
+            app.config("testing.file_pattern") or _DEFAULT_FILE_PATTERN
+        )
+        self.__method_pattern: str = (
+            app.config("testing.method_pattern") or _DEFAULT_METHOD_PATTERN
+        )
+        self.__json_cache: bool = bool(app.config("testing.cache_results"))
         self.__cache_folder: Path = (
             app.path("storage") / "framework" / "cache" / "testing"
         )
@@ -260,8 +283,9 @@ class TestingEngine(ITestingEngine):
         """
         Run the discovered test suite asynchronously.
 
-        Discovers the tests, sets verbosity, and executes them using a thread
-        pool to avoid blocking. Saves results to cache if enabled.
+        Discovers the tests, builds a runner carrying the configured verbosity,
+        and executes them using a thread pool to avoid blocking. Saves results
+        to cache if enabled.
 
         Returns
         -------
@@ -271,12 +295,10 @@ class TestingEngine(ITestingEngine):
         # Build a fresh suite so consecutive runs never accumulate tests.
         suite: unittest.TestSuite = self.discover()
 
-        # Set verbosity level in TestResult for output formatting.
-        TestResultProcessor.setPrintVerbosity(self.__verbosity)
-
-        # Create runner with current configuration.
+        # Create runner with current configuration. The verbosity travels with
+        # the runner instance and reaches the result processor it builds.
         runner = TestRunner(
-            verbosity=0,  # Keep at 0 to manage detail printing from TestResult.
+            verbosity=self.__verbosity,
             failfast=self.__fail_fast,
             with_panel=self.__with_panel,
         )

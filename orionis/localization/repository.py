@@ -13,6 +13,14 @@ class TranslationRepository(ITranslationRepository):
     Each locale is loaded from disk exactly once; every subsequent
     lookup resolves from the internal dictionary with O(1) access. The
     cache is fully transparent to consumers.
+
+    Notes
+    -----
+    The repository uses no lock. Two tasks missing the cache for the
+    same locale may both call the loader; the last assignment wins and
+    both callers receive a valid map. :meth:`get` returns the cached
+    mapping itself, not a copy, so mutating it mutates the cache for
+    every consumer.
     """
 
     __slots__ = ("_cache", "_loader")
@@ -45,7 +53,8 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         TranslationMap
-            Cached translation map for the locale.
+            Cached translation map for the locale. The mapping is the
+            cached instance, not a copy.
 
         Raises
         ------

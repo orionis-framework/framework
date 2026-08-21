@@ -96,8 +96,92 @@ def _build_fixture() -> types.ModuleType:
 
 _FIXTURE_MODULE = _build_fixture()
 
+# ---------------------------------------------------------------------------
+# Synthetic fixture module exposing private members
+# ---------------------------------------------------------------------------
+# Kept separate from the main fixture so that the negative assertions about
+# private members in the main fixture remain meaningful.
+
+_PRIVATE_FIXTURE_NAME = "_orionis_module_test_private_fixture"
+
+def _build_private_fixture() -> types.ModuleType:
+    """
+    Build and register a synthetic module exposing private members.
+
+    Returns
+    -------
+    types.ModuleType
+        The synthetic module registered under _PRIVATE_FIXTURE_NAME.
+
+    Notes
+    -----
+    Members are injected through ``__dict__`` because attribute assignment
+    written literally would be subject to name mangling rules.
+    """
+    mod = types.ModuleType(_PRIVATE_FIXTURE_NAME)
+
+    class _PrivateClass:
+        """Private class fixture."""
+
+    def _private_sync_fn() -> int:
+        """
+        Return a fixed integer as a private synchronous fixture.
+
+        Returns
+        -------
+        int
+            Always 5.
+        """
+        return 5
+
+    async def _private_async_fn() -> int: # NOSONAR
+        """
+        Return a fixed integer as a private asynchronous fixture.
+
+        Returns
+        -------
+        int
+            Always 6.
+        """
+        return 6
+
+    namespace = mod.__dict__
+    namespace["__PrivateClass"] = _PrivateClass
+    namespace["__PRIVATE_CONST"] = 7
+    namespace["_PROTECTED_CONST"] = 8
+    namespace["__private_sync_fn"] = _private_sync_fn
+    namespace["__private_async_fn"] = _private_async_fn
+
+    sys.modules[_PRIVATE_FIXTURE_NAME] = mod
+    return mod
+
+_PRIVATE_FIXTURE_MODULE = _build_private_fixture()
+
 # Real module used for getFile / getSourceCode tests
 _REAL_MODULE = "orionis.introspection.modules.reflection"
+
+# Getters whose result is memoized in the internal cache dictionary
+_CACHED_GETTERS = (
+    "getClasses",
+    "getPublicClasses",
+    "getProtectedClasses",
+    "getPrivateClasses",
+    "getConstants",
+    "getPublicConstants",
+    "getProtectedConstants",
+    "getPrivateConstants",
+    "getFunctions",
+    "getPublicFunctions",
+    "getPublicSyncFunctions",
+    "getPublicAsyncFunctions",
+    "getProtectedFunctions",
+    "getProtectedSyncFunctions",
+    "getProtectedAsyncFunctions",
+    "getPrivateFunctions",
+    "getPrivateSyncFunctions",
+    "getPrivateAsyncFunctions",
+    "getImports",
+)
 
 class TestReflectionModuleInit(TestCase):
 
@@ -943,3 +1027,159 @@ class TestReflectionModuleClearCache(TestCase):
         self.assertNotIn("classes", self.rm)
         # Recompute and check result is still valid
         self.assertIsInstance(self.rm.getClasses(), dict)
+
+class TestReflectionModulePrivateMembers(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectionModule wrapping the private-member fixture.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.rm = ReflectionModule(_PRIVATE_FIXTURE_NAME)
+
+    def testGetPrivateClassesContainsMangledClass(self) -> None:
+        """
+        Assert that double-underscore classes are reported as private.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIn("__PrivateClass", self.rm.getPrivateClasses())
+
+    def testGetPrivateConstantsContainsMangledConstant(self) -> None:
+        """
+        Assert that double-underscore constants are reported as private.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIn("__PRIVATE_CONST", self.rm.getPrivateConstants())
+
+    def testGetProtectedConstantsContainsSingleUnderscoreConstant(self) -> None:
+        """
+        Assert that single-underscore constants are reported as protected.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        self.assertIn("_PROTECTED_CONST", self.rm.getProtectedConstants())
+
+    def testGetPrivateFunctionsContainsBothVariants(self) -> None:
+        """
+        Assert that private synchronous and asynchronous functions are found.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        private = self.rm.getPrivateFunctions()
+        self.assertIn("__private_sync_fn", private)
+        self.assertIn("__private_async_fn", private)
+
+    def testGetPrivateSyncFunctionsExcludesCoroutines(self) -> None:
+        """
+        Assert that private coroutine functions are excluded from the sync set.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        sync_functions = self.rm.getPrivateSyncFunctions()
+        self.assertIn("__private_sync_fn", sync_functions)
+        self.assertNotIn("__private_async_fn", sync_functions)
+
+    def testGetPrivateAsyncFunctionsExcludesSyncFunctions(self) -> None:
+        """
+        Assert that private synchronous functions are excluded from the async set.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        async_functions = self.rm.getPrivateAsyncFunctions()
+        self.assertIn("__private_async_fn", async_functions)
+        self.assertNotIn("__private_sync_fn", async_functions)
+
+class TestReflectionModuleMemoization(TestCase):
+
+    def testCachedGettersReturnTheSameObjectOnSecondCall(self) -> None:
+        """
+        Assert that every memoized getter returns the cached instance.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+
+        Notes
+        -----
+        The second invocation must hit the internal cache instead of
+        recomputing the mapping.
+        """
+        rm = ReflectionModule(_PRIVATE_FIXTURE_NAME)
+        for getter in _CACHED_GETTERS:
+            bound = getattr(rm, getter)
+            self.assertIs(bound(), bound(), msg=getter)
+
+    def testGetFileIsMemoized(self) -> None:
+        """
+        Assert that getFile returns the cached path on repeated calls.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        rm = ReflectionModule(_REAL_MODULE)
+        self.assertIs(rm.getFile(), rm.getFile())
+
+class TestReflectionModuleSourceErrors(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Instantiate a ReflectionModule wrapping a module without a file.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.rm = ReflectionModule(_FIXTURE_NAME)
+
+    def testGetFileRaisesTypeErrorForModulesWithoutFile(self) -> None:
+        """
+        Assert that in-memory modules cannot resolve a source file.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(TypeError):
+            self.rm.getFile()
+
+    def testGetSourceCodeRaisesValueErrorWhenFileIsUnavailable(self) -> None:
+        """
+        Assert that unreadable modules surface a ValueError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with self.assertRaises(ValueError):
+            self.rm.getSourceCode()
+

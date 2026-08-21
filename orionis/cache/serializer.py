@@ -5,6 +5,7 @@ import decimal
 import enum
 import importlib
 import json
+import secrets
 import sys
 import uuid
 from pathlib import Path
@@ -449,11 +450,22 @@ class Serializer:
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        OSError
+            If the payload cannot be staged or renamed into place.
         """
-        # Encode to bytes and write atomically via a temporary file
-        tmp_file = file_path.with_suffix(".tmp")
-        tmp_file.write_bytes(_msgjson.encode(_encode(data)))
-        tmp_file.replace(file_path)
+        # Stage in a unique sibling so concurrent writers never share it
+        tmp_file = file_path.with_name(
+            f"{file_path.name}.{secrets.token_hex(8)}.tmp",
+        )
+        try:
+            tmp_file.write_bytes(_msgjson.encode(_encode(data)))
+            tmp_file.replace(file_path)
+        except OSError:
+            tmp_file.unlink(missing_ok=True)
+            raise
 
     @staticmethod
     def loadFromFile(file_path: Path) -> Any:

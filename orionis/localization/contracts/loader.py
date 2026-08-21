@@ -15,6 +15,8 @@ class ITranslationLoader(ABC):
     loading translations.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def load(self, locale: str) -> TranslationMap:
         """

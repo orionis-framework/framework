@@ -12,6 +12,11 @@ class ITranslationRepository(ABC):
     The repository guarantees that each locale is read from disk at
     most once, keeping every subsequent lookup fully in memory with
     O(1) access.
+
+    Notes
+    -----
+    Implementations are not required to be thread-safe nor to copy the
+    cached mapping before returning it.
     """
 
     __slots__ = ()
@@ -29,7 +34,8 @@ class ITranslationRepository(ABC):
         Returns
         -------
         TranslationMap
-            Cached translation map for the locale.
+            Cached translation map for the locale. The mapping is the
+            cached instance, not a copy.
         """
 
     @abstractmethod

@@ -1,633 +1,833 @@
 # Orionis Storage (`orionis.storage`)
 
-> Abstracción de sistema de archivos al estilo Laravel, con drivers intercambiables local, en memoria y en la nube (S3, Azure Blob, GCS).
->
-> 🇬🇧 English version: [README.md](README.md)
-
-`orionis.storage` ofrece a las aplicaciones una única API, agnóstica del
-disco, para leer, escribir, transmitir en streaming y gestionar archivos y
-directorios. El código de negocio siempre trabaja con objetos `Disk`,
-`File` y `Directory`; el medio real —sistema de archivos local, memoria del
-proceso o un almacenamiento de objetos en la nube— se selecciona
-únicamente mediante configuración, y toda operación bloqueante es `async`
-y se descarga a un hilo trabajador para que el bucle de eventos nunca se
-bloquee.
-
----
+> Almacenamiento de archivos asíncrono e independiente del medio: una sola API para discos locales, discos en memoria, Amazon S3, Azure Blob Storage y Google Cloud Storage.
 
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Descripción funcional del módulo](#descripción-funcional-del-módulo)
-3. [Arquitectura](#arquitectura)
-4. [Referencia de API](#referencia-de-api)
-   - [`StorageManager`](#storagemanager-orionisstoragemanagerstoragemanager)
-   - [`Disk`](#disk-orionisstoragediskdisk)
-   - [`File`](#file-orionisstoragefilefile)
-   - [`Directory`](#directory-orionisstoragedirectorydirectory)
-   - [`UploadedFile`](#uploadedfile-orionisstorageuploaded_fileuploadedfile)
-   - [`AsyncStream`](#asyncstream-orionisstoragestreamasyncstream)
-   - [`StorageProvider`](#storageprovider-orionisstorageproviderstorageprovider)
-   - [Drivers (`IStorageDriver`)](#drivers-istoragedriver)
-   - [`FileInfo` / `Visibility`](#fileinfo--visibility)
-   - [Normalización de rutas](#normalización-de-rutas)
-   - [Excepciones](#excepciones)
-5. [Ejemplos de uso](#ejemplos-de-uso)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de diseño](#notas-de-diseño)
-8. [Notas de compatibilidad](#notas-de-compatibilidad)
-
----
+- [Requisitos](#requisitos)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja en el framework](#dónde-encaja-en-el-framework)
+  - [Flujo entre componentes](#flujo-entre-componentes)
+  - [Mapa de archivos](#mapa-de-archivos)
+  - [Decisiones de diseño](#decisiones-de-diseño)
+- [Referencia de API](#referencia-de-api)
+  - [`StorageManager`](#storagemanager)
+  - [`Disk`](#disk)
+  - [`File`](#file)
+  - [`Directory`](#directory)
+  - [`UploadedFile`](#uploadedfile)
+  - [`AsyncStream`](#asyncstream)
+  - [`IStorageDriver`](#istoragedriver)
+  - [`LocalStorageDriver`](#localstoragedriver)
+  - [`MemoryStorageDriver`](#memorystoragedriver)
+  - [`S3StorageDriver`](#s3storagedriver)
+  - [`AzureStorageDriver`](#azurestoragedriver)
+  - [`GoogleStorageDriver`](#googlestoragedriver)
+  - [Funciones auxiliares de los drivers](#funciones-auxiliares-de-los-drivers)
+  - [`FileInfo`](#fileinfo)
+  - [`Visibility`](#visibility)
+  - [Normalización de rutas](#normalización-de-rutas)
+  - [Excepciones](#excepciones)
+  - [`StorageProvider` y la facade `Storage`](#storageprovider-y-la-facade-storage)
+  - [Claves de configuración](#claves-de-configuración)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [Resolver un disco con la facade](#resolver-un-disco-con-la-facade)
+  - [Manejo de errores](#manejo-de-errores)
+  - [Streaming de archivos grandes](#streaming-de-archivos-grandes)
+  - [Guardar un archivo subido por HTTP](#guardar-un-archivo-subido-por-http)
+  - [Ejecución autónoma con el driver en memoria](#ejecución-autónoma-con-el-driver-en-memoria)
+  - [Registrar un driver personalizado](#registrar-un-driver-personalizado)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
 ## Requisitos
 
-Los discos local, en memoria y público/privado funcionan sin instalación
-adicional:
+Los drivers `local` y `memory` no requieren nada más allá de `pip install orionis`: solo
+usan la biblioteca estándar (`asyncio`, `hashlib`, `mimetypes`, `shutil`, `pathlib`,
+`secrets`, `io`, `urllib.parse`).
 
-```bash
-pip install orionis
+Los drivers de nube usan el SDK oficial de cada plataforma, declarado como **dependencia
+opcional** en `pyproject.toml`:
+
+| Driver | Paquete PyPI | Versión mínima | Instalación |
+| --- | --- | --- | --- |
+| `S3StorageDriver` | `boto3` | `>=1.35` | `pip install orionis[s3]` |
+| `AzureStorageDriver` | `azure-storage-blob` | `>=12.24` | `pip install orionis[azure]` |
+| `GoogleStorageDriver` | `google-cloud-storage` | `>=2.18` | `pip install orionis[gcs]` |
+| Los tres a la vez | — | — | `pip install orionis[storage]` |
+
+El SDK nunca se importa al construir el driver: cada uno arranca su cliente en la primera
+operación mediante `importDriverDependency()`, de modo que un paquete ausente lanza
+`MissingStorageDependencyException` con el comando exacto de instalación en lugar de un
+`ImportError` durante el arranque.
+
+## Descripción funcional
+
+### Dónde encaja en el framework
+
+`orionis.storage` da acceso uniforme y totalmente asíncrono al almacenamiento de archivos,
+sin importar el medio físico que haya detrás. El código de la aplicación siempre habla con
+los mismos objetos (`Disk`, `File`, `Directory`); cambiar un disco local por un bucket de
+S3 es un cambio de configuración, no de código.
+
+Relaciones directas con otros módulos:
+
+- `orionis.foundation.config.filesystems` — aporta las entidades de configuración
+  `Filesystems` / `Disks` que `StorageManager` lee vía `app.config("filesystems")`.
+- `orionis.foundation` (`core_providers.py`) — registra `StorageProvider`.
+- `orionis.container` — resuelve `IStorageManager` y sostiene la facade `Storage`.
+- `orionis.http.payload` — produce el payload multipart que `UploadedFile` adapta. El
+  contrato HTTP se importa solo bajo `TYPE_CHECKING`, así que el módulo de storage nunca
+  depende de la capa HTTP en tiempo de ejecución.
+
+### Flujo entre componentes
+
+```text
+Storage (facade)  ->  IStorageManager
+                        |
+                        |  disk(name) / default()          cacheado por nombre
+                        v
+                      Disk  ------------------------------ IStorageDriver
+                        |                                   (local | memory |
+                        |  file(path) / directory(path)      s3 | azure | gcs |
+                        v                                    custom vía extend)
+              File            Directory
+                |                 |
+                |  open()         |  files() / directories()
+                v                 v
+           AsyncStream        list[File] / list[Directory]
+
+UploadedFile  ->  manager.disk(disk).file(target).writeStream(chunks)
 ```
 
-Los drivers en la nube requieren su SDK oficial como **dependencia
-opcional**, incluida mediante extras definidos en `pyproject.toml`:
+Toda operación de `Disk`, `File` y `Directory` se delega al driver, y el driver solo habla
+en rutas canónicas relativas a la raíz producidas por `normalizePath()` /
+`normalizeFilePath()`.
 
-```bash
-pip install orionis[s3]       # boto3>=1.35            (Amazon S3 / compatibles con S3)
-pip install orionis[azure]    # azure-storage-blob>=12.24
-pip install orionis[gcs]      # google-cloud-storage>=2.18
-pip install orionis[storage]  # los tres SDKs de nube a la vez
-```
+### Mapa de archivos
 
-- **Python:** 3.14 o superior.
-- Si falta un SDK de nube, el driver correspondiente lanza
-  `MissingStorageDependencyException` **solo cuando se usa por primera
-  vez** (la importación es perezosa), con una sugerencia de instalación
-  accionable en el mensaje.
+| Archivo | Contenido |
+| --- | --- |
+| `manager.py` | `StorageManager`: lee la configuración, construye y cachea discos, registra drivers personalizados y adapta cargas HTTP. |
+| `disk.py` | `Disk`: fábrica de objetos `File` / `Directory` más métodos de conveniencia que siempre delegan en ellos. |
+| `file.py` | `File`: todas las operaciones sobre un archivo (contenido, metadatos, reubicación, URLs). |
+| `directory.py` | `Directory`: creación, borrado, existencia y listados que devuelven objetos, nunca cadenas. |
+| `uploaded_file.py` | `UploadedFile`: adapta un payload multipart HTTP para persistirlo en cualquier disco. |
+| `stream.py` | `AsyncStream`: envoltorio asíncrono sobre un handle binario abierto de forma perezosa. |
+| `paths.py` | `normalizePath()` / `normalizeFilePath()`: forma canónica y protección ante traversal. |
+| `exceptions.py` | Jerarquía de excepciones con raíz en `StorageException`. |
+| `provider.py` | `StorageProvider`: vincula `IStorageManager` y fija la facade `Storage`. |
+| `contracts/` | ABCs: `IStorageManager`, `IDisk`, `IFile`, `IDirectory`, `IUploadedFile`, `IStorageStream`, `IStorageDriver`. |
+| `drivers/local.py` | `LocalStorageDriver` (sistema de archivos, escrituras atómicas, permisos POSIX). |
+| `drivers/memory.py` | `MemoryStorageDriver` (diccionarios en proceso, para tests/uso efímero). |
+| `drivers/s3.py` | `S3StorageDriver` (Amazon S3 y servicios compatibles). |
+| `drivers/azure.py` | `AzureStorageDriver` (Azure Blob Storage). |
+| `drivers/gcs.py` | `GoogleStorageDriver` (Google Cloud Storage). |
+| `drivers/functions.py` | Helpers compartidos por los drivers: import perezoso, validación de modos, destino de descarga, filtrado de claves. |
+| `entities/file_info.py` | `FileInfo`: instantánea inmutable de metadatos. |
+| `enums/visibility.py` | `Visibility`: `PUBLIC` / `PRIVATE`. |
 
-## Descripción funcional del módulo
+### Decisiones de diseño
 
-Casi cualquier aplicación necesita almacenar archivos subidos, reportes
-generados o artefactos en caché, y normalmente necesita moverse entre disco
-local, memoria (pruebas) y almacenamiento en la nube sin reescribir la
-lógica de negocio. `orionis.storage` resuelve esto con un modelo de objetos
-pequeño y por capas:
-
-- **`StorageManager`** lee la configuración `filesystems`
-  (`config/filesystems.py`, respaldada por las entidades
-  `orionis.foundation.config.filesystems`), construye objetos `Disk`
-  vinculados al driver correcto, y los cachea por nombre.
-- **`Disk`** es el punto de entrada que usan las aplicaciones día a día:
-  construye objetos `File`/`Directory` para una ruta dada y expone métodos
-  de conveniencia (`put`, `exists`, `delete`, `copy`, `move`) que
-  simplemente delegan en un `File`.
-- **`File`** y **`Directory`** encapsulan una ruta canónica y una
-  referencia al driver; toda operación (lectura, escritura, streaming,
-  metadatos, reubicación, listado) delega en el driver — estas clases no
-  contienen lógica de E/S propia.
-- **`UploadedFile`** adapta el payload multipart en buffer producido por la
-  capa HTTP (`orionis.http.payload`) para que pueda persistirse en
-  cualquier disco configurado (`store`, `storeAs`, `move`, `copy`).
-- **`AsyncStream`** envuelve un handle binario abierto de forma perezosa
-  para que los drivers puedan exponer `open()` como un gestor de contexto
-  asíncrono sin bloquear el bucle de eventos.
-- **Los drivers** (`LocalStorageDriver`, `MemoryStorageDriver`,
-  `S3StorageDriver`, `AzureStorageDriver`, `GoogleStorageDriver`)
-  implementan el contrato de bajo nivel `IStorageDriver` — el único lugar
-  que sabe cómo hablar con el medio real. Los drivers no contienen
-  **ninguna** lógica de negocio.
-- **`StorageProvider`** es el `ServiceProvider` del framework (diferible)
-  que registra `IStorageManager` como singleton y fija la fachada `Storage`
-  (`orionis.support.facades.storage`, fuera de este módulo) en el arranque.
-
-## Arquitectura
-
-```mermaid
-graph TD
-    A[config/filesystems.py] --> B[StorageManager]
-    B -->|nombre de disco| C[Disk]
-    C -->|ruta de archivo| D[File]
-    C -->|ruta de directorio| E[Directory]
-    D --> F[IStorageDriver]
-    E --> F
-    F --> G[LocalStorageDriver]
-    F --> H[MemoryStorageDriver]
-    F --> I[S3StorageDriver]
-    F --> J[AzureStorageDriver]
-    F --> K[GoogleStorageDriver]
-    L[Payload multipart HTTP] --> M[UploadedFile]
-    M -->|resuelve disco vía| B
-    M -->|persiste a través de| D
-    N[StorageProvider] -->|register singleton| B
-    N -->|boot: fija fachada| O[Fachada Storage]
-```
-
-- `StorageManager.disk(name)` resuelve la entidad de configuración
-  `Filesystems` para `name`, instancia el driver correspondiente
-  (asignación incorporada: `local` → `LocalStorageDriver`, `memory` →
-  `MemoryStorageDriver`, `aws`/`s3` → `S3StorageDriver`, `azure` →
-  `AzureStorageDriver`, `gcs`/`google` → `GoogleStorageDriver`), lo envuelve
-  en un `Disk`, y cachea el resultado. `StorageManager.extend(driver,
-  factory)` permite que el código de la aplicación registre una fábrica de
-  driver personalizada que tiene prioridad sobre la asignación incorporada.
-- Toda ruta aceptada por `File`/`Directory` pasa por
-  `orionis/storage/paths.py` (`normalizePath`/`normalizeFilePath`) antes de
-  llegar a un driver, de modo que los drivers solo ven rutas canónicas y
-  seguras frente a traversal.
-- `orionis/storage/drivers/functions.py` contiene helpers compartidos por
-  todos los drivers: `importDriverDependency` (importación perezosa de SDK
-  opcional), `assertBinaryMode`, `resolveDownloadTarget`, `filterFiles`,
-  `deriveDirectories`.
-- Cada clase concreta tiene un contrato equivalente en
-  `orionis/storage/contracts/` (`IStorageManager`, `IDisk`, `IFile`,
-  `IDirectory`, `IUploadedFile`, `IStorageStream`, `IStorageDriver`),
-  reexportados desde `contracts/__init__.py`.
+- **Patrón driver** — `IStorageDriver` aísla el medio; `File` / `Directory` / `Disk` nunca
+  saben sobre qué backend corren, así que el mismo código sirve para todos los discos.
+- **Sin lógica duplicada** — `Disk.put/exists/delete/copy/move` delegan en `File`, y
+  `Directory.files()` construye objetos `File`; hay una sola implementación por comportamiento.
+- **`__slots__` en todas las clases concretas** (`StorageManager`, `Disk`, `File`,
+  `Directory`, `UploadedFile`, `AsyncStream`, todos los drivers) **y `__slots__ = ()` en
+  todos los contratos** — las instancias no llevan diccionario de atributos, lo que acota
+  la memoria por objeto.
+- **Metadatos inmutables** — `FileInfo` es un `@dataclass(frozen=True, kw_only=True, slots=True)`,
+  así que la instantánea se puede pasar de un lado a otro sin riesgo de mutación.
+- **Import perezoso del SDK** — los constructores de los drivers de nube no hacen E/S ni
+  importaciones, lo que permite construirlos (y probarlos) sin el SDK instalado.
+- **Normalización de rutas en el borde** — `File` y `Directory` normalizan en `__init__`,
+  de modo que los drivers pueden asumir que la ruta ya es segura.
+- **Provider diferible** — `StorageProvider` implementa `DeferrableProvider`, así que nada
+  del stack de storage se construye hasta que se resuelve `IStorageManager` por primera vez.
 
 ## Referencia de API
 
-### `StorageManager` (`orionis.storage.manager.StorageManager`)
+### `StorageManager`
+
+`orionis.storage.manager.StorageManager` — implementa
+`orionis.storage.contracts.manager.IStorageManager`.
+
+`__slots__ = ("_app", "_base_path", "_config", "_custom", "_default", "_disks")`
 
 ```python
-class StorageManager(IStorageManager):
-    __slots__ = ("_app", "_base_path", "_config", "_custom", "_default", "_disks")
-    def __init__(self, app: IApplication) -> None: ...
+def __init__(self, app: IApplication) -> None
 ```
 
-Lee `app.config("filesystems")` en una entidad `Filesystems` durante la
-construcción y resuelve `app.basePath` para raíces locales relativas.
+Lee `app.config("filesystems")` y, cuando es un `dict`, lo convierte en la entidad
+validada `Filesystems`. Guarda `app.basePath` como ancla de las raíces locales relativas y
+el nombre del disco `default` configurado.
 
 | Método | Firma | Descripción |
 | --- | --- | --- |
-| `disk` | `(name: str \| None = None) -> IDisk` | Resuelve (y cachea) el disco registrado bajo `name`, o el disco por defecto configurado si `name is None`. |
-| `default` | `() -> IDisk` | Resuelve el disco configurado como `filesystems.default`. |
-| `extend` | `(driver: str, factory: Callable[[object], IStorageDriver]) -> None` | Registra una fábrica de driver personalizada bajo `driver`, con prioridad sobre los drivers incorporados. Vacía la caché de discos para que las futuras resoluciones la usen. |
-| `uploaded` | `(source: IHttpUploadedFile) -> IUploadedFile` | Envuelve un payload multipart HTTP (de `orionis.http.payload`) como un `UploadedFile` vinculado a este manager. |
+| `disk` | `disk(name: str \| None = None) -> IDisk` | Resuelve el disco declarado con ese nombre (o el default). Se construye en el primer acceso y se cachea en `_disks`. Lanza `DiskNotFoundException` si el disco no está declarado y `DriverNotSupportedException` si su `driver` no tiene implementación. |
+| `default` | `default() -> IDisk` | Atajo de `disk()`. |
+| `extend` | `extend(driver: str, factory: Callable[[object], IStorageDriver]) -> None` | Registra una fábrica para un nombre de driver. La fábrica recibe la entidad de configuración del disco y debe devolver un driver listo. **Efecto secundario:** limpia la caché de discos para que las resoluciones siguientes la tomen en cuenta. |
+| `uploaded` | `uploaded(source: IHttpUploadedFile) -> IUploadedFile` | Envuelve un payload multipart HTTP en un `UploadedFile` ligado a este manager. |
 
-**Lanza:** `DiskNotFoundException` (disco ausente de la configuración),
-`DriverNotSupportedException` (nombre de driver desconocido sin fábrica
-registrada vía `extend`).
+Orden de resolución del driver dentro del privado `__buildDriver()`:
 
-### `Disk` (`orionis.storage.disk.Disk`)
+1. Fábrica registrada con `extend()` para el valor `driver` del disco (siempre gana).
+2. `"local"` → `LocalStorageDriver`, con raíz en `config.path`; las rutas relativas se
+   anclan a `app.basePath` y `config.url` pasa a ser la URL pública base.
+3. `"memory"` → `MemoryStorageDriver(base_url=config.url)`.
+4. `"aws"` o `"s3"` → `S3StorageDriver(config)`.
+5. `"azure"` → `AzureStorageDriver(config)`.
+6. `"gcs"` o `"google"` → `GoogleStorageDriver(config)`.
+7. Cualquier otro valor → `DriverNotSupportedException`.
+
+### `Disk`
+
+`orionis.storage.disk.Disk` — implementa `orionis.storage.contracts.disk.IDisk`.
+
+`__slots__ = ("_driver", "_name")`
 
 ```python
-class Disk(IDisk):
-    __slots__ = ("_driver", "_name")
-    def __init__(self, name: str, driver: IStorageDriver) -> None: ...
+def __init__(self, name: str, driver: IStorageDriver) -> None
 ```
 
 | Método | Firma | Descripción |
 | --- | --- | --- |
-| `name` | `() -> str` | Nombre de configuración del disco. |
-| `file` | `(path: str) -> IFile` | Construye un `File` vinculado al driver de este disco. |
-| `directory` | `(path: str = "") -> IDirectory` | Construye un `Directory` vinculado al driver de este disco (`""` = raíz del disco). |
-| `put` | `(path: str, contents: bytes \| str, visibility: str \| None = None) -> IFile` | Conveniencia para `disk.file(path).write(contents, visibility)`. |
-| `exists` | `(path: str) -> bool` | Conveniencia para `disk.file(path).exists()`. |
-| `delete` | `(path: str) -> bool` | Conveniencia para `disk.file(path).delete()`. |
-| `copy` | `(source: str, target: str) -> IFile` | Conveniencia para `disk.file(source).copyTo(target)`. |
-| `move` | `(source: str, target: str) -> IFile` | Conveniencia para `disk.file(source).moveTo(target)`. |
+| `name` | `name() -> str` | Nombre de configuración del disco. |
+| `file` | `file(path: str) -> IFile` | Construye un `File` ligado a este driver. Lanza `StoragePathException` si la ruta es inválida o resuelve a la raíz. |
+| `directory` | `directory(path: str = "") -> IDirectory` | Construye un `Directory`; la cadena vacía es la raíz del disco. Lanza `StoragePathException` ante intentos de escape. |
+| `put` | `async put(path: str, contents: bytes \| str, visibility: str \| None = None) -> IFile` | `self.file(path).write(contents, visibility)`. |
+| `exists` | `async exists(path: str) -> bool` | `self.file(path).exists()`. |
+| `delete` | `async delete(path: str) -> bool` | `self.file(path).delete()`. |
+| `copy` | `async copy(source: str, target: str) -> IFile` | `self.file(source).copyTo(target)`. |
+| `move` | `async move(source: str, target: str) -> IFile` | `self.file(source).moveTo(target)`. |
 
-Todos los métodos de conveniencia son `async` y simplemente delegan en un
-`File` — `Disk` nunca duplica lógica de E/S.
+### `File`
 
-### `File` (`orionis.storage.file.File`)
+`orionis.storage.file.File` — implementa `orionis.storage.contracts.file.IFile`.
+
+`__slots__ = ("_driver", "_path")`
 
 ```python
-class File(IFile):
-    __slots__ = ("_driver", "_path")
-    def __init__(self, driver: IStorageDriver, path: str) -> None: ...
+def __init__(self, driver: IStorageDriver, path: str) -> None
 ```
 
-La ruta se normaliza vía `normalizeFilePath` en `__init__` (lanza
-`StoragePathException` si es inválida o vacía).
+La ruta se normaliza con `normalizeFilePath()` al construir el objeto, así que una ruta
+inválida falla de inmediato con `StoragePathException` y nunca llega al driver.
 
-**Contenido:**
-
-| Método | Firma | Descripción |
+| Método | Firma | Notas |
 | --- | --- | --- |
-| `path` | `() -> str` | Ruta canónica relativa a la raíz. |
-| `read` | `() -> bytes` | Contenido completo del archivo. |
-| `readStream` | `(chunk_size: int = 65536) -> AsyncIterator[bytes]` | Transmite el archivo en fragmentos (chunks). |
-| `write` | `(contents: bytes \| str, visibility: str \| None = None) -> IFile` | Sobrescribe el archivo; las cadenas se codifican en UTF-8. Devuelve `self` para encadenar. |
-| `writeStream` | `(stream: AsyncIterable[bytes], visibility: str \| None = None) -> IFile` | Escribe fragmentos desde un iterable asíncrono. Devuelve `self`. |
-| `open` | `(mode: str = "rb") -> IStorageStream` | Abre un `AsyncStream` (solo modos binarios: `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`). |
-| `delete` | `() -> bool` | `True` si el archivo existía y fue eliminado. |
-| `exists` | `() -> bool` | `True` si el archivo existe. |
+| `path` | `path() -> str` | Ruta canónica relativa a la raíz. |
+| `read` | `async read() -> bytes` | Lanza `StorageFileNotFoundException`. |
+| `readStream` | `readStream(chunk_size: int = 65536) -> AsyncIterator[bytes]` | No es corrutina: devuelve el iterador asíncrono del driver, se consume con `async for`. |
+| `write` | `async write(contents: bytes \| str, visibility: str \| None = None) -> IFile` | Las cadenas se codifican en UTF-8. Devuelve `self` (encadenable). |
+| `writeStream` | `async writeStream(stream: AsyncIterable[bytes], visibility: str \| None = None) -> IFile` | Devuelve `self`. |
+| `open` | `open(mode: str = "rb") -> IStorageStream` | Llamada síncrona que devuelve un stream perezoso. Modos aceptados: `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`; cualquier otro lanza `UnsupportedStorageOperationException`. |
+| `delete` | `async delete() -> bool` | `True` si el archivo existía. |
+| `exists` | `async exists() -> bool` | — |
+| `copyTo` | `async copyTo(target: str) -> IFile` | Devuelve un `File` **nuevo** que apunta a la copia. |
+| `moveTo` | `async moveTo(target: str) -> IFile` | Devuelve un `File` nuevo; el objeto actual sigue apuntando a la ruta antigua. |
+| `rename` | `async rename(name: str) -> IFile` | Renombra dentro del mismo directorio. Lanza `StoragePathException` si `name` está vacío o contiene `/` o `\`. |
+| `size` | `async size() -> int` | Bytes. |
+| `mimeType` | `async mimeType() -> str \| None` | — |
+| `lastModified` | `async lastModified() -> datetime` | Con zona horaria (UTC). |
+| `url` | `async url() -> str` | Lanza `UnsupportedStorageOperationException` si el disco no expone URLs públicas. |
+| `temporaryUrl` | `async temporaryUrl(expires_in: int = 3600) -> str` | URL firmada; no soportada por `local` ni `memory`. |
+| `visibility` | `async visibility() -> str` | `'public'` o `'private'`. |
+| `setVisibility` | `async setVisibility(visibility: str) -> IFile` | Devuelve `self`. |
+| `download` | `async download(destination: str \| Path) -> Path` | Copia al sistema de archivos local; si `destination` es un directorio existente conserva el nombre original. Devuelve la ruta absoluta. |
+| `hash` | `async hash(algorithm: str = "sha256") -> str` | Cualquier algoritmo aceptado por `hashlib.new`. |
+| `info` | `async info() -> FileInfo` | Instantánea de metadatos. |
 
-**Reubicación:**
+### `Directory`
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `copyTo` | `(target: str) -> IFile` | Copia a `target` en el mismo disco; devuelve un nuevo `File`. |
-| `moveTo` | `(target: str) -> IFile` | Mueve a `target`; el objeto original sigue apuntando a la ruta antigua — usa el `File` devuelto. |
-| `rename` | `(name: str) -> IFile` | Renombra dentro del directorio actual. Lanza `StoragePathException` si `name` contiene `/` o `\`. |
+`orionis.storage.directory.Directory` — implementa
+`orionis.storage.contracts.directory.IDirectory`.
 
-**Metadatos:**
-
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `size` | `() -> int` | Tamaño en bytes. |
-| `mimeType` | `() -> str \| None` | Tipo MIME estimado. |
-| `lastModified` | `() -> datetime` | Marca de tiempo de última modificación, con zona horaria (UTC). |
-| `url` | `() -> str` | URL pública. Lanza `UnsupportedStorageOperationException` si el disco no expone ninguna. |
-| `temporaryUrl` | `(expires_in: int = 3600) -> str` | URL firmada y de tiempo limitado. Lanza `UnsupportedStorageOperationException` si no está soportado. |
-| `visibility` | `() -> str` | `'public'` o `'private'`. |
-| `setVisibility` | `(visibility: str) -> IFile` | Cambia la visibilidad; devuelve `self`. |
-| `download` | `(destination: str \| Path) -> Path` | Copia el archivo a una ruta local; si `destination` es un directorio existente, conserva el nombre original del archivo dentro de él. |
-| `hash` | `(algorithm: str = "sha256") -> str` | Digest hexadecimal del contenido usando cualquier algoritmo compatible con `hashlib.new`. |
-| `info` | `() -> FileInfo` | Instantánea completa de metadatos (ver [`FileInfo`](#fileinfo--visibility)). |
-
-**Lanza en la mayoría de métodos:** `StorageFileNotFoundException` cuando
-el archivo objetivo no existe.
-
-### `Directory` (`orionis.storage.directory.Directory`)
+`__slots__ = ("_driver", "_path")`
 
 ```python
-class Directory(IDirectory):
-    __slots__ = ("_driver", "_path")
-    def __init__(self, driver: IStorageDriver, path: str = "") -> None: ...
+def __init__(self, driver: IStorageDriver, path: str = "") -> None
 ```
 
-La ruta se normaliza vía `normalizePath` (`""` = raíz del disco, nunca
-lanza excepción para la propia raíz).
+La ruta se normaliza con `normalizePath()`; la cadena vacía denota la raíz del disco.
 
-| Método | Firma | Descripción |
+| Método | Firma | Notas |
 | --- | --- | --- |
-| `path` | `() -> str` | Ruta canónica relativa a la raíz (`""` para la raíz del disco). |
-| `create` | `() -> IDirectory` | Crea el directorio (y los padres faltantes). Devuelve `self`. |
-| `delete` | `() -> bool` | Elimina recursivamente el directorio y su contenido. |
-| `exists` | `() -> bool` | `True` si el directorio existe. |
-| `files` | `() -> list[IFile]` | Archivos hijos directos, ordenados por ruta. |
-| `allFiles` | `() -> list[IFile]` | Todos los archivos del árbol de directorios, ordenados por ruta. |
-| `directories` | `() -> list[IDirectory]` | Directorios hijos directos, ordenados por ruta. |
-| `allDirectories` | `() -> list[IDirectory]` | Todos los directorios del árbol, ordenados por ruta. |
+| `path` | `path() -> str` | La cadena vacía significa la raíz del disco. |
+| `create` | `async create() -> IDirectory` | Crea los padres que falten. Devuelve `self`. |
+| `delete` | `async delete() -> bool` | Recursivo. `True` si existía. |
+| `exists` | `async exists() -> bool` | — |
+| `files` | `async files() -> list[IFile]` | Solo hijos directos, ordenados por ruta. |
+| `allFiles` | `async allFiles() -> list[IFile]` | Todo el subárbol. |
+| `directories` | `async directories() -> list[IDirectory]` | Solo hijos directos. |
+| `allDirectories` | `async allDirectories() -> list[IDirectory]` | Todo el subárbol. |
 
-Los métodos de listado siempre devuelven objetos `File`/`Directory`, nunca
-cadenas de ruta planas.
+Los métodos de listado devuelven objetos `File` / `Directory`, nunca cadenas: el driver
+devuelve rutas y `Directory` las envuelve.
 
-### `UploadedFile` (`orionis.storage.uploaded_file.UploadedFile`)
+### `UploadedFile`
+
+`orionis.storage.uploaded_file.UploadedFile` — implementa
+`orionis.storage.contracts.uploaded_file.IUploadedFile`.
+
+`__slots__ = ("_hash_name", "_manager", "_source")`
 
 ```python
-class UploadedFile(IUploadedFile):
-    __slots__ = ("_hash_name", "_manager", "_source")
-    def __init__(self, source: IHttpUploadedFile, manager: IStorageManager) -> None: ...
+def __init__(self, source: IHttpUploadedFile, manager: IStorageManager) -> None
 ```
 
-Adapta un payload multipart HTTP (`orionis.http.payload`) para que pueda
-persistirse en cualquier disco resuelto a través de `manager`.
-
-**Metadatos del payload:**
-
-| Método | Retorna | Descripción |
+| Método | Firma | Notas |
 | --- | --- | --- |
-| `originalName()` | `str` | Nombre de archivo sanitizado suministrado por el cliente. |
-| `extension()` | `str` | Extensión en minúsculas incluyendo el punto, o `""`. |
-| `size()` | `int` | Tamaño del payload en bytes. |
-| `mimeType()` | `str \| None` | Tipo MIME declarado por el cliente. |
-| `hashName()` | `str` | Nombre aleatorio y seguro frente a colisiones (`secrets.token_hex(20)` + extensión); se genera una vez y se cachea por instancia. |
+| `originalName` | `originalName() -> str` | `source.filename` (ya saneado por la capa HTTP). |
+| `extension` | `extension() -> str` | En minúsculas y con punto; cadena vacía si no hay extensión. |
+| `size` | `size() -> int` | Bytes del payload. |
+| `mimeType` | `mimeType() -> str \| None` | Tipo MIME declarado por el cliente. |
+| `hashName` | `hashName() -> str` | `secrets.token_hex(20)` más la extensión original. Se genera una vez y se cachea por instancia. |
+| `read` | `async read() -> bytes` | Lee todo el payload en un hilo de trabajo. |
+| `store` | `async store(directory: str = "", disk: str \| None = None, visibility: str \| None = None) -> IFile` | Persiste con el nombre hash generado. |
+| `storeAs` | `async storeAs(directory: str, name: str, disk: str \| None = None, visibility: str \| None = None) -> IFile` | Nombre explícito. Lanza `StoragePathException` si `name` está vacío o contiene separador. |
+| `move` | `async move(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persiste y después cierra el búfer de la carga. |
+| `copy` | `async copy(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persiste y deja el búfer utilizable. |
 
-**Acceso al contenido:**
+La persistencia siempre pasa por `manager.disk(disk).file(target).writeStream(...)`, y el
+payload se transmite trozo a trozo (el iterador bloqueante se avanza con
+`asyncio.to_thread`), así que una carga volcada a un archivo temporal nunca se carga
+entera en memoria.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `read` | `() -> bytes` | Lee el payload completo (vía un hilo trabajador; el payload puede estar en buffer en disco). |
+### `AsyncStream`
 
-**Persistencia:**
+`orionis.storage.stream.AsyncStream` — implementa
+`orionis.storage.contracts.stream.IStorageStream`.
 
-| Método | Firma | Descripción |
-| --- | --- | --- |
-| `store` | `(directory: str = "", disk: str \| None = None, visibility: str \| None = None) -> IFile` | Persiste bajo un `hashName()` generado. |
-| `storeAs` | `(directory: str, name: str, disk: str \| None = None, visibility: str \| None = None) -> IFile` | Persiste bajo un `name` explícito (un único segmento de ruta; lanza `StoragePathException` si contiene un separador). |
-| `move` | `(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persiste el payload y **cierra el buffer de subida** a continuación (uso único). |
-| `copy` | `(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persiste el payload **manteniendo utilizable el buffer de subida** para llamadas posteriores. |
-
-### `AsyncStream` (`orionis.storage.stream.AsyncStream`)
+`__slots__ = ("_handle", "_on_close", "_opener")`
 
 ```python
-class AsyncStream(IStorageStream):
-    __slots__ = ("_handle", "_on_close", "_opener")
-    def __init__(
-        self, opener: Callable[[], BinaryIO],
-        on_close: Callable[[BinaryIO], None] | None = None,
-    ) -> None: ...
+def __init__(
+    self,
+    opener: Callable[[], BinaryIO],
+    on_close: Callable[[BinaryIO], None] | None = None,
+) -> None
 ```
 
-Envuelve un handle binario abierto de forma perezosa para que el `open()`
-de cada driver devuelva un objeto utilizable como gestor de contexto
-`async with`. Lo construyen los drivers; normalmente no se instancia
-directamente desde el código de la aplicación.
+El handle lo crea `opener` en el primer uso (o en `__aenter__`) y toda operación
+bloqueante corre en un hilo de trabajo.
 
-| Método | Firma | Descripción |
+| Método | Firma | Notas |
 | --- | --- | --- |
-| `read` | `(size: int = -1) -> bytes` | Lee hasta `size` bytes (`-1` = hasta EOF). |
-| `write` | `(data: bytes) -> int` | Escribe `data`; devuelve los bytes escritos. |
-| `seek` | `(offset: int, whence: int = 0) -> int` | Mueve la posición; `whence`: `0` inicio, `1` actual, `2` fin. |
-| `close` | `() -> None` | Ejecuta el callback `on_close` del driver (si existe) y luego cierra el handle. Idempotente — cerrar dos veces no hace nada. |
-| `__aenter__` / `__aexit__` | — | Abre el handle al entrar; siempre lo cierra al salir. |
+| `read` | `async read(size: int = -1) -> bytes` | `-1` lee hasta EOF. |
+| `write` | `async write(data: bytes) -> int` | Bytes escritos. |
+| `seek` | `async seek(offset: int, whence: int = 0) -> int` | Nueva posición absoluta. |
+| `close` | `async close() -> None` | Invoca `on_close` con el handle abierto y luego lo cierra. Desliga el handle primero, así que un segundo cierre no hace nada. |
+| `__aenter__` | `async __aenter__() -> IStorageStream` | Abre el handle y devuelve el stream. |
+| `__aexit__` | `async __aexit__(exc_type, exc, traceback) -> None` | Siempre cierra. |
 
-El handle se abre de forma perezosa (en el primer `read`/`write`/`seek`/
-`__aenter__`), y toda llamada bloqueante se ejecuta vía
-`asyncio.to_thread`.
+El callback `on_close` es lo que permite al driver de memoria volcar el búfer de vuelta a
+su almacén cuando se cierra un stream de escritura.
 
-### `StorageProvider` (`orionis.storage.provider.StorageProvider`)
+### `IStorageDriver`
 
-```python
-class StorageProvider(ServiceProvider, DeferrableProvider):
-    @classmethod
-    def provides(cls) -> list[type]: ...
-    def register(self) -> None: ...
-    async def boot(self) -> None: ...
-```
+`orionis.storage.contracts.driver.IStorageDriver` — ABC con 24 métodos abstractos. El
+código de aplicación nunca toca un driver directamente.
 
-| Método | Descripción |
+| Grupo | Métodos |
 | --- | --- |
-| `provides()` | Devuelve `[IStorageManager]` — declara el servicio diferido para el contenedor. |
-| `register()` | Vincula `IStorageManager` → `StorageManager` como singleton. |
-| `boot()` | `await StorageFacade.pin()` — fija la fachada `Storage` para un acceso directo a atributos sin DI. |
+| Contenido | `read`, `readStream`, `write`, `writeStream`, `delete`, `exists`, `open` |
+| Reubicación | `copy`, `move`, `download` |
+| Metadatos | `size`, `mimeType`, `lastModified`, `visibility`, `setVisibility`, `hash`, `info` |
+| Directorios | `createDirectory`, `deleteDirectory`, `directoryExists`, `files`, `directories` |
+| URLs | `url`, `temporaryUrl` |
 
-### Drivers (`IStorageDriver`)
+`readStream` y `open` son los únicos miembros que no son `async def`: `readStream` se
+implementa como generador asíncrono (se llama y se itera con `async for`) y `open`
+devuelve el objeto stream de forma síncrona.
 
-Todos los drivers implementan
-`orionis.storage.contracts.driver.IStorageDriver` (`read`, `readStream`,
-`write`, `writeStream`, `delete`, `exists`, `copy`, `move`, `size`,
-`mimeType`, `lastModified`, `createDirectory`, `deleteDirectory`,
-`directoryExists`, `files`, `directories`, `url`, `temporaryUrl`,
-`visibility`, `setVisibility`, `download`, `hash`, `info`, `open`). Los
-drivers no contienen **ninguna** lógica de negocio — el código de la
-aplicación nunca los llama directamente; siempre pasa por
-`Disk`/`File`/`Directory`.
+`files()` y `directories()` reciben `recursive` como argumento solo por palabra clave
+(`files(path="", *, recursive=False)`).
 
-| Driver | Medio de respaldo | Constructor | Notas |
-| --- | --- | --- | --- |
-| `LocalStorageDriver` | Sistema de archivos local | `(root: Path, base_url: str \| None = None)` | Toda ruta se resuelve dentro de `root` (se crea si no existe); la visibilidad se mapea a bits de permisos POSIX (`0o644`/`0o600` para archivos, `0o755`/`0o700` para directorios); toda E/S bloqueante vía `asyncio.to_thread`. |
-| `MemoryStorageDriver` | Memoria del proceso (`dict`) | `(base_url: str \| None = None)` | Implementa el contrato completo sobre diccionarios simples (`_files`, `_directories`); pensado para pruebas/fakes y cargas efímeras; el contenido se pierde al finalizar el proceso. |
-| `S3StorageDriver` | Amazon S3 / compatibles con S3 | `(config: object)` | Requiere `boto3` (`pip install orionis[s3]`); importado de forma perezosa en el primer uso; ACLs predefinidas (`public-read`/`private`) aplicadas según `Visibility`; los directorios son virtuales (prefijos inferidos + marcadores `path/` de 0 bytes). |
-| `AzureStorageDriver` | Azure Blob Storage | `(config: object)` | Requiere `azure-storage-blob` (`pip install orionis[azure]`); sin visibilidad por blob — `visibility()` refleja el nivel de acceso del contenedor y `setVisibility()` no está soportado. |
-| `GoogleStorageDriver` | Google Cloud Storage | `(config: object)` | Requiere `google-cloud-storage` (`pip install orionis[gcs]`); ACLs predefinidas (`publicRead`/`private`); se autentica mediante la clave de cuenta de servicio configurada o Application Default Credentials. |
+Matriz de capacidades de los cinco drivers incorporados:
 
-Nombres de `driver` incorporados reconocidos por `StorageManager` (desde
-`config/filesystems.py`): `local`, `memory`, `aws`/`s3`, `azure`,
-`gcs`/`google`. Cualquier otro nombre requiere
-`StorageManager.extend(...)`.
+| Capacidad | `local` | `memory` | `s3` | `azure` | `gcs` |
+| --- | --- | --- | --- | --- | --- |
+| `url()` | Requiere `url` configurada; si no, `UnsupportedStorageOperationException` | Igual que local | `url` configurada, `endpoint` propio o dirección virtual-host | `url` configurada o el endpoint de blobs de Azure | `url` configurada o `storage.googleapis.com` |
+| `temporaryUrl()` | Siempre lanza `UnsupportedStorageOperationException` | Siempre lanza `UnsupportedStorageOperationException` | `generate_presigned_url` | Token SAS; requiere la clave de cuenta | URL firmada V4; requiere una clave de firma |
+| `visibility()` | Derivada de los bits de permiso (`st_mode & 0o044`) | Valor guardado con la entrada | Concesiones ACL del objeto para `AllUsers` | Política de acceso del contenedor | Entrada `allUsers` en el ACL del blob |
+| `setVisibility()` | `chmod` `0o644` / `0o600` | Actualiza el valor guardado | `put_object_acl` | Siempre lanza `UnsupportedStorageOperationException` | ACL predefinido |
+| Directorios | Directorios reales del sistema de archivos | Conjunto explícito más prefijos implícitos de las claves | Marcadores `path/` de cero bytes más prefijos implícitos | Igual que S3 | Igual que S3 |
 
-Helpers compartidos (`orionis.storage.drivers.functions`) usados por los
-drivers de nube: `importDriverDependency` (importación perezosa de SDK
-opcional con un error accionable), `assertBinaryMode`,
-`resolveDownloadTarget`, `filterFiles`, `deriveDirectories`.
+### `LocalStorageDriver`
 
-### `FileInfo` / `Visibility`
+`orionis.storage.drivers.local.LocalStorageDriver`
 
-**`FileInfo`** (`orionis.storage.entities.file_info.FileInfo`) —
-`@dataclass(frozen=True, kw_only=True, slots=True)`, devuelto por
-`File.info()`:
+`__slots__ = ("_base_url", "_root")`
 
-| Campo | Tipo | Descripción |
-| --- | --- | --- |
-| `path` | `str` | Ruta canónica relativa a la raíz. |
-| `size` | `int` | Tamaño en bytes. |
-| `lastModified` | `datetime` | Marca de tiempo de última modificación, con zona horaria. |
-| `visibility` | `str` | `'public'` o `'private'`. |
-| `mimeType` | `str \| None` | Tipo MIME estimado, por defecto `None`. |
-| `createdAt` | `datetime \| None` | Marca de tiempo de creación cuando el driver puede proporcionarla, por defecto `None`. |
-| `etag` | `str \| None` | Entity tag (digest MD5 hexadecimal en drivers incorporados), por defecto `None`. |
-| `checksum` | `str \| None` | Digest SHA-256 hexadecimal, por defecto `None`. |
-| `url` | `str \| None` | URL pública cuando el disco expone una, por defecto `None`. |
+```python
+def __init__(self, root: Path, base_url: str | None = None) -> None
+```
 
-**`Visibility`** (`orionis.storage.enums.visibility.Visibility`) —
-`StrEnum` con miembros `PUBLIC = "public"` y `PRIVATE = "private"`; los
-miembros son cadenas simples y se aceptan en cualquier lugar donde se
-espere una cadena de visibilidad.
+- `root` se resuelve con `Path.resolve()` y se crea con `mkdir(parents=True, exist_ok=True)`
+  en el constructor.
+- A `base_url` se le quita la `/` final; cuando es `None`, `url()` lanza excepción y
+  `FileInfo.url` queda en `None`.
+- **Escrituras atómicas:** `write()` y `writeStream()` escriben en un archivo hermano
+  `<nombre>.<aleatorio>.tmp` y luego hacen `Path.replace()` sobre el destino. El infijo
+  aleatorio da a cada llamada su propio archivo de preparación, así que dos escrituras
+  que compiten por la misma ruta nunca mezclan contenidos; una escritura fallida elimina
+  solo su propio temporal y deja el destino intacto.
+- Por eso mismo, `files()` omite las entradas cuyo nombre termina en `.tmp`.
+- La visibilidad se traduce a bits POSIX: archivos `0o644` (pública) / `0o600` (privada),
+  directorios `0o755` / `0o700`. Un nivel desconocido lanza
+  `UnsupportedStorageOperationException`.
+- `info()` lee el archivo una sola vez y calcula MD5 (`etag`) y SHA-256 (`checksum`) en la
+  misma pasada; `createdAt` usa `st_birthtime` cuando la plataforma lo ofrece y, si no, `None`.
+- `mimeType()` se deduce de la extensión con `mimetypes.guess_type()` y no toca el disco.
+- Toda llamada bloqueante pasa por `asyncio.to_thread`.
 
-### Normalización de rutas
+### `MemoryStorageDriver`
 
-`orionis.storage.paths` provee las dos funciones en las que se apoya cada
-constructor de `File`/`Directory`:
+`orionis.storage.drivers.memory.MemoryStorageDriver`
+
+`__slots__ = ("_base_url", "_directories", "_files")`
+
+```python
+def __init__(self, base_url: str | None = None) -> None
+```
+
+Mantiene todos los objetos en memoria del proceso: `_files` mapea rutas a `_MemoryEntry`
+(`content`, `visibility`, `created_at`, `modified_at`) y `_directories` guarda los
+directorios creados explícitamente. Pensado para tests y cargas efímeras.
+
+- Una entrada nueva queda con `Visibility.PRIVATE` cuando `write()` recibe `visibility=None`;
+  al sobrescribir se conserva la visibilidad previa y también `created_at`.
+- `open()` trabaja sobre `io.BytesIO`: los modos de lectura exigen que el archivo exista,
+  los de anexado se posicionan al final y todo modo de escritura vuelca al almacén al cerrar.
+- `download()` sí toca el sistema de archivos: escribe el contenido en memoria en el destino
+  local.
+- Concurrencia: el almacén es un diccionario mutado sin locks. Toda operación termina sin
+  esperar a mitad de camino, así que varias tareas del mismo bucle de eventos nunca ven una
+  mutación parcial; no hay garantía cuando la misma ruta se muta desde varios hilos a la
+  vez, que es lo que hacen los streams abiertos con `open()` al volcar su búfer en un hilo
+  de trabajo.
+
+### `S3StorageDriver`
+
+`orionis.storage.drivers.s3.S3StorageDriver`
+
+`__slots__ = ("_base_url", "_bucket", "_client", "_client_error", "_endpoint", "_key", "_region", "_secret", "_use_path_style")`
+
+```python
+def __init__(self, config: object) -> None
+```
+
+Lee `bucket`, `region`, `key`, `secret`, `url`, `endpoint` y `use_path_style_endpoint` de
+la entidad de configuración. El constructor no importa nada ni hace llamadas de red.
+
+- El cliente de `boto3` se construye en el primer uso: las credenciales explícitas ganan y,
+  si faltan, boto3 recurre a su propia cadena de credenciales. `use_path_style_endpoint=True`
+  cambia el estilo de direccionamiento a `path`.
+- Los códigos de error `404`, `NoSuchKey` y `NotFound` se traducen a
+  `StorageFileNotFoundException`; cualquier otro error del SDK se propaga tal cual.
+- La visibilidad se traduce a ACLs prefabricados `public-read` / `private`; `visibility()`
+  inspecciona las concesiones del objeto buscando permiso de lectura para el grupo de
+  usuarios anónimos.
+- `deleteDirectory()` borra por lotes de hasta 1000 claves.
+- Los streams se almacenan en un archivo temporal con búfer que se vuelca a disco a partir
+  de 8 MiB.
+
+### `AzureStorageDriver`
+
+`orionis.storage.drivers.azure.AzureStorageDriver`
+
+`__slots__ = ("_account_key", "_account_name", "_base_url", "_connection_string", "_container", "_container_name", "_http_error", "_not_found", "_sdk")`
+
+```python
+def __init__(self, config: object) -> None
+```
+
+Lee `connection_string`, `account_name`, `account_key`, `container` y `url`. Cuando se
+entrega una cadena de conexión, `AccountName` y `AccountKey` se extraen de ella para poder
+producir URLs y tokens SAS.
+
+- Azure no tiene visibilidad por blob: `visibility()` refleja la política de acceso del
+  contenedor y `setVisibility()` **siempre** lanza `UnsupportedStorageOperationException`.
+- `temporaryUrl()` genera una URL SAS de solo lectura y necesita la clave de cuenta; sin
+  ella, la llamada lanza `UnsupportedStorageOperationException`.
+- `info()` rellena `checksum` con el `Content-MD5` que Azure guarda (en hexadecimal) cuando
+  está disponible, y `etag` con el ETag del blob sin comillas.
+- `directoryExists("")` devuelve `True` (la raíz siempre existe).
+
+### `GoogleStorageDriver`
+
+`orionis.storage.drivers.gcs.GoogleStorageDriver`
+
+`__slots__ = ("_base_url", "_bucket", "_bucket_name", "_cloud_error", "_key_file", "_not_found", "_project")`
+
+```python
+def __init__(self, config: object) -> None
+```
+
+Lee `project_id`, `key_file`, `bucket` y `url`. La autenticación usa el archivo de clave de
+la cuenta de servicio cuando está configurado y, si no, las Application Default Credentials.
+
+- `temporaryUrl()` construye una URL firmada V4; firmar requiere credenciales con clave
+  privada (un archivo de clave), que las ADC simples no aportan.
+- `visibility()` devuelve `'private'` cuando no se pueden inspeccionar los ACL — por
+  ejemplo, con acceso uniforme a nivel de bucket.
+- La visibilidad se traduce a ACLs predefinidos de GCS; un nivel desconocido lanza
+  `UnsupportedStorageOperationException`.
+
+### Funciones auxiliares de los drivers
+
+`orionis.storage.drivers.functions` — funciones a nivel de módulo compartidas por los
+drivers de nube.
 
 | Función | Firma | Descripción |
 | --- | --- | --- |
-| `normalizePath` | `(path: str) -> str` | Convierte `\` en `/`, elimina segmentos vacíos/`.`, resuelve `..` lógicamente, y rechaza null bytes, caracteres `:` y secuencias `..` que escapen de la raíz. Devuelve `""` para la raíz del disco. |
-| `normalizeFilePath` | `(path: str) -> str` | `normalizePath` más un rechazo del resultado vacío (una ruta de archivo nunca puede ser la raíz del disco). |
+| `importDriverDependency` | `importDriverDependency(module: str, package: str, extra: str) -> ModuleType` | Importa un módulo SDK opcional y convierte `ImportError` en `MissingStorageDependencyException` con el comando de instalación. |
+| `assertBinaryMode` | `assertBinaryMode(mode: str) -> None` | Valida un modo de stream contra `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`. |
+| `resolveDownloadTarget` | `resolveDownloadTarget(normalized: str, destination: str \| Path) -> Path` | Resuelve el destino local de una descarga, conservando el nombre original si el destino es un directorio existente y creando los padres que falten. |
+| `filterFiles` | `filterFiles(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Selecciona las claves que son archivos bajo `base`; las claves terminadas en `/` son marcadores de directorio y siempre se excluyen. Devuelve una lista ordenada. |
+| `deriveDirectories` | `deriveDirectories(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Deduce rutas de directorio a partir de claves de objeto (los object stores no tienen directorios físicos). Devuelve una lista ordenada. |
 
-Ambas lanzan `StoragePathException` ante una entrada inválida.
+### `FileInfo`
+
+`orionis.storage.entities.file_info.FileInfo` —
+`@dataclass(frozen=True, kw_only=True, slots=True)`. Lo devuelve `await file.info()`.
+
+| Campo | Tipo | Valor por defecto | Descripción |
+| --- | --- | --- | --- |
+| `path` | `str` | — | Ruta canónica relativa a la raíz. |
+| `size` | `int` | — | Tamaño en bytes. |
+| `lastModified` | `datetime` | — | Marca de modificación con zona horaria. |
+| `visibility` | `str` | — | `'public'` o `'private'`. |
+| `mimeType` | `str \| None` | `None` | Tipo MIME deducido. |
+| `createdAt` | `datetime \| None` | `None` | Marca de creación cuando el driver puede aportarla. |
+| `etag` | `str \| None` | `None` | Entity tag (digest MD5 hexadecimal en los drivers incorporados). |
+| `checksum` | `str \| None` | `None` | Digest SHA-256 hexadecimal cuando está disponible. |
+| `url` | `str \| None` | `None` | URL pública cuando el disco expone una. |
+
+Los nombres de campo están en camelCase a propósito, para coincidir con la convención de
+nombres de la API pública del framework.
+
+### `Visibility`
+
+`orionis.storage.enums.visibility.Visibility` — `StrEnum` con `PUBLIC = "public"` y
+`PRIVATE = "private"`. Como los miembros heredan de `str`, se pueden pasar en cualquier
+lugar donde se acepte una cadena de visibilidad.
+
+### Normalización de rutas
+
+`orionis.storage.paths` — dos funciones a nivel de módulo aplicadas en cada borde.
+
+```python
+def normalizePath(path: str) -> str
+def normalizeFilePath(path: str) -> str
+```
+
+`normalizePath()` convierte `\` en `/`, descarta segmentos vacíos y `.`, resuelve `..` de
+forma lógica (sin tocar el sistema de archivos) y devuelve una ruta sin barra inicial ni
+final. La cadena vacía representa la raíz del disco. Lanza `StoragePathException` cuando la
+ruta contiene un byte nulo, cuando un segmento contiene `:` (bloqueando letras de unidad y
+separadores de flujo) o cuando un `..` escapa de la raíz.
+
+`normalizeFilePath()` aplica las mismas reglas y además rechaza el resultado vacío, porque
+la raíz del disco nunca puede tratarse como un archivo.
 
 ### Excepciones
 
-Todas definidas en `orionis.storage.exceptions`, y heredan de
-`StorageException(Exception)`:
+`orionis.storage.exceptions` — todas heredan de `StorageException`, que hereda de
+`Exception`.
 
 | Excepción | Se lanza cuando |
 | --- | --- |
-| `StorageException` | Clase base de todo error de almacenamiento. |
-| `DiskNotFoundException` | Un nombre de disco no está declarado en la configuración `filesystems`. |
-| `DriverNotSupportedException` | Un disco referencia un nombre de driver sin implementación incorporada ni fábrica registrada vía `extend()`. |
-| `MissingStorageDependencyException` | El SDK opcional de un driver de nube no está instalado. |
-| `StoragePathException` | Una ruta está mal formada, escapa de la raíz del disco, o no es válida para la operación solicitada. |
-| `StorageFileNotFoundException` | Un archivo no existe en el disco objetivo. |
-| `UnsupportedStorageOperationException` | Un driver no puede realizar la operación solicitada (p. ej. un modo de stream inválido, o `setVisibility` en Azure). |
+| `StorageException` | Clase base del módulo. |
+| `DiskNotFoundException` | El disco no está declarado en la configuración `filesystems`. |
+| `DriverNotSupportedException` | El disco referencia un driver sin implementación. |
+| `MissingStorageDependencyException` | Un driver necesita un paquete opcional que no está instalado. |
+| `StoragePathException` | La ruta está mal formada o escapa de la raíz del disco. |
+| `StorageFileNotFoundException` | El archivo no existe en el disco de destino. |
+| `UnsupportedStorageOperationException` | El driver no puede realizar la operación pedida (URL temporal, visibilidad, modo de stream, algoritmo de hash). |
+
+### `StorageProvider` y la facade `Storage`
+
+`orionis.storage.provider.StorageProvider` extiende `ServiceProvider` y
+`DeferrableProvider`, y está listado en `orionis/foundation/core_providers.py`.
+
+| Miembro | Comportamiento |
+| --- | --- |
+| `provides()` | `[IStorageManager]` |
+| `register()` | `self.app.singleton(IStorageManager, StorageManager)` |
+| `boot()` | `await Storage.pin()` (asíncrono) |
+
+`orionis.support.facades.storage.Storage` solo sobrescribe `getFacadeAccessor()`, que
+devuelve `IStorageManager`. El archivo hermano `storage.pyi` existe únicamente para el
+autocompletado del editor y nunca se ejecuta.
+
+Como el provider es **diferible**, `register` y `boot` solo corren la primera vez que se
+resuelve `IStorageManager` a través del contenedor. Eso tiene una consecuencia concreta
+para la facade:
+
+- Antes de esa primera resolución, `Storage.disk("public")` devuelve un dispatcher diferido
+  que hay que esperar: `disk = await Storage.disk("public")`. Esa llamada resuelve el
+  servicio, arranca el provider y fija (pin) la facade.
+- Una vez fijada, el acceso a atributos es directo: `Storage.disk("public")` devuelve el
+  `Disk` de forma síncrona, y esperarlo con `await` fallaría porque un `Disk` no es
+  awaitable.
+
+Inyectar `IStorageManager` (por constructor o como parámetro de un método de controlador)
+evita del todo esa distinción: el contenedor resuelve el provider diferido y entrega el
+manager real.
+
+### Claves de configuración
+
+`StorageManager` lee `app.config("filesystems")`, respaldado por las entidades de
+`orionis.foundation.config.filesystems` y, en la aplicación, por `config/filesystems.py`.
+
+| Clave | Tipo | Descripción |
+| --- | --- | --- |
+| `default` | `DiskName \| str` | Disco que usan `Storage.default()` / `disk(None)`. Se valida contra `DiskName` (`local`, `public`, `s3`, `azure`, `gcs`). |
+| `disks.local` | `Local` | `driver` (por defecto `"local"`), `path` (por defecto `"storage/app/private"`). |
+| `disks.public` | `Public` | `driver` (por defecto `"local"`), `path`, `url`. |
+| `disks.s3` | `S3` | `driver` (por defecto `"aws"`), `key`, `secret`, `region`, `bucket`, `url`, `endpoint`, `use_path_style_endpoint`. |
+| `disks.azure` | `Azure` | `driver` (por defecto `"azure"`), `connection_string`, `account_name`, `account_key`, `container`, `url`. |
+| `disks.gcs` | `GCS` | `driver` (por defecto `"gcs"`), `project_id`, `key_file`, `bucket`, `url`. |
+
+`Disks` es un dataclass congelado con exactamente esos cinco campos, así que los **nombres**
+de disco son fijos; lo configurable por disco es el `driver` al que apunta, que además es la
+clave que usa `StorageManager.extend()`.
 
 ## Ejemplos de uso
 
-### Resolver discos y operaciones básicas con archivos
+### Resolver un disco con la facade
 
 ```python
-from orionis.storage.manager import StorageManager
+from orionis.storage.contracts.file import IFile
+from orionis.support.facades.storage import Storage
 
-manager: StorageManager = ...  # normalmente resuelto vía el contenedor de DI
 
-disk = manager.disk("public")  # o manager.default()
+async def store_report(payload: bytes) -> IFile:
+    """Persistir un reporte en el disco público y devolver el archivo."""
+    # Primer acceso a la facade: esperarlo arranca el provider diferido y fija
+    # la facade, de modo que los accesos posteriores se usan directamente.
+    disk = await Storage.disk("public")
 
-file = await disk.put("reports/2026-07.csv", "id,name\n1,Ada\n")
-await file.exists()          # True
-await file.size()            # bytes escritos
-await file.url()             # URL pública (lanza si el disco no tiene ninguna)
+    report = await disk.put("reports/2026-q1.pdf", payload, "public")
+    print(report.path(), await report.size(), await report.url())
 
-await disk.copy("reports/2026-07.csv", "reports/2026-07-copy.csv")
-await disk.delete("reports/2026-07-copy.csv")
+    for entry in await disk.directory("reports").files():
+        print(entry.path())
+
+    return report
 ```
 
-### Trabajar directamente con un objeto `File`
+### Manejo de errores
 
 ```python
-disk_file = disk.file("images/logo.png")
+import asyncio
 
-await disk_file.write(b"\x89PNG...", visibility="public")
-info = await disk_file.info()
-info.size, info.mimeType, info.visibility
+from orionis.storage.disk import Disk
+from orionis.storage.drivers.memory import MemoryStorageDriver
+from orionis.storage.exceptions import (
+    StorageFileNotFoundException,
+    StoragePathException,
+    UnsupportedStorageOperationException,
+)
 
-digest = await disk_file.hash("sha256")
-await disk_file.rename("brand-logo.png")
-local_path = await disk_file.download("/tmp/downloads")
+
+async def main() -> None:
+    disk = Disk(name="memory", driver=MemoryStorageDriver())
+
+    try:
+        await disk.file("missing.txt").read()
+    except StorageFileNotFoundException as exc:
+        print("no encontrado:", exc)
+
+    try:
+        disk.file("../../etc/passwd")
+    except StoragePathException as exc:
+        print("ruta rechazada:", exc)
+
+    await disk.put("notes.txt", "hello")
+    try:
+        await disk.file("notes.txt").temporaryUrl(60)
+    except UnsupportedStorageOperationException as exc:
+        print("no soportado:", exc)
+
+
+asyncio.run(main())
 ```
 
 ### Streaming de archivos grandes
 
 ```python
-async for chunk in disk.file("videos/demo.mp4").readStream(chunk_size=1 << 20):
-    process(chunk)
+import asyncio
+from collections.abc import AsyncIterator
+from pathlib import Path
 
-async def produce_chunks():
-    yield b"primer fragmento..."
-    yield b"segundo fragmento..."
+from orionis.storage.disk import Disk
+from orionis.storage.drivers.local import LocalStorageDriver
 
-await disk.file("uploads/large.bin").writeStream(produce_chunks())
+
+async def rows() -> AsyncIterator[bytes]:
+    """Producir el contenido de la exportación trozo a trozo."""
+    for index in range(3):
+        yield f"row-{index}\n".encode()
+
+
+async def main() -> None:
+    driver = LocalStorageDriver(root=Path("storage/app/private"))
+    disk = Disk(name="local", driver=driver)
+
+    # Nada se materializa por completo en memoria, ni al escribir ni al leer.
+    export = await disk.file("exports/report.csv").writeStream(rows())
+
+    async for chunk in export.readStream(chunk_size=8):
+        print(chunk)
+
+    async with export.open("rb") as stream:
+        print(await stream.read(5))
+
+    await export.delete()
+
+
+asyncio.run(main())
 ```
 
-### Usar `open()` como gestor de contexto asíncrono
+### Guardar un archivo subido por HTTP
 
 ```python
-async with disk.file("logs/app.log").open("ab") as stream:
-    await stream.write(b"nueva línea de log\n")
+from orionis.http import HttpResponse, response
+from orionis.http.base import BaseController
+from orionis.http.request import Request
+from orionis.storage.contracts.manager import IStorageManager
+
+
+class AvatarController(BaseController):
+
+    async def store(
+        self,
+        request: Request,
+        storage: IStorageManager,
+    ) -> HttpResponse:
+        """
+        Persistir el avatar subido en el disco público.
+
+        Parameters
+        ----------
+        request : Request
+            Petición HTTP entrante que transporta el formulario multipart.
+        storage : IStorageManager
+            Gestor de almacenamiento inyectado por el contenedor.
+
+        Returns
+        -------
+        HttpResponse
+            Payload JSON con la ruta almacenada y su URL pública.
+        """
+        form = await request.form()
+        upload = storage.uploaded(form.files["avatar"][0])
+
+        # store() usa un nombre hash aleatorio; storeAs() recibe uno explícito.
+        stored = await upload.store("avatars", disk="public", visibility="public")
+
+        return response.json({
+            "path": stored.path(),
+            "url": await stored.url(),
+        })
 ```
 
-### Listar un árbol de directorios
+### Ejecución autónoma con el driver en memoria
 
 ```python
-directory = disk.directory("reports")
-for f in await directory.allFiles():
-    print(f.path(), await f.size())
+import asyncio
 
-for d in await directory.directories():
-    print(d.path())
-```
+from orionis.storage.disk import Disk
+from orionis.storage.drivers.memory import MemoryStorageDriver
 
-### Almacenar una subida HTTP
 
-```python
-# Dentro de un controlador HTTP, `request.file("avatar")` devuelve un
-# IHttpUploadedFile de orionis.http.payload.
-uploaded = manager.uploaded(request.file("avatar"))
+async def main() -> None:
+    disk = Disk(name="fake", driver=MemoryStorageDriver(base_url="https://cdn.test"))
 
-stored = await uploaded.store("avatars", disk="public", visibility="public")
-stored.path()  # p. ej. "avatars/9f1c...a3.png"
+    await disk.put("invoices/2026/001.txt", "total: 120", "public")
+    await disk.put("invoices/2026/002.txt", "total: 340")
 
-# O con un nombre explícito, liberando el buffer de subida a continuación:
-stored = await uploaded.move("avatars", name="user-42.png")
+    invoices = disk.directory("invoices")
+    print([entry.path() for entry in await invoices.allFiles()])
+    print([entry.path() for entry in await invoices.directories()])
+
+    first = disk.file("invoices/2026/001.txt")
+    print(await first.visibility())
+    print(await first.url())
+    print(await first.hash("md5"))
+    print(await first.info())
+
+
+asyncio.run(main())
 ```
 
 ### Registrar un driver personalizado
 
 ```python
-def my_driver_factory(disk_config: object):
-    return MyCustomStorageDriver(disk_config)
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.manager import IStorageManager
+from orionis.storage.drivers.memory import MemoryStorageDriver
 
-manager.extend("my-driver", my_driver_factory)
-# config/filesystems.py: Disks(custom=SomeConfig(driver="my-driver"))
-custom_disk = manager.disk("custom")
+
+def register_fake_driver(manager: IStorageManager) -> None:
+    """Vincular el nombre de driver 'fake' con una implementación en memoria."""
+
+    def factory(config: object) -> IStorageDriver:
+        # config es la entidad del disco declarada en config/filesystems.py.
+        return MemoryStorageDriver(base_url=getattr(config, "url", None))
+
+    # Cualquier disco cuyo campo `driver` sea "fake" resuelve ahora con esta
+    # fábrica, que además tiene prioridad sobre los drivers incorporados.
+    manager.extend("fake", factory)
 ```
 
 ## Consideraciones de rendimiento y concurrencia
 
-- **E/S bloqueante descargada a hilos**: `LocalStorageDriver`,
-  `MemoryStorageDriver`, `S3StorageDriver`, `AzureStorageDriver` y
-  `GoogleStorageDriver` ejecutan todas sus llamadas bloqueantes (syscalls
-  de sistema de archivos, llamadas HTTP del SDK) vía `asyncio.to_thread`,
-  de modo que una operación lenta no bloquea el bucle de eventos para
-  atender otras corrutinas.
-- **Importación perezosa de SDKs de nube**: `boto3`/`azure-storage-blob`/
-  `google-cloud-storage` se importan solo en el primer uso del driver
-  correspondiente (`importDriverDependency`), y el propio cliente se
-  inicializa en la primera operación — construir una instancia de
-  `S3StorageDriver`/`AzureStorageDriver`/`GoogleStorageDriver` es barato y
-  no requiere tener el SDK instalado salvo que realmente llames a un
-  método.
-- **Las instancias de disco se cachean por manager**:
-  `StorageManager.disk(name)` construye un `Disk` (y su driver) una sola
-  vez y lo reutiliza en llamadas posteriores con el mismo nombre; llamar a
-  `extend()` vacía esta caché para que las fábricas recién registradas se
-  apliquen en la próxima resolución.
-- **`MemoryStorageDriver` es local al proceso y no persiste**: el
-  contenido vive solo en los diccionarios de esa instancia de driver; no
-  se comparte entre procesos/workers y desaparece al finalizar el proceso
-  — pensado para pruebas y casos de uso efímeros, no para despliegues
-  multi-worker.
-- **El streaming evita cargar archivos completos en memoria**:
-  `readStream`/`writeStream`/`open()` permiten procesar archivos fragmento
-  a fragmento (64 KiB por defecto), lo cual importa para subidas/descargas
-  grandes; los drivers de nube usan un buffer con volcado a disco
-  (`_SPOOL_THRESHOLD` = 8 MiB en memoria antes de volcar a un archivo
-  temporal) para escrituras en streaming.
-- **Los directorios en drivers de nube son virtuales**: S3/Azure/GCS no
-  tienen un concepto real de directorio — los listados se derivan de
-  prefijos de clave de objeto, y los directorios "explícitos" son objetos
-  marcador de 0 bytes con `path/`; esto afecta el costo de
-  `Directory.files()`/`allFiles()` (una llamada de listado a la API)
-  frente a un recorrido de sistema de archivos local.
-- **Sin caché en proceso de contenido o metadatos de archivos**: cada
-  llamada a un método de `File` llega directamente al driver (y, en
-  drivers de nube, a la red) — llamar repetidamente a
-  `size()`/`exists()`/`read()` sobre la misma ruta repite la operación cada
-  vez.
-- **Los handles de `AsyncStream` se abren una vez y se reutilizan**: la
-  primera llamada a `read`/`write`/`seek`/`__aenter__` abre el handle
-  subyacente; permanece abierto hasta `close()`/`__aexit__`, evitando la
-  sobrecarga repetida de abrir/cerrar dentro del ciclo de vida de un mismo
-  stream.
-
-## Notas de diseño
-
-- **Capas estrictas, sin duplicación de lógica**: `Disk`/`File`/`Directory`
-  solo mantienen una referencia al driver y una ruta canónica — toda
-  operación real se delega en el driver, y los métodos de conveniencia de
-  `Disk` (`put`, `exists`, `delete`, `copy`, `move`) están a su vez
-  implementados delegando en `File`, de modo que el comportamiento se
-  define en un único lugar.
-- **`__slots__` en todas las clases concretas** (`StorageManager`, `Disk`,
-  `File`, `Directory`, `UploadedFile`, `AsyncStream`, y cada driver)
-  elimina la sobrecarga de `__dict__` por instancia — es una decisión de
-  diseño existente.
-- **Contratos para cada colaborador**: cada clase concreta implementa un
-  contrato `ABC` equivalente en `orionis/storage/contracts/`
-  (`IStorageManager`, `IDisk`, `IFile`, `IDirectory`, `IUploadedFile`,
-  `IStorageStream`, `IStorageDriver`), de modo que la superficie pública se
-  define independientemente de cualquier implementación de driver
-  específica.
-- **Frontera de payload HTTP duck-typed**: `UploadedFile` solo importa
-  `IHttpUploadedFile` bajo `TYPE_CHECKING` — en tiempo de ejecución
-  funciona con cualquier objeto que exponga los atributos esperados
-  (`filename`, `extension`, `size`, `content_type`, `read`, `chunks`,
-  `close`), manteniendo `orionis.storage` desacoplado de la implementación
-  concreta de la capa HTTP.
-- **Seguridad de rutas centralizada en un único módulo**:
-  `orionis/storage/paths.py` es el único lugar que rechaza traversal
-  (`..` escapando de la raíz), null bytes y caracteres `:`, de modo que
-  cada driver puede asumir que solo recibirá una ruta canónica y segura.
-- **Los clientes de nube se inicializan en el primer uso, no en la
-  construcción**: el `__init__` de cada driver de nube solo almacena
-  valores de configuración (credenciales, nombres de bucket/contenedor) —
-  el objeto cliente del SDK real se crea de forma perezosa la primera vez
-  que una operación lo necesita, lo que mantiene el constructor puro y
-  testeable sin tener el SDK instalado.
-- **Directorios virtuales en almacenamiento de objetos**: los drivers de
-  S3/Azure/GCS representan directorios como objetos de 0 bytes con una `/`
-  final en su clave/nombre, y derivan los listados (`deriveDirectories`,
-  `filterFiles` en `drivers/functions.py`) a partir de prefijos de clave en
-  lugar de un árbol de directorios real — así es como funcionan las APIs
-  de almacenamiento de objetos, no es un workaround a cambiar.
-- **La visibilidad se mapea a la primitiva nativa más cercana por
-  backend**: bits de permisos POSIX localmente, ACLs predefinidas en
-  S3/GCS, y nivel de acceso del contenedor en Azure (donde la visibilidad
-  por blob simplemente no está soportada).
+- **E/S sin bloqueo:** toda operación bloqueante (acceso al sistema de archivos, llamadas
+  al SDK, búferes de carga volcados a disco) pasa por `asyncio.to_thread`, así que el bucle
+  de eventos sigue respondiendo. No interviene ningún cliente nativo verdaderamente
+  asíncrono; el modelo es "hilos de trabajo detrás de una API async".
+- **Memoria acotada:** `readStream`, `writeStream`, `hash` e `info` procesan trozos de
+  64 KiB; los drivers de nube vuelcan los streams entrantes a un archivo temporal que pasa a
+  disco a partir de 8 MiB. `read()` es la única operación que materializa el archivo entero.
+- **Caché de discos:** `StorageManager` construye cada `Disk` una vez y lo cachea en
+  `_disks`; `extend()` limpia la caché. Los clientes de nube también se construyen una vez
+  por instancia de driver y se reutilizan.
+- **Escrituras locales atómicas:** la secuencia de archivo temporal más `Path.replace()`
+  implica que un lector nunca ve un archivo a medio escribir, y una transferencia fallida no
+  deja destino parcial. Cada llamada prepara su contenido en un temporal con nombre
+  aleatorio propio, así que varios escritores sobre la misma ruta publican un contenido
+  completo o nada.
+- **`__slots__` en todas partes** en las clases concretas y `__slots__` vacío en los
+  contratos, lo que elimina el diccionario de atributos de las muchas instancias efímeras
+  de `File` / `Directory` que crea un listado.
+- **Objetos baratos:** `Disk.file()`, `Disk.directory()` y `File.open()` no hacen E/S; solo
+  construyen objetos. El coste llega al esperarlos o al entrar en ellos.
+- **Estado independiente:** `File` y `Directory` solo guardan una referencia al driver y una
+  cadena, así que se pueden crear y usar libremente desde varias tareas. `AsyncStream`, en
+  cambio, envuelve un único handle con posición mutable, por lo que un stream debe usarse
+  desde una sola tarea a la vez.
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14 (según `pyproject.toml`,
-  `requires-python = ">=3.14"`), igual que el resto del framework.
-- **Dependencia central:** ninguna más allá de la biblioteca estándar de
-  Python (`asyncio`, `hashlib`, `mimetypes`, `pathlib`, `shutil`,
-  `tempfile`) para `LocalStorageDriver`/`MemoryStorageDriver`.
-- **Dependencias opcionales** (solo requeridas para el driver de nube
-  correspondiente, instaladas mediante extras de `pyproject.toml`):
-  - `boto3>=1.35` — `pip install orionis[s3]`
-  - `azure-storage-blob>=12.24` — `pip install orionis[azure]`
-  - `google-cloud-storage>=2.18` — `pip install orionis[gcs]`
-  - `pip install orionis[storage]` instala los tres a la vez.
-- **Dependencias internas del framework:** `StorageManager` depende de
-  `orionis.foundation.contracts.application.IApplication` y de las
-  entidades de configuración `Filesystems`/`Disks`
-  (`orionis.foundation.config.filesystems`); `StorageProvider` depende de
-  `orionis.container.providers` y `orionis.support.facades.storage`;
-  `UploadedFile` depende de
-  `orionis.http.payload.contracts.uploaded_file` únicamente para el
-  chequeo de tipos.
-- Las rutas locales se manejan con `pathlib.Path`, que se comporta
-  correctamente en Windows, Linux y macOS; los bits de permisos POSIX
-  aplicados por `LocalStorageDriver` degradan de forma controlada (mejor
-  esfuerzo) en plataformas sin una implementación completa de modos POSIX.
+- **Python `>= 3.14`** (`requires-python` en `pyproject.toml`). El módulo usa `Path.walk()`
+  (3.12+), `datetime.UTC` (3.11+), `StrEnum` (3.11+),
+  `hashlib.new(..., usedforsecurity=False)` (3.9+) y la sintaxis de tipos `X | Y`.
+- **Windows:** la visibilidad se apoya en bits de permiso POSIX. Windows no implementa el
+  modelo POSIX completo, así que `chmod` degrada de forma benigna y `visibility()` puede
+  informar `'public'` para archivos creados con el modo por defecto.
+- **`createdAt`** depende de `st_birthtime`, que no todas las plataformas/sistemas de
+  archivos exponen; queda en `None` cuando no está disponible.
+- **`Path.replace()`** no puede cruzar dispositivos; el driver local recurre a
+  `shutil.move()` para movimientos entre dispositivos. En Windows además puede lanzar
+  `PermissionError` si otro escritor está reemplazando ese mismo destino en ese preciso
+  instante, una restricción del sistema operativo que POSIX no tiene.
+- **SDKs opcionales:** los drivers de nube se pueden instanciar sin su SDK instalado; el
+  fallo aflora en la primera operación como `MissingStorageDependencyException`.
+- **El módulo `storage` nunca importa la capa HTTP en tiempo de ejecución**: el contrato del
+  payload multipart se importa solo bajo `TYPE_CHECKING` y se consume por duck-typing
+  (`filename`, `extension`, `size`, `content_type`, `read()`, `chunks()`, `close()`).

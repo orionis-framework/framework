@@ -2,6 +2,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import mimetypes
+import secrets
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
@@ -241,6 +242,25 @@ class LocalStorageDriver(IStorageDriver):
         tmp.parent.mkdir(parents=True, exist_ok=True)
         return tmp.open("wb")
 
+    @staticmethod
+    def __tempPath(absolute: Path) -> Path:
+        """
+        Build a unique staging path for an atomic write.
+
+        Parameters
+        ----------
+        absolute : Path
+            Final absolute destination path.
+
+        Returns
+        -------
+        Path
+            Sibling path carrying a random infix, so concurrent
+            writers never share a staging file, and still ending in
+            ``.tmp`` so listings keep filtering it out.
+        """
+        return absolute.with_name(f"{absolute.name}.{secrets.token_hex(8)}.tmp")
+
     def __writeSync(
         self,
         normalized: str,
@@ -267,9 +287,14 @@ class LocalStorageDriver(IStorageDriver):
         absolute.parent.mkdir(parents=True, exist_ok=True)
 
         # Write to a sibling temp file then rename for atomic replacement.
-        tmp = absolute.with_name(absolute.name + ".tmp")
-        tmp.write_bytes(data)
-        tmp.replace(absolute)
+        tmp = self.__tempPath(absolute)
+        try:
+            tmp.write_bytes(data)
+            tmp.replace(absolute)
+        except OSError:
+            tmp.unlink(missing_ok=True)
+            raise
+
         if visibility is not None:
             absolute.chmod(self.__fileMode(visibility))
 
@@ -728,7 +753,7 @@ class LocalStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         absolute = self.__absolute(normalized)
-        tmp = absolute.with_name(absolute.name + ".tmp")
+        tmp = self.__tempPath(absolute)
         handle = await asyncio.to_thread(self.__openTemp, tmp)
 
         # Track completion so failures can discard the partial temp file.

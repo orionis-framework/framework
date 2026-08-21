@@ -337,6 +337,35 @@ class TestSerializer(TestCase):
             self.assertTrue(file_path.exists())
             self.assertGreater(file_path.stat().st_size, 0)
 
+    def testDumpToFileLeavesNoStagingFileBehind(self) -> None:
+        """
+        Remove the staging file once the payload is published.
+
+        Validates that the unique ``.tmp`` sibling used for the atomic
+        write is renamed away instead of accumulating on disk.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            Serializer.dumpToFile({"a": 1}, directory / "out.bin")
+            self.assertEqual(list(directory.glob("*.tmp")), [])
+
+    def testFailedDumpToFileRemovesItsStagingFile(self) -> None:
+        """
+        Clean up the staging file when the publish step fails.
+
+        Validates the failure path by targeting an existing directory,
+        which makes the rename raise a portable OSError.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            occupied = directory / "busy"
+            occupied.mkdir()
+
+            with self.assertRaises(OSError):
+                Serializer.dumpToFile({"a": 1}, occupied)
+
+            self.assertEqual(list(directory.glob("*.tmp")), [])
+
     def testLoadFromFileMissingReturnsNone(self) -> None:
         """
         Return None when the target file does not exist.

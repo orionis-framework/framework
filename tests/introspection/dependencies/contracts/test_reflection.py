@@ -9,7 +9,7 @@ from orionis.introspection.dependencies.entities.signature import (
 
 class _StubDeps(IReflectDependencies):
 
-    def _empty_sig(self) -> Signature:
+    def _emptySig(self) -> Signature:
         """
         Build and return an empty Signature instance.
 
@@ -29,7 +29,7 @@ class _StubDeps(IReflectDependencies):
         Signature
             Always an empty Signature instance.
         """
-        return self._empty_sig()
+        return self._emptySig()
 
     def methodSignature(self, _method_name: str) -> Signature:
         """
@@ -45,7 +45,7 @@ class _StubDeps(IReflectDependencies):
         Signature
             Always an empty Signature instance.
         """
-        return self._empty_sig()
+        return self._emptySig()
 
     def callableSignature(self) -> Signature:
         """
@@ -56,7 +56,7 @@ class _StubDeps(IReflectDependencies):
         Signature
             Always an empty Signature instance.
         """
-        return self._empty_sig()
+        return self._emptySig()
 
 class _OnlyConstructor(IReflectDependencies):
 

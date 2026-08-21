@@ -259,6 +259,31 @@ class TestMetaCompilerConflicts(TestCase):
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([TimezoneAware(), TimezoneNaive()])
 
+    def testMixedBoundsWithEqualValuesRaise(self) -> None:
+        """
+        Raise MetadataConflictError when mixed bounds share the same value.
+
+        Validates that an inclusive lower bound combined with an exclusive
+        upper bound of the same value leaves no valid value.
+        """
+        with self.assertRaises(MetadataConflictError):
+            MetaCompiler.compile([GreaterThanOrEqual(10), LessThan(10)])
+
+    def testEqualInclusiveBoundsAreAllowed(self) -> None:
+        """
+        Allow equal inclusive bounds as a valid degenerate range.
+
+        Validates that GreaterThanOrEqual(5) combined with LessThanOrEqual(5)
+        is accepted (the only valid value is exactly 5).
+        """
+        result = MetaCompiler.compile(
+            [GreaterThanOrEqual(5), LessThanOrEqual(5)],
+        )
+        self.assertEqual(result.ge, 5)
+        self.assertEqual(result.le, 5)
+
+class TestMetaCompilerInvalidValues(TestCase):
+
     def testMultipleOfZeroRaises(self) -> None:
         """
         Raise MetadataConflictError when MultipleOf value is zero.
@@ -298,18 +323,15 @@ class TestMetaCompilerConflicts(TestCase):
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MaxLength(-1)])
 
-    def testEqualInclusiveBoundsAreAllowed(self) -> None:
-        """
-        Allow equal inclusive bounds as a valid degenerate range.
+class TestMetaCompilerContract(TestCase):
 
-        Validates that GreaterThanOrEqual(5) combined with LessThanOrEqual(5)
-        is accepted (the only valid value is exactly 5).
+    def testCompilerDeclaresSlots(self) -> None:
         """
-        result = MetaCompiler.compile(
-            [GreaterThanOrEqual(5), LessThanOrEqual(5)],
-        )
-        self.assertEqual(result.ge, 5)
-        self.assertEqual(result.le, 5)
+        Confirm the compiler stores no per-instance state.
+
+        Validates that the class is purely static.
+        """
+        self.assertEqual(MetaCompiler.__slots__, ())
 
     def testMetadataConflictErrorIsValueError(self) -> None:
         """

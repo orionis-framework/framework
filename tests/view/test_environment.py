@@ -71,7 +71,6 @@ class TestViewEnvironment(TestCase):
                 "cache_path": cache_path_str,
                 "auto_reload": False,
                 "autoescape": True,
-                "enable_async": True,
             },
             Path(self._tmpdir.name),
         )

@@ -17,6 +17,8 @@ _ROUTE_PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::\w+)?\}")
 _MISSING: Any = object()
 
 # Interpolation plans keyed by route template: (literal chunks, parameter names).
+# Lock-free on purpose: plans are pure functions of their key, so a racing
+# writer can only store the value another thread would have computed.
 _ROUTE_PLAN_CACHE: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {}
 
 def _compile_route_template(

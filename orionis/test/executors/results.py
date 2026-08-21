@@ -31,42 +31,39 @@ class TestResultProcessor(unittest.TestResult):
 
     # ruff: noqa: PLR2004,PLW2901
 
-    _print_verbosity: int | None = None
-
-    @classmethod
-    def setPrintVerbosity(cls, verbosity: int) -> None:
-        """
-        Set the print verbosity level for test result output.
-
-        Parameters
-        ----------
-        verbosity : int
-            The verbosity level to set for printing test results.
-
-        Returns
-        -------
-        None
-            This method sets a class-level attribute and returns None.
-        """
-        cls._print_verbosity = verbosity
-
-    def __init__(self, *args: object, **kwargs: object) -> None:
+    def __init__(
+        self,
+        stream: object = None,
+        descriptions: object = None,
+        verbosity: int | None = None,
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the TestResultProcessor instance.
 
         Parameters
         ----------
-        *args : object
-            Positional arguments passed to the superclass.
+        stream : object, optional
+            Output stream forwarded to the superclass, by default None.
+        descriptions : object, optional
+            Description flag forwarded to the superclass, by default None.
+        verbosity : int | None, optional
+            Detail level used to print every recorded outcome: 1 prints one
+            compact line per test and 2 prints a detailed panel. Any other
+            value, including None, prints nothing. Supplied by the runner
+            through ``unittest.TextTestRunner._makeResult``, by default None.
         **kwargs : object
-            Keyword arguments passed to the superclass.
+            Additional keyword arguments forwarded to the superclass.
 
         Returns
         -------
         None
             This constructor initializes instance attributes and returns None.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(stream, descriptions, verbosity, **kwargs)
+
+        # Instance-scoped verbosity: concurrent runs never share this value.
+        self.__print_verbosity: int | None = verbosity
         self.__test_results: list[TestResult] = []
         self.__console = Console()
         self.__max_width = self.__console.width * 0.8
@@ -207,8 +204,8 @@ class TestResultProcessor(unittest.TestResult):
         test_id: str = result.name
         exec_time_text: str = f"~ {result.execution_time:.3f}s"
 
-        # Read verbosity once to avoid repeated class-level lookup.
-        verbosity: int | None = self._print_verbosity
+        # Read verbosity once to avoid repeated attribute lookup.
+        verbosity: int | None = self.__print_verbosity
 
         # Compact single-line output with dot-filler alignment.
         if verbosity == 1:

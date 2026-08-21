@@ -14,6 +14,8 @@ class ITranslationRepository(ABC):
     O(1) access.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get(self, locale: str) -> TranslationMap:
         """

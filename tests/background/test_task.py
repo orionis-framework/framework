@@ -1,290 +1,601 @@
-from __future__ import annotations
-from orionis.background.task import BackgroundTask
+import functools
+import threading
+
+from orionis.background.contracts.task import IBackgroundTask
+from orionis.background.task import BackgroundTask, is_async_callable
 from orionis.test import TestCase
 
-class TestBackgroundTaskSyncExecution(TestCase):
+class _SyncCallable:
+    """Callable object used to prove non-function callables are supported."""
 
-    async def testSyncFunctionIsExecuted(self) -> None:
-        """
-        Execute a synchronous function when the task is awaited.
+    __slots__ = ("calls",)
 
-        Validates that calling a BackgroundTask wrapping a sync function
-        causes the function body to run exactly once.
+    def __init__(self) -> None:
         """
-        executed: list[bool] = []
+        Initialise the invocation log.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.calls: list[tuple[object, ...]] = []
+
+    def __call__(self, *args: object) -> None:
+        """
+        Record a single invocation of the callable.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments received by the callable.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.calls.append(args)
+
+class _AsyncCallable:
+    """Callable object whose invocation returns a coroutine."""
+
+    __slots__ = ("calls",)
+
+    def __init__(self) -> None:
+        """
+        Initialise the invocation log.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.calls: list[tuple[object, ...]] = []
+
+    async def __call__(self, *args: object) -> None:
+        """
+        Record a single invocation of the callable.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments received by the callable.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.calls.append(args)
+
+class TestIsAsyncCallable(TestCase):
+    """Validate the detection of callables that return an awaitable."""
+
+    def testDetectsCoroutineFunctions(self) -> None:
+        """
+        Detect coroutine functions as awaitable callables.
+
+        Validates the most common case, where the target is declared with
+        the async keyword.
+        """
+
+        async def async_func() -> None:
+            pass
+
+        self.assertTrue(is_async_callable(async_func))
+
+    def testDetectsCallableInstancesWithACoroutineCall(self) -> None:
+        """
+        Detect instances whose call method is a coroutine.
+
+        Validates that objects behaving like coroutine functions are not
+        mistaken for blocking callables.
+        """
+        self.assertTrue(is_async_callable(_AsyncCallable()))
+
+    def testUnwrapsPartialsBeforeInspectingTheTarget(self) -> None:
+        """
+        Look through partials to reach the real target.
+
+        Validates that pre-binding arguments never hides the awaitable
+        nature of the wrapped callable.
+        """
+
+        async def async_func(value: int) -> None:
+            pass
+
+        self.assertTrue(is_async_callable(functools.partial(async_func, 1)))
+        self.assertTrue(is_async_callable(functools.partial(_AsyncCallable())))
+
+    def testRejectsPlainCallables(self) -> None:
+        """
+        Reject callables that return a regular value.
+
+        Validates that blocking functions and objects keep being routed to
+        the executor.
+        """
 
         def sync_func() -> None:
-            executed.append(True)
+            pass
 
-        task = BackgroundTask(sync_func)
-        await task()
-        self.assertEqual(executed, [True])
+        self.assertFalse(is_async_callable(sync_func))
+        self.assertFalse(is_async_callable(_SyncCallable()))
+        self.assertFalse(is_async_callable(functools.partial(sync_func)))
 
-    async def testSyncFunctionReceivesPositionalArgs(self) -> None:
+    def testRejectsObjectsThatAreNotCallable(self) -> None:
         """
-        Forward positional arguments to the wrapped synchronous function.
+        Reject targets that cannot be called at all.
 
-        Validates that args supplied to BackgroundTask are passed through
-        to the underlying callable unchanged.
+        Validates that the inspection is safe for values lacking a call
+        implementation instead of raising.
+        """
+        self.assertFalse(is_async_callable(42))
+
+class TestBackgroundTaskConstruction(TestCase):
+    """Validate how a task captures its callable and its arguments."""
+
+    def testDeclaresSlotsInsteadOfAnInstanceDictionary(self) -> None:
+        """
+        Store the task state in slots.
+
+        Validates that tasks stay lightweight, which matters because one
+        instance may be created per HTTP response.
+        """
+
+        def sync_func() -> None:
+            pass
+
+        self.assertFalse(hasattr(BackgroundTask(sync_func), "__dict__"))
+
+    def testDoesNotInvokeTheCallableEagerly(self) -> None:
+        """
+        Defer the callable until the task is awaited.
+
+        Validates that building a task only records the callable and
+        produces none of its side effects.
+        """
+        calls: list[int] = []
+
+        def sync_func() -> None:
+            calls.append(1)
+
+        BackgroundTask(sync_func)
+        self.assertEqual(calls, [])
+
+    def testStoresPositionalAndKeywordArguments(self) -> None:
+        """
+        Capture the arguments supplied at construction time.
+
+        Validates that positional arguments are kept as a tuple and
+        keyword arguments as a mapping, ready for a later invocation.
+        """
+
+        def sync_func(*args: int, **kwargs: int) -> None:
+            pass
+
+        task = BackgroundTask(sync_func, 1, 2, offset=3)
+        self.assertEqual(task._BackgroundTask__args, (1, 2))
+        self.assertEqual(task._BackgroundTask__kwargs, {"offset": 3})
+
+    def testFlagsCoroutineFunctionsAsAsynchronous(self) -> None:
+        """
+        Classify coroutine functions as asynchronous once.
+
+        Validates that the sync/async decision is resolved during
+        construction rather than on every invocation.
+        """
+
+        async def async_func() -> None:
+            pass
+
+        self.assertTrue(BackgroundTask(async_func)._BackgroundTask__is_async)
+
+    def testFlagsPlainCallablesAsSynchronous(self) -> None:
+        """
+        Classify regular callables as synchronous.
+
+        Validates that functions and callable objects alike are routed to
+        the executor branch instead of being awaited directly.
+        """
+
+        def sync_func() -> None:
+            pass
+
+        self.assertFalse(BackgroundTask(sync_func)._BackgroundTask__is_async)
+        self.assertFalse(BackgroundTask(_SyncCallable())._BackgroundTask__is_async)
+
+    def testFlagsCallableInstancesWithACoroutineCallAsAsynchronous(self) -> None:
+        """
+        Classify awaitable callable objects as asynchronous.
+
+        Validates that an object implementing an async call method is
+        awaited instead of being run in a thread and silently dropped.
+        """
+        self.assertTrue(BackgroundTask(_AsyncCallable())._BackgroundTask__is_async)
+
+    def testUnwrapsPartialsWhenDetectingCoroutineFunctions(self) -> None:
+        """
+        Detect coroutine functions hidden behind a partial.
+
+        Validates that a partially applied coroutine function is still
+        recognised as asynchronous instead of being sent to a thread.
+        """
+
+        async def async_func(value: int) -> None:
+            pass
+
+        task = BackgroundTask(functools.partial(async_func, 1))
+        self.assertTrue(task._BackgroundTask__is_async)
+
+    def testImplementsTheBackgroundTaskContract(self) -> None:
+        """
+        Satisfy the background task interface.
+
+        Validates that a task can be consumed by any collaborator that
+        depends only on the abstract contract.
+        """
+
+        def sync_func() -> None:
+            pass
+
+        self.assertIsInstance(BackgroundTask(sync_func), IBackgroundTask)
+
+class TestBackgroundTaskSynchronousExecution(TestCase):
+    """Validate the executor branch used for synchronous callables."""
+
+    async def testExecutesTheWrappedCallable(self) -> None:
+        """
+        Execute a synchronous callable when the task is awaited.
+
+        Validates that awaiting the task runs the wrapped function body
+        exactly once.
+        """
+        calls: list[int] = []
+
+        def sync_func() -> None:
+            calls.append(1)
+
+        await BackgroundTask(sync_func)()
+        self.assertEqual(calls, [1])
+
+    async def testForwardsPositionalArguments(self) -> None:
+        """
+        Forward positional arguments to a synchronous callable.
+
+        Validates that arguments captured at construction reach the
+        wrapped function unchanged.
         """
         received: list[tuple[int, int]] = []
 
-        def sync_func(a: int, b: int) -> None:
-            received.append((a, b))
+        def sync_func(first: int, second: int) -> None:
+            received.append((first, second))
 
-        task = BackgroundTask(sync_func, 1, 2)
-        await task()
+        await BackgroundTask(sync_func, 1, 2)()
         self.assertEqual(received, [(1, 2)])
 
-    async def testSyncFunctionReceivesKeywordArgs(self) -> None:
+    async def testForwardsKeywordArguments(self) -> None:
         """
-        Forward keyword arguments to the wrapped synchronous function.
+        Forward keyword arguments to a synchronous callable.
 
-        Validates that kwargs supplied to BackgroundTask are passed through
-        to the underlying callable unchanged.
+        Validates that keyword arguments survive the partial binding used
+        by the executor branch.
         """
         received: list[tuple[str, str]] = []
 
-        def sync_func(x: str, y: str) -> None:
-            received.append((x, y))
+        def sync_func(left: str, right: str) -> None:
+            received.append((left, right))
 
-        task = BackgroundTask(sync_func, x="hello", y="world")
-        await task()
+        await BackgroundTask(sync_func, left="hello", right="world")()
         self.assertEqual(received, [("hello", "world")])
 
-    async def testSyncFunctionReceivesMixedArgs(self) -> None:
+    async def testForwardsMixedArguments(self) -> None:
         """
-        Forward both positional and keyword arguments to a sync function.
+        Forward positional and keyword arguments together.
 
-        Validates that BackgroundTask correctly passes a combination of
-        args and kwargs to the underlying callable.
+        Validates that a mixed call signature is reconstructed exactly as
+        the caller declared it.
         """
         received: list[tuple[int, int, str]] = []
 
-        def mixed_func(a: int, b: int, c: str = "default") -> None:
-            received.append((a, b, c))
+        def sync_func(first: int, second: int, label: str = "default") -> None:
+            received.append((first, second, label))
 
-        task = BackgroundTask(mixed_func, 10, 20, c="custom")
-        await task()
+        await BackgroundTask(sync_func, 10, 20, label="custom")()
         self.assertEqual(received, [(10, 20, "custom")])
 
-    async def testSyncFunctionCalledExactlyOnce(self) -> None:
+    async def testRunsOutsideTheEventLoopThread(self) -> None:
         """
-        Invoke the wrapped synchronous function exactly once per call.
+        Offload synchronous callables to a worker thread.
 
-        Validates that a single await of the task results in exactly
-        one invocation of the underlying callable.
+        Validates that blocking code never runs on the thread owning the
+        event loop, which is what keeps the loop responsive.
         """
-        call_count: list[int] = []
+        observed: list[int] = []
 
-        def counting_func() -> None:
-            call_count.append(1)
+        def sync_func() -> None:
+            observed.append(threading.get_ident())
 
-        task = BackgroundTask(counting_func)
+        await BackgroundTask(sync_func)()
+        self.assertNotEqual(observed[0], threading.get_ident())
+
+    async def testSupportsCallableObjects(self) -> None:
+        """
+        Execute callables that are not plain functions.
+
+        Validates that any object implementing ``__call__`` can be wrapped
+        and invoked with its arguments.
+        """
+        target = _SyncCallable()
+
+        await BackgroundTask(target, "payload")()
+        self.assertEqual(target.calls, [("payload",)])
+
+    async def testDiscardsTheReturnValue(self) -> None:
+        """
+        Return nothing regardless of the callable result.
+
+        Validates that a task is a fire-and-forget unit of work and never
+        surfaces the value produced by the wrapped callable.
+        """
+
+        def sync_func() -> str:
+            return "ignored"
+
+        self.assertIsNone(await BackgroundTask(sync_func)())
+
+    async def testCanBeAwaitedRepeatedly(self) -> None:
+        """
+        Allow a task instance to be reused.
+
+        Validates that each await performs a new invocation instead of
+        caching the first result.
+        """
+        calls: list[int] = []
+
+        def sync_func() -> None:
+            calls.append(1)
+
+        task = BackgroundTask(sync_func)
         await task()
-        self.assertEqual(len(call_count), 1)
+        await task()
+        self.assertEqual(len(calls), 2)
 
-    async def testSyncFunctionExceptionPropagates(self) -> None:
+    async def testPropagatesExceptions(self) -> None:
         """
-        Propagate exceptions raised by a synchronous function.
+        Surface failures raised inside the worker thread.
 
-        Validates that a RuntimeError raised inside the sync function
-        is surfaced to the caller of the task.
+        Validates that an exception thrown by a synchronous callable is
+        re-raised to whoever awaited the task.
         """
 
-        def raising_func() -> None:
-            error_msg = "sync error"
+        def sync_func() -> None:
+            error_msg = "synchronous failure"
             raise RuntimeError(error_msg)
 
-        task = BackgroundTask(raising_func)
         with self.assertRaises(RuntimeError):
+            await BackgroundTask(sync_func)()
+
+    async def testRejectsNonCallableTargetsWhenExecuted(self) -> None:
+        """
+        Fail on execution when the target cannot be called.
+
+        Validates that the constructor performs no validation, so the
+        resulting TypeError only appears once the task is awaited.
+        """
+        task = BackgroundTask(42)  # type: ignore[arg-type]
+
+        with self.assertRaises(TypeError):
             await task()
 
-    async def testSyncFunctionCanBeCalledMultipleTimes(self) -> None:
+class TestBackgroundTaskAsynchronousExecution(TestCase):
+    """Validate the direct-await branch used for coroutine functions."""
+
+    async def testAwaitsTheWrappedCoroutineFunction(self) -> None:
         """
-        Allow repeated invocations of the same task instance.
+        Await a coroutine function when the task is awaited.
 
-        Validates that successive awaits each invoke the wrapped sync
-        function an additional time, proving the task is re-entrant.
+        Validates that the coroutine is driven to completion and its side
+        effects are observable.
         """
-        call_count: list[int] = []
-
-        def counting_func() -> None:
-            call_count.append(1)
-
-        task = BackgroundTask(counting_func)
-        await task()
-        await task()
-        self.assertEqual(len(call_count), 2)
-
-class TestBackgroundTaskAsyncExecution(TestCase):
-
-    async def testAsyncFunctionIsExecuted(self) -> None:
-        """
-        Execute an asynchronous function when the task is awaited.
-
-        Validates that a coroutine function wrapped in BackgroundTask
-        is awaited and its side-effects are observable.
-        """
-        executed: list[bool] = []
+        calls: list[int] = []
 
         async def async_func() -> None:
-            executed.append(True)
+            calls.append(1)
 
-        task = BackgroundTask(async_func)
-        await task()
-        self.assertEqual(executed, [True])
+        await BackgroundTask(async_func)()
+        self.assertEqual(calls, [1])
 
-    async def testAsyncFunctionReceivesPositionalArgs(self) -> None:
+    async def testForwardsPositionalArguments(self) -> None:
         """
-        Forward positional arguments to the wrapped asynchronous function.
+        Forward positional arguments to a coroutine function.
 
-        Validates that args supplied to BackgroundTask are forwarded to
-        the coroutine function unchanged.
+        Validates that arguments captured at construction reach the
+        coroutine unchanged.
         """
         received: list[tuple[int, int]] = []
 
-        async def async_func(a: int, b: int) -> None:
-            received.append((a, b))
+        async def async_func(first: int, second: int) -> None:
+            received.append((first, second))
 
-        task = BackgroundTask(async_func, 1, 2)
-        await task()
+        await BackgroundTask(async_func, 1, 2)()
         self.assertEqual(received, [(1, 2)])
 
-    async def testAsyncFunctionReceivesKeywordArgs(self) -> None:
+    async def testForwardsKeywordArguments(self) -> None:
         """
-        Forward keyword arguments to the wrapped asynchronous function.
+        Forward keyword arguments to a coroutine function.
 
-        Validates that kwargs supplied to BackgroundTask reach the
-        coroutine function intact.
+        Validates that keyword arguments are applied when the coroutine is
+        created.
         """
         received: list[tuple[str, str]] = []
 
-        async def async_func(x: str, y: str) -> None:
-            received.append((x, y))
+        async def async_func(left: str, right: str) -> None:
+            received.append((left, right))
 
-        task = BackgroundTask(async_func, x="alpha", y="beta")
-        await task()
+        await BackgroundTask(async_func, left="alpha", right="beta")()
         self.assertEqual(received, [("alpha", "beta")])
 
-    async def testAsyncFunctionCalledExactlyOnce(self) -> None:
+    async def testRunsInsideTheEventLoopThread(self) -> None:
         """
-        Invoke the wrapped asynchronous function exactly once per call.
+        Keep coroutine execution on the running event loop.
 
-        Validates that a single await of the task results in exactly
-        one invocation of the coroutine.
+        Validates that asynchronous callables are awaited directly instead
+        of being offloaded to the default executor.
         """
-        call_count: list[int] = []
-
-        async def counting_func() -> None:
-            call_count.append(1)
-
-        task = BackgroundTask(counting_func)
-        await task()
-        self.assertEqual(len(call_count), 1)
-
-    async def testAsyncFunctionExceptionPropagates(self) -> None:
-        """
-        Propagate exceptions raised by an asynchronous function.
-
-        Validates that a ValueError raised inside the coroutine is
-        surfaced to the caller of the task.
-        """
-
-        async def raising_func() -> None:
-            error_msg = "async error"
-            raise ValueError(error_msg)
-
-        task = BackgroundTask(raising_func)
-        with self.assertRaises(ValueError):
-            await task()
-
-    async def testAsyncFunctionCanBeCalledMultipleTimes(self) -> None:
-        """
-        Allow repeated invocations of the same async task instance.
-
-        Validates that successive awaits each invoke the coroutine
-        an additional time, proving the task is re-entrant.
-        """
-        call_count: list[int] = []
-
-        async def counting_func() -> None:
-            call_count.append(1)
-
-        task = BackgroundTask(counting_func)
-        await task()
-        await task()
-        self.assertEqual(len(call_count), 2)
-
-class TestBackgroundTaskRunMethod(TestCase):
-
-    async def testRunMethodExecutesSyncFunction(self) -> None:
-        """
-        Execute the wrapped sync function via the run() coroutine method.
-
-        Validates that run() produces the same observable effect as
-        awaiting the task directly via __call__.
-        """
-        executed: list[bool] = []
-
-        def sync_func() -> None:
-            executed.append(True)
-
-        task = BackgroundTask(sync_func)
-        await task.run()
-        self.assertEqual(executed, [True])
-
-    async def testRunMethodExecutesAsyncFunction(self) -> None:
-        """
-        Execute the wrapped async function via the run() coroutine method.
-
-        Validates that run() produces the same observable effect as
-        awaiting the task directly via __call__.
-        """
-        executed: list[bool] = []
+        observed: list[int] = []
 
         async def async_func() -> None:
-            executed.append(True)
+            observed.append(threading.get_ident())
+
+        await BackgroundTask(async_func)()
+        self.assertEqual(observed[0], threading.get_ident())
+
+    async def testAwaitsCoroutineFunctionsWrappedInPartial(self) -> None:
+        """
+        Await a partially applied coroutine function.
+
+        Validates that pre-bound arguments are honoured and the coroutine
+        is awaited rather than scheduled in a thread.
+        """
+        received: list[tuple[int, int]] = []
+
+        async def async_func(first: int, second: int) -> None:
+            received.append((first, second))
+
+        await BackgroundTask(functools.partial(async_func, 1), 2)()
+        self.assertEqual(received, [(1, 2)])
+
+    async def testAwaitsCallableObjectsWithACoroutineCall(self) -> None:
+        """
+        Await callable objects that return a coroutine.
+
+        Validates that the coroutine is driven to completion; had it been
+        offloaded to a thread it would have been created and discarded,
+        leaving no trace of the invocation.
+        """
+        target = _AsyncCallable()
+
+        await BackgroundTask(target, "payload")()
+        self.assertEqual(target.calls, [("payload",)])
+
+    async def testDiscardsTheReturnValue(self) -> None:
+        """
+        Return nothing regardless of the coroutine result.
+
+        Validates that the value produced by the coroutine is dropped, as
+        background work reports no result to its caller.
+        """
+
+        async def async_func() -> str:
+            return "ignored"
+
+        self.assertIsNone(await BackgroundTask(async_func)())
+
+    async def testCanBeAwaitedRepeatedly(self) -> None:
+        """
+        Allow an asynchronous task instance to be reused.
+
+        Validates that a fresh coroutine is created on every invocation,
+        which is what makes the task re-entrant.
+        """
+        calls: list[int] = []
+
+        async def async_func() -> None:
+            calls.append(1)
 
         task = BackgroundTask(async_func)
-        await task.run()
-        self.assertEqual(executed, [True])
+        await task()
+        await task()
+        self.assertEqual(len(calls), 2)
 
-    async def testRunMethodPropagatesException(self) -> None:
+    async def testPropagatesExceptions(self) -> None:
         """
-        Propagate exceptions raised by the wrapped function through run().
+        Surface failures raised inside the coroutine.
 
-        Validates that run() does not suppress errors thrown by the
-        underlying callable.
+        Validates that an exception thrown by an asynchronous callable is
+        re-raised to whoever awaited the task.
         """
 
-        def raising_func() -> None:
-            error_msg = "run error"
+        async def async_func() -> None:
+            error_msg = "asynchronous failure"
+            raise ValueError(error_msg)
+
+        with self.assertRaises(ValueError):
+            await BackgroundTask(async_func)()
+
+class TestBackgroundTaskRunMethod(TestCase):
+    """Validate the explicit run entry point of a single task."""
+
+    async def testRunExecutesSynchronousCallables(self) -> None:
+        """
+        Execute a synchronous callable through the run method.
+
+        Validates that the contract method produces the same effect as
+        invoking the task directly.
+        """
+        calls: list[int] = []
+
+        def sync_func() -> None:
+            calls.append(1)
+
+        await BackgroundTask(sync_func).run()
+        self.assertEqual(calls, [1])
+
+    async def testRunExecutesCoroutineFunctions(self) -> None:
+        """
+        Execute a coroutine function through the run method.
+
+        Validates that the contract method awaits asynchronous callables
+        exactly like the direct invocation path.
+        """
+        calls: list[int] = []
+
+        async def async_func() -> None:
+            calls.append(1)
+
+        await BackgroundTask(async_func).run()
+        self.assertEqual(calls, [1])
+
+    async def testRunForwardsArgumentsLikeDirectInvocation(self) -> None:
+        """
+        Forward captured arguments when running the task.
+
+        Validates that the run method delegates to the same invocation
+        logic and therefore honours the stored arguments.
+        """
+        received: list[tuple[int, str]] = []
+
+        def sync_func(value: int, label: str) -> None:
+            received.append((value, label))
+
+        await BackgroundTask(sync_func, 5, label="unit").run()
+        self.assertEqual(received, [(5, "unit")])
+
+    async def testRunPropagatesExceptions(self) -> None:
+        """
+        Surface failures raised while running the task.
+
+        Validates that the run method does not swallow errors thrown by
+        the wrapped callable.
+        """
+
+        def sync_func() -> None:
+            error_msg = "run failure"
             raise RuntimeError(error_msg)
 
-        task = BackgroundTask(raising_func)
         with self.assertRaises(RuntimeError):
-            await task.run()
+            await BackgroundTask(sync_func).run()
 
-    async def testRunAndCallAreEquivalentForSyncFunction(self) -> None:
+    async def testRunReturnsNone(self) -> None:
         """
-        Produce identical results from run() and __call__ for a sync func.
+        Report no value from the run coroutine.
 
-        Validates that both invocation paths execute the underlying
-        callable and yield the same side-effects.
+        Validates that the run method matches the None return type
+        declared by the contract.
         """
-        call_results: list[str] = []
-        run_results: list[str] = []
 
-        def call_func() -> None:
-            call_results.append("called")
+        def sync_func() -> str:
+            return "ignored"
 
-        def run_func() -> None:
-            run_results.append("ran")
-
-        call_task = BackgroundTask(call_func)
-        run_task = BackgroundTask(run_func)
-        await call_task()
-        await run_task.run()
-        self.assertEqual(call_results, ["called"])
-        self.assertEqual(run_results, ["ran"])
+        self.assertIsNone(await BackgroundTask(sync_func).run())

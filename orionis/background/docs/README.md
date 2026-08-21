@@ -21,6 +21,7 @@ client, without making the client wait for that side effect to finish.
    - [`IBackgroundTask`](#ibackgroundtask)
    - [`BackgroundTask`](#backgroundtask)
    - [`BackgroundTasks`](#backgroundtasks)
+   - [`is_async_callable()`](#is_async_callable)
 4. [Usage examples](#usage-examples)
 5. [Design notes](#design-notes)
 6. [Performance and concurrency considerations](#performance-and-concurrency-considerations)
@@ -100,9 +101,9 @@ Constructor.
 | `*args` | `object` | Positional arguments forwarded to `func` when the task runs. |
 | `**kwargs` | `object` | Keyword arguments forwarded to `func` when the task runs. |
 
-**Returns:** a new `BackgroundTask` instance. Whether `func` is a coroutine
-function is detected once, at construction time, via
-`inspect.iscoroutinefunction`.
+**Returns:** a new `BackgroundTask` instance. Whether calling `func`
+produces an awaitable is detected once, at construction time, via
+`is_async_callable`.
 
 #### `await task()`
 
@@ -112,7 +113,7 @@ async def __call__(self) -> None
 
 Executes the wrapped callable:
 
-- If `func` is a coroutine function, it is awaited directly:
+- If calling `func` produces a coroutine, it is awaited directly:
   `await func(*args, **kwargs)`.
 - Otherwise, `func` is invoked in the running loop's **default executor**
   via `loop.run_in_executor(None, functools.partial(func, *args, **kwargs))`
@@ -206,12 +207,36 @@ try/except around each iteration).
 async def run(self) -> None
 ```
 
-Convenience coroutine that does `await self()`, exactly like
-`BackgroundTask.run`.
+Inherited from `BackgroundTask`: it does `await self()`, which runs every
+task in the collection.
 
 **Returns:** `None`.
 
 **Raises:** same as `__call__`.
+
+---
+
+### `is_async_callable()`
+
+```python
+from orionis.background.task import is_async_callable
+```
+
+Module-level helper used by `BackgroundTask` to decide how a callable must
+be executed.
+
+#### `is_async_callable(func)`
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `func` | `object` | Callable to inspect. `functools.partial` objects are unwrapped first, and instances are inspected through their `__call__`. |
+
+**Returns:** `True` when invoking `func` produces a coroutine — coroutine
+functions, partials of coroutine functions, and objects whose `__call__` is
+a coroutine (such as `BackgroundTasks`) — and `False` otherwise, including
+values that are not callable at all.
+
+**Raises:** nothing.
 
 ## Usage examples
 
@@ -311,15 +336,19 @@ informational purposes only — they are not suggestions for change.
   `kwargs`, and the sync/async flag as double-underscore attributes
   (`self.__func`, `self.__args`, `self.__kwargs`, `self.__is_async`),
   relying on Python's name-mangling to keep them private to the class,
-  rather than exposing them as part of the public API.
+  rather than exposing them as part of the public API. Both classes and
+  the contract declare `__slots__`, so task instances carry no `__dict__`.
 - **Callable-as-task pattern.** Both classes implement `__call__`, so a
   task (or a task collection) can be invoked directly (`await task()`) or
   through the more descriptive `await task.run()` — both do exactly the
   same thing.
 - **Sync/async detection happens once.** `BackgroundTask` inspects `func`
-  with `inspect.iscoroutinefunction` at construction time and caches the
-  result (`self.__is_async`), rather than re-checking it on every
-  invocation.
+  with the module-level helper `is_async_callable` at construction time and
+  caches the result (`self.__is_async`), rather than re-checking it on every
+  invocation. The helper unwraps `functools.partial` objects and inspects
+  `__call__` on instances, so callable objects returning a coroutine — a
+  `BackgroundTasks` collection among them — are awaited instead of being
+  offloaded to a thread and dropped.
 
 ## Performance and concurrency considerations
 

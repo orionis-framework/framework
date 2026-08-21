@@ -24,6 +24,7 @@ secundario finalice.
    - [`IBackgroundTask`](#ibackgroundtask)
    - [`BackgroundTask`](#backgroundtask)
    - [`BackgroundTasks`](#backgroundtasks)
+   - [`is_async_callable()`](#is_async_callable)
 4. [Ejemplos de uso](#ejemplos-de-uso)
 5. [Notas de diseño](#notas-de-diseño)
 6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
@@ -107,9 +108,9 @@ Constructor.
 | `*args` | `object` | Argumentos posicionales reenviados a `func` cuando la tarea se ejecuta. |
 | `**kwargs` | `object` | Argumentos con nombre reenviados a `func` cuando la tarea se ejecuta. |
 
-**Devuelve:** una nueva instancia de `BackgroundTask`. Si `func` es una
-función corrutina se detecta una sola vez, en el momento de la
-construcción, mediante `inspect.iscoroutinefunction`.
+**Devuelve:** una nueva instancia de `BackgroundTask`. Si invocar `func`
+produce un awaitable se detecta una sola vez, en el momento de la
+construcción, mediante `is_async_callable`.
 
 #### `await task()`
 
@@ -119,7 +120,7 @@ async def __call__(self) -> None
 
 Ejecuta el invocable envuelto:
 
-- Si `func` es una función corrutina, se espera directamente:
+- Si invocar `func` produce una corrutina, se espera directamente:
   `await func(*args, **kwargs)`.
 - En caso contrario, `func` se invoca en el **executor por defecto** del
   bucle en ejecución mediante
@@ -219,12 +220,36 @@ try/except alrededor de cada iteración).
 async def run(self) -> None
 ```
 
-Corrutina de conveniencia que hace `await self()`, exactamente igual que
-`BackgroundTask.run`.
+Heredada de `BackgroundTask`: hace `await self()`, lo que ejecuta todas las
+tareas de la colección.
 
 **Devuelve:** `None`.
 
 **Excepciones:** las mismas que `__call__`.
+
+---
+
+### `is_async_callable()`
+
+```python
+from orionis.background.task import is_async_callable
+```
+
+Helper a nivel de módulo que usa `BackgroundTask` para decidir cómo debe
+ejecutarse un invocable.
+
+#### `is_async_callable(func)`
+
+| Parámetro | Tipo | Descripción |
+| --- | --- | --- |
+| `func` | `object` | Invocable a inspeccionar. Los objetos `functools.partial` se desenvuelven primero, y las instancias se inspeccionan a través de su `__call__`. |
+
+**Devuelve:** `True` cuando invocar `func` produce una corrutina — funciones
+corrutina, parciales de funciones corrutina y objetos cuyo `__call__` es una
+corrutina (como `BackgroundTasks`) — y `False` en caso contrario, incluidos
+los valores que no son invocables.
+
+**Excepciones:** ninguna.
 
 ## Ejemplos de uso
 
@@ -327,15 +352,20 @@ fines exclusivamente informativos — no son propuestas de cambio.
   doble guion bajo (`self.__func`, `self.__args`, `self.__kwargs`,
   `self.__is_async`), apoyándose en el "name mangling" de Python para
   mantenerlos privados a la clase, en lugar de exponerlos como parte de la
-  API pública.
+  API pública. Ambas clases y el contrato declaran `__slots__`, de modo que
+  las instancias de tarea no tienen `__dict__`.
 - **Patrón "invocable como tarea".** Ambas clases implementan `__call__`,
   de modo que una tarea (o una colección de tareas) puede invocarse
   directamente (`await task()`) o mediante el más descriptivo
   `await task.run()` — ambos hacen exactamente lo mismo.
 - **La detección de síncrono/asíncrono ocurre una sola vez.** `BackgroundTask`
-  inspecciona `func` con `inspect.iscoroutinefunction` en el momento de la
-  construcción y almacena en caché el resultado (`self.__is_async`), en
-  lugar de volver a comprobarlo en cada invocación.
+  inspecciona `func` con el helper de módulo `is_async_callable` en el
+  momento de la construcción y almacena en caché el resultado
+  (`self.__is_async`), en lugar de volver a comprobarlo en cada invocación.
+  El helper desenvuelve los objetos `functools.partial` e inspecciona el
+  `__call__` de las instancias, de modo que los objetos invocables que
+  devuelven una corrutina — una colección `BackgroundTasks` entre ellos —
+  se esperan en lugar de delegarse a un hilo y perderse.
 
 ## Consideraciones de rendimiento y concurrencia
 

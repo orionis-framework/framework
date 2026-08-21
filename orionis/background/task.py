@@ -8,6 +8,32 @@ from orionis.background.contracts.task import IBackgroundTask
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+def is_async_callable(func: object) -> bool:
+    """
+    Report whether invoking a callable produces an awaitable.
+
+    Parameters
+    ----------
+    func : object
+        Callable to inspect. Partial objects are unwrapped first, and
+        instances are inspected through their ``__call__``.
+
+    Returns
+    -------
+    bool
+        True when calling ``func`` returns a coroutine, False otherwise.
+    """
+    # Unwrap partials so pre-bound coroutine callables are still detected
+    target: object = func
+    while isinstance(target, functools.partial):
+        target = target.func
+
+    if inspect.iscoroutinefunction(target):
+        return True
+
+    # Callable instances expose their coroutine nature through __call__
+    return callable(target) and inspect.iscoroutinefunction(target.__call__)
+
 class BackgroundTask(IBackgroundTask):
     """
     Represent a background task that can be executed asynchronously.
@@ -21,6 +47,8 @@ class BackgroundTask(IBackgroundTask):
     **kwargs : Any
         Keyword arguments to pass to the function.
     """
+
+    __slots__ = ("__args", "__func", "__is_async", "__kwargs")
 
     def __init__(
         self,
@@ -48,7 +76,7 @@ class BackgroundTask(IBackgroundTask):
         self.__func: Callable[..., Any] = func
         self.__args: tuple[object, ...] = args
         self.__kwargs: dict[str, object] = kwargs
-        self.__is_async: bool = inspect.iscoroutinefunction(func)
+        self.__is_async: bool = is_async_callable(func)
 
     async def __call__(self) -> None:
         """

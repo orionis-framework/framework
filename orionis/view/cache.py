@@ -1,4 +1,5 @@
 from __future__ import annotations
+from hashlib import sha1
 from pathlib import Path
 from jinja2.bccache import Bucket, FileSystemBytecodeCache
 
@@ -7,10 +8,19 @@ _TEMPLATE_EXTENSIONS: tuple[str, ...] = (
     ".html", ".htm", ".jinja", ".jinja2", ".j2",
 )
 
+# Digest characters appended to the readable stem to keep keys unique
+_DIGEST_LENGTH: int = 8
+
 class OrionisBytecodeCache(FileSystemBytecodeCache):
 
     def get_cache_key(self, name: str, filename: str | None = None) -> str: # noqa: ARG002
         """Convert a template name into a human-readable cache key.
+
+        Flattening separators and dropping the extension is a lossy
+        transformation, so distinct templates such as ``mail/welcome.html``
+        and ``mail/welcome.j2`` would share a single cache file.  A short
+        digest of the untouched name is appended to keep the mapping
+        injective while the stem stays readable.
 
         Parameters
         ----------
@@ -29,7 +39,10 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
             if key.endswith(ext):
                 key = key[: -len(ext)]
                 break
-        return key
+        digest: str = sha1(
+            name.encode("utf-8"), usedforsecurity=False,
+        ).hexdigest()[:_DIGEST_LENGTH]
+        return f"{key}.{digest}"
 
     def _get_cache_filename(self, bucket: Bucket) -> str:
         """
@@ -43,6 +56,7 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
         Returns
         -------
         str
-            Absolute path of the form ``<cache_dir>/<template_name>.cache``.
+            Absolute path of the form
+            ``<cache_dir>/<template_name>.<digest>.cache``.
         """
         return str(Path(self.directory) / f"{bucket.key}.cache")

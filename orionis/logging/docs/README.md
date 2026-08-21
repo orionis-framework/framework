@@ -1,362 +1,844 @@
-# `orionis.log` — Logging Module
+# orionis.logging
 
-A thread-safe, channel-based logging service for the Orionis framework, built on top of the Python standard `logging` module. It provides a Laravel-inspired "channels" abstraction (`stack`, `hourly`, `daily`, `weekly`, `monthly`, `chunked`) with lazy initialization, runtime channel switching, and a custom rotating file handler.
+> Application logging: a single stdlib logger driven by named channels, with time-based and size-based file rotation.
 
 ## Table of contents
 
-- [Requirements](#requirements)
-- [Module overview](#module-overview)
-- [Architecture](#architecture)
+- [Functional description](#functional-description)
+  - [Where it fits in the framework](#where-it-fits-in-the-framework)
+  - [Resolution pipeline](#resolution-pipeline)
+  - [File map](#file-map)
+  - [Design decisions](#design-decisions)
 - [API reference](#api-reference)
-  - [`Logger`](#logger-orionislogloggerlogger)
-  - [`ILogger` (contract)](#ilogger-orionislogcontractsloggerilogger)
-  - [`SuffixResolver` (contract)](#suffixresolver-orionislogcontractssuffix_resolversuffixresolver)
-  - [Suffix resolvers](#suffix-resolvers-orionisloghandlers)
-  - [`AdvancedRotatingFileHandler`](#advancedrotatingfilehandler-orionisloghandlersadvanced_rotating_file_handler)
-  - [`RotatingHandlerFactory`](#rotatinghandlerfactory-orionisloghandlersrotating_handler_factory)
-  - [`LoggerProvider`](#loggerprovider-orionislogprovider)
-  - [`Log` facade](#log-facade-orionissupportfacadesloggerlog)
+  - [`Log` facade](#log-facade)
+  - [`ILogger`](#ilogger)
+  - [`Logger`](#logger)
+  - [`SuffixResolver`](#suffixresolver)
+  - [Suffix resolvers](#suffix-resolvers)
+  - [`AdvancedRotatingFileHandler`](#advancedrotatingfilehandler)
+  - [`RotatingHandlerFactory`](#rotatinghandlerfactory)
+  - [`LoggerProvider`](#loggerprovider)
+  - [Configuration entities](#configuration-entities)
 - [Usage examples](#usage-examples)
-- [Performance and concurrency considerations](#performance-and-concurrency-considerations)
-- [Design notes](#design-notes)
+  - [1. Logging from a controller](#1-logging-from-a-controller)
+  - [2. Resolving the service through the container](#2-resolving-the-service-through-the-container)
+  - [3. Standalone `Logger` without the container](#3-standalone-logger-without-the-container)
+  - [4. Switching channels and handling errors](#4-switching-channels-and-handling-errors)
+  - [5. Custom `SuffixResolver`](#5-custom-suffixresolver)
+  - [6. Building a handler with the factory](#6-building-a-handler-with-the-factory)
+- [Performance and concurrency](#performance-and-concurrency)
 - [Compatibility notes](#compatibility-notes)
 
-## Requirements
+## Functional description
 
-No installation beyond the framework itself is required:
+`orionis.logging` writes application log lines to files. It wraps a single
+standard-library `logging.Logger` named `__orionis__` and configures it from the
+`logging` section of the application configuration, which declares **channels**
+(`stack`, `hourly`, `daily`, `weekly`, `monthly`, `chunked`). Exactly one channel
+is attached at a time; `switchChannel()` swaps it at runtime.
 
-```bash
-pip install orionis
+Rotation is not delegated to `logging.handlers`: the module ships its own
+`AdvancedRotatingFileHandler`, parameterised by a `SuffixResolver` strategy that
+decides the file-name suffix (`daily_2026-08-21.log`, `hourly_2026-08-21_14.log`,
+…) and, for the `chunked` channel, produces a unique suffix per rotation so
+rotation is driven by file size instead of time.
+
+### Where it fits in the framework
+
+| Piece | Value |
+|---|---|
+| Contract | `orionis.logging.contracts.logger.ILogger` |
+| Implementation | `orionis.logging.logger.Logger` |
+| Container binding | `singleton(ILogger, Logger, alias="x-orionis-ILogger")` |
+| Provider | `orionis.logging.provider.LoggerProvider` (listed in `CORE_PROVIDERS`, eager — not deferrable) |
+| Facade | `orionis.support.facades.logger.Log` (accessor `"x-orionis-ILogger"`) |
+| Configuration | `orionis.foundation.config.logging` entities, published by `config/logging.py` |
+
+The provider registers the binding in `register()` and pins the facade in
+`boot()`. Eager providers are booted by `Application.__onStartup()`, i.e. when
+the HTTP or CLI runtime starts. Before that moment the facade is **not** pinned
+and every attribute access returns a `_FacadeDispatch` that has to be awaited
+(`await Log.getAvailableChannels()`); after the pin, calls are direct
+pass-throughs (`Log.info("...")`, no `await`). Framework code that runs during
+startup itself — or standalone scripts — should either inject `ILogger` or call
+`await Log.pin()` explicitly.
+
+Other framework modules consume the service directly: the console `Reactor`
+reports command failures through `ILogger`, and the scheduler warns through the
+`Log` facade when a per-task listener is overwritten.
+
+### Resolution pipeline
+
+```text
+Log (facade)  ─┐
+               ├─► ILogger ──► Logger ──► logging.Logger("__orionis__")
+DI: ILogger   ─┘                 │
+                                 ├─ channel "stack"  ──► logging.FileHandler
+                                 └─ other channels   ──► RotatingHandlerFactory
+                                                              │
+                                                              ├─ HourlySuffixResolver
+                                                              ├─ DailySuffixResolver   ─┐
+                                                              ├─ WeeklySuffixResolver   ├─► AdvancedRotatingFileHandler
+                                                              ├─ MonthlySuffixResolver ─┘
+                                                              └─ ChunkedSuffixResolver
 ```
 
-The module relies exclusively on the Python standard library (`logging`, `pathlib`, `threading`, `gzip`, `shutil`, `re`, `time`, `datetime`) plus internal Orionis modules (`orionis.foundation`, `orionis.container`, `orionis.support.facades.datetime`). No third-party logging backends are used.
+Handler creation is **lazy**: `Logger.__init__` only snapshots
+`app.config("logging")`. The stdlib logger and its handler are built on the first
+`info()`/`error()`/`warning()`/`debug()`/`critical()`/`getLogger()`/`switchChannel()`
+call, under a double-checked `threading.Lock`. Until then
+`getActiveChannels()` returns `[]`.
 
-## Module overview
+### File map
 
-`orionis.log` implements the framework's logging service. It solves three problems:
+| File | Contents |
+|---|---|
+| `__init__.py` | Re-exports `Logger` (`__all__ = ["Logger"]`) |
+| `logger.py` | `Logger`, the only public service of the module |
+| `provider.py` | `LoggerProvider` (binding + facade pin) |
+| `contracts/logger.py` | `ILogger` (ABC) |
+| `contracts/suffix_resolver.py` | `SuffixResolver` (ABC, `__slots__ = ()`) |
+| `handlers/advanced_rotating_file_handler.py` | `AdvancedRotatingFileHandler` |
+| `handlers/rotating_handler_factory.py` | `RotatingHandlerFactory` + the six private `_create_*` builders |
+| `handlers/hourly_suffix_resolver.py` | `HourlySuffixResolver` |
+| `handlers/daily_suffix_resolver.py` | `DailySuffixResolver` |
+| `handlers/weekly_suffix_resolver.py` | `WeeklySuffixResolver` |
+| `handlers/monthly_suffix_resolver.py` | `MonthlySuffixResolver` |
+| `handlers/chunked_suffix_resolver.py` | `ChunkedSuffixResolver` |
+| `handlers/__init__.py` | Empty (handlers are imported by full path) |
 
-1. **Unified logging API** — a single `ILogger` contract (`info`, `error`, `warning`, `debug`, `critical`, plus channel/lifecycle management) usable through dependency injection or the `Log` facade.
-2. **Configurable channels** — log destinations are declared in `config/logging.py` (an app-level `BootstrapLogging` entity extending `orionis.foundation.config.logging.entities.logging.Logging`). Each channel selects a strategy: a plain file (`stack`) or a rotating file family (`hourly`, `daily`, `weekly`, `monthly`, `chunked`).
-3. **Custom rotation** — instead of relying on `logging.handlers.TimedRotatingFileHandler`/`RotatingFileHandler`, the module ships `AdvancedRotatingFileHandler`, a single handler implementation driven by a pluggable `SuffixResolver` strategy, supporting optional gzip compression of rotated files and backup-count cleanup.
+The module defines **no exceptions of its own**: failures are reported as
+`RuntimeError`, as boolean return values (`switchChannel`), or swallowed
+(cleanup and compression paths).
 
-The package is re-exported from `orionis/log/__init__.py`:
+### Design decisions
 
-```python
-from orionis.log import Logger
-```
-
-## Architecture
-
-```mermaid
-graph TD
-    A[Log facade] --> B[ILogger contract]
-    B --> C[Logger]
-    C --> D[logging.Logger - stdlib]
-    C --> E[RotatingHandlerFactory]
-    E --> F[AdvancedRotatingFileHandler]
-    E --> G[logging.FileHandler - stack channel]
-    F --> H[SuffixResolver]
-    H --> I[HourlySuffixResolver]
-    H --> J[DailySuffixResolver]
-    H --> K[WeeklySuffixResolver]
-    H --> L[MonthlySuffixResolver]
-    H --> M[ChunkedSuffixResolver]
-    N[LoggerProvider] -->|register singleton + pin facade| A
-```
-
-- `Logger` (in `orionis/log/logger.py`) implements `ILogger` and wraps a single stdlib `logging.Logger` instance named `"__orionis__"`.
-- `LoggerProvider` (in `orionis/log/provider.py`) is a framework `ServiceProvider`: it binds `ILogger → Logger` as a singleton in the container and pins the `Log` facade during `boot()`.
-- Only **one channel is active at a time** in `Logger`. Switching channels (`switchChannel`) closes the previous handler(s) and attaches a new one.
+- **Strategy pattern for rotation.** `AdvancedRotatingFileHandler` knows how to
+  write, rotate, compress and prune; *when* to rotate is delegated to a
+  `SuffixResolver`. Adding a rotation policy means writing one class, not a
+  handler.
+- **One active channel.** The handler cache holds at most one entry (or the key
+  `"fallback"`), so `getActiveChannel()` is meaningful and switching channels is
+  a complete swap, not an addition.
+- **Class-level formatter cache.** `Logger._formatter_cache` is shared by every
+  instance in the process and keyed by `format|datefmt`, so repeated
+  initialisations reuse the same `logging.Formatter`.
+- **`name` as a `ClassVar`.** `Logger.name` is a plain class attribute that
+  shadows the abstract property declared by `ILogger` through the MRO, avoiding
+  a property descriptor call on each access.
+- **`__slots__` on the resolvers.** All five resolvers and the `SuffixResolver`
+  ABC declare `__slots__`, so resolver instances carry no `__dict__`. `Logger`
+  and `AdvancedRotatingFileHandler` do not declare `__slots__`.
+- **No `from __future__ import annotations` in `logger.py`.** The class is built
+  by the DI container, which resolves constructor dependencies by reflection;
+  string annotations would break that resolution. Every other file of the module
+  does use the future import.
 
 ## API reference
 
-### `Logger` (`orionis.logging.logger.Logger`)
+### `Log` facade
 
-Implements `ILogger`. Constructed with an application instance; never instantiate it manually inside application code — resolve it through the container or the `Log` facade instead (direct instantiation is shown below only for testing/standalone scenarios).
-
-```python
-class Logger(ILogger):
-    name: ClassVar[str] = "__orionis__"
-
-    def __init__(self, app: IApplication) -> None: ...
-```
-
-**Parameters**
-
-- `app` (`IApplication`): application instance. Used to read `app.config("logging")` (the channel configuration dictionary) and `app.path("root")` (the application root directory used to resolve relative log paths).
-
-**Properties / methods**
-
-| Member | Signature | Description |
-|---|---|---|
-| `name` | `str` (class attribute) | Always `"__orionis__"`. Identifies the internal logger name. |
-| `info` | `(message: str) -> None` | Logs a message at `INFO` level. Lazily initializes the logger on first call. |
-| `error` | `(message: str) -> None` | Logs a message at `ERROR` level. |
-| `warning` | `(message: str) -> None` | Logs a message at `WARNING` level. |
-| `debug` | `(message: str) -> None` | Logs a message at `DEBUG` level. |
-| `critical` | `(message: str) -> None` | Logs a message at `CRITICAL` level. |
-| `getLogger` | `() -> logging.Logger` | Returns the underlying stdlib `logging.Logger` for advanced usage (adding filters, custom handlers, etc.). Raises `RuntimeError` if it cannot be initialized. |
-| `reloadConfiguration` | `() -> None` | Re-reads `app.config("logging")`, closes existing handlers and re-initializes the logger with the new configuration. Raises `RuntimeError` on failure. |
-| `switchChannel` | `(channel_name: str) -> bool` | Closes the current handler(s) and activates `channel_name`. Returns `False` if the channel does not exist in configuration or handler creation fails (never raises). |
-| `close` | `() -> None` | Closes and detaches all handlers, releasing file descriptors. Safe to call multiple times. Never raises (errors are suppressed). |
-| `getActiveChannels` | `() -> list[str]` | Names of channels with a currently attached handler (in practice, at most one). |
-| `getActiveChannel` | `() -> str \| None` | First active channel name, or `None` if none is active. |
-| `getAvailableChannels` | `() -> list[str]` | All channel names declared in configuration (`config["channels"].keys()`), regardless of whether they are active. |
-
-**Exceptions**
-
-- `RuntimeError`: raised by `__initializeLogger`/`reloadConfiguration` when the underlying `logging.FileHandler`/rotating handler cannot be set up (e.g. filesystem errors), and by `getLogger`/internal readiness checks if the logger could not be created.
-
-**Side effects**
-
-- Creates directories for log files on demand (`Path(...).mkdir(parents=True, exist_ok=True)`).
-- Opens/holds file handles for the active channel until `close()` is called or the instance is garbage collected (`__del__` calls `close()`).
-
-### `ILogger` (`orionis.logging.contracts.logger.ILogger`)
-
-Abstract base class (`abc.ABC`) declaring the public logging contract implemented by `Logger`. Used for dependency injection (`self.app.singleton(ILogger, Logger, ...)`) and as the facade's type. Declares the abstract `name` property and all methods listed above (`info`, `error`, `warning`, `debug`, `critical`, `getLogger`, `reloadConfiguration`, `switchChannel`, `close`, `getActiveChannels`, `getActiveChannel`, `getAvailableChannels`).
-
-### `SuffixResolver` (`orionis.logging.contracts.suffix_resolver.SuffixResolver`)
-
-Abstract base class (`__slots__ = ()`) defining the rotation strategy interface consumed by `AdvancedRotatingFileHandler`.
-
-```python
-class SuffixResolver(ABC):
-    def getSuffix(self, dt: datetime | None = None) -> str: ...
-    def getNextRotationTime(self, current_time: datetime) -> datetime: ...
-```
-
-- `getSuffix(dt=None)`: returns the string used to substitute the `{suffix}` placeholder in a channel's `path` template. Uses `dt` if provided, otherwise the current time.
-- `getNextRotationTime(current_time)`: computes the datetime of the next rotation (informational/utility method; the handler itself decides rotation by comparing the resolved suffix on each write, not by scheduling).
-
-### Suffix resolvers (`orionis.logging.handlers`)
-
-All resolvers live under `orionis/log/handlers/` and use `__slots__`. They rely on `orionis.support.facades.datetime.DateTime.getZoneInfo()` to obtain the application's configured timezone.
-
-| Class | Constructor | `getSuffix()` format | Notes |
-|---|---|---|---|
-| `HourlySuffixResolver` | `HourlySuffixResolver()` | `YYYY-MM-DD_HH` | Rotates every hour. |
-| `DailySuffixResolver` | `DailySuffixResolver(at_time: time \| None = None)` | `YYYY-MM-DD` | `at_time` defaults to midnight; used by `getNextRotationTime`. |
-| `WeeklySuffixResolver` | `WeeklySuffixResolver(at_time: time \| None = None)` | `YYYY-weekWW` (ISO week) | Rotation anchored to Monday. |
-| `MonthlySuffixResolver` | `MonthlySuffixResolver(at_time: time \| None = None)` | `YYYY-MM` | Rotation on the 1st of the next month. |
-| `ChunkedSuffixResolver` | `ChunkedSuffixResolver()` | `YYYYMMDD_HHMMSS_NNNN` (zero-padded counter) | Thread-safe monotonically increasing counter (`threading.Lock`); every call to `getSuffix()` returns a **new, unique** suffix, so rotation is driven by `max_bytes`, not by time. |
-
-### `AdvancedRotatingFileHandler` (`orionis.logging.handlers.advanced_rotating_file_handler`)
-
-A `logging.Handler` subclass that rotates files based on a `SuffixResolver` (time-based families) and/or file size (`max_bytes`, used for chunked rotation).
-
-```python
-class AdvancedRotatingFileHandler(Handler):
-    def __init__(
-        self,
-        path_template: str,
-        suffix_resolver: SuffixResolver,
-        max_bytes: int | None = None,
-        backup_count: int = 5,
-        encoding: str = "utf-8",
-        *,
-        delay: bool = True,
-        compress_rotated: bool = False,
-        app_root: str = ".",
-    ) -> None: ...
-```
-
-**Parameters**
-
-- `path_template` (`str`): path containing a literal `{suffix}` placeholder, e.g. `"storage/logs/daily_{suffix}.log"`.
-- `suffix_resolver` (`SuffixResolver`): strategy used to compute the current suffix and detect when rotation is required.
-- `max_bytes` (`int | None`): if set, rotates once the active file reaches this size (used for chunked rotation).
-- `backup_count` (`int`): number of rotated files to keep; older files matching the template are deleted.
-- `encoding` (`str`): file encoding, default `"utf-8"`.
-- `delay` (`bool`, keyword-only): if `True` (default), the file is not opened until the first record is emitted.
-- `compress_rotated` (`bool`, keyword-only): if `True`, rotated files are gzip-compressed (`.gz`) and the original is removed.
-- `app_root` (`str`, keyword-only): base directory used to resolve `path_template` (relative paths are joined with this root).
-
-**Methods**
-
-- `emit(record: logging.LogRecord) -> None`: formats the record, ensures the stream (rotating if needed), and writes the line. On `OSError`, delegates to `self.handleError(record)` (standard `logging` behavior — never raises to the caller).
-- `close() -> None`: closes the open stream and calls `Handler.close()`.
-
-**Side effects**: creates parent directories for the resolved path; may delete/rotate/gzip files under `backup_count` cleanup logic.
-
-### `RotatingHandlerFactory` (`orionis.logging.handlers.rotating_handler_factory`)
-
-Static factory used by `Logger` to build a `logging.Handler` for a given channel type.
-
-```python
-class RotatingHandlerFactory:
-    @staticmethod
-    def createHandler(
-        channel_name: str,
-        channel_config: dict,
-        app_root: str,
-    ) -> logging.Handler | None: ...
-```
-
-- `channel_name`: one of `"stack"`, `"hourly"`, `"daily"`, `"weekly"`, `"monthly"`, `"chunked"`. Unknown names return `None`.
-- `channel_config`: the channel's configuration dictionary (as produced by `config/logging.py` entities converted to `dict`), read for keys such as `path`, `level`, `retention_hours`, `retention_days`, `at`, `retention_weeks`, `retention_months`, `mb_size`, `files`.
-- `app_root`: application root path used to resolve relative log paths.
-- Returns a ready-to-use `logging.Handler` (`FileHandler` for `"stack"`, `AdvancedRotatingFileHandler` for the rotating families) or `None` for an unsupported channel type.
-
-### `LoggerProvider` (`orionis.logging.provider`)
-
-```python
-class LoggerProvider(ServiceProvider):
-    def register(self) -> None: ...
-    async def boot(self) -> None: ...
-```
-
-- `register()`: binds `ILogger` to `Logger` as a singleton in the application container, under the internal alias `"x-orionis-ILogger"`.
-- `boot()` (async): pins the `Log` facade (`await LoggerFacade.pin()`) so `Log.info(...)`, `Log.error(...)`, etc. resolve directly to the singleton instance without container lookups on every call. Registered by default in `orionis/foundation/core_providers.py`.
-
-### `Log` facade (`orionis.support.facades.logger.Log`)
+`orionis.support.facades.logger.Log`
 
 ```python
 class Log(Facade):
     @classmethod
-    def getFacadeAccessor(cls) -> str: ...  # "x-orionis-ILogger"
+    def getFacadeAccessor(cls) -> str: ...
 ```
 
-A static-style proxy (framework `Facade` pattern) exposing every `ILogger` method (`Log.info(...)`, `Log.error(...)`, `Log.switchChannel(...)`, etc.) without manually resolving the service from the container. Its type stub (`logger.pyi`) declares `class Log(ILogger, IFacade)` purely for editor/type-checker autocompletion; at runtime it forwards calls to the pinned `Logger` singleton.
+Returns the string `"x-orionis-ILogger"`, the alias under which `LoggerProvider`
+registers the service. The facade declares no logging methods of its own: every
+method of `ILogger` is exposed dynamically by `FacadeMeta`. A parallel
+`logger.pyi` stub exists for editor completion only and is never executed.
+
+State matters:
+
+| Facade state | Behaviour |
+|---|---|
+| Not pinned (before runtime startup) | `Log.anything` returns a `_FacadeDispatch`; must be awaited: `await Log.getAvailableChannels()` |
+| Pinned (`LoggerProvider.boot()` or explicit `await Log.pin()`) | Direct pass-through: `Log.info("...")`, `Log.getActiveChannel()` |
+
+### `ILogger`
+
+`orionis.logging.contracts.logger.ILogger` — `abc.ABC`. Does **not** declare
+`__slots__ = ()`, so implementations keep a `__dict__`.
+
+| Member | Signature |
+|---|---|
+| `name` | `@property def name(self) -> str` |
+| `info` | `def info(self, message: str) -> None` |
+| `error` | `def error(self, message: str) -> None` |
+| `warning` | `def warning(self, message: str) -> None` |
+| `debug` | `def debug(self, message: str) -> None` |
+| `critical` | `def critical(self, message: str) -> None` |
+| `getLogger` | `def getLogger(self) -> logging.Logger` |
+| `reloadConfiguration` | `def reloadConfiguration(self) -> None` |
+| `switchChannel` | `def switchChannel(self, channel_name: str) -> bool` |
+| `close` | `def close(self) -> None` |
+| `getActiveChannels` | `def getActiveChannels(self) -> list[str]` |
+| `getActiveChannel` | `def getActiveChannel(self) -> str \| None` |
+| `getAvailableChannels` | `def getAvailableChannels(self) -> list[str]` |
+
+Every abstract method has an empty body: the contract cannot be called through
+`super()`.
+
+### `Logger`
+
+`orionis.logging.logger.Logger(ILogger)`
+
+```python
+def __init__(self, app: IApplication) -> None: ...
+```
+
+**Parameters**
+
+- `app` (`IApplication`) — application instance. Only two hooks are used:
+  `app.config("logging")` (read once in the constructor, and again on
+  `reloadConfiguration()`) and `app.path("root")` (read when a handler is
+  built).
+
+**Side effects of the constructor:** none on the filesystem. It stores the
+configuration snapshot and initialises the internal state; no directory is
+created and no file is opened.
+
+**Class attributes**
+
+| Attribute | Value |
+|---|---|
+| `name` | `ClassVar[str] = "__orionis__"` |
+| `_formatter_cache` | `dict[str, logging.Formatter]`, class-level, keyed by `f"{log_format}\|{date_format}"` |
+
+**Fixed settings, assigned in `__init__` and not configurable**
+
+| Setting | Value |
+|---|---|
+| Message format | `"%(asctime)s [%(levelname)s]: %(message)s"` |
+| Date format | `"%Y-%m-%d %H:%M:%S"` |
+| Stdlib logger name | `"__orionis__"` |
+| Logger level | `logging.DEBUG` |
+
+The logger level is `DEBUG` and `propagate` is set to `False`; effective
+filtering is performed by the **handler** level, which comes from the channel
+configuration.
+
+**Methods**
+
+| Method | Returns | Behaviour |
+|---|---|---|
+| `info(message: str)` | `None` | Ensures initialisation, then `logging.Logger.info(message)` |
+| `error(message: str)` | `None` | Same, `error` level |
+| `warning(message: str)` | `None` | Same, `warning` level |
+| `debug(message: str)` | `None` | Same, `debug` level |
+| `critical(message: str)` | `None` | Same, `critical` level |
+| `getLogger()` | `logging.Logger` | Ensures initialisation and returns the underlying stdlib logger |
+| `reloadConfiguration()` | `None` | Closes handlers, clears caches, re-reads `app.config("logging")`, re-initialises and logs `"Logger configuration reloaded successfully"` |
+| `switchChannel(channel_name: str)` | `bool` | Replaces the active handler with the one declared by `channel_name` |
+| `close()` | `None` | Closes and removes every handler, clears the cache and drops the logger reference |
+| `getActiveChannels()` | `list[str]` | Keys currently present in the handler cache |
+| `getActiveChannel()` | `str \| None` | First key of the cache, or `None` |
+| `getAvailableChannels()` | `list[str]` | Keys of `channels` in the configuration snapshot held by the instance |
+| `__del__()` | `None` | Calls `close()` with every exception suppressed |
+
+**Raises**
+
+- `RuntimeError` — from `getLogger()` and from any logging method whenever
+  initialisation fails; the original exception is chained
+  (`"Failed to initialize logger: …"`). `reloadConfiguration()` raises
+  `RuntimeError("Failed to reload logger configuration: …")` on any failure.
+- `switchChannel()` never raises: it returns `False` for an unknown channel,
+  for a channel the factory cannot build, and when an `OSError`,
+  `RuntimeError` or `ValueError` is caught.
+- `close()` suppresses `OSError`, `RuntimeError` and `ValueError`.
+
+**Initialisation algorithm** (private `__initializeLogger`)
+
+1. `logging.getLogger("__orionis__")`; if it already has handlers, they are
+   cleared.
+2. `setLevel(logging.DEBUG)`, `propagate = False`.
+3. Reads `default` and `channels` from the snapshot, plus `app.path("root")`.
+4. If `default` is present in `channels`, the configuration is normalised and:
+   - channel `"stack"` → a `logging.FileHandler(f"{root}/{path}", encoding="utf-8")`
+     is created directly (parent directory created with `mkdir(parents=True,
+     exist_ok=True)`); `path` defaults to `storage/logs/stack.log`;
+   - any other channel → `RotatingHandlerFactory.createHandler(...)`.
+   The handler receives the cached formatter and
+   `setLevel(channel_config.get("level", logging.INFO))`, and is cached under
+   the channel name.
+5. If `default` is **not** present in `channels`, a fallback
+   `logging.FileHandler(f"{root}/storage/logs/default.log")` is created and
+   cached under the key `"fallback"`. No level is applied to this handler, so it
+   stays at `NOTSET` and the `DEBUG` logger level governs.
+
+**Level normalisation** (private `__normalizeChannelConfig`) copies the channel
+dict and rewrites `level`:
+
+| Input | Result |
+|---|---|
+| `Level` enum (or any object with `.value`) | `level.value` |
+| `str` | `getattr(logging, value.upper(), logging.INFO)` — case-insensitive, unknown names fall back to `INFO` |
+| `None` | `logging.INFO` |
+| `int` | left untouched |
+
+**`switchChannel` details.** The channel name is checked against the
+configuration *before* anything is initialised, so an invalid name never forces
+initialisation. Initialisation then happens **outside** the lock
+(`__init_lock` is a non-reentrant `threading.Lock`), after which the current
+handlers are closed and removed, the cache is cleared, and the new handler is
+built through the factory — including for `"stack"`, which therefore ends up as
+the factory's `FileHandler(delay=True)` rather than the eagerly opened handler
+used at initialisation. On success an informational line
+`"Successfully switched to channel: <name>"` is written through the new handler.
+
+### `SuffixResolver`
+
+`orionis.logging.contracts.suffix_resolver.SuffixResolver` — `abc.ABC` with
+`__slots__ = ()`.
+
+```python
+def getSuffix(self, dt: datetime | None = None) -> str: ...
+def getNextRotationTime(self, current_time: datetime) -> datetime: ...
+```
+
+`getSuffix` returns the string substituted into the `{suffix}` placeholder of a
+path template; `None` means "use the current time". `getNextRotationTime` is
+part of the contract and is implemented by all five resolvers, but
+`AdvancedRotatingFileHandler` does not call it: rotation is decided by comparing
+suffixes and by `max_bytes`.
+
+### Suffix resolvers
+
+All five live in `orionis.logging.handlers`, implement `SuffixResolver`, declare
+`__slots__`, and capture `self.tz = DateTime.getZoneInfo()` in their constructor
+— that is, the application timezone as configured at construction time
+(`config app.timezone`, loaded by `Application.create()` before providers boot).
+
+| Class | Constructor | `getSuffix` format | Example |
+|---|---|---|---|
+| `HourlySuffixResolver` | `()` | `%Y-%m-%d_%H` | `2026-08-21_14` |
+| `DailySuffixResolver` | `(at_time: time \| None = None)` | `%Y-%m-%d` | `2026-08-21` |
+| `WeeklySuffixResolver` | `(at_time: time \| None = None)` | `{iso_year}-week{iso_week:02d}` | `2026-week34` |
+| `MonthlySuffixResolver` | `(at_time: time \| None = None)` | `%Y-%m` | `2026-08` |
+| `ChunkedSuffixResolver` | `()` | `%Y%m%d_%H%M%S_{counter:04d}` | `20260821_143705_0001` |
+
+`at_time` defaults to `time(0, 0, 0)` (midnight) and only affects
+`getNextRotationTime`, never the suffix.
+
+`getNextRotationTime` per class, evaluated for `2026-08-21 14:37:05+00:00`:
+
+| Class | Rule | Result |
+|---|---|---|
+| `HourlySuffixResolver` | Truncate to the hour (replacing `tzinfo` with the resolver timezone) and add one hour | `2026-08-21 15:00:00+00:00` |
+| `DailySuffixResolver` | Today at `at_time`; add one day if that is not in the future | `2026-08-22 00:00:00+00:00` |
+| `WeeklySuffixResolver` | Next Monday at `at_time`; add seven days if that is not in the future | `2026-08-24 00:00:00+00:00` |
+| `MonthlySuffixResolver` | First day of next month at `at_time` | `2026-09-01 00:00:00+00:00` |
+| `ChunkedSuffixResolver` | `current_time + timedelta(hours=1)` (size-based rotation ignores it) | `2026-08-21 15:37:05+00:00` |
+
+`ChunkedSuffixResolver` is the only stateful resolver: it holds a counter
+incremented under a `threading.Lock`, so **every call to `getSuffix()` returns a
+different value**. That is what turns `AdvancedRotatingFileHandler` into a
+size-based rotator — the suffix always differs from the current one, so
+rotation is effectively decided by the `max_bytes` check performed before the
+suffix is consumed.
+
+### `AdvancedRotatingFileHandler`
+
+`orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler`,
+subclass of `logging.Handler`.
+
+```python
+def __init__(
+    self,
+    path_template: str,
+    suffix_resolver: SuffixResolver,
+    max_bytes: int | None = None,
+    backup_count: int = 5,
+    encoding: str = "utf-8",
+    *,
+    delay: bool = True,
+    compress_rotated: bool = False,
+    app_root: str = ".",
+) -> None: ...
+```
+
+**Parameters**
+
+| Parameter | Type | Meaning |
+|---|---|---|
+| `path_template` | `str` | Path relative to `app_root`, containing `{suffix}` |
+| `suffix_resolver` | `SuffixResolver` | Strategy deciding the suffix |
+| `max_bytes` | `int \| None` | Size threshold; `None` disables size-based rotation |
+| `backup_count` | `int` | Number of rotated files kept, besides the one being written |
+| `encoding` | `str` | Encoding used to open the file |
+| `delay` | `bool` (keyword-only) | `True` (default) postpones opening the file until the first record; `False` opens it in the constructor |
+| `compress_rotated` | `bool` (keyword-only) | Gzip the previous file on rotation |
+| `app_root` | `str` (keyword-only) | Base directory prefixed to `path_template` |
+
+**Public attributes:** `path_template`, `suffix_resolver`, `max_bytes`,
+`backup_count`, `encoding`, `delay`, `compress_rotated`, `app_root` (a `Path`),
+plus the mutable state `stream` (`None` until the first write), `current_path`,
+`current_suffix` and `file_size`.
+
+**Public methods**
+
+| Method | Behaviour |
+|---|---|
+| `emit(record: LogRecord) -> None` | Formats the record **outside** the lock, then, holding `self._lock`, ensures the stream, writes `msg + "\n"` and adds `len(msg) + 1` to `file_size`. Catches `OSError` only and reports it through `Handler.handleError(record)` |
+| `close() -> None` | Closes the stream under the lock and calls `logging.Handler.close()` |
+
+**Rotation algorithm** (`_ensureStream` → `_shouldRotate` → `_rotateFile`)
+
+1. `current_suffix = suffix_resolver.getSuffix()`.
+2. Rotate when the suffix differs from the active one, **or** when
+   `max_bytes is not None and file_size >= max_bytes`.
+3. Rotating closes the stream, gzips the previous file when `compress_rotated`
+   is enabled (`<file>.gz`, original removed; a failed compression removes the
+   partial `.gz`), prunes old files, and resets `current_path`,
+   `current_suffix` and `file_size`.
+4. The new path is resolved and opened in append mode with `buffering=1` (line
+   buffered). `file_size` is seeded from `stat().st_size` when the file already
+   exists.
+
+**Path resolution** (`_resolvePath`) substitutes `{suffix}`, joins the result
+with `app_root`, creates the parent directory (`mkdir(parents=True,
+exist_ok=True)`) and caches the string for 300 seconds using `time.monotonic()`.
+The cache is cleared once it exceeds 50 entries, which bounds it for chunked
+rotation (one unique suffix per chunk).
+
+**Pruning** (`_cleanupOldFiles`) lists the directory of the current file, keeps
+the names matched by a regex precompiled in the constructor (the template
+basename with `{suffix}` replaced by `.*`), sorts them by modification time
+newest-first and unlinks everything past `backup_count`, along with the matching
+`.gz` file when present. All `OSError`s are ignored so pruning never breaks
+logging. The net effect is at most `backup_count` rotated files plus the file
+currently being written.
+
+### `RotatingHandlerFactory`
+
+`orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory`
+
+```python
+@staticmethod
+def createHandler(
+    channel_name: str,
+    channel_config: dict,
+    app_root: str,
+) -> Handler | None: ...
+```
+
+Reads `channel_config["path"]` (default `"storage/logs/default.log"`) and
+`channel_config["level"]` (default `20`, i.e. `INFO`), then dispatches through
+the module-level dict `_CHANNEL_CREATORS`. **Returns `None` for an unknown
+channel name** — no exception is raised. Every builder calls
+`handler.setLevel(level)` before returning.
+
+| `channel_name` | Handler | Resolver | Config keys read | Defaults |
+|---|---|---|---|---|
+| `stack` | `logging.FileHandler(delay=True)` | — | — | Parent directory created eagerly |
+| `hourly` | `AdvancedRotatingFileHandler` | `HourlySuffixResolver()` | `retention_hours` → `backup_count` | `24` |
+| `daily` | `AdvancedRotatingFileHandler` | `DailySuffixResolver(at)` | `at`, `retention_days` → `backup_count` | `at=None` → midnight, `7` |
+| `weekly` | `AdvancedRotatingFileHandler` | `WeeklySuffixResolver(at)` | `at`, `retention_weeks` → `backup_count` | `at=None` → midnight, `4` |
+| `monthly` | `AdvancedRotatingFileHandler` | `MonthlySuffixResolver(at)` | `at`, `retention_months` → `backup_count` | `at=None` → midnight, `4` |
+| `chunked` | `AdvancedRotatingFileHandler` | `ChunkedSuffixResolver()` | `mb_size` → `max_bytes = mb_size * 1024 * 1024`, `files` → `backup_count` | `10` MB, `5` files; `compress_rotated=True` |
+
+`chunked` is the only channel built with `compress_rotated=True`, so its rotated
+files end in `.log.gz`.
+
+The `weekly` and `monthly` builders read `channel_config.get("at")`, but the
+matching configuration entities (`Weekly`, `Monthly`) declare no `at` field —
+only `Daily` does. With the framework entities those two channels therefore
+always receive `None` and their resolvers fall back to midnight; a hand-written
+`dict` configuration can supply `at` explicitly.
+
+### `LoggerProvider`
+
+`orionis.logging.provider.LoggerProvider(ServiceProvider)`
+
+```python
+def register(self) -> None: ...
+async def boot(self) -> None: ...
+```
+
+- `register()` — `self.app.singleton(ILogger, Logger, alias="x-orionis-ILogger")`.
+  A single `Logger` instance is shared per process; resolving `ILogger` or the
+  alias returns the same object.
+- `boot()` — `await LoggerFacade.pin()`, which makes `Log` a direct
+  pass-through. The provider is **not** deferrable, so it boots during
+  application startup along with the other core providers.
+
+### Configuration entities
+
+Declared in `orionis.foundation.config.logging`, published by the application's
+`config/logging.py` (class `BootstrapLogging`). `app.config("logging")` returns a
+plain `dict` (`{"default": ..., "channels": {...}}`); levels are already
+integers there, while `Daily.at` remains a `datetime.time`.
+
+| Entity | Fields | Defaults |
+|---|---|---|
+| `Logging` | `default: str`, `channels: Channels \| dict` | `Env.get("LOG_CHANNEL", "stack")`, `Channels()` |
+| `Channels` | `stack`, `hourly`, `daily`, `weekly`, `monthly`, `chunked` | One entity per channel |
+| `Stack` | `path`, `level` | `storage/logs/stack.log`, `INFO` |
+| `Hourly` | `path`, `level`, `retention_hours` | `storage/logs/hourly_{suffix}.log`, `INFO`, `24` |
+| `Daily` | `path`, `level`, `retention_days`, `at` | `storage/logs/daily_{suffix}.log`, `INFO`, `7`, `time(0, 0)` |
+| `Weekly` | `path`, `level`, `retention_weeks` | `storage/logs/weekly_{suffix}.log`, `INFO`, `4` |
+| `Monthly` | `path`, `level`, `retention_months` | `storage/logs/monthly_{suffix}.log`, `INFO`, `4` |
+| `Chunked` | `path`, `level`, `mb_size`, `files` | `storage/logs/chunked_{suffix}.log`, `INFO`, `10`, `5` |
+
+All of them are `@dataclass(frozen=True, kw_only=True)` extending `BaseEntity`
+and validate in `__post_init__`:
+
+- `IsValidPath` — `path` must be a non-empty string ending in `.log`; every
+  channel except `stack` also requires the literal `{suffix}` in the path.
+- `IsValidLevel` — `level` accepts a `Level` enum, one of the integers
+  `10/20/30/40/50`, or a case-insensitive level name; it is normalised to its
+  integer value.
+- Ranges: `retention_hours` 1–168, `retention_days` 1–90, `retention_weeks`
+  1–12, `retention_months` 1–12, `mb_size` 1–1000 MB, `files` ≥ 1.
+- `Logging.default` must name one of the six fields of `Channels`, otherwise
+  `ValueError` is raised at configuration build time.
+- `Daily.at` accepts a `datetime.time` or an ISO `HH:MM:SS` string, which is
+  converted; anything else raises.
+
+`Level` (`orionis.foundation.config.logging.enums.levels.Level`) is an `Enum`
+mirroring the stdlib values: `DEBUG=10`, `INFO=20`, `WARNING=30`, `ERROR=40`,
+`CRITICAL=50`.
 
 ## Usage examples
 
-### Basic logging via the facade (typical application code)
+### 1. Logging from a controller
+
+Inside a booted application the facade is pinned, so calls are synchronous. The
+contract can also be injected as a parameter, which the container resolves.
 
 ```python
+from orionis.http import HttpResponse, response
+from orionis.logging.contracts.logger import ILogger
 from orionis.support.facades.logger import Log
 
-Log.info("User created successfully")
-Log.warning("Cache miss for key 'user:42'")
-Log.error("Failed to connect to the payment gateway")
-Log.critical("Out of memory - shutting down worker")
+
+class ReportController:
+    """Emit application log lines while serving a request."""
+
+    async def index(self, logger: ILogger) -> HttpResponse:
+        logger.info("report requested")
+        return response.json({"status": "ok"})
+
+    async def store(self) -> HttpResponse:
+        Log.warning("disk usage above 80%")
+        return response.noContent()
 ```
 
-### Inspecting and switching channels at runtime
+### 2. Resolving the service through the container
+
+Dependency injection works regardless of the facade state, which makes it the
+safe option in scripts and during startup.
 
 ```python
+from bootstrap.app import app
+from orionis.aio.loop import Loop
+from orionis.logging.contracts.logger import ILogger
 from orionis.support.facades.logger import Log
 
-print(Log.getAvailableChannels())  # e.g. ["stack", "hourly", "daily", "weekly", "monthly", "chunked"]
-print(Log.getActiveChannel())      # e.g. "stack"
 
-if Log.switchChannel("daily"):
-    Log.info("Now logging to the daily rotating channel")
-else:
-    Log.warning("Channel 'daily' is not configured")
+async def main() -> None:
+    logger = await app.make(ILogger)
+    logger.info("resolved through the container")
+    print("active channel:", logger.getActiveChannel())
+
+    # The facade is pinned by LoggerProvider.boot() during runtime startup;
+    # a standalone script has to request the pin explicitly.
+    await Log.pin()
+    Log.warning("disk usage above 80%")
+    print("available channels:", Log.getAvailableChannels())
+    print("same instance:", Log.getLogger() is logger.getLogger())
+
+
+Loop.run(main())
 ```
 
-### Reloading configuration after a runtime config change
+Output with the default configuration:
 
-```python
-from orionis.support.facades.logger import Log
-
-# ... application updates config("logging") at runtime ...
-Log.reloadConfiguration()
-Log.info("Logger reloaded with the new configuration")
+```text
+active channel: stack
+available channels: ['stack', 'hourly', 'daily', 'weekly', 'monthly', 'chunked']
+same instance: True
 ```
 
-### Accessing the underlying stdlib logger for interoperability
+### 3. Standalone `Logger` without the container
+
+`Logger` only needs an object exposing `config(key)` and `path(name)`, which
+makes it usable in isolated scripts and tests.
 
 ```python
 import logging
-from orionis.support.facades.logger import Log
+import tempfile
+from pathlib import Path
 
-stdlib_logger: logging.Logger = Log.getLogger()
-stdlib_logger.addFilter(logging.Filter(name="orders"))
-```
+from orionis.logging import Logger
 
-### Direct `Logger` instantiation (standalone scripts / tests, outside the container)
 
-```python
-from orionis.logging.logger import Logger
-
-class MinimalApp:
-    """Duck-typed stand-in for IApplication (only config/path are used)."""
+class MiniApp:
+    """Minimal stand-in exposing the two hooks Logger consumes."""
 
     def __init__(self, root: str) -> None:
         self._root = root
 
     def config(self, key: str) -> dict:
         return {
-            "default": "stack",
+            "default": "daily",
             "channels": {
-                "stack": {"path": "storage/logs/stack.log", "level": 20},
+                "daily": {
+                    "path": "logs/app_{suffix}.log",
+                    "level": logging.DEBUG,
+                    "retention_days": 3,
+                },
             },
         }
 
-    def path(self, key: str) -> str:
+    def path(self, name: str) -> str:
         return self._root
 
-logger = Logger(MinimalApp("."))
-logger.info("Application booted")
-logger.close()  # release file handles when done
+
+with tempfile.TemporaryDirectory() as root:
+    logger = Logger(MiniApp(root))
+    logger.info("service started")
+    logger.debug("cache warm-up finished")
+    print("active:", logger.getActiveChannels())
+    print("files:", sorted(p.name for p in (Path(root) / "logs").iterdir()))
+    logger.close()
+    print("after close:", logger.getActiveChannels())
 ```
 
-### Wiring `AdvancedRotatingFileHandler` manually (advanced use, without the DI container)
+Output (run on 2026-08-21):
+
+```text
+active: ['daily']
+files: ['app_2026-08-21.log']
+after close: []
+```
+
+### 4. Switching channels and handling errors
+
+`switchChannel` reports failure with `False`; `reloadConfiguration` is the only
+method that raises on failure.
 
 ```python
 import logging
-from orionis.logging.handlers.advanced_rotating_file_handler import AdvancedRotatingFileHandler
-from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
+import tempfile
 
-handler = AdvancedRotatingFileHandler(
-    path_template="storage/logs/daily_{suffix}.log",
-    suffix_resolver=DailySuffixResolver(),
-    backup_count=7,
-    app_root=".",
-    compress_rotated=False,
-)
-handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s"))
+from orionis.logging import Logger
 
-worker_logger = logging.getLogger("background-worker")
-worker_logger.setLevel(logging.INFO)
-worker_logger.addHandler(handler)
-worker_logger.info("Manually wired daily rotation")
+
+class MiniApp:
+    """Minimal stand-in exposing the two hooks Logger consumes."""
+
+    def __init__(self, root: str) -> None:
+        self._root = root
+
+    def config(self, key: str) -> dict:
+        return {
+            "default": "daily",
+            "channels": {
+                "daily": {
+                    "path": "logs/app_{suffix}.log",
+                    "level": logging.DEBUG,
+                    "retention_days": 3,
+                },
+            },
+        }
+
+    def path(self, name: str) -> str:
+        return self._root
+
+
+with tempfile.TemporaryDirectory() as root:
+    logger = Logger(MiniApp(root))
+    logger.info("written to the default channel")
+
+    if not logger.switchChannel("hourly"):
+        print("channel 'hourly' is not declared; staying on the current one")
+
+    print("available:", logger.getAvailableChannels())
+    print("active:", logger.getActiveChannel())
+
+    try:
+        logger.reloadConfiguration()
+    except RuntimeError as exc:
+        print("reload failed:", exc)
+    else:
+        print("reloaded, active:", logger.getActiveChannel())
+
+    logger.close()
 ```
 
-### Declaring channels in `config/logging.py`
+Output:
+
+```text
+channel 'hourly' is not declared; staying on the current one
+available: ['daily']
+active: daily
+reloaded, active: daily
+```
+
+### 5. Custom `SuffixResolver`
+
+Implementing the contract is enough to plug a new rotation policy into
+`AdvancedRotatingFileHandler`.
 
 ```python
-from datetime import time
-from orionis.foundation.config.logging import Channels, Daily, Level, Logging, Stack
+import logging
+import tempfile
+from datetime import datetime, timedelta
+from pathlib import Path
 
-class BootstrapLogging(Logging):
-    default: str = "daily"
-    channels: Channels = Channels(
-        stack=Stack(path="storage/logs/stack.log", level=Level.INFO),
-        daily=Daily(
-            path="storage/logs/daily_{suffix}.log",
-            level=Level.INFO,
-            retention_days=7,
-            at=time(hour=0, minute=0, second=0),
-        ),
+from orionis.logging.contracts.suffix_resolver import SuffixResolver
+from orionis.logging.handlers.advanced_rotating_file_handler import (
+    AdvancedRotatingFileHandler,
+)
+
+
+class ShiftSuffixResolver(SuffixResolver):
+    """Rotate twice a day: one file for the morning, one for the afternoon."""
+
+    __slots__ = ()
+
+    def getSuffix(self, dt: datetime | None = None) -> str:
+        moment = dt or datetime.now()
+        half = "am" if moment.hour < 12 else "pm"
+        return f"{moment:%Y-%m-%d}-{half}"
+
+    def getNextRotationTime(self, current_time: datetime) -> datetime:
+        if current_time.hour < 12:
+            return current_time.replace(hour=12, minute=0, second=0, microsecond=0)
+        midnight = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
+        return midnight + timedelta(days=1)
+
+
+with tempfile.TemporaryDirectory() as root:
+    handler = AdvancedRotatingFileHandler(
+        path_template="logs/shift_{suffix}.log",
+        suffix_resolver=ShiftSuffixResolver(),
+        backup_count=4,
+        app_root=root,
     )
+    handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s"))
+
+    native = logging.getLogger("shift-demo")
+    native.setLevel(logging.INFO)
+    native.addHandler(handler)
+    native.info("payment accepted")
+    native.handlers.clear()
+    handler.close()
+
+    print("files:", sorted(p.name for p in (Path(root) / "logs").iterdir()))
 ```
 
-## Performance and concurrency considerations
+Output (run at 18:57 local time):
 
-- **Lazy, thread-safe initialization**: `Logger` uses double-checked locking (`threading.Lock`) so the stdlib logger/handlers are only built on the first log call, and concurrent threads calling `info`/`error`/etc. before initialization will not race.
-- **Shared formatter cache**: `Logger._formatter_cache` is a `ClassVar` dict shared by *all* `Logger` instances in the process, keyed by `f"{log_format}|{date_format}"`, avoiding redundant `logging.Formatter` construction.
-- **Lock scope in `AdvancedRotatingFileHandler.emit`**: message formatting happens *outside* the internal lock; only the rotation check and the actual file write happen inside `self._lock`, reducing contention when many threads log concurrently.
-- **Single active channel**: `Logger` keeps only one channel attached at a time. `switchChannel`/`reloadConfiguration` close previous handlers before opening new ones — no file handle leaks across switches under normal operation.
-- **Process-safety, not multi-process safety**: the locking in `AdvancedRotatingFileHandler` is a `threading.Lock`, which only coordinates threads within the same process. Do not point two separate OS processes at the same rotating log file path without external coordination (e.g. separate files per worker, or an external log aggregator).
-- **Path resolution cache**: `AdvancedRotatingFileHandler` caches resolved paths for 5 minutes (monotonic clock) and clears the cache once it exceeds 50 entries — relevant mainly for `chunked` rotation, which generates a new suffix on every call.
-- **Cleanup cost**: `_cleanupOldFiles` lists and stats every file in the log directory matching the channel's pattern on each rotation; keep `backup_count`/`retention_*` values reasonable if the log directory holds many unrelated files.
-- **Optional gzip compression** (`compress_rotated=True`, used by the `chunked` channel) is synchronous and runs once per rotation (not per log line), so its cost is amortized.
-- **Fully synchronous API**: all methods perform blocking file I/O. There is no `async`/`await` variant; if called from latency-sensitive `async` code paths, consider offloading with `asyncio.to_thread` (the module does not do this internally).
-- **Graceful shutdown**: `close()` and `__del__` suppress `OSError`/`RuntimeError`/`ValueError` to guarantee handles are released even during interpreter shutdown or unpredictable GC ordering.
+```text
+files: ['shift_2026-08-21-pm.log']
+```
 
-## Design notes
+### 6. Building a handler with the factory
 
-- `Logger` implements the `ILogger` contract (`abc.ABC`) so it can be swapped via the container (`self.app.singleton(ILogger, Logger, ...)`) and consumed through the `Log` facade without depending on the concrete class.
-- The channel abstraction mirrors a Laravel-style logging "channels" design: a `stack` channel uses a plain `logging.FileHandler`; the time/size-based families (`hourly`, `daily`, `weekly`, `monthly`, `chunked`) share a single `AdvancedRotatingFileHandler` implementation parameterized by the Strategy pattern (`SuffixResolver`).
-- `RotatingHandlerFactory` dispatches by channel type through a module-level dict (`_CHANNEL_CREATORS`) instead of an `if/elif` chain, for O(1) resolution.
-- Suffix resolver classes use `__slots__` (no `__dict__`), consistent with the framework-wide convention for small, frequently-instantiated value/strategy objects.
-- `LoggerProvider` follows the framework's standard `ServiceProvider` + `Facade` pinning pattern: bind the singleton in `register()`, pin the facade in async `boot()` — the same pattern used by other core services (e.g. the encrypter module).
+Useful to attach an Orionis rotating handler to a third-party logger, and to see
+how channel options map onto handler parameters.
+
+```python
+import logging
+import tempfile
+
+from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
+
+with tempfile.TemporaryDirectory() as root:
+    built = RotatingHandlerFactory.createHandler(
+        channel_name="chunked",
+        channel_config={
+            "path": "logs/audit_{suffix}.log",
+            "level": logging.INFO,
+            "mb_size": 1,
+            "files": 3,
+        },
+        app_root=root,
+    )
+    print("handler:", type(built).__name__)
+    print("max_bytes:", built.max_bytes, "backup_count:", built.backup_count)
+    print("compress_rotated:", built.compress_rotated)
+
+    unknown = RotatingHandlerFactory.createHandler(
+        channel_name="syslog",
+        channel_config={"path": "logs/syslog.log", "level": logging.INFO},
+        app_root=root,
+    )
+    print("unsupported channel ->", unknown)
+    built.close()
+```
+
+Output:
+
+```text
+handler: AdvancedRotatingFileHandler
+max_bytes: 1048576 backup_count: 3
+compress_rotated: True
+unsupported channel -> None
+```
+
+## Performance and concurrency
+
+- **Lazy initialisation.** Building the logger costs nothing until the first
+  message. `__ensureLoggerReady()` uses double-checked locking over a
+  `threading.Lock`, so the fast path is a single `is not None` check.
+- **Inlined guard on the hot path.** Every logging method repeats the
+  `if self.__logger is None` check inline instead of always calling the helper,
+  and calls the stdlib level method directly rather than `log(level, …)`.
+- **Formatter cache.** `Logger._formatter_cache` is a plain class-level `dict`
+  with no lock. Concurrent misses may build the same formatter twice; because
+  the value is a pure function of the key, the surviving entry is equivalent.
+- **Handler-level thread safety.** `AdvancedRotatingFileHandler` guards
+  `_ensureStream()` and the write with its own `threading.Lock`, and formats the
+  record *before* taking it. `logging.Logger` adds its own per-record locking.
+- **Resolvers.** `ChunkedSuffixResolver` increments its counter under a lock and
+  is safe to share. The other four are effectively immutable after construction
+  (they only store `tz` and `at_time`) and hold no per-call state.
+- **Path cache.** Resolution results are cached per handler instance for 300
+  seconds and read only inside `_ensureStream()`, i.e. always under the handler
+  lock. The 50-entry cap prevents unbounded growth when each rotation produces a
+  unique suffix.
+- **I/O is synchronous.** The module exposes no async API: a log call performs a
+  buffered write to an open file and, because the stream is opened with
+  `buffering=1`, flushes one line per record. Inside a coroutine this blocks the
+  event loop for the duration of the write; rotation additionally pays for
+  `stat`, `mkdir`, directory listing and — for `chunked` — gzip compression of
+  the previous file.
+- **Process scope.** The stdlib logger `"__orionis__"` is global to the process,
+  so any `Logger` instance built against it shares its handlers; the container
+  registers a single instance anyway. There is **no** inter-process locking:
+  several processes writing to the same file rely on OS append semantics, and
+  concurrent rotation or pruning between processes is not coordinated.
+- **Cleanup cost.** `_cleanupOldFiles()` runs on every rotation and performs a
+  full `glob("*")` of the log directory plus a `stat()` per matching file, so it
+  is proportional to the number of files kept in that directory.
 
 ## Compatibility notes
 
-- **Python**: `>=3.14` (per the project's `pyproject.toml`).
-- **External dependencies**: none — only the Python standard library.
-- **Internal dependencies**: `orionis.foundation` (`IApplication`, `Level` enum), `orionis.container` (`ServiceProvider`, `Facade`), `orionis.support.facades.datetime` (`DateTime.getZoneInfo()`, used by suffix resolvers for timezone-aware timestamps).
+- **Python.** Requires Python ≥ 3.14, matching the project's `requires-python`.
+  Type hints use PEP 604 unions (`int | None`) and PEP 649 deferred annotations.
+- **Dependencies.** Standard library only (`logging`, `gzip`, `shutil`, `re`,
+  `threading`, `pathlib`, `time`, `datetime`), plus
+  `orionis.support.facades.datetime.DateTime` — the framework's single source of
+  truth for the timezone, which wraps `pendulum`. No extra installation is
+  needed beyond the framework itself.
+- **`from __future__ import annotations`.** Used by the provider, contracts,
+  handlers and resolvers; deliberately **not** used in `logger.py`, because the
+  DI container resolves `Logger.__init__` by reflection and string annotations
+  would be interpreted as literal forward references.
+- **Windows.** Log files are opened in text mode, so `\n` is written as `\r\n`.
+  `file_size` is tracked as `len(msg) + 1` per record, meaning the counter
+  understates the real size and size-based rotation triggers slightly later than
+  the configured `max_bytes` suggests.
+- **Path separators.** `path_template` is split with `rsplit("/", 1)` when the
+  cleanup regex is built, so templates should use forward slashes even on
+  Windows; the resolved path itself is built with `pathlib`.
+- **Timezone.** Resolvers capture `DateTime.getZoneInfo()` at construction time.
+  Since `Application.create()` configures the timezone before providers boot,
+  handlers built during startup already use the application timezone; a resolver
+  instantiated before that configuration would keep the default (`UTC`).

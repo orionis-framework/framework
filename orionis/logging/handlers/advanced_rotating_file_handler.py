@@ -268,11 +268,9 @@ class AdvancedRotatingFileHandler(Handler):
         if self._shouldRotate(current_suffix):
             self._rotateFile()
 
-        # Open a new stream if necessary or if suffix has changed
+        # Open a new stream if necessary or if suffix has changed.
+        # A suffix change always rotates first, so the stream is None here.
         if self.stream is None or current_suffix != self.current_suffix:
-            if self.stream:
-                self.stream.close()
-
             self.current_suffix = current_suffix
             self.current_path = self._resolvePath(current_suffix)
 

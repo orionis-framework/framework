@@ -105,7 +105,10 @@ class ITranslator(ABC):
         key : str
             Translation key containing the pluralized segments.
         count : int
-            Quantity used to select the proper segment.
+            Quantity used to select the proper segment. The value is
+            used as received: explicit conditions compare it against
+            their numeric bounds and the positional rule tests
+            ``count == 1``. No coercion or validation is applied.
         locale : str | None, optional
             Locale to translate into, or ``None`` for the active locale.
         **replace : object

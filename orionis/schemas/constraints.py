@@ -53,7 +53,7 @@ class GreaterThan(ConstraintMetadata):
     value : int | float
         The exclusive lower bound.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int | float
@@ -69,7 +69,7 @@ class GreaterThanOrEqual(ConstraintMetadata):
     value : int | float
         The inclusive lower bound.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int | float
@@ -85,7 +85,7 @@ class LessThan(ConstraintMetadata):
     value : int | float
         The exclusive upper bound.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int | float
@@ -101,7 +101,7 @@ class LessThanOrEqual(ConstraintMetadata):
     value : int | float
         The inclusive upper bound.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int | float
@@ -117,7 +117,7 @@ class MultipleOf(ConstraintMetadata):
     value : int | float
         The divisor; the field value must be evenly divisible by this.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int | float
@@ -137,7 +137,7 @@ class Pattern(ConstraintMetadata):
     regex : str
         A regular expression that the field value must fully match.
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     regex: str
@@ -153,7 +153,7 @@ class MinLength(ConstraintMetadata):
     value : int
         The minimum allowed length (inclusive).
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int
@@ -169,7 +169,7 @@ class MaxLength(ConstraintMetadata):
     value : int
         The maximum allowed length (inclusive).
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     value: int
@@ -189,7 +189,7 @@ class TimezoneAware(ConstraintMetadata):
     Parameters
     ----------
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     message: str | None = field(default=None, kw_only=True)
@@ -204,7 +204,7 @@ class TimezoneNaive(ConstraintMetadata):
     Parameters
     ----------
     message : str | None
-        Reserved for a future custom validation error message.
+        Custom error message reported when this constraint fails.
     """
 
     message: str | None = field(default=None, kw_only=True)

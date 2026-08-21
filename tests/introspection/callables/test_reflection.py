@@ -1,4 +1,5 @@
 import inspect
+import types
 from orionis.test import TestCase
 from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.introspection.dependencies.entities.signature import Signature
@@ -17,14 +18,22 @@ def _no_doc_function(): # NOSONAR
 _lambda = lambda a, b: a + b  # noqa: E731
 
 class _SampleClass:
-    def regular_method(self, value: int) -> int:
+    def regularMethod(self, value: int) -> int:
         """Return value doubled."""
         return value * 2
 
     @staticmethod
-    def static_method(n: int) -> int:
+    def staticMethod(n: int) -> int:
         """Return n plus one."""
         return n + 1
+
+# Function whose code object points at a synthetic file, so that the
+# interpreter cannot recover its source lines.
+_sourceless_function = types.FunctionType(
+    _simple_function.__code__.replace(co_filename="<orionis-missing-source>"),
+    {"__name__": "orionis_missing_source"},
+    "_sourceless_function",
+)
 
 # ---------------------------------------------------------------------------
 # __init__ / construction
@@ -66,7 +75,7 @@ class TestReflectionCallableInit(TestCase):
             Raises AssertionError on failure.
         """
         obj = _SampleClass()
-        rc = ReflectionCallable(obj.regular_method)
+        rc = ReflectionCallable(obj.regularMethod)
         self.assertIsInstance(rc, ReflectionCallable)
 
     def testInitWithStaticMethodFunctionSucceeds(self) -> None:
@@ -78,7 +87,7 @@ class TestReflectionCallableInit(TestCase):
         None
             Raises AssertionError on failure.
         """
-        rc = ReflectionCallable(_SampleClass.static_method)
+        rc = ReflectionCallable(_SampleClass.staticMethod)
         self.assertIsInstance(rc, ReflectionCallable)
 
     def testInitWithNonCallableRaisesTypeError(self) -> None:
@@ -119,18 +128,6 @@ class TestReflectionCallableInit(TestCase):
         """
         with self.assertRaises(TypeError):
             ReflectionCallable(len)  # type: ignore[arg-type]
-
-    def testInstanceIsReflectionCallable(self) -> None:
-        """
-        Assert that the returned object is an instance of ReflectionCallable.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        rc = ReflectionCallable(_simple_function)
-        self.assertIsInstance(rc, ReflectionCallable)
 
 # ---------------------------------------------------------------------------
 # Cache protocol  (__getitem__, __setitem__, __contains__, __delitem__)
@@ -392,6 +389,19 @@ class TestReflectionCallableSourceCode(TestCase):
         second = self.rc.getSourceCode()
         self.assertIs(first, second)
 
+    def testGetSourceCodeRaisesAttributeErrorWhenUnavailable(self) -> None:
+        """
+        Assert that unreadable sources are reported as AttributeError.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        rc = ReflectionCallable(_sourceless_function)
+        with self.assertRaises(AttributeError):
+            rc.getSourceCode()
+
 # ---------------------------------------------------------------------------
 # File path
 # ---------------------------------------------------------------------------
@@ -638,18 +648,18 @@ class TestReflectionCallableBoundMethod(TestCase):
     def setUp(self) -> None:
         """Initialise a bound method ReflectionCallable."""
         self.obj = _SampleClass()
-        self.rc = ReflectionCallable(self.obj.regular_method)
+        self.rc = ReflectionCallable(self.obj.regularMethod)
 
     def testGetNameReturnsBoundMethodName(self) -> None:
         """
-        Assert that getName returns 'regular_method' for a bound method.
+        Assert that getName returns 'regularMethod' for a bound method.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertEqual(self.rc.getName(), "regular_method")
+        self.assertEqual(self.rc.getName(), "regularMethod")
 
     def testGetSignatureExcludesSelf(self) -> None:
         """
@@ -666,11 +676,11 @@ class TestReflectionCallableBoundMethod(TestCase):
 
     def testGetSourceCodeContainsMethodName(self) -> None:
         """
-        Assert that getSourceCode contains 'regular_method'.
+        Assert that getSourceCode contains 'regularMethod'.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
         """
-        self.assertIn("regular_method", self.rc.getSourceCode())
+        self.assertIn("regularMethod", self.rc.getSourceCode())

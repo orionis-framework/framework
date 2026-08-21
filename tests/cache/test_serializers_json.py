@@ -73,6 +73,34 @@ class TestMsgspecSerializer(TestCase):
         """
         self.assertIsNone(self._ser.loads(None))
 
+    def testLoadsReturnsNativeIntegerUnchanged(self) -> None:
+        """
+        Return an integer payload untouched instead of decoding it.
+
+        Validates the passthrough that keeps the counters written by the
+        aiocache memory backend readable: increment() stores a raw int,
+        skipping dumps().
+        """
+        self.assertEqual(self._ser.loads(7), 7)
+
+    def testLoadsReturnsNativeFloatUnchanged(self) -> None:
+        """
+        Return a float payload untouched instead of decoding it.
+
+        Validates that the passthrough is not restricted to integers.
+        """
+        self.assertAlmostEqual(self._ser.loads(1.5), 1.5)
+
+    def testLoadsDecodesFromByteArray(self) -> None:
+        """
+        Decode a bytearray payload like a plain bytes payload.
+
+        Validates that mutable byte buffers are still routed to the JSON
+        decoder rather than being returned unchanged.
+        """
+        result = self._ser.loads(bytearray(self._ser.dumps("buffered")))
+        self.assertEqual(result, "buffered")
+
     def testRoundtripInteger(self) -> None:
         """
         Preserve an integer through a full dumps/loads cycle.

@@ -524,6 +524,21 @@ class TestRunEntryPoint(TestCase):
         with self.assertRaises(ValueError):
             call_off_loop(Loop.run, coroutine_raising(ValueError, "boom"))
 
+    def testRefusesToStartASecondLoopInTheSameThread(self) -> None:
+        """
+        Refuse to start a loop where another one is already running.
+
+        Validates the documented failure mode, including that the coroutine
+        handed over is left unconsumed and stays the caller's to close.
+        """
+        self.assertTrue(Loop.isLoopRunning())
+        coro = coroutine_returning("never started")
+        try:
+            with self.assertRaises(RuntimeError):
+                Loop.run(coro)
+        finally:
+            coro.close()
+
 class TestRunWithoutAnOptimalFactory(TestCase):
     """Entry point exercised while no optimal loop factory is resolved."""
 

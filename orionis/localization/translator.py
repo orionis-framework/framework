@@ -34,6 +34,15 @@ class Translator(ITranslator):
     repository, falls back to the configured fallback locale, applies
     style ``:name`` parameter replacement, and selects
     pluralized segments through :meth:`choice`.
+
+    Notes
+    -----
+    The provider binds a single instance for the whole process and the
+    class uses no lock, so :meth:`setLocale`, :meth:`missing`,
+    :meth:`reload`, :meth:`forget` and :meth:`flush` are global side
+    effects visible to every concurrent task. Pass an explicit
+    ``locale`` to :meth:`get`, :meth:`has` or :meth:`choice` to select a
+    language for a single call instead.
     """
 
     __slots__ = ("_fallback", "_loader", "_locale", "_missing", "_repository")
@@ -186,7 +195,12 @@ class Translator(ITranslator):
         key : str
             Translation key containing the pluralized segments.
         count : int
-            Quantity used to select the proper segment.
+            Quantity used to select the proper segment. The value is
+            used as received: explicit conditions compare it against
+            their numeric bounds and the positional rule tests
+            ``count == 1``. No coercion or validation is applied, so a
+            non-numeric quantity propagates the comparison ``TypeError``
+            raised by Python.
         locale : str | None, optional
             Locale to translate into, or ``None`` for the active locale.
         **replace : object

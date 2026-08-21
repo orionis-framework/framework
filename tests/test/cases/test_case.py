@@ -1,3 +1,6 @@
+import asyncio
+import contextvars
+import fnmatch
 import inspect
 import re
 from orionis.test import TestCase
@@ -5,6 +8,7 @@ from orionis.test.cases import TestCase as PackageTestCase
 from orionis.test.cases.case import (
     _DEFAULT_PATTERN,
     _LIFECYCLE_HOOKS,
+    _METHOD_PATTERN,
     TestCase as CoreTestCase,
 )
 
@@ -69,7 +73,17 @@ class TestTestCaseDefinition(TestCase):
         translation.
         """
         self.assertIsInstance(_DEFAULT_PATTERN, re.Pattern)
-        self.assertIs(CoreTestCase._method_regex, _DEFAULT_PATTERN)
+        self.assertEqual(_DEFAULT_PATTERN.pattern, fnmatch.translate("test*"))
+
+    def testUnconfiguredContextUsesTheDefaultPattern(self) -> None:
+        """
+        Fall back to the default pattern when nothing was configured.
+
+        Validates the value observed by a context that never called the
+        pattern setter.
+        """
+        pattern = contextvars.Context().run(_METHOD_PATTERN.get)
+        self.assertIs(pattern, _DEFAULT_PATTERN)
 
     def testLifecycleHooksAreExcludedFromWrapping(self) -> None:
         """
@@ -82,15 +96,6 @@ class TestTestCaseDefinition(TestCase):
 
 class TestTestCaseMethodPattern(TestCase):
 
-    def tearDown(self) -> None:
-        """
-        Restore the default discovery pattern after each scenario.
-
-        Guarantees that class level state is never leaked to the tests
-        executed afterwards.
-        """
-        CoreTestCase.setMethodPattern("test*")
-
     def testCustomPatternReplacesTheDefault(self) -> None:
         """
         Match method names against a freshly supplied glob pattern.
@@ -99,8 +104,8 @@ class TestTestCaseMethodPattern(TestCase):
         pattern instead of the default one.
         """
         CoreTestCase.setMethodPattern("check*")
-        self.assertIsNotNone(CoreTestCase._method_regex.match("checkSomething"))
-        self.assertIsNone(CoreTestCase._method_regex.match("testSomething"))
+        self.assertIsNotNone(_METHOD_PATTERN.get().match("checkSomething"))
+        self.assertIsNone(_METHOD_PATTERN.get().match("testSomething"))
 
     def testPatternIsStoredAsCompiledExpression(self) -> None:
         """
@@ -110,8 +115,8 @@ class TestTestCaseMethodPattern(TestCase):
         reused for every lookup.
         """
         CoreTestCase.setMethodPattern("verify_*")
-        self.assertIsInstance(CoreTestCase._method_regex, re.Pattern)
-        self.assertIsNotNone(CoreTestCase._method_regex.match("verify_something"))
+        self.assertIsInstance(_METHOD_PATTERN.get(), re.Pattern)
+        self.assertIsNotNone(_METHOD_PATTERN.get().match("verify_something"))
 
     def testDefaultPatternIsRestorable(self) -> None:
         """
@@ -122,19 +127,25 @@ class TestTestCaseMethodPattern(TestCase):
         """
         CoreTestCase.setMethodPattern("check*")
         CoreTestCase.setMethodPattern("test*")
-        self.assertIsNotNone(CoreTestCase._method_regex.match("testSomething"))
-        self.assertIsNone(CoreTestCase._method_regex.match("checkSomething"))
+        self.assertIsNotNone(_METHOD_PATTERN.get().match("testSomething"))
+        self.assertIsNone(_METHOD_PATTERN.get().match("checkSomething"))
+
+    async def testPatternDoesNotLeakOutOfTheRunningTask(self) -> None:
+        """
+        Keep a configured pattern inside the task that requested it.
+
+        Validates that two runs executing at the same time never
+        overwrite the discovery pattern of each other.
+        """
+        async def _configure() -> str:
+            CoreTestCase.setMethodPattern("check*")
+            return _METHOD_PATTERN.get().pattern
+
+        inner = await asyncio.create_task(_configure())
+        self.assertEqual(inner, fnmatch.translate("check*"))
+        self.assertIsNone(_METHOD_PATTERN.get().match("checkSomething"))
 
 class TestTestCaseWrapping(TestCase):
-
-    def tearDown(self) -> None:
-        """
-        Restore the default discovery pattern after each scenario.
-
-        Guarantees that probes built with custom patterns cannot alter
-        the discovery of the remaining tests.
-        """
-        CoreTestCase.setMethodPattern("test*")
 
     def testMatchingMethodIsWrapped(self) -> None:
         """

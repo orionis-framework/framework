@@ -1,5 +1,8 @@
 from __future__ import annotations
+import asyncio
+import os
 import tempfile
+import time
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from orionis.session.entities.record import SessionRecord
@@ -181,9 +184,13 @@ class TestFileSessionStore(TestCase):
         store = self._store()
         path = self._directory / "atomic.json"
         store._writeFile(path, b"data")
-        tmp = path.with_suffix(".tmp")
+        leftovers = [
+            entry.name
+            for entry in self._directory.iterdir()
+            if entry.name.endswith(".tmp")
+        ]
         self.assertTrue(path.exists())
-        self.assertFalse(tmp.exists())
+        self.assertEqual(leftovers, [])
 
     # ── read ─────────────────────────────────────────────────────────────────
 
@@ -415,3 +422,156 @@ class TestFileSessionStore(TestCase):
         nested.mkdir()
         await store.gc()
         self.assertTrue(nested.is_dir())
+
+class TestFileSessionStoreAtomicWrites(TestCase):
+    """Regression tests for the staging file backing every write."""
+
+    def setUp(self) -> None:
+        """
+        Create an isolated temporary directory before each test.
+
+        Provides a fresh directory so staging files from one test can
+        never influence another.
+        """
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._directory = Path(self._tmpdir.name)
+
+    def tearDown(self) -> None:
+        """
+        Remove the temporary directory and its contents after each test.
+
+        Ensures no session or staging file survives the test run.
+        """
+        self._tmpdir.cleanup()
+
+    def _store(self) -> FileSessionStore:
+        """
+        Construct a FileSessionStore backed by the temporary directory.
+
+        Returns
+        -------
+        FileSessionStore
+            A fresh store instance for each caller.
+        """
+        return FileSessionStore(directory=self._directory)
+
+    def _temps(self) -> list[str]:
+        """
+        List the staging files currently present in the directory.
+
+        Returns
+        -------
+        list[str]
+            Names of every file whose suffix is ``.tmp``.
+        """
+        return [
+            entry.name
+            for entry in self._directory.iterdir()
+            if entry.name.endswith(".tmp")
+        ]
+
+    def testTempPathIsUniquePerCall(self) -> None:
+        """
+        Derive a different staging path on every call.
+
+        Validates that two writers of the same session never share a
+        staging file, which would let them publish a mixed payload.
+        """
+        store = self._store()
+        path = self._directory / "abc.json"
+
+        first = store._tempPath(path)
+        second = store._tempPath(path)
+
+        self.assertNotEqual(first, second)
+        self.assertEqual(first.parent, path.parent)
+        self.assertTrue(first.name.endswith(".tmp"))
+        self.assertTrue(second.name.endswith(".tmp"))
+
+    async def testConcurrentWritesToTheSameSessionAllSucceed(self) -> None:
+        """
+        Publish every concurrent write of one session without failing.
+
+        Validates that parallel requests sharing a session identifier
+        neither raise nor leave the stored payload half written.
+        """
+        store = self._store()
+        expires = datetime.now(UTC) + timedelta(hours=1)
+        blob = "x" * 8192
+        records = [
+            SessionRecord(
+                id="shared",
+                data={"n": n, "blob": blob},
+                expires_at=expires,
+            )
+            for n in range(25)
+        ]
+
+        results = await asyncio.gather(
+            *(store.write(record) for record in records),
+            return_exceptions=True,
+        )
+
+        failures = [r for r in results if isinstance(r, BaseException)]
+        self.assertEqual(failures, [])
+
+        restored = await store.read("shared")
+        self.assertIsNotNone(restored)
+        self.assertEqual(restored.data["blob"], blob)  # type: ignore[union-attr]
+        self.assertIn(restored.data["n"], range(25))  # type: ignore[union-attr]
+        self.assertEqual(self._temps(), [])
+
+    async def testFailedWriteRemovesItsTempFile(self) -> None:
+        """
+        Reclaim the staging file when the write cannot be published.
+
+        Validates that a rename failure propagates without leaking an
+        orphaned staging file into the session directory.
+        """
+        store = self._store()
+
+        # A directory at the destination makes the rename fail portably.
+        (self._directory / "blocked.json").mkdir()
+
+        with self.assertRaises(OSError):
+            await store.write(
+                SessionRecord(
+                    id="blocked",
+                    data={},
+                    expires_at=datetime.now(UTC) + timedelta(hours=1),
+                ),
+            )
+
+        self.assertEqual(self._temps(), [])
+
+    async def testGcReclaimsStaleTempFiles(self) -> None:
+        """
+        Remove staging files left behind by an interrupted write.
+
+        Validates that an orphan too old to belong to a live write is
+        swept instead of accumulating forever.
+        """
+        store = self._store()
+        orphan = self._directory / "abc.json.deadbeefdeadbeef.tmp"
+        orphan.write_bytes(b"partial payload")
+        stale = time.time() - 7200
+        os.utime(orphan, (stale, stale))
+
+        await store.gc()
+
+        self.assertFalse(orphan.exists())
+
+    async def testGcKeepsTempFilesOfInFlightWrites(self) -> None:
+        """
+        Preserve a staging file that a concurrent write may still fill.
+
+        Validates that the sweep only reclaims staging files old enough
+        to be certain no writer owns them.
+        """
+        store = self._store()
+        in_flight = self._directory / "abc.json.cafebabecafebabe.tmp"
+        in_flight.write_bytes(b"in flight")
+
+        await store.gc()
+
+        self.assertTrue(in_flight.exists())

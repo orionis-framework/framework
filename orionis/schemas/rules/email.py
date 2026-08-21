@@ -16,8 +16,17 @@ _EMAIL_PATTERN = re.compile(
 )
 
 class Email(Rule):
+    """
+    Ensure a string is a valid email address.
+
+    The value must be a dot-separated local part of RFC 5322 characters,
+    followed by a dotted domain. The whole address is capped at 254
+    characters and the local part at 64, as required by RFC 5321.
+    """
 
     # ruff: noqa: ARG002
+
+    __slots__ = ()
 
     __message__ = "Value must be a valid email address."
     __code__ = "email"

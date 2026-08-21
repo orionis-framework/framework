@@ -1,4 +1,5 @@
 from __future__ import annotations
+import dataclasses
 import importlib.util
 from orionis.foundation.config.filesystems.entitites.aws import S3
 from orionis.storage.drivers.s3 import S3StorageDriver
@@ -9,7 +10,31 @@ from orionis.storage.exceptions import (
 )
 from orionis.test import TestCase
 
+# Options the driver actually reads from the disk configuration.
+_CONSUMED_OPTIONS: frozenset[str] = frozenset({
+    "driver",
+    "key",
+    "secret",
+    "region",
+    "bucket",
+    "url",
+    "endpoint",
+    "use_path_style_endpoint",
+})
+
 class TestS3StorageDriver(TestCase):
+
+    def testEntityDeclaresOnlyConsumedOptions(self) -> None:
+        """
+        Declare exactly the options the S3 driver consumes.
+
+        Validates that the configuration entity never grows fields
+        that no driver ever reads.
+        """
+        self.assertEqual(
+            {field.name for field in dataclasses.fields(S3)},
+            set(_CONSUMED_OPTIONS),
+        )
 
     async def testUrlUsesVirtualHostAddress(self) -> None:
         """

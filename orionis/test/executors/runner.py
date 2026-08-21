@@ -36,15 +36,24 @@ class TestRunner(unittest.TextTestRunner):
         Parameters
         ----------
         verbosity : int, optional
-            Level of detail in test output, by default 0
+            Level of detail printed for each test. It is handed to the
+            TestResultProcessor built by _makeResult, which owns the console
+            rendering: 1 prints one line per test, 2 prints a detailed panel
+            and any other value prints nothing, by default 0
         failfast : bool, optional
             Stop on first failure, by default False
         buffer : bool, optional
             Buffer stdout and stderr during tests, by default False
         warnings : str | None, optional
             Control warnings during test execution, by default None
+        with_panel : bool, optional
+            Render the Rich start and summary panels around the run. When
+            False both panels are skipped and the console is never cleared,
+            by default True
         **kwargs : dict
-            Additional keyword arguments
+            Additional keyword arguments forwarded verbatim to
+            unittest.TextTestRunner (stream, descriptions, tb_locals,
+            durations), whose semantics are defined by the standard library.
 
         Returns
         -------

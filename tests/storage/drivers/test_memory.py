@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import hashlib
 from datetime import UTC, datetime
 from orionis.storage.drivers.memory import MemoryStorageDriver
@@ -342,3 +343,24 @@ class TestMemoryStorageDriver(TestCase):
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
             await self._driver.temporaryUrl("f.txt", 60)
+
+    async def testConcurrentWritesLandCompletely(self) -> None:
+        """
+        Persist every payload written by concurrent tasks.
+
+        Validates the concurrency guarantee declared by the driver:
+        an operation never observes a partial mutation of the store
+        when several tasks share the same event loop.
+        """
+        paths = [f"batch/{index}.bin" for index in range(50)]
+        await asyncio.gather(*[
+            self._driver.write(path, path.encode()) for path in paths
+        ])
+
+        contents = await asyncio.gather(*[
+            self._driver.read(path) for path in paths
+        ])
+        self.assertEqual(contents, [path.encode() for path in paths])
+        self.assertEqual(
+            await self._driver.files("batch", recursive=True), sorted(paths),
+        )

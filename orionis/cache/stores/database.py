@@ -6,7 +6,7 @@ import msgspec
 import msgspec.json as _msgjson
 from orionis.database.exceptions import QueryException
 from orionis.orm.schema.table import TableDefinition
-from orionis.orm.schema.types import BigInteger, String, Text
+from orionis.orm.schema.types import Double, String, Text
 
 if TYPE_CHECKING:
     from orionis.database.contracts.connection import IConnection
@@ -16,6 +16,9 @@ _MISSING = object()
 
 # Default lock table used when the config does not declare one explicitly.
 _DEFAULT_LOCK_TABLE = "cache_locks"
+
+# Compare-and-swap rounds allowed before an increment gives up on contention.
+_INCREMENT_ATTEMPTS = 25
 
 
 def _buildEntriesTable(table: str) -> TableDefinition:
@@ -31,8 +34,8 @@ def _buildEntriesTable(table: str) -> TableDefinition:
     -------
     TableDefinition
         Definition with ``cache_key`` (primary key), ``cache_value``
-        (JSON payload) and ``expiration`` (epoch seconds, nullable)
-        columns.
+        (JSON payload) and ``expiration`` (epoch seconds, sub-second
+        precision, nullable) columns.
     """
     key_column = String(255).primary()
     key_column.name = "cache_key"
@@ -40,7 +43,8 @@ def _buildEntriesTable(table: str) -> TableDefinition:
     value_column = Text().nullable()
     value_column.name = "cache_value"
 
-    expiration_column = BigInteger().nullable()
+    # Floating point: the public API accepts fractional TTLs.
+    expiration_column = Double().nullable()
     expiration_column.name = "expiration"
 
     return TableDefinition(
@@ -67,7 +71,7 @@ def _buildLocksTable(table: str) -> TableDefinition:
     -------
     TableDefinition
         Definition with ``cache_key`` (primary key), ``owner`` and
-        ``expiration`` (epoch seconds) columns.
+        ``expiration`` (epoch seconds, sub-second precision) columns.
     """
     key_column = String(255).primary()
     key_column.name = "cache_key"
@@ -75,7 +79,8 @@ def _buildLocksTable(table: str) -> TableDefinition:
     owner_column = String(255).nullable()
     owner_column.name = "owner"
 
-    expiration_column = BigInteger().nullable()
+    # Floating point: lease durations are expressed in fractional seconds.
+    expiration_column = Double().nullable()
     expiration_column.name = "expiration"
 
     return TableDefinition(
@@ -439,6 +444,10 @@ class DatabaseCacheBackend:
         """
         Store *value* under *key* only if the key does not already exist.
 
+        The primary key decides the winner, so concurrent callers never
+        both succeed and the operation is safe as a mutual-exclusion
+        primitive.
+
         Parameters
         ----------
         key : str
@@ -457,19 +466,41 @@ class DatabaseCacheBackend:
         ------
         ValueError
             If the key already exists and has not expired.
+        QueryException
+            If the insert fails for any reason other than the key being
+            already taken.
         """
-        if await self.exists(key):
+        await self._ensureSchema()
+
+        # Release the slot when the previous entry is merely lingering.
+        await self._connection.execute(
+            f"DELETE FROM {self._table} WHERE cache_key = :k "  # noqa: S608
+            "AND expiration IS NOT NULL AND expiration <= :now",
+            {"k": key, "now": time.time()},
+        )
+
+        expiration = time.time() + ttl if ttl is not None else None
+        try:
+            await self._connection.execute(
+                f"INSERT INTO {self._table} "  # noqa: S608
+                "(cache_key, cache_value, expiration) VALUES (:k, :v, :e)",
+                {"k": key, "v": self.__encode(value), "e": expiration},
+            )
+        except QueryException as exc:
+            if not await self.exists(key):
+                raise
             msg = f"Key {key!r} already exists in the cache."
-            raise ValueError(msg)
-        return await self.set(key, value, ttl=ttl)
+            raise ValueError(msg) from exc
+        return True
 
     async def increment(self, key: str, delta: int = 1) -> int:
         """
         Increment the integer stored at *key* by *delta*.
 
-        Creates the key with value *delta* if it does not exist. The
-        read/modify/write cycle runs inside a single database
-        transaction, mirroring ``DatabaseStore::increment()``.
+        Creates the key with value *delta* if it does not exist.  The
+        update is applied with a compare-and-swap so concurrent writers
+        never lose an increment, without relying on row-locking syntax
+        that not every dialect supports.
 
         Parameters
         ----------
@@ -482,66 +513,72 @@ class DatabaseCacheBackend:
         -------
         int
             New value after increment.
+
+        Raises
+        ------
+        QueryException
+            If contention prevents the update from landing after
+            ``_INCREMENT_ATTEMPTS`` rounds.
         """
         await self._ensureSchema()
-        await self._connection.begin()
-        try:
-            new_value = await self.__incrementLocked(key, delta)
-        except Exception:
-            await self._connection.rollback()
-            raise
-        else:
-            await self._connection.commit()
-            return new_value
 
-    async def __incrementLocked(self, key: str, delta: int) -> int:
+        for _ in range(_INCREMENT_ATTEMPTS):
+            counter = await self.__currentCounter(key)
+
+            if counter is None:
+                try:
+                    await self.add(key, delta)
+                except ValueError:
+                    continue
+                return delta
+
+            raw, current = counter
+            new_value = current + delta
+            updated = await self._connection.execute(
+                f"UPDATE {self._table} SET cache_value = :v "  # noqa: S608
+                "WHERE cache_key = :k AND cache_value = :old",
+                {"v": self.__encode(new_value), "k": key, "old": raw},
+            )
+            if updated:
+                return new_value
+
+        error_msg = (
+            f"Could not increment {key!r} after {_INCREMENT_ATTEMPTS} "
+            "attempts because of concurrent writers."
+        )
+        raise QueryException(error_msg)
+
+    async def __currentCounter(self, key: str) -> tuple[str, int] | None:
         """
-        Apply the increment while an outer transaction is active.
+        Return the raw payload and integer value stored at *key*.
 
         Parameters
         ----------
         key : str
             Cache key.
-        delta : int
-            Amount to add to the current value.
 
         Returns
         -------
-        int
-            New value after the increment.
+        tuple[str, int] | None
+            The stored payload exactly as persisted, used later as the
+            compare-and-swap witness, together with its integer value.
+            ``None`` when the row is missing or already expired.
         """
         rows = await self._connection.select(
             f"SELECT cache_value, expiration FROM {self._table} "  # noqa: S608
             "WHERE cache_key = :k",
             {"k": key},
         )
-        now = time.time()
-        row = rows[0] if rows else None
-        expired = row is not None and (
-            row.get("expiration") is not None and row["expiration"] <= now
-        )
+        if not rows:
+            return None
 
-        if row is None or expired:
-            new_value = delta
-            await self._connection.execute(
-                f"DELETE FROM {self._table} WHERE cache_key = :k",  # noqa: S608
-                {"k": key},
-            )
-            await self._connection.execute(
-                f"INSERT INTO {self._table} "  # noqa: S608
-                "(cache_key, cache_value, expiration) VALUES (:k, :v, NULL)",
-                {"k": key, "v": self.__encode(new_value)},
-            )
-            return new_value
+        row = rows[0]
+        expiration = row.get("expiration")
+        if expiration is not None and expiration <= time.time():
+            return None
 
-        current = self.__decode(row.get("cache_value")) or 0
-        new_value = int(current) + delta
-        await self._connection.execute(
-            f"UPDATE {self._table} SET cache_value = :v "  # noqa: S608
-            "WHERE cache_key = :k",
-            {"v": self.__encode(new_value), "k": key},
-        )
-        return new_value
+        raw = row.get("cache_value")
+        return raw, int(self.__decode(raw) or 0)
 
     # ── Atomic locks (backing orionis.cache.locks.lock.CacheLock) ───────────
 

@@ -199,7 +199,7 @@ class DatabaseSessionStore(ISessionStore):
         -------
         None
         """
-        expiration = record.expires_at.timestamp()
+        expiration = int(record.expires_at.timestamp())
 
         if expiration <= time.time():
             await self.delete(record.id)
@@ -219,7 +219,7 @@ class DatabaseSessionStore(ISessionStore):
         self,
         session_id: str,
         payload: str,
-        expiration: float,
+        expiration: int,
     ) -> None:
         """
         Insert a new session row, falling back to an update on conflict.
@@ -230,8 +230,8 @@ class DatabaseSessionStore(ISessionStore):
             Unique session identifier.
         payload : str
             JSON-encoded session data already serialized by :meth:`write`.
-        expiration : float
-            Absolute expiration timestamp (epoch seconds).
+        expiration : int
+            Absolute expiration timestamp (whole epoch seconds).
 
         Returns
         -------
@@ -282,7 +282,7 @@ class DatabaseSessionStore(ISessionStore):
         await self._ensureSchema()
         await self._connection.execute(
             self._sql_gc,
-            {"now": time.time()},
+            {"now": int(time.time())},
         )
 
     # ── Serialization helpers ────────────────────────────────────────────────

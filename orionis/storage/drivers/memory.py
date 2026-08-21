@@ -72,6 +72,15 @@ class MemoryStorageDriver(IStorageDriver):
     as a future ``Storage.fake()`` without touching the rest of the
     component. Directories exist implicitly through file prefixes and
     explicitly through :meth:`createDirectory`.
+
+    Concurrency
+    -----------
+    The store is a plain dictionary mutated without locks. Every
+    operation completes without awaiting midway, so concurrent tasks
+    on a single event loop never observe a partial mutation. No
+    guarantee is offered when the same path is mutated from several
+    threads at once, which streams opened with :meth:`open` do because
+    they flush their buffer on a worker thread.
     """
 
     __slots__ = ("_base_url", "_directories", "_files")

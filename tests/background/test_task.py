@@ -1,6 +1,5 @@
 import functools
 import threading
-
 from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask, is_async_callable
 from orionis.test import TestCase

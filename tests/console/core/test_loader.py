@@ -1,5 +1,6 @@
 from __future__ import annotations
 import inspect
+import tempfile
 from typing import ClassVar
 from unittest.mock import Mock, patch, AsyncMock
 from pathlib import Path
@@ -58,12 +59,17 @@ class TestLoader(TestCase):
 
         Creates a Loader instance and mock objects needed for testing.
         """
+        # FileBasedCache creates this directory on disk, so it must point at a
+        # writable temporary location instead of the filesystem root.
+        compiled_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(compiled_dir.cleanup)
+
         self.mock_app = Mock()
         self.mock_app.compiled = False
         self.mock_app.basePath = Path("/mock/path")
         self.mock_app.path.return_value = Path("/mock/path/console")
         self.mock_app.routingPaths.return_value = [Path("/mock/path/routes.py")]
-        self.mock_app.compiledPath = Path("/mock/path/compiled")
+        self.mock_app.compiledPath = Path(compiled_dir.name) / "compiled"
         self.mock_app.compiledInvalidationPathsDirs = []
         self.mock_app.compiledInvalidationPathsFiles = []
 

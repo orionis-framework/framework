@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
-from orionis.http.response import FileResponse, Response
+from orionis.http.responses import FileResponse, Response
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Awaitable, Callable

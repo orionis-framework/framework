@@ -8,7 +8,7 @@ from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import Request
 from orionis.http.request import UnsupportedMediaTypeException
-from orionis.http.response import Response
+from orionis.http.responses import Response
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.logging.contracts.logger import ILogger

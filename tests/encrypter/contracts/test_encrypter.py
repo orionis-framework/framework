@@ -1,128 +1,132 @@
-from __future__ import annotations
+import inspect
 from abc import ABC
 from orionis.encrypter.contracts.encrypter import IEncrypter
+from orionis.encrypter.encrypter import Encrypter
 from orionis.test import TestCase
 
-# ---------------------------------------------------------------------------
-# Concrete stub — used for instantiation tests only
-# ---------------------------------------------------------------------------
+# Methods every implementation must provide.
+_ABSTRACT_METHODS: frozenset[str] = frozenset({"decrypt", "encrypt"})
+
 
 class _ConcreteEncrypter(IEncrypter):
-    """Minimal IEncrypter implementation used only for structural tests."""
+    """Minimal implementation used to exercise the contract structurally."""
 
-    def encrypt(self, _plaintext: str) -> str:  # NOSONAR
-        """Return an empty string (stub)."""
-        return ""
+    __slots__ = ()
 
-    def decrypt(self, _payload: str) -> str:  # NOSONAR
-        """Return an empty string (stub)."""
-        return ""
-
-# ===========================================================================
-# IEncrypter contract
-# ===========================================================================
-
-class TestIEncrypter(TestCase):
-
-    # ------------------------------------------------------------------
-    # Structural / ABC
-    # ------------------------------------------------------------------
-
-    def testIsAbstractBaseClass(self) -> None:
+    def encrypt(self, _plaintext: str) -> str:
         """
-        Verify IEncrypter is a subclass of ABC.
+        Return a fixed placeholder instead of a ciphertext.
+
+        Parameters
+        ----------
+        _plaintext : str
+            Ignored by this structural double.
 
         Returns
         -------
-        None
-            This method does not return a value.
+        str
+            An empty string.
+        """
+        return ""
+
+    def decrypt(self, _payload: str) -> str:
+        """
+        Return a fixed placeholder instead of a plaintext.
+
+        Parameters
+        ----------
+        _payload : str
+            Ignored by this structural double.
+
+        Returns
+        -------
+        str
+            An empty string.
+        """
+        return ""
+
+
+class TestIEncrypterDefinition(TestCase):
+
+    def testIsAnAbstractBaseClass(self) -> None:
+        """
+        Derive from the abstract base class machinery.
+
+        Validates that the contract cannot be used as a plain mixin.
         """
         self.assertTrue(issubclass(IEncrypter, ABC))
 
     def testCannotBeInstantiatedDirectly(self) -> None:
         """
-        Raise TypeError when IEncrypter is instantiated directly.
+        Refuse instantiation while abstract methods remain unimplemented.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the contract is enforced at construction time.
         """
         with self.assertRaises(TypeError):
             IEncrypter()  # type: ignore[abstract]
 
-    # ------------------------------------------------------------------
-    # Abstract method presence
-    # ------------------------------------------------------------------
-
-    def testHasAbstractMethodEncrypt(self) -> None:
+    def testDeclaresEmptySlots(self) -> None:
         """
-        Verify 'encrypt' is declared as an abstract method.
+        Declare empty slots so implementations can stay dictionary free.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the requirement that makes the slots of Encrypter
+        effective instead of decorative.
         """
-        self.assertIn("encrypt", IEncrypter.__abstractmethods__)
+        self.assertEqual(IEncrypter.__dict__.get("__slots__"), ())
 
-    def testHasAbstractMethodDecrypt(self) -> None:
+    def testExposesExactlyTheExpectedAbstractMethods(self) -> None:
         """
-        Verify 'decrypt' is declared as an abstract method.
+        Publish encrypt and decrypt as the only abstract members.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the surface every implementation has to cover.
         """
-        self.assertIn("decrypt", IEncrypter.__abstractmethods__)
+        self.assertEqual(IEncrypter.__abstractmethods__, _ABSTRACT_METHODS)
 
-    def testAbstractMethodsMatchExpectedSet(self) -> None:
+    def testAbstractMethodsCarryNoImplementation(self) -> None:
         """
-        Verify IEncrypter exposes exactly the expected abstract methods.
+        Keep the abstract methods free of executable bodies.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that no dead code hides behind the contract.
         """
-        expected = frozenset({"encrypt", "decrypt"})
-        self.assertEqual(IEncrypter.__abstractmethods__, expected)
+        for name in _ABSTRACT_METHODS:
+            source = inspect.getsource(getattr(IEncrypter, name))
+            self.assertNotIn("return", source)
 
-    # ------------------------------------------------------------------
-    # Concrete subclass
-    # ------------------------------------------------------------------
 
-    def testConcreteSubclassCanBeInstantiated(self) -> None:
+class TestIEncrypterImplementations(TestCase):
+
+    def testEncrypterMatchesTheContractSignatures(self) -> None:
         """
-        Instantiate a concrete subclass implementing all abstract methods.
+        Keep the parameters of the service aligned with the contract.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that callers relying on the contract can invoke the
+        concrete implementation unchanged.
         """
-        obj = _ConcreteEncrypter()
-        self.assertIsInstance(obj, IEncrypter)
+        for name in _ABSTRACT_METHODS:
+            expected = inspect.signature(getattr(IEncrypter, name))
+            actual = inspect.signature(getattr(Encrypter, name))
+            self.assertEqual(
+                list(expected.parameters),
+                list(actual.parameters),
+            )
 
-    def testEncryptIsCallableOnConcreteSubclass(self) -> None:
+    def testConcreteSubclassSatisfiesTheContract(self) -> None:
         """
-        Verify encrypt() is callable on a concrete subclass instance.
+        Instantiate a subclass that implements every abstract method.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that the contract is satisfiable with the declared
+        signatures alone.
         """
-        self.assertTrue(callable(_ConcreteEncrypter().encrypt))
+        instance = _ConcreteEncrypter()
+        self.assertIsInstance(instance, IEncrypter)
+        self.assertEqual(instance.encrypt("value"), "")
+        self.assertEqual(instance.decrypt("value"), "")
 
-    def testDecryptIsCallableOnConcreteSubclass(self) -> None:
+    def testConcreteSubclassInheritsTheSlotsGuarantee(self) -> None:
         """
-        Verify decrypt() is callable on a concrete subclass instance.
+        Keep implementations free of an attribute dictionary.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that the empty slots of the contract propagate to
+        subclasses declaring their own slots.
         """
-        self.assertTrue(callable(_ConcreteEncrypter().decrypt))
+        self.assertFalse(hasattr(_ConcreteEncrypter(), "__dict__"))

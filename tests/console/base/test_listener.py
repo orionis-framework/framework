@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 import inspect
+from annotationlib import Format
 from orionis.console.base.listener import BaseTaskListener
 from orionis.console.base.contracts.listener import IBaseTaskListener
 from orionis.console.entities.task_event import TaskEvent
@@ -296,8 +297,13 @@ class TestBaseTaskListener(TestCase):
 
         for method_name in methods_to_test:
             with self.subTest(method=method_name):
-                method = getattr(self.listener, method_name)
-                signature = inspect.signature(method)
+                # The unbound function keeps ``self`` in the signature, and
+                # ``TaskEvent`` is a TYPE_CHECKING-only import in the listener
+                # module, so annotations must not be eagerly evaluated.
+                method = getattr(BaseTaskListener, method_name)
+                signature = inspect.signature(
+                    method, annotation_format=Format.FORWARDREF,
+                )
 
                 # Check parameter count (self + event)
                 parameters = list(signature.parameters.keys())

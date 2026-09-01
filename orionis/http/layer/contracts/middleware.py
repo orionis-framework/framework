@@ -8,7 +8,7 @@ NextCallable = Callable[[], Awaitable["Response"]]
 
 if TYPE_CHECKING:
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class IBaseMiddleware(ABC):
     """Define the base contract for all HTTP middlewares in the pipeline.

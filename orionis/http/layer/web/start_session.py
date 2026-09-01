@@ -7,7 +7,7 @@ from orionis.support.facades.session import Session
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
     from orionis.session.contracts.session import ISession
 
 # Only plain navigations are worth remembering as the "previous page".

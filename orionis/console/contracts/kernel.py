@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class IKernelCLI(ABC):
 
+    __slots__ = ()
+
     @abstractmethod
     async def boot(
         self,

@@ -1,8 +1,81 @@
-from __future__ import annotations
+import base64
 from pathlib import Path
-from orionis.test import TestCase
 from orionis.environment.dynamic.caster import EnvironmentCaster
 from orionis.environment.enums.value_type import EnvironmentValueType
+from orionis.test import TestCase
+
+# Truthy and falsy spellings accepted by the boolean parser.
+_TRUE_WORDS: tuple[str, ...] = ("true", "1", "yes", "on", "enabled")
+_FALSE_WORDS: tuple[str, ...] = ("false", "0", "no", "off", "disabled")
+
+# Bytes that cannot be decoded as UTF-8.
+_NON_UTF8: bytes = b"\xff\xfe"
+
+# Lone surrogate that cannot be encoded as UTF-8 either.
+_LONE_SURROGATE: str = "\ud800"
+
+# ---------------------------------------------------------------------------
+# Test doubles
+# ---------------------------------------------------------------------------
+
+class _ExtendedCaster(EnvironmentCaster):
+    """Caster advertising a type hint that has no dispatch branch."""
+
+    OPTIONS = frozenset({*EnvironmentCaster.OPTIONS, "unknown"})
+
+class _UncoercibleValue:
+    """Value that cannot be coerced to a boolean."""
+
+    __slots__ = ()
+
+    def __bool__(self) -> bool:
+        """Refuse the truthiness protocol."""
+        error_msg = "truthiness is undefined"
+        raise ValueError(error_msg)
+
+    def __repr__(self) -> str:
+        """Return a stable, printable representation."""
+        return "<uncoercible>"
+
+class _UnprintableOnceValue:
+    """Value whose first string conversion fails and then recovers."""
+
+    __slots__ = ("conversions",)
+
+    def __init__(self) -> None:
+        self.conversions: int = 0
+
+    def __str__(self) -> str:
+        """Fail the first conversion so the error path can be reached."""
+        self.conversions += 1
+        if self.conversions == 1:
+            error_msg = "value is not printable"
+            raise ValueError(error_msg)
+        return "recovered"
+
+def build_caster(type_hint: str, value: object) -> EnvironmentCaster:
+    """
+    Build a caster holding an arbitrary value under a given type hint.
+
+    The public constructor can only attach a type hint to a string, so this
+    helper is required to exercise the defensive branches that guard against
+    values injected by other means.
+
+    Parameters
+    ----------
+    type_hint : str
+        Canonical type hint to attach to the caster.
+    value : object
+        Raw value the caster must operate on.
+
+    Returns
+    -------
+    EnvironmentCaster
+        Caster carrying the requested hint and raw value.
+    """
+    caster = EnvironmentCaster(f"{type_hint}:seed")
+    caster._EnvironmentCaster__value_raw = value
+    return caster
 
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterSupportedTypes
@@ -10,1016 +83,700 @@ from orionis.environment.enums.value_type import EnvironmentValueType
 
 class TestEnvironmentCasterSupportedTypes(TestCase):
 
-    def testSupportedTypesReturnsFrozenset(self):
+    def testExposesEveryEnumeratedTypeAsAnOption(self) -> None:
         """
-        Verify that supportedTypes returns a frozenset instance.
+        Expose every enumerated value type as a supported option.
 
-        Checks that the static method's return type is a frozenset, which
-        is the immutable set variant stored in EnvironmentCaster.OPTIONS.
+        Validates that the fast membership set never drifts from the
+        enumeration that documents the ``"<type>:<value>"`` convention.
         """
-        result = EnvironmentCaster.supportedTypes()
-        self.assertIsInstance(result, frozenset)
+        expected = frozenset(member.value for member in EnvironmentValueType)
+        self.assertEqual(EnvironmentCaster.supportedTypes(), expected)
 
-    def testSupportedTypesContainsExpectedValues(self):
+    def testExposesTheOptionsAsAnImmutableSet(self) -> None:
         """
-        Verify that supportedTypes contains all expected type name strings.
+        Expose the options as an immutable frozen set.
 
-        Ensures every EnvironmentValueType member's value is represented
-        in the returned set.
+        Validates that callers cannot mutate the shared catalogue and
+        corrupt parsing for the rest of the process.
         """
-        result = EnvironmentCaster.supportedTypes()
-        expected = {e.value for e in EnvironmentValueType}
-        self.assertEqual(result, expected)
+        self.assertIsInstance(EnvironmentCaster.supportedTypes(), frozenset)
+
+    def testReturnsTheSharedOptionsObject(self) -> None:
+        """
+        Return the shared class-level options object.
+
+        Validates that the accessor performs no per-call allocation.
+        """
+        self.assertIs(EnvironmentCaster.supportedTypes(), EnvironmentCaster.OPTIONS)
 
 # ---------------------------------------------------------------------------
-# TestEnvironmentCasterInit
+# TestEnvironmentCasterParseTyped
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterInit(TestCase):
+class TestEnvironmentCasterParseTyped(TestCase):
 
-    def testInitWithPlainString(self):
+    def testParsesIntegersWithoutBuildingACaster(self) -> None:
         """
-        Initialize with a plain string and return it unchanged via get().
+        Parse an integer through the allocation-free fast path.
 
-        Confirms that a string with no recognized type-hint prefix is stored
-        as the raw value and returned without conversion.
+        Validates the primitive shortcut used whenever a typed entry is
+        read back from the ``.env`` file.
         """
-        self.assertEqual(EnvironmentCaster("hello").get(), "hello")
+        self.assertEqual(EnvironmentCaster.parseTyped("int: 42 "), 42)
 
-    def testInitWithTypedString(self):
+    def testRejectsAnUnparsableInteger(self) -> None:
         """
-        Initialize with a typed string and dispatch to the correct parser.
+        Raise ValueError when the integer payload is malformed.
 
-        Confirms that 'int:42' extracts the type hint and converts the value
-        to the expected integer.
+        Validates that the fast path reports the offending token instead
+        of leaking the built-in conversion error.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster.parseTyped("int:abc")
+        self.assertIn("Cannot convert 'abc' to int", str(ctx.exception))
+
+    def testParsesFloatsWithoutBuildingACaster(self) -> None:
+        """
+        Parse a float through the allocation-free fast path.
+
+        Validates the second primitive shortcut of the typed reader.
+        """
+        self.assertEqual(EnvironmentCaster.parseTyped("float: 3.5 "), 3.5)
+
+    def testRejectsAnUnparsableFloat(self) -> None:
+        """
+        Raise ValueError when the float payload is malformed.
+
+        Validates that the fast path reports the offending token instead
+        of leaking the built-in conversion error.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster.parseTyped("float:abc")
+        self.assertIn("Cannot convert 'abc' to float", str(ctx.exception))
+
+    def testParsesEveryTruthyBooleanSpelling(self) -> None:
+        """
+        Parse every truthy spelling through the fast path.
+
+        Validates the case-insensitive vocabulary accepted for boolean
+        environment entries.
+        """
+        for word in _TRUE_WORDS:
+            self.assertTrue(EnvironmentCaster.parseTyped(f"bool: {word.upper()} "))
+
+    def testTreatsAnyOtherBooleanSpellingAsFalse(self) -> None:
+        """
+        Treat unknown boolean spellings as ``False`` on the fast path.
+
+        Validates the documented asymmetry with the full parser, which
+        instead rejects unknown spellings.
+        """
+        for word in (*_FALSE_WORDS, "maybe"):
+            self.assertFalse(EnvironmentCaster.parseTyped(f"bool:{word}"))
+
+    def testKeepsTrailingWhitespaceOnStrings(self) -> None:
+        """
+        Preserve trailing whitespace when parsing a string entry.
+
+        Validates that only leading whitespace is trimmed, so padded
+        values survive a write and read round trip.
+        """
+        self.assertEqual(EnvironmentCaster.parseTyped("str:  hello "), "hello ")
+
+    def testDelegatesComplexTypesToTheFullCaster(self) -> None:
+        """
+        Delegate non-primitive hints to the full caster.
+
+        Validates that containers, paths and base64 payloads still resolve
+        through the slower but complete construction path.
+        """
+        self.assertEqual(EnvironmentCaster.parseTyped("list:[1, 2]"), [1, 2])
+        self.assertEqual(EnvironmentCaster.parseTyped("dict:{'a': 1}"), {"a": 1})
+        self.assertEqual(EnvironmentCaster.parseTyped("tuple:(1, 2)"), (1, 2))
+        self.assertEqual(EnvironmentCaster.parseTyped("set:{1, 2}"), {1, 2})
+        self.assertEqual(EnvironmentCaster.parseTyped("base64:aGVsbG8="), "hello")
+
+# ---------------------------------------------------------------------------
+# TestEnvironmentCasterConstruction
+# ---------------------------------------------------------------------------
+
+class TestEnvironmentCasterConstruction(TestCase):
+
+    def testDetectsAKnownTypeHint(self) -> None:
+        """
+        Detect a known type hint written before the first colon.
+
+        Validates the split that turns ``int:42`` into a hint plus its
+        payload.
         """
         self.assertEqual(EnvironmentCaster("int:42").get(), 42)
 
-    def testInitWithLeadingWhitespaceAndTypeHint(self):
+    def testIgnoresSurroundingWhitespaceAroundTheHint(self) -> None:
         """
-        Initialize with leading whitespace before the typed string.
+        Ignore whitespace and casing around the declared type hint.
 
-        Verifies that lstrip normalizes the input so the type hint is still
-        detected and the value converted correctly.
+        Validates that manually edited ``.env`` entries still resolve to
+        the intended type.
         """
-        self.assertEqual(EnvironmentCaster("  int:42").get(), 42)
+        self.assertEqual(EnvironmentCaster("  INT : 42").get(), 42)
 
-    def testInitWithUppercaseTypeHint(self):
+    def testTreatsAnUnknownPrefixAsPartOfTheValue(self) -> None:
         """
-        Initialize with an uppercase type hint prefix.
+        Treat an unknown prefix as ordinary value content.
 
-        Ensures the parser is case-insensitive when extracting type hints
-        and converts the value as if the hint were lowercase.
+        Validates that colon-bearing values such as URLs are never
+        mistaken for a typed entry.
         """
-        self.assertEqual(EnvironmentCaster("INT:42").get(), 42)
+        caster = EnvironmentCaster("https://example.test")
+        self.assertEqual(caster.get(), "https://example.test")
 
-    def testInitWithInvalidTypeHintBeforeColon(self):
+    def testTreatsAColonFreeStringAsAPlainValue(self) -> None:
         """
-        Initialize with an unrecognized prefix and treat the input as raw.
+        Treat a string without a colon as an untyped value.
 
-        Confirms that the entire string is kept as the raw value when the
-        prefix before the colon is not a supported type hint.
+        Validates the most common case of a plain textual variable.
         """
-        self.assertEqual(EnvironmentCaster("invalid:42").get(), "invalid:42")
+        self.assertEqual(EnvironmentCaster("plain").get(), "plain")
 
-    def testInitWithNonStringInt(self):
+    def testStripsLeadingWhitespaceFromUntypedValues(self) -> None:
         """
-        Initialize with an integer and store it as raw value unchanged.
+        Strip leading whitespace from an untyped string value.
 
-        Ensures that non-string inputs bypass type hint detection and are
-        passed through get() without any conversion.
+        Validates the normalisation applied before the hint lookup.
         """
-        self.assertEqual(EnvironmentCaster(99).get(), 99)
+        self.assertEqual(EnvironmentCaster("   plain").get(), "plain")
 
-    def testInitWithNonStringPath(self):
+    def testKeepsNonStringInputsUntouched(self) -> None:
         """
-        Initialize with a Path object and store it as raw value unchanged.
+        Keep non-string inputs exactly as they were supplied.
 
-        Ensures that Path instances bypass string-based type hint detection
-        and are returned as-is by get().
+        Validates that values arriving from Python code, rather than from
+        the ``.env`` file, are never re-parsed.
         """
-        p = Path("/some/dir")
-        self.assertEqual(EnvironmentCaster(p).get(), p)
+        payload = [1, 2, 3]
+        self.assertIs(EnvironmentCaster(payload).get(), payload)
 
-    def testInitWithEmptyValueAfterColonRaisesError(self):
+    def testStoresNoneWhenTheTypedPayloadIsEmpty(self) -> None:
         """
-        Raise an error when get() is called after init with an empty value.
+        Store ``None`` when a typed entry carries no payload.
 
-        Confirms that 'str:' sets value_raw to None and that attempting to
-        process a None value raises ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("str:").get()
-
-    def testInitWithColonInValuePreservesRemainder(self):
-        """
-        Split only at the first colon and preserve subsequent colons as value.
-
-        Validates that 'str:hello:world' stores 'hello:world' as the value
-        and returns it unchanged through get().
-        """
-        self.assertEqual(EnvironmentCaster("str:hello:world").get(), "hello:world")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetRaw
-# -----------------------------------------------
-class TestEnvironmentCasterGetRaw(TestCase):
-
-    def testGetRawStringNoTypeHint(self):
-        """
-        Return a plain string unchanged when no type hint is present.
-
-        Confirms that strings without a recognized type-hint prefix are
-        returned exactly as provided.
-        """
-        self.assertEqual(EnvironmentCaster("hello").get(), "hello")
-
-    def testGetRawNonString(self):
-        """
-        Return a non-string raw value unchanged when no type hint is set.
-
-        Checks that integer inputs pass through get() without modification.
-        """
-        self.assertEqual(EnvironmentCaster(42).get(), 42)
-
-    def testGetRawUnrecognizedTypeHint(self):
-        """
-        Return the entire string unchanged when the type hint is unrecognized.
-
-        Validates that unsupported prefix strings are not processed or split.
-        """
-        self.assertEqual(EnvironmentCaster("foo:bar").get(), "foo:bar")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetStr
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetStr(TestCase):
-
-    def testGetStrBasic(self):
-        """
-        Return the value from a str-typed input with no excess whitespace.
-
-        Checks basic parsing of the 'str:' prefix for a simple string.
-        """
-        self.assertEqual(EnvironmentCaster("str:hello").get(), "hello")
-
-    def testGetStrWithLeadingWhitespace(self):
-        """
-        Strip leading whitespace from the value portion of a str-typed input.
-
-        Validates that both __init__ lstrip and __parseStr lstrip cooperate
-        to remove any leading whitespace from the value.
-        """
-        self.assertEqual(
-            EnvironmentCaster("str:  hello world").get(),
-            "hello world",
-        )
-
-    def testGetStrWithColonInValue(self):
-        """
-        Preserve colons within the value portion after the first delimiter.
-
-        Ensures the first colon is used as the type-hint delimiter only, so
-        subsequent colons remain intact in the returned string.
-        """
-        self.assertEqual(
-            EnvironmentCaster("str:hello:world").get(),
-            "hello:world",
-        )
-
-    def testGetStrEmptyValueRaisesError(self):
-        """
-        Raise ValueError when the str type hint is followed by an empty value.
-
-        Confirms that an empty value part sets value_raw to None, which
-        triggers a ValueError when get() attempts to process it.
+        Validates the guard that prevents an empty payload from being
+        mistaken for an empty string.
         """
         with self.assertRaises(ValueError):
-            EnvironmentCaster("str:").get()
+            EnvironmentCaster("int:").get()
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep caster instances free of an instance dictionary.
+
+        Validates that the declared slots are effective, which requires
+        the contract to declare empty slots as well.
+        """
+        self.assertFalse(hasattr(EnvironmentCaster("int:1"), "__dict__"))
 
 # ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetInt
+# TestEnvironmentCasterGet
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterGetInt(TestCase):
+class TestEnvironmentCasterGet(TestCase):
 
-    def testGetIntBasic(self):
+    def testParsesEveryPrimitiveType(self) -> None:
         """
-        Convert a well-formed int-typed string to an integer.
+        Parse every primitive type declared by a hint.
 
-        Validates standard integer parsing through the 'int:' prefix.
+        Validates the string, integer, float and boolean branches of the
+        dispatch table.
         """
-        self.assertEqual(EnvironmentCaster("int:42").get(), 42)
+        self.assertEqual(EnvironmentCaster("str:  text ").get(), "text ")
+        self.assertEqual(EnvironmentCaster("int: -7 ").get(), -7)
+        self.assertEqual(EnvironmentCaster("float: -2.5 ").get(), -2.5)
+        self.assertTrue(EnvironmentCaster("bool: TRUE ").get())
 
-    def testGetIntNegative(self):
+    def testParsesEveryTruthyBooleanSpelling(self) -> None:
         """
-        Convert a negative int-typed string to a negative integer.
+        Parse every truthy boolean spelling accepted by the parser.
 
-        Ensures the parser handles negative integer literals correctly.
+        Validates the full vocabulary documented for boolean entries.
         """
-        self.assertEqual(EnvironmentCaster("int:-7").get(), -7)
+        for word in _TRUE_WORDS:
+            self.assertTrue(EnvironmentCaster(f"bool:{word}").get())
 
-    def testGetIntWithWhitespace(self):
+    def testParsesEveryFalsyBooleanSpelling(self) -> None:
         """
-        Parse an integer value that has surrounding whitespace.
+        Parse every falsy boolean spelling accepted by the parser.
 
-        Confirms that strip() inside __parseInt handles extra spaces around
-        the numeric value.
+        Validates the counterpart vocabulary of the truthy spellings.
         """
-        self.assertEqual(EnvironmentCaster("int: 42 ").get(), 42)
+        for word in _FALSE_WORDS:
+            self.assertFalse(EnvironmentCaster(f"bool:{word}").get())
 
-    def testGetIntInvalidRaisesError(self):
+    def testRejectsAnUnknownBooleanSpelling(self) -> None:
         """
-        Raise ValueError when the int-typed value is not a valid integer.
+        Raise ValueError for a boolean spelling outside the vocabulary.
 
-        Validates that non-numeric strings trigger the appropriate error
-        during parsing.
+        Validates that the full parser is stricter than the fast path and
+        surfaces the accepted representations.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("int:abc").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetFloat
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetFloat(TestCase):
-
-    def testGetFloatBasic(self):
-        """
-        Convert a well-formed float-typed string to a floating-point number.
-
-        Validates standard float parsing through the 'float:' prefix.
-        """
-        self.assertAlmostEqual(EnvironmentCaster("float:3.14").get(), 3.14)
-
-    def testGetFloatNegative(self):
-        """
-        Convert a negative float-typed string to a negative float.
-
-        Ensures the parser handles negative floating-point literals.
-        """
-        self.assertAlmostEqual(EnvironmentCaster("float:-1.5").get(), -1.5)
-
-    def testGetFloatFromIntegerString(self):
-        """
-        Promote an integer string to float under the float prefix.
-
-        Confirms that integer-like strings are returned as float instances
-        rather than ints.
-        """
-        result = EnvironmentCaster("float:10").get()
-        self.assertIsInstance(result, float)
-        self.assertEqual(result, 10.0)
-
-    def testGetFloatInvalidRaisesError(self):
-        """
-        Raise ValueError when the float-typed value is not numeric.
-
-        Validates that non-numeric strings trigger the appropriate error.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("float:abc").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetBool
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetBool(TestCase):
-
-    def testGetBoolTrue(self):
-        """
-        Recognize 'true' as boolean True.
-
-        Validates that the lowercase 'true' literal maps to Python True.
-        """
-        self.assertIs(EnvironmentCaster("bool:true").get(), True)
-
-    def testGetBoolFalse(self):
-        """
-        Recognize 'false' as boolean False.
-
-        Validates that the lowercase 'false' literal maps to Python False.
-        """
-        self.assertIs(EnvironmentCaster("bool:false").get(), False)
-
-    def testGetBoolOne(self):
-        """
-        Recognize '1' as boolean True.
-
-        Validates the numeric truthy representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:1").get(), True)
-
-    def testGetBoolZero(self):
-        """
-        Recognize '0' as boolean False.
-
-        Validates the numeric falsy representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:0").get(), False)
-
-    def testGetBoolYes(self):
-        """
-        Recognize 'yes' as boolean True.
-
-        Validates the 'yes' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:yes").get(), True)
-
-    def testGetBoolNo(self):
-        """
-        Recognize 'no' as boolean False.
-
-        Validates the 'no' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:no").get(), False)
-
-    def testGetBoolOn(self):
-        """
-        Recognize 'on' as boolean True.
-
-        Validates the 'on' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:on").get(), True)
-
-    def testGetBoolOff(self):
-        """
-        Recognize 'off' as boolean False.
-
-        Validates the 'off' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:off").get(), False)
-
-    def testGetBoolEnabled(self):
-        """
-        Recognize 'enabled' as boolean True.
-
-        Validates the 'enabled' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:enabled").get(), True)
-
-    def testGetBoolDisabled(self):
-        """
-        Recognize 'disabled' as boolean False.
-
-        Validates the 'disabled' string representation.
-        """
-        self.assertIs(EnvironmentCaster("bool:disabled").get(), False)
-
-    def testGetBoolUppercaseValueIsCaseInsensitive(self):
-        """
-        Recognize uppercase 'TRUE' as boolean True.
-
-        Validates that the bool parser lowercases the value before matching,
-        making the comparison case-insensitive.
-        """
-        self.assertIs(EnvironmentCaster("bool:TRUE").get(), True)
-
-    def testGetBoolInvalidRaisesError(self):
-        """
-        Raise ValueError when the bool-typed value is not a recognized token.
-
-        Confirms that arbitrary strings that do not map to a known boolean
-        representation trigger the appropriate error.
-        """
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster("bool:maybe").get()
+        self.assertIn("true/false", str(ctx.exception))
+
+    def testRejectsUnparsableNumbers(self) -> None:
+        """
+        Raise ValueError when a numeric payload cannot be converted.
+
+        Validates the parser error branches reached through the full
+        dispatch table rather than the primitive fast path.
+        """
+        for entry, expected in (("int:abc", "to int"), ("float:abc", "to float")):
+            with self.assertRaises(ValueError) as ctx:
+                EnvironmentCaster(entry).get()
+            self.assertIn(expected, str(ctx.exception))
+
+    def testParsesEveryContainerType(self) -> None:
+        """
+        Parse every container type declared by a hint.
+
+        Validates the list, dictionary, tuple and set branches evaluated
+        through ``ast.literal_eval``.
+        """
+        self.assertEqual(EnvironmentCaster("list: [1, 2] ").get(), [1, 2])
+        self.assertEqual(EnvironmentCaster("dict: {'a': 1} ").get(), {"a": 1})
+        self.assertEqual(EnvironmentCaster("tuple: (1, 2) ").get(), (1, 2))
+        self.assertEqual(EnvironmentCaster("set: {1, 2} ").get(), {1, 2})
+
+    def testRejectsAContainerOfTheWrongShape(self) -> None:
+        """
+        Reject a payload whose literal does not match the declared hint.
+
+        Validates that a dictionary declared as a list, and every other
+        mismatched combination, is refused instead of silently accepted.
+        """
+        for entry in ("list:{'a': 1}", "dict:[1, 2]", "tuple:[1, 2]", "set:[1, 2]"):
+            with self.assertRaises((TypeError, ValueError)):
+                EnvironmentCaster(entry).get()
+
+    def testRejectsAContainerWithInvalidSyntax(self) -> None:
+        """
+        Reject a container payload that is not a valid Python literal.
+
+        Validates that a malformed ``.env`` entry fails loudly rather than
+        returning a partially parsed value.
+        """
+        for entry in ("list:[1,", "dict:{'a':", "tuple:(1,", "set:{1,"):
+            with self.assertRaises((SyntaxError, ValueError)):
+                EnvironmentCaster(entry).get()
+
+    def testReRaisesTypeErrorsWithTheOriginalType(self) -> None:
+        """
+        Preserve ``TypeError`` when the payload has the wrong shape.
+
+        Validates that the error wrapper keeps the concrete exception type
+        instead of collapsing everything into ``ValueError``.
+        """
+        with self.assertRaises(TypeError) as ctx:
+            EnvironmentCaster("list:{'a': 1}").get()
+        self.assertIn("type hint 'list'", str(ctx.exception))
+
+    def testWrapsUnexpectedFailuresAsValueError(self) -> None:
+        """
+        Wrap unexpected failures into a ``ValueError``.
+
+        Validates the last-resort handler that keeps the caster from
+        leaking arbitrary exception types to its callers.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster("int:").get()
+        self.assertIn("Error processing value", str(ctx.exception))
+
+    def testDecodesBase64Payloads(self) -> None:
+        """
+        Decode a base64 payload back into readable text.
+
+        Validates the round trip used by ``APP_KEY`` style secrets.
+        """
+        self.assertEqual(EnvironmentCaster("base64:aGVsbG8=").get(), "hello")
+
+    def testReturnsRawBytesForNonTextualBase64Payloads(self) -> None:
+        """
+        Return raw bytes when the decoded payload is not UTF-8 text.
+
+        Validates that binary secrets survive decoding without being
+        mangled by a lossy conversion.
+        """
+        encoded = base64.b64encode(_NON_UTF8).decode("utf-8")
+        self.assertEqual(EnvironmentCaster(f"base64:{encoded}").get(), _NON_UTF8)
+
+    def testDecodesBase64PayloadsHeldAsBytes(self) -> None:
+        """
+        Decode a base64 payload that is stored as raw bytes.
+
+        Validates the normalisation applied when the value was supplied by
+        Python code rather than parsed from the ``.env`` file.
+        """
+        caster = EnvironmentCaster(b"aGVsbG8=")
+        caster.to("base64")
+        self.assertEqual(caster.get(), "hello")
+
+    def testRejectsAMalformedBase64Payload(self) -> None:
+        """
+        Raise ValueError when the base64 payload cannot be decoded.
+
+        Validates that a truncated or corrupted secret is reported instead
+        of producing garbage bytes.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster("base64:not-base64!").get()
+        self.assertIn("Cannot decode Base64 value", str(ctx.exception))
+
+    def testNormalisesPathSeparators(self) -> None:
+        """
+        Normalise Windows separators into POSIX form.
+
+        Validates that a path written on any platform is read back with a
+        single, portable representation.
+        """
+        caster = EnvironmentCaster("path:C:\\\\data\\\\logs")
+        self.assertNotIn("\\", str(caster.get()))
+
+    def testReturnsPosixFormForPathObjects(self) -> None:
+        """
+        Return the POSIX form when the value already is a path object.
+
+        Validates the shortcut that avoids re-parsing a value produced by
+        Python code.
+        """
+        caster = EnvironmentCaster(Path("/var/log/app"))
+        caster.to("path")
+        self.assertEqual(caster.get(), "/var/log/app")
+
+    def testWrapsPathConversionFailures(self) -> None:
+        """
+        Wrap path conversion failures into a ``ValueError``.
+
+        Validates the defensive handler protecting the caller from values
+        that cannot be rendered as text.
+        """
+        caster = build_caster("path", _UnprintableOnceValue())
+        with self.assertRaises(ValueError) as ctx:
+            caster.get()
+        self.assertIn("to path", str(ctx.exception))
+
+    def testReturnsTheRawValueWhenNoHintIsDeclared(self) -> None:
+        """
+        Return the raw value when no type hint was detected.
+
+        Validates the untyped shortcut of the dispatch table.
+        """
+        self.assertEqual(EnvironmentCaster("plain value").get(), "plain value")
+
+    def testReturnsTheRawValueForAnUndispatchedHint(self) -> None:
+        """
+        Return the raw value when the hint has no dispatch branch.
+
+        Validates the defensive fallback that keeps the caster usable if
+        the supported options are extended without a matching parser.
+        """
+        self.assertEqual(_ExtendedCaster("unknown:payload").get(), "payload")
 
 # ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetList
+# TestEnvironmentCasterTo
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterGetList(TestCase):
+class TestEnvironmentCasterTo(TestCase):
 
-    def testGetListBasic(self):
+    def testSerialisesEveryPrimitiveType(self) -> None:
         """
-        Parse a list-typed string into a Python list of integers.
+        Serialise every primitive type with its hint prefix.
 
-        Validates standard list parsing through the 'list:' prefix.
+        Validates the representation written back to the ``.env`` file for
+        strings, integers, floats and booleans.
         """
-        self.assertEqual(EnvironmentCaster("list:[1, 2, 3]").get(), [1, 2, 3])
-
-    def testGetListOfStrings(self):
-        """
-        Parse a list of string literals from a list-typed input.
-
-        Confirms that string elements inside a list literal are parsed
-        correctly via ast.literal_eval.
-        """
-        self.assertEqual(
-            EnvironmentCaster("list:['a', 'b', 'c']").get(),
-            ["a", "b", "c"],
-        )
-
-    def testGetListEmpty(self):
-        """
-        Parse an empty list literal from a list-typed input.
-
-        Verifies that '[]' is correctly evaluated to an empty Python list.
-        """
-        self.assertEqual(EnvironmentCaster("list:[]").get(), [])
-
-    def testGetListInvalidRaisesError(self):
-        """
-        Raise an error when the list-typed value is not a valid list literal.
-
-        Validates that non-list strings trigger an error during ast evaluation.
-        """
-        with self.assertRaises((ValueError, TypeError)):
-            EnvironmentCaster("list:notalist").get()
-
-    def testGetListWrongTypeRaisesError(self):
-        """
-        Raise an error when the evaluated literal is a tuple, not a list.
-
-        Confirms that type checking after evaluation rejects non-list types
-        and propagates the failure as ValueError or TypeError.
-        """
-        with self.assertRaises((ValueError, TypeError)):
-            EnvironmentCaster("list:(1, 2, 3)").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetDict
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetDict(TestCase):
-
-    def testGetDictBasic(self):
-        """
-        Parse a dict-typed string into a Python dictionary.
-
-        Validates standard dictionary parsing through the 'dict:' prefix.
-        """
-        self.assertEqual(
-            EnvironmentCaster("dict:{'a': 1}").get(),
-            {"a": 1},
-        )
-
-    def testGetDictEmpty(self):
-        """
-        Parse an empty dict literal from a dict-typed input.
-
-        Verifies that '{}' is correctly evaluated to an empty Python dict.
-        """
-        self.assertEqual(EnvironmentCaster("dict:{}").get(), {})
-
-    def testGetDictInvalidRaisesError(self):
-        """
-        Raise ValueError when the dict-typed value is not a valid dict literal.
-
-        Validates that non-dict strings trigger an error during parsing.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("dict:notadict").get()
-
-    def testGetDictWrongTypeRaisesError(self):
-        """
-        Raise ValueError when the evaluated literal is a list, not a dict.
-
-        Confirms that type checking after evaluation rejects non-dict types
-        and normalizes the failure to ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("dict:[1, 2]").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetTuple
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetTuple(TestCase):
-
-    def testGetTupleBasic(self):
-        """
-        Parse a tuple-typed string into a Python tuple.
-
-        Validates standard tuple parsing through the 'tuple:' prefix.
-        """
-        self.assertEqual(
-            EnvironmentCaster("tuple:(1, 2, 3)").get(),
-            (1, 2, 3),
-        )
-
-    def testGetTupleEmpty(self):
-        """
-        Parse an empty tuple literal from a tuple-typed input.
-
-        Verifies that '()' is correctly evaluated to an empty Python tuple.
-        """
-        self.assertEqual(EnvironmentCaster("tuple:()").get(), ())
-
-    def testGetTupleInvalidRaisesError(self):
-        """
-        Raise ValueError when the tuple-typed value is not a valid literal.
-
-        Validates that non-tuple strings trigger an error during parsing.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("tuple:notatuple").get()
-
-    def testGetTupleWrongTypeRaisesError(self):
-        """
-        Raise ValueError when the evaluated literal is a list, not a tuple.
-
-        Confirms that type checking after evaluation rejects non-tuple types
-        and normalizes the failure to ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("tuple:[1, 2]").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetSet
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetSet(TestCase):
-
-    def testGetSetBasic(self):
-        """
-        Parse a set-typed string into a Python set.
-
-        Validates standard set parsing through the 'set:' prefix using a
-        non-empty set literal supported by ast.literal_eval.
-        """
-        self.assertEqual(
-            EnvironmentCaster("set:{1, 2, 3}").get(),
-            {1, 2, 3},
-        )
-
-    def testGetSetInvalidRaisesError(self):
-        """
-        Raise ValueError when the set-typed value is not a valid set literal.
-
-        Validates that non-set strings trigger an error during parsing.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("set:notaset").get()
-
-    def testGetSetEmptyBracesRaisesError(self):
-        """
-        Raise ValueError when '{}' is provided for a set-typed value.
-
-        Confirms that empty braces evaluate to a dict in Python, causing the
-        isinstance(parsed, set) check to fail and raise ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("set:{}").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetBase64
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetBase64(TestCase):
-
-    def testGetBase64ValidEncoded(self):
-        """
-        Decode a valid Base64 string to its original UTF-8 value.
-
-        Confirms that the standard base64 encoding of 'hello' (aGVsbG8=)
-        is correctly decoded back to the string 'hello'.
-        """
-        result = EnvironmentCaster("base64:aGVsbG8=").get()
-        self.assertEqual(result, "hello")
-
-    def testGetBase64InvalidRaisesError(self):
-        """
-        Raise ValueError when the base64-typed value has invalid characters.
-
-        Validates that malformed Base64 input (non-alphabet characters) is
-        rejected and triggers an appropriate ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("base64:!@#$").get()
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterGetPath
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterGetPath(TestCase):
-
-    def testGetPathForwardSlashes(self):
-        """
-        Return a normalized POSIX path string from a path-typed input.
-
-        Validates that a forward-slash path is returned exactly as a POSIX
-        string without any transformation.
-        """
-        result = EnvironmentCaster("path:/home/user/file.txt").get()
-        self.assertEqual(result, "/home/user/file.txt")
-
-    def testGetPathBackslashesNormalized(self):
-        """
-        Normalize backslashes to forward slashes in path-typed values.
-
-        Verifies that Windows-style separators in a relative path are
-        converted to POSIX forward slashes.
-        """
-        result = EnvironmentCaster(r"path:relative\subdir").get()
-        self.assertEqual(result, "relative/subdir")
-
-    def testGetPathRelativePreserved(self):
-        """
-        Return a relative path as a POSIX string without resolving it.
-
-        Confirms that __parsePath does not convert relative paths to
-        absolute paths — it only normalizes separators.
-        """
-        result = EnvironmentCaster("path:some/relative/path").get()
-        self.assertEqual(result, "some/relative/path")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToStr
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToStr(TestCase):
-
-    def testToStr(self):
-        """
-        Serialize a string value with the 'str' type hint prefix.
-
-        Validates that to('str') produces the 'str:<value>' format.
-        """
-        self.assertEqual(EnvironmentCaster("hello").to("str"), "str:hello")
-
-    def testToStrWithEnumHint(self):
-        """
-        Serialize a string using an EnvironmentValueType enum as the hint.
-
-        Confirms that enum hints are accepted and produce the same result
-        as the equivalent string hint.
-        """
-        result = EnvironmentCaster("hello").to(EnvironmentValueType.STR)
-        self.assertEqual(result, "str:hello")
-
-    def testToStrRaisesErrorForNonString(self):
-        """
-        Raise ValueError when a non-string value is serialized with str hint.
-
-        Validates that the type enforcement in __toStr is propagated through
-        to() as ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster(42).to("str")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToInt
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToInt(TestCase):
-
-    def testToIntFromInt(self):
-        """
-        Serialize an integer value with the 'int' type hint prefix.
-
-        Validates that to('int') produces the 'int:<value>' format.
-        """
+        self.assertEqual(EnvironmentCaster("text").to("str"), "str:text")
         self.assertEqual(EnvironmentCaster(42).to("int"), "int:42")
-
-    def testToIntFromString(self):
-        """
-        Serialize a numeric string value with the 'int' type hint prefix.
-
-        Confirms that string representations of integers are converted and
-        serialized correctly.
-        """
-        self.assertEqual(EnvironmentCaster("42").to("int"), "int:42")
-
-    def testToIntFromFloat(self):
-        """
-        Serialize a float value truncated to int under the 'int' hint.
-
-        Validates that float values representable as integers are accepted
-        and the fractional part is discarded.
-        """
-        self.assertEqual(EnvironmentCaster(3.0).to("int"), "int:3")
-
-    def testToIntInvalidStringRaisesError(self):
-        """
-        Raise ValueError when a non-numeric string is serialized as int.
-
-        Confirms that conversion errors inside __toInt are propagated
-        correctly as ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("abc").to("int")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToFloat
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToFloat(TestCase):
-
-    def testToFloatFromFloat(self):
-        """
-        Serialize a float value with the 'float' type hint prefix.
-
-        Validates that to('float') produces the 'float:<value>' format.
-        """
-        self.assertEqual(EnvironmentCaster(3.14).to("float"), "float:3.14")
-
-    def testToFloatFromString(self):
-        """
-        Serialize a numeric string value with the 'float' type hint prefix.
-
-        Confirms that string representations of floats are converted and
-        serialized correctly.
-        """
-        self.assertEqual(EnvironmentCaster("3.14").to("float"), "float:3.14")
-
-    def testToFloatFromInt(self):
-        """
-        Serialize an integer value promoted to float under the 'float' hint.
-
-        Validates that integer inputs are promoted to float and the resulting
-        serialized string reflects the float representation.
-        """
-        self.assertEqual(EnvironmentCaster(10).to("float"), "float:10.0")
-
-    def testToFloatInvalidStringRaisesError(self):
-        """
-        Raise ValueError when a non-numeric string is serialized as float.
-
-        Confirms that conversion errors inside __toFloat are propagated
-        correctly as ValueError.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("abc").to("float")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToBool
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToBool(TestCase):
-
-    def testToBoolFromTrue(self):
-        """
-        Serialize Python True to the 'bool:true' string.
-
-        Validates that the boolean True literal is lowercased in the output.
-        """
+        self.assertEqual(EnvironmentCaster(2.5).to("float"), "float:2.5")
         self.assertEqual(EnvironmentCaster(True).to("bool"), "bool:true")
-
-    def testToBoolFromFalse(self):
-        """
-        Serialize Python False to the 'bool:false' string.
-
-        Validates that the boolean False literal is lowercased in the output.
-        """
         self.assertEqual(EnvironmentCaster(False).to("bool"), "bool:false")
 
-    def testToBoolFromTrueString(self):
+    def testSerialisesEveryContainerType(self) -> None:
         """
-        Serialize a recognized truthy string to 'bool:true'.
+        Serialise every container type with its hint prefix.
 
-        Confirms that 'yes' is normalized to the canonical 'true' form.
+        Validates that the stored representation is the Python literal
+        expected by the matching parser.
         """
-        self.assertEqual(EnvironmentCaster("yes").to("bool"), "bool:true")
+        self.assertEqual(EnvironmentCaster([1, 2]).to("list"), "list:[1, 2]")
+        self.assertEqual(EnvironmentCaster({"a": 1}).to("dict"), "dict:{'a': 1}")
+        self.assertEqual(EnvironmentCaster((1, 2)).to("tuple"), "tuple:(1, 2)")
+        self.assertEqual(EnvironmentCaster({1}).to("set"), "set:{1}")
 
-    def testToBoolFromFalseString(self):
+    def testAcceptsAnEnumerationHint(self) -> None:
         """
-        Serialize a recognized falsy string to 'bool:false'.
+        Accept the target type expressed as an enumeration member.
 
-        Confirms that 'no' is normalized to the canonical 'false' form.
+        Validates that callers may use ``EnvironmentValueType`` instead of
+        raw strings when declaring a type.
         """
-        self.assertEqual(EnvironmentCaster("no").to("bool"), "bool:false")
+        caster = EnvironmentCaster(42)
+        self.assertEqual(caster.to(EnvironmentValueType.INT), "int:42")
 
-    def testToBoolFromNumericOne(self):
+    def testConvertsTextualNumbersToTheirDeclaredType(self) -> None:
         """
-        Serialize the string '1' to 'bool:true'.
+        Convert textual numbers into their declared numeric type.
 
-        Validates that the numeric truthy string representation is accepted
-        and normalized correctly.
+        Validates the usability branch that accepts a string when an
+        integer or a float was declared.
         """
-        self.assertEqual(EnvironmentCaster("1").to("bool"), "bool:true")
+        self.assertEqual(EnvironmentCaster(" 42 ").to("int"), "int:42")
+        self.assertEqual(EnvironmentCaster(" 2.5 ").to("float"), "float:2.5")
 
-    def testToBoolInvalidStringRaisesError(self):
+    def testConvertsCompatibleNumbersAcrossTypes(self) -> None:
         """
-        Raise ValueError when an unrecognized string is serialized as bool.
+        Convert compatible numbers across the numeric hints.
 
-        Confirms that invalid boolean strings trigger the appropriate error
-        inside __toBool, propagated as ValueError through to().
+        Validates the direct coercion branch used when an integer is
+        declared as a float, and the opposite case.
+        """
+        self.assertEqual(EnvironmentCaster(42).to("float"), "float:42.0")
+        self.assertEqual(EnvironmentCaster(2.9).to("int"), "int:2")
+
+    def testRejectsTextualNumbersThatCannotBeConverted(self) -> None:
+        """
+        Reject textual payloads that are not valid numbers.
+
+        Validates that a malformed declaration fails at write time rather
+        than at the next read.
+        """
+        for type_hint in ("int", "float"):
+            with self.assertRaises(ValueError):
+                EnvironmentCaster("abc").to(type_hint)
+
+    def testRejectsValuesThatCannotBecomeNumbers(self) -> None:
+        """
+        Reject non-textual values that cannot become numbers.
+
+        Validates the last coercion branch of the numeric serialisers.
+        """
+        for type_hint in ("int", "float"):
+            with self.assertRaises(ValueError) as ctx:
+                EnvironmentCaster([1, 2]).to(type_hint)
+            self.assertIn("must be convertible", str(ctx.exception))
+
+    def testSerialisesEveryTextualBooleanSpelling(self) -> None:
+        """
+        Serialise every textual boolean spelling to a canonical form.
+
+        Validates that all accepted spellings collapse into ``true`` or
+        ``false`` before being written.
+        """
+        for word in _TRUE_WORDS:
+            self.assertEqual(EnvironmentCaster(word).to("bool"), "bool:true")
+        for word in _FALSE_WORDS:
+            self.assertEqual(EnvironmentCaster(word).to("bool"), "bool:false")
+
+    def testRejectsAnUnknownTextualBoolean(self) -> None:
+        """
+        Reject a textual boolean outside the accepted vocabulary.
+
+        Validates that ambiguous values never reach the ``.env`` file.
         """
         with self.assertRaises(ValueError):
             EnvironmentCaster("maybe").to("bool")
 
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToList
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToList(TestCase):
-
-    def testToList(self):
+    def testFallsBackToTruthinessForOtherTypes(self) -> None:
         """
-        Serialize a list value with the 'list' type hint prefix.
+        Fall back to Python truthiness for non-textual values.
 
-        Validates that to('list') produces the 'list:<repr>' format using
-        the repr of the list.
+        Validates the branch used when an arbitrary object is declared as
+        a boolean.
         """
-        self.assertEqual(EnvironmentCaster([1, 2, 3]).to("list"), "list:[1, 2, 3]")
+        self.assertEqual(EnvironmentCaster([1, 2]).to("bool"), "bool:true")
+        self.assertEqual(EnvironmentCaster([]).to("bool"), "bool:false")
 
-    def testToListRaisesErrorForNonList(self):
+    def testRejectsValuesWithoutATruthValue(self) -> None:
         """
-        Raise ValueError when a non-list value is serialized with list hint.
+        Reject values that refuse the truthiness protocol.
 
-        Confirms that type enforcement in __toList is propagated as ValueError
-        through to().
+        Validates the defensive handler around the truthiness fallback.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("hello").to("list")
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster(_UncoercibleValue()).to("bool")
+        self.assertIn("must be convertible to boolean", str(ctx.exception))
 
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToDict
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToDict(TestCase):
-
-    def testToDict(self):
+    def testRejectsMismatchedContainerTypes(self) -> None:
         """
-        Serialize a dict value with the 'dict' type hint prefix.
+        Reject values whose type does not match the declared container.
 
-        Validates that to('dict') produces the 'dict:<repr>' format using
-        the repr of the dictionary.
+        Validates the guards of the list, dictionary, tuple and set
+        serialisers.
         """
-        self.assertEqual(
-            EnvironmentCaster({"a": 1}).to("dict"),
-            "dict:{'a': 1}",
-        )
+        for type_hint in ("list", "dict", "tuple", "set"):
+            with self.assertRaises(ValueError) as ctx:
+                EnvironmentCaster("text").to(type_hint)
+            self.assertIn(f"to convert to {type_hint}", str(ctx.exception))
 
-    def testToDictRaisesErrorForNonDict(self):
+    def testRejectsNonTextualStringValues(self) -> None:
         """
-        Raise ValueError when a non-dict value is serialized with dict hint.
+        Reject non-textual values declared as a string.
 
-        Confirms that type enforcement in __toDict is propagated as ValueError
-        through to().
+        Validates that the string serialiser never coerces silently.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("hello").to("dict")
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster(42).to("str")
+        self.assertIn("must be a string", str(ctx.exception))
 
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToTuple
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToTuple(TestCase):
-
-    def testToTuple(self):
+    def testResolvesRelativePathsAgainstTheWorkingDirectory(self) -> None:
         """
-        Serialize a tuple value with the 'tuple' type hint prefix.
+        Resolve a relative path against the current working directory.
 
-        Validates that to('tuple') produces the 'tuple:<repr>' format using
-        the repr of the tuple.
+        Validates that stored paths are always absolute and therefore
+        independent of the process that reads them later.
         """
-        self.assertEqual(
-            EnvironmentCaster((1, 2, 3)).to("tuple"),
-            "tuple:(1, 2, 3)",
-        )
+        stored = EnvironmentCaster("logs/app.log").to("path")
+        self.assertTrue(stored.startswith("path:"))
+        self.assertTrue(Path(stored.removeprefix("path:")).is_absolute())
 
-    def testToTupleRaisesErrorForNonTuple(self):
+    def testKeepsAbsolutePathsUnchanged(self) -> None:
         """
-        Raise ValueError when a non-tuple value is serialized with tuple hint.
+        Keep an already absolute path unchanged.
 
-        Confirms that type enforcement in __toTuple is propagated as ValueError
-        through to().
+        Validates that the working directory is never prepended twice.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("hello").to("tuple")
+        absolute = Path.cwd() / "logs"
+        stored = EnvironmentCaster(absolute).to("path")
+        self.assertEqual(stored, f"path:{absolute.as_posix()}")
 
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToSet
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToSet(TestCase):
-
-    def testToSet(self):
+    def testNormalisesWindowsSeparatorsWhenStoringPaths(self) -> None:
         """
-        Serialize a set value with the 'set' type hint prefix.
+        Normalise Windows separators when storing a path.
 
-        Uses a single-element set to avoid repr ordering non-determinism
-        across different Python implementations.
+        Validates that the persisted representation is always POSIX.
         """
-        self.assertEqual(EnvironmentCaster({42}).to("set"), "set:{42}")
+        stored = EnvironmentCaster("\\\\var\\\\log").to("path")
+        self.assertNotIn("\\", stored)
 
-    def testToSetRaisesErrorForNonSet(self):
+    def testRejectsValuesThatAreNotPathLike(self) -> None:
         """
-        Raise ValueError when a non-set value is serialized with set hint.
+        Reject values that are neither strings nor path objects.
 
-        Confirms that type enforcement in __toSet is propagated as ValueError
-        through to().
+        Validates the type guard of the path serialiser.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("hello").to("set")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToBase64
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToBase64(TestCase):
-
-    def testToBase64Encode(self):
-        """
-        Encode a plain string value to Base64 with the 'base64' prefix.
-
-        Validates that 'hello' is Base64-encoded to 'aGVsbG8=' and the
-        result is prefixed with the type hint.
-        """
-        result = EnvironmentCaster("hello").to("base64")
-        self.assertEqual(result, "base64:aGVsbG8=")
-
-    def testToBase64PreservesAlreadyEncodedValue(self):
-        """
-        Preserve a value that is already valid Base64 without re-encoding.
-
-        Confirms that a well-formed Base64 string passed as input is detected
-        as valid and left unchanged in the serialized output.
-        """
-        result = EnvironmentCaster("aGVsbG8=").to("base64")
-        self.assertEqual(result, "base64:aGVsbG8=")
-
-    def testToBase64RaisesErrorForNonStringOrBytes(self):
-        """
-        Raise ValueError when a non-string/non-bytes value is Base64-encoded.
-
-        Validates that the type check in __toBase64 rejects integer inputs
-        and the error is propagated as ValueError through to().
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster(42).to("base64")
-
-# ---------------------------------------------------------------------------
-# TestEnvironmentCasterToPath
-# ---------------------------------------------------------------------------
-
-class TestEnvironmentCasterToPath(TestCase):
-
-    def testToPathAbsolute(self):
-        """
-        Serialize an absolute path string with the 'path' prefix.
-
-        Uses the current working directory to construct a guaranteed absolute
-        path and verifies the serialized output starts with 'path:' and
-        contains the expected directory name.
-        """
-        abs_path = Path.cwd().as_posix()
-        result = EnvironmentCaster(abs_path).to("path")
-        self.assertTrue(result.startswith("path:"))
-        self.assertIn(Path.cwd().name, result)
-
-    def testToPathRelativeMadeAbsolute(self):
-        """
-        Resolve a relative path to an absolute form during serialization.
-
-        Confirms that relative inputs are joined with the current working
-        directory so the output always contains a full absolute path.
-        """
-        result = EnvironmentCaster("subdir/file.txt").to("path")
-        self.assertTrue(result.startswith("path:"))
-        self.assertTrue(result.endswith("/subdir/file.txt"))
-
-    def testToPathFromPathObject(self):
-        """
-        Serialize a Path object with the 'path' type hint prefix.
-
-        Validates that Path instances are accepted by __toPath and serialized
-        in normalized POSIX format.
-        """
-        abs_path = Path.cwd()
-        result = EnvironmentCaster(abs_path).to("path")
-        self.assertTrue(result.startswith("path:"))
-        self.assertIn(abs_path.name, result)
-
-    def testToPathRaisesErrorForNonStringOrPath(self):
-        """
-        Raise ValueError when a non-string/non-Path value is used as path.
-
-        Confirms that the type check in __toPath rejects integer inputs and
-        the error is propagated as ValueError through to().
-        """
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(42).to("path")
+        self.assertIn("must be a string or Path", str(ctx.exception))
+
+    def testPreservesValuesThatAlreadyAreBase64(self) -> None:
+        """
+        Preserve a payload that already is valid base64.
+
+        Validates that re-writing an existing secret never double encodes
+        it.
+        """
+        self.assertEqual(
+            EnvironmentCaster("aGVsbG8=").to("base64"),
+            "base64:aGVsbG8=",
+        )
+
+    def testEncodesTextualPayloadsIntoBase64(self) -> None:
+        """
+        Encode a plain textual payload into base64.
+
+        Validates the branch taken when the value is not already encoded.
+        """
+        self.assertEqual(
+            EnvironmentCaster("hi!").to("base64"),
+            f"base64:{base64.b64encode(b'hi!').decode('utf-8')}",
+        )
+
+    def testEncodesBinaryPayloadsIntoBase64(self) -> None:
+        """
+        Encode a raw bytes payload into base64.
+
+        Validates the branch that skips the UTF-8 encoding step because
+        the value already is binary.
+        """
+        self.assertEqual(
+            EnvironmentCaster(b"hello").to("base64"),
+            f"base64:{base64.b64encode(b'hello').decode('utf-8')}",
+        )
+
+    def testRejectsBinaryPayloadsThatAreNotUtf8(self) -> None:
+        """
+        Reject binary payloads that cannot be decoded as UTF-8.
+
+        Validates the guard placed before the base64 validity check.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster(_NON_UTF8).to("base64")
+        self.assertIn("Cannot decode bytes to UTF-8", str(ctx.exception))
+
+    def testRejectsTextualPayloadsThatCannotBeEncoded(self) -> None:
+        """
+        Reject textual payloads that cannot be encoded as UTF-8.
+
+        Validates the handler around the base64 encoding step, reachable
+        with an unpaired surrogate.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster(_LONE_SURROGATE).to("base64")
+        self.assertIn("Error during Base64 encoding", str(ctx.exception))
+
+    def testRejectsValuesThatCannotBecomeBase64(self) -> None:
+        """
+        Reject values that are neither strings nor bytes.
+
+        Validates the type guard of the base64 serialiser.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster(42).to("base64")
+        self.assertIn("must be a string or bytes", str(ctx.exception))
+
+    def testRejectsAnUnsupportedTypeHint(self) -> None:
+        """
+        Reject a type hint outside the supported catalogue.
+
+        Validates the guard that runs before any serialisation work.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            EnvironmentCaster("text").to("decimal")
+        self.assertIn("Invalid type hint", str(ctx.exception))
+
+    def testRejectsASupportedHintWithoutASerialiser(self) -> None:
+        """
+        Reject a supported hint that has no serialiser branch.
+
+        Validates the defensive fallback that keeps the caster safe if the
+        supported options are extended without a matching serialiser.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            _ExtendedCaster("text").to("unknown")
+        self.assertIn("is not supported for conversion", str(ctx.exception))
 
 # ---------------------------------------------------------------------------
-# TestEnvironmentCasterToInvalidType
+# TestEnvironmentCasterRoundTrip
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterToInvalidType(TestCase):
+class TestEnvironmentCasterRoundTrip(TestCase):
 
-    def testToInvalidTypeHintRaisesError(self):
+    def testRestoresEveryValueThroughAFullRoundTrip(self) -> None:
         """
-        Raise ValueError when an unsupported type hint is passed to to().
+        Restore every supported value through a write and read cycle.
 
-        Validates that invalid type hint strings are rejected before dispatch
-        and the caller receives a descriptive ValueError.
+        Validates that the serialiser and the parser agree on the stored
+        representation for the whole type catalogue.
         """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("hello").to("invalid")
-
-    def testToBase64RoundTrip(self):
-        """
-        Verify that encoding and decoding a string via Base64 is symmetric.
-
-        Encodes a value through to('base64'), extracts the encoded portion,
-        then decodes it with get() and confirms the original value is restored.
-        """
-        original = "round-trip test"
-        encoded_repr = EnvironmentCaster(original).to("base64")
-        # encoded_repr is "base64:<b64value>"; pass it to get() for decoding
-        decoded = EnvironmentCaster(encoded_repr).get()
-        self.assertEqual(decoded, original)
+        for value, type_hint in (
+            ("text", "str"),
+            (42, "int"),
+            (2.5, "float"),
+            (True, "bool"),
+            ([1, 2], "list"),
+            ({"a": 1}, "dict"),
+            ((1, 2), "tuple"),
+            ({1, 2}, "set"),
+            ("secret", "base64"),
+        ):
+            stored = EnvironmentCaster(value).to(type_hint)
+            self.assertEqual(EnvironmentCaster.parseTyped(stored), value)

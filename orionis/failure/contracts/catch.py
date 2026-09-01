@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class ICatch(ABC):
 

@@ -1,27 +1,17 @@
 from __future__ import annotations
-from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.encrypter.contracts.encrypter import IEncrypter
 from orionis.encrypter.encrypter import Encrypter
 from orionis.support.facades.encrypter import Crypt as CryptFacade
 
-class EncrypterProvider(ServiceProvider, DeferrableProvider):
+class EncrypterProvider(ServiceProvider):
+    """
+    Service provider for the Orionis encryption system.
 
-    @classmethod
-    def provides(cls) -> list[type]:
-        """
-        Return the services provided by this provider.
-
-        Specify the service types that this provider is responsible for.
-        Used by the application container to determine which services can be
-        deferred and loaded on demand.
-
-        Returns
-        -------
-        list[type]
-            List containing the types of services provided by this provider.
-        """
-        return [IEncrypter]
+    Binds :class:`IEncrypter` to :class:`Encrypter` as a singleton and pins
+    the :class:`Crypt` facade so the synchronous ``Crypt.encrypt(...)`` and
+    ``Crypt.decrypt(...)`` calls resolve without container overhead.
+    """
 
     def register(self) -> None:
         """
@@ -39,10 +29,11 @@ class EncrypterProvider(ServiceProvider, DeferrableProvider):
 
     async def boot(self) -> None:
         """
-        Perform asynchronous initialization after service registration.
+        Pin the Crypt facade after all services are registered.
 
-        This method is used for setup tasks that require registered services,
-        such as initializing facades or performing asynchronous operations.
+        Pinning is mandatory here because the encrypter exposes a synchronous
+        API: consumers such as ``Stringable.encrypt()`` call the facade without
+        awaiting, and an unpinned facade would hand them a dispatcher object.
 
         Returns
         -------

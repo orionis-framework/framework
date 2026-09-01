@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 class IEncrypter(ABC):
 
+    __slots__ = ()
+
     @abstractmethod
     def encrypt(
         self,
@@ -27,7 +29,7 @@ class IEncrypter(ABC):
             If plaintext is not a string.
         ValueError
             If plaintext is empty or has encoding issues.
-        EncryptionError
+        RuntimeError
             If encryption fails.
         """
 
@@ -55,6 +57,6 @@ class IEncrypter(ABC):
             If payload is not a string.
         ValueError
             If payload is empty or invalid.
-        DecryptionError
+        RuntimeError
             If decryption fails.
         """

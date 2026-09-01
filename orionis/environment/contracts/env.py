@@ -9,6 +9,8 @@ class IEnv(ABC):
 
     # ruff: noqa: FBT001
 
+    __slots__ = ()
+
     @classmethod
     @abstractmethod
     def get(

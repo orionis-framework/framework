@@ -8,7 +8,7 @@ from orionis.http.middleware import BaseMiddleware
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 # ---------------------------------------------------------------------------
 # Module-level constants — allocated once, never per-request.

@@ -1,230 +1,153 @@
-from __future__ import annotations
-import inspect
 from abc import ABC
-from inspect import isabstract
+from inspect import isabstract, signature
+from typing import Any
 from orionis.environment.contracts.env import IEnv
+from orionis.environment.facade import Env
 from orionis.test import TestCase
 
-class _ConcreteEnv(IEnv):
-    """Minimal concrete implementation used to verify the contract."""
+# Abstract surface the contract is expected to publish.
+_EXPECTED_ABSTRACTS: frozenset[str] = frozenset(
+    {"get", "set", "unset", "all", "reload"},
+)
+
+# ---------------------------------------------------------------------------
+# Test doubles
+# ---------------------------------------------------------------------------
+
+class _CompleteEnv(IEnv):
+    """Minimal implementation covering the whole contract."""
+
+    # ruff: noqa: FBT001
+
+    __slots__ = ()
 
     @classmethod
-    def get(cls, key: str, default=None) -> object:
+    def get(cls, key: str, default: object | None = None) -> object:
+        """Return the supplied default for every key."""
         return default
 
     @classmethod
-    def set(cls, key: str, value, type_hint=None, *, only_os: bool = False) -> bool:
+    def set(
+        cls,
+        key: str,
+        value: str | float | bool | list | dict | tuple | set,
+        type_hint: str | None = None,
+        *,
+        only_os: bool = False,
+    ) -> bool:
+        """Pretend the assignment always succeeds."""
         return True
 
     @classmethod
     def unset(cls, key: str, *, only_os: bool = False) -> bool:
+        """Pretend the removal always succeeds."""
         return True
 
     @classmethod
-    def all(cls) -> dict:
+    def all(cls) -> dict[str, Any]:
+        """Return an empty mapping of variables."""
         return {}
 
     @classmethod
     def reload(cls) -> bool:
+        """Pretend the reload always succeeds."""
         return True
 
-class _PartialEnv(IEnv):
-    """Subclass implementing only get — intentionally incomplete."""
+class _IncompleteEnv(IEnv):
+    """Implementation that deliberately leaves most methods unimplemented."""
+
+    __slots__ = ()
 
     @classmethod
-    def get(cls, key: str, default=None) -> object:
+    def get(cls, key: str, default: object | None = None) -> object:
+        """Return the supplied default for every key."""
         return default
 
-# ===========================================================================
-# TestIEnvContract
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# TestEnvContract
+# ---------------------------------------------------------------------------
 
-class TestIEnvContract(TestCase):
+class TestEnvContract(TestCase):
 
-    def testInheritsFromABC(self) -> None:
+    def testIsAnAbstractBaseClass(self) -> None:
         """
-        Assert that IEnv inherits from ABC.
+        Expose the environment contract as an abstract base class.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the contract cannot be used as a concrete service
+        and participates in the ABC registration machinery.
         """
         self.assertTrue(issubclass(IEnv, ABC))
-
-    def testIsAbstractClass(self) -> None:
-        """
-        Assert that inspect.isabstract identifies IEnv as abstract.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
         self.assertTrue(isabstract(IEnv))
 
-    def testCannotInstantiateDirectly(self) -> None:
+    def testPublishesExactlyTheDocumentedAbstractSurface(self) -> None:
         """
-        Assert that instantiating IEnv directly raises TypeError.
+        Publish exactly the documented abstract method surface.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that no method is silently added to or removed from the
+        contract without updating its implementations.
+        """
+        self.assertEqual(IEnv.__abstractmethods__, _EXPECTED_ABSTRACTS)
+
+    def testDeclaresEmptySlots(self) -> None:
+        """
+        Declare empty slots so implementations stay dictionary free.
+
+        Validates that implementations declaring ``__slots__`` do not
+        inherit an unwanted instance dictionary from the contract.
+        """
+        self.assertEqual(IEnv.__dict__.get("__slots__"), ())
+
+    def testCannotBeInstantiatedDirectly(self) -> None:
+        """
+        Reject direct instantiation of the contract.
+
+        Validates that callers are forced to depend on a concrete facade
+        implementation instead of the interface itself.
         """
         with self.assertRaises(TypeError):
-            IEnv()  # type: ignore[abstract]
+            IEnv()
 
-    def testGetIsAbstractMethod(self) -> None:
+    def testRejectsPartialImplementations(self) -> None:
         """
-        Assert that 'get' is present in __abstractmethods__.
+        Reject subclasses that leave abstract methods unimplemented.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("get", IEnv.__abstractmethods__)
-
-    def testSetIsAbstractMethod(self) -> None:
-        """
-        Assert that 'set' is present in __abstractmethods__.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("set", IEnv.__abstractmethods__)
-
-    def testUnsetIsAbstractMethod(self) -> None:
-        """
-        Assert that 'unset' is present in __abstractmethods__.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("unset", IEnv.__abstractmethods__)
-
-    def testAllIsAbstractMethod(self) -> None:
-        """
-        Assert that 'all' is present in __abstractmethods__.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("all", IEnv.__abstractmethods__)
-
-    def testReloadIsAbstractMethod(self) -> None:
-        """
-        Assert that 'reload' is present in __abstractmethods__.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("reload", IEnv.__abstractmethods__)
-
-    def testAbstractMethodsSetContainsFiveMethods(self) -> None:
-        """
-        Assert that __abstractmethods__ contains exactly five methods.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertEqual(
-            IEnv.__abstractmethods__,
-            frozenset({"get", "set", "unset", "all", "reload"}),
-        )
-
-    def testPartialSubclassCannotBeInstantiated(self) -> None:
-        """
-        Assert that a subclass missing methods cannot be instantiated.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that a half-finished facade fails at construction time
+        rather than at the first call site.
         """
         with self.assertRaises(TypeError):
-            _PartialEnv()  # type: ignore[abstract]
+            _IncompleteEnv()
 
-    def testConcreteSubclassCanBeInstantiated(self) -> None:
+    def testAcceptsCompleteImplementations(self) -> None:
         """
-        Assert that a fully implemented subclass can be created without error.
+        Accept subclasses that implement the whole contract.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the abstract surface is satisfiable without any
+        additional hook or attribute.
         """
-        instance = _ConcreteEnv()
-        self.assertIsInstance(instance, IEnv)
+        self.assertEqual(_CompleteEnv.get("KEY", "default"), "default")
+        self.assertTrue(_CompleteEnv.set("KEY", "value"))
+        self.assertTrue(_CompleteEnv.unset("KEY"))
+        self.assertEqual(_CompleteEnv.all(), {})
+        self.assertTrue(_CompleteEnv.reload())
 
-    def testConcreteGetReturnsDefault(self) -> None:
+    def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
         """
-        Assert that a concrete get returns the default when called.
+        Match the parameter names published by the shipped facade.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that ``Env`` can be substituted wherever the contract is
+        expected without changing call sites.
         """
-        result = _ConcreteEnv.get("KEY", "default_val")
-        self.assertEqual(result, "default_val")
+        for name in sorted(_EXPECTED_ABSTRACTS):
+            expected = list(signature(getattr(IEnv, name)).parameters)
+            actual = list(signature(getattr(Env, name)).parameters)
+            self.assertEqual(actual, expected)
 
-    def testConcreteSetReturnsBool(self) -> None:
+    def testIsImplementedByTheShippedFacade(self) -> None:
         """
-        Assert that a concrete set returns a bool.
+        Recognise the shipped facade as a valid implementation.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that ``Env`` actually derives from the contract used
+        across the framework.
         """
-        result = _ConcreteEnv.set("KEY", "value")
-        self.assertIsInstance(result, bool)
-
-    def testConcreteAllReturnsDict(self) -> None:
-        """
-        Assert that a concrete all returns a dict.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = _ConcreteEnv.all()
-        self.assertIsInstance(result, dict)
-
-    def testConcreteReloadReturnsBool(self) -> None:
-        """
-        Assert that a concrete reload returns a bool.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        result = _ConcreteEnv.reload()
-        self.assertIsInstance(result, bool)
-
-    def testGetMethodAcceptsKeyAndDefault(self) -> None:
-        """
-        Assert that the get method accepts key and default parameters.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        sig = inspect.signature(IEnv.get)
-        self.assertIn("key", sig.parameters)
-        self.assertIn("default", sig.parameters)
+        self.assertTrue(issubclass(Env, IEnv))
+        self.assertEqual(Env.__abstractmethods__, frozenset())

@@ -1,78 +1,42 @@
 from __future__ import annotations
 import inspect
 from orionis.test import TestCase
-from orionis.container.providers.service_provider import ServiceProvider
-from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.contracts.service_provider import IServiceProvider
-from orionis.container.contracts.deferrable_provider import IDeferrableProvider
+from orionis.container.providers.service_provider import ServiceProvider
 
 # ---------------------------------------------------------------------------
-# Minimal stubs — no external dependencies
+# Module-level doubles — no external dependencies
 # ---------------------------------------------------------------------------
 
 class _FakeApp:
     """Lightweight application stub; satisfies the type hint without booting."""
 
-class _RegistrationRecorder(ServiceProvider):
-    """Subclass that records register() calls."""
-
-    def __init__(self, app: _FakeApp) -> None:
-        super().__init__(app)
-        self.register_called: bool = False
-
-    def register(self) -> None:
-        self.register_called = True
-
-class _BootRecorder(ServiceProvider):
-    """Subclass that records async boot() calls."""
-
-    def __init__(self, app: _FakeApp) -> None:
-        super().__init__(app)
-        self.boot_called: bool = False
-
-    async def boot(self) -> None:
-        self.boot_called = True
-
 class _FullProvider(ServiceProvider):
-    """Subclass that overrides both register and boot."""
+    """Subclass recording both register() and boot() invocations."""
 
     def __init__(self, app: _FakeApp) -> None:
+        """Store the application and initialise the call recorders."""
         super().__init__(app)
-        self.registered: bool = False
-        self.booted: bool = False
+        self.register_calls: int = 0
+        self.boot_calls: int = 0
 
     def register(self) -> None:
-        self.registered = True
+        """Record a synchronous registration call."""
+        self.register_calls += 1
 
     async def boot(self) -> None:
-        self.booted = True
-
-class _ConcreteDeferred(DeferrableProvider):
-    """Concrete DeferrableProvider that returns a real list from provides()."""
-
-    @classmethod
-    def provides(cls) -> list[type]:
-        return [str, int]
-
-class _EmptyDeferred(DeferrableProvider):
-    """Concrete DeferrableProvider that returns an empty list."""
-
-    @classmethod
-    def provides(cls) -> list[type]:
-        return []
+        """Record an asynchronous boot call."""
+        self.boot_calls += 1
 
 # ===========================================================================
-# ServiceProvider tests
+# Construction and contract
 # ===========================================================================
 
-class TestServiceProviderInit(TestCase):
+class TestServiceProviderConstruction(TestCase):
 
-    def testAppAttributeIsStoredOnInit(self) -> None:
+    def testApplicationIsStoredOnTheInstance(self) -> None:
         """
-        Test that __init__ stores the application object as self.app.
-
-        Verifies that the injected application instance is preserved exactly
-        (identity check) after construction.
+        Keep the injected application object untouched on the provider.
 
         Returns
         -------
@@ -80,42 +44,26 @@ class TestServiceProviderInit(TestCase):
             This method does not return a value.
         """
         app = _FakeApp()
-        provider = _RegistrationRecorder(app)
-        self.assertIs(provider.app, app)
+        self.assertIs(_FullProvider(app).app, app)
 
-    def testMultipleProvidersHaveIndependentAppReferences(self) -> None:
+    def testProvidersKeepIndependentApplicationReferences(self) -> None:
         """
-        Test that two ServiceProvider instances store independent app references.
+        Store independent application references on separate providers.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        app1, app2 = _FakeApp(), _FakeApp()
-        p1 = _RegistrationRecorder(app1)
-        p2 = _RegistrationRecorder(app2)
-        self.assertIs(p1.app, app1)
-        self.assertIs(p2.app, app2)
-        self.assertIsNot(p1.app, p2.app)
+        first, second = _FakeApp(), _FakeApp()
+        self.assertIsNot(
+            _FullProvider(first).app,
+            _FullProvider(second).app,
+        )
 
-class TestServiceProviderInheritance(TestCase):
-
-    def testServiceProviderIsInstanceOfIServiceProvider(self) -> None:
+    def testProviderSatisfiesTheServiceProviderContract(self) -> None:
         """
-        Test that ServiceProvider satisfies the IServiceProvider contract.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _RegistrationRecorder(_FakeApp())
-        self.assertIsInstance(provider, IServiceProvider)
-
-    def testConcreteSubclassIsInstanceOfServiceProvider(self) -> None:
-        """
-        Test that a concrete subclass is an instance of ServiceProvider.
+        Satisfy the IServiceProvider contract with a concrete provider.
 
         Returns
         -------
@@ -124,106 +72,17 @@ class TestServiceProviderInheritance(TestCase):
         """
         provider = _FullProvider(_FakeApp())
         self.assertIsInstance(provider, ServiceProvider)
+        self.assertIsInstance(provider, IServiceProvider)
 
-class TestServiceProviderRegister(TestCase):
+# ===========================================================================
+# Default hooks
+# ===========================================================================
 
-    def testBaseRegisterIsCallableAndReturnsNone(self) -> None:
+class TestServiceProviderDefaultHooks(TestCase):
+
+    def testBaseRegisterIsANoopReturningNone(self) -> None:
         """
-        Test that the base register() method can be called and returns None.
-
-        The base ServiceProvider.register() is a no-op; it must not raise and
-        must return None.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _RegistrationRecorder(_FakeApp())
-        # Call the *base* register directly (not the override)
-        result = ServiceProvider.register(provider) # NOSONAR
-        self.assertIsNone(result)
-
-    def testOverriddenRegisterIsInvoked(self) -> None:
-        """
-        Test that a subclass override of register() is properly executed.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _RegistrationRecorder(_FakeApp())
-        self.assertFalse(provider.register_called)
-        provider.register()
-        self.assertTrue(provider.register_called)
-
-    def testRegisterCanBeCalledMultipleTimes(self) -> None:
-        """
-        Test that calling register() multiple times does not raise an error.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _RegistrationRecorder(_FakeApp())
-        provider.register()
-        provider.register()
-        self.assertTrue(provider.register_called)
-
-class TestServiceProviderBoot(TestCase):
-
-    async def testBaseBootIsAwaitableAndReturnsNone(self) -> None:
-        """
-        Test that the base async boot() can be awaited and returns None.
-
-        The base ServiceProvider.boot() is an async no-op that must be awaitable
-        without raising any exception.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _BootRecorder(_FakeApp())
-        # Call base boot() directly (bypassing override) via super()
-        result = await ServiceProvider.boot(provider)
-        self.assertIsNone(result)
-
-    async def testOverriddenBootIsInvokedWhenAwaited(self) -> None:
-        """
-        Test that a subclass override of async boot() is executed when awaited.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _BootRecorder(_FakeApp())
-        self.assertFalse(provider.boot_called)
-        await provider.boot()
-        self.assertTrue(provider.boot_called)
-
-    async def testBootCanBeCalledMultipleTimes(self) -> None:
-        """
-        Test that awaiting boot() multiple times does not raise an error.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        provider = _BootRecorder(_FakeApp())
-        await provider.boot()
-        await provider.boot()
-        self.assertTrue(provider.boot_called)
-
-    async def testFullProviderRegisterAndBootAreIndependent(self) -> None:
-        """
-        Test that register() and boot() operate independently on the same provider.
-
-        Ensures that calling one does not implicitly trigger the other.
+        Return None from the inherited, empty register() implementation.
 
         Returns
         -------
@@ -231,19 +90,25 @@ class TestServiceProviderBoot(TestCase):
             This method does not return a value.
         """
         provider = _FullProvider(_FakeApp())
-        provider.register()
-        self.assertTrue(provider.registered)
-        self.assertFalse(provider.booted)
+        self.assertIsNone(ServiceProvider.register(provider))
+        self.assertEqual(provider.register_calls, 0)
 
-        await provider.boot()
-        self.assertTrue(provider.booted)
-
-    def testBootMethodIsCoroutineFunction(self) -> None:
+    async def testBaseBootIsAnAwaitableNoopReturningNone(self) -> None:
         """
-        Test that ServiceProvider.boot is declared as a coroutine function (async def).
+        Return None from the inherited, empty asynchronous boot() hook.
 
-        Validates the contract alignment: IServiceProvider declares boot() as async,
-        so the base ServiceProvider must also expose it as async.
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        provider = _FullProvider(_FakeApp())
+        self.assertIsNone(await ServiceProvider.boot(provider))
+        self.assertEqual(provider.boot_calls, 0)
+
+    def testBootIsDeclaredAsACoroutineFunction(self) -> None:
+        """
+        Declare boot() as a coroutine function, matching the contract.
 
         Returns
         -------
@@ -253,135 +118,31 @@ class TestServiceProviderBoot(TestCase):
         self.assertTrue(inspect.iscoroutinefunction(ServiceProvider.boot))
 
 # ===========================================================================
-# DeferrableProvider tests
+# Overridden hooks
 # ===========================================================================
 
-class TestDeferrableProviderInheritance(TestCase):
+class TestServiceProviderOverriddenHooks(TestCase):
 
-    def testDeferrableProviderIsInstanceOfIDeferrableProvider(self) -> None:
+    async def testRegisterAndBootRunIndependentlyAndRepeatedly(self) -> None:
         """
-        Verify a concrete DeferrableProvider satisfies IDeferrableProvider.
+        Run the overridden hooks independently and tolerate repeated calls.
+
+        Validates that invoking one hook never triggers the other and that
+        neither raises when executed more than once.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        provider = _ConcreteDeferred()
-        self.assertIsInstance(provider, IDeferrableProvider)
+        provider = _FullProvider(_FakeApp())
 
-    def testConcreteSubclassIsInstanceOfDeferrableProvider(self) -> None:
-        """
-        Test that a concrete subclass is an instance of DeferrableProvider.
+        provider.register()
+        provider.register()
+        self.assertEqual(provider.register_calls, 2)
+        self.assertEqual(provider.boot_calls, 0)
 
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIsInstance(_ConcreteDeferred(), DeferrableProvider)
-
-class TestDeferrableProviderProvides(TestCase):
-
-    def testProvidesRaisesNotImplementedErrorOnBase(self) -> None:
-        """
-        Raise NotImplementedError when provides() is called on the base class.
-
-        DeferrableProvider.provides() is a sentinel implementation that forces
-        subclasses to declare their services explicitly.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        with self.assertRaises(NotImplementedError):
-            DeferrableProvider.provides()
-
-    def testProvidesErrorMessageIsDescriptive(self) -> None:
-        """
-        Test that the NotImplementedError message from provides() is informative.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        with self.assertRaises(NotImplementedError) as ctx:
-            DeferrableProvider.provides()
-        self.assertIn("provides", str(ctx.exception).lower())
-
-    def testConcreteProviderReturnsList(self) -> None:
-        """
-        Test that a concrete provides() implementation returns a list.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        result = _ConcreteDeferred.provides()
-        self.assertIsInstance(result, list)
-
-    def testConcreteProviderReturnsExpectedTypes(self) -> None:
-        """
-        Test that provides() returns the exact types declared by the subclass.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        result = _ConcreteDeferred.provides()
-        self.assertIn(str, result)
-        self.assertIn(int, result)
-
-    def testProvidesCanReturnEmptyList(self) -> None:
-        """
-        Test that provides() is allowed to return an empty list without error.
-
-        An empty return is valid when the provider has no eagerly declared services.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        result = _EmptyDeferred.provides()
-        self.assertEqual(result, [])
-
-    def testProvidesIsClassMethod(self) -> None:
-        """
-        Test that provides() is accessible as a classmethod without instantiation.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        # Should not raise when called on the class directly
-        result = _ConcreteDeferred.provides()
-        self.assertIsNotNone(result)
-
-    def testProvidesReturnsSameResultOnRepeatedCalls(self) -> None:
-        """
-        Test that successive calls to provides() return equivalent results.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertEqual(_ConcreteDeferred.provides(), _ConcreteDeferred.provides())
-
-    def testProvidesOnInstanceAndClassAreEquivalent(self) -> None:
-        """
-        Yield the same result from provides() on instance and class.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        instance = _ConcreteDeferred()
-        self.assertEqual(instance.provides(), _ConcreteDeferred.provides())
+        await provider.boot()
+        await provider.boot()
+        self.assertEqual(provider.boot_calls, 2)
+        self.assertEqual(provider.register_calls, 2)

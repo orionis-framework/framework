@@ -6,6 +6,8 @@ from orionis.foundation.config.app.enums.ciphers import Cipher
 
 class SecureKeyGenerator:
 
+    __slots__ = ()
+
     # Mapping of cipher modes to their respective key sizes in bytes
     KEY_SIZES: ClassVar[dict[Cipher, int]] = {
         Cipher.AES_128_CBC: 16,

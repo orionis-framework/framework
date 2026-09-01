@@ -4,7 +4,7 @@ from orionis.http.layer.contracts.middleware import IBaseMiddleware, NextCallabl
 
 if TYPE_CHECKING:
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class BaseMiddleware(IBaseMiddleware):
     """Base class for HTTP middleware implementations."""

@@ -1,34 +1,43 @@
-from __future__ import annotations
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from orionis.foundation.config.hashing.entities.hashing import Hashing
 from orionis.hashing.contracts.hash_manager import IHashManager
+from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashDriverNotSupportedException
 from orionis.hashing.hash_manager import HashManager
 from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
 from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
 from orionis.test import TestCase
 
-# Cheap cost parameters shared by every test in this module
-_ARGON2 = {"memory": 8, "threads": 1, "time": 1}
-_BCRYPT = {"rounds": 4}
+# Cheap cost parameters shared by every test in this module. Argon2
+# requires memory_cost >= 8 * parallelism, so 32 KiB leaves room for the
+# tests raising the parallelism to two lanes.
+_ARGON2_OPTIONS: dict[str, int] = {"memory": 32, "threads": 1, "time": 1}
+_BCRYPT_OPTIONS: dict[str, int] = {"rounds": 4}
 
-class _FakeApp:
-    """Minimal application stub exposing a hashing configuration."""
 
-    def __init__(self, driver: str = "argon2") -> None:
+class _StubApp:
+    """Application double returning a fixed hashing configuration."""
+
+    __slots__ = ("requested", "section")
+
+    def __init__(self, section: object) -> None:
         """
-        Store the hashing configuration returned to the manager.
+        Store the configuration section handed to the manager.
 
         Parameters
         ----------
-        driver : str
-            Driver name written into the configuration.
-        """
-        self._config = asdict(
-            Hashing(driver=driver, argon2=_ARGON2, bcrypt=_BCRYPT),
-        )
+        section : object
+            Value returned for the ``hashing`` configuration key.
 
-    def config(self, key: str) -> dict | None:
+        Returns
+        -------
+        None
+        """
+        self.section = section
+        self.requested: list[str] = []
+
+    def config(self, key: str) -> object:
         """
         Return the stored configuration section.
 
@@ -39,209 +48,368 @@ class _FakeApp:
 
         Returns
         -------
-        dict | None
-            Hashing configuration as a plain dictionary, or ``None`` when
-            another section is requested.
+        object
+            The stored section, whatever key is requested.
         """
-        return self._config if key == "hashing" else None
+        self.requested.append(key)
+        return self.section
 
-def _manager(driver: str = "argon2") -> HashManager:
+
+def build_config(driver: str = "argon2") -> Hashing:
     """
-    Build a hash manager backed by the stub application.
+    Build a hashing configuration entity with cheap cost parameters.
+
+    Parameters
+    ----------
+    driver : str
+        Default driver written into the configuration.
+
+    Returns
+    -------
+    Hashing
+        Configuration entity ready to be handed to the manager.
+    """
+    return Hashing(
+        driver=driver,
+        argon2=dict(_ARGON2_OPTIONS),
+        bcrypt=dict(_BCRYPT_OPTIONS),
+    )
+
+
+def build_manager(driver: str = "argon2", *, as_entity: bool = False) -> HashManager:
+    """
+    Build a manager backed by the application double.
 
     Parameters
     ----------
     driver : str
         Default driver used by the manager.
+    as_entity : bool
+        Whether the application exposes the configuration as a typed
+        entity instead of a plain dictionary.
 
     Returns
     -------
     HashManager
         Manager configured with cheap cost parameters.
     """
-    return HashManager(_FakeApp(driver))
+    config = build_config(driver)
+    section = config if as_entity else asdict(config)
+    return HashManager(_StubApp(section))  # type: ignore[arg-type]
 
-class TestHashManagerContract(TestCase):
-    """Tests for the contract implemented by HashManager."""
 
-    def testImplementsManagerContract(self) -> None:
+class TestHashManagerLayout(TestCase):
+
+    def testImplementsTheManagerContract(self) -> None:
         """
-        Verify HashManager implements the IHashManager contract.
+        Register the manager as an implementation of its contract.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the binding resolved through the Hash facade.
         """
-        self.assertIsInstance(_manager(), IHashManager)
+        self.assertIsInstance(build_manager(), IHashManager)
 
-class TestHashManagerDriverResolution(TestCase):
-    """Tests for driver resolution and caching."""
-
-    def testDefaultDriverIsArgon2(self) -> None:
+    def testDeclaresTheExpectedSlots(self) -> None:
         """
-        Verify Argon2id is the driver used by default.
+        Declare the state of the manager as explicit slots.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the memory layout required by the framework
+        conventions.
         """
-        manager = _manager()
+        self.assertEqual(
+            HashManager.__dict__.get("__slots__"),
+            ("_config", "_default", "_drivers"),
+        )
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep instances free of an attribute dictionary.
+
+        Validates that the empty slots of the contracts propagate to the
+        manager.
+        """
+        self.assertFalse(hasattr(build_manager(), "__dict__"))
+
+
+class TestHashManagerConstruction(TestCase):
+
+    def testReadsOnlyTheHashingSection(self) -> None:
+        """
+        Read the hashing section from the application configuration.
+
+        Validates that the manager never reaches for unrelated keys.
+        """
+        app = _StubApp(asdict(build_config()))
+        HashManager(app)  # type: ignore[arg-type]
+        self.assertEqual(app.requested, ["hashing"])
+
+    def testAcceptsAConfigurationDictionary(self) -> None:
+        """
+        Accept a plain dictionary and convert it into an entity.
+
+        Validates the branch taken when the configuration comes from the
+        compiled application state.
+        """
+        manager = build_manager()
         self.assertEqual(manager.getDefaultDriver(), "argon2")
         self.assertIsInstance(manager.driver(), Argon2Hasher)
 
-    def testNamedDriverIsResolved(self) -> None:
+    def testAcceptsAnAlreadyBuiltConfigurationEntity(self) -> None:
         """
-        Verify a named driver is resolved regardless of the default.
+        Accept a typed entity without rebuilding it.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the branch taken when the application exposes the
+        configuration as an entity.
         """
-        self.assertIsInstance(_manager().driver("bcrypt"), BcryptHasher)
+        manager = build_manager(as_entity=True)
+        self.assertEqual(manager.getDefaultDriver(), "argon2")
+        self.assertIsInstance(manager.driver(), Argon2Hasher)
 
-    def testConfiguredDriverIsHonored(self) -> None:
+    def testUsesTheConfiguredDriverAsDefault(self) -> None:
         """
-        Verify the configured driver becomes the default one.
+        Promote the configured driver to the default one.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that the application chooses the algorithm without
+        touching any call site.
         """
-        manager = _manager("bcrypt")
-        self.assertEqual(manager.getAlgorithm(), "bcrypt")
+        manager = build_manager("bcrypt")
+        self.assertEqual(manager.getDefaultDriver(), "bcrypt")
         self.assertIsInstance(manager.driver(), BcryptHasher)
 
-    def testDriverInstancesAreCached(self) -> None:
+    def testMissingSectionFallsBackToTheEntityDefaults(self) -> None:
         """
-        Verify repeated resolutions return the same driver instance.
+        Fall back to the entity defaults when the section is absent.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the guard covering an application whose configuration
+        does not declare a hashing section, since `config()` resolves an
+        unknown key to None.
         """
-        manager = _manager()
+        expected = str(Hashing().driver)
+        for section in (None, {}):
+            manager = HashManager(_StubApp(section))  # type: ignore[arg-type]
+            self.assertEqual(manager.getDefaultDriver(), expected)
+            self.assertIsInstance(manager.driver(), IHasher)
+
+
+class TestHashManagerDriverResolution(TestCase):
+
+    def testResolvesTheDefaultDriverWhenNoNameIsGiven(self) -> None:
+        """
+        Resolve the configured driver when no name is provided.
+
+        Validates the resolution used by every delegated operation.
+        """
+        self.assertIsInstance(build_manager().driver(), Argon2Hasher)
+
+    def testResolvesADriverByName(self) -> None:
+        """
+        Resolve a named driver regardless of the configured default.
+
+        Validates the escape hatch used to verify legacy hashes.
+        """
+        self.assertIsInstance(build_manager().driver("bcrypt"), BcryptHasher)
+
+    def testFallsBackToTheDefaultForAnEmptyName(self) -> None:
+        """
+        Treat an empty name as a request for the default driver.
+
+        Validates the guard covering an unset configuration value.
+        """
+        manager = build_manager()
+        self.assertIs(manager.driver(""), manager.driver())
+
+    def testCachesEveryResolvedDriver(self) -> None:
+        """
+        Return the same instance for repeated resolutions.
+
+        Validates that drivers are built once and reused afterwards.
+        """
+        manager = build_manager()
         self.assertIs(manager.driver(), manager.driver("argon2"))
 
-    def testUnknownDriverRaises(self) -> None:
+    def testKeepsOneInstancePerDriverName(self) -> None:
         """
-        Verify an unsupported driver name is rejected.
+        Keep a separate instance for every requested driver.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that the cache is keyed by driver name.
+        """
+        manager = build_manager()
+        self.assertIsNot(manager.driver("argon2"), manager.driver("bcrypt"))
+
+    def testRejectsAnUnsupportedDriver(self) -> None:
+        """
+        Reject a driver name without an implementation.
+
+        Validates that a typo never degrades password storage silently.
         """
         with self.assertRaises(HashDriverNotSupportedException):
-            _manager().driver("md5")
+            build_manager().driver("md5")
 
-    def testConfiguredCostParametersAreApplied(self) -> None:
+    def testUnsupportedDriverErrorListsTheSupportedOnes(self) -> None:
         """
-        Verify the configured Argon2id cost parameters reach the hash.
+        Report the rejected name and the supported alternatives.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that the failure is actionable without a traceback.
         """
-        hashed = _manager().make("secret")
-        self.assertIn("m=8", hashed)
+        with self.assertRaises(HashDriverNotSupportedException) as captured:
+            build_manager().driver("md5")
+        message = str(captured.exception)
+        self.assertIn("md5", message)
+        self.assertIn("argon2", message)
+        self.assertIn("bcrypt", message)
+
+    def testAppliesTheConfiguredArgon2Costs(self) -> None:
+        """
+        Hand the configured Argon2id costs to the driver.
+
+        Validates that the configuration reaches the produced hash.
+        """
+        hashed = build_manager().make("secret")
+        self.assertIn("m=32", hashed)
         self.assertIn("t=1", hashed)
         self.assertIn("p=1", hashed)
 
+    def testAppliesTheConfiguredBcryptRounds(self) -> None:
+        """
+        Hand the configured bcrypt cost factor to the driver.
+
+        Validates that the configuration reaches the produced hash.
+        """
+        hashed = build_manager("bcrypt").make("secret")
+        self.assertTrue(hashed.startswith("$2b$04$"))
+
+
 class TestHashManagerDelegation(TestCase):
-    """Tests for the hashing API exposed by the manager."""
+
+    def testMakeUsesTheDefaultDriver(self) -> None:
+        """
+        Produce hashes with the configured default driver.
+
+        Validates that application code never picks an algorithm.
+        """
+        self.assertTrue(build_manager().make("secret").startswith("$argon2id$"))
 
     def testMakeAndCheckRoundTrip(self) -> None:
         """
-        Verify a hash produced by the manager validates the same value.
+        Verify a value against the hash the manager produced.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the round trip application code depends on.
         """
-        manager = _manager()
+        manager = build_manager()
         hashed = manager.make("my-secret-password")
         self.assertTrue(manager.check("my-secret-password", hashed))
+
+    def testCheckRejectsAnotherValue(self) -> None:
+        """
+        Reject a value that does not match the stored hash.
+
+        Validates that verification is delegated without weakening it.
+        """
+        manager = build_manager()
+        hashed = manager.make("my-secret-password")
         self.assertFalse(manager.check("wrong-password", hashed))
 
-    def testMakeUsesTheDefaultAlgorithm(self) -> None:
+    def testMakeForwardsTheRoundsOverride(self) -> None:
         """
-        Verify the default driver produces an Argon2id hash.
+        Forward the per-call cost override to the active driver.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the tuning hook exposed by the shared contract.
         """
-        self.assertTrue(_manager().make("secret").startswith("$argon2id$"))
+        self.assertIn("t=2", build_manager().make("secret", rounds=2))
 
-    def testMakeHonorsPerCallRounds(self) -> None:
+    def testMakeForwardsTheMemoryOverride(self) -> None:
         """
-        Verify a per-call cost override reaches the active driver.
+        Forward the per-call memory override to the active driver.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the tuning hook exposed by the shared contract.
         """
-        self.assertIn("t=2", _manager().make("secret", rounds=2))
+        self.assertIn("m=16", build_manager().make("secret", memory=16))
 
-    def testNeedsRehashFollowsConfiguration(self) -> None:
+    def testMakeForwardsTheThreadsOverride(self) -> None:
         """
-        Verify rehash detection reflects the configured parameters.
+        Forward the per-call parallelism override to the active driver.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the tuning hook exposed by the shared contract.
         """
-        manager = _manager()
-        hashed = manager.make("secret")
-        self.assertFalse(manager.needsRehash(hashed))
+        self.assertIn("p=2", build_manager().make("secret", threads=2))
 
-    def testNeedsRehashDetectsForeignAlgorithm(self) -> None:
+    def testGetAlgorithmReportsTheDefaultDriver(self) -> None:
         """
-        Verify a hash from another driver requires a rehash.
+        Report the algorithm of the configured default driver.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the identifier surfaced to application code.
         """
-        manager = _manager()
-        bcrypt_hash = manager.driver("bcrypt").make("secret")
-        self.assertTrue(manager.needsRehash(bcrypt_hash))
+        self.assertEqual(build_manager().getAlgorithm(), "argon2id")
+        self.assertEqual(build_manager("bcrypt").getAlgorithm(), "bcrypt")
 
-    def testSetRoundsIsFluentAndAppliesToDefaultDriver(self) -> None:
+    def testNeedsRehashFollowsTheConfiguration(self) -> None:
         """
-        Verify setRounds returns the manager and updates the driver.
+        Report a freshly produced hash as up to date.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that no needless rehash is triggered on login.
         """
-        manager = _manager()
+        manager = build_manager()
+        self.assertFalse(manager.needsRehash(manager.make("secret")))
+
+    def testNeedsRehashDetectsAForeignAlgorithm(self) -> None:
+        """
+        Report a hash from another driver as outdated.
+
+        Validates the migration path between the shipped drivers.
+        """
+        manager = build_manager()
+        legacy = manager.driver("bcrypt").make("secret")
+        self.assertTrue(manager.needsRehash(legacy))
+
+    def testSetRoundsReturnsTheManager(self) -> None:
+        """
+        Return the manager itself from the fluent setter.
+
+        Validates the chaining style advertised by the contract.
+        """
+        manager = build_manager()
         self.assertIs(manager.setRounds(2), manager)
+
+    def testSetRoundsUpdatesTheDefaultDriver(self) -> None:
+        """
+        Apply the new cost to the default driver of the manager.
+
+        Validates that the fluent configuration is delegated.
+        """
+        manager = build_manager()
+        manager.setRounds(2)
         self.assertIn("t=2", manager.make("secret"))
 
-    def testSetRoundsMarksPreviousHashesForRehash(self) -> None:
+    def testSetRoundsMarksEarlierHashesForRehash(self) -> None:
         """
-        Verify hashes made before setRounds are flagged for regeneration.
+        Flag hashes produced before the change for regeneration.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that raising the cost never invalidates stored
+        credentials.
         """
-        manager = _manager()
+        manager = build_manager()
         hashed = manager.make("secret")
         manager.setRounds(2)
         self.assertTrue(manager.needsRehash(hashed))
         self.assertTrue(manager.check("secret", hashed))
+
+
+class TestHashManagerConcurrency(TestCase):
+
+    def testConcurrentHashingProducesVerifiableHashes(self) -> None:
+        """
+        Hash from several threads without corrupting the shared cache.
+
+        Validates the concurrency contract declared by the manager: the
+        driver cache is written on first resolution and every later
+        operation only reads it.
+        """
+        manager = build_manager()
+
+        def round_trip(index: int) -> bool:
+            value = f"secret-{index}"
+            return manager.check(value, manager.make(value))
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results = list(pool.map(round_trip, range(16)))
+
+        self.assertEqual(results, [True] * 16)

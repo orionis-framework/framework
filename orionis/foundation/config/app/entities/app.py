@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.app.enums import Cipher, Environments
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.environment.key.key_generator import SecureKeyGenerator
 from orionis.support.entities.base import BaseEntity
 

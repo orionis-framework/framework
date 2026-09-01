@@ -2,15 +2,13 @@ from __future__ import annotations
 from orionis.test import TestCase
 from orionis.container.exceptions.container import CircularDependencyException
 
+_MESSAGE = "A -> B -> A"
+
 class TestCircularDependencyException(TestCase):
 
-    # ------------------------------------------------------------------
-    # Inheritance
-    # ------------------------------------------------------------------
-
-    def testIsSubclassOfException(self) -> None:
+    def testInheritsFromTheBuiltinException(self) -> None:
         """
-        Test that CircularDependencyException is a subclass of Exception.
+        Derive from Exception so generic handlers can still catch it.
 
         Returns
         -------
@@ -19,25 +17,9 @@ class TestCircularDependencyException(TestCase):
         """
         self.assertTrue(issubclass(CircularDependencyException, Exception))
 
-    # ------------------------------------------------------------------
-    # Instantiation — no message
-    # ------------------------------------------------------------------
-
-    def testCanBeInstantiatedWithoutMessage(self) -> None:
+    def testCanBeBuiltWithoutAMessage(self) -> None:
         """
-        Test that CircularDependencyException can be raised without arguments.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        exc = CircularDependencyException()
-        self.assertIsInstance(exc, CircularDependencyException)
-
-    def testArgsEmptyWhenNoMessageProvided(self) -> None:
-        """
-        Test that args is an empty tuple when no message is supplied.
+        Build the exception without arguments and keep ``args`` empty.
 
         Returns
         -------
@@ -46,94 +28,47 @@ class TestCircularDependencyException(TestCase):
         """
         exc = CircularDependencyException()
         self.assertEqual(exc.args, ())
+        self.assertEqual(str(exc), "")
 
-    # ------------------------------------------------------------------
-    # Instantiation — with message
-    # ------------------------------------------------------------------
-
-    def testCanBeInstantiatedWithMessage(self) -> None:
+    def testPreservesTheSuppliedMessage(self) -> None:
         """
-        Test that CircularDependencyException stores a message correctly.
+        Preserve the supplied message in both ``args`` and ``str()``.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        exc = CircularDependencyException("circular dependency detected")
-        self.assertEqual(str(exc), "circular dependency detected")
+        exc = CircularDependencyException(_MESSAGE)
+        self.assertEqual(exc.args, (_MESSAGE,))
+        self.assertEqual(str(exc), _MESSAGE)
 
-    def testArgsContainsMessageWhenProvided(self) -> None:
+    def testRaisedInstanceKeepsItsMessage(self) -> None:
         """
-        Test that the args tuple contains the supplied message string.
+        Keep the message intact once the exception has been raised.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        msg = "A -> B -> A"
-        exc = CircularDependencyException(msg)
-        self.assertIn(msg, exc.args)
+        with self.assertRaises(CircularDependencyException) as ctx:
+            raise CircularDependencyException(_MESSAGE)
+        self.assertEqual(str(ctx.exception), _MESSAGE)
 
-    # ------------------------------------------------------------------
-    # Raise / catch
-    # ------------------------------------------------------------------
-
-    def testCanBeRaisedAndCaughtAsCircularDependencyException(self) -> None:
+    def testSupportsExceptionChaining(self) -> None:
         """
-        Test that the exception can be raised and caught by its own type.
+        Keep the original error reachable through ``__cause__``.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        with self.assertRaises(CircularDependencyException):
-            err_msg = "cycle"
-            raise CircularDependencyException(err_msg)
-
-    def testCanBeRaisedAndCaughtAsException(self) -> None:
-        """
-        Test that the exception can be caught by the base Exception handler.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        with self.assertRaises(Exception):  # noqa: B017
-            err_msg = "cycle"
-            raise CircularDependencyException(err_msg)
-
-    def testRaisedExceptionPreservesMessage(self) -> None:
-        """
-        Test that the message is preserved after the exception is raised.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        try:
-            err_msg = "A depends on B which depends on A"
-            raise CircularDependencyException(err_msg)
-        except CircularDependencyException as exc:
-            self.assertEqual(str(exc), "A depends on B which depends on A")
-
-    # ------------------------------------------------------------------
-    # Identity
-    # ------------------------------------------------------------------
-
-    def testTwoInstancesAreNotTheSameObject(self) -> None:
-        """
-        Test that two separately constructed instances are distinct objects.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        exc_a = CircularDependencyException("msg")
-        exc_b = CircularDependencyException("msg")
-        self.assertIsNot(exc_a, exc_b)
+        original = ValueError("root cause")
+        with self.assertRaises(CircularDependencyException) as ctx:
+            try:
+                raise original
+            except ValueError as exc:
+                raise CircularDependencyException(_MESSAGE) from exc
+        self.assertIs(ctx.exception.__cause__, original)

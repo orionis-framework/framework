@@ -5,7 +5,7 @@ from orionis.foundation.config.database.enums import (
     MySQLCollation,
     MySQLEngine,
 )
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)

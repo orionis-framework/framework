@@ -36,7 +36,7 @@
 ## Functional description
 
 `orionis.view` turns a template name plus a context into an
-`orionis.http.response.HTMLResponse`. It owns exactly one
+`orionis.http.responses.HTMLResponse`. It owns exactly one
 `jinja2.Environment` per application, built at construction time from
 `app.config("view")`, and exposes it only through typed helpers so no
 other layer of the framework touches Jinja2 directly.

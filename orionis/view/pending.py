@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from typing import Any, TYPE_CHECKING
-from orionis.http.response import HTMLResponse
+from orionis.http.responses import HTMLResponse
 from orionis.session.flash import (
     ERRORS_KEY,
     OLD_INPUT_KEY,

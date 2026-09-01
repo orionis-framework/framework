@@ -36,7 +36,7 @@
 ## Descripción funcional
 
 `orionis.view` convierte un nombre de plantilla más un contexto en un
-`orionis.http.response.HTMLResponse`. Posee exactamente un
+`orionis.http.responses.HTMLResponse`. Posee exactamente un
 `jinja2.Environment` por aplicación, construido en el constructor a partir
 de `app.config("view")`, y solo lo expone mediante métodos tipados, de
 modo que ninguna otra capa del framework toca Jinja2 directamente.

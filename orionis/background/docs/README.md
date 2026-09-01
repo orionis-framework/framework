@@ -58,7 +58,7 @@ minimal API:
   (`BackgroundTasks`), useful when more than one side effect must follow an
   operation.
 - Expose a common contract (`IBackgroundTask`) so other parts of the
-  framework (e.g. `orionis.http.response`) can accept "something
+  framework (e.g. `orionis.http.responses`) can accept "something
   background-task-shaped" without depending on a concrete implementation.
 
 ## API reference
@@ -152,7 +152,7 @@ Manages an **ordered collection** of `BackgroundTask` instances and runs
 them one after another, in insertion order. Inherits from `BackgroundTask`
 (so a `BackgroundTasks` instance can be used anywhere a single
 `BackgroundTask` is expected — e.g. as the `background` argument of
-`orionis.http.response.Response`), but overrides its constructor, `__call__`
+`orionis.http.responses.Response`), but overrides its constructor, `__call__`
 and internal storage to hold a list of tasks instead of a single callable.
 
 #### `BackgroundTasks(tasks=None)`
@@ -300,7 +300,7 @@ asyncio.run(main())
 
 ```python
 from orionis.background.task import BackgroundTask
-from orionis.http.response import JSONResponse
+from orionis.http.responses import JSONResponse
 
 async def send_confirmation(order_id: int) -> None:
     print(f"confirmation sent for order {order_id}")
@@ -327,7 +327,7 @@ informational purposes only — they are not suggestions for change.
   `BackgroundTask` rather than only implementing `IBackgroundTask`
   directly. This allows a collection of tasks to be passed wherever an
   `isinstance(x, BackgroundTask)` check is performed — notably in
-  `orionis.http.response`, whose responses accept a single
+  `orionis.http.responses`, whose responses accept a single
   `background: BackgroundTask | None` parameter. `BackgroundTasks`
   overrides `__init__` and `__call__` completely, so the parent's private
   `func`/`args`/`kwargs` attributes are never populated or used on a
@@ -382,7 +382,7 @@ These are informative notes about existing behaviour, not tuning advice:
 - **Dependencies:** standard library only — `abc`, `asyncio`, `functools`,
   `inspect`, `typing`. No third-party packages are required by this
   module.
-- **Framework integration:** `orionis.http.response` depends on
+- **Framework integration:** `orionis.http.responses` depends on
   `BackgroundTask` (accepts it as the `background` constructor parameter
   and exposes `await response.runBackground()`), so this module is a
   transitive dependency of the HTTP response layer.

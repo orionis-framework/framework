@@ -62,7 +62,7 @@ probar. `orionis.background` estandariza este patrón con una API mínima:
   (`BackgroundTasks`), útil cuando más de un efecto secundario debe seguir
   a una operación.
 - Expone un contrato común (`IBackgroundTask`) para que otras partes del
-  framework (por ejemplo, `orionis.http.response`) puedan aceptar "algo con
+  framework (por ejemplo, `orionis.http.responses`) puedan aceptar "algo con
   forma de tarea en segundo plano" sin depender de una implementación
   concreta.
 
@@ -163,7 +163,7 @@ ejecuta una tras otra, en el orden en que fueron insertadas. Hereda de
 `BackgroundTask` (de modo que una instancia de `BackgroundTasks` puede
 usarse en cualquier lugar donde se espere un único `BackgroundTask` — por
 ejemplo, como el argumento `background` de
-`orionis.http.response.Response`), pero sobrescribe su constructor,
+`orionis.http.responses.Response`), pero sobrescribe su constructor,
 `__call__` y el almacenamiento interno para contener una lista de tareas en
 lugar de un único invocable.
 
@@ -313,7 +313,7 @@ asyncio.run(main())
 
 ```python
 from orionis.background.task import BackgroundTask
-from orionis.http.response import JSONResponse
+from orionis.http.responses import JSONResponse
 
 async def send_confirmation(order_id: int) -> None:
     print(f"confirmación enviada para el pedido {order_id}")
@@ -342,7 +342,7 @@ fines exclusivamente informativos — no son propuestas de cambio.
   directamente. Esto permite que una colección de tareas se pase a
   cualquier lugar donde se realice una comprobación
   `isinstance(x, BackgroundTask)` — en particular en
-  `orionis.http.response`, cuyas respuestas aceptan un único parámetro
+  `orionis.http.responses`, cuyas respuestas aceptan un único parámetro
   `background: BackgroundTask | None`. `BackgroundTasks` sobrescribe por
   completo `__init__` y `__call__`, de modo que los atributos privados
   `func`/`args`/`kwargs` de la clase padre nunca se completan ni se usan en
@@ -402,7 +402,7 @@ recomendaciones de optimización:
 - **Versión mínima de Python:** 3.14.
 - **Dependencias:** solo librería estándar — `abc`, `asyncio`, `functools`,
   `inspect`, `typing`. Este módulo no requiere paquetes de terceros.
-- **Integración con el framework:** `orionis.http.response` depende de
+- **Integración con el framework:** `orionis.http.responses` depende de
   `BackgroundTask` (lo acepta como el parámetro `background` del
   constructor y expone `await response.runBackground()`), por lo que este
   módulo es una dependencia transitiva de la capa de respuestas HTTP.

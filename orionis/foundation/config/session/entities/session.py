@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.session.enums import SameSitePolicy
 from orionis.foundation.config.session.enums.drivers import SessionDriver
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozensets enable O(1) membership tests at validation time.

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 
 def env(key: str, default: object | None = None) -> object:
     """

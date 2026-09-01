@@ -1,4 +1,5 @@
 from __future__ import annotations
+import tempfile
 from pathlib import Path
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.migration import Migration
@@ -13,16 +14,19 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
-# Shared file-backed database so every connection of a test sees the
-# same schema; ``:memory:`` would give each engine its own private one.
-_DATABASE: str = "file:orionis_migrator_test?mode=memory&cache=shared&uri=true"
+# File-backed database created per test so every connection sees the same
+# schema; ``:memory:`` would give each engine its own private one, and a
+# ``file:...?uri=true`` DSN is not URI-decoded by the driver, which leaves a
+# stray file in the working directory.
+_DATABASE_FILE: str = "migrator.sqlite"
 
 
 class _StubApp:
     """Application stub exposing the paths and configuration used."""
 
-    def __init__(self) -> None:
+    def __init__(self, database: str) -> None:
         self.basePath = Path.cwd()
+        self._database = database
 
     def path(self, key: str) -> Path:  # noqa: ARG002
         return Path.cwd() / "database"
@@ -33,7 +37,7 @@ class _StubApp:
             "connections": {
                 "sqlite": {
                     "driver": "sqlite",
-                    "database": _DATABASE,
+                    "database": self._database,
                     "prefix": "",
                 },
             },
@@ -101,18 +105,18 @@ class TestMigrator(TestCase):
 
     async def asyncSetUp(self) -> None:
         """Wire an isolated manager and a migrator with fixed migrations."""
-        self._manager = ConnectionManager(_StubApp())
+        self._workspace = tempfile.TemporaryDirectory()
+        app = _StubApp(str(Path(self._workspace.name) / _DATABASE_FILE))
+        self._manager = ConnectionManager(app)
         ConnectionResolver.setManager(self._manager)
-        self._migrator = Migrator(_StubApp(), self._manager)
+        self._migrator = Migrator(app, self._manager)
         self.useMigrations({"m01_alpha": _CreateAlpha, "m02_beta": _CreateBeta})
 
     async def asyncTearDown(self) -> None:
-        """Drop every table created by the tests and release the manager."""
-        connection = self._manager.connection()
-        for table in ("alpha", "beta", "migrations"):
-            await connection.dropTable(table)
+        """Release the manager and drop the temporary database."""
         await self._manager.disconnect()
         ConnectionResolver.clear()
+        self._workspace.cleanup()
 
     def useMigrations(self, migrations: dict) -> None:
         """

@@ -9,7 +9,7 @@ from orionis.console.output.contracts.http_request import IHTTPRequestPrinter
 
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 # ANSI escape codes
 _RESET = "\033[0m"

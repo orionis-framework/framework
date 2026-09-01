@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from dataclasses import dataclass, field
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Table names must start and contain only lowercase letters or underscores.

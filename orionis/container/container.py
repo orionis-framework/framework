@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import contextvars
 import importlib
 import inspect
@@ -34,6 +35,22 @@ _resolution_stack: contextvars.ContextVar[frozenset[str]] = contextvars.ContextV
 _INSPECT_EMPTY = inspect.Parameter.empty
 
 class Container(IContainer):
+    """
+    Resolve services from contracts, aliases and constructor signatures.
+
+    Concurrency
+    -----------
+    ``__new__`` is thread-safe: concurrent construction of the same subclass
+    always yields a single instance, guarded by ``_lock``.
+
+    Inside one event loop, the one-shot work behind ``Lifetime.SINGLETON``,
+    ``Lifetime.SCOPED`` and deferred providers is serialised per key, so
+    concurrent tasks share a single construction instead of duplicating it.
+
+    No other guarantee is provided: registration methods mutate plain
+    dictionaries without locks, and containers shared between distinct event
+    loops fall back to per-loop serialisation only.
+    """
 
     # ruff: noqa: ANN401, FBT001, ANN002, ANN003, ARG004, C901
 
@@ -109,8 +126,64 @@ class Container(IContainer):
             # Tracks resolved deferred providers
             self.__cache_resolve_deferred_providers: set[Any] = set()
 
+            # Per-key locks serialising one-shot construction, paired with the
+            # loop they were created on so a second loop never awaits a foreign lock.
+            self.__creation_locks: dict[
+                Any, tuple[asyncio.AbstractEventLoop, asyncio.Lock],
+            ] = {}
+
             # Mark as initialized to prevent re-initialization
             self._Container__initialized = True
+
+    def __creationLock(
+        self,
+        key: Any,
+    ) -> asyncio.Lock:
+        """
+        Return the creation lock for a key, bound to the running loop.
+
+        Parameters
+        ----------
+        key : Any
+            Contract or deferred provider key whose construction is guarded.
+
+        Returns
+        -------
+        asyncio.Lock
+            Lock owned by the running loop for this key. A new lock replaces
+            any entry created on a different loop.
+        """
+        loop = asyncio.get_running_loop()
+        entry = self.__creation_locks.get(key)
+        if entry is not None and entry[0] is loop:
+            return entry[1]
+
+        lock = asyncio.Lock()
+        self.__creation_locks[key] = (loop, lock)
+        return lock
+
+    @staticmethod
+    def __isBeingResolved(
+        concrete: type[Any],
+    ) -> bool:
+        """
+        Determine whether a concrete type is already resolving in this task.
+
+        Parameters
+        ----------
+        concrete : type[Any]
+            Concrete class about to be constructed.
+
+        Returns
+        -------
+        bool
+            True when the type is already on the current resolution stack,
+            which means the caller must skip the creation lock it already owns.
+        """
+        return (
+            f"{concrete.__module__}.{concrete.__name__}"
+            in _resolution_stack.get()
+        )
 
     def __aliasService(
         self,
@@ -363,9 +436,8 @@ class Container(IContainer):
                 raise TypeError(error_msg)
             abstract = concrete
 
-        # Validate the alias if provided
-        if alias is not None:
-            alias = self.__aliasService(alias)
+        # Validate the alias; a missing alias passes through untouched
+        alias = self.__aliasService(alias)
 
         # Enforce override rules for service registration
         self.__ensureCanOverrideGlobal(override, abstract, alias)
@@ -430,9 +502,8 @@ class Container(IContainer):
         else:
             abstract = type(instance)
 
-        # Validate the alias if provided
-        if alias is not None:
-            alias = self.__aliasService(alias)
+        # Validate the alias; a missing alias passes through untouched
+        alias = self.__aliasService(alias)
 
         # Get the current scope for registration
         scope: dict[Any, Any] | None = self.getCurrentScope()
@@ -693,25 +764,34 @@ class Container(IContainer):
         if key in self.__cache_resolve_deferred_providers:
             return
 
-        # Retrieve provider metadata for the given key
-        provider_metadata = self._deferred_providers.get(key)
+        # Serialise the bootstrap: registering and booting a provider spans
+        # several await points, so without this lock concurrent tasks would run
+        # the same provider twice and its register() would raise on the second.
+        async with self.__creationLock(key):
 
-        # Mark as resolved to prevent duplicate processing
-        module = importlib.import_module(provider_metadata["module"])
-        provider_class = getattr(module, provider_metadata["class"], None)
+            # Another task may have completed the bootstrap while waiting
+            if key in self.__cache_resolve_deferred_providers:
+                return
 
-        # Build and register the provider instance
-        instance: IServiceProvider = await self.build(provider_class)
-        instance.register()
+            # Retrieve provider metadata for the given key
+            provider_metadata = self._deferred_providers.get(key)
 
-        # Boot the provider instance, supporting async and sync methods
-        if inspect.iscoroutinefunction(instance.boot):
-            await instance.boot()
-        else:
-            instance.boot()
+            # Import the module declaring the provider class
+            module = importlib.import_module(provider_metadata["module"])
+            provider_class = getattr(module, provider_metadata["class"], None)
 
-        # Cache the resolved service to prevent redundant resolution
-        self.__cache_resolve_deferred_providers.add(key)
+            # Build and register the provider instance
+            instance: IServiceProvider = await self.build(provider_class)
+            instance.register()
+
+            # Boot the provider instance, supporting async and sync methods
+            if inspect.iscoroutinefunction(instance.boot):
+                await instance.boot()
+            else:
+                instance.boot()
+
+            # Cache the resolved service to prevent redundant resolution
+            self.__cache_resolve_deferred_providers.add(key)
 
     async def __resolveKey(
         self,
@@ -890,12 +970,9 @@ class Container(IContainer):
         # Handle singleton lifetime: return cached instance or create and cache it
         if lt is Lifetime.SINGLETON:
             cached = self.__singleton_cache.get(binding.contract)
-            if cached is None:
-                cached = await self.__autoResolveClass(
-                    binding.concrete, *args, **kwargs,
-                )
-                self.__singleton_cache[binding.contract] = cached
-            return cached
+            if cached is not None:
+                return cached
+            return await self.__createSingleton(binding, *args, **kwargs)
 
         # Handle transient lifetime: always create a new instance
         if lt is Lifetime.TRANSIENT:
@@ -914,14 +991,96 @@ class Container(IContainer):
             if binding.contract in scope:
                 return scope[binding.contract]
 
-            instance = await self.__autoResolveClass(
-                binding.concrete, *args, **kwargs,
-            )
-            scope[binding.contract] = instance
-            return instance
+            return await self.__createScoped(binding, scope, *args, **kwargs)
 
         # This line should never be reached due to the enum handling
         return None
+
+    async def __createSingleton(
+        self,
+        binding: Binding,
+        *args: tuple[Any, ...],
+        **kwargs: dict[str, Any],
+    ) -> Any:
+        """
+        Build and cache the single instance backing a singleton binding.
+
+        Parameters
+        ----------
+        binding : Binding
+            The singleton binding to materialize.
+        *args : tuple[Any, ...]
+            Positional arguments for the constructor.
+        **kwargs : dict[str, Any]
+            Keyword arguments for the constructor.
+
+        Returns
+        -------
+        Any
+            The cached instance, built by this call or by the task that won
+            the creation lock.
+        """
+        concrete = binding.concrete
+
+        # A nested resolution of the same concrete type already owns the lock;
+        # going through it again would deadlock instead of reporting the cycle.
+        if self.__isBeingResolved(concrete):
+            return await self.__autoResolveClass(concrete, *args, **kwargs)
+
+        async with self.__creationLock(binding.contract):
+
+            # Another task may have finished the construction while waiting
+            cached = self.__singleton_cache.get(binding.contract)
+            if cached is not None:
+                return cached
+
+            instance = await self.__autoResolveClass(concrete, *args, **kwargs)
+            self.__singleton_cache[binding.contract] = instance
+            return instance
+
+    async def __createScoped(
+        self,
+        binding: Binding,
+        scope: dict[Any, Any],
+        *args: tuple[Any, ...],
+        **kwargs: dict[str, Any],
+    ) -> Any:
+        """
+        Build and store the instance backing a scoped binding.
+
+        Parameters
+        ----------
+        binding : Binding
+            The scoped binding to materialize.
+        scope : dict[Any, Any]
+            The active scope that owns the resulting instance.
+        *args : tuple[Any, ...]
+            Positional arguments for the constructor.
+        **kwargs : dict[str, Any]
+            Keyword arguments for the constructor.
+
+        Returns
+        -------
+        Any
+            The scoped instance, built by this call or by the task that won
+            the creation lock.
+        """
+        concrete = binding.concrete
+
+        # A nested resolution of the same concrete type already owns the lock;
+        # going through it again would deadlock instead of reporting the cycle.
+        if self.__isBeingResolved(concrete):
+            return await self.__autoResolveClass(concrete, *args, **kwargs)
+
+        async with self.__creationLock(binding.contract):
+
+            # Another task may have finished the construction while waiting
+            if binding.contract in scope:
+                return scope[binding.contract]
+
+            instance = await self.__autoResolveClass(concrete, *args, **kwargs)
+            scope[binding.contract] = instance
+            return instance
 
     async def __autoResolveClass(
         self,

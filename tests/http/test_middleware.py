@@ -1,76 +1,106 @@
-from orionis.http.middleware import BaseMiddleware
+from orionis.http.layer.contracts.middleware import IBaseMiddleware
+from orionis.http.middleware import BaseMiddleware, NextCallable
+from orionis.http.responses import Response
 from orionis.test import TestCase
 
-class TestBaseMiddleware(TestCase):
-    """Unit tests for the BaseMiddleware abstract class."""
 
-    async def testHandleRaisesNotImplementedError(self) -> None:
+class _BareMiddleware(BaseMiddleware):
+    """Middleware that forgets to override the request hook."""
+
+    __slots__ = ()
+
+
+class _PassThroughMiddleware(BaseMiddleware):
+    """Middleware that simply advances the pipeline."""
+
+    __slots__ = ()
+
+    async def handle(
+        self,
+        _request: object,
+        call_next: NextCallable,
+    ) -> Response:
         """
-        Verify that the base handle() method raises NotImplementedError.
+        Advance to the next layer and tag the response.
 
-        Confirms that callers attempting to use an un-subclassed
-        BaseMiddleware receive a NotImplementedError.
+        Parameters
+        ----------
+        _request : object
+            Incoming HTTP request.
+        call_next : NextCallable
+            Pipeline continuation.
+
+        Returns
+        -------
+        Response
+            Response produced downstream, carrying a marker header.
         """
+        response = await call_next()
+        response.setHeader("x-visited", "1")
+        return response
 
-        class _Bare(BaseMiddleware):
-            pass
 
-        async def _next():
-            pass
+async def terminal() -> Response:
+    """
+    Return the response produced at the end of the pipeline.
 
-        instance = _Bare()
+    Returns
+    -------
+    Response
+        Response carrying a fixed marker body.
+    """
+    return Response(content="handler")
+
+
+class TestBaseMiddlewareContract(TestCase):
+
+    def testImplementsTheMiddlewareContract(self) -> None:
+        """
+        Derive the base class from the middleware contract.
+
+        Validates that every middleware is accepted wherever the kernel
+        expects the interface.
+        """
+        self.assertTrue(issubclass(BaseMiddleware, IBaseMiddleware))
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep middleware instances free of a per-instance dictionary.
+
+        Validates the slot layout shared by the whole middleware stack,
+        which is instantiated once per application boot.
+        """
+        self.assertFalse(hasattr(_PassThroughMiddleware(), "__dict__"))
+
+
+class TestBaseMiddlewareHandle(TestCase):
+
+    async def testRejectsASubclassThatDoesNotOverrideHandle(self) -> None:
+        """
+        Refuse to serve a middleware without a request hook.
+
+        Validates that an incomplete middleware fails loudly instead of
+        silently dropping the request.
+        """
         with self.assertRaises(NotImplementedError):
-            await instance.handle(None, _next)  # type: ignore[arg-type]
+            await _BareMiddleware().handle(None, terminal)
 
-    async def testSubclassCanImplementHandle(self) -> None:
+    async def testNamesTheOffendingSubclass(self) -> None:
         """
-        Verify that a concrete subclass can override handle() successfully.
+        Name the offending subclass in the diagnostic.
 
-        Confirms that defining handle() in a subclass does not raise and
-        is invoked correctly.
+        Validates that the message points straight at the class to fix.
         """
+        with self.assertRaises(NotImplementedError) as captured:
+            await _BareMiddleware().handle(None, terminal)
+        self.assertIn("_BareMiddleware", str(captured.exception))
 
-        class _Concrete(BaseMiddleware):
-            async def handle(self, _request, _call_next):  # type: ignore[override]
-                return "response"
-
-        instance = _Concrete()
-        result = await instance.handle(None, None)  # type: ignore[arg-type]
-        self.assertEqual(result, "response")
-
-    def testBaseMiddlewareIsSubclassable(self) -> None:
+    async def testSubclassesCanAdvanceThePipeline(self) -> None:
         """
-        Verify that BaseMiddleware can be subclassed without errors.
+        Let a concrete middleware run the rest of the pipeline.
 
-        Confirms that the class hierarchy allows clean inheritance.
+        Validates the contract every application middleware relies on.
         """
-
-        class _MW(BaseMiddleware):
-            async def handle(self, _request, call_next):  # type: ignore[override]
-                return await call_next()
-
-        self.assertTrue(issubclass(_MW, BaseMiddleware))
-
-    async def testErrorMessageContainsClassName(self) -> None:
-        """
-        Verify that the NotImplementedError message includes the subclass name.
-
-        Confirms that the class name is interpolated into the error string
-        to aid debugging.
-        """
-
-        class _CustomMiddleware(BaseMiddleware):
-            pass
-
-        async def _next():
-            pass
-
-        instance = _CustomMiddleware()
-        message: str | None = None
-        try:
-            await instance.handle(None, _next)  # type: ignore[arg-type]
-        except NotImplementedError as exc:
-            message = str(exc)
-
-        self.assertIsNotNone(message)
-        self.assertIn("_CustomMiddleware", message)
+        response = await _PassThroughMiddleware().handle(None, terminal)
+        self.assertEqual(response.getBody(), b"handler")
+        self.assertEqual(response.getHeader("x-visited"), ["1"])

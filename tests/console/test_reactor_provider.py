@@ -1,147 +1,192 @@
-from __future__ import annotations
-from unittest.mock import AsyncMock, MagicMock, patch
+import inspect
+from orionis.console import reactor_provider as provider_module
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.reactor import Reactor
 from orionis.console.reactor_provider import ReactorProvider
+from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
+from orionis.foundation.core_providers import CORE_PROVIDERS
+from orionis.support.facades.reactor import Reactor as ReactorFacade
 from orionis.test import TestCase
 
-class TestReactorProvider(TestCase):
+# Alias shared by the container binding and the facade accessor.
+_REACTOR_ALIAS = "x-orionis-IReactor"
 
-    def _make(self) -> tuple[ReactorProvider, MagicMock]:
+
+class _StubApp:
+    """Application double capturing every binding it receives."""
+
+    __slots__ = ("singletons",)
+
+    def __init__(self) -> None:
         """
-        Create a ReactorProvider with a mock application.
+        Initialise the list of recorded bindings.
 
         Returns
         -------
-        tuple[ReactorProvider, MagicMock]
-            The provider instance and its mock application.
+        None
         """
-        mock_app = MagicMock()
-        provider = ReactorProvider(mock_app)
-        return provider, mock_app
+        self.singletons: list[tuple[object, object, str | None]] = []
 
-    def testIsSubclassOfServiceProvider(self) -> None:
+    def singleton(
+        self,
+        abstract: object,
+        concrete: object,
+        alias: str | None = None,
+    ) -> None:
         """
-        Verify ReactorProvider extends ServiceProvider.
+        Record a singleton binding.
 
-        Ensures the class hierarchy is correct and the provider
-        follows the service provider contract.
+        Parameters
+        ----------
+        abstract : object
+            Contract used as the binding key.
+        concrete : object
+            Implementation bound to the contract.
+        alias : str or None, optional
+            Alternative key the binding is also reachable through.
+
+        Returns
+        -------
+        None
+        """
+        self.singletons.append((abstract, concrete, alias))
+
+
+class _StubReactorFacade:
+    """Facade double counting how many times it was pinned."""
+
+    __slots__ = ("pinned",)
+
+    def __init__(self) -> None:
+        """
+        Initialise the pin counter.
+
+        Returns
+        -------
+        None
+        """
+        self.pinned = 0
+
+    async def pin(self) -> None:
+        """
+        Count a pin invocation.
+
+        Returns
+        -------
+        None
+        """
+        self.pinned += 1
+
+
+class TestReactorProviderDefinition(TestCase):
+
+    def testInheritsTheServiceProviderBase(self) -> None:
+        """
+        Extend the base ServiceProvider class.
+
+        Validates the provider class hierarchy.
         """
         self.assertTrue(issubclass(ReactorProvider, ServiceProvider))
 
-    def testCanBeInstantiated(self) -> None:
+    def testIsNotDeferred(self) -> None:
         """
-        Verify ReactorProvider can be instantiated with an application.
+        Stay out of the deferred provider mechanism.
 
-        Ensures the constructor accepts the app argument without raising.
+        Validates that the reactor is available as soon as the application
+        boots, which is what the CLI entry point expects.
         """
-        provider, _ = self._make()
-        self.assertIsInstance(provider, ReactorProvider)
+        self.assertFalse(issubclass(ReactorProvider, DeferrableProvider))
 
-    def testRegisterCallsSingleton(self) -> None:
+    def testIsRegisteredAsACoreProvider(self) -> None:
         """
-        Verify register() calls app.singleton with IReactor and Reactor.
+        Ship with the core providers booted by the framework.
 
-        Ensures the reactor interface is bound to its concrete
-        implementation as a singleton in the container.
+        Validates that IReactor is bound without the application having to
+        register anything by hand.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        mock_app.singleton.assert_called_once_with(
-            IReactor,
-            Reactor,
-            alias="x-orionis-IReactor",
-        )
+        self.assertIn(ReactorProvider, CORE_PROVIDERS)
 
-    def testRegisterUsesCorrectAlias(self) -> None:
+    def testStoresTheApplicationReference(self) -> None:
         """
-        Verify register() registers the binding with the expected alias.
+        Keep the container passed to the constructor.
 
-        Ensures the facade accessor alias is set so the ReactorFacade
-        can resolve the correct instance from the container.
+        Validates the container the provider binds services into.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        _, kwargs = mock_app.singleton.call_args
-        self.assertEqual(kwargs.get("alias"), "x-orionis-IReactor")
+        app = _StubApp()
+        self.assertIs(ReactorProvider(app).app, app)  # type: ignore[arg-type]
 
-    def testRegisterBindsIReactorInterface(self) -> None:
+    def testBootIsDeclaredAsynchronous(self) -> None:
         """
-        Verify register() uses IReactor as the binding key.
+        Declare the boot phase as an asynchronous method.
 
-        Ensures resolution by interface is possible through the container.
+        Validates that boot can await the facade pinning.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        args, _ = mock_app.singleton.call_args
-        self.assertIs(args[0], IReactor)
+        self.assertTrue(inspect.iscoroutinefunction(ReactorProvider.boot))
 
-    def testRegisterBindsReactorImplementation(self) -> None:
-        """
-        Verify register() binds the Reactor concrete class.
 
-        Ensures the correct implementation is registered, not a mock
-        or alternative class.
-        """
-        provider, mock_app = self._make()
-        provider.register()
-        args, _ = mock_app.singleton.call_args
-        self.assertIs(args[1], Reactor)
+class TestReactorProviderRegister(TestCase):
 
-    async def testBootCallsReactorFacadePin(self) -> None:
+    def testBindsTheReactorContractAsASingleton(self) -> None:
         """
-        Verify boot() invokes ReactorFacade.pin() exactly once.
+        Bind IReactor to the concrete Reactor implementation.
 
-        Ensures the reactor facade is initialised during the boot phase
-        so it is available for subsequent requests.
+        Validates the single binding declared by the provider, including
+        the alias used to reach it.
         """
-        provider, _ = self._make()
-        with patch(
-            "orionis.console.reactor_provider.ReactorFacade.pin",
-            new_callable=AsyncMock,
-        ) as mock_pin:
-            await provider.boot()
-            mock_pin.assert_called_once()
+        app = _StubApp()
 
-    async def testBootDoesNotCallRegister(self) -> None:
-        """
-        Verify boot() does not call app.singleton.
+        ReactorProvider(app).register()  # type: ignore[arg-type]
 
-        Ensures the boot phase only initialises the facade and does not
-        attempt to re-register the binding.
-        """
-        provider, mock_app = self._make()
-        with patch(
-            "orionis.console.reactor_provider.ReactorFacade.pin",
-            new_callable=AsyncMock,
-        ):
-            await provider.boot()
-            mock_app.singleton.assert_not_called()
+        self.assertEqual(app.singletons, [(IReactor, Reactor, _REACTOR_ALIAS)])
 
-    async def testRegisterThenBootSequence(self) -> None:
+    def testRegisteredAliasMatchesTheFacadeAccessor(self) -> None:
         """
-        Verify the full register → boot lifecycle succeeds without error.
+        Register the alias the Reactor facade resolves.
 
-        Ensures that calling both methods in sequence does not raise
-        and each method performs exactly its own side effects.
+        Validates that the facade and the binding cannot drift apart.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        with patch(
-            "orionis.console.reactor_provider.ReactorFacade.pin",
-            new_callable=AsyncMock,
-        ) as mock_pin:
-            await provider.boot()
-        mock_app.singleton.assert_called_once()
-        mock_pin.assert_called_once()
+        self.assertEqual(ReactorFacade.getFacadeAccessor(), _REACTOR_ALIAS)
 
-    def testAppAttributeIsStored(self) -> None:
-        """
-        Verify that the app attribute is stored correctly on the provider.
 
-        Ensures the application reference is accessible after construction,
-        which is required for register() to call app.singleton().
+class TestReactorProviderBoot(TestCase):
+
+    def setUp(self) -> None:
         """
-        provider, mock_app = self._make()
-        self.assertIs(provider.app, mock_app)
+        Replace the Reactor facade with a double before each test.
+
+        Prevents the boot phase from pinning the real facade, which would
+        require a fully booted application.
+        """
+        self._original_facade = provider_module.ReactorFacade
+        self._facade = _StubReactorFacade()
+        provider_module.ReactorFacade = self._facade
+        self._app = _StubApp()
+
+    def tearDown(self) -> None:
+        """
+        Restore the original Reactor facade after each test.
+
+        Guarantees that module level state never leaks between tests.
+        """
+        provider_module.ReactorFacade = self._original_facade
+
+    async def testBootPinsTheReactorFacade(self) -> None:
+        """
+        Pin the Reactor facade once the services are registered.
+
+        Validates that facade access skips container resolution.
+        """
+        await ReactorProvider(self._app).boot()  # type: ignore[arg-type]
+
+        self.assertEqual(self._facade.pinned, 1)
+
+    async def testBootRegistersNoAdditionalBinding(self) -> None:
+        """
+        Keep the boot phase free of container registrations.
+
+        Validates the separation between register() and boot().
+        """
+        await ReactorProvider(self._app).boot()  # type: ignore[arg-type]
+
+        self.assertEqual(self._app.singletons, [])

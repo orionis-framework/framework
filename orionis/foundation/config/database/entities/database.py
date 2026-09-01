@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.database.entities.connections import Connections
 from orionis.foundation.config.database.enums.connection_name import ConnectionName
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozenset of valid connection names for O(1) membership checks

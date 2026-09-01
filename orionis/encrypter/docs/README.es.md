@@ -1,261 +1,370 @@
-# Encrypter de Orionis (`orionis.encrypter`)
+# Orionis Encrypter (`orionis.encrypter`)
 
-> Servicio de cifrado simétrico autenticado basado en AES para el Orionis
-> Framework, integrado en el contenedor de la aplicación como el contrato
-> `IEncrypter` y la fachada `Crypt`.
+> Servicio de cifrado simétrico AES, síncrono, expuesto mediante el contrato
+> `IEncrypter` y la facade `Crypt`.
 >
 > 🇬🇧 English version: [README.md](README.md)
 
-`orionis.encrypter` provee un único servicio gestionado por el contenedor —
-`Encrypter` — que cifra y descifra cadenas de texto usando AES en modo CBC
-o GCM, controlado enteramente por los valores de configuración `app.key` /
-`app.cipher` de la aplicación. Es la implementación concreta detrás de la
-fachada `Crypt` del framework.
-
----
-
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Qué problema resuelve](#qué-problema-resuelve)
-3. [Referencia de API](#referencia-de-api)
-   - [`IEncrypter`](#iencrypter)
-   - [`Encrypter`](#encrypter)
-   - [`EncrypterProvider`](#encrypterprovider)
-4. [Ejemplos de uso](#ejemplos-de-uso)
-5. [Notas de diseño](#notas-de-diseño)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de compatibilidad](#notas-de-compatibilidad)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja](#dónde-encaja)
+  - [Mapa del módulo](#mapa-del-módulo)
+  - [Formato del payload](#formato-del-payload)
+  - [Decisiones de diseño](#decisiones-de-diseño)
+- [Referencia de API](#referencia-de-api)
+  - [`IEncrypter`](#iencrypter)
+  - [`Encrypter`](#encrypter)
+    - [Atributos de clase](#atributos-de-clase)
+    - [`Encrypter.__init__()`](#encrypter__init__)
+    - [`Encrypter.encrypt()`](#encrypterencrypt)
+    - [`Encrypter.decrypt()`](#encrypterdecrypt)
+    - [Helpers internos](#helpers-internos)
+  - [`EncrypterProvider`](#encrypterprovider)
+  - [Facade `Crypt`](#facade-crypt)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [Cifrar con la configuración de la aplicación](#cifrar-con-la-configuración-de-la-aplicación)
+  - [Elegir el cipher explícitamente](#elegir-el-cipher-explícitamente)
+  - [Manejo de errores](#manejo-de-errores)
+  - [Resolver el servicio y la facade](#resolver-el-servicio-y-la-facade)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
----
+## Descripción funcional
 
-## Requisitos
+`orionis.encrypter` convierte una cadena en un sobre autodescriptivo
+codificado en base64, y viceversa, usando AES en modo CBC o GCM. La clave y
+el modo provienen de la configuración de la aplicación (`app.key` y
+`app.cipher`), de modo que quien lo usa nunca manipula material de clave,
+vectores de inicialización, relleno PKCS7 ni etiquetas de autenticación.
 
-No se necesita ningún paso de instalación adicional además del propio
-framework:
+### Dónde encaja
 
-```bash
-pip install orionis
+| Componente | Relación |
+|---|---|
+| `orionis.foundation.contracts.application.IApplication` | Se lee al construir, mediante `app.config("app.key")` y `app.config("app.cipher")`. |
+| `orionis.foundation.config.app.enums.ciphers.Cipher` | Origen de `Encrypter.SUPPORTED_CIPHERS`. |
+| `orionis.container.providers` | `EncrypterProvider` extiende `ServiceProvider` y `DeferrableProvider`. |
+| `orionis.support.facades.encrypter.Crypt` | Facade cuyo accessor es `IEncrypter`; la fija `EncrypterProvider.boot()`. |
+| `orionis.view.globals.bcrypt` | Construye los globals de plantilla `encrypt` / `decrypt` con `await app.make(IEncrypter)`. |
+| `orionis.support.types.stringable.Stringable` | Sus métodos `encrypt()` / `decrypt()` delegan en la facade `Crypt`. |
+
+### Mapa del módulo
+
+| Archivo | Contenido |
+|---|---|
+| `orionis/encrypter/__init__.py` | Exporta `Encrypter` (`__all__ = ["Encrypter"]`). |
+| `orionis/encrypter/encrypter.py` | `_Payload` (`msgspec.Struct` privado) y `Encrypter`. |
+| `orionis/encrypter/provider.py` | `EncrypterProvider`. |
+| `orionis/encrypter/contracts/__init__.py` | Exporta `IEncrypter` (`__all__ = ["IEncrypter"]`). |
+| `orionis/encrypter/contracts/encrypter.py` | Contrato abstracto `IEncrypter`. |
+
+### Formato del payload
+
+`encrypt()` devuelve `base64(json(_Payload))`. `_Payload` es un
+`msgspec.Struct` declarado con `gc=False` y cuatro campos, en este orden:
+
+```python
+class _Payload(msgspec.Struct, gc=False):
+    iv: str
+    value: str
+    tag: str | None
+    cipher: str
 ```
 
-- **Python:** 3.14 o superior.
-- **Dependencias de terceros** (ya declaradas por el framework):
-  - [`cryptography`](https://pypi.org/project/cryptography/) `~=48.0` —
-    primitivas AES (`Cipher`, `algorithms`, `modes`, `AESGCM`).
-  - [`msgspec`](https://pypi.org/project/msgspec/) `>=0.21.1` —
-    codificación/decodificación JSON rápida y validada por esquema para la
-    estructura interna del payload.
-- **Configuración:** deben existir valores `app.key` y `app.cipher`
-  accesibles a través de `IApplication.config(...)` (típicamente
-  provenientes de `config/app.py`, que a su vez lee las variables de
-  entorno `APP_KEY` / `APP_CIPHER`). Si `APP_KEY` no está definida, el
-  framework genera una automáticamente al arrancar
-  (`SecureKeyGenerator`, ver [orionis/environment](../../environment)) y la
-  persiste de vuelta en el entorno.
+| Campo | CBC | GCM |
+|---|---|---|
+| `iv` | base64 de 16 bytes aleatorios | base64 de 12 bytes aleatorios |
+| `value` | base64 del texto cifrado con relleno PKCS7 | base64 del texto cifrado sin la etiqueta final |
+| `tag` | `None` | base64 de la etiqueta de autenticación de 16 bytes |
+| `cipher` | nombre del cipher configurado | nombre del cipher configurado |
 
-## Qué problema resuelve
+El sobre lleva su propio nombre de cipher, pero `decrypt()` igualmente
+rechaza cualquier payload cuyo `cipher` difiera del configurado actualmente.
 
-Las aplicaciones necesitan con frecuencia proteger valores sensibles en
-reposo o en tránsito — datos de sesión, tokens firmados, secretos
-almacenados — sin que cada parte del código tenga que reimplementar
-correctamente la gestión de claves, la generación de IV, el relleno
-(padding) y las etiquetas de autenticación. `orionis.encrypter` centraliza
-esta responsabilidad:
+### Decisiones de diseño
 
-- Una única clase, `Encrypter`, expone solo dos operaciones —
-  `encrypt(plaintext)` y `decrypt(payload)` — respaldadas por AES en el
-  modo configurado para la aplicación (`AES-128-CBC`, `AES-256-CBC`,
-  `AES-128-GCM` o `AES-256-GCM`).
-- La longitud de la clave, el soporte del cifrador y la integridad del
-  payload (coincidencia de cifrador, tamaño de IV, etiqueta de
-  autenticación para GCM) se validan internamente, por lo que quien llama
-  no puede usar accidentalmente una combinación de clave/cifrador
-  incompatible sin recibir un error explícito.
-- El payload cifrado es autodescriptivo (incluye su propio nombre de
-  cifrador e IV/etiqueta), pero aun así se niega a descifrar con un
-  cifrador distinto al configurado actualmente.
-- `EncrypterProvider` conecta `Encrypter` al contenedor de la aplicación
-  como un singleton vinculado a `IEncrypter`, y lo expone en toda la
-  aplicación mediante la fachada `Crypt` — sin necesidad de instanciarlo
-  manualmente dentro del código de la aplicación.
+- `Encrypter` declara `__slots__ = ("_aesgcm", "_is_gcm", "cipher", "key")` e
+  `IEncrypter` declara `__slots__ = ()`, así que las instancias no arrastran
+  diccionario de atributos.
+- `_is_gcm` se calcula una sola vez en `__init__` (`"GCM" in self.cipher`),
+  de modo que no hay búsqueda de subcadena por operación.
+- El objeto `AESGCM` se construye una vez en `__init__` para los ciphers GCM
+  y se reutiliza, así que el key schedule no se recalcula en cada llamada.
+  Para los ciphers CBC queda en `None` y se construye un `Cipher` nuevo en
+  cada operación.
+- `SUPPORTED_CIPHERS` es un `ClassVar[frozenset[str]]` derivado del enum
+  `Cipher`: las comprobaciones de pertenencia son O(1) y el catálogo es
+  inmutable.
+- `_Payload` es un `msgspec.Struct` tipado, así que un sobre malformado se
+  rechaza por validación de esquema antes de tocar ninguna primitiva
+  criptográfica.
+- `EncrypterProvider` vincula `IEncrypter` como **singleton**: toda la
+  aplicación comparte una instancia (y por tanto un único key schedule de
+  `AESGCM`).
+- `EncrypterProvider` es un `ServiceProvider` normal, no uno diferido, así que
+  su `boot()` corre en el arranque de la aplicación y la facade `Crypt` queda
+  fijada antes de atender ninguna petición. Los consumidores síncronos dependen
+  de ello.
 
 ## Referencia de API
 
 ### `IEncrypter`
 
+Ubicación: `orionis/encrypter/contracts/encrypter.py`. También se reexporta
+desde `orionis.encrypter.contracts`.
+
 ```python
-from orionis.encrypter.contracts.encrypter import IEncrypter
+class IEncrypter(ABC):
+
+    __slots__ = ()
+
+    @abstractmethod
+    def encrypt(self, plaintext: str) -> str: ...
+
+    @abstractmethod
+    def decrypt(self, payload: str) -> str: ...
 ```
 
-Clase base abstracta (`abc.ABC`) que describe el contrato de cifrado que
-implementan `Encrypter` (y la fachada `Crypt`).
+Miembros abstractos: `encrypt` y `decrypt`. Ambos se declaran sin cuerpo, así
+que una subclase que no los implemente no se puede instanciar.
 
-| Miembro | Firma | Descripción |
-| --- | --- | --- |
-| `encrypt` | `def encrypt(self, plaintext: str) -> str` | Método abstracto. Cifra `plaintext` y devuelve un payload codificado en base64. |
-| `decrypt` | `def decrypt(self, payload: str) -> str` | Método abstracto. Descifra un payload previamente producido y devuelve el texto original. |
-
-**Excepciones:** instanciar `IEncrypter` directamente lanza `TypeError`
-(comportamiento estándar de `abc.ABC`), ya que ambos métodos son
-abstractos.
-
----
+`__slots__ = ()` implica que las subclases que declaren sus propios
+`__slots__` quedan libres de `__dict__` por instancia.
 
 ### `Encrypter`
 
-```python
-from orionis.encrypter.encrypter import Encrypter
-```
-
-Implementación concreta de `IEncrypter`. Usa
-`__slots__ = ("_aesgcm", "_is_gcm", "cipher", "key")` — no se permiten
-atributos dinámicos en las instancias.
-
-#### Constantes de clase
-
-| Constante | Valor | Significado |
-| --- | --- | --- |
-| `AES_128_KEY_SIZE` | `16` | Longitud de clave requerida, en bytes, para los cifradores AES-128. |
-| `AES_256_KEY_SIZE` | `32` | Longitud de clave requerida, en bytes, para los cifradores AES-256. |
-| `CBC_IV_SIZE` | `16` | Longitud de IV requerida, en bytes, para el modo CBC. |
-| `GCM_IV_SIZE` | `12` | Longitud de IV requerida, en bytes, para el modo GCM. |
-| `GCM_TAG_SIZE` | `16` | Longitud de la etiqueta de autenticación, en bytes, requerida para el modo GCM. |
-| `PKCS7_BLOCK_SIZE` | `16` | Tamaño de bloque, en bytes, usado para el relleno PKCS7 en modo CBC. |
-| `SUPPORTED_CIPHERS` | `frozenset[str]` | Los cuatro identificadores de cifrador soportados: `"AES-128-CBC"`, `"AES-256-CBC"`, `"AES-128-GCM"`, `"AES-256-GCM"` (refleja `orionis.foundation.config.app.enums.ciphers.Cipher`). |
-
-#### `Encrypter(app)`
-
-Constructor.
-
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `app` | `IApplication` | La instancia de la aplicación; se usa para leer `app.config("app.key")` y `app.config("app.cipher")`. |
-
-**Comportamiento:**
-
-- Lee `self.key` desde `app.config("app.key")` (se espera que sea
-  `bytes`) y `self.cipher` desde `app.config("app.cipher")` (una cadena
-  que identifica uno de los cifradores soportados).
-- Valida que `self.cipher` sea uno de los `SUPPORTED_CIPHERS`.
-- Valida que `len(self.key)` coincida con el tamaño requerido por la
-  familia del cifrador (`16` bytes para `AES-128-*`, `32` bytes para
-  `AES-256-*`).
-- Precalcula si el cifrador es una variante GCM y, en ese caso, crea y
-  almacena en caché una instancia `AESGCM` (`self._aesgcm`) para evitar
-  recalcular el key schedule en cada llamada.
-
-**Excepciones:** `ValueError` si el cifrador no es compatible o si la
-longitud de la clave no coincide con el cifrador configurado.
-
-#### `encrypter.encrypt(plaintext)`
+Ubicación: `orionis/encrypter/encrypter.py`. Única implementación concreta de
+`IEncrypter` que trae el framework.
 
 ```python
-def encrypt(self, plaintext: str) -> str
+class Encrypter(IEncrypter):
+
+    __slots__ = ("_aesgcm", "_is_gcm", "cipher", "key")
 ```
 
-Cifra `plaintext` usando el cifrador configurado y devuelve un payload
-JSON codificado en base64 que contiene el IV, el texto cifrado, la
-etiqueta de autenticación (solo GCM) y el identificador del cifrador.
+Atributos de instancia, todos asignados en `__init__`:
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `plaintext` | `str` | El texto a cifrar. Debe ser no vacío. |
+| Atributo | Tipo | Significado |
+|---|---|---|
+| `key` | `bytes` | Clave AES en crudo, tal como la devuelve `app.config("app.key")`. |
+| `cipher` | `str` | Nombre del cipher configurado. |
+| `_is_gcm` | `bool` | Indica si el cipher configurado opera en modo GCM. |
+| `_aesgcm` | `AESGCM \| None` | Helper AEAD cacheado para GCM, `None` para CBC. |
 
-**Devuelve:** `str` — un payload autodescriptivo codificado en base64,
-apto para almacenamiento o transmisión, y para su uso posterior con
-`decrypt`.
+#### Atributos de clase
 
-**Excepciones:**
-- `TypeError` si `plaintext` no es un `str`.
-- `ValueError` si `plaintext` está vacío, o si no puede codificarse como
-  UTF-8.
-- `RuntimeError` si la operación de cifrado subyacente falla por
-  cualquier otro motivo (envuelve la excepción original mediante
-  `raise ... from e`).
+| Nombre | Valor | Uso |
+|---|---|---|
+| `AES_128_KEY_SIZE` | `16` | Longitud de clave exigida por los ciphers `AES-128-*`. |
+| `AES_256_KEY_SIZE` | `32` | Longitud de clave exigida por los ciphers `AES-256-*`. |
+| `CBC_IV_SIZE` | `16` | Longitud del IV generado y validado en CBC. |
+| `GCM_IV_SIZE` | `12` | Longitud del IV generado y validado en GCM. |
+| `GCM_TAG_SIZE` | `16` | Longitud de la etiqueta de autenticación en GCM. |
+| `PKCS7_BLOCK_SIZE` | `16` | Tamaño de bloque usado para el relleno y su validación. |
+| `SUPPORTED_CIPHERS` | `ClassVar[frozenset[str]]` | `{'AES-128-CBC', 'AES-128-GCM', 'AES-256-CBC', 'AES-256-GCM'}`, construido desde el enum `Cipher`. |
 
-**Efectos secundarios:** genera un IV aleatorio nuevo mediante
-`os.urandom` en cada llamada (no se conserva ningún estado entre llamadas
-más allá de la clave en caché / la instancia `AESGCM`).
-
-#### `encrypter.decrypt(payload)`
+#### `Encrypter.__init__()`
 
 ```python
-def decrypt(self, payload: str) -> str
+def __init__(
+    self,
+    app: IApplication,
+) -> None:
 ```
 
-Descifra un payload previamente producido por `encrypt` (o por cualquier
-productor compatible que siga el mismo formato de intercambio) y devuelve
-el texto original.
+| Parámetro | Tipo | Descripción |
+|---|---|---|
+| `app` | `IApplication` | Objeto que da acceso a la configuración. Solo se leen `app.config("app.key")` y `app.config("app.cipher")`; no hay comprobación `isinstance`, así que sirve cualquier objeto que exponga `config(path)`. |
+
+**Devuelve:** `None`.
+
+**Lanza:** `ValueError` cuando el cipher configurado no está en
+`SUPPORTED_CIPHERS`, cuando un cipher `AES-128-*` no recibe una clave de 16
+bytes, o cuando un cipher `AES-256-*` no recibe una clave de 32 bytes.
+
+**Efectos secundarios:** construye y cachea una instancia de `AESGCM` cuando
+el cipher opera en modo GCM. Sin E/S y sin registros en el contenedor.
+
+#### `Encrypter.encrypt()`
+
+```python
+def encrypt(
+    self,
+    plaintext: str,
+) -> str:
+```
 
 | Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `payload` | `str` | Cadena de payload codificada en base64, tal como la devuelve `encrypt`. Debe ser no vacía. |
+|---|---|---|
+| `plaintext` | `str` | Texto a cifrar. Se codifica como UTF-8 antes de llegar al cipher. |
 
-**Devuelve:** `str` — el texto descifrado, decodificado como UTF-8.
+**Devuelve:** `str` — el sobre codificado en base64 descrito en
+[Formato del payload](#formato-del-payload).
 
-**Excepciones:**
-- `TypeError` si `payload` no es un `str`.
-- `ValueError` si `payload` está vacío, no puede decodificarse como
-  base64/JSON, su cifrador no coincide con el cifrador actualmente
-  configurado, el tamaño de su IV es incorrecto para el modo configurado,
-  o (en GCM) su etiqueta de autenticación falta o tiene un tamaño
-  incorrecto.
-- `RuntimeError` si el propio descifrado falla (por ejemplo, un fallo de
-  autenticación en modo GCM, o un relleno PKCS7 corrupto o inválido en
-  modo CBC) — envuelve la excepción original mediante `raise ... from e`.
+**Lanza:**
 
-> Internamente, `decrypt` delega en varios métodos auxiliares privados
-> (con "name mangling") — `__decodePayload`, `__extractPayloadData`,
-> `__validateCipherMatch`, `__validateIvSize`, `__performDecryption`,
-> `__encryptCBC` / `__decryptCBC`, `__encryptGCM` / `__decryptGCM` —, que
-> son detalles de implementación y no forman parte de la API pública.
+| Excepción | Condición |
+|---|---|
+| `TypeError` | `plaintext` no es `str` (mensaje: `Plaintext must be a string`). |
+| `ValueError` | `plaintext` está vacío (`Plaintext cannot be empty`). |
+| `ValueError` | `plaintext.encode("utf-8")` falla, por ejemplo ante un sustituto suelto (`UTF-8 encoding error: ...`). |
+| `RuntimeError` | Cualquier fallo lanzado por la rama del cipher, envuelto como `Error during encryption: ...`. |
 
----
+**Efectos secundarios:** obtiene un IV nuevo de `os.urandom` en cada llamada
+(`CBC_IV_SIZE` o `GCM_IV_SIZE` bytes), así que dos llamadas con el mismo
+texto nunca devuelven el mismo payload. No muta el estado de la instancia.
+
+#### `Encrypter.decrypt()`
+
+```python
+def decrypt(
+    self,
+    payload: str,
+) -> str:
+```
+
+| Parámetro | Tipo | Descripción |
+|---|---|---|
+| `payload` | `str` | Sobre producido previamente por `encrypt()`. |
+
+**Devuelve:** `str` — el texto plano recuperado, decodificado como UTF-8.
+
+**Lanza:**
+
+| Excepción | Condición |
+|---|---|
+| `TypeError` | `payload` no es `str` (`Payload must be a string`). |
+| `ValueError` | `payload` está vacío (`Payload cannot be empty`). |
+| `ValueError` | El base64 exterior o el sobre JSON está malformado, o falta un campo obligatorio (`Invalid payload: ...`). |
+| `ValueError` | Un campo base64 interno no se puede decodificar (`Error decoding payload data: ...`). |
+| `ValueError` | El sobre lo produjo otro cipher (`Payload cipher '...' does not match configured cipher '...'`). |
+| `ValueError` | La longitud del IV no corresponde al modo (`Invalid IV for GCM: ...` / `Invalid IV for CBC: ...`). |
+| `RuntimeError` | Todo lo lanzado desde la etapa de descifrado, envuelto como `Error during decryption: ...`. |
+
+Las familias de `ValueError` anteriores las lanza la etapa de validación,
+antes de ejecutar ninguna primitiva criptográfica. Una vez empieza el
+descifrado, **todos** los fallos afloran como `RuntimeError`, incluidos la
+etiqueta GCM ausente, una etiqueta de tamaño incorrecto, un relleno PKCS7
+inválido y una autenticación GCM fallida.
+
+**Efectos secundarios:** ninguno. Sin E/S y sin mutación del estado de la
+instancia.
+
+#### Helpers internos
+
+Métodos privados de `Encrypter`, listados porque determinan qué tipo de
+excepción llega a quien llama.
+
+| Método | Etapa | Lanza |
+|---|---|---|
+| `__decodePayload(payload)` | Validación | `ValueError` — `Invalid payload: ...` |
+| `__extractPayloadData(data)` | Validación | `ValueError` — `Error decoding payload data: ...` |
+| `__validateCipherMatch(cipher)` | Validación | `ValueError` — cipher incompatible |
+| `__validateIvSize(iv)` | Validación | `ValueError` — longitud de IV incorrecta |
+| `__performDecryption(value, iv, tag)` | Descifrado | `RuntimeError` — envuelve todo lo de abajo |
+| `__encryptCBC(data)` | Cifrado | `RuntimeError` — `Error in CBC encryption: ...` |
+| `__decryptCBC(ct, iv)` | Descifrado | `ValueError` con datos vacíos y relleno PKCS7 inválido, `RuntimeError` en el resto |
+| `__encryptGCM(data)` | Cifrado | `RuntimeError` — `Error in GCM encryption: ...` |
+| `__decryptGCM(value, iv, tag)` | Descifrado | `ValueError` cuando `tag` es `None`, `RuntimeError` en el resto |
+
+`__decryptCBC` rechaza un byte de relleno igual a `0`, un byte de relleno
+mayor que `PKCS7_BLOCK_SIZE` y un bloque de relleno cuyos bytes no sean todos
+iguales a la longitud declarada.
 
 ### `EncrypterProvider`
 
+Ubicación: `orionis/encrypter/provider.py`.
+
 ```python
-from orionis.encrypter.provider import EncrypterProvider
+class EncrypterProvider(ServiceProvider):
+
+    def register(self) -> None: ...
+
+    async def boot(self) -> None: ...
 ```
 
-Proveedor de servicio que conecta `Encrypter` al contenedor de la
-aplicación. Hereda de `ServiceProvider` y de `DeferrableProvider`.
+| Miembro | Comportamiento |
+|---|---|
+| `register()` | Llama a `self.app.singleton(IEncrypter, Encrypter)`. Nada más. |
+| `boot()` | Hace `await` de `Crypt.pin()`, de modo que los accesos posteriores a la facade evitan la resolución por contenedor. No registra ningún binding. |
 
-| Miembro | Firma | Descripción |
-| --- | --- | --- |
-| `provides` | `@classmethod def provides(cls) -> list[type]` | Devuelve `[IEncrypter]` — declara qué tipos de servicio gestiona este proveedor, habilitando la carga diferida (bajo demanda). |
-| `register` | `def register(self) -> None` | Vincula `IEncrypter` a `Encrypter` como un **singleton** en el contenedor de la aplicación (`self.app.singleton(IEncrypter, Encrypter)`). |
-| `boot` | `async def boot(self) -> None` | Fija (pin) la fachada `Crypt` (`await CryptFacade.pin()`) para que `orionis.support.facades.encrypter.Crypt` resuelva al singleton `Encrypter` registrado. |
+El constructor lo aporta `ServiceProvider`: `EncrypterProvider(app)` guarda
+el contenedor en `self.app`.
 
-**Devuelve / Excepciones:** ninguna adicional más allá de las que lancen
-los métodos subyacentes del contenedor (por ejemplo, si `IEncrypter` no
-puede resolverse).
+El provider figura en `CORE_PROVIDERS`
+(`orionis/foundation/core_providers.py`), así que una aplicación obtiene
+`IEncrypter` vinculado sin registrar nada a mano. **No** es un
+`DeferrableProvider`: diferirlo dejaría la facade `Crypt` sin fijar hasta que
+algo resolviera `IEncrypter`, y la primera llamada síncrona de un consumidor
+como `Stringable.encrypt()` recibiría un objeto `_FacadeDispatch` en lugar de
+una cadena.
+
+### Facade `Crypt`
+
+Ubicación: `orionis/support/facades/encrypter.py`.
+
+```python
+class Crypt(Facade):
+
+    @classmethod
+    def getFacadeAccessor(cls) -> type:
+        return IEncrypter
+```
+
+La facade resuelve `IEncrypter` desde el contenedor. `EncrypterProvider.boot()`
+la fija durante el arranque de la aplicación, así que bajo el runtime de CLI o
+HTTP `Crypt.encrypt(...)` y `Crypt.decrypt(...)` son llamadas síncronas
+normales — que es justo de lo que dependen `Stringable.encrypt()` y
+`Stringable.decrypt()`. En un script suelto que solo importa `bootstrap.app`,
+el arranque no ha ocurrido, la facade sigue sin fijar y el acceso a atributos
+devuelve un objeto `_FacadeDispatch` que hay que awaitar. El stub
+`orionis/support/facades/encrypter.pyi` existe solo para el autocompletado
+del editor y nunca se ejecuta.
 
 ## Ejemplos de uso
 
-### 1. Resolver el encrypter a través de la fachada `Crypt`
+### Cifrar con la configuración de la aplicación
+
+`Encrypter` lee `app.key` y `app.cipher` directamente del contenedor, así que
+se puede construir sin registrar el provider.
 
 ```python
-from orionis.support.facades.encrypter import Crypt
-
-def store_secret(raw_value: str) -> str:
-    return Crypt.encrypt(raw_value)
-
-def read_secret(stored_value: str) -> str:
-    return Crypt.decrypt(stored_value)
-
-token = store_secret("valor-super-secreto")
-original = read_secret(token)
-assert original == "valor-super-secreto"
-```
-
-### 2. Ciclo de cifrado y descifrado directamente con `Encrypter`
-
-```python
+from bootstrap.app import app
 from orionis.encrypter.encrypter import Encrypter
 
-class _ConfigStub:
-    """Sustituto mínimo de IApplication.config(...) usado aquí solo a modo ilustrativo."""
+crypt = Encrypter(app)
+
+token = crypt.encrypt("card-4111111111111111")
+print("cipher:", crypt.cipher)
+print("token is a string:", isinstance(token, str))
+print("recovered:", crypt.decrypt(token))
+```
+
+Salida con la configuración por defecto de este repositorio:
+
+```text
+cipher: AES-256-CBC
+token is a string: True
+recovered: card-4111111111111111
+```
+
+### Elegir el cipher explícitamente
+
+`__init__` solo llama a `config(path)`, de modo que cualquier objeto que
+exponga ese método puede aportar la clave y el cipher. Es la forma que usan
+las pruebas unitarias.
+
+```python
+import base64
+
+import msgspec.json
+
+from orionis.encrypter.encrypter import Encrypter
+
+
+class StaticConfig:
+    """Any object exposing config(path) satisfies what Encrypter reads."""
 
     def __init__(self, key: bytes, cipher: str) -> None:
         self._values = {"app.key": key, "app.cipher": cipher}
@@ -263,137 +372,196 @@ class _ConfigStub:
     def config(self, path: str) -> object:
         return self._values[path]
 
-# Una aplicación real obtiene estos valores desde config/app.py (APP_KEY / APP_CIPHER).
-key_32_bytes = b"\x9f" * 32
-app = _ConfigStub(key_32_bytes, "AES-256-GCM")
 
-encrypter = Encrypter(app)
-payload = encrypter.encrypt("hola mundo")
-plaintext = encrypter.decrypt(payload)
-assert plaintext == "hola mundo"
+crypt = Encrypter(StaticConfig(b"\x11" * 32, "AES-256-GCM"))
+
+token = crypt.encrypt("Orionis")
+envelope = msgspec.json.decode(base64.b64decode(token))
+
+print("fields:", sorted(envelope))
+print("cipher:", envelope["cipher"])
+print("iv bytes:", len(base64.b64decode(envelope["iv"])))
+print("tag bytes:", len(base64.b64decode(envelope["tag"])))
+print("recovered:", crypt.decrypt(token))
+print("payloads differ:", crypt.encrypt("Orionis") != token)
 ```
 
-### 3. Manejar entradas inválidas de forma explícita
+Salida:
+
+```text
+fields: ['cipher', 'iv', 'tag', 'value']
+cipher: AES-256-GCM
+iv bytes: 12
+tag bytes: 16
+recovered: Orionis
+payloads differ: True
+```
+
+### Manejo de errores
+
+Los fallos de validación lanzan `ValueError`; todo lo que falla dentro de la
+etapa criptográfica lanza `RuntimeError`.
 
 ```python
+import base64
+
+import msgspec.json
+
 from orionis.encrypter.encrypter import Encrypter
 
-def safe_decrypt(encrypter: Encrypter, payload: str) -> str | None:
-    try:
-        return encrypter.decrypt(payload)
-    except (TypeError, ValueError) as exc:
-        # Payload malformado, entrada vacía, cifrador incompatible o tamaño de IV/etiqueta incorrecto.
-        print(f"Payload rechazado: {exc}")
-        return None
-    except RuntimeError as exc:
-        # Fallo de autenticación (GCM) o relleno corrupto (CBC).
-        print(f"Fallo al descifrar: {exc}")
-        return None
+
+class StaticConfig:
+    """Any object exposing config(path) satisfies what Encrypter reads."""
+
+    def __init__(self, key: bytes, cipher: str) -> None:
+        self._values = {"app.key": key, "app.cipher": cipher}
+
+    def config(self, path: str) -> object:
+        return self._values[path]
+
+
+cbc = Encrypter(StaticConfig(b"\x11" * 32, "AES-256-CBC"))
+gcm = Encrypter(StaticConfig(b"\x11" * 32, "AES-256-GCM"))
+
+# 1. Rejected before any cipher work happens.
+try:
+    cbc.encrypt("")
+except ValueError as exc:
+    print("empty ->", exc)
+
+# 2. A payload produced by another cipher is refused.
+try:
+    cbc.decrypt(gcm.encrypt("Orionis"))
+except ValueError as exc:
+    print("mismatch ->", exc)
+
+# 3. A malformed envelope never reaches the cipher.
+try:
+    cbc.decrypt("abcde")
+except ValueError as exc:
+    print("malformed ->", exc)
+
+# 4. A tampered GCM ciphertext fails authentication.
+token = gcm.encrypt("Orionis")
+envelope = msgspec.json.decode(base64.b64decode(token))
+envelope["value"] = base64.b64encode(b"\x00" * 7).decode()
+tampered = base64.b64encode(msgspec.json.encode(envelope)).decode()
+
+try:
+    gcm.decrypt(tampered)
+except RuntimeError as exc:
+    print("tampered ->", exc)
+
+# 5. Configuration errors surface when the service is built.
+try:
+    Encrypter(StaticConfig(b"\x11" * 16, "AES-256-CBC"))
+except ValueError as exc:
+    print("key length ->", exc)
 ```
 
-### 4. Registrar el proveedor manualmente (escenarios avanzados / de pruebas)
+Salida:
+
+```text
+empty -> Plaintext cannot be empty
+mismatch -> Payload cipher 'AES-256-GCM' does not match configured cipher 'AES-256-CBC'
+malformed -> Invalid payload: Invalid base64-encoded string: number of data characters (5) cannot be 1 more than a multiple of 4
+tampered -> Error during decryption: Error in GCM decryption: 
+key length -> Key must be 32 bytes for AES-256
+```
+
+La línea `Error in GCM decryption:` termina sin detalle porque la excepción
+subyacente `InvalidTag` no lleva mensaje.
+
+### Resolver el servicio y la facade
+
+El framework arranca `EncrypterProvider`, así que `IEncrypter` ya está
+vinculado y la facade `Crypt` queda fijada en cuanto arranca el runtime de CLI
+o HTTP. El script siguiente corre fuera de ese runtime, por eso awaita la
+facade; dentro de una aplicación arrancada el `await` sobra.
 
 ```python
-from orionis.encrypter.provider import EncrypterProvider
+import asyncio
+
+from bootstrap.app import app
 from orionis.encrypter.contracts.encrypter import IEncrypter
+from orionis.support.facades.encrypter import Crypt
 
-# `app` es una instancia de Application/contenedor de Orionis.
-provider = EncrypterProvider(app)
-provider.register()      # vincula IEncrypter -> Encrypter como singleton
-await provider.boot()     # fija la fachada Crypt
 
-encrypter = app.make(IEncrypter)
-token = encrypter.encrypt("valor a proteger")
+async def main() -> None:
+    service = await app.make(IEncrypter)
+    print("resolved:", type(service).__name__)
+    print("singleton:", service is await app.make(IEncrypter))
+
+    token = await Crypt.encrypt("through the facade")
+    print("facade returns:", type(token).__name__)
+    print("recovered:", await Crypt.decrypt(token))
+
+
+asyncio.run(main())
 ```
 
-## Notas de diseño
+Salida:
 
-Las siguientes notas describen decisiones de diseño **ya existentes** con
-fines exclusivamente informativos — no son propuestas de cambio.
-
-- **`__slots__` por eficiencia de memoria.** `Encrypter` declara
-  `__slots__ = ("_aesgcm", "_is_gcm", "cipher", "key")`, lo que impide la
-  creación dinámica de atributos y evita un `__dict__` por instancia —
-  apropiado para un servicio que típicamente se instancia una sola vez
-  (como singleton del contenedor).
-- **Indicador de modo precalculado y `AESGCM` en caché.** `_is_gcm` se
-  calcula una sola vez en el constructor (`"GCM" in self.cipher`) en lugar
-  de volver a comprobarse en cada llamada a `encrypt`/`decrypt`, y la
-  instancia `AESGCM` (que realiza la configuración del key schedule) se
-  crea una vez y se reutiliza, evitando el costo repetido en cada llamada.
-- **Payload autodescriptivo mediante `msgspec.Struct`.** La estructura
-  interna `_Payload` (`msgspec.Struct, gc=False`) modela el formato de
-  intercambio — `iv`, `value`, `tag`, `cipher`, todos cadenas codificadas
-  en base64 — y se codifica/decodifica con `msgspec.json`, que valida
-  estrictamente la forma del payload al decodificar (campos
-  inesperados/faltantes lanzan `msgspec.DecodeError`, traducido a un
-  `ValueError` por `decrypt`). `_Payload` es un detalle de implementación
-  privado del módulo, no forma parte de la superficie de la API pública.
-- **Defensa en profundidad al descifrar.** `decrypt` revalida
-  explícitamente que el `cipher` del payload coincida con el cifrador
-  configurado de la instancia y que la longitud del IV coincida con el
-  tamaño esperado para el modo, además de apoyarse en la etiqueta de
-  autenticación integrada de AES-GCM — de modo que un payload producido
-  bajo una configuración distinta de cifrador/clave se rechaza antes de
-  intentar cualquier operación criptográfica real.
-- **Relleno PKCS7 implementado manualmente para CBC.** Dado que AES-CBC (a
-  diferencia de GCM) no está autenticado y no gestiona el relleno por sí
-  mismo, `Encrypter` aplica/elimina el relleno PKCS7 a mano
-  (`PKCS7_BLOCK_SIZE = 16`) alrededor del objeto de cifrado CBC crudo de
-  la librería `cryptography`.
-- **Impulsado por configuración, no por parámetros.** El cifrador y la
-  clave se resuelven una sola vez, en el momento de la construcción, desde
-  `app.config("app.cipher")` / `app.config("app.key")` — no existe forma
-  de pasar una clave o cifrador distinto a una llamada individual de
-  `encrypt`/`decrypt`; se necesitaría una nueva instancia de `Encrypter`
-  (o una aplicación configurada de otra manera) para eso.
+```text
+resolved: Encrypter
+singleton: True
+facade returns: str
+recovered: through the facade
+```
 
 ## Consideraciones de rendimiento y concurrencia
 
-Estas son notas informativas sobre el comportamiento existente, no
-recomendaciones de optimización:
+- Toda la API pública es **síncrona**. `encrypt()` y `decrypt()` nunca hacen
+  `await`, nunca tocan el sistema de archivos ni la red, y nunca invocan al
+  contenedor.
+- Las instancias no arrastran `__dict__` (verificado:
+  `hasattr(encrypter, "__dict__")` es `False`), porque `Encrypter` declara
+  `__slots__` e `IEncrypter` declara `__slots__ = ()`.
+- GCM construye su helper `AESGCM` una vez por instancia; CBC construye un
+  objeto `Cipher` nuevo en cada llamada a `encrypt()` y `decrypt()`.
+- Cada llamada a `encrypt()` lee entropía nueva de `os.urandom`
+  (16 bytes en CBC, 12 en GCM).
+- La codificación y decodificación del payload pasan por `msgspec.json`, y
+  `_Payload` se declara con `gc=False`, así que el recolector de basura no
+  rastrea la estructura.
+- Ambas operaciones mantienen en memoria el texto plano y el texto cifrado
+  completos; no hay API de streaming ni por bloques.
+- Después de `__init__`, `encrypt()` y `decrypt()` solo leen `key`, `cipher`,
+  `_is_gcm` y `_aesgcm`; ningún método los reasigna.
 
-- `Encrypter` se registra como **singleton** por parte de
-  `EncrypterProvider`, por lo que la configuración del key schedule para
-  GCM (`AESGCM(self.key)`), relativamente económica, ocurre una sola vez
-  por proceso de la aplicación, no una vez por solicitud.
-- Tanto `encrypt` como `decrypt` son operaciones **totalmente síncronas y
-  ligadas a CPU** (sin `await`, sin E/S). Cuando se llaman desde
-  manejadores de solicitudes `async def`, se ejecutan en el hilo del bucle
-  de eventos; para payloads muy grandes o tasas de solicitudes muy altas,
-  esto ocupa el bucle igual que cualquier otro trabajo síncrono ligado a
-  CPU. El framework no delega estas llamadas automáticamente a un pool de
-  hilos — hágalo explícitamente (por ejemplo, mediante
-  `orionis.aio.Loop.execute`) si el perfilado muestra que es necesario
-  para su carga de trabajo.
-- Las instancias de `Encrypter` no están documentadas como thread-safe
-  frente a mutación concurrente (no la hay — todo el estado mutable se
-  establece una vez en `__init__`), por lo que múltiples hilos que llamen
-  a `encrypt`/`decrypt` concurrentemente sobre la misma instancia
-  singleton solo comparten estado de solo lectura (`self.key`,
-  `self.cipher`, `self._aesgcm`), lo cual la librería `cryptography`
-  subyacente está diseñada para soportar en operaciones concurrentes e
-  independientes.
-- Se genera un IV nuevo y criptográficamente aleatorio (`os.urandom`) en
-  **cada** llamada a `encrypt` — cifrar repetidamente el mismo texto plano
-  no producirá el mismo texto cifrado, lo cual es esperado y necesario
-  para las garantías de seguridad de AES-CBC/AES-GCM, pero también implica
-  que la longitud del texto cifrado y el tamaño del payload crecen con el
-  overhead del IV/etiqueta/JSON envuelto, además del propio texto plano.
+> ⚠️ El código fuente no declara ninguna garantía de thread-safety ni de
+> concurrencia: el módulo no usa locks ni primitivas de `asyncio`.
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14.
-- **Dependencias:**
-  - `cryptography ~= 48.0` — provee `Cipher`, `algorithms`, `modes` y
-    `AESGCM`.
-  - `msgspec >= 0.21.1` — provee `msgspec.Struct` y `msgspec.json`, usados
-    para codificar/decodificar el formato interno del payload.
-  - Librería estándar: `base64`, `os`, `typing`.
-- **Integración con el framework:** `Encrypter` requiere una instancia de
-  `IApplication` que exponga un método `config(path: str)` capaz de
-  resolver `"app.key"` (bytes) y `"app.cipher"` (una cadena que coincida
-  con uno de los `SUPPORTED_CIPHERS`). En una aplicación Orionis completa,
-  estos valores provienen de `config/app.py` (variables de entorno
-  `APP_KEY` / `APP_CIPHER`), generándose `APP_KEY` automáticamente en el
-  primer arranque si no está definida.
+- **Python:** el proyecto declara `requires-python = ">=3.14"` en
+  `pyproject.toml`. El módulo usa anotaciones `X | None` evaluadas de forma
+  perezosa (PEP 649) y evita deliberadamente
+  `from __future__ import annotations`, que rompería la inyección de
+  dependencias cuando el contenedor reflexiona sobre `Encrypter.__init__`.
+- **Dependencias de terceros**, ambas ya requisitos base del framework — no
+  hay que instalar nada extra:
+  - `cryptography~=48.0` — `Cipher`, `algorithms`, `modes`, `AESGCM`.
+  - `msgspec>=0.21.1` — codificación del sobre y validación de esquema.
+- **Configuración:** `app.config("app.key")` debe producir una clave tipo
+  bytes de exactamente 16 o 32 bytes, acorde a la familia que nombre
+  `app.config("app.cipher")`. `config/app.py` lee ambos de las variables de
+  entorno `APP_KEY` y `APP_CIPHER`, y la entidad de configuración `App`
+  genera una clave con `SecureKeyGenerator` cuando `APP_KEY` no existe.
+- **Catálogo de ciphers:** solo se aceptan los cuatro nombres de
+  `SUPPORTED_CIPHERS`, derivados de
+  `orionis.foundation.config.app.enums.ciphers.Cipher`. Añadir un miembro a
+  ese enum cambia lo que acepta `Encrypter`.
+- **Autenticación:** solo los payloads GCM llevan etiqueta de autenticación.
+  Los payloads CBC guardan `tag: None` y su integridad se comprueba
+  únicamente mediante la validación del relleno PKCS7.
+- **Portabilidad del payload:** un payload solo lo puede descifrar una
+  instancia configurada con el mismo nombre de cipher y la misma clave; la
+  comprobación del cipher ocurre antes de usar la clave.
+- **Cableado del contenedor:** `EncrypterProvider` forma parte de
+  `CORE_PROVIDERS`, así que `IEncrypter` queda vinculado como singleton y la
+  facade `Crypt` se fija durante el arranque de la aplicación. Como la caché
+  compilada del bootstrap (`storage/framework/bootstrap`) no se invalida por
+  cambios dentro de `orionis/`, una aplicación que ya cacheó sus providers debe
+  borrar esa carpeta — o ejecutar `reactor optimize:clear` — para tomar este
+  cableado.

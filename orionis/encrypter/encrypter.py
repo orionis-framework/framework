@@ -119,7 +119,7 @@ class Encrypter(IEncrypter):
             If plaintext is not a string.
         ValueError
             If plaintext is empty or has encoding issues.
-        EncryptionError
+        RuntimeError
             If encryption fails.
         """
         if not isinstance(plaintext, str):
@@ -169,7 +169,7 @@ class Encrypter(IEncrypter):
             If payload is not a string.
         ValueError
             If payload is empty or invalid.
-        DecryptionError
+        RuntimeError
             If decryption fails.
         """
         if not isinstance(payload, str):
@@ -398,7 +398,7 @@ class Encrypter(IEncrypter):
             iv = os.urandom(self.CBC_IV_SIZE)
             cipher = Cipher(
                 algorithms.AES(self.key),
-                modes.CBC(iv),
+                modes.CBC(iv), # NOSONAR
             )
             encryptor = cipher.encryptor()
 
@@ -421,7 +421,7 @@ class Encrypter(IEncrypter):
         except Exception as e:
 
             # Raise error if encryption fails
-            error_msg = f"Error en encriptación CBC: {e}"
+            error_msg = f"Error in CBC encryption: {e}"
             raise RuntimeError(error_msg) from e
 
     def __decryptCBC(
@@ -456,7 +456,7 @@ class Encrypter(IEncrypter):
             # Create cipher instance and decryptor for CBC mode
             cipher = Cipher(
                 algorithms.AES(self.key),
-                modes.CBC(iv),
+                modes.CBC(iv), # NOSONAR
             )
             decryptor = cipher.decryptor()
 

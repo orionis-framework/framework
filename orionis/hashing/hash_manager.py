@@ -14,6 +14,17 @@ class HashManager(IHashManager):
     Resolve the configured password hashing driver and delegate every
     operation to it, so application code never depends on a concrete
     algorithm.
+
+    Concurrency
+    -----------
+    No locks are used. The only mutable state is the driver cache, written
+    the first time a driver is resolved: a concurrent first resolution from
+    several threads may build the same driver twice, and the last write
+    wins. Every operation is synchronous and never suspends, so tasks
+    sharing an event loop never observe a partially built cache.
+    ``setRounds`` mutates the cached driver, and the provider binds this
+    class as a singleton, so the change is visible to the whole
+    application.
     """
 
     # ruff: noqa: TC001
@@ -23,6 +34,9 @@ class HashManager(IHashManager):
     def __init__(self, app: IApplication) -> None:
         """
         Initialize the manager from the application hashing configuration.
+
+        A missing ``hashing`` section falls back to the defaults declared by
+        the configuration entity.
 
         Parameters
         ----------
@@ -34,7 +48,7 @@ class HashManager(IHashManager):
         None
             This method initializes the instance and returns None.
         """
-        config_data = app.config("hashing")
+        config_data = app.config("hashing") or {}
         self._config: _HashingConfig = (
             _HashingConfig(**config_data)
             if isinstance(config_data, dict)

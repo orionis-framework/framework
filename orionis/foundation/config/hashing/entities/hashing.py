@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.foundation.config.hashing.entities.argon2 import Argon2
 from orionis.foundation.config.hashing.entities.bcrypt import Bcrypt
 from orionis.foundation.config.hashing.enums import Drivers

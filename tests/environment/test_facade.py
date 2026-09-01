@@ -401,3 +401,27 @@ class TestEnvReloadUnexpectedFailure(_EnvReloadFailureTestCase):
         """
         with self.assertRaises(RuntimeError):
             Env.reload()
+
+# ---------------------------------------------------------------------------
+# TestEnvLayout
+# ---------------------------------------------------------------------------
+
+class TestEnvLayout(TestCase):
+
+    def testDeclaresEmptySlots(self) -> None:
+        """
+        Declare empty slots for a facade that holds no state.
+
+        Validates that the contract declaring ``__slots__`` is honoured by
+        its only implementation.
+        """
+        self.assertEqual(Env.__slots__, ())
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep instances free of a dictionary.
+
+        Validates that an accidental instantiation cannot be used to hold
+        state that the classmethods would ignore.
+        """
+        self.assertFalse(hasattr(Env(), "__dict__"))

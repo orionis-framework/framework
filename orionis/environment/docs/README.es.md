@@ -1,89 +1,158 @@
-# Environment de Orionis (`orionis.environment`)
+# Environment (`orionis.environment`)
 
-> Gestión thread-safe de archivos `.env` con conversión tipada de valores,
-> validación de claves y generación segura de la clave de aplicación para
-> el Orionis Framework.
->
-> 🇬🇧 English version: [README.md](README.md)
+> Lee y escribe variables de `.env` manteniendo sincronizados `os.environ`, una caché en memoria y el archivo en disco, con una convención explícita `"<tipo>:<valor>"` para que los valores sobrevivan al formato de solo texto de `.env`.
 
-`orionis.environment` es la única fuente de verdad del framework para leer
-y escribir variables de entorno. Combina un gestor de archivos `.env`
-(`DotEnv`), una fachada estática sencilla (`Env`) y una función auxiliar
-(`env()`), un conversor de valores tipado (`EnvironmentCaster`) que permite
-que los valores conserven su tipo de Python a través del formato `.env`
-(que solo admite cadenas), y un generador de claves seguro usado para
-producir la clave de cifrado de la aplicación (`APP_KEY`, consumida por
-[`orionis.encrypter`](../../encrypter)).
-
----
+🇬🇧 English version: [README.md](README.md)
 
 ## Tabla de contenidos
 
-1. [Requisitos](#requisitos)
-2. [Qué problema resuelve](#qué-problema-resuelve)
-3. [Referencia de API](#referencia-de-api)
-   - [`Env`](#env)
-   - [`env()`](#env-1)
-   - [`IEnv`](#ienv)
-   - [`DotEnv`](#dotenv)
-   - [`EnvironmentCaster`](#environmentcaster)
-   - [`IEnvironmentCaster`](#ienvironmentcaster)
-   - [`EnvironmentValueType`](#environmentvaluetype)
-   - [`ValidateKeyName`](#validatekeyname)
-   - [`ValidateTypes`](#validatetypes)
-   - [`SecureKeyGenerator`](#securekeygenerator)
-4. [Ejemplos de uso](#ejemplos-de-uso)
-5. [Notas de diseño](#notas-de-diseño)
-6. [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-7. [Notas de compatibilidad](#notas-de-compatibilidad)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja](#dónde-encaja)
+  - [Flujo de lectura y escritura](#flujo-de-lectura-y-escritura)
+  - [Mapa de archivos](#mapa-de-archivos)
+  - [Convención de valores tipados](#convención-de-valores-tipados)
+  - [Decisiones de diseño](#decisiones-de-diseño)
+- [Referencia de API](#referencia-de-api)
+  - [`Env`](#env)
+  - [`env()`](#env-1)
+  - [`IEnv`](#ienv)
+  - [`DotEnv`](#dotenv)
+  - [`EnvironmentCaster`](#environmentcaster)
+  - [`IEnvironmentCaster`](#ienvironmentcaster)
+  - [`EnvironmentValueType`](#environmentvaluetype)
+  - [`ValidateKeyName()`](#validatekeyname)
+  - [`ValidateTypes()`](#validatetypes)
+  - [`SecureKeyGenerator`](#securekeygenerator)
+- [Ejemplos de uso](#ejemplos-de-uso)
+  - [Leer y escribir valores](#leer-y-escribir-valores)
+  - [Guardar valores tipados](#guardar-valores-tipados)
+  - [Manejar errores de validación y casteo](#manejar-errores-de-validación-y-casteo)
+  - [Usar el caster por separado](#usar-el-caster-por-separado)
+  - [Generar una clave de aplicación](#generar-una-clave-de-aplicación)
+  - [Leer configuración desde una entidad](#leer-configuración-desde-una-entidad)
+  - [Recargar tras una edición externa](#recargar-tras-una-edición-externa)
+- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
+- [Notas de compatibilidad](#notas-de-compatibilidad)
 
----
+## Descripción funcional
 
-## Requisitos
+Un archivo `.env` solo guarda texto. El código de la aplicación, en cambio,
+necesita `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, rutas del
+sistema de archivos y secretos codificados en base64. Este módulo centraliza
+esa traducción, valida cada nombre de variable que toca y mantiene
+coherentes tres almacenes: el archivo `.env`, el entorno del proceso
+(`os.environ`) y una caché en memoria.
 
-No se necesita ningún paso de instalación adicional además del propio
-framework:
+### Dónde encaja
 
-```bash
-pip install orionis
+- Cada entidad de configuración bajo `orionis/foundation/config/**` declara
+  sus valores por defecto con
+  `default_factory=lambda: Env.get("VAR", default)`, y los archivos de la
+  aplicación en `config/*.py` hacen lo mismo. Eso convierte a este módulo en
+  la puerta de entrada de toda la configuración del framework.
+- `orionis.foundation.config.app.entities.app.App.__post_init__` llama a
+  `SecureKeyGenerator.generate()` y a `Env.set("APP_KEY", ...)` cuando no hay
+  clave configurada, así que la clave que consume `orionis.encrypter` se
+  produce aquí.
+- El módulo **no tiene service provider ni facade registrada en el
+  contenedor**: `Env` es una clase normal con classmethods, importada
+  directamente. Solo depende de `orionis.support.patterns.singleton` (para
+  la metaclase de `DotEnv`) y, en el caso de `SecureKeyGenerator`, del enum
+  `Cipher` de `orionis.foundation.config.app.enums.ciphers`.
+
+### Flujo de lectura y escritura
+
+```text
+Env.get(key)      -> DotEnv.get      -> ValidateKeyName -> os.environ -> __parseValue -> value
+env(key)          -> Env.get
+Env.set(k, v, t)  -> DotEnv.set      -> ValidateKeyName -> ValidateTypes -> EnvironmentCaster.to()
+                                     -> set_key(.env)  + cache + os.environ
+Env.all()         -> DotEnv.all      -> in-memory cache -> __parseValue per entry
+Env.reload()      -> DotEnv.reload   -> load_dotenv(override=True) + cache rebuild
 ```
 
-- **Python:** 3.14 o superior.
-- **Dependencia de terceros** (ya declarada por el framework):
-  [`python-dotenv`](https://pypi.org/project/python-dotenv/) `~=1.2`
-  (`dotenv_values`, `load_dotenv`, `set_key`, `unset_key`).
-- Se crea automáticamente un archivo `.env` (vacío, si aún no existe) en el
-  directorio de trabajo actual la primera vez que se usa `DotEnv`, salvo
-  que se indique una ruta explícita.
+Del diagrama se desprenden dos hechos visibles en el código fuente:
 
-## Qué problema resuelve
+- `get()` lee de **`os.environ`**, así que una variable exportada por el
+  sistema operativo (o puesta por otra librería) sí se ve a través de
+  `Env.get`.
+- `all()` lee la **caché en memoria**, que se llena al construir y en
+  `reload()` a partir del archivo `.env`, y que actualizan `set()` /
+  `unset()` cuando `only_os=False`. Por eso una variable que solo existe en
+  `os.environ` la devuelve `get()` pero *no* aparece en `all()`.
 
-Los archivos de entorno (`.env`) solo almacenan cadenas de texto planas,
-pero el código de la aplicación normalmente necesita `int`, `float`,
-`bool`, `list`, `dict`, `tuple`, `set`, rutas del sistema de archivos o
-secretos codificados en base64. Leer y escribir estos valores de forma
-consistente, validar los nombres de las variables, y mantener sincronizados
-el estado de `os.environ` en el proceso, una caché en memoria y el propio
-archivo `.env` — de forma segura entre hilos — es exactamente lo que
-centraliza este módulo:
+### Mapa de archivos
 
-- `Env` / `env()` ofrecen al resto del framework (y al código de la
-  aplicación) una forma estática y sencilla de leer y escribir
-  configuración sin tocar directamente `os.environ` ni `python-dotenv`.
-- `DotEnv` es el motor real detrás de `Env`: un singleton thread-safe por
-  proceso que posee la ruta resuelta del archivo `.env`, mantiene
-  sincronizados `os.environ` y una caché en memoria, y valida cada clave
-  que toca.
-- `EnvironmentCaster` implementa una pequeña convención
-  `"<tipo>:<valor>"` (por ejemplo, `int:42`, `list:[1, 2, 3]`,
-  `path:/ruta/abs`, `base64:aGVsbG8=`) para que un valor escrito con un
-  indicador de tipo se recupere con el mismo tipo de Python, en lugar de
-  ser siempre una cadena de texto plana.
-- `SecureKeyGenerator` produce claves aleatorias criptográficamente
-  seguras, con formato `base64:<...>` al estilo Laravel y dimensionadas
-  correctamente para un cifrador AES dado — se usa para autogenerar
-  `APP_KEY` la primera vez que una aplicación arranca sin tenerla
-  definida.
+| Ruta | Contenido |
+| --- | --- |
+| `__init__.py` | Exportaciones públicas: `Env`, `env`. |
+| `facade.py` | `Env`, la facade estática que implementa `IEnv`. |
+| `functions.py` | `env()`, atajo a nivel de módulo de `Env.get`. |
+| `core/dot_env.py` | `DotEnv`, el motor singleton dueño del archivo. |
+| `dynamic/caster.py` | `EnvironmentCaster`, el códec `"<tipo>:<valor>"`. |
+| `enums/value_type.py` | `EnvironmentValueType`, los diez tipos soportados. |
+| `validators/key_name.py` | `ValidateKeyName`, la guarda `^[A-Z][A-Z0-9_]*$`. |
+| `validators/types.py` | `ValidateTypes`, validación de valor y type hint. |
+| `key/key_generator.py` | `SecureKeyGenerator`, claves `base64:` de aplicación. |
+| `contracts/env.py` | Contrato abstracto `IEnv`. |
+| `contracts/caster.py` | Contrato abstracto `IEnvironmentCaster`. |
+
+### Convención de valores tipados
+
+Un valor escrito con type hint se guarda como `"<tipo>:<valor>"` y se
+decodifica al leer. La comparación de prefijo que hace
+`DotEnv.__parseValue` es **sensible a mayúsculas y sin recorte de espacios**
+(`value_str.split(":", 1)`), así que `INT:5` *no* se trata como valor tipado
+y vuelve como la cadena `'INT:5'`.
+
+| Type hint | Forma almacenada | Valor devuelto por `get()` |
+| --- | --- | --- |
+| `str` | `str:hello` | `'hello'` (sin espacios iniciales) |
+| `int` | `int:42` | `42` |
+| `float` | `float:3.5` | `3.5` |
+| `bool` | `bool:true` | `True` |
+| `list` | `list:[1, 2, 3]` | `[1, 2, 3]` |
+| `dict` | `dict:{'a': 1}` | `{'a': 1}` |
+| `tuple` | `tuple:(1, 2)` | `(1, 2)` |
+| `set` | `set:{1, 2}` | `{1, 2}` |
+| `path` | `path:/ruta/posix/absoluta` | `str` con separadores `/` |
+| `base64` | `base64:aGVsbG8=` | `'hello'` (`bytes` si no es UTF-8 válido) |
+
+La lectura se guía por el prefijo, no por el hint: cualquier valor ya
+guardado con un prefijo reconocido se decodifica aunque se haya escrito sin
+type hint. Por eso `APP_KEY`, que el framework guarda como `base64:<...>`,
+lo devuelve `Env.get("APP_KEY")` como `bytes` decodificados y no como la
+cadena literal.
+
+Los valores sin prefijo también se parsean: `none`/`null`/`nan`/`nil` (sin
+distinguir mayúsculas) y la cadena vacía pasan a `None`, `true`/`false`
+pasan a booleanos, y todo lo demás se intenta con `ast.literal_eval`,
+devolviendo la cadena original cuando eso falla.
+
+### Decisiones de diseño
+
+- **Singleton (`DotEnv`)** — una sola ruta `.env` resuelta por proceso, de
+  modo que la caché y el archivo nunca divergen entre puntos de llamada. La
+  instancia la crea la *primera* llamada; las siguientes ignoran sus
+  argumentos.
+- **Facade estática (`Env`)** — solo classmethods, sin estado, para que las
+  entidades de configuración puedan llamarla dentro de un `default_factory`
+  sin inyección de dependencias.
+- **`__slots__` en todas las clases** — ninguna clase del módulo da
+  `__dict__` a sus instancias: `EnvironmentCaster` declara sus dos slots
+  (escritos con los nombres ya manglados), `DotEnv` declara
+  `("__cache", "__resolved_path")`, y las clases sin estado `Env` y
+  `SecureKeyGenerator` declaran `__slots__ = ()`, en coherencia con el
+  `__slots__ = ()` de sus contratos.
+- **`lru_cache` en ambos validadores** — los nombres de clave (512 entradas)
+  y los type hints (64 entradas) salen de un conjunto pequeño y finito, así
+  que validar se vuelve una búsqueda en diccionario tras la primera llamada.
+- **Los contratos son `abc.ABC` con `__slots__ = ()`** — `IEnv` e
+  `IEnvironmentCaster` no añaden almacenamiento por instancia a sus
+  implementaciones.
+- **`threading.Lock` (no `RLock`) dentro de `DotEnv`** — cada método público
+  toma una sola vez el lock de clase y nunca llama a otro método bloqueado
+  mientras lo mantiene.
 
 ## Referencia de API
 
@@ -91,53 +160,70 @@ centraliza este módulo:
 
 ```python
 from orionis.environment import Env
-# o
-from orionis.environment.facade import Env
 ```
 
-Fachada estática que implementa `IEnv`. Cada método es un `@classmethod`
-que delega en el singleton compartido `DotEnv()` — no es necesario (ni
-está soportado) instanciar `Env`.
+Facade estática definida en `orionis/environment/facade.py`, que implementa
+`IEnv`. Todos sus métodos son `@classmethod` y delegan en el singleton
+compartido `DotEnv()`; la clase no guarda estado y declara
+`__slots__ = ()`, así que instanciarla no aporta nada.
 
-| Método | Firma | Descripción |
+```python
+@classmethod
+def get(cls, key: str, default: object | None = None) -> object: ...
+
+@classmethod
+def set(
+    cls,
+    key: str,
+    value: str | float | bool | list | dict | tuple | set,
+    type_hint: str | EnvironmentValueType | None = None,
+    *,
+    only_os: bool = False,
+) -> bool: ...
+
+@classmethod
+def unset(cls, key: str, *, only_os: bool = False) -> bool: ...
+
+@classmethod
+def all(cls) -> dict[str, Any]: ...
+
+@classmethod
+def reload(cls) -> bool: ...
+```
+
+| Método | Devuelve | Notas |
 | --- | --- | --- |
-| `get` | `Env.get(key: str, default: object \| None = None) -> object` | Devuelve el valor procesado de `key`, o `default` si no está definido. |
-| `set` | `Env.set(key: str, value: str \| float \| bool \| list \| dict \| tuple \| set, type_hint: str \| EnvironmentValueType \| None = None, *, only_os: bool = False) -> bool` | Escribe/actualiza `key` en el archivo `.env` (salvo que `only_os=True`) y en `os.environ`. Devuelve `True` si tuvo éxito. |
-| `unset` | `Env.unset(key: str, *, only_os: bool = False) -> bool` | Elimina `key` del archivo `.env` (salvo que `only_os=True`) y de `os.environ`. Devuelve `True`. |
-| `all` | `Env.all() -> dict[str, Any]` | Devuelve todas las variables presentes actualmente en la caché en memoria respaldada por `.env`, procesadas a tipos nativos de Python. |
-| `reload` | `Env.reload() -> bool` | Recarga las variables desde disco hacia `os.environ` y reconstruye la caché interna. Devuelve `True` si tuvo éxito, `False` ante `OSError`/`ValueError`. |
+| `get` | el valor parseado, o `default` | `default` se devuelve **tal cual**, nunca se parsea. |
+| `set` | `True` | Efectos: escribe en `.env` (salvo `only_os=True`), actualiza la caché y `os.environ`. |
+| `unset` | `True` | Devuelve `True` incluso si la clave no existía. |
+| `all` | `dict[str, Any]` | Instantánea parseada de la caché en memoria. |
+| `reload` | `bool` | `False` cuando construir el `DotEnv` compartido lanza `OSError` o `ValueError`. |
 
-**Excepciones:** `get`/`set`/`unset` propagan `TypeError`/`ValueError`
-desde la validación de la clave (ver [`ValidateKeyName`](#validatekeyname))
-cuando `key` no es un nombre de variable de entorno válido.
+**Lanza**
 
----
+- `TypeError` — `key` no es una cadena, `value` no es uno de los tipos
+  soportados, o `type_hint` no es ni `str` ni `EnvironmentValueType`.
+- `ValueError` — `key` no coincide con `^[A-Z][A-Z0-9_]*$`, o un valor no se
+  puede serializar/parsear para el tipo pedido.
+- `RuntimeError` — `type_hint` es una cadena que no corresponde a ningún
+  miembro de `EnvironmentValueType`. También en `reload()`: solo captura
+  `OSError` y `ValueError`, pero `DotEnv.reload()` envuelve cualquier fallo
+  en `RuntimeError`, así que una recarga fallida se propaga en vez de
+  devolver `False`.
 
 ### `env()`
 
 ```python
 from orionis.environment import env
-# o
-from orionis.environment.functions import env
 ```
 
 ```python
-def env(key: str, default: object | None = None) -> object
+def env(key: str, default: object | None = None) -> object: ...
 ```
 
-Función de conveniencia equivalente a `Env.get(key, default)` — un
-auxiliar global al estilo Laravel para leer valores de configuración.
-
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `key` | `str` | Nombre de la variable de entorno a recuperar. |
-| `default` | `object \| None`, opcional | Valor devuelto cuando `key` no está definida. |
-
-**Devuelve:** el valor procesado, o `default`.
-
-**Excepciones:** las mismas que `Env.get`.
-
----
+Atajo a nivel de módulo definido en `orionis/environment/functions.py`.
+Llama a `Env.get(key, default)` y tiene exactamente el mismo comportamiento,
+valor de retorno y excepciones.
 
 ### `IEnv`
 
@@ -145,11 +231,9 @@ auxiliar global al estilo Laravel para leer valores de configuración.
 from orionis.environment.contracts.env import IEnv
 ```
 
-Clase base abstracta (`abc.ABC`) que define el contrato implementado por
-`Env`: los métodos de clase abstractos `get`, `set`, `unset`, `all` y
-`reload`, con exactamente las mismas firmas descritas arriba.
-
----
+`abc.ABC` con `__slots__ = ()` que declara cinco classmethods abstractos:
+`get`, `set`, `unset`, `all` y `reload`, con las mismas firmas listadas para
+`Env`.
 
 ### `DotEnv`
 
@@ -157,77 +241,119 @@ Clase base abstracta (`abc.ABC`) que define el contrato implementado por
 from orionis.environment.core.dot_env import DotEnv
 ```
 
-**Singleton** thread-safe por proceso (impuesto mediante la metaclase
-`Singleton` de `orionis.support.patterns.singleton`) que gestiona un
-archivo `.env` resuelto. Los métodos de `Env` son envoltorios delgados
-sobre esta clase.
+Motor dueño del archivo `.env`. Usa la metaclase `Singleton` de
+`orionis.support.patterns.singleton`, así que hay exactamente una instancia
+por proceso, y protege cada método público con un `threading.Lock` de clase.
+Todo su estado de instancia está declarado en
+`__slots__ = ("__cache", "__resolved_path")`.
 
-#### `DotEnv(path=None)`
+#### `DotEnv.__init__()`
 
-Constructor (solo tiene efecto en la **primera** llamada — llamadas
-posteriores a `DotEnv(...)` devuelven la misma instancia singleton sin
-importar los argumentos pasados).
+```python
+def __init__(self, path: str | None = None) -> None: ...
+```
 
 | Parámetro | Tipo | Descripción |
 | --- | --- | --- |
-| `path` | `str \| None`, opcional | Ruta al archivo `.env`. Por defecto, `.env` en el directorio de trabajo actual. |
+| `path` | `str \| None` | Ruta del archivo `.env`. Por defecto `Path.cwd() / ".env"`; una ruta indicada se resuelve con `expanduser().resolve()`. |
 
-**Comportamiento:** resuelve la ruta, crea el archivo si falta, lo carga
-en `os.environ` mediante `load_dotenv(..., override=True)`, y construye
-una caché en memoria (`dotenv_values(...)`) usada por `all()`.
+Efectos: crea el archivo con `touch()` si no existe, lo carga en
+`os.environ` con `load_dotenv(..., override=True)` y construye la caché en
+memoria con `dotenv_values(...)`.
 
-**Excepciones:** `OSError` si el archivo no puede crearse/accederse;
-`RuntimeError` ante cualquier otro fallo inesperado de inicialización.
+**Lanza**
 
-#### `dotenv.get(key, default=None)`
+- `OSError` — el archivo no se puede crear ni acceder.
+- `RuntimeError` — cualquier otro fallo durante la inicialización.
 
-Mismo contrato que `Env.get`. Internamente, `get` lee directamente de
-`os.environ` (la fuente única de verdad tras
-`load_dotenv(override=True)` y las llamadas posteriores a `set`/`unset`)
-en lugar de la caché en memoria, y procesa la cadena cruda con la misma
-lógica que `EnvironmentCaster` (prefijos de tipo, booleanos, tokens nulos
-y `ast.literal_eval` como respaldo).
+> **Nota:** como la clase es un singleton, solo aplica la primera
+> construcción del proceso. En una aplicación Orionis estándar esa primera
+> construcción ya ocurrió mientras se importaba el framework
+> (`orionis/foundation/core_config.py` construye `App()` a nivel de módulo,
+> lo que escribe `APP_KEY` mediante `Env.set`), así que pasar un `path`
+> propio desde el código de la aplicación no tiene efecto y el `.env` por
+> defecto del directorio de trabajo actual es el que queda en uso.
 
-**Excepciones:** `TypeError`/`ValueError` desde `ValidateKeyName` para
-nombres de clave inválidos.
+#### `DotEnv.set()`
 
-#### `dotenv.set(key, value, type_hint=None, *, only_os=False)`
+```python
+def set(
+    self,
+    key: str,
+    value: str | float | bool | list | dict | tuple | set,
+    type_hint: str | EnvironmentValueType | None = None,
+    *,
+    only_os: bool = False,
+) -> bool: ...
+```
 
-Mismo contrato que `Env.set`. Valida la clave, serializa `value` (vía
-`EnvironmentCaster` cuando se indica `type_hint`, o mediante una
-conversión simple `str`/`repr` en caso contrario), lo escribe en el
-archivo `.env` con `set_key` y actualiza la caché en memoria (salvo que
-`only_os=True`), y siempre actualiza `os.environ`.
+Valida la clave, resuelve el tipo con `ValidateTypes` cuando se pasa
+`type_hint`, serializa el valor, lo escribe con `set_key` (salvo
+`only_os=True`), actualiza la caché y siempre asigna `os.environ[key]`.
+Devuelve `True`.
 
-**Excepciones:** `TypeError`/`ValueError` desde la validación de
-clave/tipo.
+**Lanza** `TypeError` / `ValueError` desde la validación de clave y tipo, y
+`RuntimeError` desde `ValidateTypes` si el nombre del type hint es
+desconocido.
 
-#### `dotenv.unset(key, *, only_os=False)`
+#### `DotEnv.get()`
 
-Mismo contrato que `Env.unset`. Elimina la clave del archivo `.env` (vía
-`unset_key`) y de la caché en memoria (salvo que `only_os=True`), y
-siempre la elimina de `os.environ`. Devuelve `True` incluso si la clave no
-existía.
+```python
+def get(self, key: str, default: object | None = None) -> object: ...
+```
 
-**Excepciones:** `TypeError`/`ValueError` desde la validación de clave.
+Valida la clave, lee `os.environ.get(key)` y lo parsea con `__parseValue`.
+Devuelve `default` sin modificar cuando la clave no existe.
 
-#### `dotenv.all()`
+**Lanza** `TypeError` / `ValueError` de la validación de clave, más
+cualquier `ValueError` / `TypeError` producido al decodificar un valor
+tipado.
 
-Mismo contrato que `Env.all`. Devuelve un diccionario construido
-procesando cada entrada actualmente en la **caché en memoria**
-(poblada en el momento de la construcción y refrescada por `reload()`,
-más cualquier clave añadida vía `set(..., only_os=False)`).
+#### `DotEnv.unset()`
 
-#### `dotenv.reload()`
+```python
+def unset(self, key: str, *, only_os: bool = False) -> bool: ...
+```
 
-Mismo contrato que `Env.reload`, pero lanza en lugar de silenciar
-errores: vuelve a ejecutar `load_dotenv(..., override=True)` y reconstruye
-la caché en memoria desde el disco.
+Valida la clave, la elimina del archivo con `unset_key` y de la caché
+(salvo `only_os=True`), y la saca de `os.environ`. Devuelve `True` incluso
+si la clave no existía; en ese caso `python-dotenv` imprime su propio aviso
+por stdout.
 
-**Excepciones:** `RuntimeError` envolviendo cualquier excepción encontrada
-durante la recarga.
+#### `DotEnv.all()`
 
----
+```python
+def all(self) -> dict: ...
+```
+
+Devuelve un diccionario nuevo construido desde la caché en memoria, con
+cada valor pasado por `__parseValue`. Una clave presente en el archivo sin
+`=` se almacena como `None` y se devuelve como `None`.
+
+#### `DotEnv.reload()`
+
+```python
+def reload(self) -> bool: ...
+```
+
+Vuelve a ejecutar `load_dotenv(..., override=True)` y reconstruye la caché
+desde disco. Devuelve `True`.
+
+**Lanza** `RuntimeError` envolviendo cualquier excepción producida durante
+la recarga (por ejemplo un `.env` que no es UTF-8 válido).
+
+#### Helpers privados
+
+No forman parte de la API pública, pero definen el comportamiento
+observable descrito arriba:
+
+- `__serializeValue(value, type_hint=None)` — `None` pasa a `"null"`; con
+  type hint delega en `EnvironmentCaster(value).to(type_hint)`; si no, las
+  cadenas se recortan, los booleanos pasan a `"true"`/`"false"`, los números
+  usan `str()` y `list`/`dict`/`tuple`/`set` usan `repr()`.
+- `__parseValue(value)` — implementa los tokens nulos, las cadenas
+  booleanas, el despacho por prefijo `"<tipo>:"` hacia
+  `EnvironmentCaster.parseTyped` y el respaldo con `ast.literal_eval`.
 
 ### `EnvironmentCaster`
 
@@ -235,88 +361,100 @@ durante la recarga.
 from orionis.environment.dynamic.caster import EnvironmentCaster
 ```
 
-Implementa `IEnvironmentCaster`. Convierte entre valores tipados de
-Python y la convención de cadena `"<tipo>:<valor>"` usada para el
-almacenamiento en `.env`. Usa
-`__slots__ = ("_EnvironmentCaster__type_hint", "_EnvironmentCaster__value_raw")`
-— no se permiten atributos dinámicos en las instancias.
+Códec de la convención `"<tipo>:<valor>"`, implementa
+`IEnvironmentCaster`. Expone `OPTIONS`, un `ClassVar[frozenset[str]]`
+construido a partir de `EnvironmentValueType`, y declara `__slots__`, así
+que sus instancias no tienen `__dict__`.
 
 #### `EnvironmentCaster.supportedTypes()`
 
 ```python
 @staticmethod
-def supportedTypes() -> frozenset[str]
+def supportedTypes() -> frozenset[str]: ...
 ```
 
-Devuelve el conjunto de cadenas de indicador de tipo válidas:
-`{"base64", "path", "str", "int", "float", "bool", "list", "dict", "tuple", "set"}`.
+Devuelve el propio `EnvironmentCaster.OPTIONS` (el mismo objeto):
+`{'base64', 'bool', 'dict', 'float', 'int', 'list', 'path', 'set', 'str', 'tuple'}`.
 
-#### `EnvironmentCaster.parseTyped(value_str)`
+#### `EnvironmentCaster.parseTyped()`
 
 ```python
 @staticmethod
-def parseTyped(value_str: str) -> object
+def parseTyped(value_str: str) -> object: ...
 ```
 
-Ruta rápida para procesar una cadena ya tipada como `"int:42"` sin
-construir una instancia completa de `EnvironmentCaster` para tipos
-primitivos (`int`, `float`, `bool`, `str`); recurre a una instancia
-completa (`EnvironmentCaster(value_str).get()`) para tipos complejos
-(`list`, `dict`, `tuple`, `set`, `path`, `base64`).
+Camino rápido que usa `DotEnv.__parseValue`. `int`, `float`, `bool` y `str`
+se resuelven en línea sin crear una instancia; el resto de tipos delega en
+`EnvironmentCaster(value_str).get()`.
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `value_str` | `str` | Una cadena con formato `"<tipo>:<valor>"`, por ejemplo `"int:42"`. |
+**Lanza**
 
-**Devuelve:** el valor de Python procesado.
+- `ValueError` — `value_str` no contiene `":"` (`substring not found`,
+  desde `str.index`), o el valor no encaja con el tipo anunciado.
+- `TypeError` — el valor es incompatible con el tipo anunciado.
 
-**Excepciones:** `ValueError` si el valor no puede convertirse al tipo
-indicado; `TypeError` si el valor es incompatible con dicho tipo.
-
-#### `EnvironmentCaster(raw)`
-
-Constructor.
-
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `raw` | `str \| object` | Si es una cadena que contiene dos puntos cuyo prefijo es un indicador de tipo válido, el prefijo se convierte en el indicador de tipo y el resto en el valor crudo. En caso contrario, toda la entrada se trata como el valor crudo sin indicador de tipo. |
-
-#### `caster.get()`
+#### `EnvironmentCaster.__init__()`
 
 ```python
-def get(self) -> object
+def __init__(self, raw: str | object) -> None: ...
 ```
 
-Devuelve el valor procesado según el indicador de tipo detectado (`str`,
-`int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, `path` o
-`base64`), o el valor crudo sin cambios si no se detectó ningún
-indicador de tipo.
+Con una cadena de entrada, la parte anterior al primer `":"` se toma como
+type hint **solo si** es una de las `OPTIONS` tras `strip().lower()`; en
+caso contrario la cadena completa se conserva como valor. Las entradas que
+no son cadenas se guardan como valor sin type hint. Los espacios iniciales
+del valor se eliminan.
 
-**Excepciones:** `ValueError` o `TypeError` si la conversión falla (el
-tipo específico depende del fallo; ambos se relanzan con un mensaje
-descriptivo).
-
-#### `caster.to(type_hint)`
+#### `EnvironmentCaster.get()`
 
 ```python
-def to(self, type_hint: str | EnvironmentValueType) -> str
+def get(self) -> object: ...
 ```
 
-Convierte el valor interno al `type_hint` indicado y devuelve la
-representación en cadena `"<tipo>:<valor>"`, apta para escribirse en un
-archivo `.env`.
+Decodifica el valor guardado según el type hint actual. Sin hint devuelve
+el valor crudo sin tocar (ya sin espacios iniciales).
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `type_hint` | `str \| EnvironmentValueType` | El tipo destino. Debe ser uno de `EnvironmentCaster.supportedTypes()`. |
+Comportamiento a tener en cuenta:
 
-**Devuelve:** `str`, por ejemplo `"int:42"`, `"list:[1, 2, 3]"`,
-`"path:/home/user/app"`, `"base64:aGVsbG8="`.
+- `path` solo normaliza separadores; **no** vuelve absoluta la ruta y
+  devuelve un `str`, no un `Path`.
+- `base64` devuelve `str` cuando los bytes decodificados son UTF-8 válido, y
+  `bytes` en caso contrario.
+- `list`, `dict`, `tuple` y `set` usan `ast.literal_eval` y exigen que el
+  literal sea del tipo anunciado.
 
-**Excepciones:** `ValueError` si `type_hint` es inválido o la conversión
-falla.
+**Lanza** `TypeError` cuando el fallo subyacente es un `TypeError` (por
+ejemplo `list:{1}`), y `ValueError` en cualquier otro caso. Ambos mensajes
+llevan el prefijo
+`Error processing value '<raw>' with type hint '<hint>':`.
 
----
+#### `EnvironmentCaster.to()`
+
+```python
+def to(self, type_hint: str | EnvironmentValueType) -> str: ...
+```
+
+Serializa el valor guardado y devuelve `"<type_hint>:<valor>"`. Acepta el
+miembro del enum o su valor en cadena.
+
+**Efecto secundario:** asigna `type_hint` a la instancia, de modo que un
+`get()` posterior sobre la misma instancia decodifica con ese hint y no con
+el original.
+
+Comportamiento a tener en cuenta:
+
+- `path` produce una ruta POSIX **absoluta**: un valor relativo se une a
+  `Path.cwd()` y luego se aplica `expanduser()`.
+- `base64` deja el valor tal cual si ya es Base64 válido, y lo codifica en
+  caso contrario; solo acepta `str` y `bytes`.
+- `int`, `float` y `bool` aceptan entrada en cadena (`"42"`, `"on"`,
+  `"yes"`, `"disabled"`, ...); `list`, `dict`, `tuple` y `set` exigen que el
+  valor ya sea exactamente de ese tipo.
+
+**Lanza** `ValueError` ante un type hint inválido y ante cualquier fallo de
+conversión — incluidos los que internamente son `TypeError`, que este
+método envuelve. Los mensajes llevan el prefijo
+`Error converting value '<raw>' to type '<hint>':`.
 
 ### `IEnvironmentCaster`
 
@@ -324,10 +462,8 @@ falla.
 from orionis.environment.contracts.caster import IEnvironmentCaster
 ```
 
-Clase base abstracta (`abc.ABC`) que define el contrato
-`get()`/`to(type_hint)` implementado por `EnvironmentCaster`.
-
----
+`abc.ABC` con `__slots__ = ()` que declara dos métodos abstractos, `get()` y
+`to(type_hint)`.
 
 ### `EnvironmentValueType`
 
@@ -335,67 +471,57 @@ Clase base abstracta (`abc.ABC`) que define el contrato
 from orionis.environment.enums import EnvironmentValueType
 ```
 
-`Enum` que lista los diez identificadores de tipo soportados:
-`BASE64 = "base64"`, `PATH = "path"`, `STR = "str"`, `INT = "int"`,
-`FLOAT = "float"`, `BOOL = "bool"`, `LIST = "list"`, `DICT = "dict"`,
-`TUPLE = "tuple"`, `SET = "set"`.
+`enum.Enum` (no `StrEnum`) con diez miembros cuyos valores son los type
+hints aceptados: `BASE64`, `PATH`, `STR`, `INT`, `FLOAT`, `BOOL`, `LIST`,
+`DICT`, `TUPLE`, `SET`. Al ser un `Enum` normal, un miembro no es igual a su
+cadena; usa `.value` cuando necesites un string. `Env.set`,
+`EnvironmentCaster.to` y `ValidateTypes` aceptan ambas formas.
 
----
-
-### `ValidateKeyName`
+### `ValidateKeyName()`
 
 ```python
 from orionis.environment.validators import ValidateKeyName
 ```
 
-Un invocable (respaldado por una función decorada con
-`functools.lru_cache`, `maxsize=512`) que valida el nombre de una
-variable de entorno.
-
 ```python
-ValidateKeyName(key: str) -> str
+def ValidateKeyName(key: str) -> str: ...
 ```
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `key` | `str` | El nombre a validar. Debe coincidir con `^[A-Z][A-Z0-9_]*$` (comienza con una letra mayúscula, seguida de letras mayúsculas, dígitos o guiones bajos). |
+Alias a nivel de módulo de `_validate_key_name`, decorada con
+`functools.lru_cache(maxsize=512)`. Devuelve la clave sin cambios cuando
+coincide con `^[A-Z][A-Z0-9_]*$` (comprobado con `fullmatch`).
 
-**Devuelve:** `key` sin cambios, si es válido.
+**Lanza**
 
-**Excepciones:** `TypeError` si `key` no es un `str`; `ValueError` si no
-coincide con el patrón requerido.
+- `TypeError` — `key` no es `str`.
+- `ValueError` — el nombre no coincide con el patrón.
 
----
-
-### `ValidateTypes`
+### `ValidateTypes()`
 
 ```python
 from orionis.environment.validators import ValidateTypes
 ```
 
-Una **instancia** invocable (objeto a nivel de módulo, similar a un
-singleton) usada para determinar/validar el tipo de serialización de un
-valor.
-
 ```python
-ValidateTypes(*, value: str | int | float | bool | list | dict | tuple | set,
-              type_hint: str | EnvironmentValueType | None = None) -> str
+def ValidateTypes(
+    *,
+    value: str | float | bool | list | dict | tuple | set,
+    type_hint: str | EnvironmentValueType | None = None,
+) -> str: ...
 ```
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `value` | `str \| int \| float \| bool \| list \| dict \| tuple \| set` | El valor cuyo tipo se está validando/determinando. |
-| `type_hint` | `str \| EnvironmentValueType \| None`, opcional | Indicador de tipo explícito; si se omite, el tipo se infiere de `value` mediante `type(value).__name__.lower()`. |
+Instancia a nivel de módulo de la clase privada `__ValidateTypes`; ambos
+parámetros son solo por nombre. Devuelve el nombre canónico del tipo: el
+`type_hint` normalizado cuando se indica (la búsqueda es por **nombre** del
+enum, así que `"INT"`, `"int"` y `EnvironmentValueType.INT` son
+equivalentes), o `type(value).__name__.lower()` en caso contrario.
 
-**Devuelve:** la cadena canónica del indicador de tipo (por ejemplo,
-`"int"`, `"list"`).
+**Lanza**
 
-**Excepciones:** `TypeError` si el tipo de `value` no es soportado, o si
-`type_hint` se proporciona pero no es ni un `str` ni un
-`EnvironmentValueType`; `RuntimeError` si `type_hint` (como cadena) no
-coincide con ningún miembro conocido de `EnvironmentValueType`.
-
----
+- `TypeError` — `value` no es `str`, `int`, `float`, `bool`, `list`, `dict`,
+  `tuple` ni `set`; o `type_hint` no es `str` ni `EnvironmentValueType`.
+- `RuntimeError` — `type_hint` es una cadena que no corresponde a ningún
+  nombre de miembro de `EnvironmentValueType`.
 
 ### `SecureKeyGenerator`
 
@@ -403,209 +529,297 @@ coincide con ningún miembro conocido de `EnvironmentValueType`.
 from orionis.environment.key.key_generator import SecureKeyGenerator
 ```
 
-Clase utilitaria para generar claves de aplicación criptográficamente
-seguras, al estilo Laravel, dimensionadas para un cifrador AES dado.
-
-#### `SecureKeyGenerator.generate(cipher=Cipher.AES_256_CBC)`
-
 ```python
+KEY_SIZES: ClassVar[dict[Cipher, int]]
+
 @staticmethod
-def generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
+def generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str: ...
 ```
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `cipher` | `str \| Cipher`, opcional | El cifrador para el que se dimensiona la clave. Uno de `AES_128_CBC`, `AES_256_CBC`, `AES_128_GCM`, `AES_256_GCM` (de `orionis.foundation.config.app.enums.ciphers.Cipher`). Por defecto, `Cipher.AES_256_CBC`. |
+Produce una clave `"base64:<...>"` a partir de `os.urandom`, con el tamaño
+que exige el cifrado pedido: 16 bytes para `AES-128-CBC` y `AES-128-GCM`, 32
+bytes para `AES-256-CBC` y `AES-256-GCM`. El argumento `cipher` acepta un
+miembro de `Cipher` o su valor en cadena.
 
-**Devuelve:** `str` — una clave con formato
-`"base64:<bytes-aleatorios-codificados-en-base64>"`, usando
-`os.urandom(16)` para cifradores de 128 bits o `os.urandom(32)` para
-cifradores de 256 bits.
+**Lanza** `ValueError` cuando el cifrado no es uno de los cuatro soportados
+(el mensaje enumera las opciones válidas).
 
-**Excepciones:** `ValueError` si `cipher` no es uno de los valores
-soportados.
-
-> Este es el mecanismo que usa el framework para autopoblar `APP_KEY`
-> cuando falta al arrancar (ver [orionis.encrypter](../../encrypter)), y
-> el formato `"base64:..."` que produce es exactamente lo que
-> `EnvironmentCaster`/`DotEnv.get()` decodifican de vuelta a `bytes` sin
-> procesar al leerlo mediante `Env.get("APP_KEY")`.
+Consumidor dentro del framework: `App.__post_init__`
+(`orionis/foundation/config/app/entities/app.py`) llama a `generate()` y
+guarda el resultado con `Env.set("APP_KEY", ...)` cuando no hay clave
+configurada.
 
 ## Ejemplos de uso
 
-### 1. Lectura/escritura básica con la fachada `Env`
+Todos los ejemplos siguientes se ejecutaron tal cual; la salida mostrada es
+la real.
+
+### Leer y escribir valores
+
+```python
+from orionis.environment import Env, env
+
+# Write a value into the .env file and the process environment.
+Env.set("APP_NAME", "Orionis")
+
+# Env.get() and the env() shorthand read the very same value.
+print(Env.get("APP_NAME"))
+print(env("APP_NAME"))
+
+# A missing key falls back to the provided default.
+print(Env.get("APP_TIMEOUT", 30))
+
+# Remove it again: gone from the file and from os.environ.
+print(Env.unset("APP_NAME"))
+print(Env.get("APP_NAME"))
+```
+
+```text
+Orionis
+Orionis
+30
+True
+None
+```
+
+### Guardar valores tipados
 
 ```python
 from orionis.environment import Env
+from orionis.environment.enums import EnvironmentValueType
 
-Env.set("APP_NAME", "Orionis Demo")
-print(Env.get("APP_NAME"))              # "Orionis Demo"
-print(Env.get("MISSING_VAR", "fallback"))  # "fallback"
+# The type hint is stored in the file as a "<type>:<value>" prefix.
+Env.set("QUEUE_RETRIES", 5, "int")
+Env.set("ALLOWED_HOSTS", ["localhost", "127.0.0.1"], "list")
+Env.set("FEATURE_FLAGS", {"beta": True}, EnvironmentValueType.DICT)
+Env.set("MAIL_ENABLED", True, "bool")
 
-Env.unset("APP_NAME")
-print(Env.get("APP_NAME"))              # None
+for key in ("QUEUE_RETRIES", "ALLOWED_HOSTS", "FEATURE_FLAGS", "MAIL_ENABLED"):
+    value = Env.get(key)
+    print(f"{key}: {value!r} ({type(value).__name__})")
+
+# Any value already stored with a known prefix is decoded on read,
+# even when it was written without a type hint.
+Env.set("SIGNING_SECRET", "base64:aGVsbG8=")
+print("SIGNING_SECRET:", repr(Env.get("SIGNING_SECRET")))
 ```
 
-### 2. Usando el atajo `env()`
-
-```python
-from orionis.environment import env
-
-debug_mode = env("APP_DEBUG", False)
-if debug_mode:
-    print("Ejecutando en modo debug")
+```text
+QUEUE_RETRIES: 5 (int)
+ALLOWED_HOSTS: ['localhost', '127.0.0.1'] (list)
+FEATURE_FLAGS: {'beta': True} (dict)
+MAIL_ENABLED: True (bool)
+SIGNING_SECRET: 'hello'
 ```
 
-### 3. Almacenar y leer valores tipados
+### Manejar errores de validación y casteo
 
 ```python
 from orionis.environment import Env
+from orionis.environment.dynamic.caster import EnvironmentCaster
 
-Env.set("MAX_RETRIES", 5, type_hint="int")
-Env.set("ALLOWED_HOSTS", ["api.example.com", "web.example.com"], type_hint="list")
-Env.set("STORAGE_PATH", "storage/app", type_hint="path")
+# Key names must match ^[A-Z][A-Z0-9_]*$.
+try:
+    Env.get("app_name")
+except ValueError as exc:
+    print("ValueError:", exc)
 
-retries = Env.get("MAX_RETRIES")           # 5 (int)
-hosts = Env.get("ALLOWED_HOSTS")           # ["api.example.com", "web.example.com"]
-storage_path = Env.get("STORAGE_PATH")     # ruta POSIX absoluta como cadena
+# A non-string key is rejected before the pattern check.
+try:
+    Env.set(42, "value")
+except TypeError as exc:
+    print("TypeError:", exc)
+
+# Parsing failures keep the concrete exception type.
+try:
+    EnvironmentCaster("int:not-a-number").get()
+except ValueError as exc:
+    print("ValueError:", exc)
+
+# Serialising a value whose type does not match the hint fails too.
+try:
+    EnvironmentCaster([1, 2]).to("dict")
+except ValueError as exc:
+    print("ValueError:", exc)
 ```
 
-### 4. Usar `EnvironmentCaster` directamente para una conversión puntual
+```text
+ValueError: Invalid environment variable name 'app_name'. It must start with an uppercase letter, contain only uppercase letters, numbers, or underscores. Example: 'MY_ENV_VAR'.
+TypeError: Environment variable name must be a string, got int.
+ValueError: Error processing value 'not-a-number' with type hint 'int': Cannot convert 'not-a-number' to int: invalid literal for int() with base 10: 'not-a-number'
+ValueError: Error converting value '[1, 2]' to type 'dict': Value must be a dict to convert to dict, got list instead.
+```
+
+### Usar el caster por separado
 
 ```python
 from orionis.environment.dynamic.caster import EnvironmentCaster
 
-encoded = EnvironmentCaster("super-secreto").to("base64")
-print(encoded)  # "base64:c3VwZXItc2VjcmV0bw=="
+# Serialise a Python value into its .env representation...
+encoded = EnvironmentCaster([1, 2, 3]).to("list")
+print(encoded)
 
-decoded = EnvironmentCaster(encoded).get()
-print(decoded)  # "super-secreto"
+# ...and read it back into a real Python object.
+print(EnvironmentCaster(encoded).get())
 
-# Ruta rápida para cadenas ya tipadas:
-value = EnvironmentCaster.parseTyped("int:42")  # 42
+# Fast path for primitives: no instance is allocated.
+print(EnvironmentCaster.parseTyped("bool:on"))
+print(EnvironmentCaster.parseTyped("float: 3.5"))
+
+# Without a recognised prefix the raw string is returned untouched.
+print(EnvironmentCaster("mailto:someone@example.com").get())
+
+print(sorted(EnvironmentCaster.supportedTypes()))
 ```
 
-### 5. Generar una clave de aplicación segura
+```text
+list:[1, 2, 3]
+[1, 2, 3]
+True
+3.5
+mailto:someone@example.com
+['base64', 'bool', 'dict', 'float', 'int', 'list', 'path', 'set', 'str', 'tuple']
+```
+
+### Generar una clave de aplicación
 
 ```python
+import base64
+
 from orionis.environment.key.key_generator import SecureKeyGenerator
-from orionis.environment import Env
+from orionis.foundation.config.app.enums.ciphers import Cipher
 
-new_key = SecureKeyGenerator.generate("AES-256-GCM")
-Env.set("APP_KEY", new_key)  # almacenada tal cual, p. ej. "base64:...="
+# Each cipher gets a key of the exact size it needs.
+for cipher in (Cipher.AES_128_CBC, Cipher.AES_256_GCM):
+    key = SecureKeyGenerator.generate(cipher)
+    raw = base64.b64decode(key.split(":", 1)[1])
+    print(f"{cipher.value}: prefix={key[:7]!r} bytes={len(raw)}")
+
+# The cipher may also be given as its string value.
+print(SecureKeyGenerator.generate("AES-256-CBC").startswith("base64:"))
+
+# Anything outside the catalogue is rejected.
+try:
+    SecureKeyGenerator.generate("AES-512-CBC")
+except ValueError as exc:
+    print("ValueError:", exc)
 ```
 
-### 6. Recargar tras una edición externa de `.env`
+```text
+AES-128-CBC: prefix='base64:' bytes=16
+AES-256-GCM: prefix='base64:' bytes=32
+True
+ValueError: Cipher 'AES-512-CBC' is not supported. Options: AES-128-CBC, AES-256-CBC, AES-128-GCM, AES-256-GCM
+```
+
+### Leer configuración desde una entidad
 
 ```python
+from dataclasses import dataclass, field
+
 from orionis.environment import Env
 
-# Algún proceso externo (o un editor de texto) modificó el archivo .env en disco.
-reloaded = Env.reload()
-if reloaded:
-    print("Variables de entorno actualizadas:", Env.all())
+# This is how every entity under orionis/foundation/config reads its
+# defaults: a default_factory that calls Env.get() at construction time.
+@dataclass(frozen=True, kw_only=True)
+class CacheSection:
+    default: str = field(default_factory=lambda: Env.get("CACHE_STORE", "file"))
+    ttl: int = field(default_factory=lambda: Env.get("CACHE_TTL", 3600))
+
+# No variable set yet: the declared defaults win.
+print(CacheSection())
+
+# Once the variable exists, the same declaration picks it up.
+Env.set("CACHE_STORE", "redis")
+Env.set("CACHE_TTL", 60, "int")
+print(CacheSection())
 ```
 
-## Notas de diseño
+```text
+CacheSection(default='file', ttl=3600)
+CacheSection(default='redis', ttl=60)
+```
 
-Las siguientes notas describen decisiones de diseño **ya existentes** con
-fines exclusivamente informativos — no son propuestas de cambio.
+### Recargar tras una edición externa
 
-- **`DotEnv` singleton mediante metaclase.** `DotEnv` usa
-  `orionis.support.patterns.singleton.Singleton` como su metaclase, de
-  modo que `DotEnv()` (con o sin argumento `path`) siempre devuelve la
-  misma instancia a nivel de proceso después de la primera construcción —
-  los argumentos posteriores se ignoran porque `__init__` solo se ejecuta
-  una vez.
-- **`os.environ` como fuente única de verdad para `get`.** `DotEnv.get`
-  lee de `os.environ`, no de la caché en memoria, por lo que siempre
-  refleja el estado más reciente, incluidos valores establecidos con
-  `only_os=True` o modificados de otra manera durante la vida del
-  proceso. `DotEnv.all()`, en cambio, lee de la **caché en memoria**, que
-  solo se actualiza mediante `set(..., only_os=False)` (el valor por
-  defecto) y se reconstruye por completo con `reload()` — las variables
-  establecidas con `only_os=True` **no** aparecerán en `Env.all()` aunque
-  `Env.get()` sí pueda leerlas. `Env.reload()` solo captura
-  `OSError`/`ValueError` provenientes del `DotEnv.reload()` subyacente;
-  como `DotEnv.reload()` envuelve los fallos inesperados como
-  `RuntimeError`, dicho `RuntimeError` **no** es capturado por
-  `Env.reload()` y se propagará a quien llame.
-- **`threading.Lock` explícito por instancia.** Todas las operaciones de
-  `DotEnv` (`get`, `set`, `unset`, `all`, `reload` y `__init__`) adquieren
-  el mismo `_lock`, serializando cada llamada entre hilos — se prioriza
-  la simplicidad y la corrección sobre el rendimiento concurrente para el
-  acceso a `.env`, que no se espera que sea una ruta de alta frecuencia.
-- **`lru_cache` en los validadores.** Tanto `ValidateKeyName`
-  (`maxsize=512`) como la función interna `_normalize_type_hint` usada por
-  `ValidateTypes` (`maxsize=64`) están memoizadas, ya que el conjunto de
-  nombres de variables de entorno e indicadores de tipo usados por una
-  aplicación dada es pequeño y finito, de modo que la validación repetida
-  se reduce a una búsqueda O(1) en un diccionario tras la primera llamada.
-- **Despacho `if`/`elif` en lugar de una tabla de invocables.** Tanto
-  `EnvironmentCaster.get()` como `EnvironmentCaster.to()` despachan según
-  el indicador de tipo mediante una cadena explícita `if`/`elif` en lugar
-  de una tabla de despacho, evitando la asignación de métodos vinculados
-  en cada llamada.
-- **Slots con "name mangling".** `EnvironmentCaster` lista explícitamente
-  los nombres de atributo con mangling en `__slots__`
-  (`"_EnvironmentCaster__type_hint"`, `"_EnvironmentCaster__value_raw"`),
-  combinando atributos privados de doble guion bajo con el ahorro de
-  memoria de `__slots__`.
-- **`"<tipo>:<valor>"` es una convención de cadena, no un esquema.**
-  Cualquier cadena que contenga dos puntos cuyo prefijo coincida con un
-  indicador de tipo conocido (por ejemplo, `"int:"`, `"path:"`) se
-  interpreta como tipada; no existe un mecanismo de escape para los dos
-  puntos que aparezcan al inicio de un valor de cadena que, por lo demás,
-  no está tipado.
+```python
+from pathlib import Path
+
+from orionis.environment import Env
+
+# Simulate an external process appending a variable to the .env file.
+with Path(".env").open("a", encoding="utf-8") as handle:
+    handle.write("\nEXTERNALLY_ADDED=42\n")
+
+# The process environment has not changed yet.
+print(Env.get("EXTERNALLY_ADDED"))
+
+# reload() re-reads the file into os.environ and rebuilds the cache.
+print(Env.reload())
+print(Env.get("EXTERNALLY_ADDED"))
+
+# all() lists what the .env file holds, parsed to native types.
+# APP_KEY is there because the App config entity generated one on boot.
+print(sorted(Env.all()))
+```
+
+```text
+None
+True
+42
+['APP_KEY', 'EXTERNALLY_ADDED']
+```
 
 ## Consideraciones de rendimiento y concurrencia
 
-Estas son notas informativas sobre el comportamiento existente, no
-recomendaciones de optimización:
-
-- Cada operación de `DotEnv` (`get`, `set`, `unset`, `all`, `reload`)
-  adquiere el **mismo lock único**, por lo que las llamadas concurrentes
-  desde múltiples hilos se serializan por completo — no hay distinción
-  entre lectura/escritura ni bloqueo por clave. Bajo acceso concurrente
-  intenso, las llamadas se encolan en lugar de ejecutarse en paralelo.
-- `set` y `unset` (salvo que `only_os=True`) escriben en el archivo `.env`
-  en disco mediante `set_key`/`unset_key` de `python-dotenv`, lo que
-  implica E/S de archivo en cada llamada — esto es E/S bloqueante y
-  síncrona, sin variante asíncrona provista por este módulo.
-- `get` evita la E/S de disco leyendo de `os.environ` (poblado una vez en
-  la construcción de `DotEnv()`/`reload()` y mantenido sincronizado por
-  `set`/`unset`), por lo que llamadas repetidas a `Env.get(...)` son
-  económicas en comparación con `set`/`unset`.
-- `ValidateKeyName` y la normalización del indicador de tipo usada por
-  `ValidateTypes` están memoizadas con `lru_cache`, por lo que validar
-  repetidamente la misma clave/indicador de tipo (por ejemplo, dentro de
-  una ruta de lectura de configuración de alta frecuencia) es O(1) tras la
-  primera llamada — pero las cachés son de ámbito de proceso y no están
-  acotadas por el contenido de la clave más allá de su `maxsize` (512 y 64
-  respectivamente), por lo que una aplicación que genere una cantidad muy
-  grande de claves dinámicas distintas podría desalojar entradas
-  anteriores.
-- `DotEnv` es un singleton basado en metaclase sin variante asíncrona;
-  llamar a cualquiera de sus métodos desde código `async def` se ejecuta
-  de forma síncrona en el hilo/bucle de eventos que llama (no hay
-  delegación tipo `run_in_executor` dentro de este módulo) — ver
-  [orionis.aio](../../aio) si se necesita delegar de forma segura para
-  asyncio llamadas bloqueantes para una carga de trabajo específica.
+- **Las lecturas no tocan el disco.** `get()` solo consulta `os.environ`; el
+  archivo se lee al construir y en `reload()`.
+- **Seguridad entre hilos dentro del proceso.** `DotEnv` protege `__init__`,
+  `set`, `get`, `unset`, `all` y `reload` con un `threading.Lock` de clase.
+  Llamadas concurrentes a `set()` desde varios hilos terminan sin errores y
+  todos los valores quedan almacenados (verificado con doce hilos
+  escribiendo claves distintas). El lock es un `Lock` simple, no un `RLock`:
+  ningún método público llama a otro mientras lo mantiene, así que no hace
+  falta reentrada.
+- **Las escrituras no son atómicas ni están sincronizadas entre procesos.**
+  `set()` / `unset()` delegan en `set_key` / `unset_key` de `python-dotenv`,
+  que reescriben el archivo. Dos procesos escribiendo el mismo `.env` a la
+  vez no están coordinados por este módulo.
+- **No hay API asíncrona.** El módulo no contiene ningún `async def`; todas
+  las llamadas son síncronas y bloqueantes. `set`, `unset` y `reload` hacen
+  E/S de archivos, así que llamarlas dentro de un event loop lo bloquean.
+- **Los validadores están cacheados.** `ValidateKeyName` (512 entradas) y el
+  normalizador de type hints (64 entradas) usan `functools.lru_cache`, de
+  modo que validar de nuevo es una búsqueda en diccionario.
+- **`parseTyped` evita asignaciones** para `int`, `float`, `bool` y `str`;
+  solo los hints de contenedor, ruta y base64 construyen una instancia de
+  `EnvironmentCaster`.
+- **`all()` copia.** Construye un diccionario nuevo y reparsea cada entrada
+  en cada llamada, así que no está pensado para rutas calientes.
+- **Constantes a nivel de módulo.** `_NULL_VALUES` y `_ENV_TYPE_PREFIXES`
+  son `frozenset` calculados una vez al importar; las comprobaciones de
+  pertenencia son O(1).
 
 ## Notas de compatibilidad
 
-- **Versión mínima de Python:** 3.14.
-- **Dependencias:**
-  - `python-dotenv ~= 1.2` — provee `dotenv_values`, `load_dotenv`,
-    `set_key`, `unset_key`.
-  - Librería estándar: `os`, `ast`, `threading`, `pathlib`, `re`,
-    `functools`, `base64`, `enum`, `abc`, `typing`.
-  - `SecureKeyGenerator` importa
-    `orionis.foundation.config.app.enums.ciphers.Cipher` (un enum interno
-    del framework), acoplando la generación de claves a la lista de
-    cifradores soportados por el framework.
-- **Integración con el framework:** `config/app.py` lee `APP_KEY` /
-  `APP_CIPHER` mediante `Env.get(...)`, y `orionis.encrypter.Encrypter`
-  consume el valor `bytes` resultante; otros archivos de configuración del
-  framework (database, cache, mail, queue, etc.) siguen el mismo patrón
-  `Env.get(...)` para leer ajustes controlados por variables de entorno.
+- **Python:** el framework declara `requires-python = ">=3.14"`
+  (`pyproject.toml`). El módulo usa `from __future__ import annotations` en
+  todos sus archivos, uniones `X | Y` y `ClassVar`.
+- **Dependencia de terceros:** `python-dotenv~=1.2`, que ya es dependencia
+  base de `orionis`, así que basta con `pip install orionis`. El módulo usa
+  `dotenv_values`, `load_dotenv`, `set_key` y `unset_key` sin cambiar sus
+  valores por defecto, lo que implica codificación UTF-8,
+  `quote_mode="always"` (los valores se escriben entre comillas simples) e
+  `interpolate=True` (una referencia `${OTRA_VAR}` se expande al cargar el
+  archivo).
+- **`SecureKeyGenerator` importa del framework:** depende de
+  `orionis.foundation.config.app.enums.ciphers.Cipher`, a diferencia del
+  resto del módulo, que solo depende de
+  `orionis.support.patterns.singleton`.
+- **Sin provider ni facade de contenedor.** Nada de este módulo se registra
+  en el contenedor de servicios, así que funciona en scripts sueltos,
+  comandos de consola y tests sin arrancar la aplicación.
+- **Windows:** los valores `path` siempre se normalizan a separadores POSIX,
+  y una ruta relativa pasada a `to("path")` se ancla al directorio de
+  trabajo actual, por lo que el valor guardado incluye la letra de unidad de
+  ese directorio.

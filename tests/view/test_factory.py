@@ -1,5 +1,5 @@
 from typing import Any
-from orionis.http.response import HTMLResponse
+from orionis.http.responses import HTMLResponse
 from orionis.test import TestCase
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 from orionis.view.factory import ViewFactory

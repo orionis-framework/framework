@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from orionis.logging.contracts.logger import ILogger
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class IBaseExceptionHandler(ABC):
 

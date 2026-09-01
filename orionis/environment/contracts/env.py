@@ -118,13 +118,21 @@ class IEnv(ABC):
         """
         Reload environment variables from the .env file.
 
-        Reset the DotEnv singleton instance and reload all environment variables
-        from the .env file. Useful when the .env file has been modified
+        Refresh the shared DotEnv singleton in place: the file is read again
+        into the process environment and the in-memory snapshot is rebuilt,
+        keeping the same instance. Useful when the .env file has been modified
         externally and the latest values need to be reflected in the application.
 
         Returns
         -------
         bool
             True if the environment variables were reloaded successfully,
-            False otherwise.
+            False if the shared DotEnv instance could not be built because of
+            an OSError or a ValueError.
+
+        Raises
+        ------
+        RuntimeError
+            If the reload itself fails. DotEnv.reload wraps every failure in
+            this type, which is deliberately left to propagate.
         """

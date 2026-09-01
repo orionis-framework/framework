@@ -20,6 +20,14 @@ class Argon2Hasher(IHasher):
 
     Argon2id won the Password Hashing Competition and is the recommended
     default driver of the framework.
+
+    Concurrency
+    -----------
+    No locks are used. The backend class and the backend instance are
+    cached on first use: a concurrent first use from several threads may
+    build them twice, and the last write wins. Hashing operations only read
+    that cache, and the fluent setters drop it so later calls rebuild the
+    backend with the new cost parameters.
     """
 
     __slots__ = ("_backend", "_backend_class", "_memory", "_threads", "_time")

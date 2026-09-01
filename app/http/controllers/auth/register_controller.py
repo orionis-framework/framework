@@ -1,6 +1,6 @@
 from app.models.user import User
-from orionis.http import response, HttpResponse
 from app.http.schemas.auth.register import RegisterSchema
+from orionis.http import response, HttpResponse
 from orionis.http.base import BaseController
 from orionis.support.facades import DB, Hash
 

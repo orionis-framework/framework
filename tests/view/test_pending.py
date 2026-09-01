@@ -1,5 +1,5 @@
 from typing import Any
-from orionis.http.response import HTMLResponse
+from orionis.http.responses import HTMLResponse
 from orionis.test import TestCase
 from orionis.view import pending as pending_module
 from orionis.view.exceptions import (

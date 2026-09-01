@@ -6,7 +6,7 @@ from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class RateLimitMiddleware:
 

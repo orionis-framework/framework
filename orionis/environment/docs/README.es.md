@@ -92,7 +92,7 @@ centraliza este módulo:
 ```python
 from orionis.environment import Env
 # o
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 ```
 
 Fachada estática que implementa `IEnv`. Cada método es un `@classmethod`

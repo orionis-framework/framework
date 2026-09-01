@@ -84,7 +84,7 @@ sync — safely across threads — is exactly what this module centralises:
 ```python
 from orionis.environment import Env
 # or
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 ```
 
 Static facade implementing `IEnv`. Every method is a `@classmethod` that

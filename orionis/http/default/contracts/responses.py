@@ -5,7 +5,12 @@ from orionis.http.enums.status import HTTPStatus
 
 if TYPE_CHECKING:
     from orionis.http.request import Request
-    from orionis.http.response import FileResponse, HTMLResponse, JSONResponse, Response
+    from orionis.http.responses import (
+        FileResponse,
+        HTMLResponse,
+        JSONResponse,
+        Response,
+    )
 
 class IDefaultResponses(ABC):
 

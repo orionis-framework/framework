@@ -5,7 +5,7 @@ from orionis.foundation.config.database.enums import (
     SQLiteJournalMode,
     SQLiteSynchronous,
 )
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed membership

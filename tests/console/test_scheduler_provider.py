@@ -1,158 +1,189 @@
-from __future__ import annotations
-from unittest.mock import AsyncMock, MagicMock, patch
+import inspect
+from orionis.console import scheduler_provider as provider_module
 from orionis.console.contracts.schedule import ISchedule
-from orionis.console.scheduler_provider import ScheduleProvider
 from orionis.console.contracts.store import IScheduleStore
+from orionis.console.scheduler_provider import ScheduleProvider
 from orionis.console.tasks.schedule import Schedule
 from orionis.console.tasks.store import ScheduleStore
+from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
+from orionis.foundation.core_providers import CORE_PROVIDERS
+from orionis.support.facades.schedule import Schedule as ScheduleFacade
 from orionis.test import TestCase
 
-class TestScheduleProvider(TestCase):
 
-    def _make(self) -> tuple[ScheduleProvider, MagicMock]:
+class _StubApp:
+    """Application double capturing every binding it receives."""
+
+    __slots__ = ("singletons",)
+
+    def __init__(self) -> None:
         """
-        Create a ScheduleProvider with a mock application.
+        Initialise the list of recorded bindings.
 
         Returns
         -------
-        tuple[ScheduleProvider, MagicMock]
-            The provider instance and its mock application.
+        None
         """
-        mock_app = MagicMock()
-        provider = ScheduleProvider(mock_app)
-        return provider, mock_app
+        self.singletons: list[tuple[object, object]] = []
 
-    def testIsSubclassOfServiceProvider(self) -> None:
+    def singleton(self, abstract: object, concrete: object) -> None:
         """
-        Verify ScheduleProvider extends ServiceProvider.
+        Record a singleton binding.
 
-        Ensures the class hierarchy is correct and the provider
-        follows the service provider contract.
+        Parameters
+        ----------
+        abstract : object
+            Contract used as the binding key.
+        concrete : object
+            Implementation bound to the contract.
+
+        Returns
+        -------
+        None
+        """
+        self.singletons.append((abstract, concrete))
+
+
+class _StubScheduleFacade:
+    """Facade double counting how many times it was pinned."""
+
+    __slots__ = ("pinned",)
+
+    def __init__(self) -> None:
+        """
+        Initialise the pin counter.
+
+        Returns
+        -------
+        None
+        """
+        self.pinned = 0
+
+    async def pin(self) -> None:
+        """
+        Count a pin invocation.
+
+        Returns
+        -------
+        None
+        """
+        self.pinned += 1
+
+
+class TestScheduleProviderDefinition(TestCase):
+
+    def testInheritsTheServiceProviderBase(self) -> None:
+        """
+        Extend the base ServiceProvider class.
+
+        Validates the provider class hierarchy.
         """
         self.assertTrue(issubclass(ScheduleProvider, ServiceProvider))
 
-    def testCanBeInstantiated(self) -> None:
+    def testIsNotDeferred(self) -> None:
         """
-        Verify ScheduleProvider can be instantiated with an application.
+        Stay out of the deferred provider mechanism.
 
-        Ensures the constructor accepts the app argument without raising.
+        Validates that the schedule facade is pinned during the regular
+        boot phase instead of on first resolution.
         """
-        provider, _ = self._make()
-        self.assertIsInstance(provider, ScheduleProvider)
+        self.assertFalse(issubclass(ScheduleProvider, DeferrableProvider))
 
-    def testRegisterCallsSingleton(self) -> None:
+    def testIsRegisteredAsACoreProvider(self) -> None:
         """
-        Verify register() calls app.singleton for IScheduleStore and ISchedule.
+        Ship with the core providers booted by the framework.
 
-        Ensures both the store dependency and the schedule interface are
-        bound as singletons in the container.
+        Validates that ISchedule is bound without the application having to
+        register anything by hand.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        self.assertEqual(mock_app.singleton.call_count, 2)
+        self.assertIn(ScheduleProvider, CORE_PROVIDERS)
 
-    def testRegisterBindsIScheduleStoreInterface(self) -> None:
+    def testStoresTheApplicationReference(self) -> None:
         """
-        Verify register() binds IScheduleStore to ScheduleStore.
+        Keep the container passed to the constructor.
 
-        Ensures the store dependency required by Schedule's constructor
-        can be auto-resolved by the container.
+        Validates the container the provider binds services into.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        args, _ = mock_app.singleton.call_args_list[0]
-        self.assertIs(args[0], IScheduleStore)
-        self.assertIs(args[1], ScheduleStore)
+        app = _StubApp()
+        self.assertIs(ScheduleProvider(app).app, app)  # type: ignore[arg-type]
 
-    def testRegisterBindsIScheduleInterface(self) -> None:
+    def testBootIsDeclaredAsynchronous(self) -> None:
         """
-        Verify register() uses ISchedule as the binding key.
+        Declare the boot phase as an asynchronous method.
 
-        Ensures resolution by interface is possible through the container.
+        Validates that boot can await the facade pinning.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        args, _ = mock_app.singleton.call_args
-        self.assertIs(args[0], ISchedule)
+        self.assertTrue(inspect.iscoroutinefunction(ScheduleProvider.boot))
 
-    def testRegisterBindsScheduleImplementation(self) -> None:
-        """
-        Verify register() binds the Schedule concrete class.
 
-        Ensures the correct implementation is registered, not a mock
-        or alternative class.
-        """
-        provider, mock_app = self._make()
-        provider.register()
-        args, _ = mock_app.singleton.call_args
-        self.assertIs(args[1], Schedule)
+class TestScheduleProviderRegister(TestCase):
 
-    async def testBootCallsScheduleFacadePin(self) -> None:
+    def testBindsTheStoreBeforeTheScheduleContract(self) -> None:
         """
-        Verify boot() invokes ScheduleFacade.pin() exactly once.
+        Bind both contracts, the store first.
 
-        Ensures the schedule facade is initialised during the boot phase
-        so it is available for subsequent task registration.
+        Validates the order required by the container: Schedule declares
+        IScheduleStore as a constructor dependency, and an interface can
+        only be auto resolved once it owns an explicit binding.
         """
-        provider, _ = self._make()
-        with patch(
-            "orionis.console.scheduler_provider.ScheduleFacade.pin",
-            new_callable=AsyncMock,
-        ) as mock_pin:
-            await provider.boot()
-            mock_pin.assert_called_once()
+        app = _StubApp()
 
-    async def testBootDoesNotCallRegister(self) -> None:
-        """
-        Verify boot() does not call app.singleton.
+        ScheduleProvider(app).register()  # type: ignore[arg-type]
 
-        Ensures the boot phase only initialises the facade and does not
-        attempt to re-register the binding.
-        """
-        provider, mock_app = self._make()
-        with patch(
-            "orionis.console.scheduler_provider.ScheduleFacade.pin",
-            new_callable=AsyncMock,
-        ):
-            await provider.boot()
-            mock_app.singleton.assert_not_called()
+        self.assertEqual(
+            app.singletons,
+            [(IScheduleStore, ScheduleStore), (ISchedule, Schedule)],
+        )
 
-    async def testRegisterThenBootSequence(self) -> None:
+    def testFacadeAccessorIsTheScheduleContract(self) -> None:
         """
-        Verify the full register → boot lifecycle succeeds without error.
+        Resolve the schedule contract from the container.
 
-        Ensures that calling both methods in sequence does not raise
-        and each method performs exactly its own side effects.
+        Validates that the facade reads the very contract the provider
+        registers.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        with patch(
-            "orionis.console.scheduler_provider.ScheduleFacade.pin",
-            new_callable=AsyncMock,
-        ) as mock_pin:
-            await provider.boot()
-        self.assertEqual(mock_app.singleton.call_count, 2)
-        mock_pin.assert_called_once()
+        self.assertIs(ScheduleFacade.getFacadeAccessor(), ISchedule)
 
-    def testAppAttributeIsStored(self) -> None:
-        """
-        Verify that the app attribute is stored correctly on the provider.
 
-        Ensures the application reference is accessible after construction,
-        which is required for register() to call app.singleton().
-        """
-        provider, mock_app = self._make()
-        self.assertIs(provider.app, mock_app)
+class TestScheduleProviderBoot(TestCase):
 
-    def testRegisterIsCalledMultipleTimesSafely(self) -> None:
+    def setUp(self) -> None:
         """
-        Verify register() can be called multiple times without raising.
+        Replace the Schedule facade with a double before each test.
 
-        Ensures there is no guard preventing re-registration, which could
-        indicate idempotency or potential double-binding issues.
+        Prevents the boot phase from pinning the real facade, which would
+        require a fully booted application.
         """
-        provider, mock_app = self._make()
-        provider.register()
-        provider.register()
-        self.assertEqual(mock_app.singleton.call_count, 4)
+        self._original_facade = provider_module.ScheduleFacade
+        self._facade = _StubScheduleFacade()
+        provider_module.ScheduleFacade = self._facade
+        self._app = _StubApp()
+
+    def tearDown(self) -> None:
+        """
+        Restore the original Schedule facade after each test.
+
+        Guarantees that module level state never leaks between tests.
+        """
+        provider_module.ScheduleFacade = self._original_facade
+
+    async def testBootPinsTheScheduleFacade(self) -> None:
+        """
+        Pin the Schedule facade once the services are registered.
+
+        Validates that facade access skips container resolution.
+        """
+        await ScheduleProvider(self._app).boot()  # type: ignore[arg-type]
+
+        self.assertEqual(self._facade.pinned, 1)
+
+    async def testBootRegistersNoAdditionalBinding(self) -> None:
+        """
+        Keep the boot phase free of container registrations.
+
+        Validates the separation between register() and boot().
+        """
+        await ScheduleProvider(self._app).boot()  # type: ignore[arg-type]
+
+        self.assertEqual(self._app.singletons, [])

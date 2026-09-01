@@ -3,7 +3,7 @@ from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.request import Request
-from orionis.http.response import Response
+from orionis.http.responses import Response
 
 if TYPE_CHECKING:
     from orionis.failure.contracts.handler import IBaseExceptionHandler

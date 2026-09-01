@@ -1,17 +1,23 @@
 from __future__ import annotations
+import inspect
 from abc import ABC
 from orionis.test import TestCase
 from orionis.container.contracts.service_provider import IServiceProvider
 
+class _ConcreteProvider(IServiceProvider):
+    """Minimal IServiceProvider implementation for structural tests."""
+
+    def register(self) -> None:
+        """Skip registration; the stub binds nothing."""
+
+    async def boot(self) -> None:
+        """Skip booting; the stub initialises nothing."""
+
 class TestIServiceProvider(TestCase):
 
-    # ------------------------------------------------------------------
-    # Structural / ABC
-    # ------------------------------------------------------------------
-
-    def testIServiceProviderIsAbstractBaseClass(self) -> None:
+    def testContractIsAnAbstractBaseClass(self) -> None:
         """
-        Test that IServiceProvider is a subclass of ABC.
+        Declare IServiceProvider as an ABC that cannot be instantiated.
 
         Returns
         -------
@@ -19,122 +25,49 @@ class TestIServiceProvider(TestCase):
             This method does not return a value.
         """
         self.assertTrue(issubclass(IServiceProvider, ABC))
-
-    def testIServiceProviderCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Test that direct instantiation of IServiceProvider raises TypeError.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
         with self.assertRaises(TypeError):
             IServiceProvider()  # type: ignore[abstract]
 
-    # ------------------------------------------------------------------
-    # Abstract method presence
-    # ------------------------------------------------------------------
-
-    def testHasAbstractMethodRegister(self) -> None:
+    def testContractDeclaresExactlyTheExpectedAbstractMethods(self) -> None:
         """
-        Test that 'register' is declared as an abstract method.
+        Declare exactly the register() and boot() lifecycle hooks.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        self.assertIn("register", IServiceProvider.__abstractmethods__)
+        self.assertEqual(
+            IServiceProvider.__abstractmethods__,
+            frozenset({"register", "boot"}),
+        )
 
-    def testHasAbstractMethodBoot(self) -> None:
+    def testBootIsDeclaredAsynchronousAndRegisterIsNot(self) -> None:
         """
-        Test that 'boot' is declared as an abstract method.
+        Split the lifecycle into a sync register() and an async boot().
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        self.assertIn("boot", IServiceProvider.__abstractmethods__)
+        self.assertTrue(
+            inspect.iscoroutinefunction(IServiceProvider.boot),
+        )
+        self.assertFalse(
+            inspect.iscoroutinefunction(IServiceProvider.register),
+        )
 
-    # ------------------------------------------------------------------
-    # Concrete subclass
-    # ------------------------------------------------------------------
-
-    def testConcreteSubclassCanBeInstantiated(self) -> None:
+    async def testConcreteSubclassRunsBothLifecycleHooks(self) -> None:
         """
-        Instantiate a concrete subclass implementing both abstract methods.
+        Instantiate a concrete subclass and run both lifecycle hooks.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        class _ConcreteProvider(IServiceProvider):
-            def register(self) -> None: # NOSONAR
-                pass
-
-            async def boot(self) -> None: # NOSONAR
-                pass
-
-        obj = _ConcreteProvider()
-        self.assertIsInstance(obj, IServiceProvider)
-
-    def testRegisterIsCallable(self) -> None:
-        """
-        Test that register() is callable on a concrete subclass instance.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        class _Provider(IServiceProvider):
-            def register(self) -> None: # NOSONAR
-                pass
-
-            async def boot(self) -> None: # NOSONAR
-                pass
-
-        obj = _Provider()
-        self.assertTrue(callable(obj.register))
-
-    def testBootIsCallable(self) -> None:
-        """
-        Test that boot() is callable on a concrete subclass instance.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        class _Provider(IServiceProvider):
-            def register(self) -> None: # NOSONAR
-                pass
-
-            async def boot(self) -> None: # NOSONAR
-                pass
-
-        obj = _Provider()
-        self.assertTrue(callable(obj.boot))
-
-    def testRegisterMethodExecutesWithoutError(self) -> None:
-        """
-        Test that calling register() on a concrete provider runs without error.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        class _Provider(IServiceProvider):
-            def register(self) -> None:
-                self.called = True
-
-            async def boot(self) -> None: # NOSONAR
-                pass
-
-        obj = _Provider()
-        obj.register()
-        self.assertTrue(obj.called)
+        provider = _ConcreteProvider()
+        self.assertIsInstance(provider, IServiceProvider)
+        self.assertIsNone(provider.register())
+        self.assertIsNone(await provider.boot())

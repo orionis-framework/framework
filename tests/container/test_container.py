@@ -1,15 +1,26 @@
+import asyncio
+import threading
 from abc import ABC
+from concurrent.futures import ThreadPoolExecutor
+from typing import Self
 from orionis.test import TestCase
 from orionis.container.container import Container
-from orionis.container.contracts.container import IContainer
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
+from orionis.container.contracts.container import IContainer
+from orionis.container.entities.binding import Binding
+from orionis.container.enums.lifetimes import Lifetime
 from orionis.container.exceptions.container import CircularDependencyException
+from orionis.http.request import Request
+from orionis.introspection.dependencies.entities.argument import Argument
+from orionis.schemas.schema import Schema
 
 # ---------------------------------------------------------------------------
 # Module-level domain helpers
 # (must live at module scope so qualified names are stable for DI resolution)
 # ---------------------------------------------------------------------------
+
+_NOT_A_CLASS = "not_a_class"
 
 class _Plain:
     """No-dependency service."""
@@ -21,10 +32,32 @@ class _ConcreteA(_Plain, _IAbstract):
     """Satisfies both _Plain and _IAbstract."""
 
 class _NeedsPlain:
-    """Service with a single _Plain dependency."""
+    """Service with a single positional _Plain dependency."""
 
     def __init__(self, dep: _Plain) -> None:
+        """Store the injected dependency."""
         self.dep = dep
+
+class _NeedsKeywordPlain:
+    """Service with a single keyword-only _Plain dependency."""
+
+    def __init__(self, *, dep: _Plain) -> None:
+        """Store the injected dependency."""
+        self.dep = dep
+
+class _NeedsBuiltin:
+    """Service annotated with a builtin type and no default value."""
+
+    def __init__(self, count: int) -> None:
+        """Store the builtin argument that the container cannot resolve."""
+        self.count = count
+
+class _NeedsDefault:
+    """Service whose only argument carries a default value."""
+
+    def __init__(self, flag: str = "fallback") -> None:
+        """Store the argument resolved from its own default."""
+        self.flag = flag
 
 # Circular dependency pair — patched after both classes are defined so that
 # annotations are real class references (not strings), which the reflection
@@ -36,10 +69,11 @@ class _CircB:
     """Circular dep node B — depends on _CircA."""
 
     def __init__(self, a: _CircA) -> None:
+        """Store the injected node A."""
         self.a = a
 
 def _circa_init(self, b: _CircB) -> None:
-    """Patched constructor that closes the A→B→A cycle."""
+    """Patch the constructor that closes the A to B to A cycle."""
     self.b = b
 
 _CircA.__init__ = _circa_init  # type: ignore[method-assign]
@@ -50,23 +84,351 @@ class _Host:
     non_callable: str = "string_value"
 
     def greet(self) -> str:
+        """Return a fixed greeting."""
         return "hello"
 
     def echo(self, dep: _Plain) -> _Plain:
+        """Return the injected dependency."""
         return dep
 
 def _fn_no_dep() -> str:
-    """Plain synchronous function with no dependencies."""
+    """Return a constant from a dependency-free function."""
     return "ok"
 
-
 def _fn_with_dep(dep: _Plain) -> _Plain:
-    """Declare a _Plain dependency."""
+    """Return the dependency injected into a synchronous function."""
     return dep
 
-async def _afn_no_dep() -> str: # NOSONAR
-    """Async function with no dependencies."""
+async def _afn_no_dep() -> str:
+    """Return a constant from a dependency-free coroutine function."""
     return "async_ok"
+
+async def _afn_with_dep(dep: _Plain) -> _Plain:
+    """Return the dependency injected into a coroutine function."""
+    return dep
+
+# ---------------------------------------------------------------------------
+# Schema resolution helpers
+# ---------------------------------------------------------------------------
+
+_SCHEMA_NAME = "orionis"
+
+class _StubRequest(Request):
+    """Request double returning a fixed body payload."""
+
+    def __init__(self) -> None:
+        """Skip the transport wiring required by the real request."""
+
+    async def data(self) -> dict[str, object]:
+        """Return the canned request payload."""
+        return {"name": _SCHEMA_NAME}
+
+class _PayloadSchema(Schema):
+    """Schema declaring the single field carried by the stub request."""
+
+    name: str
+
+class _NeedsSchema:
+    """Service receiving a schema as a positional constructor argument."""
+
+    def __init__(self, payload: _PayloadSchema) -> None:
+        """Store the validated schema payload."""
+        self.payload = payload
+
+class _NeedsKeywordSchema:
+    """Service receiving a schema as a keyword-only constructor argument."""
+
+    def __init__(self, *, payload: _PayloadSchema) -> None:
+        """Store the validated schema payload."""
+        self.payload = payload
+
+# ---------------------------------------------------------------------------
+# Concurrency helpers
+# ---------------------------------------------------------------------------
+
+_CONCURRENT_TASKS = 8
+_CONCURRENT_THREADS = 32
+_CYCLE_TIMEOUT = 5.0
+
+class _SlowRequest(Request):
+    """Request double that yields control before answering."""
+
+    def __init__(self) -> None:
+        """Skip the transport wiring required by the real request."""
+
+    async def data(self) -> dict[str, object]:
+        """Suspend once, then return the canned request payload."""
+        await asyncio.sleep(0)
+        return {"name": _SCHEMA_NAME}
+
+class _SuspendingSingleton:
+    """Singleton whose construction suspends on a schema argument."""
+
+    constructions = 0
+
+    def __init__(self, payload: _PayloadSchema) -> None:
+        """Count the construction and store the validated payload."""
+        _SuspendingSingleton.constructions += 1
+        self.payload = payload
+
+class _SuspendingScoped:
+    """Scoped service whose construction suspends on a schema argument."""
+
+    constructions = 0
+
+    def __init__(self, payload: _PayloadSchema) -> None:
+        """Count the construction and store the validated payload."""
+        _SuspendingScoped.constructions += 1
+        self.payload = payload
+
+def _locks_from_two_loops(container: Container) -> tuple[object, object]:
+    """
+    Build the creation lock of one key on two different event loops.
+
+    Parameters
+    ----------
+    container : Container
+        Container whose private lock registry is exercised.
+
+    Returns
+    -------
+    tuple[object, object]
+        The lock produced by the first loop and the one produced by a second,
+        independent loop.
+    """
+    async def take() -> object:
+        return container._Container__creationLock(_Plain)
+
+    def capture() -> tuple[object, object]:
+        return asyncio.run(take()), asyncio.run(take())
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(capture).result()
+
+# ---------------------------------------------------------------------------
+# Deferred provider helpers
+# ---------------------------------------------------------------------------
+
+_ASYNC_ALIAS = "deferred_async_service"
+_SYNC_ALIAS = "deferred_sync_service"
+
+class _DeferredService:
+    """Service published by the deferred provider doubles."""
+
+class _DeferredKwService:
+    """Dependency published by the deferred provider double."""
+
+class _AsyncDeferredProvider:
+    """Deferred provider double exposing an asynchronous boot hook."""
+
+    container: Container | None = None
+    register_calls: int = 0
+    boot_calls: int = 0
+
+    @classmethod
+    def reset(cls, container: Container | None) -> None:
+        """
+        Attach a container to the double and clear its counters.
+
+        Parameters
+        ----------
+        container : Container | None
+            Container that ``register()`` must populate, or None to detach.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        cls.container = container
+        cls.register_calls = 0
+        cls.boot_calls = 0
+
+    def register(self) -> None:
+        """Publish the deferred alias into the attached container."""
+        _AsyncDeferredProvider.register_calls += 1
+        if _AsyncDeferredProvider.container is not None:
+            _AsyncDeferredProvider.container.transient(
+                None, _DeferredService, alias=_ASYNC_ALIAS,
+            )
+
+    async def boot(self) -> None:
+        """Record that the asynchronous boot hook ran."""
+        _AsyncDeferredProvider.boot_calls += 1
+
+class _SyncDeferredProvider:
+    """Deferred provider double exposing a synchronous boot hook."""
+
+    container: Container | None = None
+    boot_calls: int = 0
+
+    @classmethod
+    def reset(cls, container: Container | None) -> None:
+        """
+        Attach a container to the double and clear its counters.
+
+        Parameters
+        ----------
+        container : Container | None
+            Container that ``register()`` must populate, or None to detach.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        cls.container = container
+        cls.boot_calls = 0
+
+    def register(self) -> None:
+        """Publish the deferred alias into the attached container."""
+        if _SyncDeferredProvider.container is not None:
+            _SyncDeferredProvider.container.transient(
+                None, _DeferredService, alias=_SYNC_ALIAS,
+            )
+
+    def boot(self) -> None:
+        """Record that the synchronous boot hook ran."""
+        _SyncDeferredProvider.boot_calls += 1
+
+class _DependencyProvider:
+    """Deferred provider double binding a constructor dependency."""
+
+    container: Container | None = None
+    register_calls: int = 0
+
+    @classmethod
+    def reset(cls, container: Container | None) -> None:
+        """
+        Attach a container to the double and clear its counters.
+
+        Parameters
+        ----------
+        container : Container | None
+            Container that ``register()`` must populate, or None to detach.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        cls.container = container
+        cls.register_calls = 0
+
+    def register(self) -> None:
+        """Publish the deferred dependency into the attached container."""
+        _DependencyProvider.register_calls += 1
+        if _DependencyProvider.container is not None:
+            _DependencyProvider.container.transient(None, _DeferredKwService)
+
+    async def boot(self) -> None:
+        """Suspend once so concurrent resolutions can interleave."""
+        await asyncio.sleep(0)
+
+class _NeedsDeferredDep:
+    """Service depending on a type published by a deferred provider."""
+
+    def __init__(self, dep: _DeferredKwService) -> None:
+        """Store the deferred dependency."""
+        self.dep = dep
+
+_TEST_MODULE = __name__
+_DEFERRED_DEP_KEY = (
+    f"{_DeferredKwService.__module__}.{_DeferredKwService.__name__}"
+)
+_DEFERRED_REGISTRY: dict[str, dict[str, str]] = {
+    _ASYNC_ALIAS: {"module": _TEST_MODULE, "class": "_AsyncDeferredProvider"},
+    _SYNC_ALIAS: {"module": _TEST_MODULE, "class": "_SyncDeferredProvider"},
+    _DEFERRED_DEP_KEY: {
+        "module": _TEST_MODULE,
+        "class": "_DependencyProvider",
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Singleton race helpers
+# ---------------------------------------------------------------------------
+
+class _RaceLock:
+    """Lock double publishing a competing singleton while it is held."""
+
+    __slots__ = ("entries", "owner")
+
+    def __init__(self) -> None:
+        """Start the lock double unbound and never entered."""
+        self.entries: int = 0
+        self.owner: type | None = None
+
+    def bindTo(self, owner: type | None) -> None:
+        """
+        Bind the container subclass that must win the singleton race.
+
+        Parameters
+        ----------
+        owner : type | None
+            Container subclass published on the next acquisition, or None to
+            disarm the double.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.owner = owner
+        self.entries = 0
+
+    def __enter__(self) -> Self:
+        """
+        Publish the competing instance as soon as the lock is acquired.
+
+        Returns
+        -------
+        Self
+            The lock double itself, mirroring ``threading.RLock`` semantics.
+        """
+        self.entries += 1
+        owner = self.owner
+        if owner is not None:
+            owner._instances[owner] = object.__new__(owner)
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> bool:
+        """
+        Release the lock without ever suppressing exceptions.
+
+        Parameters
+        ----------
+        exc_type : object
+            Exception type raised inside the block, if any.
+        exc : object
+            Exception instance raised inside the block, if any.
+        tb : object
+            Traceback of the raised exception, if any.
+
+        Returns
+        -------
+        bool
+            Always False, so exceptions propagate untouched.
+        """
+        return False
+
+_RACE_LOCK = _RaceLock()
+
+class _SingletonRaceProbe(Container):
+    """Container subclass whose lock publishes a competing instance."""
+
+    _lock = _RACE_LOCK  # type: ignore[assignment]
+
+class _UnknownLifetimeBinding:
+    """Binding double carrying a lifetime outside the Lifetime enum."""
+
+    __slots__ = ("concrete", "contract", "lifetime")
+
+    def __init__(self) -> None:
+        """Build a binding double with an unrecognised lifetime."""
+        self.contract: type = _Plain
+        self.concrete: type = _Plain
+        self.lifetime: str = "unsupported"
 
 # ---------------------------------------------------------------------------
 # Container isolation factory
@@ -90,69 +452,32 @@ def _fresh() -> Container:
 
     return _Isolated()
 
-# ===========================================================================
-# IContainer contract
-# ===========================================================================
+class _ScopelessTestCase(TestCase):
+    """
+    Base case detaching whatever container scope the runner keeps active.
 
-class TestIContainerContract(TestCase):
+    The CLI runner resolves its own services inside a long-lived scope, and
+    that scope object is shared by every test context. Detaching it keeps
+    registrations global and prevents state from leaking between tests.
+    """
 
-    def testCannotInstantiateDirectly(self) -> None:
-        """
-        Test that IContainer cannot be directly instantiated.
+    def setUp(self) -> None:
+        """Detach the ambient scope so registrations land globally."""
+        self._scope_token = ScopedContext.setCurrentScope(None)
 
-        IContainer is abstract; instantiating it must raise TypeError.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        with self.assertRaises(TypeError):
-            IContainer()  # type: ignore[abstract]
-
-    def testIsAbstractBaseClass(self) -> None:
-        """
-        Test that IContainer is registered as a subclass of ABC.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertTrue(issubclass(IContainer, ABC))
-
-    def testAllRequiredAbstractMethodsAreDeclared(self) -> None:
-        """
-        Test that IContainer declares all expected abstract method names.
-
-        Ensures that refactoring never silently removes a critical contract
-        method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        expected = {
-            "instance", "transient", "singleton", "scoped",
-            "bound", "beginScope", "getCurrentScope",
-            "make", "build", "invoke", "call",
-        }
-        for name in expected:
-            self.assertTrue(
-                hasattr(IContainer, name),
-                f"IContainer is missing declared method: {name!r}",
-            )
+    def tearDown(self) -> None:
+        """Restore the ambient scope captured before the test."""
+        ScopedContext.reset(self._scope_token)
 
 # ===========================================================================
-# Container — singleton pattern & contract
+# Container - singleton pattern and contract
 # ===========================================================================
 
-class TestContainerSingleton(TestCase):
+class TestContainerSingleton(_ScopelessTestCase):
 
     def testSameClassReturnsSameInstance(self) -> None:
         """
-        Test that constructing the same Container subclass twice yields the same object.
+        Return the same object when a Container subclass is built twice.
 
         Returns
         -------
@@ -166,7 +491,7 @@ class TestContainerSingleton(TestCase):
 
     def testDifferentSubclassesYieldDifferentInstances(self) -> None:
         """
-        Test that two distinct Container subclasses produce independent singletons.
+        Produce independent singletons for two distinct Container subclasses.
 
         Returns
         -------
@@ -183,7 +508,7 @@ class TestContainerSingleton(TestCase):
 
     def testContainerImplementsIContainer(self) -> None:
         """
-        Test that a Container instance satisfies the IContainer contract.
+        Satisfy the IContainer contract with a concrete Container instance.
 
         Returns
         -------
@@ -192,15 +517,65 @@ class TestContainerSingleton(TestCase):
         """
         self.assertIsInstance(_fresh(), IContainer)
 
+    def testRepeatedInitialisationKeepsTheOriginalState(self) -> None:
+        """
+        Skip re-initialisation when the singleton is constructed again.
+
+        Validates that the guard in ``__init__`` preserves registrations made
+        through a previously returned reference to the same singleton.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        class _S(Container):
+            pass
+
+        _S().transient(None, _Plain)
+        self.assertTrue(_S().bound(_Plain))
+
+class TestContainerSingletonRace(_ScopelessTestCase):
+
+    def setUp(self) -> None:
+        """Arm the lock double so the probe observes a competing instance."""
+        super().setUp()
+        _RACE_LOCK.bindTo(_SingletonRaceProbe)
+
+    def tearDown(self) -> None:
+        """Disarm the lock double and drop the probe singleton."""
+        _RACE_LOCK.bindTo(None)
+        Container._instances.pop(_SingletonRaceProbe, None)
+        super().tearDown()
+
+    def testConstructionReturnsTheInstancePublishedUnderTheLock(self) -> None:
+        """
+        Return the instance published by a competing caller under the lock.
+
+        Validates the double-checked locking branch of ``__new__``, which must
+        discard its own construction when another caller already stored a
+        singleton while the lock was being acquired.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        published = _SingletonRaceProbe()
+
+        self.assertEqual(_RACE_LOCK.entries, 1)
+        self.assertIs(published, Container._instances[_SingletonRaceProbe])
+        self.assertIsInstance(published, _SingletonRaceProbe)
+
 # ===========================================================================
-# instance()  # noqa: ERA001
+# instance()
 # ===========================================================================
 
-class TestContainerInstance(TestCase):
+class TestContainerInstance(_ScopelessTestCase):
 
     def testRegisterInstanceReturnsTrue(self) -> None:
         """
-        Test that instance() returns True on a successful registration.
+        Return True from instance() on a successful registration.
 
         Returns
         -------
@@ -209,29 +584,23 @@ class TestContainerInstance(TestCase):
         """
         class _Svc:
             pass
-        c = _fresh()
-        self.assertTrue(c.instance(None, _Svc()))
+
+        self.assertTrue(_fresh().instance(None, _Svc()))
 
     def testRegisterInstanceWithExplicitAbstract(self) -> None:
         """
-        Test that instance() accepts an explicit abstract contract and returns True.
+        Accept an explicit abstract contract when registering an instance.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        from abc import ABC  # noqa: PLC0415
-        class _ISvc(ABC):  # noqa: B024
-            pass
-        class _SvcImpl(_ISvc):
-            pass
-        c = _fresh()
-        self.assertTrue(c.instance(_ISvc, _SvcImpl()))
+        self.assertTrue(_fresh().instance(_IAbstract, _ConcreteA()))
 
     def testRegisterClassTypeRaisesTypeError(self) -> None:
         """
-        Test that passing a class (not an instance) to instance() raises TypeError.
+        Raise TypeError when instance() receives a class instead of an object.
 
         Returns
         -------
@@ -253,11 +622,24 @@ class TestContainerInstance(TestCase):
         """
         c = _fresh()
         with self.assertRaises(TypeError):
-            c.instance(_IAbstract, _Plain())  # _Plain does not extend _IAbstract
+            c.instance(_IAbstract, _Plain())
+
+    def testRegisterInstanceWithNonClassAbstractRaisesTypeError(self) -> None:
+        """
+        Raise TypeError when the abstract passed to instance() is not a class.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError):
+            c.instance(_NOT_A_CLASS, _Plain())  # type: ignore[arg-type]
 
     def testRegisterDuplicateWithoutOverrideRaisesValueError(self) -> None:
         """
-        Raise ValueError when the same abstract is registered twice without override.
+        Raise ValueError when the same abstract is registered twice.
 
         Returns
         -------
@@ -266,6 +648,7 @@ class TestContainerInstance(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.instance(None, _Svc())
         with self.assertRaises(ValueError):
@@ -273,7 +656,7 @@ class TestContainerInstance(TestCase):
 
     def testRegisterDuplicateWithOverrideSucceeds(self) -> None:
         """
-        Test that re-registering with override=True does not raise and returns True.
+        Replace an existing registration when override is requested.
 
         Returns
         -------
@@ -282,15 +665,81 @@ class TestContainerInstance(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.instance(None, _Svc())
         self.assertTrue(c.instance(None, _Svc(), override=True))
 
-    async def testRegisterInstanceWithAliasInsideScopeRaisesValueError(self) -> None:
+    async def testRegisterInstanceWithAliasResolvesByAlias(self) -> None:
         """
-        Raise ValueError when registering an aliased instance inside an active scope.
+        Resolve a globally registered instance through its alias.
 
-        Alias registration is only allowed globally, not inside a scope.
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        service = _Plain()
+        self.assertTrue(c.instance(None, service, alias="plain_instance"))
+        self.assertIs(await c.make("plain_instance"), service)
+
+class TestContainerInstanceInsideScope(_ScopelessTestCase):
+
+    async def testInstanceIsStoredInTheActiveScope(self) -> None:
+        """
+        Store an instance in the active scope instead of the global registry.
+
+        Validates that ``bound()`` also reports the scoped registration.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        service = _Plain()
+        async with c.beginScope() as scope:
+            self.assertTrue(c.instance(None, service))
+            self.assertIs(scope[_Plain], service)
+            self.assertTrue(c.bound(_Plain))
+
+    async def testDuplicateInstanceInsideScopeRaisesValueError(self) -> None:
+        """
+        Raise ValueError when the same abstract is registered twice in a scope.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        async with c.beginScope():
+            c.instance(None, _Plain())
+            with self.assertRaises(ValueError):
+                c.instance(None, _Plain())
+
+    async def testInstanceOverrideInsideScopeReplacesTheEntry(self) -> None:
+        """
+        Replace a scoped registration when override is requested.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        replacement = _Plain()
+        async with c.beginScope() as scope:
+            c.instance(None, _Plain())
+            self.assertTrue(c.instance(None, replacement, override=True))
+            self.assertIs(scope[_Plain], replacement)
+
+    async def testInstanceWithAliasInsideScopeRaisesValueError(self) -> None:
+        """
+        Raise ValueError when registering an aliased instance inside a scope.
+
+        Alias registration is only allowed globally, never inside a scope.
 
         Returns
         -------
@@ -303,14 +752,14 @@ class TestContainerInstance(TestCase):
                 c.instance(None, _Plain(), alias="scoped_alias")
 
 # ===========================================================================
-# transient()  # noqa: ERA001
+# transient()
 # ===========================================================================
 
-class TestContainerTransient(TestCase):
+class TestContainerTransient(_ScopelessTestCase):
 
     def testTransientReturnsTrue(self) -> None:
         """
-        Test that transient() returns True on a valid registration.
+        Return True from transient() on a valid registration.
 
         Returns
         -------
@@ -321,9 +770,7 @@ class TestContainerTransient(TestCase):
 
     def testTransientWithoutAbstractSelfBinds(self) -> None:
         """
-        Test that transient(None, Concrete) binds the concrete to itself.
-
-        After registration, bound(Concrete) must return True.
+        Bind the concrete class to itself when no abstract is supplied.
 
         Returns
         -------
@@ -336,7 +783,7 @@ class TestContainerTransient(TestCase):
 
     def testTransientWithAbstractBindsContract(self) -> None:
         """
-        Test that transient with an explicit abstract registers the abstract correctly.
+        Register the abstract contract when one is supplied explicitly.
 
         Returns
         -------
@@ -349,7 +796,7 @@ class TestContainerTransient(TestCase):
 
     def testTransientConcreteNotClassRaisesTypeError(self) -> None:
         """
-        Test that providing a non-class as the concrete argument raises TypeError.
+        Raise TypeError when the concrete argument is not a class.
 
         Returns
         -------
@@ -358,11 +805,52 @@ class TestContainerTransient(TestCase):
         """
         c = _fresh()
         with self.assertRaises(TypeError):
-            c.transient(None, "not_a_class")  # type: ignore[arg-type]
+            c.transient(None, _NOT_A_CLASS)  # type: ignore[arg-type]
+
+    def testTransientAbstractNotClassRaisesTypeError(self) -> None:
+        """
+        Raise TypeError when the abstract argument is not a class.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError):
+            c.transient(_NOT_A_CLASS, _Plain)  # type: ignore[arg-type]
+
+    def testTransientConcreteNotClassWithAbstractRaisesTypeError(self) -> None:
+        """
+        Raise TypeError when only the concrete argument is not a class.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError):
+            c.transient(_IAbstract, _NOT_A_CLASS)  # type: ignore[arg-type]
+
+    def testTransientConcreteNotImplementingAbstractRaisesTypeError(
+        self,
+    ) -> None:
+        """
+        Raise TypeError when the concrete does not implement the abstract.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError):
+            c.transient(_IAbstract, _Plain)
 
     def testTransientDuplicateRaisesValueError(self) -> None:
         """
-        Raise ValueError when the same abstract is registered twice without override.
+        Raise ValueError when the same abstract is registered twice.
 
         Returns
         -------
@@ -376,7 +864,7 @@ class TestContainerTransient(TestCase):
 
     async def testTransientMakeReturnsNewInstanceEachTime(self) -> None:
         """
-        Test that every make() call on a transient binding returns a distinct object.
+        Return a distinct object from every make() on a transient binding.
 
         Returns
         -------
@@ -385,21 +873,20 @@ class TestContainerTransient(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.transient(None, _Svc)
-        i1 = await c.make(_Svc)
-        i2 = await c.make(_Svc)
-        self.assertIsNot(i1, i2)
+        self.assertIsNot(await c.make(_Svc), await c.make(_Svc))
 
 # ===========================================================================
-# singleton()  # noqa: ERA001
+# singleton()
 # ===========================================================================
 
-class TestContainerSingletonBinding(TestCase):
+class TestContainerSingletonBinding(_ScopelessTestCase):
 
     def testSingletonReturnsTrue(self) -> None:
         """
-        Test that singleton() returns True on a valid registration.
+        Return True from singleton() on a valid registration.
 
         Returns
         -------
@@ -410,7 +897,7 @@ class TestContainerSingletonBinding(TestCase):
 
     async def testSingletonMakeReturnsSameInstanceEveryTime(self) -> None:
         """
-        Test that make() on a singleton binding always returns the same cached object.
+        Return the same cached object from every make() on a singleton.
 
         Returns
         -------
@@ -419,15 +906,14 @@ class TestContainerSingletonBinding(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.singleton(None, _Svc)
-        i1 = await c.make(_Svc)
-        i2 = await c.make(_Svc)
-        self.assertIs(i1, i2)
+        self.assertIs(await c.make(_Svc), await c.make(_Svc))
 
     def testSingletonDuplicateRaisesValueError(self) -> None:
         """
-        Raise ValueError when the same singleton is registered twice without override.
+        Raise ValueError when the same singleton is registered twice.
 
         Returns
         -------
@@ -440,14 +926,14 @@ class TestContainerSingletonBinding(TestCase):
             c.singleton(None, _Plain)
 
 # ===========================================================================
-# scoped()  # noqa: ERA001
+# scoped()
 # ===========================================================================
 
-class TestContainerScopedBinding(TestCase):
+class TestContainerScopedBinding(_ScopelessTestCase):
 
     def testScopedReturnsTrue(self) -> None:
         """
-        Test that scoped() returns True on a valid registration.
+        Return True from scoped() on a valid registration.
 
         Returns
         -------
@@ -458,7 +944,7 @@ class TestContainerScopedBinding(TestCase):
 
     async def testScopedServiceResolvesInsideScope(self) -> None:
         """
-        Test that a scoped service is resolved successfully within an active scope.
+        Resolve a scoped service successfully within an active scope.
 
         Returns
         -------
@@ -472,7 +958,7 @@ class TestContainerScopedBinding(TestCase):
 
     async def testScopedServiceReturnsSameInstanceWithinScope(self) -> None:
         """
-        Verify multiple make() calls within the same scope return the same instance.
+        Return the same instance for repeated make() calls in one scope.
 
         Returns
         -------
@@ -482,17 +968,11 @@ class TestContainerScopedBinding(TestCase):
         c = _fresh()
         c.scoped(None, _Plain)
         async with c.beginScope():
-            i1 = await c.make(_Plain)
-            i2 = await c.make(_Plain)
-            self.assertIs(i1, i2)
+            self.assertIs(await c.make(_Plain), await c.make(_Plain))
 
     async def testScopedServiceRaisesRuntimeErrorOutsideScope(self) -> None:
         """
-        Raise RuntimeError when resolving a scoped service outside an active scope.
-
-        The test runner keeps a scope active at all times, so the reactor scope is
-        temporarily cleared with a ContextVar token to simulate a truly scope-free
-        context, then restored in the finally block.
+        Raise RuntimeError when a scoped service is resolved without a scope.
 
         Returns
         -------
@@ -501,23 +981,18 @@ class TestContainerScopedBinding(TestCase):
         """
         c = _fresh()
         c.scoped(None, _Plain)
-        # Temporarily clear the reactor scope to test the no-scope error path.
-        token = ScopedContext.setCurrentScope(None)
-        try:
-            with self.assertRaises(RuntimeError):
-                await c.make(_Plain)
-        finally:
-            ScopedContext.reset(token)
+        with self.assertRaises(RuntimeError):
+            await c.make(_Plain)
 
 # ===========================================================================
-# bound()  # noqa: ERA001
+# bound()
 # ===========================================================================
 
-class TestContainerBound(TestCase):
+class TestContainerBound(_ScopelessTestCase):
 
     def testBoundReturnsTrueAfterTransientRegistration(self) -> None:
         """
-        Test that bound() returns True immediately after a transient registration.
+        Return True from bound() right after a transient registration.
 
         Returns
         -------
@@ -530,7 +1005,7 @@ class TestContainerBound(TestCase):
 
     def testBoundReturnsFalseForUnregisteredType(self) -> None:
         """
-        Test that bound() returns False for a type that has never been registered.
+        Return False from bound() for a type that was never registered.
 
         Returns
         -------
@@ -541,7 +1016,7 @@ class TestContainerBound(TestCase):
 
     def testBoundReturnsTrueForRegisteredAlias(self) -> None:
         """
-        Test that bound() returns True when queried with a valid alias string.
+        Return True from bound() when queried with a registered alias.
 
         Returns
         -------
@@ -554,7 +1029,7 @@ class TestContainerBound(TestCase):
 
     def testBoundReturnsFalseForUnknownAlias(self) -> None:
         """
-        Test that bound() returns False for a string alias that was never registered.
+        Return False from bound() for an alias that was never registered.
 
         Returns
         -------
@@ -565,7 +1040,7 @@ class TestContainerBound(TestCase):
 
     def testBoundReturnsTrueAfterInstanceRegistration(self) -> None:
         """
-        Test that bound() returns True after registering an object instance.
+        Return True from bound() after registering an object instance.
 
         Returns
         -------
@@ -574,6 +1049,7 @@ class TestContainerBound(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.instance(None, _Svc())
         self.assertTrue(c.bound(_Svc))
@@ -582,11 +1058,11 @@ class TestContainerBound(TestCase):
 # Alias validation
 # ===========================================================================
 
-class TestContainerAlias(TestCase):
+class TestContainerAlias(_ScopelessTestCase):
 
     def testEmptyAliasRaisesValueError(self) -> None:
         """
-        Test that a blank-only alias string raises ValueError.
+        Raise ValueError for an alias made only of whitespace.
 
         Returns
         -------
@@ -599,7 +1075,7 @@ class TestContainerAlias(TestCase):
 
     def testNonStringAliasRaisesTypeError(self) -> None:
         """
-        Test that a non-string alias raises TypeError.
+        Raise TypeError when the alias is not a string.
 
         Returns
         -------
@@ -610,9 +1086,22 @@ class TestContainerAlias(TestCase):
         with self.assertRaises(TypeError):
             c.transient(None, _Plain, alias=123)  # type: ignore[arg-type]
 
+    def testAliasIsStrippedBeforeRegistration(self) -> None:
+        """
+        Strip surrounding whitespace from an alias before registering it.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        c.transient(None, _Plain, alias="  padded_alias  ")
+        self.assertTrue(c.bound("padded_alias"))
+
     def testDuplicateAliasRaisesValueError(self) -> None:
         """
-        Test that two registrations using the same alias raise ValueError.
+        Raise ValueError when two registrations reuse the same alias.
 
         Returns
         -------
@@ -626,7 +1115,7 @@ class TestContainerAlias(TestCase):
 
     async def testMakeByAliasReturnsCorrectType(self) -> None:
         """
-        Return an instance of the registered type when resolving by alias string.
+        Return an instance of the registered type when resolving by alias.
 
         Returns
         -------
@@ -641,11 +1130,11 @@ class TestContainerAlias(TestCase):
 # override parameter
 # ===========================================================================
 
-class TestContainerOverride(TestCase):
+class TestContainerOverride(_ScopelessTestCase):
 
     def testOverrideFalseRaisesValueError(self) -> None:
         """
-        Raise ValueError when the same abstract is registered twice with override=False.
+        Raise ValueError when a contract is re-registered with override False.
 
         Returns
         -------
@@ -659,7 +1148,7 @@ class TestContainerOverride(TestCase):
 
     def testOverrideTrueReplacesExistingBinding(self) -> None:
         """
-        Test that re-registering with override=True succeeds and returns True.
+        Replace an existing binding when override is requested.
 
         Returns
         -------
@@ -671,14 +1160,14 @@ class TestContainerOverride(TestCase):
         self.assertTrue(c.singleton(_IAbstract, _ConcreteA, override=True))
 
 # ===========================================================================
-# make()  # noqa: ERA001
+# make()
 # ===========================================================================
 
-class TestContainerMake(TestCase):
+class TestContainerMake(_ScopelessTestCase):
 
     async def testMakeTransientReturnsNewInstanceEachCall(self) -> None:
         """
-        Test that make() on a transient binding returns a different object every time.
+        Return a different object from every make() on a transient binding.
 
         Returns
         -------
@@ -687,15 +1176,14 @@ class TestContainerMake(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.transient(None, _Svc)
-        i1 = await c.make(_Svc)
-        i2 = await c.make(_Svc)
-        self.assertIsNot(i1, i2)
+        self.assertIsNot(await c.make(_Svc), await c.make(_Svc))
 
     async def testMakeSingletonReturnsSameObjectEachCall(self) -> None:
         """
-        Test that make() on a singleton binding always returns the same cached instance.
+        Return the cached instance from every make() on a singleton binding.
 
         Returns
         -------
@@ -704,13 +1192,14 @@ class TestContainerMake(TestCase):
         """
         class _Svc:
             pass
+
         c = _fresh()
         c.singleton(None, _Svc)
         self.assertIs(await c.make(_Svc), await c.make(_Svc))
 
     async def testMakeUnregisteredClassAutoResolves(self) -> None:
         """
-        Test that make() auto-resolves an unregistered class with no constructor args.
+        Auto-resolve an unregistered class that needs no constructor argument.
 
         Returns
         -------
@@ -722,7 +1211,7 @@ class TestContainerMake(TestCase):
 
     async def testMakeUnregisteredStringRaisesValueError(self) -> None:
         """
-        Test that make() raises ValueError when given an unknown string key.
+        Raise ValueError when make() receives an unknown alias string.
 
         Returns
         -------
@@ -733,9 +1222,25 @@ class TestContainerMake(TestCase):
         with self.assertRaises(ValueError):
             await c.make("ghost_service")
 
+    async def testMakeNonTypeKeyRaisesValueError(self) -> None:
+        """
+        Raise ValueError when make() receives a key that is not a class.
+
+        A non-string, non-class key cannot be auto-built, so the container
+        must report it as an unregistered service.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(ValueError):
+            await c.make(123)  # type: ignore[arg-type]
+
     async def testMakeAbstractContractReturnsConcreteInstance(self) -> None:
         """
-        Test that make() on an abstract key returns an instance of the concrete class.
+        Return an instance of the concrete class when resolving an abstract.
 
         Returns
         -------
@@ -746,15 +1251,30 @@ class TestContainerMake(TestCase):
         c.transient(_IAbstract, _ConcreteA)
         self.assertIsInstance(await c.make(_IAbstract), _ConcreteA)
 
+    async def testMakeReturnsTheInstanceRegisteredInTheScope(self) -> None:
+        """
+        Return the scope entry when the abstract is already stored there.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        service = _Plain()
+        async with c.beginScope():
+            c.instance(None, service)
+            self.assertIs(await c.make(_Plain), service)
+
 # ===========================================================================
-# build()  # noqa: ERA001
+# build()
 # ===========================================================================
 
-class TestContainerBuild(TestCase):
+class TestContainerBuild(_ScopelessTestCase):
 
     async def testBuildPlainClassReturnsInstance(self) -> None:
         """
-        Test that build() creates and returns an instance of a plain no-arg class.
+        Create an instance of a plain class with no constructor arguments.
 
         Returns
         -------
@@ -766,7 +1286,7 @@ class TestContainerBuild(TestCase):
 
     async def testBuildClassWithDepAutoResolvesConstructorArg(self) -> None:
         """
-        Test that build() injects a _Plain dependency into _NeedsPlain automatically.
+        Inject an unregistered dependency into the constructor automatically.
 
         Returns
         -------
@@ -780,7 +1300,7 @@ class TestContainerBuild(TestCase):
 
     async def testBuildNonClassRaisesTypeError(self) -> None:
         """
-        Test that passing a non-class argument to build() raises TypeError.
+        Raise TypeError when build() receives a non-class argument.
 
         Returns
         -------
@@ -789,9 +1309,11 @@ class TestContainerBuild(TestCase):
         """
         c = _fresh()
         with self.assertRaises(TypeError):
-            await c.build("not_a_class")  # type: ignore[arg-type]
+            await c.build(_NOT_A_CLASS)  # type: ignore[arg-type]
 
-    async def testBuildAlwaysCreatesNewInstanceEvenForRegisteredSingleton(self) -> None:
+    async def testBuildAlwaysCreatesNewInstanceForRegisteredSingleton(
+        self,
+    ) -> None:
         """
         Bypass the singleton cache and create a fresh instance with build().
 
@@ -802,19 +1324,554 @@ class TestContainerBuild(TestCase):
         """
         c = _fresh()
         c.singleton(None, _Plain)
-        singleton = await c.make(_Plain)   # cached
-        built = await c.build(_Plain)       # bypasses cache
+        singleton = await c.make(_Plain)
+        built = await c.build(_Plain)
         self.assertIsNot(singleton, built)
 
 # ===========================================================================
-# invoke()  # noqa: ERA001
+# Constructor signature resolution
 # ===========================================================================
 
-class TestContainerInvoke(TestCase):
+class TestContainerSignatureResolution(_ScopelessTestCase):
+
+    async def testBoundPositionalDependencyIsResolvedFromContainer(
+        self,
+    ) -> None:
+        """
+        Resolve a positional dependency through its container binding.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        shared = _Plain()
+        c.instance(None, shared)
+        instance = await c.build(_NeedsPlain)
+        self.assertIs(instance.dep, shared)
+
+    async def testExplicitPositionalArgumentWinsOverAutoResolution(
+        self,
+    ) -> None:
+        """
+        Consume the supplied positional argument instead of auto-resolving.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        supplied = _Plain()
+        instance = await c.build(_NeedsPlain, supplied)
+        self.assertIs(instance.dep, supplied)
+
+    async def testExplicitKeywordArgumentFeedsAPositionalParameter(
+        self,
+    ) -> None:
+        """
+        Consume a keyword argument that targets a positional parameter.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        supplied = _Plain()
+        instance = await c.build(_NeedsPlain, dep=supplied)
+        self.assertIs(instance.dep, supplied)
+
+    async def testExtraArgumentsAreForwardedToTheConstructor(self) -> None:
+        """
+        Forward unmatched positional and keyword arguments to the constructor.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        captured: dict[str, object] = {}
+
+        class _Variadic:
+            """Service capturing every argument it receives."""
+
+            def __init__(
+                self,
+                dep: _Plain,
+                *args: object,
+                **kwargs: object,
+            ) -> None:
+                """Record the variadic arguments received."""
+                captured["dep"] = dep
+                captured["args"] = args
+                captured["kwargs"] = kwargs
+
+        c = _fresh()
+        await c.build(_Variadic, _Plain(), "extra", flag=True)
+
+        self.assertEqual(captured["args"], ("extra",))
+        self.assertEqual(captured["kwargs"], {"flag": True})
+
+    async def testKeywordOnlyDependencyIsAutoResolved(self) -> None:
+        """
+        Auto-resolve a keyword-only dependency that has no explicit value.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        instance = await c.build(_NeedsKeywordPlain)
+        self.assertIsInstance(instance.dep, _Plain)
+
+    async def testBoundKeywordOnlyDependencyIsResolvedFromContainer(
+        self,
+    ) -> None:
+        """
+        Resolve a keyword-only dependency through its container binding.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        shared = _Plain()
+        c.instance(None, shared)
+        instance = await c.build(_NeedsKeywordPlain)
+        self.assertIs(instance.dep, shared)
+
+    async def testExplicitKeywordOnlyArgumentWinsOverAutoResolution(
+        self,
+    ) -> None:
+        """
+        Consume the supplied keyword-only argument instead of resolving it.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        supplied = _Plain()
+        c.instance(None, _Plain())
+        instance = await c.build(_NeedsKeywordPlain, dep=supplied)
+        self.assertIs(instance.dep, supplied)
+
+    async def testParameterDefaultIsUsedWhenNothingElseResolves(self) -> None:
+        """
+        Fall back to the declared default of an unbound parameter.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        instance = await c.build(_NeedsDefault)
+        self.assertEqual(instance.flag, "fallback")
+
+    async def testBuiltinParameterWithoutDefaultRaisesTypeError(self) -> None:
+        """
+        Raise TypeError for a builtin-typed parameter without a default.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError) as ctx:
+            await c.build(_NeedsBuiltin)
+        self.assertIn("built-in type", str(ctx.exception))
+
+# ===========================================================================
+# Schema arguments
+# ===========================================================================
+
+class TestContainerSchemaArguments(_ScopelessTestCase):
+
+    def setUp(self) -> None:
+        """Bind a request double so schema arguments can be validated."""
+        super().setUp()
+        self._container = _fresh()
+        self._container.instance(Request, _StubRequest())
+
+    async def testPositionalSchemaArgumentIsValidatedFromRequestBody(
+        self,
+    ) -> None:
+        """
+        Validate the request body into a positional schema argument.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        instance = await self._container.build(_NeedsSchema)
+
+        self.assertIsInstance(instance.payload, _PayloadSchema)
+        self.assertEqual(instance.payload.name, _SCHEMA_NAME)
+
+    async def testKeywordSchemaArgumentIsValidatedFromRequestBody(
+        self,
+    ) -> None:
+        """
+        Validate the request body into a keyword-only schema argument.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        instance = await self._container.build(_NeedsKeywordSchema)
+
+        self.assertIsInstance(instance.payload, _PayloadSchema)
+        self.assertEqual(instance.payload.name, _SCHEMA_NAME)
+
+# ===========================================================================
+# Deferred providers
+# ===========================================================================
+
+class TestContainerDeferredProviders(_ScopelessTestCase):
+
+    def setUp(self) -> None:
+        """Attach a fresh container to every deferred provider double."""
+        super().setUp()
+        self._container = _fresh()
+        self._container._deferred_providers = dict(_DEFERRED_REGISTRY)
+        _AsyncDeferredProvider.reset(self._container)
+        _SyncDeferredProvider.reset(self._container)
+        _DependencyProvider.reset(self._container)
+
+    def tearDown(self) -> None:
+        """Detach the container from every deferred provider double."""
+        _AsyncDeferredProvider.reset(None)
+        _SyncDeferredProvider.reset(None)
+        _DependencyProvider.reset(None)
+        super().tearDown()
+
+    async def testAliasTriggersDeferredProviderWithAsyncBoot(self) -> None:
+        """
+        Register and boot a deferred provider declaring an async boot hook.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        resolved = await self._container.make(_ASYNC_ALIAS)
+
+        self.assertIsInstance(resolved, _DeferredService)
+        self.assertEqual(_AsyncDeferredProvider.register_calls, 1)
+        self.assertEqual(_AsyncDeferredProvider.boot_calls, 1)
+
+    async def testAliasTriggersDeferredProviderWithSyncBoot(self) -> None:
+        """
+        Register and boot a deferred provider declaring a sync boot hook.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        resolved = await self._container.make(_SYNC_ALIAS)
+
+        self.assertIsInstance(resolved, _DeferredService)
+        self.assertEqual(_SyncDeferredProvider.boot_calls, 1)
+
+    async def testUnknownAliasStillRaisesAfterDeferredLookup(self) -> None:
+        """
+        Raise ValueError when no deferred provider publishes the alias.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        with self.assertRaises(ValueError):
+            await self._container.make("missing_deferred_alias")
+
+    async def testTypesOutsideTheRegistrySkipDeferredResolution(self) -> None:
+        """
+        Skip deferred resolution for a type absent from the registry.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.assertIsInstance(await self._container.build(_Plain), _Plain)
+        self.assertEqual(_AsyncDeferredProvider.register_calls, 0)
+
+    async def testConstructorDependencyTriggersDeferredProvider(self) -> None:
+        """
+        Resolve a constructor dependency published by a deferred provider.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        instance = await self._container.build(_NeedsDeferredDep)
+
+        self.assertIsInstance(instance.dep, _DeferredKwService)
+        self.assertEqual(_DependencyProvider.register_calls, 1)
+
+    async def testDeferredProviderIsResolvedOnlyOnce(self) -> None:
+        """
+        Run a deferred provider once even when its service is built twice.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        await self._container.build(_NeedsDeferredDep)
+        await self._container.build(_NeedsDeferredDep)
+
+        self.assertEqual(_DependencyProvider.register_calls, 1)
+
+    async def testConcurrentResolutionsRunTheDeferredProviderOnce(
+        self,
+    ) -> None:
+        """
+        Bootstrap a deferred provider once under concurrent first resolution.
+
+        Registering a provider spans several await points, so without
+        serialisation every racing task would run ``register()`` again and the
+        duplicate binding would raise.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        results = await asyncio.gather(
+            *(self._container.build(_NeedsDeferredDep)
+              for _ in range(_CONCURRENT_TASKS)),
+        )
+
+        self.assertEqual(len(results), _CONCURRENT_TASKS)
+        self.assertEqual(_DependencyProvider.register_calls, 1)
+
+# ===========================================================================
+# Concurrency guarantees
+# ===========================================================================
+
+class TestContainerConcurrentResolution(_ScopelessTestCase):
+
+    def setUp(self) -> None:
+        """Bind a suspending request double and reset the build counters."""
+        super().setUp()
+        self._container = _fresh()
+        self._container.instance(Request, _SlowRequest())
+        _SuspendingSingleton.constructions = 0
+        _SuspendingScoped.constructions = 0
+
+    async def testConcurrentSingletonResolutionsShareOneInstance(self) -> None:
+        """
+        Build a singleton once when several tasks resolve it simultaneously.
+
+        The construction path suspends while validating the request body, so
+        the singleton cache is still empty when every task reaches it.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self._container.singleton(None, _SuspendingSingleton)
+
+        results = await asyncio.gather(
+            *(self._container.make(_SuspendingSingleton)
+              for _ in range(_CONCURRENT_TASKS)),
+        )
+
+        self.assertEqual(len({id(item) for item in results}), 1)
+        self.assertEqual(_SuspendingSingleton.constructions, 1)
+
+    async def testConcurrentScopedResolutionsShareOneInstance(self) -> None:
+        """
+        Build a scoped service once when several tasks share one scope.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self._container.scoped(None, _SuspendingScoped)
+
+        async with self._container.beginScope():
+            results = await asyncio.gather(
+                *(self._container.make(_SuspendingScoped)
+                  for _ in range(_CONCURRENT_TASKS)),
+            )
+
+        self.assertEqual(len({id(item) for item in results}), 1)
+        self.assertEqual(_SuspendingScoped.constructions, 1)
+
+    async def testSeparateScopesStillGetTheirOwnInstance(self) -> None:
+        """
+        Keep one instance per scope even though the lock is shared by key.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self._container.scoped(None, _SuspendingScoped)
+
+        async def resolve() -> object:
+            async with self._container.beginScope():
+                return await self._container.make(_SuspendingScoped)
+
+        first, second = await asyncio.gather(resolve(), resolve())
+
+        self.assertIsNot(first, second)
+        self.assertEqual(_SuspendingScoped.constructions, 2)
+
+    async def testSingletonCycleRaisesInsteadOfDeadlocking(self) -> None:
+        """
+        Report a cycle between singletons instead of blocking on the lock.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        c.singleton(None, _CircA)
+        c.singleton(None, _CircB)
+
+        with self.assertRaises(CircularDependencyException):
+            await asyncio.wait_for(c.make(_CircB), timeout=_CYCLE_TIMEOUT)
+
+    async def testScopedCycleRaisesInsteadOfDeadlocking(self) -> None:
+        """
+        Report a cycle between scoped services instead of blocking.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        c.scoped(None, _CircA)
+        c.scoped(None, _CircB)
+
+        async with c.beginScope():
+            with self.assertRaises(CircularDependencyException):
+                await asyncio.wait_for(c.make(_CircB), timeout=_CYCLE_TIMEOUT)
+
+    async def testNestedSingletonChainResolvesWithoutDeadlock(self) -> None:
+        """
+        Resolve a chain of singletons that depend on one another.
+
+        Each level takes the creation lock of a different contract, so the
+        nested construction must complete instead of blocking.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        c.singleton(None, _Plain)
+        c.singleton(None, _NeedsPlain)
+
+        instance = await asyncio.wait_for(
+            c.make(_NeedsPlain), timeout=_CYCLE_TIMEOUT,
+        )
+
+        self.assertIs(instance.dep, await c.make(_Plain))
+
+class TestContainerCreationLocks(_ScopelessTestCase):
+
+    async def testLockIsReusedForTheSameKeyOnTheSameLoop(self) -> None:
+        """
+        Return the identical lock for repeated requests on one loop.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+
+        self.assertIs(
+            c._Container__creationLock(_Plain),
+            c._Container__creationLock(_Plain),
+        )
+
+    def testLockIsRebuiltForADifferentEventLoop(self) -> None:
+        """
+        Replace the cached lock when the running loop is a different one.
+
+        An ``asyncio.Lock`` binds to the loop that first awaits it, so reusing
+        it from another loop would fail.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        first, second = _locks_from_two_loops(_fresh())
+
+        self.assertIsNotNone(first)
+        self.assertIsNot(first, second)
+
+class TestContainerThreadSafety(_ScopelessTestCase):
+
+    def testSingletonCreationIsThreadSafe(self) -> None:
+        """
+        Return one instance when many OS threads construct the same subclass.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        class _Threaded(Container):
+            pass
+
+        barrier = threading.Barrier(_CONCURRENT_THREADS)
+        seen: list[Container] = []
+        guard = threading.Lock()
+
+        def build() -> None:
+            barrier.wait()
+            instance = _Threaded()
+            with guard:
+                seen.append(instance)
+
+        threads = [
+            threading.Thread(target=build)
+            for _ in range(_CONCURRENT_THREADS)
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+        try:
+            self.assertEqual(len(seen), _CONCURRENT_THREADS)
+            self.assertEqual(len({id(item) for item in seen}), 1)
+        finally:
+            Container._instances.pop(_Threaded, None)
+
+# ===========================================================================
+# invoke()
+# ===========================================================================
+
+class TestContainerInvoke(_ScopelessTestCase):
 
     async def testInvokeSyncFunctionReturnsResult(self) -> None:
         """
-        Test that invoke() executes a plain synchronous function and returns its result.
+        Execute a plain synchronous function and return its result.
 
         Returns
         -------
@@ -826,7 +1883,7 @@ class TestContainerInvoke(TestCase):
 
     async def testInvokeAsyncFunctionReturnsResult(self) -> None:
         """
-        Test that invoke() awaits an async function and returns the correct result.
+        Await a dependency-free coroutine function and return its result.
 
         Returns
         -------
@@ -838,7 +1895,7 @@ class TestContainerInvoke(TestCase):
 
     async def testInvokeFunctionInjectedDependency(self) -> None:
         """
-        Test that invoke() resolves and injects a _Plain dependency into _fn_with_dep.
+        Inject a dependency into a synchronous function and return it.
 
         Returns
         -------
@@ -846,12 +1903,23 @@ class TestContainerInvoke(TestCase):
             This method does not return a value.
         """
         c = _fresh()
-        result = await c.invoke(_fn_with_dep)
-        self.assertIsInstance(result, _Plain)
+        self.assertIsInstance(await c.invoke(_fn_with_dep), _Plain)
+
+    async def testInvokeAsyncFunctionInjectedDependency(self) -> None:
+        """
+        Inject a dependency into a coroutine function and await the result.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        self.assertIsInstance(await c.invoke(_afn_with_dep), _Plain)
 
     async def testInvokeClassRaisesTypeError(self) -> None:
         """
-        Test that passing a class type to invoke() raises TypeError.
+        Raise TypeError when invoke() receives a class type.
 
         Returns
         -------
@@ -862,15 +1930,28 @@ class TestContainerInvoke(TestCase):
         with self.assertRaises(TypeError):
             await c.invoke(_Plain)  # type: ignore[arg-type]
 
+    async def testInvokeNonCallableRaisesTypeError(self) -> None:
+        """
+        Raise TypeError when invoke() receives a non-callable object.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        with self.assertRaises(TypeError):
+            await c.invoke(_NOT_A_CLASS)  # type: ignore[arg-type]
+
 # ===========================================================================
-# call()  # noqa: ERA001
+# call()
 # ===========================================================================
 
-class TestContainerCall(TestCase):
+class TestContainerCall(_ScopelessTestCase):
 
     async def testCallMethodReturnsCorrectResult(self) -> None:
         """
-        Test that call() dispatches to the named method and returns its value.
+        Dispatch to the named method and return its value.
 
         Returns
         -------
@@ -895,7 +1976,7 @@ class TestContainerCall(TestCase):
 
     async def testCallNonCallableAttributeRaisesTypeError(self) -> None:
         """
-        Test that call() raises TypeError when the named attribute is not callable.
+        Raise TypeError when the named attribute is not callable.
 
         Returns
         -------
@@ -908,7 +1989,7 @@ class TestContainerCall(TestCase):
 
     async def testCallMethodWithInjectedDependency(self) -> None:
         """
-        Inject _Plain into _Host.echo() which declares it as a parameter.
+        Inject a declared dependency into the dispatched method.
 
         Returns
         -------
@@ -916,20 +1997,20 @@ class TestContainerCall(TestCase):
             This method does not return a value.
         """
         c = _fresh()
-        result = await c.call(_Host(), "echo")
-        self.assertIsInstance(result, _Plain)
+        self.assertIsInstance(await c.call(_Host(), "echo"), _Plain)
 
 # ===========================================================================
 # Circular dependency detection
 # ===========================================================================
 
-class TestContainerCircularDependency(TestCase):
+class TestContainerCircularDependency(_ScopelessTestCase):
 
     async def testCircularDependencyRaisesException(self) -> None:
         """
-        Raise CircularDependencyException for mutually dependent class resolution.
+        Raise CircularDependencyException for mutually dependent classes.
 
-        _CircA → _CircB → _CircA forms a cycle that the container must detect.
+        The pair _CircA to _CircB to _CircA forms a cycle the container must
+        detect while resolving constructor dependencies.
 
         Returns
         -------
@@ -942,26 +2023,132 @@ class TestContainerCircularDependency(TestCase):
         with self.assertRaises(CircularDependencyException):
             await c.make(_CircB)
 
-    async def testCircularDependencyExceptionIsSubclassOfException(self) -> None:
+    async def testResolutionStackIsRestoredAfterAFailure(self) -> None:
         """
-        Test that CircularDependencyException is a subclass of the built-in Exception.
+        Restore the resolution stack after a circular dependency failure.
+
+        Validates that a later, acyclic resolution still succeeds once the
+        failing one has unwound.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        self.assertTrue(issubclass(CircularDependencyException, Exception))
+        c = _fresh()
+        c.transient(None, _CircA)
+        c.transient(None, _CircB)
+        with self.assertRaises(CircularDependencyException):
+            await c.make(_CircB)
+        self.assertIsInstance(await c.make(_Plain), _Plain)
+
+# ===========================================================================
+# Defensive resolution branches
+# ===========================================================================
+
+class TestContainerLifetimeResolution(_ScopelessTestCase):
+
+    async def testSingletonBindingReturnsTheInstanceAlreadyCached(
+        self,
+    ) -> None:
+        """
+        Return the cached singleton without taking the creation lock.
+
+        Validates the fast check that runs before the lock is acquired.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        cached = _Plain()
+        c.instance(None, cached)
+        binding = Binding(
+            contract=_Plain,
+            concrete=_Plain,
+            lifetime=Lifetime.SINGLETON,
+        )
+
+        self.assertIs(await c._Container__resolve(binding), cached)
+
+    async def testScopedBindingReturnsTheInstanceCachedInTheScope(
+        self,
+    ) -> None:
+        """
+        Return the cached scope entry when resolving a scoped binding.
+
+        Validates the defensive scope lookup performed while a binding with
+        SCOPED lifetime is resolved.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        binding = Binding(
+            contract=_Plain,
+            concrete=_Plain,
+            lifetime=Lifetime.SCOPED,
+        )
+        cached = _Plain()
+        async with c.beginScope() as scope:
+            scope[_Plain] = cached
+            resolved = await c._Container__resolve(binding)
+        self.assertIs(resolved, cached)
+
+    async def testUnknownLifetimeResolvesToNone(self) -> None:
+        """
+        Return None for a binding whose lifetime is outside the enum.
+
+        Validates the defensive fallback that closes the lifetime dispatch.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        resolved = await c._Container__resolve(_UnknownLifetimeBinding())
+        self.assertIsNone(resolved)
+
+class TestContainerArgumentResolution(_ScopelessTestCase):
+
+    async def testUnresolvedNonBuiltinArgumentRaisesTypeError(self) -> None:
+        """
+        Raise TypeError for an unresolved argument outside builtins.
+
+        Validates the branch asking the caller to register the dependency or
+        declare a default value.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        argument = Argument(
+            name="dep",
+            resolved=False,
+            module_name=_Plain.__module__,
+            class_name=_Plain.__name__,
+            type=_Plain,
+            full_class_path=f"{_Plain.__module__}.{_Plain.__name__}",
+        )
+        with self.assertRaises(TypeError) as ctx:
+            await c._Container__resolveArgument(argument)
+        self.assertIn("register the dependency", str(ctx.exception))
 
 # ===========================================================================
 # Scope management: beginScope() / getCurrentScope()
 # ===========================================================================
 
-class TestContainerScopeManagement(TestCase):
+class TestContainerScopeManagement(_ScopelessTestCase):
 
     def testBeginScopeReturnsScopeManager(self) -> None:
         """
-        Test that beginScope() returns a ScopeManager instance.
+        Return a ScopeManager instance from beginScope().
 
         Returns
         -------
@@ -972,42 +2159,18 @@ class TestContainerScopeManagement(TestCase):
 
     def testGetCurrentScopeReturnsNoneOutsideScope(self) -> None:
         """
-        Test that getCurrentScope() returns None when no scope is active.
-
-        The test runner keeps a reactor scope active during execution, so this
-        test temporarily clears the ContextVar to isolate the assertion.
+        Return None from getCurrentScope() when no scope is active.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        token = ScopedContext.setCurrentScope(None)
-        try:
-            self.assertIsNone(_fresh().getCurrentScope())
-        finally:
-            ScopedContext.reset(token)
+        self.assertIsNone(_fresh().getCurrentScope())
 
     async def testGetCurrentScopeReturnsActiveObjectInsideScope(self) -> None:
         """
-        Return a non-None scope object while inside an active scope.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        c = _fresh()
-        async with c.beginScope():
-            self.assertIsNotNone(c.getCurrentScope())
-
-    async def testGetCurrentScopeReturnsNoneAfterScopeExits(self) -> None:
-        """
-        Verify the nested scope is no longer active after its block exits.
-
-        The reactor scope is always active, so this test verifies that after the
-        nested scope terminates, the active scope is no longer that nested scope
-        manager (it reverts to the outer reactor scope).
+        Return the active scope manager while inside an open scope.
 
         Returns
         -------
@@ -1017,17 +2180,27 @@ class TestContainerScopeManagement(TestCase):
         c = _fresh()
         async with c.beginScope() as nested:
             self.assertIs(c.getCurrentScope(), nested)
-        # After exit the nested scope is no longer the active context.
-        self.assertIsNot(c.getCurrentScope(), nested)
+
+    async def testGetCurrentScopeDropsTheScopeAfterItExits(self) -> None:
+        """
+        Drop the nested scope from the context once its block exits.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        c = _fresh()
+        async with c.beginScope() as nested:
+            self.assertIs(c.getCurrentScope(), nested)
+        self.assertIsNone(c.getCurrentScope())
 
     async def testScopedInstanceIsNotVisibleOutsideScope(self) -> None:
         """
-        Verify a scoped instance is cleared after the scope block exits.
+        Clear the scoped instance once the surrounding scope block exits.
 
-        After the nested scope exits the reactor scope is restored.  The scoped binding
-        still exists globally, but without any scope that owns the cached instance the
-        container must raise RuntimeError.  The reactor scope is temporarily cleared
-        via a ContextVar token to simulate the no-scope condition.
+        The scoped binding survives globally, but with no owning scope the
+        container must raise RuntimeError again.
 
         Returns
         -------
@@ -1037,13 +2210,6 @@ class TestContainerScopeManagement(TestCase):
         c = _fresh()
         c.scoped(None, _Plain)
         async with c.beginScope():
-            instance_inside = await c.make(_Plain)
-            self.assertIsInstance(instance_inside, _Plain)
-        # After the nested scope exits, temporarily clear the reactor scope so that
-        # the scoped resolution fails as expected.
-        token = ScopedContext.setCurrentScope(None)
-        try:
-            with self.assertRaises(RuntimeError):
-                await c.make(_Plain)
-        finally:
-            ScopedContext.reset(token)
+            self.assertIsInstance(await c.make(_Plain), _Plain)
+        with self.assertRaises(RuntimeError):
+            await c.make(_Plain)

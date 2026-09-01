@@ -3,7 +3,7 @@ import re
 from re import Pattern
 from typing import TYPE_CHECKING, Final
 from orionis.foundation.config.http.entitites.cors import Cors
-from orionis.http.response import Response
+from orionis.http.responses import Response
 
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter

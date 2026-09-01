@@ -1,168 +1,155 @@
-from __future__ import annotations
-
 import inspect
-
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
+from orionis.encrypter import provider as provider_module
 from orionis.encrypter.contracts.encrypter import IEncrypter
 from orionis.encrypter.encrypter import Encrypter
 from orionis.encrypter.provider import EncrypterProvider
+from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.test import TestCase
 
 
-# ---------------------------------------------------------------------------
-# Module-level stub application
-# ---------------------------------------------------------------------------
+class _StubApp:
+    """Application double capturing every binding it receives."""
 
-
-class _FakeApp:
-    """Minimal application stub for EncrypterProvider registration tests."""
+    __slots__ = ("singletons",)
 
     def __init__(self) -> None:
         self.singletons: list[tuple[object, object]] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
-        """Record a singleton binding."""
+        """
+        Record a singleton binding.
+
+        Parameters
+        ----------
+        abstract : object
+            Contract used as the binding key.
+        concrete : object
+            Implementation bound to the contract.
+
+        Returns
+        -------
+        None
+        """
         self.singletons.append((abstract, concrete))
 
 
-# ===========================================================================
-# EncrypterProvider
-# ===========================================================================
+class _StubCryptFacade:
+    """Facade double counting how many times it was pinned."""
 
+    __slots__ = ("pinned",)
 
-class TestEncrypterProviderInheritance(TestCase):
+    def __init__(self) -> None:
+        self.pinned = 0
 
-    def testInheritsServiceProvider(self) -> None:
+    async def pin(self) -> None:
         """
-        Verify EncrypterProvider inherits from ServiceProvider.
+        Count a pin invocation.
 
         Returns
         -------
         None
-            This method does not return a value.
+        """
+        self.pinned += 1
+
+
+class TestEncrypterProviderDefinition(TestCase):
+
+    def testInheritsTheServiceProviderBase(self) -> None:
+        """
+        Extend the base ServiceProvider class.
+
+        Validates the provider class hierarchy.
         """
         self.assertTrue(issubclass(EncrypterProvider, ServiceProvider))
 
-    def testInheritsDeferrableProvider(self) -> None:
+    def testIsNotDeferred(self) -> None:
         """
-        Verify EncrypterProvider inherits from DeferrableProvider.
+        Stay out of the deferred provider mechanism.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the requirement imposed by the synchronous API: a deferred
+        provider would leave the Crypt facade unpinned, so the first call of
+        a synchronous consumer would receive a dispatcher instead of a value.
         """
-        self.assertTrue(issubclass(EncrypterProvider, DeferrableProvider))
+        self.assertFalse(issubclass(EncrypterProvider, DeferrableProvider))
 
-    def testAppAttributeIsStoredOnInit(self) -> None:
+    def testIsRegisteredAsACoreProvider(self) -> None:
         """
-        Verify the application reference is stored after initialization.
+        Ship with the core providers booted by the framework.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that IEncrypter is bound without the application having to
+        register anything by hand.
         """
-        app = _FakeApp()
-        provider = EncrypterProvider(app)  # type: ignore[arg-type]
-        self.assertIs(provider.app, app)
+        self.assertIn(EncrypterProvider, CORE_PROVIDERS)
 
-
-class TestEncrypterProviderProvides(TestCase):
-
-    def testProvidesReturnsListType(self) -> None:
+    def testStoresTheApplicationReference(self) -> None:
         """
-        Verify provides() returns a list.
+        Keep the container passed to the constructor.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the container the provider binds services into.
         """
-        result = EncrypterProvider.provides()
-        self.assertIsInstance(result, list)
+        app = _StubApp()
+        self.assertIs(EncrypterProvider(app).app, app)
 
-    def testProvidesContainsIEncrypter(self) -> None:
+    def testBootIsDeclaredAsynchronous(self) -> None:
         """
-        Verify provides() returns a list that includes IEncrypter.
+        Declare the boot phase as an asynchronous method.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates that boot can await the facade pinning.
         """
-        self.assertIn(IEncrypter, EncrypterProvider.provides())
-
-    def testProvidesReturnsSingleElement(self) -> None:
-        """
-        Verify provides() returns exactly one service type.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertEqual(len(EncrypterProvider.provides()), 1)
-
-    def testProvidesIsCallableAsClassMethod(self) -> None:
-        """
-        Verify provides() can be called on the class without instantiation.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        result = EncrypterProvider.provides()
-        self.assertIsNotNone(result)
+        self.assertTrue(inspect.iscoroutinefunction(EncrypterProvider.boot))
 
 
 class TestEncrypterProviderRegister(TestCase):
 
-    def testRegisterBindsIEncrypterToEncrypterSingleton(self) -> None:
+    def testRegisterBindsTheEncrypterAsASingleton(self) -> None:
         """
-        Verify register() binds IEncrypter to Encrypter as a singleton.
+        Bind IEncrypter to the concrete Encrypter implementation.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Validates the contract resolved by the Crypt facade.
         """
-        app = _FakeApp()
-        provider = EncrypterProvider(app)  # type: ignore[arg-type]
-        provider.register()
-        self.assertEqual(len(app.singletons), 1)
-        abstract, concrete = app.singletons[0]
-        self.assertIs(abstract, IEncrypter)
-        self.assertIs(concrete, Encrypter)
-
-    def testRegisterCallsAppSingletonOnce(self) -> None:
-        """
-        Verify register() invokes app.singleton exactly once.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        app = _FakeApp()
-        provider = EncrypterProvider(app)  # type: ignore[arg-type]
-        provider.register()
-        self.assertEqual(len(app.singletons), 1)
+        app = _StubApp()
+        EncrypterProvider(app).register()
+        self.assertEqual(app.singletons, [(IEncrypter, Encrypter)])
 
 
 class TestEncrypterProviderBoot(TestCase):
 
-    def testBootIsAsyncCoroutineFunction(self) -> None:
+    def setUp(self) -> None:
         """
-        Verify boot() is declared as an async coroutine function.
+        Replace the Crypt facade with a double before each test.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
+        Prevents the boot phase from pinning the real facade, which would
+        require a fully booted application.
         """
-        app = _FakeApp()
-        provider = EncrypterProvider(app)  # type: ignore[arg-type]
-        self.assertTrue(inspect.iscoroutinefunction(provider.boot))
+        self._original_facade = provider_module.CryptFacade
+        self._facade = _StubCryptFacade()
+        provider_module.CryptFacade = self._facade
+        self._app = _StubApp()
+
+    def tearDown(self) -> None:
+        """
+        Restore the original Crypt facade after each test.
+
+        Guarantees that module-level state never leaks between tests.
+        """
+        provider_module.CryptFacade = self._original_facade
+
+    async def testBootPinsTheCryptFacade(self) -> None:
+        """
+        Pin the Crypt facade once the services are registered.
+
+        Validates that facade access skips container resolution.
+        """
+        await EncrypterProvider(self._app).boot()
+        self.assertEqual(self._facade.pinned, 1)
+
+    async def testBootRegistersNoAdditionalBinding(self) -> None:
+        """
+        Keep the boot phase free of container registrations.
+
+        Validates the separation between register() and boot().
+        """
+        await EncrypterProvider(self._app).boot()
+        self.assertEqual(self._app.singletons, [])

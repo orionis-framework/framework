@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.filesystems.entitites.disks import Disks
 from orionis.foundation.config.filesystems.enums.disk_name import DiskName
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozenset of valid disk names for O(1) membership checks

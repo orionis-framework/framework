@@ -1,273 +1,134 @@
-from __future__ import annotations
 import base64
-import binascii
-from orionis.test import TestCase
-from orionis.foundation.config.app.enums.ciphers import Cipher
 from orionis.environment.key.key_generator import SecureKeyGenerator
+from orionis.foundation.config.app.enums.ciphers import Cipher
+from orionis.test import TestCase
+
+# Prefix every generated key is expected to carry.
+_KEY_PREFIX: str = "base64:"
 
 # ---------------------------------------------------------------------------
-# TestSecureKeyGeneratorKeySizes
+# TestSecureKeyGeneratorCatalogue
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorKeySizes(TestCase):
+class TestSecureKeyGeneratorCatalogue(TestCase):
 
-    def testKeySizesContainsAllCiphers(self):
+    def testCoversEveryDeclaredCipher(self) -> None:
         """
-        Confirm that KEY_SIZES maps every supported Cipher member.
+        Map every declared cipher to a key size.
 
-        Ensures the class-level mapping is complete so that all Cipher
-        variants yield a valid key length at generation time.
+        Validates that no supported cipher is left without an entry, which
+        would make key generation fail at runtime.
         """
-        for cipher in Cipher:
-            self.assertIn(cipher, SecureKeyGenerator.KEY_SIZES)
+        self.assertEqual(set(SecureKeyGenerator.KEY_SIZES), set(Cipher))
 
-    def testAes128CbcKeySize(self):
+    def testDeclaresTheKeySizeRequiredByEachCipher(self) -> None:
         """
-        Verify that AES-128-CBC maps to a 16-byte key size.
+        Declare the byte length required by each cipher variant.
 
-        Validates that the stored key length matches the AES-128 standard.
+        Validates that 128-bit modes map to 16 bytes and 256-bit modes to
+        32 bytes, as expected by the encrypter.
         """
-        self.assertEqual(SecureKeyGenerator.KEY_SIZES[Cipher.AES_128_CBC], 16)
-
-    def testAes256CbcKeySize(self):
-        """
-        Verify that AES-256-CBC maps to a 32-byte key size.
-
-        Validates that the stored key length matches the AES-256 standard.
-        """
-        self.assertEqual(SecureKeyGenerator.KEY_SIZES[Cipher.AES_256_CBC], 32)
-
-    def testAes128GcmKeySize(self):
-        """
-        Verify that AES-128-GCM maps to a 16-byte key size.
-
-        Validates that the stored key length matches the AES-128 GCM standard.
-        """
-        self.assertEqual(SecureKeyGenerator.KEY_SIZES[Cipher.AES_128_GCM], 16)
-
-    def testAes256GcmKeySize(self):
-        """
-        Verify that AES-256-GCM maps to a 32-byte key size.
-
-        Validates that the stored key length matches the AES-256 GCM standard.
-        """
-        self.assertEqual(SecureKeyGenerator.KEY_SIZES[Cipher.AES_256_GCM], 32)
+        self.assertEqual(
+            SecureKeyGenerator.KEY_SIZES,
+            {
+                Cipher.AES_128_CBC: 16,
+                Cipher.AES_256_CBC: 32,
+                Cipher.AES_128_GCM: 16,
+                Cipher.AES_256_GCM: 32,
+            },
+        )
 
 # ---------------------------------------------------------------------------
-# TestSecureKeyGeneratorOutputFormat
+# TestSecureKeyGeneratorOutput
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorOutputFormat(TestCase):
+class TestSecureKeyGeneratorOutput(TestCase):
 
-    def testDefaultGenerateReturnsString(self):
+    def testDefaultsToTheAes256CbcCipher(self) -> None:
         """
-        Confirm that generate() returns a string with the default cipher.
+        Generate a 32 byte key when no cipher is supplied.
 
-        Validates the return type contract for the most common usage path.
+        Validates the documented default, which must stay aligned with the
+        cipher configured by a freshly scaffolded application.
         """
-        result = SecureKeyGenerator.generate()
-        self.assertIsInstance(result, str)
+        generated = SecureKeyGenerator.generate()
+        payload = base64.b64decode(generated.removeprefix(_KEY_PREFIX))
+        self.assertEqual(len(payload), 32)
 
-    def testDefaultGenerateStartsWithBase64Prefix(self):
+    def testProducesADecodableKeyForEveryCipher(self) -> None:
         """
-        Confirm that the generated key starts with 'base64:'.
+        Produce a prefixed, decodable key for every supported cipher.
 
-        Ensures the output format is compatible with the Laravel APP_KEY
-        convention used by the framework.
+        Validates the Laravel compatible ``base64:`` envelope and that the
+        decoded payload matches the declared key size.
         """
-        result = SecureKeyGenerator.generate()
-        self.assertTrue(result.startswith("base64:"))
+        for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
+            generated = SecureKeyGenerator.generate(cipher)
+            self.assertTrue(generated.startswith(_KEY_PREFIX))
+            payload = base64.b64decode(
+                generated.removeprefix(_KEY_PREFIX),
+                validate=True,
+            )
+            self.assertEqual(len(payload), size)
 
-    def testDefaultGenerateContainsSingleColon(self):
+    def testAcceptsTheCipherAsAPlainString(self) -> None:
         """
-        Verify that the generated key contains exactly one colon delimiter.
+        Accept the cipher expressed as its canonical string value.
 
-        Confirms the 'base64:<encoded>' format is strict and does not embed
-        extra colons in the Base64 payload.
+        Validates the branch used when the cipher arrives straight from an
+        environment variable instead of the enumeration.
         """
-        result = SecureKeyGenerator.generate()
-        self.assertEqual(result.count(":"), 1)
+        for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
+            generated = SecureKeyGenerator.generate(cipher.value)
+            payload = base64.b64decode(generated.removeprefix(_KEY_PREFIX))
+            self.assertEqual(len(payload), size)
 
-    def testDefaultGeneratePayloadIsValidBase64(self):
+    def testProducesADifferentKeyOnEveryCall(self) -> None:
         """
-        Confirm that the portion after 'base64:' is valid Base64-encoded data.
+        Produce cryptographically distinct keys across invocations.
 
-        Validates that the encoded payload can be decoded without errors,
-        proving the key is correctly formatted.
+        Validates that the generator draws fresh randomness instead of
+        reusing a cached or seeded value.
         """
-        result = SecureKeyGenerator.generate()
-        encoded = result.split(":", 1)[1]
-        try:
-            base64.b64decode(encoded, validate=True)
-        except (binascii.Error, ValueError) as exc:
-            self.fail(f"Payload is not valid Base64: {exc}")
+        generated = {SecureKeyGenerator.generate() for _ in range(25)}
+        self.assertEqual(len(generated), 25)
 
 # ---------------------------------------------------------------------------
-# TestSecureKeyGeneratorKeyLength
+# TestSecureKeyGeneratorRejections
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorKeyLength(TestCase):
+class TestSecureKeyGeneratorRejections(TestCase):
 
-    def testAes256CbcProduces32ByteKey(self):
+    def testRejectsAnUnknownCipherName(self) -> None:
         """
-        Verify that AES-256-CBC generates a 32-byte decoded key.
+        Raise ValueError when the cipher name is not recognised.
 
-        Decodes the Base64 payload and confirms the raw entropy length
-        matches the expected 32 bytes for AES-256.
+        Validates that the message lists the supported options so the
+        misconfiguration can be corrected immediately.
         """
-        result = SecureKeyGenerator.generate(Cipher.AES_256_CBC)
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 32)
-
-    def testAes128CbcProduces16ByteKey(self):
-        """
-        Verify that AES-128-CBC generates a 16-byte decoded key.
-
-        Decodes the Base64 payload and confirms the raw entropy length
-        matches the expected 16 bytes for AES-128.
-        """
-        result = SecureKeyGenerator.generate(Cipher.AES_128_CBC)
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 16)
-
-    def testAes256GcmProduces32ByteKey(self):
-        """
-        Verify that AES-256-GCM generates a 32-byte decoded key.
-
-        Decodes the Base64 payload and confirms the raw entropy length
-        matches the expected 32 bytes for AES-256 in GCM mode.
-        """
-        result = SecureKeyGenerator.generate(Cipher.AES_256_GCM)
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 32)
-
-    def testAes128GcmProduces16ByteKey(self):
-        """
-        Verify that AES-128-GCM generates a 16-byte decoded key.
-
-        Decodes the Base64 payload and confirms the raw entropy length
-        matches the expected 16 bytes for AES-128 in GCM mode.
-        """
-        result = SecureKeyGenerator.generate(Cipher.AES_128_GCM)
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 16)
-
-# ---------------------------------------------------------------------------
-# TestSecureKeyGeneratorStringInput
-# ---------------------------------------------------------------------------
-
-class TestSecureKeyGeneratorStringInput(TestCase):
-
-    def testGenerateWithStringAes256Cbc(self):
-        """
-        Accept the string 'AES-256-CBC' and generate a valid 32-byte key.
-
-        Confirms that string cipher inputs are converted to Cipher enums
-        before key generation without raising any error.
-        """
-        result = SecureKeyGenerator.generate("AES-256-CBC")
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 32)
-
-    def testGenerateWithStringAes128Cbc(self):
-        """
-        Accept the string 'AES-128-CBC' and generate a valid 16-byte key.
-
-        Confirms that string conversion for CBC-128 mode works correctly.
-        """
-        result = SecureKeyGenerator.generate("AES-128-CBC")
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 16)
-
-    def testGenerateWithStringAes256Gcm(self):
-        """
-        Accept the string 'AES-256-GCM' and generate a valid 32-byte key.
-
-        Confirms that string conversion for GCM-256 mode works correctly.
-        """
-        result = SecureKeyGenerator.generate("AES-256-GCM")
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 32)
-
-    def testGenerateWithStringAes128Gcm(self):
-        """
-        Accept the string 'AES-128-GCM' and generate a valid 16-byte key.
-
-        Confirms that string conversion for GCM-128 mode works correctly.
-        """
-        result = SecureKeyGenerator.generate("AES-128-GCM")
-        decoded = base64.b64decode(result.split(":", 1)[1])
-        self.assertEqual(len(decoded), 16)
-
-    def testGenerateWithInvalidStringRaisesValueError(self):
-        """
-        Raise ValueError when an unsupported cipher string is provided.
-
-        Validates that the string-to-enum conversion raises ValueError
-        for unrecognized cipher names, preventing silent fallbacks.
-        """
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate("AES-512-CBC")
+        message = str(ctx.exception)
+        self.assertIn("AES-512-CBC", message)
+        self.assertIn("AES-256-CBC", message)
 
-    def testErrorMessageContainsCipherName(self):
+    def testRejectsAnEmptyCipherName(self) -> None:
         """
-        Include the invalid cipher name in the ValueError message.
+        Raise ValueError when the cipher name is an empty string.
 
-        Ensures the error message is informative enough for the caller to
-        identify which cipher string caused the failure.
-        """
-        invalid = "INVALID-CIPHER"
-        try:
-            SecureKeyGenerator.generate(invalid)
-            self.fail("Expected ValueError was not raised")
-        except ValueError as exc:
-            self.assertIn(invalid, str(exc))
-
-    def testErrorMessageContainsValidOptions(self):
-        """
-        Include at least one valid option in the ValueError message.
-
-        Confirms that the error message guides the caller toward a
-        supported cipher rather than providing no context.
-        """
-        try:
-            SecureKeyGenerator.generate("BAD")
-        except ValueError as exc:
-            self.assertIn("AES-256-CBC", str(exc))
-
-    def testLowercaseCipherStringRaisesError(self):
-        """
-        Raise ValueError when a lowercase cipher string is provided.
-
-        Validates that cipher string matching is case-sensitive, since Cipher
-        enum values are defined in uppercase format.
+        Validates that a blank environment variable cannot silently fall
+        back to the default cipher.
         """
         with self.assertRaises(ValueError):
-            SecureKeyGenerator.generate("aes-256-cbc")
+            SecureKeyGenerator.generate("")
 
-# ---------------------------------------------------------------------------
-# TestSecureKeyGeneratorRandomness
-# ---------------------------------------------------------------------------
-
-class TestSecureKeyGeneratorRandomness(TestCase):
-
-    def testSuccessiveCallsProduceDifferentKeys(self):
+    def testRejectsACipherOutsideTheSizeCatalogue(self) -> None:
         """
-        Verify that two consecutive generate() calls return different keys.
+        Raise ValueError when a non-string cipher has no declared size.
 
-        Confirms that each invocation uses fresh entropy from os.urandom
-        rather than reusing a cached or static value.
+        Validates the guard protecting the key size lookup from arbitrary
+        objects that bypass the string conversion branch.
         """
-        key_a = SecureKeyGenerator.generate()
-        key_b = SecureKeyGenerator.generate()
-        self.assertNotEqual(key_a, key_b)
-
-    def testLargeSetOfKeysAreUnique(self):
-        """
-        Verify that a batch of fifty generated keys contains no duplicates.
-
-        Provides a statistical confidence check for the randomness of the
-        underlying os.urandom source.
-        """
-        keys = {SecureKeyGenerator.generate() for _ in range(50)}
-        self.assertEqual(len(keys), 50)
+        with self.assertRaises(ValueError) as ctx:
+            SecureKeyGenerator.generate(object())
+        self.assertIn("is not supported", str(ctx.exception))

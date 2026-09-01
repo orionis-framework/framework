@@ -1,126 +1,447 @@
-# `orionis.container` — Contenedor de Inyección de Dependencias
+# orionis.container
 
-El contenedor central de Inversión de Control (IoC) del framework Orionis: registro de servicios (transient, singleton, scoped, instance), inyección automática de dependencias en constructores/callables mediante reflexión, ciclos de vida con alcance (scope) para unidades de trabajo tipo "request", proveedores de servicio diferidos (deferred) y el patrón `Facade` de proxy estático usado en todo el framework (`Log`, `Crypt`, `DB`, etc.).
+> Contenedor de servicios async-first: bindings, ciclos de vida, scopes, autowiring, service providers y facades.
 
 ## Tabla de contenidos
 
-- [Requisitos](#requisitos)
-- [Descripción general del módulo](#descripción-general-del-módulo)
-- [Arquitectura](#arquitectura)
+- [Descripción funcional](#descripción-funcional)
+  - [Dónde encaja](#dónde-encaja)
+  - [Pipeline de resolución](#pipeline-de-resolución)
+  - [Orden de resolución de argumentos](#orden-de-resolución-de-argumentos)
+  - [Mapa de archivos](#mapa-de-archivos)
+  - [Decisiones de diseño](#decisiones-de-diseño)
 - [Referencia de API](#referencia-de-api)
-  - [`Container`](#container-orioniscontainercontainercontainer)
-  - [`IContainer` (contrato)](#icontainer-orioniscontainercontractscontainericontainer)
-  - [`Binding`](#binding-orioniscontainerentitiesbindingbinding)
-  - [`Lifetime`](#lifetime-orioniscontainerenumslifetimeslifetime)
-  - [`CircularDependencyException`](#circulardependencyexception-orioniscontainerexceptionscontainercirculardependencyexception)
-  - [`ScopeManager` / `ScopedContext`](#scopemanager--scopedcontext-orioniscontainercontext)
-  - [`ServiceProvider` / `IServiceProvider`](#serviceprovider--iserviceprovider)
-  - [`DeferrableProvider` / `IDeferrableProvider`](#deferrableprovider--ideferrableprovider)
-  - [`Facade` / `FacadeMeta` / `IFacade`](#facade--facademeta--ifacade)
+  - [`Container`](#container)
+    - [`Container.instance()`](#containerinstance)
+    - [`Container.transient()`](#containertransient)
+    - [`Container.singleton()`](#containersingleton)
+    - [`Container.scoped()`](#containerscoped)
+    - [`Container.bound()`](#containerbound)
+    - [`Container.beginScope()`](#containerbeginscope)
+    - [`Container.getCurrentScope()`](#containergetcurrentscope)
+    - [`Container.make()`](#containermake)
+    - [`Container.build()`](#containerbuild)
+    - [`Container.invoke()`](#containerinvoke)
+    - [`Container.call()`](#containercall)
+  - [`IContainer`](#icontainer)
+  - [`Lifetime`](#lifetime)
+  - [`Binding`](#binding)
+  - [`ScopeManager`](#scopemanager)
+  - [`ScopedContext`](#scopedcontext)
+  - [`CircularDependencyException`](#circulardependencyexception)
+  - [`ServiceProvider`](#serviceprovider)
+  - [`DeferrableProvider`](#deferrableprovider)
+  - [`IServiceProvider`](#iserviceprovider)
+  - [`IDeferrableProvider`](#ideferrableprovider)
+  - [`Facade`](#facade)
+  - [`FacadeMeta`](#facademeta)
+  - [`IFacade`](#ifacade)
+  - [Exportaciones del paquete](#exportaciones-del-paquete)
 - [Ejemplos de uso](#ejemplos-de-uso)
+  - [Registrar y resolver servicios](#registrar-y-resolver-servicios)
+  - [Trabajar con scopes](#trabajar-con-scopes)
+  - [Manejo de errores de resolución](#manejo-de-errores-de-resolución)
+  - [Construir un service provider](#construir-un-service-provider)
+  - [Exponer un servicio con una facade](#exponer-un-servicio-con-una-facade)
+  - [Inspeccionar bindings y scopes](#inspeccionar-bindings-y-scopes)
+  - [Resolver de forma concurrente](#resolver-de-forma-concurrente)
 - [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-- [Notas de diseño](#notas-de-diseño)
 - [Notas de compatibilidad](#notas-de-compatibilidad)
 
-## Requisitos
+---
 
-No se necesita ninguna instalación adicional más allá del propio framework:
+## Descripción funcional
 
-```bash
-pip install orionis
-```
+`orionis.container` es el motor de inyección de dependencias del framework. Asocia
+contratos (clases abstractas o alias de texto) con implementaciones concretas, decide
+cuánto vive cada objeto resuelto y construye instancias leyendo por reflexión la firma
+de sus constructores, de modo que quien lo usa nunca cablea dependencias a mano.
 
-Dependencias internas usadas por este módulo: `orionis.introspection` (reflexión sobre constructores/callables usada para el autowiring), `orionis.http.request.Request` y `orionis.schemas.validator.Schema` (usados solo al inyectar un parámetro `msgspec.Struct` desde el cuerpo de una petición HTTP), y `orionis.foundation.contracts.application.IApplication` (tipo usado por `ServiceProvider`/`Facade`). `msgspec` es una dependencia central (no opcional) del proyecto.
+### Dónde encaja
 
-## Descripción general del módulo
+- `orionis.foundation.application.Application` extiende `Container` y añade la capa de
+  arranque. El MRO verificado es
+  `Application -> Container -> IApplication -> IContainer -> ABC -> object`, así que el
+  contenedor real de una aplicación en ejecución *es* el singleton de `Application`.
+- `orionis.introspection` aporta `ReflectionConcrete` y `ReflectionCallable`, que
+  producen los metadatos `Signature`/`Argument` usados para inyectar parámetros de
+  constructores y de callables.
+- `orionis.schemas.validator.Schema` y `orionis.http.request.Request` se importan a
+  nivel de módulo en `container.py`: un parámetro anotado con una subclase de
+  `msgspec.Struct` se resuelve validando el cuerpo de la petición actual.
+- `orionis.support.entities.base.BaseEntity` es la base del dataclass `Binding`.
+- `orionis.foundation.contracts.application.IApplication` lo importa en runtime
+  `ServiceProvider` para tipar su argumento de constructor.
 
-`orionis.container` resuelve el problema de conectar implementaciones concretas con el resto del framework sin fijar dependencias de forma rígida. Ofrece:
+### Pipeline de resolución
 
-1. **Registro de servicios** — enlazar un contrato abstracto (o una clase concreta usada como su propio contrato) con una implementación bajo un ciclo de vida determinado: `transient` (nueva instancia en cada resolución), `singleton` (una instancia compartida), `scoped` (una instancia compartida por alcance lógico, p. ej. una petición) o una `instance` ya construida.
-2. **Inyección automática de dependencias** — `make`, `build`, `invoke` y `call` usan reflexión para inspeccionar las firmas de constructores/callables y resolver sus parámetros de forma recursiva (incluyendo dependencias anidadas, tipos enlazados en el contenedor, valores por defecto y esquemas `msgspec.Struct` de petición).
-3. **Unidades de trabajo con alcance (scope)** — `beginScope()` abre un bloque `async with` durante el cual los bindings `scoped` resuelven a la misma instancia; el alcance se libera automáticamente al salir.
-4. **Proveedores de servicio diferidos (deferred)** — los servicios pueden registrarse de forma perezosa: el contenedor solo importa y arranca el módulo del proveedor la primera vez que uno de sus servicios es realmente solicitado.
-5. **El patrón `Facade`** — un proxy de estilo estático (`Log`, `Crypt`, `DB`, etc. se construyen sobre él) que resuelve el servicio subyacente desde el contenedor, con una vía rápida opcional "fijada" (pinned) para llamadas en rutas críticas tras el arranque.
+`make(key)` ejecuta estos pasos, en este orden:
 
-## Arquitectura
+1. Si `key` no es una cadena y la caché de singletons ya lo contiene, se devuelve el
+   objeto cacheado de inmediato.
+2. `key` se normaliza a un tipo abstracto. Una cadena se busca en la tabla de alias; si
+   no aparece, se consulta el registro de proveedores diferidos, se importa el
+   proveedor correspondiente, se construye, se ejecuta su `register()` y su `boot()`, y
+   se vuelve a leer la tabla de alias. Un alias que sigue siendo desconocido lanza
+   `ValueError`.
+3. Se comprueba de nuevo la caché de singletons con el tipo abstracto ya resuelto.
+4. Si hay un scope activo que ya contiene el tipo abstracto, se devuelve esa instancia.
+5. Se consulta la tabla de bindings. Si no hay binding, se consulta otra vez el
+   registro diferido. Si sigue sin haber binding y la clave es una clase, el contenedor
+   recurre a `build()`; en caso contrario lanza `ValueError`.
+6. El binding se resuelve según su `Lifetime`: `SINGLETON` cachea la instancia contra
+   el contrato, `TRANSIENT` construye siempre una nueva y `SCOPED` la guarda en el
+   scope activo (lanzando `RuntimeError` si no hay ninguno abierto).
 
-```mermaid
-graph TD
-    A[ServiceProvider.register] -->|container.singleton/transient/scoped/instance| B[Container]
-    B --> C[Registro de Bindings]
-    B --> D[Cache de singletons]
-    B --> E[Mapa de alias]
-    F[Container.make / build / invoke / call] --> B
-    F --> G[ReflectionCallable / ReflectionConcrete]
-    F --> H[ScopedContext - contextvars]
-    I[Facade] -->|resuelve servicio| B
-    J[DeferrableProvider.provides] -.declara servicios para.-> K[Registro de proveedores diferidos - orionis.foundation]
-    K -.import perezoso + register/boot.-> B
-```
+`build()` nunca consulta la caché de singletons: siempre construye un objeto nuevo.
 
-- `Container` (en `orionis/container/container.py`) implementa `IContainer` y es el registro + resolutor concreto.
-- `orionis.foundation.application.Application` extiende `Container` (e `IApplication`); en la práctica, el único contenedor en ejecución del framework **es** la instancia de `Application`, y `Facade.resolve()` la obtiene mediante `Application()`.
-- `ScopedContext`/`ScopeManager` (en `orionis/container/context/`) implementan el mecanismo de ciclo de vida `scoped` usando `contextvars`, de modo que los alcances componen correctamente con las tareas de `asyncio`.
-- `ServiceProvider`/`DeferrableProvider` (en `orionis/container/providers/`) son las clases base que extienden los proveedores de la aplicación/framework para registrar bindings.
-- `Facade`/`FacadeMeta` (en `orionis/container/facades/`) implementan el patrón de proxy estático usado para exponer servicios enlazados como simples llamadas a nivel de clase.
+### Orden de resolución de argumentos
+
+`Container` inspecciona la firma del objetivo una sola vez y luego resuelve cada
+parámetro en orden de declaración. Los parámetros llamados `self`, `cls`, `args` y
+`kwargs`, además de `*args` y `**kwargs`, los descarta la capa de reflexión.
+
+Para parámetros posicionales-o-keyword:
+
+1. El parámetro está anotado con una subclase de `msgspec.Struct` → el valor se produce
+   validando el cuerpo de la petición.
+2. El tipo anotado está registrado en el contenedor **y** el nombre del parámetro no se
+   pasó como keyword → se resuelve con `make()`.
+3. Queda algún argumento posicional aportado por quien llama → se consume.
+4. Un argumento keyword aportado por quien llama coincide con el nombre → se consume.
+5. En otro caso el argumento se resuelve por sí solo: gana el valor por defecto
+   declarado y, si no lo hay, se usa `make()`. Los parámetros sin resolver cuyo tipo
+   vive en `builtins` o `typing` lanzan `TypeError`.
+
+Para parámetros keyword-only:
+
+1. Parámetros de schema, igual que arriba.
+2. Un argumento keyword aportado por quien llama coincide con el nombre → se consume.
+3. El tipo anotado está registrado en el contenedor → se resuelve con `make()`.
+4. En otro caso el argumento se resuelve por sí solo, como en el paso 5 anterior.
+
+Los argumentos posicionales que la firma no consumió se añaden al final y los keyword
+sin usar se fusionan en la llamada final.
+
+### Mapa de archivos
+
+| Ruta | Contenido |
+|---|---|
+| `container.py` | `Container`, el motor concreto. |
+| `contracts/container.py` | `IContainer` — 11 métodos abstractos. |
+| `contracts/service_provider.py` | `IServiceProvider` — `register()` / `boot()`. |
+| `contracts/deferrable_provider.py` | `IDeferrableProvider` — `provides()`. |
+| `contracts/facade.py` | `IFacade` — `getFacadeAccessor()` / `resolve()` / `pin()` / `unpin()`. |
+| `context/scope.py` | `ScopedContext` y los atajos de módulo `get_current_scope` / `set_current_scope` / `reset_scope`. |
+| `context/manager.py` | `ScopeManager`, el context manager async que respalda el ciclo de vida scoped. |
+| `entities/binding.py` | `Binding`, el registro inmutable que describe una registración. |
+| `enums/lifetimes.py` | `Lifetime` — `TRANSIENT`, `SINGLETON`, `SCOPED`. |
+| `exceptions/container.py` | `CircularDependencyException`. |
+| `facades/facade.py` | `Facade`, la clase base de proxy estático. |
+| `facades/meta.py` | `FacadeMeta` y el privado `_FacadeDispatch`. |
+| `providers/service_provider.py` | Clase base `ServiceProvider`. |
+| `providers/deferrable_provider.py` | Clase base marcadora `DeferrableProvider`. |
+
+### Decisiones de diseño
+
+- **Singleton por clase.** `Container.__new__` guarda una instancia por clase en el
+  diccionario de clase `_instances` usando double-checked locking sobre un
+  `threading.RLock`. Las subclases que no redeclaran `_instances` comparten ese único
+  diccionario, indexado por objeto-clase, así que cada subclase sigue teniendo su
+  propia instancia.
+- **`__init__` idempotente.** La inicialización está protegida por la presencia de
+  `_Container__initialized` en `self.__dict__`, así que volver a construir el singleton
+  nunca borra registros existentes.
+- **API de resolución asíncrona.** `make`, `build`, `invoke` y `call` son corrutinas
+  porque los `boot()` de los proveedores y la validación de schemas pueden hacer await.
+- **`contextvars` para scopes y detección de ciclos.** Tanto el scope activo como la
+  pila de resolución en curso viven en `ContextVar`s, así que tareas asyncio
+  concurrentes nunca observan el estado de las demás.
+- **El trabajo de una sola vez se serializa por clave.** Construir un singleton,
+  rellenar una entrada de scope y arrancar un proveedor diferido atraviesan varios
+  puntos `await`, así que cada uno se ejecuta bajo un `asyncio.Lock` indexado por
+  contrato (o por clave de proveedor). Las tareas concurrentes comparten esa única
+  construcción en lugar de duplicarla.
+- **`Binding` inmutable.** Las registraciones se describen con un dataclass inmutable y
+  hasheable, seguro de compartir entre la tabla de bindings y quien lo consulte.
+- **Dispatch perezoso en las facades.** `FacadeMeta.__getattr__` devuelve una función
+  normal cacheada; el contenedor solo se toca cuando el `_FacadeDispatch` resultante se
+  awaita o se entra como context manager, lo que respeta los bindings transitorios.
+- **Sin `__slots__`.** `Container`, `ScopeManager` y `Binding` conservan `__dict__`;
+  solo `_FacadeDispatch` declara `__slots__`.
+
+---
 
 ## Referencia de API
 
-### `Container` (`orionis.container.container.Container`)
+### `Container`
 
 ```python
 class Container(IContainer):
+    _instances: ClassVar[dict] = {}
+    _lock: ClassVar[threading.RLock] = threading.RLock()
+
     def __new__(cls, *args, **kwargs) -> Self: ...
     def __init__(self) -> None: ...
 ```
 
-**Comportamiento de instanciación**: `Container()` (y cualquier subclase, p. ej. `Application()`) es un **singleton por clase** — la primera llamada construye la instancia y la almacena en un diccionario indexado por clase (`Container._instances`); las llamadas posteriores a `Container()` devuelven el mismo objeto. La instanciación es thread-safe mediante double-checked locking (`threading.RLock`). Una subclase de `Container` obtiene su **propio** singleton, independiente de `Container()` en sí.
+Implementación concreta de `IContainer`, en `orionis.container.container`. Su docstring
+de clase declara el contrato de concurrencia reproducido en [Consideraciones de
+rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia).
 
-**Métodos de registro**
+**Atributos de clase**
 
-| Método | Firma | Descripción |
+| Nombre | Tipo | Significado |
 |---|---|---|
-| `instance` | `(abstract: type \| None, instance: object, *, alias: str \| None = None, override: bool = False) -> bool` | Registra un objeto ya construido. Si hay un scope activo, la instancia se guarda en ese scope (no se permiten alias en este caso); en caso contrario se registra como singleton global. |
-| `transient` | `(abstract: type \| None, concrete: type, *, alias: str \| None = None, override: bool = False) -> bool` | Registra un binding que produce una nueva instancia cada vez que se resuelve. |
-| `singleton` | `(abstract: type \| None, concrete: type, *, alias: str \| None = None, override: bool = False) -> bool` | Registra un binding que produce una única instancia compartida, creada de forma perezosa en la primera resolución. |
-| `scoped` | `(abstract: type \| None, concrete: type, *, alias: str \| None = None, override: bool = False) -> bool` | Registra un binding que produce una instancia compartida por cada scope activo (ver `beginScope`). |
-| `bound` | `(key: type \| str) -> bool` | Verifica si `key` (un tipo o un alias en forma de string) está registrado en el scope actual, en los bindings globales o en la caché de singletons. |
+| `_instances` | `ClassVar[dict]` | Registro de singletons indexado por objeto-clase. Lo comparte toda subclase que no lo redeclare. |
+| `_lock` | `ClassVar[threading.RLock]` | Protege la creación del singleton dentro de `__new__`. |
 
-En todos los métodos de registro, `abstract=None` usa el propio `concrete` como clave del contrato. `alias` permite además resolver el servicio mediante una clave de tipo string. `override=False` (por defecto) lanza `ValueError` si el contrato/alias ya está registrado.
+**Estado de instancia creado por `__init__`**
 
-**Métodos de scope**
-
-| Método | Firma | Descripción |
+| Nombre | Tipo | Significado |
 |---|---|---|
-| `beginScope` | `() -> ScopeManager` | Crea un nuevo `ScopeManager`, usado como `async with container.beginScope():` para abrir una unidad de trabajo con alcance. |
-| `getCurrentScope` | `() -> dict[Any, Any] \| None` | Devuelve el mapeo interno de instancias del scope activo, o `None` si no hay ningún scope activo. |
+| `_deferred_providers` | `dict[str, dict[str, str]]` | Asocia una clave solicitada con `{"module": ..., "class": ...}`. Lo puebla `Application.create()`, no este módulo. |
+| `__singleton_cache` | `dict[str, Any]` | Instancias singleton resueltas, indexadas por contrato. |
+| `__aliases` | `dict[str, type]` | Alias de texto → tipo abstracto. |
+| `__bindings` | `dict[Any, Binding]` | Tipo abstracto → `Binding`. |
+| `__cache_resolve_deferred_providers` | `set[Any]` | Claves cuyo proveedor diferido ya se ejecutó. |
+| `__creation_locks` | `dict[Any, tuple[AbstractEventLoop, asyncio.Lock]]` | Lock de creación por clave junto al loop que lo posee. |
 
-**Métodos de resolución** (todos `async`)
+**Efectos secundarios.** Construir cualquier subclase de `Container` muta el
+diccionario compartido `_instances`. Los métodos de registro mutan los diccionarios de
+instancia listados arriba. La resolución puede importar módulos (proveedores diferidos)
+y leer la petición HTTP actual (argumentos de schema).
 
-| Método | Firma | Descripción |
-|---|---|---|
-| `make` | `(key: type \| str, *args, **kwargs) -> Any` | Resuelve un servicio por tipo abstracto o alias. Usa el ciclo de vida del binding registrado; si no está enlazado, intenta autoconstruir el tipo. Lanza `ValueError` si no puede resolverse. |
-| `build` | `(type_: Callable[..., Any], *args, **kwargs) -> Any` | Instancia `type_` directamente con dependencias autoinyectadas, resolviendo antes los proveedores diferidos. Siempre construye una instancia nueva (ignora la caché de ciclo de vida/singleton). Lanza `TypeError` si `type_` no es una clase. |
-| `invoke` | `(fn: Callable[..., Any], *args, **kwargs) -> Any` | Llama a un callable que no sea una clase (función, método enlazado, lambda) con parámetros autoinyectados. Espera (`await`) el resultado si `fn` es una función corrutina. Lanza `TypeError` si `fn` es una clase o no es invocable. |
-| `call` | `(instance: object, method_name: str, *args, **kwargs) -> Any` | Busca `method_name` en `instance` y lo invoca con parámetros autoinyectados. Lanza `AttributeError` si el método no existe, `TypeError` si no es invocable. |
+#### `Container.instance()`
 
-**Excepciones**
+```python
+def instance(
+    self,
+    abstract: type[Any] | None,
+    instance: object,
+    *,
+    alias: str | None = None,
+    override: bool = False,
+) -> bool: ...
+```
 
-- `TypeError` — argumentos inválidos en los métodos de registro (`concrete`/`abstract` que no es una clase, `alias` que no es string, `instance()` llamado con una clase, `invoke`/`call` apuntando a algo no invocable o a una clase).
-- `ValueError` — contrato/alias ya registrado sin `override=True`; alias/clave de servicio no resuelta; también la lanzan internamente `make`/`build` cuando un tipo realmente no puede resolverse.
-- `RuntimeError` — se resuelve un binding `scoped` sin un scope activo (usar antes `beginScope()`).
-- `CircularDependencyException` — se detecta un ciclo de dependencias al autorresolver argumentos de un constructor.
-- `TypeError` — un parámetro de constructor/callable es un tipo built-in/`typing` sin valor por defecto y sin binding (no se puede autorresolver).
+Registra un objeto ya construido.
 
-**Efectos secundarios**: los métodos de registro mutan los diccionarios internos de bindings/alias/singletons del contenedor; `make`/`build` pueden importar de forma perezosa y ejecutar `register()`/`boot()` de un módulo proveedor diferido la primera vez que se solicita uno de sus servicios declarados.
+- `abstract` — contrato a asociar con el objeto, o `None` para usar `type(instance)`.
+- `instance` — el objeto ya inicializado. Pasar una clase lanza `TypeError`.
+- `alias` — alias opcional. Se le hace `strip` y debe ser una cadena no vacía.
+- `override` — permite reemplazar una registración existente.
+- **Devuelve** `True` cuando la registración fue correcta.
 
-### `IContainer` (`orionis.container.contracts.container.IContainer`)
+El comportamiento depende de si hay un scope activo:
 
-Clase base abstracta (`abc.ABC`) que declara el contrato público completo descrito arriba: `instance`, `transient`, `singleton`, `scoped`, `bound`, `beginScope`, `getCurrentScope`, y los métodos asíncronos `make`, `build`, `invoke`, `call`. Implementado por `Container` (y transitivamente por `orionis.foundation.application.Application`).
+- **Dentro de un scope**, el objeto se guarda en ese scope. Pasar `alias` lanza
+  `ValueError("Alias registration is only allowed globally.")`.
+- **Fuera de un scope**, se guarda un `Binding` con `Lifetime.SINGLETON` y el objeto se
+  coloca en la caché de singletons; el alias, si lo hay, se añade a la tabla de alias.
 
-### `Binding` (`orionis.container.entities.binding.Binding`)
+**Lanza**
 
-Un registro inmutable que describe una entrada de registro del contenedor.
+- `TypeError` — `instance` es una clase; `abstract` no es una clase; `instance` no es
+  instancia de `abstract`; `alias` no es una cadena.
+- `ValueError` — `alias` queda vacío tras el `strip`; el contrato o el alias ya están
+  registrados y `override` es `False`; se pasó un alias dentro de un scope.
+
+#### `Container.transient()`
+
+```python
+def transient(
+    self,
+    abstract: type[Any] | None,
+    concrete: type[Any],
+    *,
+    alias: str | None = None,
+    override: bool = False,
+) -> bool: ...
+```
+
+Registra `concrete` con `Lifetime.TRANSIENT`; cada resolución construye un objeto
+nuevo. Cuando `abstract` es `None`, `concrete` se enlaza consigo mismo.
+
+**Lanza**
+
+- `TypeError` — `abstract` o `concrete` no son clases; `concrete` no es subclase de
+  `abstract`; `alias` no es una cadena.
+- `ValueError` — alias vacío, o contrato/alias duplicado sin `override`.
+
+#### `Container.singleton()`
+
+```python
+def singleton(
+    self,
+    abstract: type[Any] | None,
+    concrete: type[Any],
+    *,
+    alias: str | None = None,
+    override: bool = False,
+) -> bool: ...
+```
+
+Misma validación que `transient()`, con `Lifetime.SINGLETON`. La instancia se crea en
+el primer `make()` y a partir de ahí queda cacheada contra el contrato.
+
+#### `Container.scoped()`
+
+```python
+def scoped(
+    self,
+    abstract: type[Any] | None,
+    concrete: type[Any],
+    *,
+    alias: str | None = None,
+    override: bool = False,
+) -> bool: ...
+```
+
+Misma validación que `transient()`, con `Lifetime.SCOPED`. Resolver el binding sin un
+scope activo lanza `RuntimeError`.
+
+#### `Container.bound()`
+
+```python
+def bound(
+    self,
+    key: type[Any] | str,
+) -> bool: ...
+```
+
+Indica si `key` se puede resolver. Una cadena se traduce primero por la tabla de alias
+y devuelve `False` si es desconocida. La búsqueda revisa el scope activo, después la
+tabla de bindings y por último la caché de singletons. `bound()` nunca dispara
+proveedores diferidos.
+
+#### `Container.beginScope()`
+
+```python
+def beginScope(self) -> ScopeManager: ...
+```
+
+Devuelve un `ScopeManager` nuevo. El scope solo pasa a estar activo cuando el manager
+se entra con `async with`.
+
+#### `Container.getCurrentScope()`
+
+```python
+def getCurrentScope(self) -> dict[Any, Any] | None: ...
+```
+
+Devuelve el objeto de scope activo, o `None`. El valor sale del `ContextVar` de
+`orionis.container.context.scope`, así que es por tarea.
+
+#### `Container.make()`
+
+```python
+async def make(
+    self,
+    key: type[Any] | str,
+    *args: tuple[Any, ...],
+    **kwargs: dict[str, Any],
+) -> Any: ...
+```
+
+Resuelve un servicio siguiendo el [pipeline de resolución](#pipeline-de-resolución).
+`*args` y `**kwargs` se reenvían al constructor cuando hay que construir el objeto.
+
+Cuando varias tareas del mismo event loop resuelven a la vez el mismo binding
+`SINGLETON` o `SCOPED` aún sin cachear, solo se ejecuta una construcción y todas
+reciben esa instancia.
+
+**Lanza**
+
+- `ValueError` — clave de texto desconocida, o clave que no es clase y no tiene binding.
+- `RuntimeError` — binding `SCOPED` resuelto sin scope activo.
+- `CircularDependencyException` — el grafo de dependencias tiene un ciclo.
+- `TypeError` — algún parámetro del constructor no se puede resolver.
+
+#### `Container.build()`
+
+```python
+async def build(
+    self,
+    type_: Callable[..., Any],
+    *args: tuple[Any, ...],
+    **kwargs: dict[str, Any],
+) -> Any: ...
+```
+
+Instancia `type_` con dependencias autocableadas, ignorando la caché de singletons.
+Cuando `type_` no está registrado todavía, primero se consulta el registro de
+proveedores diferidos.
+
+**Lanza**
+
+- `TypeError` — `type_` no es una clase, o algún parámetro del constructor no se puede
+  resolver.
+- `CircularDependencyException` — el grafo de dependencias tiene un ciclo.
+
+#### `Container.invoke()`
+
+```python
+async def invoke(
+    self,
+    fn: Callable[..., Any],
+    *args: tuple[Any, ...],
+    **kwargs: dict[str, Any],
+) -> Any: ...
+```
+
+Llama a `fn` con argumentos autocableados y devuelve su resultado. Las funciones
+corrutina se awaitan; los callables síncronos se llaman directamente.
+
+**Lanza**
+
+- `TypeError` — `fn` no es invocable o es una clase.
+
+#### `Container.call()`
+
+```python
+async def call(
+    self,
+    instance: object,
+    method_name: str,
+    *args: tuple,
+    **kwargs: dict,
+) -> Any: ...
+```
+
+Busca `method_name` en `instance` y lo invoca con argumentos autocableados.
+
+**Lanza**
+
+- `AttributeError` — el atributo no existe en la instancia.
+- `TypeError` — el atributo existe pero no es invocable.
+
+### `IContainer`
+
+Clase base abstracta en `orionis.container.contracts.container`. Declara exactamente
+estos métodos abstractos:
+
+`instance`, `transient`, `singleton`, `scoped`, `bound`, `beginScope`,
+`getCurrentScope`, `make`, `build`, `invoke`, `call`.
+
+`make`, `build`, `invoke` y `call` se declaran con `async def`. El módulo usa
+`from __future__ import annotations`, así que sus anotaciones son cadenas en runtime
+mientras que las de la implementación son objetos reales; solo los nombres de los
+parámetros son directamente comparables.
+
+### `Lifetime`
+
+```python
+class Lifetime(Enum):
+    TRANSIENT = auto()
+    SINGLETON = auto()
+    SCOPED = auto()
+```
+
+`enum.Enum` con tres miembros. Valores verificados: `TRANSIENT = 1`, `SINGLETON = 2`,
+`SCOPED = 3`.
+
+### `Binding`
 
 ```python
 @dataclass(frozen=True, kw_only=True)
@@ -132,28 +453,17 @@ class Binding(BaseEntity):
     alias: str | None = None
 ```
 
-`__post_init__` valida que `lifetime` sea un miembro del enum `Lifetime` (lanza `TypeError` si no lo es). `Binding` extiende el `BaseEntity` del framework (ver `orionis.support.entities.base`) y normalmente no se construye directamente desde código de aplicación — lo crea internamente `Container.instance`/`transient`/`singleton`/`scoped`.
+Registro inmutable, hasheable y keyword-only que describe una registración. Hereda
+`toDict()` y `getFields()` de `BaseEntity`; `toDict()` convierte el miembro `lifetime`
+a su valor entero.
 
-### `Lifetime` (`orionis.container.enums.lifetimes.Lifetime`)
+`__post_init__` lanza `TypeError` cuando `lifetime` no es un miembro de `Lifetime`.
 
-```python
-class Lifetime(Enum):
-    TRANSIENT = auto()
-    SINGLETON = auto()
-    SCOPED = auto()
-```
+`Container` rellena `contract`, `concrete`, `lifetime` y `alias`. Los objetos ya
+construidos los guarda en su caché interna de singletons y no en el campo `instance`,
+por lo que los bindings creados por el contenedor dejan `instance` en `None`.
 
-- `TRANSIENT`: se crea una nueva instancia en cada `make()`/resolución.
-- `SINGLETON`: se crea una instancia de forma perezosa y se cachea durante la vida del contenedor.
-- `SCOPED`: se crea una instancia por cada scope activo (ver `beginScope()`); resolverla fuera de un scope lanza `RuntimeError`.
-
-### `CircularDependencyException` (`orionis.container.exceptions.container.CircularDependencyException`)
-
-Una subclase simple de `Exception` que el contenedor lanza cuando detecta que resolver las dependencias de un tipo requeriría volver a resolver ese mismo tipo (un ciclo de dependencias) dentro de la cadena de resolución actual.
-
-### `ScopeManager` / `ScopedContext` (`orionis.container.context`)
-
-`ScopeManager` (`orionis.container.context.manager.ScopeManager`) es el gestor de contexto asíncrono devuelto por `Container.beginScope()`.
+### `ScopeManager`
 
 ```python
 class ScopeManager:
@@ -163,68 +473,113 @@ class ScopeManager:
     def __contains__(self, key: object) -> bool: ...
     def clear(self) -> None: ...
     async def __aenter__(self) -> Self: ...
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None: ...
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> None: ...
     async def get(self, key: object) -> Any | None: ...
     def set(self, key: object, value: Any) -> None: ...
     async def resolve(self, key: object) -> Any: ...
 ```
 
-- Entrar al bloque `async with` registra este `ScopeManager` como el scope activo (mediante `ScopedContext`); salir limpia todas las instancias almacenadas y restaura el scope anterior (soporta scopes anidados).
-- `get(key)` admite almacenar una corrutina o un `asyncio.Task` bajo una clave: la primera llamada a `get()` convierte una corrutina almacenada en una `Task`, la espera (`await`) y cachea el resultado resuelto para llamadas posteriores.
-- `resolve(key)` se comporta como `get(key)` pero lanza `KeyError` en lugar de devolver `None` cuando la clave no existe.
-- El acceso directo `[]` (`scope[key]`, `scope[key] = value`, `key in scope`) es síncrono y no espera corrutinas — prefiere `get`/`set`/`resolve` cuando un valor pueda ser una corrutina.
+Contenedor tipo diccionario para instancias scoped, en
+`orionis.container.context.manager`.
 
-`ScopedContext` (`orionis.container.context.scope.ScopedContext`) envuelve una única `contextvars.ContextVar` que contiene el scope activo:
+- `__getitem__` devuelve `None` para claves ausentes en lugar de lanzar.
+- `__aenter__` publica el manager como scope activo y guarda el token de reset en
+  `self._token`; ese atributo solo existe tras entrar, así que llamar antes a
+  `__aexit__` lanza `AttributeError`.
+- `__aexit__` limpia todas las instancias guardadas y resetea el `ContextVar` del
+  scope. Siempre limpia, incluso si el bloque lanzó una excepción.
+- `get()` awaita corrutinas y `asyncio.Task` almacenados, reemplazando el valor
+  guardado por el resultado resuelto para que las llamadas siguientes sean baratas.
+  Devuelve `None` tanto para una clave ausente como para una clave que guarda `None`.
+- `resolve()` delega en `get()` y lanza `KeyError` cuando el resultado es `None`, lo
+  que incluye el caso de un valor que realmente es `None`.
+
+### `ScopedContext`
 
 ```python
 class ScopedContext:
+    _active_scope: contextvars.ContextVar[object | None] = contextvars.ContextVar(
+        "x-orionis-container-context-scope",
+        default=None,
+    )
+
     @classmethod
     def getCurrentScope(cls) -> object | None: ...
     @classmethod
     def setCurrentScope(cls, scope: object) -> contextvars.Token: ...
     @classmethod
     def reset(cls, token: contextvars.Token) -> None: ...
+```
 
-# Atajos a nivel de módulo (referencias directas a los métodos vinculados de la ContextVar):
+Envoltorio mínimo sobre un único `ContextVar` llamado
+`"x-orionis-container-context-scope"`, con valor por defecto `None`.
+
+El módulo expone además tres atajos ligados directamente a los métodos del
+`ContextVar`:
+
+```python
 get_current_scope = ScopedContext._active_scope.get
 set_current_scope = ScopedContext._active_scope.set
 reset_scope       = ScopedContext._active_scope.reset
 ```
 
-### `ServiceProvider` / `IServiceProvider`
+`Container` usa `get_current_scope` internamente.
 
-`IServiceProvider` (`orionis.container.contracts.service_provider.IServiceProvider`) declara el contrato del proveedor: un `register(self) -> None` síncrono y un `boot(self) -> None` asíncrono.
+### `CircularDependencyException`
 
-`ServiceProvider` (`orionis.container.providers.service_provider.ServiceProvider`) es la clase base que extienden los proveedores de la aplicación/framework:
+```python
+class CircularDependencyException(Exception): ...
+```
+
+La lanza `Container` durante el autowiring cuando un tipo ya está presente en la pila
+de resolución de la tarea actual. El mensaje nombra el tipo culpable, por ejemplo
+`Circular dependency detected while resolving argument '__main__.NodeB'.`
+
+### `ServiceProvider`
 
 ```python
 class ServiceProvider(IServiceProvider):
     def __init__(self, app: IApplication) -> None: ...
-    def register(self) -> None: ...       # sobrescribir en subclases
-    async def boot(self) -> None: ...      # sobrescribir en subclases
+    def register(self) -> None: ...
+    async def boot(self) -> None: ...
 ```
 
-`self.app` es la instancia de la aplicación/contenedor pasada en la construcción, usada dentro de `register()`/`boot()` para llamar a `self.app.singleton(...)`, `self.app.make(...)`, etc.
+Clase base de los proveedores. El constructor guarda el contenedor en `self.app`. Los
+dos hooks del ciclo de vida están vacíos en la clase base, así que las subclases
+sobrescriben solo lo que necesitan: `register()` es síncrono y está pensado para los
+bindings; `boot()` es una corrutina y se ejecuta después del registro.
 
-### `DeferrableProvider` / `IDeferrableProvider`
-
-`IDeferrableProvider` (`orionis.container.contracts.deferrable_provider.IDeferrableProvider`) declara un único classmethod abstracto: `provides(cls) -> list[type | str]`.
-
-`DeferrableProvider` (`orionis.container.providers.deferrable_provider.DeferrableProvider`) es una clase base marcadora para proveedores cuyo registro/arranque puede diferirse hasta que uno de sus servicios declarados sea realmente solicitado:
+### `DeferrableProvider`
 
 ```python
 class DeferrableProvider(IDeferrableProvider):
     @classmethod
-    def provides(cls) -> list[type | str]: ...  # debe sobrescribirse
+    def provides(cls) -> list[type | str]: ...
 ```
 
-`provides()` declara qué tipos de servicio/alias son responsabilidad de este proveedor. El registro real que mapea una clave solicitada a `{"module": ..., "class": ...}` (usado internamente por `Container.__resolveDeferredProvider`/`Container._deferred_providers`) lo construye la capa de arranque del framework (`orionis.foundation.application.Application`), no este módulo directamente — `DeferrableProvider` solo aporta la declaración usada para construir ese registro.
+Clase base marcadora para proveedores que deben registrarse bajo demanda. El
+`provides()` base lanza `NotImplementedError("Subclasses must implement the provides
+method.")`.
 
-### `Facade` / `FacadeMeta` / `IFacade`
+`provides()` solo declara qué tipos o alias son responsabilidad del proveedor. El
+registro que lee `Container.__resolveDeferredProvider` — `_deferred_providers`, que
+asocia una clave con `{"module": ..., "class": ...}` — lo puebla
+`orionis.foundation.application.Application.create()`, no esta clase.
 
-`IFacade` (`orionis.container.contracts.facade.IFacade`) declara el contrato: `getFacadeAccessor() -> str`, `resolve(*args, **kwargs) -> object` asíncrono, `pin() -> None` asíncrono, `unpin() -> None`.
+### `IServiceProvider`
 
-`Facade` (`orionis.container.facades.facade.Facade`, metaclase `FacadeMeta`) es la clase base para facades de proxy estático (`Log`, `Crypt`, `DB`, ...):
+Clase base abstracta que declara exactamente `register` (síncrono) y `boot` (corrutina).
+
+### `IDeferrableProvider`
+
+Clase base abstracta que declara exactamente el classmethod `provides`.
+
+### `Facade`
 
 ```python
 class Facade(metaclass=FacadeMeta):
@@ -232,216 +587,678 @@ class Facade(metaclass=FacadeMeta):
     _pinned_instance: Any = None
 
     @classmethod
-    def getFacadeAccessor(cls) -> str: ...        # debe sobrescribirse; si no, lanza NotImplementedError
+    def getFacadeAccessor(cls) -> str: ...
     @classmethod
-    async def resolve(cls, *args, **kwargs) -> object: ...
+    async def resolve(cls, *args: object, **kwargs: object) -> object: ...
     @classmethod
     async def pin(cls) -> None: ...
     @classmethod
     def unpin(cls) -> None: ...
 ```
 
-- `getFacadeAccessor()` debe devolver la clave del contenedor (tipo o alias en string) usada para resolver el servicio subyacente. Las subclases deben sobrescribirlo; la implementación base lanza `NotImplementedError`.
-- `resolve()` obtiene de forma perezosa la instancia compartida `Application()`, lanza `RuntimeError` si la aplicación no ha sido arrancada (`app.isBooted` es `False`), y delega en `app.make(cls.getFacadeAccessor(), *args, **kwargs)`.
-- `pin()` resuelve el servicio una vez y lo cachea en `cls._pinned_instance`; `unpin()` limpia esa caché.
+Clase base de proxy estático.
 
-`FacadeMeta` (`orionis.container.facades.meta.FacadeMeta`) implementa el despacho dinámico de atributos usado por cada subclase de `Facade`:
+- `getFacadeAccessor()` debe sobrescribirse; la implementación base lanza
+  `NotImplementedError` con el mensaje `Class <Name> must define
+  getFacadeAccessor()`.
+- `resolve()` crea `orionis.foundation.application.Application()` de forma perezosa
+  cuando `_application` es `None`, lanza `RuntimeError("Application not booted. Boot
+  your app first.")` cuando la aplicación reporta `isBooted` como falso, y en caso
+  contrario devuelve `await application.make(cls.getFacadeAccessor(), *args,
+  **kwargs)`.
+- `pin()` guarda la instancia resuelta en `_pinned_instance`.
+- `unpin()` devuelve `_pinned_instance` a `None`.
 
-- **Cuando está fijado (pinned)** (`cls._pinned_instance is not None`): `FacadeClass.algun_attr` devuelve `getattr(cls._pinned_instance, "algun_attr")` directamente — sin envoltura asíncrona, sin búsqueda en el contenedor.
-- **Cuando no está fijado**: `FacadeClass.algun_attr` devuelve una función dispatcher asíncrona cacheada (una por cada par `(clase, atributo)`). Al llamarla — `await FacadeClass.algun_attr(*args, **kwargs)` — se resuelve el servicio mediante `cls.resolve()`, se busca `algun_attr` en él, se invoca si es invocable (esperando el resultado si es awaitable), o se devuelve tal cual si es un atributo simple. **En el estado no fijado, el acceso a atributos/métodos del facade siempre debe esperarse (`await`)**, incluso para atributos que no son invocables.
+`_application` y `_pinned_instance` son **atributos de clase**, así que los comparte
+todo el que use esa clase de facade dentro del proceso.
+
+### `FacadeMeta`
+
+```python
+class FacadeMeta(type):
+    def __getattr__(cls, name: str) -> object: ...
+```
+
+Metaclase que gobierna el acceso a atributos en las clases facade. Python solo llama a
+`__getattr__` cuando la búsqueda normal falla, así que los métodos reales y los
+atributos de clase declarados en una subclase de facade la esquivan por completo.
+
+- Cuando `cls._pinned_instance` no es `None`, el atributo se toma directamente del
+  objeto pineado; un nombre inexistente lanza `AttributeError` como siempre.
+- En caso contrario se devuelve una función `dispatcher` síncrona normal. Los
+  dispatchers se memoizan en el diccionario de módulo `_dispatcher_cache`, indexado por
+  `(cls, name)`, así que accesos repetidos devuelven el objeto idéntico.
+
+Llamar a un dispatcher construye un `_FacadeDispatch`:
+
+```python
+class _FacadeDispatch:
+    __slots__ = ("_args", "_cls", "_context", "_kwargs", "_name")
+
+    def __await__(self) -> Generator[object, None, object]: ...
+    async def __aenter__(self) -> object: ...
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> bool: ...
+```
+
+`_FacadeDispatch` es privado. Construirlo no toca el contenedor; la resolución ocurre
+cuando el objeto se awaita o se entra:
+
+- Al awaitarlo se resuelve el servicio, se lee el atributo, se llama si es invocable y
+  se awaita el resultado si es awaitable. Un atributo no invocable se devuelve tal
+  cual, y por eso `await SomeFacade.attribute()` entrega el valor plano.
+- `async with` resuelve el servicio, llama al atributo y delega en el `__aenter__` /
+  `__aexit__` del objeto devuelto. `__aexit__` exige un `__aenter__` previo.
+
+### `IFacade`
+
+Clase base abstracta que declara exactamente `getFacadeAccessor`, `resolve`, `pin` y
+`unpin`, todos como classmethods; `resolve` y `pin` son corrutinas.
+
+### Exportaciones del paquete
+
+`orionis/container/__init__.py` y `orionis/container/context/__init__.py` están vacíos;
+hay que importar desde los módulos concretos. Los demás subpaquetes reexportan un
+nombre público cada uno:
+
+| Módulo | `__all__` |
+|---|---|
+| `orionis.container.contracts` | `IFacade` |
+| `orionis.container.entities` | `Binding` |
+| `orionis.container.enums` | `Lifetime` |
+| `orionis.container.exceptions` | `CircularDependencyException` |
+| `orionis.container.facades` | `Facade` |
+| `orionis.container.providers` | `DeferrableProvider`, `ServiceProvider` |
+
+---
 
 ## Ejemplos de uso
 
-### Registrar y resolver bindings
+Cada fragmento de abajo es un script completo y ejecutable. La salida mostrada se
+capturó ejecutándolos.
+
+### Registrar y resolver servicios
 
 ```python
 import asyncio
-from abc import ABC, abstractmethod
+
 from orionis.container.container import Container
 
-class IEngine(ABC):
-    @abstractmethod
-    def start(self) -> str: ...
 
-class V8Engine(IEngine):
-    def start(self) -> str:
-        return "Motor V8 iniciado"
+class IClock:
+    """Contract implemented by every clock service."""
 
-class Car:
-    def __init__(self, engine: IEngine) -> None:
-        self.engine = engine
 
-async def main() -> None:
-    container = Container()
+class SystemClock(IClock):
+    """Clock returning a fixed timestamp."""
 
-    # Singleton: una única instancia de IEngine compartida durante la vida del contenedor
-    container.singleton(IEngine, V8Engine, alias="engine.v8")
+    def now(self) -> str:
+        return "2026-09-01T00:00:00Z"
 
-    # Transient: un Car nuevo (con su dependencia IEngine autoinyectada) en cada llamada
-    container.transient(Car, Car)
 
-    car = await container.make(Car)
-    print(car.engine.start())              # "Motor V8 iniciado"
-
-    # Resolver el mismo singleton del motor mediante su alias
-    engine_by_alias = await container.make("engine.v8")
-    print(engine_by_alias is car.engine)    # True
-
-asyncio.run(main())
-```
-
-### Registrar una instancia ya construida
-
-```python
-container = Container()
-container.instance(IEngine, V8Engine(), alias="engine.v8")
-print(container.bound(IEngine))     # True
-print(container.bound("engine.v8"))  # True
-```
-
-### Servicios con scope (por unidad de trabajo)
-
-```python
-import asyncio
-from orionis.container.container import Container
-
-class RequestContext:
-    def __init__(self) -> None:
-        self.request_id = "req-123"
-
-async def handle_request(container: Container) -> None:
-    async with container.beginScope():
-        ctx = await container.make(RequestContext)
-        print(ctx.request_id)
-    # el scope (y su RequestContext cacheado) se descarta al salir
-
-async def main() -> None:
-    container = Container()
-    container.scoped(RequestContext, RequestContext)
-    await handle_request(container)
-
-asyncio.run(main())
-```
-
-### `build`, `invoke` y `call`
-
-```python
-# build(): siempre construye una instancia nueva autoconectada (ignora la caché de ciclo de vida)
-car = await container.build(Car)
-
-# invoke(): llamar a una función/corrutina simple con parámetros autoinyectados
-async def describe(engine: IEngine) -> str:
-    return f"Auto con: {engine.start()}"
-
-description = await container.invoke(describe)
-
-# call(): invocar un método de un objeto existente con parámetros autoinyectados
 class Reporter:
-    def report(self, engine: IEngine) -> str:
-        return f"Reportando: {engine.start()}"
+    """Service whose constructor declares an IClock dependency."""
 
-reporter = Reporter()
-report = await container.call(reporter, "report")
+    def __init__(self, clock: IClock) -> None:
+        self.clock = clock
+
+
+async def main() -> None:
+    container = Container()
+
+    container.singleton(IClock, SystemClock, alias="clock")
+    container.transient(None, Reporter)
+
+    clock = await container.make(IClock)
+    print(type(clock).__name__, clock.now())
+
+    # An alias resolves to exactly the same singleton instance.
+    print("alias hits the singleton:", await container.make("clock") is clock)
+
+    # Reporter is transient and its IClock argument is injected automatically.
+    reporter = await container.make(Reporter)
+    print("injected dependency:", type(reporter.clock).__name__)
+    print("transient reuse:", await container.make(Reporter) is reporter)
+
+    # build() always constructs a new object, even for singleton bindings.
+    print("build returns a new object:", await container.build(SystemClock) is not clock)
+
+    print("bound(IClock):", container.bound(IClock))
+    print("bound('clock'):", container.bound("clock"))
+    print("bound('missing'):", container.bound("missing"))
+
+
+asyncio.run(main())
 ```
 
-### Manejar una dependencia circular
+```text
+SystemClock 2026-09-01T00:00:00Z
+alias hits the singleton: True
+injected dependency: SystemClock
+transient reuse: False
+build returns a new object: True
+bound(IClock): True
+bound('clock'): True
+bound('missing'): False
+```
+
+### Trabajar con scopes
 
 ```python
+import asyncio
+
 from orionis.container.container import Container
-from orionis.container.exceptions import CircularDependencyException
 
-class A:
-    def __init__(self, b: "B") -> None:
-        self.b = b
 
-class B:
-    def __init__(self, a: A) -> None:
+class RequestState:
+    """Service that must live for exactly one scope."""
+
+
+async def main() -> None:
+    container = Container()
+    container.scoped(None, RequestState)
+
+    print("scope before:", container.getCurrentScope())
+
+    async with container.beginScope() as scope:
+        first = await container.make(RequestState)
+        second = await container.make(RequestState)
+        print("same instance inside the scope:", first is second)
+        print("scope is active:", container.getCurrentScope() is scope)
+
+        # Instances registered while a scope is active land in that scope.
+        container.instance(None, "request-id-42")
+        print("scoped instance:", await container.make(str))
+
+    print("scope after:", container.getCurrentScope())
+
+    async with container.beginScope():
+        third = await container.make(RequestState)
+        print("new scope, new instance:", third is first)
+
+
+asyncio.run(main())
+```
+
+```text
+scope before: None
+same instance inside the scope: True
+scope is active: True
+scoped instance: request-id-42
+scope after: None
+new scope, new instance: False
+```
+
+### Manejo de errores de resolución
+
+```python
+import asyncio
+
+from orionis.container.container import Container
+from orionis.container.exceptions.container import CircularDependencyException
+
+
+class RequestState:
+    """Scoped service used to trigger the missing-scope error."""
+
+
+class NodeA:
+    """First node of the dependency cycle."""
+
+
+class NodeB:
+    """Second node of the dependency cycle."""
+
+    def __init__(self, a: NodeA) -> None:
         self.a = a
 
+
+def _node_a_init(self, b: NodeB) -> None:
+    self.b = b
+
+
+# Closing the cycle after both classes exist keeps the annotations resolvable.
+NodeA.__init__ = _node_a_init
+
+
+class NeedsPort:
+    """Service asking for a builtin type the container cannot invent."""
+
+    def __init__(self, port: int) -> None:
+        self.port = port
+
+
+class IClockLike:
+    """Contract that RequestState does not implement."""
+
+
 async def main() -> None:
     container = Container()
-    container.transient(A, A)
-    container.transient(B, B)
+
     try:
-        await container.make(A)
+        await container.make("missing-service")
+    except ValueError as exc:
+        print(f"ValueError: {exc}")
+
+    container.scoped(None, RequestState)
+    try:
+        await container.make(RequestState)
+    except RuntimeError as exc:
+        print(f"RuntimeError: {exc}")
+
+    try:
+        await container.build(NodeB)
     except CircularDependencyException as exc:
-        print(f"Ciclo detectado: {exc}")
+        print(f"CircularDependencyException: {exc}")
+
+    try:
+        await container.build(NeedsPort)
+    except TypeError as exc:
+        print(f"TypeError: {exc}")
+
+    try:
+        container.transient(IClockLike, RequestState)
+    except TypeError as exc:
+        print(f"TypeError: {exc}")
+
+    try:
+        container.transient(None, RequestState, alias="   ")
+    except ValueError as exc:
+        print(f"ValueError: {exc}")
+
+
+asyncio.run(main())
 ```
 
-### Escribir un `ServiceProvider`
-
-```python
-from orionis.container.providers.service_provider import ServiceProvider
-
-class EngineServiceProvider(ServiceProvider):
-    def register(self) -> None:
-        self.app.singleton(IEngine, V8Engine, alias="x-engine")
-
-    async def boot(self) -> None:
-        # Inicialización asíncrona opcional tras registrarse todos los proveedores
-        pass
+```text
+ValueError: Service 'missing-service' is not registered.
+RuntimeError: No active scope for scoped service. Use 'beginScope()' to create a scope.
+CircularDependencyException: Circular dependency detected while resolving argument '__main__.NodeB'.
+TypeError: Cannot auto-resolve built-in type 'int' for parameter 'port'. Provide a default value.
+TypeError: RequestState must implement IClockLike
+ValueError: Alias cannot be empty.
 ```
 
-### Escribir un `DeferrableProvider`
+### Construir un service provider
 
 ```python
+import asyncio
+
+from orionis.container.container import Container
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 
-class HeavyServiceProvider(ServiceProvider, DeferrableProvider):
-    @classmethod
-    def provides(cls) -> list[type | str]:
-        return [IEngine]
+
+class IMailer:
+    """Contract for the mail transport."""
+
+
+class SmtpMailer(IMailer):
+    """Concrete mail transport."""
+
+    def send(self, to: str) -> str:
+        return f"sent to {to}"
+
+
+class MailProvider(ServiceProvider):
+    """Register and boot the mail transport."""
 
     def register(self) -> None:
-        self.app.singleton(IEngine, V8Engine, alias="x-engine")
+        self.app.singleton(IMailer, SmtpMailer, alias="mailer")
+
+    async def boot(self) -> None:
+        mailer = await self.app.make(IMailer)
+        print("booted with:", type(mailer).__name__)
+
+
+class DeferredMailProvider(MailProvider, DeferrableProvider):
+    """Same provider, but registered only when its services are requested."""
+
+    @classmethod
+    def provides(cls) -> list[type | str]:
+        return [IMailer, "mailer"]
+
+
+async def main() -> None:
+    container = Container()
+
+    provider = MailProvider(container)
+    provider.register()
+    await provider.boot()
+
+    print("bound('mailer'):", container.bound("mailer"))
+    mailer = await container.make("mailer")
+    print(mailer.send("ops@example.com"))
+
+    print("declared services:", DeferredMailProvider.provides())
+
+    try:
+        DeferrableProvider.provides()
+    except NotImplementedError as exc:
+        print(f"NotImplementedError: {exc}")
+
+
+asyncio.run(main())
 ```
 
-### Escribir un `Facade`
+```text
+booted with: SmtpMailer
+bound('mailer'): True
+sent to ops@example.com
+declared services: [<class '__main__.IMailer'>, 'mailer']
+NotImplementedError: Subclasses must implement the provides method.
+```
+
+### Exponer un servicio con una facade
 
 ```python
+import asyncio
+
+from orionis.container.container import Container
 from orionis.container.facades.facade import Facade
 
-class Engine(Facade):
+
+class Cache:
+    """Service reachable through the facade."""
+
+    driver = "memory"
+
+    def get(self, key: str) -> str:
+        return f"value:{key}"
+
+
+class CacheFacade(Facade):
+    """Static proxy for the cache service."""
+
     @classmethod
     def getFacadeAccessor(cls) -> str:
-        return "x-engine"
+        return "cache"
 
-# Antes de pin(): cada acceso resuelve el servicio a través del contenedor;
-# siempre usar await, incluso para atributos simples.
-result = await Engine.start()
 
-# Después de que el proveedor propietario llame a `await Engine.pin()` en boot(),
-# el acceso a atributos se convierte en un passthrough directo a la instancia fijada.
-await Engine.pin()
-Engine.start()  # no hace falta await aquí si el método subyacente es síncrono
+class BootedApplication(Container):
+    """Container double reporting itself as booted."""
+
+    isBooted = True
+
+
+async def main() -> None:
+    app = BootedApplication()
+    app.singleton(None, Cache, alias="cache")
+
+    # Facade.resolve() reads the shared application from the class attribute.
+    CacheFacade._application = app
+
+    # Without a pinned instance every attribute access returns a dispatcher
+    # that only touches the container once it is awaited.
+    dispatcher = CacheFacade.get
+    print("dispatcher is cached:", dispatcher is CacheFacade.get)
+    print("await a method:", await CacheFacade.get("users"))
+    print("await an attribute:", await CacheFacade.driver())
+
+    # After pin() the facade forwards attribute access directly.
+    await CacheFacade.pin()
+    print("pinned method call:", CacheFacade.get("users"))
+    print("pinned attribute:", CacheFacade.driver)
+
+    CacheFacade.unpin()
+    print("pinned instance cleared:", CacheFacade._pinned_instance)
+
+    try:
+        Facade.getFacadeAccessor()
+    except NotImplementedError as exc:
+        print(f"NotImplementedError: {exc}")
+
+
+asyncio.run(main())
 ```
+
+```text
+dispatcher is cached: True
+await a method: value:users
+await an attribute: memory
+pinned method call: value:users
+pinned attribute: memory
+pinned instance cleared: None
+NotImplementedError: Class Facade must define getFacadeAccessor()
+```
+
+### Inspeccionar bindings y scopes
+
+```python
+import asyncio
+
+from orionis.container.context.manager import ScopeManager
+from orionis.container.context.scope import ScopedContext
+from orionis.container.entities.binding import Binding
+from orionis.container.enums.lifetimes import Lifetime
+
+
+class IClock:
+    """Contract stored in the binding."""
+
+
+class SystemClock(IClock):
+    """Implementation stored in the binding."""
+
+
+def describe_binding() -> None:
+    binding = Binding(
+        contract=IClock,
+        concrete=SystemClock,
+        lifetime=Lifetime.SINGLETON,
+        alias="clock",
+    )
+    print("lifetime:", binding.lifetime)
+    print("serialised:", binding.toDict())
+    print("fields:", [field["name"] for field in binding.getFields()])
+
+    try:
+        Binding(lifetime="singleton")
+    except TypeError as exc:
+        print(f"TypeError: {exc}")
+
+
+async def describe_scope_manager() -> None:
+    manager = ScopeManager()
+    manager.set("config", {"debug": True})
+    print("subscript:", manager["config"])
+    print("membership:", "config" in manager)
+    print("await get:", await manager.get("config"))
+    print("missing get:", await manager.get("absent"))
+
+    try:
+        await manager.resolve("absent")
+    except KeyError as exc:
+        print(f"KeyError: {exc}")
+
+    manager.clear()
+    print("after clear:", "config" in manager, manager["config"])
+
+
+def describe_scoped_context() -> None:
+    print("initial scope:", ScopedContext.getCurrentScope())
+    token = ScopedContext.setCurrentScope("outer")
+    print("after set:", ScopedContext.getCurrentScope())
+    ScopedContext.reset(token)
+    print("after reset:", ScopedContext.getCurrentScope())
+
+
+describe_binding()
+asyncio.run(describe_scope_manager())
+describe_scoped_context()
+```
+
+```text
+lifetime: Lifetime.SINGLETON
+serialised: {'contract': <class '__main__.IClock'>, 'concrete': <class '__main__.SystemClock'>, 'instance': None, 'lifetime': 2, 'alias': 'clock'}
+fields: ['contract', 'concrete', 'instance', 'lifetime', 'alias']
+TypeError: The 'lifetime' attribute must be an instance of 'Lifetime', but received type 'str'.
+subscript: {'debug': True}
+membership: True
+await get: {'debug': True}
+missing get: None
+KeyError: "Instance for key 'absent' not found in scope"
+after clear: False None
+initial scope: None
+after set: outer
+after reset: None
+```
+
+### Resolver de forma concurrente
+
+```python
+import asyncio
+
+from orionis.container.container import Container
+
+
+class Config:
+    """Singleton whose construction suspends before returning."""
+
+    constructions = 0
+
+    def __init__(self) -> None:
+        Config.constructions += 1
+
+
+class Report:
+    """Service depending on a type published by a deferred provider."""
+
+    def __init__(self, config: Config) -> None:
+        self.config = config
+
+
+class ConfigProvider:
+    """Deferred provider that suspends while booting."""
+
+    container: Container | None = None
+    registrations = 0
+
+    def register(self) -> None:
+        ConfigProvider.registrations += 1
+        ConfigProvider.container.singleton(None, Config)
+
+    async def boot(self) -> None:
+        await asyncio.sleep(0)
+
+
+CONFIG_KEY = f"{Config.__module__}.{Config.__name__}"
+
+
+async def main() -> None:
+    container = Container()
+    ConfigProvider.container = container
+
+    # The bootstrap layer normally fills this registry; here it is explicit.
+    container._deferred_providers = {
+        CONFIG_KEY: {"module": __name__, "class": "ConfigProvider"},
+    }
+
+    reports = await asyncio.gather(*(container.build(Report)
+                                     for _ in range(8)))
+
+    print("reports built:", len(reports))
+    print("provider registrations:", ConfigProvider.registrations)
+    print("Config constructions:", Config.constructions)
+    print("shared singleton:", len({id(r.config) for r in reports}))
+
+
+asyncio.run(main())
+```
+
+```text
+reports built: 8
+provider registrations: 1
+Config constructions: 1
+shared singleton: 1
+```
+
+---
 
 ## Consideraciones de rendimiento y concurrencia
 
-- **Construcción de singleton thread-safe**: `Container.__new__` usa double-checked locking (`threading.RLock`) para que los hilos concurrentes que crean la primera instancia de una subclase de `Container` nunca compitan entre sí; las llamadas posteriores toman una vía rápida sin bloqueo.
-- **Resolución asíncrona, no basada en hilos**: `make`/`build`/`invoke`/`call` son funciones corrutina; deben ejecutarse dentro de un bucle de eventos `asyncio` y esperarse (`await`). No existe una API de resolución síncrona.
-- **Seguimiento de dependencias circulares por tarea**: la pila de resolución usada para detectar ciclos se almacena en una `contextvars.ContextVar` (un `frozenset` inmutable intercambiado mediante `token`/`reset`), de modo que las tareas concurrentes de `asyncio` que resuelven grafos de dependencias superpuestos no interfieren entre sí.
-- **Los scopes se basan en contextvars**: `ScopedContext` también usa una `ContextVar`, por lo que un scope abierto con `beginScope()` es visible para la tarea actual y cualquier código esperado (`await`) desde ella; crear manualmente una nueva `asyncio.Task` dentro de un scope captura una instantánea del contexto en el momento de su creación, siguiendo la semántica estándar de `contextvars`/`asyncio`.
-- **El registro no está bloqueado internamente más allá de la creación de instancia**: `instance`/`transient`/`singleton`/`scoped` mutan los diccionarios de bindings/alias del contenedor sin un lock explícito. El patrón de uso esperado es realizar todos los registros durante el arranque de la aplicación (antes de que comience el manejo concurrente de peticiones); resolver singletons ya registrados después es una simple búsqueda en diccionario, segura para lecturas bajo el GIL.
-- **Condición de carrera en la primera resolución de singletons**: si dos tareas concurrentes llaman a `make()` para el mismo singleton aún no creado al mismo tiempo, ambas pueden construir una instancia antes de que la caché se llene (la última escritura en la caché de singletons prevalece). Esto solo afecta a la primerísima resolución de un singleton dado.
-- **Caché del dispatcher del facade**: `FacadeMeta` cachea un closure dispatcher por cada par `(clase de facade, nombre de atributo)` en un diccionario a nivel de módulo, de modo que los accesos repetidos sin fijar no recrean la función corrutina; fijar (`await Facade.pin()`) elimina por completo esa indirección adicional para rutas críticas.
-- **Los proveedores diferidos evitan imports/arranques innecesarios**: el módulo de un proveedor diferido solo se importa y su `register()`/`boot()` se ejecuta la primera vez que uno de sus servicios declarados es realmente solicitado, reduciendo el costo de arranque cuando un servicio nunca se usa en una ejecución dada.
+- **La creación del singleton está protegida por lock.** `Container.__new__` lee
+  `_instances` sin el lock primero y solo adquiere el `threading.RLock` cuando falla,
+  revisando de nuevo dentro de la sección crítica. Verificado: 32 hilos construyendo la
+  misma subclase a la vez observan una única instancia.
+- **La construcción de una sola vez se serializa por clave dentro de un loop.** Las
+  creaciones `SINGLETON` y `SCOPED` y el arranque de proveedores diferidos corren bajo
+  un `asyncio.Lock` obtenido de `__creationLock`, revisando la caché de nuevo tras
+  adquirirlo. Verificado: ocho tareas resolviendo el mismo singleton sin cachear (cuya
+  construcción se suspende) producen una instancia y una sola llamada al constructor;
+  lo mismo vale para un servicio scoped dentro de un scope, y un proveedor diferido se
+  registra exactamente una vez.
+- **Los locks pertenecen al loop que los creó.** `__creation_locks` guarda el loop en
+  ejecución junto a cada lock y reemplaza la entrada cuando otro loop pide la misma
+  clave, así que un lock nunca se awaita desde un loop ajeno. Dos loops sobre el mismo
+  contenedor se serializan por separado, no entre sí.
+- **Los caminos rápidos nunca toman un lock.** Un acierto de caché, un acierto de
+  scope, un binding transitorio y una clave que no es diferida retornan antes de pedir
+  cualquier lock.
+- **La construcción anidada no produce deadlock.** Cada contrato tiene su propio lock, y
+  un tipo concreto que ya está en la pila de resolución se salta el lock por completo,
+  así que un ciclo de dependencias sigue apareciendo como
+  `CircularDependencyException` en lugar de bloquearse.
+- **El registro no está protegido.** Salvo `__new__`, el módulo no declara
+  sincronización para `_deferred_providers`, la tabla de bindings, la tabla de alias ni
+  la caché de singletons: son diccionarios normales que se mutan in situ, así que el
+  registro está pensado para el arranque y no para ejecutarse concurrentemente desde
+  varios hilos del SO.
+- **El aislamiento entre tareas viene de `contextvars`.** Tanto el scope activo
+  (`"x-orionis-container-context-scope"`) como la pila de dependencias circulares
+  (`"x-orionis-resolution-stack"`) son `ContextVar`s, así que tareas asyncio
+  concurrentes nunca comparten ese estado. La pila de ciclos se apila con un token y se
+  restaura en un bloque `finally`, así que una resolución fallida no deja residuos.
+- **`make()` tiene camino rápido.** Una clave que no es cadena y ya está en la caché de
+  singletons retorna antes de ejecutar cualquier búsqueda de alias, de proveedor
+  diferido o de scope.
+- **Los proveedores diferidos se ejecutan una vez por clave.** Las claves resueltas se
+  anotan en un conjunto, y el registro se consulta antes que ese conjunto para que los
+  tipos no diferidos salgan tras una única búsqueda en diccionario.
+- **La reflexión se cachea aguas arriba.** La inspección de firmas se delega en
+  `orionis.introspection`, cuyos helpers `_get_signature` y `_get_resolved_signature`
+  están envueltos en `functools.lru_cache(maxsize=1024)` indexados por el objeto
+  destino.
+- **Los dispatchers de facade se cachean para siempre.** `_dispatcher_cache` es un
+  diccionario de módulo indexado por `(clase_facade, nombre_atributo)` sin desalojo,
+  así que cada entrada mantiene una referencia fuerte a la clase facade durante toda la
+  vida del proceso.
+- **Pinear elimina una resolución por llamada.** Mientras `_pinned_instance` está
+  puesto, el acceso a atributos es un `getattr` directo sobre el objeto cacheado; sin
+  pinear, cada await delega en el contenedor.
+- **`ScopeManager.get()` memoiza los valores awaitados.** Una corrutina almacenada se
+  promueve a `asyncio.Task`, se awaita una vez y se sustituye por su resultado.
 
-## Notas de diseño
-
-- `Container` implementa `IContainer` (`abc.ABC`) para que el registro/resolutor concreto pueda referenciarse de forma abstracta (p. ej. tipado como `IContainer`) en todo el framework, y para que `orionis.foundation.application.Application` pueda extenderlo añadiendo aspectos propios de la aplicación.
-- `Binding` es un dataclass inmutable (`frozen=True, kw_only=True`) que extiende el `BaseEntity` del framework, en consonancia con el resto de la capa de entidades del framework.
-- `Lifetime` es un `Enum` simple con tres miembros (`TRANSIENT`, `SINGLETON`, `SCOPED`) que dirige un despacho de estrategia directo dentro de `Container.__resolve`.
-- El autowiring de dependencias se basa en reflexión: las firmas de constructores/callables se inspeccionan una vez por llamada mediante `orionis.introspection.callables.reflection.ReflectionCallable` / `orionis.introspection.concretes.reflection.ReflectionConcrete`, produciendo metadatos `Signature`/`Argument` que el contenedor recorre para resolver cada parámetro (tipos enlazados en el contenedor, valores por defecto o autorresolución recursiva).
-- Los parámetros de constructor/callable de tipo `msgspec.Struct` reciben un tratamiento especial: el contenedor lee el cuerpo de la petición HTTP actual (`orionis.http.request.Request`) y lo valida/decodifica al tipo de esquema solicitado mediante `orionis.schemas.validator.Schema.validate(...)`.
-- Tanto los ciclos de vida `scoped` como la detección de dependencias circulares se implementan con `contextvars.ContextVar` en lugar de variables locales de hilo, de modo que componen correctamente con la concurrencia basada en `asyncio` en vez de asumir un hilo por unidad de trabajo.
-- El patrón `Facade` imita el facade estático al estilo Laravel: `FacadeMeta.__getattr__` intercepta el acceso a atributos arbitrarios en la propia clase del facade, resolviendo el servicio enlazado bajo demanda (o devolviendo una referencia directa una vez "fijado"). Es el mismo mecanismo usado por los facades integrados del framework (p. ej. el facade `Log` documentado en `orionis/log`).
-- `DeferrableProvider` es solo una clase marcadora/de declaración: no realiza por sí misma la carga perezosa — aporta la lista `provides()` que la capa de arranque del framework (`orionis.foundation`) usa para construir el registro de proveedores diferidos que consulta `Container`.
+---
 
 ## Notas de compatibilidad
 
-- **Python**: `>=3.14` (según el `pyproject.toml` del proyecto).
-- **Dependencias externas**: `msgspec` (dependencia central del proyecto, usada solo en la ruta de inyección de dependencias tipada con `msgspec.Struct` para peticiones).
-- **Dependencias internas**: `orionis.introspection` (reflexión), `orionis.http.request.Request` y `orionis.schemas.validator.Schema` (inyección de dependencias tipada por esquema), `orionis.foundation.contracts.application.IApplication` (tipado para `ServiceProvider`/`Facade`).
-- **Requisito de asyncio**: todos los métodos de resolución (`make`, `build`, `invoke`, `call`) y el gestor de contexto de scope (`beginScope`) son asíncronos y requieren un bucle de eventos `asyncio` en ejecución.
+- **Python:** `requires-python = ">=3.14"` en `pyproject.toml`. El módulo usa
+  `typing.Self`, uniones `X | Y` y la evaluación diferida de anotaciones de PEP 649.
+- **Dependencias de runtime:** solo la biblioteca estándar (`contextvars`,
+  `importlib`, `inspect`, `threading`, `collections`, `abc`, `dataclasses`, `enum`,
+  `asyncio`), más los módulos hermanos de Orionis `orionis.introspection`,
+  `orionis.schemas`, `orionis.http` y `orionis.support.entities`. No hay nada extra que
+  instalar más allá de `pip install orionis`.
+- **Coste de import:** `container.py` importa `orionis.http.request.Request` y
+  `orionis.schemas.validator.Schema` a nivel de módulo, así que importar el contenedor
+  arrastra también esas capas.
+- **No uses `from __future__ import annotations` en las clases que construye el
+  contenedor.** Con ese import las anotaciones del constructor quedan como cadenas y la
+  capa de reflexión las trata como forward references de tipo `str`; el contenedor
+  inyecta entonces un `str` en lugar de la dependencia esperada. Verificado: un
+  servicio anotado `def __init__(self, repo: Repo)` dentro de un módulo con el future
+  import recibe un `str`. Los módulos que confían en PEP 649 (el comportamiento por
+  defecto en 3.14) inyectan correctamente.
+- **`Application` es el contenedor real.** `orionis.foundation.application.Application`
+  hereda de `Container`, así que el singleton del framework devuelto por
+  `Application()` posee los bindings usados en runtime, y `Facade.resolve()` llega a él
+  automáticamente.
+- **Los módulos de contratos usan anotaciones en texto.** `contracts/container.py`,
+  `contracts/service_provider.py` y `contracts/deferrable_provider.py` declaran
+  `from __future__ import annotations`; compararlos contra las implementaciones debe
+  hacerse por nombres de parámetros, no por objetos de anotación resueltos.

@@ -1,41 +1,57 @@
 from __future__ import annotations
+import inspect
 from abc import ABC
 from orionis.test import TestCase
+from orionis.container.container import Container
 from orionis.container.contracts.container import IContainer
 
+_ABSTRACT_METHODS = frozenset({
+    "instance", "transient", "singleton", "scoped",
+    "bound", "beginScope", "getCurrentScope",
+    "make", "build", "invoke", "call",
+})
+
 class _ConcreteContainer(IContainer):
-    def instance(self, _abstract, _instance, *, _alias=None, _override=False):  # type: ignore[override]
+    """Minimal IContainer implementation used for structural tests."""
+
+    def instance(self, _abstract, _instance, *, _alias=None, _override=False):
         return True
-    def transient(self, _abstract, _concrete, *, _alias=None, _override=False):  # type: ignore[override]
+
+    def transient(self, _abstract, _concrete, *, _alias=None, _override=False):
         return True
-    def singleton(self, _abstract, _concrete, *, _alias=None, _override=False):  # type: ignore[override]
+
+    def singleton(self, _abstract, _concrete, *, _alias=None, _override=False):
         return True
-    def scoped(self, _abstract, _concrete, *, _alias=None, _override=False):  # type: ignore[override]
+
+    def scoped(self, _abstract, _concrete, *, _alias=None, _override=False):
         return True
-    def bound(self, _key):  # type: ignore[override]
+
+    def bound(self, _key):
         return False
-    def beginScope(self):  # type: ignore[override]
+
+    def beginScope(self):
         return None
-    def getCurrentScope(self):  # type: ignore[override]
+
+    def getCurrentScope(self):
         return None
-    async def make(self, _key, *_args: object, **_kwargs: object):  # type: ignore[override]
+
+    async def make(self, _key, *_args: object, **_kwargs: object):
         return None
-    async def build(self, _type_, *_args: object, **_kwargs: object):  # type: ignore[override]  # noqa: ARG002
+
+    async def build(self, _target, *_args: object, **_kwargs: object):
         return None
-    async def invoke(self, _fn, *_args: object, **_kwargs: object):  # type: ignore[override]
+
+    async def invoke(self, _fn, *_args: object, **_kwargs: object):
         return None
-    async def call(self, _instance, _method_name, *_args: object, **_kwargs: object):  # type: ignore[override]
+
+    async def call(self, _instance, _name, *_args: object, **_kwargs: object):
         return None
 
 class TestIContainer(TestCase):
 
-    # ------------------------------------------------------------------
-    # Structural / ABC
-    # ------------------------------------------------------------------
-
-    def testIContainerIsAbstractBaseClass(self) -> None:
+    def testContractIsAnAbstractBaseClass(self) -> None:
         """
-        Test that IContainer is a subclass of ABC.
+        Declare IContainer as an ABC that cannot be instantiated directly.
 
         Returns
         -------
@@ -43,156 +59,67 @@ class TestIContainer(TestCase):
             This method does not return a value.
         """
         self.assertTrue(issubclass(IContainer, ABC))
-
-    def testIContainerCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Test that direct instantiation of IContainer raises TypeError.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
         with self.assertRaises(TypeError):
             IContainer()  # type: ignore[abstract]
 
-    # ------------------------------------------------------------------
-    # Abstract method presence
-    # ------------------------------------------------------------------
-
-    def testHasAbstractMethodInstance(self) -> None:
+    def testContractDeclaresExactlyTheExpectedAbstractMethods(self) -> None:
         """
-        Test that 'instance' is declared as an abstract method.
+        Declare exactly the documented set of abstract methods.
+
+        Catches both silent removals and unintended additions to the public
+        container surface.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        self.assertIn("instance", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodTransient(self) -> None:
-        """
-        Test that 'transient' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("transient", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodSingleton(self) -> None:
-        """
-        Test that 'singleton' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("singleton", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodScoped(self) -> None:
-        """
-        Test that 'scoped' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("scoped", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodBound(self) -> None:
-        """
-        Test that 'bound' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("bound", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodBeginScope(self) -> None:
-        """
-        Test that 'beginScope' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("beginScope", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodGetCurrentScope(self) -> None:
-        """
-        Test that 'getCurrentScope' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("getCurrentScope", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodMake(self) -> None:
-        """
-        Test that 'make' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("make", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodBuild(self) -> None:
-        """
-        Test that 'build' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("build", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodInvoke(self) -> None:
-        """
-        Test that 'invoke' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("invoke", IContainer.__abstractmethods__)
-
-    def testHasAbstractMethodCall(self) -> None:
-        """
-        Test that 'call' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertIn("call", IContainer.__abstractmethods__)
-
-    # ------------------------------------------------------------------
-    # Concrete subclass can be instantiated once all methods are defined
-    # ------------------------------------------------------------------
+        self.assertEqual(IContainer.__abstractmethods__, _ABSTRACT_METHODS)
 
     def testConcreteSubclassCanBeInstantiated(self) -> None:
         """
-        Instantiate a concrete subclass implementing all abstract methods without error.
+        Instantiate a subclass that implements every abstract method.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        obj = _ConcreteContainer()
-        self.assertIsInstance(obj, IContainer)
+        self.assertIsInstance(_ConcreteContainer(), IContainer)
+
+    def testContainerImplementationMatchesTheContractSignatures(self) -> None:
+        """
+        Keep the Container parameter names aligned with the contract.
+
+        Only parameter names are compared: the contract module defers its
+        annotations while the implementation does not, so the resolved
+        annotation objects can never be equal.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        for name in sorted(_ABSTRACT_METHODS):
+            expected = list(
+                inspect.signature(getattr(IContainer, name)).parameters,
+            )
+            actual = list(
+                inspect.signature(getattr(Container, name)).parameters,
+            )
+            self.assertEqual(actual, expected, f"signature drift on {name!r}")
+
+    def testAsynchronousContractMethodsStayAsynchronous(self) -> None:
+        """
+        Keep the resolution entry points declared as coroutine functions.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        for name in ("make", "build", "invoke", "call"):
+            self.assertTrue(
+                inspect.iscoroutinefunction(getattr(Container, name)),
+                f"{name!r} must stay asynchronous",
+            )

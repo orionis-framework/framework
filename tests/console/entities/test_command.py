@@ -89,10 +89,10 @@ class TestCommandEntity(TestCase):
         Verify the default value of the method field.
 
         Ensures that when no method is provided, the field defaults to
-        the string 'hanldle' as declared in the dataclass definition.
+        the string 'handle' as declared in the dataclass definition.
         """
         cmd = self._make()
-        self.assertEqual(cmd.method, "hanldle")
+        self.assertEqual(cmd.method, "handle")
 
     def testDefaultTimestamps(self) -> None:
         """

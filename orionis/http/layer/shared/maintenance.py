@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class UnderMaintenanceMiddleware:
     """Reject every incoming request with 503 while in maintenance mode.

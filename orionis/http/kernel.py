@@ -22,7 +22,7 @@ from orionis.http.layer.web.csrf_token import CSRFTokenMiddleware
 from orionis.http.layer.web.start_session import StartSessionMiddleware
 from orionis.http.payload.body import BodyStream
 from orionis.http.request import Request
-from orionis.http.response import JSONResponse, Response
+from orionis.http.responses import JSONResponse, Response
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.loader import RouteLoader

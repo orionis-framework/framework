@@ -132,3 +132,27 @@ class TestSecureKeyGeneratorRejections(TestCase):
         with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate(object())
         self.assertIn("is not supported", str(ctx.exception))
+
+# ---------------------------------------------------------------------------
+# TestSecureKeyGeneratorLayout
+# ---------------------------------------------------------------------------
+
+class TestSecureKeyGeneratorLayout(TestCase):
+
+    def testDeclaresEmptySlots(self) -> None:
+        """
+        Declare empty slots for a generator that holds no state.
+
+        Validates that the utility keeps its whole catalogue at class
+        level instead of per instance.
+        """
+        self.assertEqual(SecureKeyGenerator.__slots__, ())
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep instances free of a dictionary.
+
+        Validates that an accidental instantiation cannot be used to
+        shadow the declared key sizes.
+        """
+        self.assertFalse(hasattr(SecureKeyGenerator(), "__dict__"))

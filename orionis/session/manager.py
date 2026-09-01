@@ -16,7 +16,7 @@ from orionis.session.stores.memory import MemorySessionStore
 if TYPE_CHECKING:
     from pathlib import Path
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
     from orionis.session.contracts.store import ISessionStore
 
 class SessionManager:

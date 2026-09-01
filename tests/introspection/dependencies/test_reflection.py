@@ -81,7 +81,10 @@ class _KeywordOnly:
 class _ForwardRef:
     """Class whose constructor annotates a parameter with a string literal."""
 
-    def __init__(self, dep: "UnknownDependency") -> None:  # noqa: F821, UP037
+    def __init__(
+        self,
+        dep: "UnknownDependency",  # type: ignore[name-defined]  # noqa: F821, UP037
+    ) -> None:
         self.dep = dep
 
 

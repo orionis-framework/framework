@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
-from orionis.http.response import (
+from orionis.http.responses import (
     FileResponse,
     HTMLResponse,
     JSONResponse,

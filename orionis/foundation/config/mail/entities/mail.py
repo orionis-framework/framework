@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from orionis.foundation.config.mail.entities.mailers import Mailers
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed mailer option names

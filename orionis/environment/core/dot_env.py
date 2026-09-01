@@ -17,6 +17,8 @@ class DotEnv(metaclass=Singleton):
 
     # ruff: noqa: PLR0911, FBT001
 
+    __slots__ = ("__cache", "__resolved_path")
+
     # Lock to ensure thread safety during initialization and
     # operations that modify the .env file
     _lock = threading.Lock()
@@ -113,8 +115,16 @@ class DotEnv(metaclass=Singleton):
 
         Raises
         ------
-        OrionisEnvironmentValueError
-            If the provided key is not a valid environment variable name.
+        TypeError
+            If `key` is not a string, if `value` is not one of the supported
+            types, or if `type_hint` is neither a string nor an
+            `EnvironmentValueType`.
+        ValueError
+            If `key` is not a valid environment variable name, or if `value`
+            cannot be serialized for the requested type.
+        RuntimeError
+            If `type_hint` is a string that does not name a member of
+            `EnvironmentValueType`.
 
         Notes
         -----
@@ -157,18 +167,22 @@ class DotEnv(metaclass=Singleton):
         ----------
         key : str
             Name of the environment variable to retrieve.
-        default : Any or None, optional
+        default : object | None, optional
             Value to return if the key is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        object
             Parsed value of the environment variable if found, otherwise `default`.
 
         Raises
         ------
-        OrionisEnvironmentValueError
-            If `key` is not a valid environment variable name.
+        TypeError
+            If `key` is not a string, or if the stored value is incompatible
+            with its declared type.
+        ValueError
+            If `key` is not a valid environment variable name, or if the stored
+            value cannot be decoded for its declared type.
         """
         # Ensure thread-safe operation while retrieving the environment variable.
         with self._lock:
@@ -206,8 +220,10 @@ class DotEnv(metaclass=Singleton):
 
         Raises
         ------
-        OrionisEnvironmentValueError
-            If the provided key is not a valid environment variable name.
+        TypeError
+            If `key` is not a string.
+        ValueError
+            If `key` is not a valid environment variable name.
 
         Notes
         -----

@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from orionis.http.response import RedirectResponse
+from orionis.http.responses import RedirectResponse
 
 if TYPE_CHECKING:
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.request import Request
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
     from orionis.schemas.exceptions.validation import ValidationException
 
 async def validation_response(

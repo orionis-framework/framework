@@ -1,1003 +1,725 @@
 import os
 import shutil
 import tempfile
-from orionis.test import TestCase
+from pathlib import Path
 from orionis.environment.core.dot_env import DotEnv
 from orionis.environment.enums import EnvironmentValueType
 from orionis.support.patterns.singleton.meta import _MISSING
+from orionis.test import TestCase
+
+# Path segment used for a `.env` file that can never be created.
+_UNREACHABLE_DIRECTORY: str = "missing-directory"
+
+# Path containing a null byte, rejected by every filesystem call.
+_MALFORMED_PATH: str = "broken\x00path"
 
 # ---------------------------------------------------------------------------
-# Shared base — singleton reset + temp-file lifecycle
+# Test doubles
 # ---------------------------------------------------------------------------
 
-class _DotEnvBase(TestCase):
+class _OpaqueValue:
+    """Value outside the supported catalogue with a stable text form."""
+
+    __slots__ = ()
+
+    def __str__(self) -> str:
+        """Return the canonical text form of the value."""
+        return "opaque-value"
+
+# ---------------------------------------------------------------------------
+# Shared fixture
+# ---------------------------------------------------------------------------
+
+class _DotEnvTestCase(TestCase):
 
     def setUp(self) -> None:
         """
-        Reset the singleton and create a temporary .env file for the test.
+        Install a throwaway `.env` file as the active singleton.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Isolates every test from the repository `.env` file and from the
+        process environment shared with the rest of the suite.
         """
-        # Reset the singleton so each test starts fresh
+        self._previous_singleton = vars(DotEnv)["_singleton_instance"]
         type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        # Temporary directory + path used as the .env backing file
-        self._tmpdir: str = tempfile.mkdtemp()
-        self._env_path: str = os.path.join(self._tmpdir, ".test_env")
-        self._dot_env: DotEnv = DotEnv(path=self._env_path)
-        # Keys registered here are removed from os.environ in tearDown
+        self._directory = Path(tempfile.mkdtemp())
+        self._env_path = self._directory / ".env"
+        self._dot_env = DotEnv(path=str(self._env_path))
         self._tracked_keys: list[str] = []
 
     def tearDown(self) -> None:
         """
-        Clean up os.environ keys, temp files, and the singleton.
+        Restore the previous singleton and clean every side effect.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Removes the tracked process variables and the temporary directory
+        so no state survives the test case.
         """
-        # Remove every key that was set during the test
         for key in self._tracked_keys:
             os.environ.pop(key, None)
-        shutil.rmtree(self._tmpdir, ignore_errors=True)
-        # Always reset the singleton so tests cannot bleed state
-        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
+        shutil.rmtree(self._directory, ignore_errors=True)
+        type.__setattr__(
+            DotEnv,
+            "_singleton_instance",
+            self._previous_singleton,
+        )
 
-    def _track(self, key: str) -> str:
+    def _trackKey(self, key: str) -> str:
         """
-        Register a key for automatic os.environ cleanup in tearDown.
+        Register a variable for automatic cleanup after the test.
 
         Parameters
         ----------
         key : str
-            Environment variable name to track.
+            Environment variable name to remove during teardown.
 
         Returns
         -------
         str
-            The same key, for convenient inline use.
+            The same key, so it can be used inline at the call site.
         """
         if key not in self._tracked_keys:
             self._tracked_keys.append(key)
         return key
 
+    def _fileContents(self) -> str:
+        """
+        Read the raw contents of the temporary `.env` file.
+
+        Returns
+        -------
+        str
+            Everything currently persisted on disk.
+        """
+        return self._env_path.read_text(encoding="utf-8")
+
+    def _writeRawEntry(self, key: str, raw: str) -> None:
+        """
+        Publish a raw, unserialised value in the process environment.
+
+        Parameters
+        ----------
+        key : str
+            Environment variable name to publish.
+        raw : str
+            Exact string the reader must parse.
+        """
+        os.environ[self._trackKey(key)] = raw
+
 # ---------------------------------------------------------------------------
-# TestDotEnvInit
+# TestDotEnvInitialisation
 # ---------------------------------------------------------------------------
 
-class TestDotEnvInit(TestCase):
+class TestDotEnvInitialisation(TestCase):
 
     def setUp(self) -> None:
         """
-        Reset the singleton and create a temp directory for path tests.
+        Detach the singleton and prepare an empty working directory.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Allows each test to build its own instance without leaking state
+        into the rest of the suite.
         """
+        self._previous_singleton = vars(DotEnv)["_singleton_instance"]
         type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        self._tmpdir: str = tempfile.mkdtemp()
-        self._env_path: str = os.path.join(self._tmpdir, ".test_env")
+        self._directory = Path(tempfile.mkdtemp())
 
     def tearDown(self) -> None:
         """
-        Clean up the temp directory and singleton after each test.
+        Restore the previous singleton and drop the working directory.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Guarantees that the shared application state is left untouched.
         """
-        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        shutil.rmtree(self._tmpdir, ignore_errors=True)
+        os.environ.pop("INIT_SEEDED_KEY", None)
+        shutil.rmtree(self._directory, ignore_errors=True)
+        type.__setattr__(
+            DotEnv,
+            "_singleton_instance",
+            self._previous_singleton,
+        )
 
-    def testCustomPathCreatesFile(self) -> None:
+    def testCreatesTheFileWhenItDoesNotExist(self) -> None:
         """
-        Assert that DotEnv creates the .env file when it does not exist.
+        Create an empty `.env` file when none is present.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the bootstrap behaviour of a freshly scaffolded project
+        that has no environment file yet.
         """
-        # The temp file path does not exist yet
-        self.assertFalse(os.path.exists(self._env_path))
-        DotEnv(path=self._env_path)
-        # After init the file must exist on disk
-        self.assertTrue(os.path.exists(self._env_path))
+        target = self._directory / ".env"
+        DotEnv(path=str(target))
+        self.assertTrue(target.is_file())
 
-    def testCustomPathFileExistsAfterInit(self) -> None:
+    def testKeepsTheContentsOfAnExistingFile(self) -> None:
         """
-        Assert that the resolved path is accessible after initialisation.
+        Preserve the contents of an existing `.env` file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that initialisation never truncates a configuration
+        file that already holds values.
         """
-        DotEnv(path=self._env_path)
-        self.assertTrue(os.path.isfile(self._env_path))
+        target = self._directory / ".env"
+        target.write_text("INIT_SEEDED_KEY=seeded\n", encoding="utf-8")
+        DotEnv(path=str(target))
+        self.assertIn("INIT_SEEDED_KEY=seeded", target.read_text(encoding="utf-8"))
 
-    def testExistingFileIsNotOverwritten(self) -> None:
+    def testPublishesFileValuesInTheProcessEnvironment(self) -> None:
         """
-        Assert that pre-existing .env content is preserved on re-init.
+        Publish every file value in the process environment.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the eager load that makes variables visible to code
+        reading ``os.environ`` directly.
         """
-        # Write a sentinel line before DotEnv is created
-        with open(self._env_path, "w") as fh:
-            fh.write("SENTINEL=1\n")
-        DotEnv(path=self._env_path)
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertIn("SENTINEL", content)
+        target = self._directory / ".env"
+        target.write_text("INIT_SEEDED_KEY=seeded\n", encoding="utf-8")
+        DotEnv(path=str(target))
+        self.assertEqual(os.environ.get("INIT_SEEDED_KEY"), "seeded")
 
-    def testSingletonReturnsSameInstance(self) -> None:
+    def testResolvesTheSuppliedPath(self) -> None:
         """
-        Assert that two DotEnv calls return the identical singleton object.
+        Resolve the supplied path before touching the filesystem.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that relative segments are collapsed so the same file is
+        used regardless of how the path was spelled.
         """
-        a = DotEnv(path=self._env_path)
-        b = DotEnv(path=self._env_path)
-        self.assertIs(a, b)
+        nested = self._directory / "nested"
+        nested.mkdir()
+        DotEnv(path=str(nested / ".." / ".env"))
+        self.assertTrue((self._directory / ".env").is_file())
+
+    def testReusesTheSingletonInstance(self) -> None:
+        """
+        Reuse the same instance for every subsequent construction.
+
+        Validates the singleton contract that keeps one authoritative
+        reader per process.
+        """
+        first = DotEnv(path=str(self._directory / ".env"))
+        second = DotEnv(path=str(self._directory / "ignored.env"))
+        self.assertIs(first, second)
+
+    def testReportsAnUnreachableFileAsOsError(self) -> None:
+        """
+        Raise OSError when the `.env` file cannot be created.
+
+        Validates the handler that reports a misconfigured path with the
+        offending location included in the message.
+        """
+        target = self._directory / _UNREACHABLE_DIRECTORY / ".env"
+        with self.assertRaises(OSError) as ctx:
+            DotEnv(path=str(target))
+        self.assertIn("Failed to create or access", str(ctx.exception))
+
+    def testReportsAnyOtherFailureAsRuntimeError(self) -> None:
+        """
+        Raise RuntimeError for failures that are not filesystem errors.
+
+        Validates the last-resort handler that keeps initialisation from
+        leaking arbitrary exception types to the bootstrap sequence.
+        """
+        with self.assertRaises(RuntimeError) as ctx:
+            DotEnv(path=_MALFORMED_PATH)
+        self.assertIn("unexpected error occurred", str(ctx.exception))
+
+    def testLeavesNoSingletonBehindAfterAFailure(self) -> None:
+        """
+        Leave no half-built instance behind when initialisation fails.
+
+        Validates that a later, valid construction is not served with the
+        broken instance produced by a failed attempt.
+        """
+        with self.assertRaises(OSError):
+            DotEnv(path=str(self._directory / _UNREACHABLE_DIRECTORY / ".env"))
+        self.assertIs(vars(DotEnv)["_singleton_instance"], _MISSING)
 
 # ---------------------------------------------------------------------------
 # TestDotEnvSet
 # ---------------------------------------------------------------------------
 
-class TestDotEnvSet(_DotEnvBase):
+class TestDotEnvSet(_DotEnvTestCase):
 
-    def testSetReturnsTrueForString(self) -> None:
+    def testReportsASuccessfulAssignment(self) -> None:
         """
-        Assert that set() returns True after a successful string assignment.
+        Report success after storing a variable.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the boolean contract relied upon by the console
+        commands that write configuration.
         """
-        key = self._track("TEST_SET_RETVAL")
-        result = self._dot_env.set(key, "hello")
-        self.assertTrue(result)
+        self.assertTrue(self._dot_env.set(self._trackKey("PLAIN_KEY"), "value"))
 
-    def testSetStringValueIsRetrievable(self) -> None:
+    def testPersistsTheValueInTheFile(self) -> None:
         """
-        Assert that a string value stored via set() is returned by get().
+        Persist the assigned value in the `.env` file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the variable survives a process restart.
         """
-        key = self._track("TEST_SET_STR")
-        self._dot_env.set(key, "world")
-        self.assertEqual(self._dot_env.get(key), "world")
+        self._dot_env.set(self._trackKey("PLAIN_KEY"), "value")
+        self.assertIn("PLAIN_KEY", self._fileContents())
 
-    def testSetIntValueIsRetrievable(self) -> None:
+    def testPublishesTheValueInTheProcessEnvironment(self) -> None:
         """
-        Assert that an integer value stored via set() is parsed back as int.
+        Publish the assigned value in the process environment.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the change is visible immediately, without waiting
+        for a reload.
         """
-        key = self._track("TEST_SET_INT")
-        self._dot_env.set(key, 42)
+        self._dot_env.set(self._trackKey("PLAIN_KEY"), "value")
+        self.assertEqual(os.environ.get("PLAIN_KEY"), "value")
+
+    def testOverwritesAnExistingValue(self) -> None:
+        """
+        Overwrite the previous value of an existing variable.
+
+        Validates that repeated assignments never accumulate duplicated
+        entries.
+        """
+        key = self._trackKey("PLAIN_KEY")
+        self._dot_env.set(key, "first")
+        self._dot_env.set(key, "second")
+        self.assertEqual(self._dot_env.get(key), "second")
+
+    def testRestoresEverySupportedValueType(self) -> None:
+        """
+        Restore every supported value type without a declared hint.
+
+        Validates the inferred serialisation used by the majority of the
+        framework configuration entries.
+        """
+        for index, value in enumerate(
+            ("text", 42, 2.5, True, False, [1, 2], {"a": 1}, (1, 2), {1, 2}),
+        ):
+            key = self._trackKey(f"INFERRED_KEY_{index}")
+            self._dot_env.set(key, value, only_os=True)
+            self.assertEqual(self._dot_env.get(key), value)
+
+    def testStoresNoneAsTheNullMarker(self) -> None:
+        """
+        Store ``None`` as the documented null marker.
+
+        Validates that an absent value round trips back to ``None``
+        instead of the literal text.
+        """
+        key = self._trackKey("NULL_KEY")
+        self._dot_env.set(key, None, only_os=True)
+        self.assertEqual(os.environ.get(key), "null")
+        self.assertIsNone(self._dot_env.get(key))
+
+    def testTrimsSurroundingWhitespaceFromStrings(self) -> None:
+        """
+        Trim surrounding whitespace before storing a string.
+
+        Validates the normalisation that keeps padded editor input out of
+        the configuration file.
+        """
+        key = self._trackKey("PADDED_KEY")
+        self._dot_env.set(key, "  padded  ", only_os=True)
+        self.assertEqual(self._dot_env.get(key), "padded")
+
+    def testFallsBackToTheTextFormOfUnsupportedValues(self) -> None:
+        """
+        Fall back to the text form of an unsupported value type.
+
+        Validates the defensive branch that keeps an exotic object from
+        breaking the writer when no hint is declared.
+        """
+        key = self._trackKey("OPAQUE_KEY")
+        self._dot_env.set(key, _OpaqueValue(), only_os=True)
+        self.assertEqual(self._dot_env.get(key), "opaque-value")
+
+    def testHonoursATextualTypeHint(self) -> None:
+        """
+        Honour a type hint expressed as a plain string.
+
+        Validates that the stored entry carries the ``"<type>:<value>"``
+        prefix understood by the reader.
+        """
+        key = self._trackKey("HINTED_KEY")
+        self._dot_env.set(key, 42, "int", only_os=True)
+        self.assertEqual(os.environ.get(key), "int:42")
         self.assertEqual(self._dot_env.get(key), 42)
 
-    def testSetFloatValueIsRetrievable(self) -> None:
+    def testHonoursAnEnumeratedTypeHint(self) -> None:
         """
-        Assert that a float value stored via set() is parsed back as float.
+        Honour a type hint expressed as an enumeration member.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that callers may use ``EnvironmentValueType`` instead of
+        a raw string.
         """
-        key = self._track("TEST_SET_FLOAT")
-        self._dot_env.set(key, 3.14)
-        self.assertAlmostEqual(self._dot_env.get(key), 3.14, places=5)
+        key = self._trackKey("ENUM_HINTED_KEY")
+        self._dot_env.set(key, "secret", EnvironmentValueType.BASE64, only_os=True)
+        self.assertEqual(self._dot_env.get(key), "secret")
 
-    def testSetBoolTrueIsRetrievable(self) -> None:
+    def testSkipsTheFileWhenOnlyTheProcessIsTargeted(self) -> None:
         """
-        Assert that boolean True is serialized and parsed back correctly.
+        Skip the `.env` file when only the process is targeted.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the ephemeral assignment used for values that must not
+        be persisted, such as runtime overrides.
         """
-        key = self._track("TEST_SET_BOOL_T")
-        self._dot_env.set(key, True)
-        self.assertIs(self._dot_env.get(key), True)
+        key = self._trackKey("EPHEMERAL_KEY")
+        self._dot_env.set(key, "value", only_os=True)
+        self.assertNotIn(key, self._fileContents())
+        self.assertEqual(os.environ.get(key), "value")
 
-    def testSetBoolFalseIsRetrievable(self) -> None:
+    def testRejectsAnInvalidVariableName(self) -> None:
         """
-        Assert that boolean False is serialized and parsed back correctly.
+        Reject names that break the environment naming convention.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_BOOL_F")
-        self._dot_env.set(key, False)
-        self.assertIs(self._dot_env.get(key), False)
-
-    def testSetListValueIsRetrievable(self) -> None:
-        """
-        Assert that a list value stored via set() is parsed back as a list.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_LIST")
-        self._dot_env.set(key, [1, 2, 3])
-        self.assertEqual(self._dot_env.get(key), [1, 2, 3])
-
-    def testSetDictValueIsRetrievable(self) -> None:
-        """
-        Assert that a dict value stored via set() is parsed back as a dict.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_DICT")
-        self._dot_env.set(key, {"a": 1, "b": 2})
-        self.assertEqual(self._dot_env.get(key), {"a": 1, "b": 2})
-
-    def testSetWithTypeHintInt(self) -> None:
-        """
-        Assert that set() with EnvironmentValueType.INT stores an int string.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_HINT")
-        # Passing a string "7" with INT hint should cast to integer 7
-        self._dot_env.set(key, "7", type_hint=EnvironmentValueType.INT)
-        result = self._dot_env.get(key)
-        self.assertEqual(result, 7)
-
-    def testSetOnlyOsDoesNotWriteToFile(self) -> None:
-        """
-        Assert that only_os=True skips writing to the .env file.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_ONLY_OS")
-        self._dot_env.set(key, "inmemory", only_os=True)
-        # Reading directly from the .env file must not contain the key
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertNotIn(key, content)
-
-    def testSetOnlyOsIsReadableFromOsEnviron(self) -> None:
-        """
-        Assert that only_os=True still sets the variable in os.environ.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SET_OS_READ")
-        self._dot_env.set(key, "present", only_os=True)
-        self.assertEqual(os.environ.get(key), "present")
-
-    def testSetInvalidKeyLowercaseRaisesValueError(self) -> None:
-        """
-        Assert that set() raises ValueError for a lowercase key name.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that key validation runs before anything is written to
+        disk.
         """
         with self.assertRaises(ValueError):
-            self._dot_env.set("invalid_key", "value")
+            self._dot_env.set("lower_case", "value")
+        with self.assertRaises(TypeError):
+            self._dot_env.set(42, "value")
 
-    def testSetInvalidKeyStartsWithDigitRaisesValueError(self) -> None:
+    def testRejectsAnUnsupportedValueWhenAHintIsDeclared(self) -> None:
         """
-        Assert that set() raises ValueError when the key starts with a digit.
+        Reject an unsupported value type when a hint is declared.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(ValueError):
-            self._dot_env.set("1INVALID", "value")
-
-    def testSetNonStringKeyRaisesTypeError(self) -> None:
-        """
-        Assert that set() raises TypeError when the key is not a string.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the hinted path runs the value validation that the
+        inferred path deliberately skips.
         """
         with self.assertRaises(TypeError):
-            self._dot_env.set(123, "value")  # type: ignore[arg-type]
+            self._dot_env.set(self._trackKey("BYTES_KEY"), b"payload", "str")
 
 # ---------------------------------------------------------------------------
 # TestDotEnvGet
 # ---------------------------------------------------------------------------
 
-class TestDotEnvGet(_DotEnvBase):
+class TestDotEnvGet(_DotEnvTestCase):
 
-    def testGetExistingKeyReturnsValue(self) -> None:
+    def testReturnsNoneForAnUnknownVariable(self) -> None:
         """
-        Assert that get() returns the stored value for an existing key.
+        Return ``None`` when the variable is not defined.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the implicit default of the reader.
         """
-        key = self._track("TEST_GET_EXIST")
-        self._dot_env.set(key, "found")
-        self.assertEqual(self._dot_env.get(key), "found")
+        self.assertIsNone(self._dot_env.get("UNDEFINED_KEY"))
 
-    def testGetMissingKeyReturnsNoneByDefault(self) -> None:
+    def testReturnsTheSuppliedDefaultForAnUnknownVariable(self) -> None:
         """
-        Assert that get() returns None when the key is absent and no default.
+        Return the caller default when the variable is not defined.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the fallback is handed back untouched, whatever
+        its type.
         """
-        result = self._dot_env.get("TEST_GET_MISSING_XYZ")
-        self.assertIsNone(result)
+        self.assertEqual(self._dot_env.get("UNDEFINED_KEY", "fallback"), "fallback")
+        self.assertEqual(self._dot_env.get("UNDEFINED_KEY", 7), 7)
 
-    def testGetMissingKeyReturnsCustomDefault(self) -> None:
+    def testResolvesEveryNullSpelling(self) -> None:
         """
-        Assert that get() returns the provided default for a missing key.
+        Resolve every accepted null spelling to ``None``.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the case-insensitive vocabulary that lets a `.env` file
+        express an explicitly empty value.
         """
-        result = self._dot_env.get("TEST_GET_NODEFAULT_XYZ", default="fallback")
-        self.assertEqual(result, "fallback")
+        for index, raw in enumerate(("null", "NONE", " Nan ", "nil")):
+            key = f"NULLISH_KEY_{index}"
+            self._writeRawEntry(key, raw)
+            self.assertIsNone(self._dot_env.get(key))
 
-    def testGetBoolTrueString(self) -> None:
+    def testResolvesAnEmptyValueToNone(self) -> None:
         """
-        Assert that the string 'true' is parsed as boolean True.
+        Resolve an empty entry to ``None``.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that a declared but blank variable behaves like an
+        undefined one.
         """
-        key = self._track("TEST_GET_BOOL_T")
-        self._dot_env.set(key, "true")
-        self.assertIs(self._dot_env.get(key), True)
+        self._writeRawEntry("EMPTY_KEY", "")
+        self.assertIsNone(self._dot_env.get("EMPTY_KEY"))
 
-    def testGetBoolFalseString(self) -> None:
+    def testResolvesBooleanSpellings(self) -> None:
         """
-        Assert that the string 'false' is parsed as boolean False.
+        Resolve textual booleans regardless of their casing.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the shortcut applied before literal evaluation.
         """
-        key = self._track("TEST_GET_BOOL_F")
-        self._dot_env.set(key, "false")
-        self.assertIs(self._dot_env.get(key), False)
+        self._writeRawEntry("TRUE_KEY", "TRUE")
+        self._writeRawEntry("FALSE_KEY", " false ")
+        self.assertTrue(self._dot_env.get("TRUE_KEY"))
+        self.assertFalse(self._dot_env.get("FALSE_KEY"))
 
-    def testGetNullStringReturnsNone(self) -> None:
+    def testEvaluatesPythonLiterals(self) -> None:
         """
-        Assert that the string 'null' stored in the file is parsed as None.
+        Evaluate entries that spell a plain Python literal.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the fallback that restores numbers and containers
+        written without a type hint.
         """
-        key = self._track("TEST_GET_NULL")
-        # Write directly to the file to simulate a raw null value
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}=null\n")
-        self._dot_env.reload()
-        self.assertIsNone(self._dot_env.get(key))
+        for index, (raw, expected) in enumerate(
+            (
+                ("42", 42),
+                ("2.5", 2.5),
+                ("[1, 2]", [1, 2]),
+                ("{'a': 1}", {"a": 1}),
+                ("(1, 2)", (1, 2)),
+            ),
+        ):
+            key = f"LITERAL_KEY_{index}"
+            self._writeRawEntry(key, raw)
+            self.assertEqual(self._dot_env.get(key), expected)
 
-    def testGetNoneStringReturnsNone(self) -> None:
+    def testResolvesTypedEntries(self) -> None:
         """
-        Assert that the string 'none' stored in the file is parsed as None.
+        Resolve entries carrying a recognised type prefix.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the dispatch to the caster for the ``"<type>:<value>"``
+        convention.
         """
-        key = self._track("TEST_GET_NONE_STR")
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}=none\n")
-        self._dot_env.reload()
-        self.assertIsNone(self._dot_env.get(key))
+        self._writeRawEntry("TYPED_KEY", "int:42")
+        self.assertEqual(self._dot_env.get("TYPED_KEY"), 42)
 
-    def testGetIntLiteral(self) -> None:
+    def testKeepsColonBearingTextAsIs(self) -> None:
         """
-        Assert that an integer literal in the file is returned as int.
+        Keep colon-bearing text that declares no known type.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that values such as URLs are never mistaken for typed
+        entries nor mangled by literal evaluation.
         """
-        key = self._track("TEST_GET_INT_LIT")
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}=99\n")
-        self._dot_env.reload()
-        self.assertEqual(self._dot_env.get(key), 99)
+        self._writeRawEntry("URL_KEY", "https://example.test/path")
+        self.assertEqual(
+            self._dot_env.get("URL_KEY"),
+            "https://example.test/path",
+        )
 
-    def testGetFloatLiteral(self) -> None:
+    def testKeepsUnparsableTextAsIs(self) -> None:
         """
-        Assert that a float literal in the file is returned as float.
+        Keep text that is not a valid Python literal.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the last fallback of the parser, which returns the
+        original string instead of failing.
         """
-        key = self._track("TEST_GET_FLOAT_LIT")
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}=2.71\n")
-        self._dot_env.reload()
-        result = self._dot_env.get(key)
-        self.assertIsInstance(result, float)
-        self.assertAlmostEqual(result, 2.71, places=5)
+        self._writeRawEntry("TEXT_KEY", "just some text")
+        self.assertEqual(self._dot_env.get("TEXT_KEY"), "just some text")
 
-    def testGetInvalidKeyRaises(self) -> None:
+    def testReturnsAlreadyTypedValuesUntouched(self) -> None:
         """
-        Assert that get() raises an error for an invalid key name.
+        Return values that already are native Python objects.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the defensive shortcut of the parser, reached when the
+        cached entry was not produced by the file reader.
         """
-        with self.assertRaises((ValueError, TypeError)):
-            self._dot_env.get("invalid-key")
+        parse = self._dot_env._DotEnv__parseValue
+        for value in (True, 42, 2.5, {"a": 1}, [1], (1,), {1}):
+            self.assertIs(parse(value), value)
+
+    def testRejectsAnInvalidVariableName(self) -> None:
+        """
+        Reject names that break the environment naming convention.
+
+        Validates that key validation also guards the read path.
+        """
+        with self.assertRaises(ValueError):
+            self._dot_env.get("lower_case")
+        with self.assertRaises(TypeError):
+            self._dot_env.get(42)
 
 # ---------------------------------------------------------------------------
 # TestDotEnvUnset
 # ---------------------------------------------------------------------------
 
-class TestDotEnvUnset(_DotEnvBase):
+class TestDotEnvUnset(_DotEnvTestCase):
 
-    def testUnsetReturnsTrueForExistingKey(self) -> None:
+    def testReportsASuccessfulRemoval(self) -> None:
         """
-        Assert that unset() returns True when the key existed.
+        Report success after removing a variable.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the boolean contract relied upon by the console
+        commands that clean configuration.
         """
-        key = self._track("TEST_UNSET_RET")
-        self._dot_env.set(key, "bye")
-        result = self._dot_env.unset(key)
-        self.assertTrue(result)
+        key = self._trackKey("REMOVABLE_KEY")
+        self._dot_env.set(key, "value")
+        self.assertTrue(self._dot_env.unset(key))
 
-    def testUnsetRemovesKeyFromFile(self) -> None:
+    def testRemovesTheVariableFromTheFile(self) -> None:
         """
-        Assert that unset() removes the key from the .env file.
+        Remove the variable from the `.env` file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the deletion survives a process restart.
         """
-        key = self._track("TEST_UNSET_FILE")
-        self._dot_env.set(key, "written")
+        key = self._trackKey("REMOVABLE_KEY")
+        self._dot_env.set(key, "value")
         self._dot_env.unset(key)
-        # The key must not appear in the file contents any more
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertNotIn(key, content)
+        self.assertNotIn(key, self._fileContents())
 
-    def testUnsetRemovesKeyFromOsEnviron(self) -> None:
+    def testRemovesTheVariableFromTheProcessEnvironment(self) -> None:
         """
-        Assert that unset() removes the key from os.environ.
+        Remove the variable from the process environment.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the value stops resolving immediately, without
+        waiting for a reload.
         """
-        key = self._track("TEST_UNSET_ENV")
-        self._dot_env.set(key, "alive")
-        self.assertIn(key, os.environ)
+        key = self._trackKey("REMOVABLE_KEY")
+        self._dot_env.set(key, "value")
         self._dot_env.unset(key)
         self.assertNotIn(key, os.environ)
+        self.assertIsNone(self._dot_env.get(key))
 
-    def testUnsetOnlyOsKeepsKeyInFile(self) -> None:
+    def testKeepsTheFileEntryWhenOnlyTheProcessIsTargeted(self) -> None:
         """
-        Assert that only_os=True leaves the key in the .env file.
+        Keep the file entry when only the process is targeted.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the ephemeral removal used to hide a value from the
+        running process without editing the file.
         """
-        key = self._track("TEST_UNSET_ONLYOS")
-        self._dot_env.set(key, "stays_in_file")
+        key = self._trackKey("REMOVABLE_KEY")
+        self._dot_env.set(key, "value")
         self._dot_env.unset(key, only_os=True)
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertIn(key, content)
+        self.assertIn(key, self._fileContents())
+        self.assertNotIn(key, os.environ)
 
-    def testUnsetNonExistingKeyReturnsTrue(self) -> None:
+    def testTreatsAnUnknownVariableAsAlreadyRemoved(self) -> None:
         """
-        Assert that unset() returns True even when the key does not exist.
+        Treat an unknown variable as already removed.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the idempotent contract that lets clean-up routines run
+        unconditionally.
         """
-        result = self._dot_env.unset("TEST_UNSET_GHOST_XYZ")
-        self.assertTrue(result)
+        self.assertTrue(self._dot_env.unset("UNDEFINED_KEY"))
 
-    def testUnsetInvalidKeyRaises(self) -> None:
+    def testRejectsAnInvalidVariableName(self) -> None:
         """
-        Assert that unset() raises an error for an invalid key name.
+        Reject names that break the environment naming convention.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that key validation also guards the removal path.
         """
-        with self.assertRaises((ValueError, TypeError)):
-            self._dot_env.unset("bad-key")
+        with self.assertRaises(ValueError):
+            self._dot_env.unset("lower_case")
+        with self.assertRaises(TypeError):
+            self._dot_env.unset(42)
 
 # ---------------------------------------------------------------------------
 # TestDotEnvAll
 # ---------------------------------------------------------------------------
 
-class TestDotEnvAll(_DotEnvBase):
+class TestDotEnvAll(_DotEnvTestCase):
 
-    def testAllReturnsDictType(self) -> None:
+    def testReturnsAnEmptyMappingForAnEmptyFile(self) -> None:
         """
-        Assert that all() returns a dict instance.
+        Return an empty mapping when the file holds no variables.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the freshly scaffolded project scenario.
         """
-        self.assertIsInstance(self._dot_env.all(), dict)
+        self.assertEqual(self._dot_env.all(), {})
 
-    def testAllContainsSetKey(self) -> None:
+    def testIncludesEveryPersistedVariable(self) -> None:
         """
-        Assert that all() includes a key that was previously set.
+        Include every variable persisted in the file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the snapshot used by the ``about`` console command.
         """
-        key = self._track("TEST_ALL_PRESENT")
-        self._dot_env.set(key, "here")
-        self.assertIn(key, self._dot_env.all())
+        self._dot_env.set(self._trackKey("FIRST_KEY"), "first")
+        self._dot_env.set(self._trackKey("SECOND_KEY"), "second")
+        self.assertEqual(
+            self._dot_env.all(),
+            {"FIRST_KEY": "first", "SECOND_KEY": "second"},
+        )
 
-    def testAllExcludesUnsetKey(self) -> None:
+    def testParsesEveryValueToItsNativeType(self) -> None:
         """
-        Assert that all() excludes a key that was unset.
+        Parse every persisted value back to its native type.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the snapshot is directly usable instead of holding
+        raw strings.
         """
-        key = self._track("TEST_ALL_ABSENT")
-        self._dot_env.set(key, "temp")
+        self._dot_env.set(self._trackKey("NUMBER_KEY"), 42)
+        self._dot_env.set(self._trackKey("FLAG_KEY"), True)
+        self._dot_env.set(self._trackKey("ITEMS_KEY"), [1, 2])
+        self.assertEqual(
+            self._dot_env.all(),
+            {"NUMBER_KEY": 42, "FLAG_KEY": True, "ITEMS_KEY": [1, 2]},
+        )
+
+    def testExcludesRemovedVariables(self) -> None:
+        """
+        Exclude variables that were removed from the file.
+
+        Validates that the in-memory cache is kept in sync with every
+        deletion.
+        """
+        key = self._trackKey("TEMPORARY_KEY")
+        self._dot_env.set(key, "value")
         self._dot_env.unset(key)
         self.assertNotIn(key, self._dot_env.all())
 
-    def testAllEmptyFileReturnsEmptyDict(self) -> None:
+    def testExcludesProcessOnlyVariables(self) -> None:
         """
-        Assert that all() returns an empty dict for a blank .env file.
+        Exclude variables that were never written to the file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the documented asymmetry with ``get``, which also sees
+        process-only values.
         """
-        # The file was created empty in setUp — no keys have been set
-        self.assertEqual(self._dot_env.all(), {})
+        key = self._trackKey("EPHEMERAL_KEY")
+        self._dot_env.set(key, "value", only_os=True)
+        self.assertNotIn(key, self._dot_env.all())
 
-    def testAllParsesValuesCorrectly(self) -> None:
+    def testResolvesValuelessEntriesToNone(self) -> None:
         """
-        Assert that all() parses the stored values to their Python types.
+        Resolve entries declared without a value to ``None``.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the parser guard reached when the file reader yields a
+        missing value for a declared name.
         """
-        key = self._track("TEST_ALL_PARSED")
-        self._dot_env.set(key, 7)
-        result = self._dot_env.all()
-        self.assertEqual(result[key], 7)
+        self._env_path.write_text("BARE_KEY\n", encoding="utf-8")
+        self._dot_env.reload()
+        self.assertEqual(self._dot_env.all(), {"BARE_KEY": None})
 
 # ---------------------------------------------------------------------------
 # TestDotEnvReload
 # ---------------------------------------------------------------------------
 
-class TestDotEnvReload(_DotEnvBase):
+class TestDotEnvReload(_DotEnvTestCase):
 
-    def testReloadReturnsTrue(self) -> None:
+    def testReportsASuccessfulReload(self) -> None:
         """
-        Assert that reload() returns True on success.
+        Report success after reloading the file.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the boolean contract exposed through the facade.
         """
         self.assertTrue(self._dot_env.reload())
 
-    def testReloadPicksUpExternallyAddedKey(self) -> None:
+    def testPicksUpExternallyAddedVariables(self) -> None:
         """
-        Assert that reload() loads a key written externally to the .env file.
+        Pick up variables added to the file by another process.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the use case of an operator editing `.env` while the
+        application is running.
         """
-        key = self._track("TEST_RELOAD_EXT")
-        # Write the key directly to disk, bypassing DotEnv.set()
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}=external\n")
+        key = self._trackKey("EXTERNAL_KEY")
+        self._env_path.write_text(f"{key}=external\n", encoding="utf-8")
         self._dot_env.reload()
-        # The key should now be accessible in os.environ
-        self.assertEqual(os.environ.get(key), "external")
+        self.assertEqual(self._dot_env.get(key), "external")
 
-    def testReloadOverridesExistingOsValue(self) -> None:
+    def testOverridesStaleProcessValues(self) -> None:
         """
-        Assert that reload() overrides os.environ with the file's value.
+        Override values already published in the process environment.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the file remains the authoritative source after a
+        reload.
         """
-        key = self._track("TEST_RELOAD_OVERRIDE")
-        # Store the original value via DotEnv
-        self._dot_env.set(key, "original")
-        # Tamper with os.environ directly
-        os.environ[key] = "tampered"
+        key = self._trackKey("STALE_KEY")
+        self._dot_env.set(key, "old")
+        self._env_path.write_text(f"{key}=new\n", encoding="utf-8")
         self._dot_env.reload()
-        # Reload must restore the file's value
-        self.assertEqual(os.environ.get(key), "original")
+        self.assertEqual(self._dot_env.get(key), "new")
 
-# ---------------------------------------------------------------------------
-# TestDotEnvSerializeValue (exercised indirectly via set + get)
-# ---------------------------------------------------------------------------
-
-class TestDotEnvSerializeValue(_DotEnvBase):
-
-    def testSerializeNoneStoresNull(self) -> None:
+    def testRebuildsTheSnapshotFromDisk(self) -> None:
         """
-        Assert that None is serialized as the string 'null' in the file.
+        Rebuild the in-memory snapshot from the file contents.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that entries deleted externally disappear from the
+        snapshot returned by ``all``.
         """
-        key = self._track("TEST_SER_NULL")
-        self._dot_env.set(key, None)  # type: ignore[arg-type]
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertIn("null", content)
-
-    def testSerializeTrueStoresTrue(self) -> None:
-        """
-        Assert that True is serialized as the string 'true' in the file.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_T")
-        self._dot_env.set(key, True)
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertIn("true", content)
-
-    def testSerializeFalseStoresFalse(self) -> None:
-        """
-        Assert that False is serialized as the string 'false' in the file.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_F")
-        self._dot_env.set(key, False)
-        with open(self._env_path) as fh:
-            content = fh.read()
-        self.assertIn("false", content)
-
-    def testSerializeIntRoundTrips(self) -> None:
-        """
-        Assert that an integer set via set() round-trips as int through get().
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_INT_RT")
-        self._dot_env.set(key, 100)
-        self.assertEqual(self._dot_env.get(key), 100)
-
-    def testSerializeFloatRoundTrips(self) -> None:
-        """
-        Assert that a float set via set() round-trips as float through get().
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_FLOAT_RT")
-        self._dot_env.set(key, 1.5)
-        self.assertAlmostEqual(self._dot_env.get(key), 1.5, places=5)
-
-    def testSerializeListRoundTrips(self) -> None:
-        """
-        Assert that a list set via set() round-trips as list through get().
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_LIST_RT")
-        self._dot_env.set(key, [10, 20])
-        self.assertEqual(self._dot_env.get(key), [10, 20])
-
-    def testSerializeTupleRoundTrips(self) -> None:
-        """
-        Assert that a tuple set via set() round-trips as tuple through get().
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_TUPLE_RT")
-        self._dot_env.set(key, (1, 2))
-        self.assertEqual(self._dot_env.get(key), (1, 2))
-
-    def testSerializeSetRoundTrips(self) -> None:
-        """
-        Assert that a set value stored via set() returns a set through get().
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_SET_RT")
-        self._dot_env.set(key, {7, 8})
-        result = self._dot_env.get(key)
-        self.assertIsInstance(result, set)
-
-    def testSerializeStringStrip(self) -> None:
-        """
-        Assert that a string with surrounding whitespace is stripped on store.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        key = self._track("TEST_SER_STRIP")
-        self._dot_env.set(key, "  trimmed  ")
-        self.assertEqual(self._dot_env.get(key), "trimmed")
-
-# ---------------------------------------------------------------------------
-# TestDotEnvParseValue (exercised indirectly via get)
-# ---------------------------------------------------------------------------
-
-class TestDotEnvParseValue(_DotEnvBase):
-
-    def _write(self, key: str, raw: str) -> None:
-        """
-        Write a raw key=value line directly to the .env file and reload.
-
-        Parameters
-        ----------
-        key : str
-            Environment variable name.
-        raw : str
-            Raw string value to write (not quoted).
-
-        Returns
-        -------
-        None
-        """
-        self._track(key)
-        with open(self._env_path, "a") as fh:
-            fh.write(f"{key}={raw}\n")
+        key = self._trackKey("DROPPED_KEY")
+        self._dot_env.set(key, "value")
+        self._env_path.write_text("", encoding="utf-8")
         self._dot_env.reload()
+        self.assertNotIn(key, self._dot_env.all())
 
-    def testParseNullStringReturnsNone(self) -> None:
+    def testReportsAnUnreadableFileAsRuntimeError(self) -> None:
         """
-        Assert that the raw token 'null' is parsed to None.
+        Raise RuntimeError when the file cannot be decoded.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates the handler that surfaces a corrupted `.env` file
+        instead of leaving the application with stale values.
         """
-        self._write("TEST_PARSE_NULL", "null")
-        self.assertIsNone(self._dot_env.get("TEST_PARSE_NULL"))
-
-    def testParseNoneStringReturnsNone(self) -> None:
-        """
-        Assert that the raw token 'none' is parsed to None.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_NONE", "none")
-        self.assertIsNone(self._dot_env.get("TEST_PARSE_NONE"))
-
-    def testParseNanStringReturnsNone(self) -> None:
-        """
-        Assert that the raw token 'nan' is parsed to None.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_NAN", "nan")
-        self.assertIsNone(self._dot_env.get("TEST_PARSE_NAN"))
-
-    def testParseNilStringReturnsNone(self) -> None:
-        """
-        Assert that the raw token 'nil' is parsed to None.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_NIL", "nil")
-        self.assertIsNone(self._dot_env.get("TEST_PARSE_NIL"))
-
-    def testParseBoolTrueString(self) -> None:
-        """
-        Assert that the raw token 'true' is parsed to boolean True.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_BOOL_T", "true")
-        self.assertIs(self._dot_env.get("TEST_PARSE_BOOL_T"), True)
-
-    def testParseBoolFalseString(self) -> None:
-        """
-        Assert that the raw token 'false' is parsed to boolean False.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_BOOL_F", "false")
-        self.assertIs(self._dot_env.get("TEST_PARSE_BOOL_F"), False)
-
-    def testParseIntString(self) -> None:
-        """
-        Assert that a raw integer string is parsed to int.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_INT", "55")
-        self.assertEqual(self._dot_env.get("TEST_PARSE_INT"), 55)
-
-    def testParseFloatString(self) -> None:
-        """
-        Assert that a raw float string is parsed to float.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_FLOAT", "9.81")
-        result = self._dot_env.get("TEST_PARSE_FLOAT")
-        self.assertAlmostEqual(result, 9.81, places=5)
-
-    def testParseListString(self) -> None:
-        """
-        Assert that a raw Python list literal is parsed to a list.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_LIST", "[1, 2, 3]")
-        self.assertEqual(self._dot_env.get("TEST_PARSE_LIST"), [1, 2, 3])
-
-    def testParseDictString(self) -> None:
-        """
-        Assert that a raw Python dict literal is parsed to a dict.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_DICT", "{'x': 10}")
-        self.assertEqual(self._dot_env.get("TEST_PARSE_DICT"), {"x": 10})
-
-    def testParseEmptyStringReturnsNone(self) -> None:
-        """
-        Assert that an empty value in the file is parsed as None.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_EMPTY", "")
-        self.assertIsNone(self._dot_env.get("TEST_PARSE_EMPTY"))
-
-    def testParseUnknownStringReturnedAsIs(self) -> None:
-        """
-        Assert that an unrecognised raw string is returned unchanged.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self._write("TEST_PARSE_ASIS", "some_opaque_value")
-        result = self._dot_env.get("TEST_PARSE_ASIS")
-        self.assertEqual(result, "some_opaque_value")
+        self._env_path.write_bytes(b"KEY=\xff\xfe\n")
+        with self.assertRaises(RuntimeError) as ctx:
+            self._dot_env.reload()
+        self.assertIn("while reloading environment variables", str(ctx.exception))

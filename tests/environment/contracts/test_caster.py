@@ -1,171 +1,123 @@
-from __future__ import annotations
-import inspect
 from abc import ABC
-from inspect import isabstract
+from inspect import isabstract, signature
 from orionis.environment.contracts.caster import IEnvironmentCaster
+from orionis.environment.dynamic.caster import EnvironmentCaster
 from orionis.test import TestCase
 
-class _ConcreteCaster(IEnvironmentCaster):
-    """Minimal concrete implementation used to verify the contract."""
+# Abstract surface the contract is expected to publish.
+_EXPECTED_ABSTRACTS: frozenset[str] = frozenset({"get", "to"})
+
+# ---------------------------------------------------------------------------
+# Test doubles
+# ---------------------------------------------------------------------------
+
+class _CompleteCaster(IEnvironmentCaster):
+    """Minimal implementation covering the whole contract."""
+
+    __slots__ = ()
 
     def get(self) -> object:
-        return "raw_value"
+        """Return a canned value."""
+        return "value"
 
-    def to(self, type_hint) -> str:
-        return f"str:{type_hint}"
+    def to(self, type_hint: str) -> str:
+        """Return a canned serialised representation."""
+        return f"{type_hint}:value"
 
-class _PartialCaster(IEnvironmentCaster):
-    """Subclass implementing only get — intentionally incomplete."""
+class _IncompleteCaster(IEnvironmentCaster):
+    """Implementation that deliberately leaves ``to`` unimplemented."""
+
+    __slots__ = ()
 
     def get(self) -> object:
-        return None
+        """Return a canned value."""
+        return "value"
 
-# ===========================================================================
-# TestIEnvironmentCasterContract
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# TestEnvironmentCasterContract
+# ---------------------------------------------------------------------------
 
-class TestIEnvironmentCasterContract(TestCase):
+class TestEnvironmentCasterContract(TestCase):
 
-    def testInheritsFromABC(self) -> None:
+    def testIsAnAbstractBaseClass(self) -> None:
         """
-        Assert that IEnvironmentCaster inherits from ABC.
+        Expose the caster contract as an abstract base class.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the contract cannot be used as a concrete service
+        and participates in the ABC registration machinery.
         """
         self.assertTrue(issubclass(IEnvironmentCaster, ABC))
-
-    def testIsAbstractClass(self) -> None:
-        """
-        Assert that inspect.isabstract identifies IEnvironmentCaster as abstract.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
         self.assertTrue(isabstract(IEnvironmentCaster))
 
-    def testCannotInstantiateDirectly(self) -> None:
+    def testPublishesExactlyTheDocumentedAbstractSurface(self) -> None:
         """
-        Assert that instantiating IEnvironmentCaster directly raises TypeError.
+        Publish exactly the documented abstract method surface.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(TypeError):
-            IEnvironmentCaster()  # type: ignore[abstract]
-
-    def testGetIsAbstractMethod(self) -> None:
-        """
-        Assert that 'get' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("get", IEnvironmentCaster.__abstractmethods__)
-
-    def testToIsAbstractMethod(self) -> None:
-        """
-        Assert that 'to' is declared as an abstract method.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIn("to", IEnvironmentCaster.__abstractmethods__)
-
-    def testAbstractMethodsSetContainsExactlyGetAndTo(self) -> None:
-        """
-        Assert that __abstractmethods__ contains exactly get and to.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that no method is silently added to or removed from the
+        contract without updating its implementations.
         """
         self.assertEqual(
             IEnvironmentCaster.__abstractmethods__,
-            frozenset({"get", "to"}),
+            _EXPECTED_ABSTRACTS,
         )
 
-    def testPartialSubclassCannotBeInstantiated(self) -> None:
+    def testDeclaresEmptySlots(self) -> None:
         """
-        Assert that a subclass missing 'to' cannot be instantiated.
+        Declare empty slots so implementations stay dictionary free.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that concrete casters declaring ``__slots__`` do not
+        inherit an unwanted instance dictionary from the contract.
+        """
+        self.assertEqual(IEnvironmentCaster.__dict__.get("__slots__"), ())
+
+    def testCannotBeInstantiatedDirectly(self) -> None:
+        """
+        Reject direct instantiation of the contract.
+
+        Validates that callers are forced to depend on a concrete caster
+        implementation instead of the interface itself.
         """
         with self.assertRaises(TypeError):
-            _PartialCaster()  # type: ignore[abstract]
+            IEnvironmentCaster()
 
-    def testConcreteSubclassCanBeInstantiated(self) -> None:
+    def testRejectsPartialImplementations(self) -> None:
         """
-        Assert that a fully implemented subclass can be created without error.
+        Reject subclasses that leave an abstract method unimplemented.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that a half-finished caster fails at construction time
+        rather than at the first call site.
         """
-        instance = _ConcreteCaster()
-        self.assertIsInstance(instance, IEnvironmentCaster)
+        with self.assertRaises(TypeError):
+            _IncompleteCaster()
 
-    def testConcreteGetReturnsObject(self) -> None:
+    def testAcceptsCompleteImplementations(self) -> None:
         """
-        Assert that a concrete get returns a value.
+        Accept subclasses that implement the whole contract.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the abstract surface is satisfiable without any
+        additional hook or attribute.
         """
-        instance = _ConcreteCaster()
-        result = instance.get()
-        self.assertIsNotNone(result)
+        caster = _CompleteCaster()
+        self.assertEqual(caster.get(), "value")
+        self.assertEqual(caster.to("int"), "int:value")
 
-    def testConcreteToReturnsString(self) -> None:
+    def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
         """
-        Assert that a concrete to implementation returns a string.
+        Match the parameter names published by the shipped caster.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that ``EnvironmentCaster`` can be substituted wherever
+        the contract is expected without changing call sites.
         """
-        instance = _ConcreteCaster()
-        result = instance.to("int")
-        self.assertIsInstance(result, str)
+        for name in sorted(_EXPECTED_ABSTRACTS):
+            expected = list(signature(getattr(IEnvironmentCaster, name)).parameters)
+            actual = list(signature(getattr(EnvironmentCaster, name)).parameters)
+            self.assertEqual(actual, expected)
 
-    def testGetMethodSignatureDocumented(self) -> None:
+    def testIsImplementedByTheShippedCaster(self) -> None:
         """
-        Assert that the get method has a signature with parameters.
+        Recognise the shipped caster as a valid implementation.
 
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
+        Validates that the concrete class actually derives from the
+        contract used across the framework.
         """
-        sig = inspect.signature(IEnvironmentCaster.get)
-        self.assertIn("self", sig.parameters)
-
-    def testToMethodAcceptsTypeHintParameter(self) -> None:
-        """
-        Assert that 'to' accepts a type_hint parameter.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        sig = inspect.signature(IEnvironmentCaster.to)
-        self.assertIn("type_hint", sig.parameters)
+        self.assertTrue(issubclass(EnvironmentCaster, IEnvironmentCaster))

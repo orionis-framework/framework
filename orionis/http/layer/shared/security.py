@@ -5,7 +5,7 @@ from orionis.foundation.config.http.entitites.security import HTTPSecurity
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
-    from orionis.http.response import Response
+    from orionis.http.responses import Response
 
 class SecurityMiddleware:
     """
@@ -159,7 +159,7 @@ class SecurityMiddleware:
             ):
                 return self.__default_responses.error(
                     status_code=400,
-                    description="Invalid header format.",
+                    content="Invalid header format.",
                     expects_json=adapter.wantsJson(),
                 )
 
@@ -168,7 +168,7 @@ class SecurityMiddleware:
         if len(host_values) > 1:
             return self.__default_responses.error(
                 status_code=400,
-                description="Multiple Host headers not allowed.",
+                content="Multiple Host headers not allowed.",
                 expects_json=adapter.wantsJson(),
             )
 
@@ -180,7 +180,7 @@ class SecurityMiddleware:
             ):
                 return self.__default_responses.error(
                     status_code=400,
-                    description="Host header not allowed.",
+                    content="Host header not allowed.",
                     expects_json=adapter.wantsJson(),
                 )
 

@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class IEnvironmentCaster(ABC):
 
+    __slots__ = ()
+
     @abstractmethod
     def get(
         self,

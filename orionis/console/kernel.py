@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 
 class KernelCLI(IKernelCLI):
 
+    __slots__ = ("__reactor",)
+
     IGNORE_FLAGS: ClassVar[frozenset[str]] = frozenset({
         "reactor", "-c", "-m", "-", "-i", "-q", "-B", "-O", "-OO", "-v",
         "-vv", "-d", "-x", "-E", "-s", "-S", "-u", "-I", "-W",

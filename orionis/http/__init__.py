@@ -3,7 +3,7 @@ from orionis.http.middleware import (
     BaseMiddleware,
     NextCallable,
 )
-from orionis.http.response import (
+from orionis.http.responses import (
     FileResponse,
     HTMLResponse,
     JSONResponse,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field, fields as dc_fields
 from orionis.foundation.config.queue.entities.brokers import Brokers
-from orionis.environment.env import Env
+from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed broker field names

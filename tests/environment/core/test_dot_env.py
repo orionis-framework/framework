@@ -378,6 +378,26 @@ class TestDotEnvSet(_DotEnvTestCase):
         with self.assertRaises(TypeError):
             self._dot_env.set(self._trackKey("BYTES_KEY"), b"payload", "str")
 
+    def testRejectsAnUnknownTypeHint(self) -> None:
+        """
+        Reject a hint that names no supported type.
+
+        Validates the ``RuntimeError`` documented for a type hint outside
+        the ``EnvironmentValueType`` catalogue.
+        """
+        with self.assertRaises(RuntimeError):
+            self._dot_env.set(self._trackKey("HINTED_KEY"), "value", "complex")
+
+    def testRejectsAValueThatDoesNotFitTheDeclaredHint(self) -> None:
+        """
+        Reject a value that cannot be serialised for the declared hint.
+
+        Validates the ``ValueError`` documented for a serialisation that
+        the caster cannot perform.
+        """
+        with self.assertRaises(ValueError):
+            self._dot_env.set(self._trackKey("HINTED_KEY"), "abc", "int")
+
 # ---------------------------------------------------------------------------
 # TestDotEnvGet
 # ---------------------------------------------------------------------------
@@ -509,6 +529,28 @@ class TestDotEnvGet(_DotEnvTestCase):
             self._dot_env.get("lower_case")
         with self.assertRaises(TypeError):
             self._dot_env.get(42)
+
+    def testPropagatesDecodingFailuresOfTypedEntries(self) -> None:
+        """
+        Propagate a typed entry whose value cannot be decoded.
+
+        Validates the ``ValueError`` documented for a stored value that
+        does not match its declared type.
+        """
+        self._writeRawEntry("BROKEN_INT_KEY", "int:abc")
+        with self.assertRaises(ValueError):
+            self._dot_env.get("BROKEN_INT_KEY")
+
+    def testPropagatesTypeMismatchesOfTypedEntries(self) -> None:
+        """
+        Propagate a typed entry holding a literal of another type.
+
+        Validates the ``TypeError`` documented for a stored value that is
+        incompatible with its declared type.
+        """
+        self._writeRawEntry("BROKEN_LIST_KEY", "list:{1}")
+        with self.assertRaises(TypeError):
+            self._dot_env.get("BROKEN_LIST_KEY")
 
 # ---------------------------------------------------------------------------
 # TestDotEnvUnset
@@ -723,3 +765,29 @@ class TestDotEnvReload(_DotEnvTestCase):
         with self.assertRaises(RuntimeError) as ctx:
             self._dot_env.reload()
         self.assertIn("while reloading environment variables", str(ctx.exception))
+
+# ---------------------------------------------------------------------------
+# TestDotEnvLayout
+# ---------------------------------------------------------------------------
+
+class TestDotEnvLayout(_DotEnvTestCase):
+
+    def testDeclaresItsInstanceStateAsSlots(self) -> None:
+        """
+        Declare the whole instance state as slots.
+
+        Validates that the resolved path and the snapshot are the only
+        attributes the reader keeps per instance.
+        """
+        self.assertEqual(DotEnv.__slots__, ("__cache", "__resolved_path"))
+
+    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+        """
+        Keep the reader free of an instance dictionary.
+
+        Validates that the singleton cannot accumulate arbitrary
+        attributes at runtime.
+        """
+        self.assertFalse(hasattr(self._dot_env, "__dict__"))
+        with self.assertRaises(AttributeError):
+            self._dot_env.unexpected_attribute = 1

@@ -3,7 +3,7 @@ from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.body import BodyStream
 from orionis.http.request import Request
-from orionis.http.response import JSONResponse, RedirectResponse
+from orionis.http.responses import JSONResponse, RedirectResponse
 from orionis.http.validation import previous_url, validation_response
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exceptions.validation import ValidationException
@@ -13,6 +13,12 @@ from orionis.test import TestCase
 
 class _FakeDefaultResponses:
     """Minimal stand-in for the default response factory."""
+
+    __slots__ = ("expects_json",)
+
+    def __init__(self) -> None:
+        """Initialise the recorder of the negotiated payload format."""
+        self.expects_json: bool = False
 
     def error(
         self,

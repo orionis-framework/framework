@@ -20,6 +20,14 @@ class BcryptHasher(IHasher):
 
     Kept for interoperability with existing applications that already
     store bcrypt hashes.
+
+    Concurrency
+    -----------
+    No locks are used. The backend class and the backend instance are
+    cached on first use: a concurrent first use from several threads may
+    build them twice, and the last write wins. Hashing operations only read
+    that cache, and the fluent setter drops it so later calls rebuild the
+    backend with the new cost factor.
     """
 
     __slots__ = ("_backend", "_backend_class", "_rounds")
@@ -189,7 +197,7 @@ class BcryptHasher(IHasher):
             ``True`` when the value matches the hash, ``False`` otherwise.
         """
         # A hash produced by another algorithm can never match here
-        if not hashed or not self._backendClass().identify(hashed):
+        if not hashed or not self._identify(hashed):
             return False
         return self._default().verify(value, hashed)
 
@@ -208,9 +216,25 @@ class BcryptHasher(IHasher):
             ``True`` when the hash should be regenerated.
         """
         # Hashes from another algorithm must always be regenerated
-        if not hashed:
+        if not hashed or not self._identify(hashed):
             return True
         return self._default().check_needs_rehash(hashed)
+
+    def _identify(self, hashed: str) -> bool:
+        """
+        Check whether the hash was produced by bcrypt.
+
+        Parameters
+        ----------
+        hashed : str
+            Hash to inspect.
+
+        Returns
+        -------
+        bool
+            ``True`` when the hash belongs to this driver.
+        """
+        return self._backendClass().identify(hashed)
 
     def getAlgorithm(self) -> str:
         """

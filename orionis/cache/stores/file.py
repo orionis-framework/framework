@@ -1,10 +1,11 @@
-from __future__ import annotations
 import asyncio
 import hashlib
 import secrets
 import threading
 import time
 from typing import TYPE_CHECKING, Any
+from zlib import crc32
+from filelock import FileLock
 import msgspec
 import msgspec.json as _msgjson
 
@@ -17,12 +18,13 @@ _MISSING = object()
 # Retry budget for a rename refused because another process holds the target.
 _REPLACE_ATTEMPTS: int = 3
 _REPLACE_BACKOFF_SECONDS: float = 0.005
+_LOCK_STRIPES: int = 64
 
 class FileCacheBackend:
 
     # ruff: noqa: ANN401
 
-    __slots__ = ("_counter_lock", "_path", "_rename_lock")
+    __slots__ = ("_counter_lock", "_locks", "_path", "_rename_lock")
 
     def __init__(self, path: Path) -> None:
         """
@@ -39,8 +41,27 @@ class FileCacheBackend:
         # Writes run in worker threads, so the rename needs a thread lock.
         self._rename_lock = threading.Lock()
         path.mkdir(parents=True, exist_ok=True)
+        self._locks = tuple(
+            FileLock(path / f".cache-lock-{index}", timeout=10)
+            for index in range(_LOCK_STRIPES)
+        )
 
     # ── Internal helpers ────────────────────────────────────────────────────
+
+    def __lock(self, file: Path) -> FileLock:
+        """Select the stable cross-process lock stripe for a cache file.
+
+        Parameters
+        ----------
+        file : Path
+            Cache file protected by the lock.
+
+        Returns
+        -------
+        FileLock
+            Reentrant lock shared by writes, replacement and deletion.
+        """
+        return self._locks[crc32(file.name.encode()) % _LOCK_STRIPES]
 
     def __file(self, key: str) -> Path:
         """
@@ -91,10 +112,18 @@ class FileCacheBackend:
         dict | None
             Decoded entry, or ``None`` on any error.
         """
-        try:
-            return _msgjson.decode(file.read_bytes())
-        except (OSError, msgspec.DecodeError):
-            return None
+        with self.__lock(file):
+            try:
+                entry = _msgjson.decode(file.read_bytes())
+            except (OSError, msgspec.DecodeError):
+                return None
+            if not isinstance(entry, dict):
+                return None
+            expiration = entry.get("e")
+            if expiration is not None and time.monotonic() >= expiration:
+                file.unlink(missing_ok=True)
+                return None
+            return entry
 
     def __writeSync(self, file: Path, entry: dict) -> None:
         """
@@ -112,14 +141,15 @@ class FileCacheBackend:
         OSError
             If the entry cannot be staged or renamed into place.
         """
-        data = _msgjson.encode(entry)
-        tmp = self.__tempPath(file)
-        try:
-            tmp.write_bytes(data)
-            self.__replaceSync(tmp, file)
-        except OSError:
-            tmp.unlink(missing_ok=True)
-            raise
+        with self.__lock(file):
+            data = _msgjson.encode(entry)
+            tmp = self.__tempPath(file)
+            try:
+                tmp.write_bytes(data)
+                self.__replaceSync(tmp, file)
+            except OSError:
+                tmp.unlink(missing_ok=True)
+                raise
 
     def __replaceSync(self, tmp: Path, file: Path) -> None:
         """
@@ -174,7 +204,7 @@ class FileCacheBackend:
             return False
         return True
 
-    def __unlinkSync(self, file: Path) -> None:
+    def __unlinkSync(self, file: Path) -> int:
         """
         Remove *file*, ignoring missing-file errors.
 
@@ -182,8 +212,39 @@ class FileCacheBackend:
         ----------
         file : Path
             File to remove.
+
+        Returns
+        -------
+        int
+            One when a file was removed, otherwise zero.
         """
-        file.unlink(missing_ok=True)
+        with self.__lock(file):
+            try:
+                file.unlink()
+            except FileNotFoundError:
+                return 0
+            return 1
+
+    def __replaceIfPresent(self, file: Path, entry: dict) -> bool:
+        """Replace a live entry while holding its cross-process lock.
+
+        Parameters
+        ----------
+        file : Path
+            Target cache file.
+        entry : dict
+            Encoded replacement entry.
+
+        Returns
+        -------
+        bool
+            False when the previous entry has disappeared or expired.
+        """
+        with self.__lock(file):
+            if self.__readSync(file) is None:
+                return False
+            self.__writeSync(file, entry)
+            return True
 
     # ── Public async API (mirrors aiocache BaseCache interface) ─────────────
 
@@ -210,12 +271,32 @@ class FileCacheBackend:
         if entry is None:
             return default
 
-        exp: float | None = entry.get("e")
-        if exp is not None and time.monotonic() > exp:
-            await asyncio.to_thread(self.__unlinkSync, file)
-            return default
-
         return entry.get("v")
+
+    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+        """Replace an existing live key without recreating a deleted entry.
+
+        Parameters
+        ----------
+        key : str
+            Existing cache key.
+        value : Any
+            Replacement value.
+        ttl : float | None
+            Replacement lifetime in seconds.
+
+        Returns
+        -------
+        bool
+            Whether the entry was replaced atomically.
+        """
+        entry = {
+            "v": value,
+            "e": time.monotonic() + ttl if ttl is not None else None,
+        }
+        return await asyncio.to_thread(
+            self.__replaceIfPresent, self.__file(key), entry,
+        )
 
     async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
@@ -273,11 +354,7 @@ class FileCacheBackend:
             1 if the key existed, 0 otherwise.
         """
         file = self.__file(key)
-        try:
-            await asyncio.to_thread(file.unlink)
-            return 1
-        except FileNotFoundError:
-            return 0
+        return await asyncio.to_thread(self.__unlinkSync, file)
 
     async def clear(self) -> bool:
         """
@@ -290,7 +367,7 @@ class FileCacheBackend:
         """
         def _clear_all() -> None:
             for f in self._path.glob("*.json"):
-                f.unlink(missing_ok=True)
+                self.__unlinkSync(f)
             for f in self._path.glob("*.tmp"):
                 f.unlink(missing_ok=True)
 

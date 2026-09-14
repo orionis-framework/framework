@@ -305,6 +305,37 @@ class DatabaseCacheBackend:
                 {"v": encoded, "e": expiration, "k": key},
             )
 
+    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+        """Replace a live cache row with a single conditional update.
+
+        Parameters
+        ----------
+        key : str
+            Existing cache key.
+        value : Any
+            Replacement value.
+        ttl : float | None
+            Replacement lifetime in seconds.
+
+        Returns
+        -------
+        bool
+            False when the entry is missing or has expired.
+        """
+        await self._ensureSchema()
+        now = time.time()
+        affected = await self._connection.execute(
+            f"UPDATE {self._table} SET cache_value = :v, expiration = :e "  # noqa: S608
+            "WHERE cache_key = :k AND (expiration IS NULL OR expiration > :now)",
+            {
+                "k": key,
+                "v": self.__encode(value),
+                "e": now + ttl if ttl is not None else None,
+                "now": now,
+            },
+        )
+        return affected > 0
+
     async def exists(self, key: str) -> bool:
         """
         Return True if *key* exists and has not expired.

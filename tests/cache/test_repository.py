@@ -1,10 +1,27 @@
-from __future__ import annotations
+import asyncio
 import tempfile
 from pathlib import Path
+from aiocache import SimpleMemoryCache
 from orionis.cache.repository import CacheRepository
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.cache.stores.memory import build as build_memory
 from orionis.test import TestCase
+
+class _PausedMemoryCache(SimpleMemoryCache):
+    """Pause after reading the compare-and-set token."""
+
+    def __init__(self) -> None:
+        """Create deterministic barriers around the compare-and-set window."""
+        super().__init__()
+        self.entered = asyncio.Event()
+        self.released = asyncio.Event()
+
+    async def _gets(self, key: str, **kwargs: object) -> object:
+        """Read the token before another coroutine removes the key."""
+        value = await super()._gets(key, **kwargs)
+        self.entered.set()
+        await self.released.wait()
+        return value
 
 class TestCacheRepository(TestCase):
     """Tests for CacheRepository backed by FileCacheBackend."""
@@ -71,6 +88,16 @@ class TestCacheRepository(TestCase):
         await self._repo.set("k", "first")
         await self._repo.set("k", "second")
         self.assertEqual(await self._repo.get("k"), "second")
+
+    async def testReplaceRequiresALiveEntry(self) -> None:
+        """Replace live file entries without creating or reviving absent keys."""
+        self.assertFalse(await self._repo.replace("session", "new"))
+        await self._repo.set("session", "old")
+        self.assertTrue(await self._repo.replace("session", "new"))
+        self.assertEqual(await self._repo.get("session"), "new")
+        await self._repo.delete("session")
+        self.assertFalse(await self._repo.replace("session", "late"))
+        self.assertIsNone(await self._repo.get("session"))
 
     # ── has ──────────────────────────────────────────────────────────────────
 
@@ -408,3 +435,24 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
             await self._repo.getMany(["hits", "name"]),
             {"hits": 1, "name": "orionis"},
         )
+
+    async def testReplaceDoesNotCreateMissingEntries(self) -> None:
+        """Reject aiocache's unconditional-write fallback for missing keys."""
+        self.assertFalse(await self._repo.replace("session", "new"))
+        await self._repo.set("session", "old")
+        self.assertTrue(await self._repo.replace("session", "new"))
+        self.assertEqual(await self._repo.get("session"), "new")
+
+    async def testDeletionBetweenReadAndCasWins(self) -> None:
+        """Keep a deleted session absent even while a replacement is in flight."""
+        backend = _PausedMemoryCache()
+        repository = CacheRepository(backend)
+        await repository.set("session", "original")
+        pending = asyncio.create_task(repository.replace("session", "stale"))
+        await backend.entered.wait()
+        try:
+            await repository.delete("session")
+        finally:
+            backend.released.set()
+        self.assertFalse(await pending)
+        self.assertIsNone(await repository.get("session"))

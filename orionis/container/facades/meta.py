@@ -1,4 +1,3 @@
-from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING
 
@@ -188,3 +187,26 @@ class FacadeMeta(type):
 
         # Return the newly created dispatcher for this attribute access.
         return dispatcher
+
+class ScopedFacadeMeta(FacadeMeta):
+    """Dispatch attributes exclusively to the active scope's service."""
+
+    def __getattr__(cls, name: str) -> object:
+        """Return an attribute from the current scoped service.
+
+        Parameters
+        ----------
+        name : str
+            Service attribute requested by the caller.
+
+        Returns
+        -------
+        object
+            Attribute of the service bound to the active scope.
+
+        Raises
+        ------
+        RuntimeError
+            If the scope is closed or the service has not been bound.
+        """
+        return getattr(cls.scopedInstance(), name)

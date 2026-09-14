@@ -1,4 +1,3 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -13,6 +12,7 @@ class ISessionStore(ABC):
     ----------------
     - Persist and retrieve ``SessionRecord`` objects.
     - Remove records on demand.
+    - Reject updates to absent or expired records atomically.
     - Collect expired records via ``gc()``.
 
     The store is **not** responsible for:
@@ -20,7 +20,7 @@ class ISessionStore(ABC):
     - Knowing about ``Request`` or ``Response``.
     - Generating session identifiers.
     - Creating ``Session`` objects.
-    - Enforcing expiry policy (the manager does that).
+    - Choosing the lifetime duration (the manager does that).
     """
 
     __slots__ = ()
@@ -57,7 +57,23 @@ class ISessionStore(ABC):
         """
 
     @abstractmethod
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        """Update a live session atomically without creating a missing record.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Replacement session payload and expiration.
+
+        Returns
+        -------
+        bool
+            True only when a live record was updated. Deletion or expiry
+            must win over a stale request's write, including across workers.
+        """
+
+    @abstractmethod
+    async def delete(self, session_id: str) -> bool:
         """
         Remove the record for *session_id*; a no-op when absent.
 
@@ -68,7 +84,8 @@ class ISessionStore(ABC):
 
         Returns
         -------
-        None
+        bool
+            True if this call removed a record; False when already absent.
         """
 
     @abstractmethod

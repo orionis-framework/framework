@@ -1,3 +1,4 @@
+from orionis.auth.provider import AuthProvider
 from orionis.cache.provider import CacheProvider
 from orionis.console.reactor_provider import ReactorProvider
 from orionis.console.scheduler_provider import ScheduleProvider
@@ -25,6 +26,7 @@ def get_core_providers_mapping() -> tuple:
     """
     # Create an immutable mapping of all core provider classes
     return (
+        AuthProvider,
         CacheProvider,
         CatchProvider,
         ConnectionManagerProvider,

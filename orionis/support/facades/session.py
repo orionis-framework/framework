@@ -1,12 +1,12 @@
-from orionis.container.facades.facade import Facade
+from orionis.container.facades.facade import ScopedFacade
 from orionis.session.contracts.session import ISession
 
-class Session(Facade):
+class Session(ScopedFacade):
 
     @classmethod
     def getFacadeAccessor(cls) -> type[ISession]:
         """
-        Return the facade accessor string for the unit test contract.
+        Return the contract of the request-local session.
 
         Returns
         -------

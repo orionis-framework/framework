@@ -1,4 +1,4 @@
-from __future__ import annotations
+from copy import deepcopy
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from orionis.session.contracts.store import ISessionStore
@@ -54,7 +54,7 @@ class MemorySessionStore(ISessionStore):
             del self._storage[session_id]
             return None
 
-        return record
+        return deepcopy(record)
 
     async def write(self, record: SessionRecord) -> None:
         """
@@ -69,9 +69,28 @@ class MemorySessionStore(ISessionStore):
         -------
         None
         """
-        self._storage[record.id] = record
+        self._storage[record.id] = deepcopy(record)
 
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        """Replace a live record without yielding between checking and writing.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Replacement record.
+
+        Returns
+        -------
+        bool
+            Whether a live session still existed at the time of the update.
+        """
+        previous = self._storage.get(record.id)
+        if previous is None or previous.expires_at <= datetime.now(UTC):
+            return False
+        self._storage[record.id] = deepcopy(record)
+        return True
+
+    async def delete(self, session_id: str) -> bool:
         """
         Remove the record for *session_id* (no-op when absent).
 
@@ -82,9 +101,10 @@ class MemorySessionStore(ISessionStore):
 
         Returns
         -------
-        None
+        bool
+            True only when a stored record was removed.
         """
-        self._storage.pop(session_id, None)
+        return self._storage.pop(session_id, None) is not None
 
     async def gc(self) -> None:
         """

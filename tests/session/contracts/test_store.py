@@ -54,14 +54,13 @@ class TestISessionStoreContract(TestCase):
 
     def testContractDeclaresExpectedMembers(self) -> None:
         """
-        Expose exactly the four persistence operations.
+        Expose the five persistence operations required for safe revocation.
 
-        Validates that the store surface stays limited to read, write,
-        delete and garbage collection.
+        Validate conditional update separately from unconditional creation.
         """
         self.assertEqual(
             set(ISessionStore.__abstractmethods__),
-            {"read", "write", "delete", "gc"},
+            {"read", "write", "update", "delete", "gc"},
         )
 
     def testPartialImplementationCannotBeInstantiated(self) -> None:

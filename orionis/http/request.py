@@ -20,7 +20,7 @@ _MIME_JSON = "application/json"
 _MIME_MULTIPART = "multipart/form-data"
 _MIME_MSGPACK = "application/msgpack"
 _MIME_URLENCODED = "application/x-www-form-urlencoded"
-_BEARER_PREFIX = "Bearer "
+_BEARER_PREFIX = "bearer "
 _BEARER_PREFIX_LEN = 7
 
 if TYPE_CHECKING:
@@ -651,17 +651,19 @@ class Request(IRequest):
     @property
     def bearerToken(self) -> str | None:
         """
-        Return the bearer token from the Authorization header if present.
+        Extract a bearer credential from one unambiguous Authorization header.
 
         Returns
         -------
         str | None
-            The bearer token extracted from the 'Authorization' header,
-            or None if not present or does not start with 'Bearer '.
+            Token after a case-insensitive Bearer scheme, with surrounding
+            whitespace removed. Missing, empty or duplicate headers return None.
         """
+        if len(self.headers.getAll("authorization")) != 1:
+            return None
         auth_header: str | None = self.headers.get("authorization")
-        if auth_header and auth_header.startswith(_BEARER_PREFIX):
-            return auth_header[_BEARER_PREFIX_LEN:]
+        if auth_header and auth_header[:_BEARER_PREFIX_LEN].lower() == _BEARER_PREFIX:
+            return auth_header[_BEARER_PREFIX_LEN:].strip() or None
         return None
 
     @property

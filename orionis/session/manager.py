@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 from orionis.cache.contracts.cache_manager import ICacheManager
@@ -18,6 +19,8 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
     from orionis.session.contracts.store import ISessionStore
+
+_VALID_SESSION_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
 
 class SessionManager:
     """
@@ -143,22 +146,40 @@ class SessionManager:
         -------
         None
         """
-        if not session.started:
-            return
-
         if session.invalidated:
             await self.__invalidateSession(response, session)
             return
 
-        if session.wantsRegenerate:
-            await self.__rotateId(session)
+        if not session.started:
+            return
 
-        if session.dirty:
-            await self.__persist(session)
+        if session.wantsRegenerate and not await self.__rotateId(session):
+            return
+
+        if not await self.__persist(session):
+            return
 
         self.__setCookie(response, session.id)
 
     # ── Private helpers ─────────────────────────────────────────────────────────
+
+    async def abort(self, session: Session) -> None:
+        """Persist pending revocation when a request cannot produce a response.
+
+        Parameters
+        ----------
+        session : Session
+            Session belonging to a failed or cancelled request.
+
+        Returns
+        -------
+        None
+            Invalidated or superseded IDs are deleted; no new session is issued.
+        """
+        if session.id is not None and (
+            session.invalidated or session.wantsRegenerate
+        ):
+            await self._store.delete(session.id)
 
     def __register(self, session: Session) -> None:
         """
@@ -230,12 +251,19 @@ class SessionManager:
         Session
             Restored session, or a blank lazy session on cache miss.
         """
+        if _VALID_SESSION_ID.fullmatch(session_id) is None:
+            return Session()
         record: SessionRecord | None = await self._store.read(session_id)
-        if record is None:
+        if (
+            record is None
+            or record.id != session_id
+            or record.expires_at.tzinfo is None
+            or record.expires_at <= datetime.now(UTC)
+        ):
             return Session()
         return Session(id=record.id, data=record.data, started=True, is_new=False)
 
-    async def __persist(self, session: Session) -> None:
+    async def __persist(self, session: Session) -> bool:
         """
         Write the current session state to the backing store.
 
@@ -246,18 +274,23 @@ class SessionManager:
 
         Returns
         -------
-        None
+        bool
+            False if a restored session has already been revoked or expired.
         """
-        await self._store.write(
-            SessionRecord(
-                id=session.id,  # type: ignore[arg-type]
-                data=session.all(),
-                expires_at=datetime.now(UTC) + self._lifetime_delta,
-            ),
+        record = SessionRecord(
+            id=session.id,  # type: ignore[arg-type]
+            data=session.all(),
+            expires_at=datetime.now(UTC) + self._lifetime_delta,
         )
+        if session.isNew:
+            await self._store.write(record)
+        elif not await self._store.update(record):
+            session.invalidate()
+            return False
         session._markClean()  # noqa: SLF001
+        return True
 
-    async def __rotateId(self, session: Session) -> None:
+    async def __rotateId(self, session: Session) -> bool:
         """
         Replace the session ID, deleting the old record from the store.
 
@@ -268,11 +301,17 @@ class SessionManager:
 
         Returns
         -------
-        None
+        bool
+            False if another request has already invalidated the old ID.
         """
-        old_id = session._rotateId()  # noqa: SLF001
+        old_id = session.id
         if old_id is not None:
-            await self._store.delete(old_id)
+            removed = await self._store.delete(old_id)
+            if not session.isNew and not removed:
+                session.invalidate()
+                return False
+        session._rotateId()  # noqa: SLF001
+        return True
 
     async def __invalidateSession(
         self,

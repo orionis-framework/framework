@@ -5,6 +5,7 @@ import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
 from sqlalchemy.schema import CreateTable, DropTable
+from sqlalchemy.sql import CompoundSelect
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     COLUMNLESS_WHERE_TYPES,
@@ -21,7 +22,7 @@ from orionis.orm.schema.types import ColumnType
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from sqlalchemy.sql import CompoundSelect, Delete, Insert, Select, Update
+    from sqlalchemy.sql import Delete, Insert, Select, Update
     from sqlalchemy.sql.elements import ColumnElement
     from sqlalchemy.sql.expression import Executable
     from sqlalchemy.types import TypeEngine
@@ -254,8 +255,9 @@ class SQLCompiler:
         """
         Combine a compiled statement with the plan union branches.
 
-        Branches are folded left to right so a query mixing ``UNION``
-        and ``UNION ALL`` keeps the order it was declared in.
+        Consecutive branches of the same kind form one flat compound.
+        Mixed operators retain left-to-right semantics through derived
+        tables, which also keeps the SQL valid on SQLite.
 
         Parameters
         ----------
@@ -269,15 +271,19 @@ class SQLCompiler:
         CompoundSelect
             Compound statement combining every branch.
         """
-        combined: Any = statement
+        branches: list[Any] = [statement]
+        all_rows = plan.unions[0].all_rows
         for union in plan.unions:
-            branch = self._buildSelect(union.plan, {})
-            combined = (
-                sqlalchemy.union_all(combined, branch)
-                if union.all_rows
-                else sqlalchemy.union(combined, branch)
-            )
-        return combined
+            if union.all_rows != all_rows:
+                combine = sqlalchemy.union_all if all_rows else sqlalchemy.union
+                branches = [sqlalchemy.select(combine(*branches).subquery())]
+                all_rows = union.all_rows
+            branch = self.compileSelect(union.plan)
+            if isinstance(branch, CompoundSelect):
+                branch = sqlalchemy.select(branch.subquery())
+            branches.append(branch)
+        combine = sqlalchemy.union_all if all_rows else sqlalchemy.union
+        return combine(*branches)
 
     def _buildSelect(
         self,
@@ -1199,15 +1205,7 @@ class SQLCompiler:
         QueryException
             If the logical column type has no registered builder.
         """
-        builder = self._TYPE_BUILDERS.get(definition.column_type)
-        if builder is None:
-            error_msg = (
-                f"No SQL type registered for column type "
-                f"'{definition.column_type}'."
-            )
-            raise QueryException(error_msg)
-
-        args: list[Any] = [definition.name, builder(definition)]
+        args: list[Any] = [definition.name, self._sqlType(definition)]
         if definition.foreign_ref is not None:
             reference = definition.foreign_ref
             args.append(
@@ -1231,6 +1229,49 @@ class SQLCompiler:
                 options["server_default"] = sqlalchemy.literal(value, args[1])
 
         return SqlColumn(*args, **options)
+
+    def _sqlType(self, definition: ColumnDefinition) -> TypeEngine[Any]:
+        """
+        Resolve the engine type backing a column definition.
+
+        Parameters
+        ----------
+        definition : ColumnDefinition
+            Orionis column definition.
+
+        Returns
+        -------
+        TypeEngine
+            Engine type, carrying a dialect variant when the declared
+            type cannot auto-increment on every backend.
+
+        Raises
+        ------
+        QueryException
+            If the logical column type has no registered builder.
+        """
+        builder = self._TYPE_BUILDERS.get(definition.column_type)
+        if builder is None:
+            error_msg = (
+                f"No SQL type registered for column type "
+                f"'{definition.column_type}'."
+            )
+            raise QueryException(error_msg)
+
+        column_type = builder(definition)
+
+        # SQLite only treats a single-column primary key as an alias of
+        # ROWID when its declared type is literally INTEGER, so a BIGINT
+        # key would never auto-increment there. The variant keeps BIGINT
+        # on every other backend.
+        if (
+            definition.is_primary
+            and definition.is_auto_increment
+            and isinstance(column_type, sqlalchemy.BigInteger)
+        ):
+            return column_type.with_variant(sqlalchemy.Integer(), "sqlite")
+
+        return column_type
 
     def _splitQualifiedColumn(self, name: str) -> tuple[str | None, str]:
         """

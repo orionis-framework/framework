@@ -452,6 +452,7 @@ class Session(ISession):
         None
         """
         self._regenerate = True
+        self._invalidated = False
         if not self._started:
             self.__activate()
         self._dirty = True
@@ -523,6 +524,7 @@ class Session(ISession):
         """
         old_id = self._id
         self._id = secrets.token_urlsafe(32)
+        self._is_new = True
         self._regenerate = False
         self._dirty = True
         return old_id
@@ -535,3 +537,4 @@ class Session(ISession):
         None
         """
         self._dirty = False
+        self._is_new = False

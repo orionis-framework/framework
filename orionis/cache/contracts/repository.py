@@ -1,4 +1,3 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
@@ -8,6 +7,27 @@ if TYPE_CHECKING:
 class ICacheRepository(ABC):
 
     # ruff: noqa: ANN401
+
+    __slots__ = ()
+
+    @abstractmethod
+    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+        """Replace a live entry atomically without creating a missing key.
+
+        Parameters
+        ----------
+        key : str
+            Cache key that must already exist.
+        value : Any
+            Replacement value.
+        ttl : float | None
+            New lifetime in seconds, or None for no expiry.
+
+        Returns
+        -------
+        bool
+            True when replaced; False when missing, expired or superseded.
+        """
 
     @abstractmethod
     async def get(self, key: str) -> Any:

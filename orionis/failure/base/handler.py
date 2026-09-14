@@ -1,4 +1,9 @@
 from typing import ClassVar
+from orionis.auth.context.functions import current_auth_context
+from orionis.auth.exceptions import (
+    AuthenticationException,
+    AuthorizationException,
+)
 from orionis.console.output.console import Console
 from orionis.failure.contracts.handler import IBaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
@@ -16,6 +21,8 @@ from orionis.logging.contracts.logger import ILogger
 # Mapping of specific exception types to their corresponding
 # HTTP status codes and messages
 _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
+    AuthenticationException: (401, "Unauthenticated"),
+    AuthorizationException: (403, "This action is unauthorized"),
     RouteNotFound: (404, "Route not found"),
     MethodNotAllowed: (405, "Method not allowed"),
     PayloadTooLargeException: (413, "Payload too large"),
@@ -190,14 +197,22 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         wants_json = request.wantsJson()
         exc_type = type(exception)
 
-        # Check if the exception type is in the predefined HTTP status map
-        if exc_type in _HTTP_STATUS_MAP:
-            status_code, content = _HTTP_STATUS_MAP[exc_type]
-            return self.__default_responses.error(
+        for ancestor in exc_type.__mro__:
+            mapped = _HTTP_STATUS_MAP.get(ancestor)
+            if mapped is None:
+                continue
+            status_code, content = mapped
+            response = self.__default_responses.error(
                 status_code=status_code,
                 content=content,
                 expects_json=wants_json,
             )
+            if (
+                isinstance(exception, AuthenticationException)
+                and current_auth_context().guard == "token"
+            ):
+                response.setHeader("WWW-Authenticate", "Bearer")
+            return response
 
         # Handle 500 server error — resolve adapter type once
         is_adapter = isinstance(request, TransportAdapter)

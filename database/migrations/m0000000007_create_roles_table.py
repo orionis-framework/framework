@@ -14,11 +14,9 @@ class CreateRolesTable(Migration):
         """
         async with Schema.create("roles") as table:
             table.id().comment("Role ID")
-            table.string("name", 255).comment("Role Name")
-            table.string("guard_name", 255).comment("Guard Name")
+            table.string("name", 255).unique().comment("Role Name")
             table.timestamps()
 
-            table.unique("name", "guard_name")
             table.comment("Table to store roles.")
 
     async def down(self) -> None:

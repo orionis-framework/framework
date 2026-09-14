@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from math import ceil
 from typing import Any
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.contracts.repository import ICacheRepository
@@ -64,13 +65,26 @@ class CacheSessionStore(ISessionStore):
             _KEY_PREFIX + session_id,
         )
 
-        if payload is None:
+        if not isinstance(payload, dict) or payload.get("id") != session_id:
+            return None
+        expiration = payload.get("expires_at")
+        if isinstance(expiration, str):
+            try:
+                expiration = datetime.fromisoformat(expiration)
+            except ValueError:
+                return None
+        if (
+            not isinstance(expiration, datetime)
+            or expiration.tzinfo is None
+            or expiration <= datetime.now(UTC)
+            or not isinstance(payload.get("data"), dict)
+        ):
             return None
 
         return SessionRecord(
             id=payload["id"],
             data=payload["data"],
-            expires_at=payload["expires_at"],
+            expires_at=expiration,
         )
 
     async def write(self, record: SessionRecord) -> None:
@@ -100,9 +114,35 @@ class CacheSessionStore(ISessionStore):
             "data": record.data,
             "expires_at": record.expires_at,
         }
-        await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ttl)
+        await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ceil(ttl))
 
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        """Replace a live cache session without recreating a missing key.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Replacement record.
+
+        Returns
+        -------
+        bool
+            Whether the cache atomically replaced a live record.
+        """
+        ttl = (record.expires_at - datetime.now(UTC)).total_seconds()
+        if ttl <= 0:
+            return False
+        return await self._repository.replace(
+            _KEY_PREFIX + record.id,
+            {
+                "id": record.id,
+                "data": record.data,
+                "expires_at": record.expires_at,
+            },
+            ttl=ceil(ttl),
+        )
+
+    async def delete(self, session_id: str) -> bool:
         """
         Remove the record for *session_id* (no-op when absent).
 
@@ -113,9 +153,10 @@ class CacheSessionStore(ISessionStore):
 
         Returns
         -------
-        None
+        bool
+            True only when an entry was deleted.
         """
-        await self._repository.delete(_KEY_PREFIX + session_id)
+        return await self._repository.delete(_KEY_PREFIX + session_id)
 
     async def gc(self) -> None:
         """

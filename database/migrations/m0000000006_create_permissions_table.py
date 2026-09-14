@@ -14,11 +14,9 @@ class CreatePermissionsTable(Migration):
         """
         async with Schema.create("permissions") as table:
             table.id().comment("Permission ID")
-            table.string("name", 255).comment("Permission Name")
-            table.string("guard_name", 255).comment("Guard Name")
+            table.string("name", 255).unique().comment("Permission Name")
             table.timestamps()
 
-            table.unique("name", "guard_name")
             table.comment("Table to store permissions.")
 
     async def down(self) -> None:

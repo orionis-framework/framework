@@ -560,3 +560,32 @@ class TestScopeManager(TestCase):
 
         result = await sm.resolve("k")
         self.assertEqual(result, "produced")
+
+    async def testClosedScopeCannotBeReenteredOrRepopulated(self) -> None:
+        """Keep inherited references from reviving a completed request scope."""
+        async with ScopeManager() as scope:
+            self.assertTrue(scope.isActive)
+        self.assertFalse(scope.isActive)
+        with self.assertRaises(RuntimeError):
+            scope["identity"] = object()
+        with self.assertRaises(RuntimeError):
+            await scope.__aenter__()
+
+    async def testInFlightResolutionCannotPublishAfterScopeExit(self) -> None:
+        """Reject a late service result even when its task inherited the scope."""
+        entered = asyncio.Event()
+        finished = asyncio.Event()
+
+        async def build_late() -> object:
+            entered.set()
+            await finished.wait()
+            return object()
+
+        async with ScopeManager() as scope:
+            scope["late"] = build_late()
+            pending = asyncio.create_task(scope.get("late"))
+            await entered.wait()
+        finished.set()
+        with self.assertRaises(RuntimeError):
+            await pending
+        self.assertNotIn("late", scope)

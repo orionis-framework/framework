@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sqlalchemy.dialects import registry as sqlalchemy_registry
 from orionis.database.compiler import SQLCompiler
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
@@ -646,6 +647,66 @@ class TestSQLCompiler(TestCase):
         ddl = str(SQLCompiler(prefix="app_").compileCreateTable(table)).lower()
         self.assertIn("foreign key", ddl)
         self.assertIn("app_order_products", ddl)
+
+    def testAutoIncrementBigIntegerKeyBecomesIntegerOnSqlite(self) -> None:
+        """
+        Render a BIGINT identity column as INTEGER on SQLite.
+
+        Validates the dialect variant applied to auto-incrementing
+        primary keys: SQLite only aliases a single-column primary key to
+        ROWID when the declared type is literally INTEGER, so a BIGINT
+        key would never auto-increment there.
+        """
+        columns = {"id": BigInteger().primary().autoIncrement()}
+        columns["id"].name = "id"
+        table = TableDefinition(
+            name="probes", columns=columns, primary_key="id",
+        )
+
+        engine_table = SQLCompiler()._sqlTable(table)
+        rendered = engine_table.c.id.type.compile(
+            dialect=sqlalchemy_registry.load("sqlite")(),
+        )
+
+        self.assertEqual(rendered.upper(), "INTEGER")
+
+    def testAutoIncrementBigIntegerKeyStaysBigIntElsewhere(self) -> None:
+        """
+        Keep a BIGINT identity column wide on every other backend.
+
+        Validates that the SQLite variant never narrows the key on the
+        server engines, where a 64-bit identity is the whole point.
+        """
+        columns = {"id": BigInteger().primary().autoIncrement()}
+        columns["id"].name = "id"
+        table = TableDefinition(
+            name="probes", columns=columns, primary_key="id",
+        )
+
+        engine_table = SQLCompiler()._sqlTable(table)
+        for dialect_name in ("postgresql", "mysql"):
+            rendered = engine_table.c.id.type.compile(
+                dialect=sqlalchemy_registry.load(dialect_name)(),
+            )
+            self.assertIn("BIGINT", rendered.upper(), dialect_name)
+
+    def testPlainBigIntegerColumnsKeepTheirTypeOnSqlite(self) -> None:
+        """
+        Leave non identity BIGINT columns untouched.
+
+        Validates that the variant only applies to auto-incrementing
+        primary keys, so foreign keys pointing at them stay BIGINT.
+        """
+        columns = {"owner_id": BigInteger()}
+        columns["owner_id"].name = "owner_id"
+        table = TableDefinition(name="probes", columns=columns)
+
+        engine_table = SQLCompiler()._sqlTable(table)
+        rendered = engine_table.c.owner_id.type.compile(
+            dialect=sqlalchemy_registry.load("sqlite")(),
+        )
+
+        self.assertEqual(rendered.upper(), "BIGINT")
 
     def testTableIndexIsRegisteredOnEngineTable(self) -> None:
         """

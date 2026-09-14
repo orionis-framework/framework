@@ -18,6 +18,7 @@ class CreateRoleHasPermissionsTable(Migration):
             table.bigInteger("permission_id").foreign("permissions.id").comment("Permission ID")
             table.bigInteger("role_id").foreign("roles.id").comment("Role ID")
             table.primaryKey("permission_id", "role_id")
+            table.index("role_id", "permission_id")
 
             table.comment("Table to relate roles with permissions.")
 

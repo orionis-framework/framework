@@ -1,9 +1,16 @@
-from __future__ import annotations
+import asyncio
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
+from aiocache import SimpleMemoryCache
+from orionis.cache.repository import CacheRepository
+from orionis.cache.serializers.json import MsgspecSerializer
+from orionis.cache.stores.file import FileCacheBackend
 from orionis.database.connection_manager import ConnectionManager
+from orionis.http.layer.web.start_session import StartSessionMiddleware
+from orionis.http.responses import JSONResponse
 from orionis.orm.resolver import ConnectionResolver
 from orionis.session.contracts.session import ISession
 from orionis.session.entities.record import SessionRecord
@@ -97,6 +104,17 @@ class _FakeRequest:
 
     def __init__(self, cookies: dict[str, str] | None = None) -> None:
         self.cookies: dict[str, str] = cookies if cookies is not None else {}
+        self.state = SimpleNamespace()
+        self.method = "POST"
+
+class _RecordingCatch:
+    """Turn a controller failure into a normal framework response."""
+
+    __slots__ = ()
+
+    async def exception(self, error: Exception, request: object) -> JSONResponse:  # noqa: ARG002
+        """Return an error response for the middleware lifecycle probe."""
+        return JSONResponse(content={"message": "Request failed"}, status_code=500)
 
 class _FakeResponse:
     """Response stub recording cookie mutations issued by the manager."""
@@ -142,8 +160,13 @@ class _RecordingStore:
     async def write(self, record: SessionRecord) -> None:
         self.written.append(record)
 
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        self.written.append(record)
+        return True
+
+    async def delete(self, session_id: str) -> bool:
         self.deleted.append(session_id)
+        return True
 
     async def gc(self) -> None:
         return
@@ -392,11 +415,11 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls[0][0], "sessionid")
         self.assertEqual(response.set_calls[0][1], session.id)
 
-    async def testSaveSkipsWriteWhenNotDirty(self) -> None:
+    async def testCleanSessionsRenewServerAndCookieExpiryTogether(self) -> None:
         """
-        Refresh the cookie without rewriting a clean record.
+        Renew the server-side expiry before refreshing the cookie.
 
-        Validates that idle requests do not hit the backing store.
+        Validate that a clean request cannot extend only the browser's deadline.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -406,7 +429,7 @@ class TestSessionManager(TestCase):
 
         await manager.save(response, session)
 
-        self.assertEqual(store.written, [])
+        self.assertEqual(len(store.written), 1)
         self.assertEqual(len(response.set_calls), 1)
 
     async def testSavePersistsExpiryFromConfiguredLifetime(self) -> None:
@@ -552,6 +575,115 @@ class TestSessionManager(TestCase):
 
         self.assertEqual(restored.get("user_id"), 42)
         self.assertFalse(restored.isNew)
+
+    async def testSlowRequestsCannotRestoreAnInvalidatedSession(self) -> None:
+        """Let logout win over later writes and rotations from stale requests."""
+        for driver in ("memory", "file"):
+            manager, _ = self._makeManager({"driver": driver, "files": "sessions"})
+            session = await manager.start(_FakeRequest())
+            session.put("_auth_identifier", 42)
+            await manager.save(_FakeResponse(), session)
+            cookies = {"sessionid": session.id}
+            slow = await manager.start(_FakeRequest(cookies))
+            rotating = await manager.start(_FakeRequest(cookies))
+            logout = await manager.start(_FakeRequest(cookies))
+            logout.invalidate()
+            await manager.save(_FakeResponse(), logout)
+
+            slow.put("late", True)
+            rotating.regenerate()
+            slow_response = _FakeResponse()
+            rotating_response = _FakeResponse()
+            await manager.save(slow_response, slow)
+            await manager.save(rotating_response, rotating)
+            self.assertIsNone(await manager._store.read(session.id))
+            self.assertEqual(slow_response.set_calls, [])
+            self.assertEqual(rotating_response.set_calls, [])
+
+    async def testMemoryRequestsNeverShareNestedPayloads(self) -> None:
+        """Keep unsaved nested mutations private to the owning request."""
+        manager, _ = self._makeManager()
+        session = await manager.start(_FakeRequest())
+        session.put("cart", ["book"])
+        await manager.save(_FakeResponse(), session)
+        cookies = {"sessionid": session.id}
+        first = await manager.start(_FakeRequest(cookies))
+        second = await manager.start(_FakeRequest(cookies))
+        first.get("cart").append("pen")
+        self.assertEqual(second.get("cart"), ["book"])
+
+    async def testMalformedCookieNeverReachesTheStore(self) -> None:
+        """Reject path traversal and invalid IDs before storage lookup."""
+        manager, _ = self._makeManager()
+        store = _RecordingStore()
+        manager._store = store
+        for identifier in ("../private", "..\\private", "C:alternate", "bad/entry"):
+            session = await manager.start(_FakeRequest({"sessionid": identifier}))
+            self.assertFalse(session.started)
+        self.assertEqual(store.read_ids, [])
+
+    async def testCacheSessionsRoundTripAndCannotResurrect(self) -> None:
+        """Exercise actual cache serialization and conditional replacement."""
+        for backend in (
+            SimpleMemoryCache(serializer=MsgspecSerializer()),
+            FileCacheBackend(self._base_path / "cache"),
+        ):
+            cache = _FakeCacheManager()
+            cache.repository = CacheRepository(backend)
+            store = CacheSessionStore(cache)
+            record = SessionRecord(
+                id="cache-session",
+                data={"_auth_identifier": 42},
+                expires_at=datetime.now(UTC) + timedelta(minutes=1),
+            )
+            await store.write(record)
+            restored = await store.read(record.id)
+            self.assertEqual(restored.data, record.data)
+            self.assertTrue(await store.update(record))
+            self.assertTrue(await store.delete(record.id))
+            self.assertFalse(await store.update(record))
+            self.assertIsNone(await store.read(record.id))
+
+    async def testLogoutSurvivesAControllerException(self) -> None:
+        """Persist logout before returning the framework's error response."""
+        manager, _ = self._makeManager()
+        session = await manager.start(_FakeRequest())
+        session.put("_auth_identifier", 42)
+        await manager.save(_FakeResponse(), session)
+        request = _FakeRequest({"sessionid": session.id})
+        middleware = StartSessionMiddleware(manager, _RecordingCatch())
+
+        async def controller() -> None:
+            request.state.session.invalidate()
+            error_msg = "controller failed after logout"
+            raise ValueError(error_msg)
+
+        response = await middleware.handle(request, controller)
+        self.assertEqual(response.getStatusCode(), 500)
+        self.assertIsNone(await manager._store.read(session.id))
+
+    async def testCancelledLogoutStillRevokesTheSession(self) -> None:
+        """Remove an invalidated record even when the request task is cancelled."""
+        manager, _ = self._makeManager()
+        session = await manager.start(_FakeRequest())
+        session.put("_auth_identifier", 42)
+        await manager.save(_FakeResponse(), session)
+        request = _FakeRequest({"sessionid": session.id})
+        middleware = StartSessionMiddleware(manager, _RecordingCatch())
+        entered = asyncio.Event()
+        hold = asyncio.Event()
+
+        async def controller() -> None:
+            request.state.session.invalidate()
+            entered.set()
+            await hold.wait()
+
+        pending = asyncio.create_task(middleware.handle(request, controller))
+        await entered.wait()
+        pending.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await pending
+        self.assertIsNone(await manager._store.read(session.id))
 
 class TestSessionManagerDatabaseDriver(TestCase):
     """Unit tests for the database-backed store resolution."""

@@ -1,3 +1,4 @@
+import asyncio
 from app.models.user import User
 from app.http.schemas.auth.register import RegisterSchema
 from orionis.http import response, HttpResponse
@@ -29,33 +30,15 @@ class RegisterController(BaseController):
         Returns
         -------
         HttpResponse
-            Rendered registration page including the submitted data.
+            Redirect to login after the account is created.
         """
-        await DB.beginTransaction()
-
-        try:
-
-            user = User()
-            user.name = request.name.strip()
-            user.email = request.email.strip().lower()
-            user.password = Hash.make(request.password.strip())
-            await user.save()
-
-            await DB.commit()
-            return (
-                response.redirect("/login")
-                        .withFlash(
-                            "success", "Account created successfully. Please log in.",
-                        )
-            )
-
-        except Exception as e:
-
-            await DB.rollback()
-            return await (
-                response.view("auth.register")
-                        .withErrors({
-                            "registration": str(e),
-                        })
-                        .withInput(request.toDict())
-            )
+        hashed = await asyncio.to_thread(Hash.make, request.password)
+        async with DB.transaction():
+            await User.create({
+                "name": request.name.strip(),
+                "email": request.email.strip().lower(),
+                "password": hashed,
+            })
+        return response.redirect("/login").withFlash(
+            "success", "Account created successfully. Please log in.",
+        )

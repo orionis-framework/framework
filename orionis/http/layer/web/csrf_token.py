@@ -1,4 +1,3 @@
-from __future__ import annotations
 import secrets
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http.entitites.csrf import HTTPCsrf
@@ -362,6 +361,14 @@ class CSRFTokenMiddleware(BaseMiddleware):
         None
         """
         cfg = self._cfg
+        session = getattr(request.state, "session", None)
+        if session is not None:
+            if session.invalidated:
+                response.deleteCookie(
+                    cfg.cookie_name, path=cfg.cookie_path, domain=cfg.cookie_domain,
+                )
+                return
+            token = session.get(self._session_key) or token
         secure = cfg.cookie_secure or request.scheme == "https"
 
         response.setCookie(

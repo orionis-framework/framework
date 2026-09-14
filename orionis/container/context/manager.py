@@ -1,4 +1,3 @@
-from __future__ import annotations
 import asyncio
 from typing import Any, TypeVar, Self, TYPE_CHECKING
 from orionis.container.context.scope import ScopedContext
@@ -11,6 +10,8 @@ T = TypeVar("T")
 class ScopeManager:
 
     # ruff: noqa: ANN401
+
+    __slots__ = ("__active", "__closed", "_instances", "_token")
 
     def __init__(self) -> None:
         """
@@ -25,6 +26,20 @@ class ScopeManager:
         """
         # Dictionary to hold instances for the current scope
         self._instances: dict[object, object] = {}
+        self.__active = False
+        self.__closed = False
+
+    @property
+    def isActive(self) -> bool:
+        """Report whether the owning scope is still open.
+
+        Returns
+        -------
+        bool
+            False before entry and after exit, including in child tasks
+            retaining a reference to this scope.
+        """
+        return self.__active
 
     def __getitem__(self, key: object) -> object | None:
         """
@@ -58,8 +73,16 @@ class ScopeManager:
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        RuntimeError
+            If the scope has already closed.
         """
         # Store the instance in the internal dictionary
+        if self.__closed:
+            error_msg = "Cannot publish a service to a closed container scope."
+            raise RuntimeError(error_msg)
         self._instances[key] = value
 
     def __contains__(self, key: object) -> bool:
@@ -102,8 +125,17 @@ class ScopeManager:
         -------
         Self
             The current ScopeManager instance.
+
+        Raises
+        ------
+        RuntimeError
+            If the scope is already active or has previously closed.
         """
+        if self.__active or self.__closed:
+            error_msg = "A container scope can only be entered once."
+            raise RuntimeError(error_msg)
         self._token = ScopedContext.setCurrentScope(self)
+        self.__active = True
         return self
 
     async def __aexit__(
@@ -130,6 +162,8 @@ class ScopeManager:
             This method does not return a value.
         """
         # Clear all stored instances and reset the current scope context
+        self.__active = False
+        self.__closed = True
         self.clear()
         ScopedContext.reset(self._token)
 
@@ -161,7 +195,7 @@ class ScopeManager:
         # Await the Task if necessary and store the result
         if isinstance(instance, asyncio.Task):
             instance = await instance
-            self._instances[key] = instance
+            self[key] = instance
 
         # Return the resolved instance
         return instance
@@ -183,7 +217,7 @@ class ScopeManager:
             This method does not return a value.
         """
         # Store the instance (sync or coroutine) in the scope dictionary
-        self._instances[key] = value
+        self[key] = value
 
     async def resolve(self, key: object) -> Any:
         """

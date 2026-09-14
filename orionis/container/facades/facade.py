@@ -1,6 +1,7 @@
-from __future__ import annotations
 from typing import Any, TYPE_CHECKING
-from orionis.container.facades.meta import FacadeMeta
+from orionis.container.context.manager import ScopeManager
+from orionis.container.context.scope import ScopedContext
+from orionis.container.facades.meta import FacadeMeta, ScopedFacadeMeta
 
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
@@ -96,3 +97,71 @@ class Facade(metaclass=FacadeMeta):
         """
         # Remove the cached pinned instance to restore normal resolution.
         cls._pinned_instance = None
+
+class ScopedFacade(Facade, metaclass=ScopedFacadeMeta):
+    """Expose a service already bound to the caller's active scope.
+
+    Scoped services never enter the process-wide facade cache. Closing a
+    scope also prevents access from child tasks that inherited that scope.
+    """
+
+    @classmethod
+    def scopedInstance(cls) -> object:
+        """Return the service bound to the active scope.
+
+        Returns
+        -------
+        object
+            Request-local service instance.
+
+        Raises
+        ------
+        RuntimeError
+            If no active scope contains the service.
+        """
+        scope = ScopedContext.getCurrentScope()
+        if isinstance(scope, ScopeManager) and scope.isActive:
+            instance = scope[cls.getFacadeAccessor()]
+            if instance is not None:
+                return instance
+        error_msg = f"{cls.__name__} requires an active scope with a bound service."
+        raise RuntimeError(error_msg)
+
+    @classmethod
+    async def resolve(cls, *_args: object, **_kwargs: object) -> object:
+        """Resolve the current instance without constructing a global service.
+
+        Parameters
+        ----------
+        *_args : object
+            Unused; scoped instances are bound by their lifecycle owner.
+        **_kwargs : object
+            Unused; scoped instances are bound by their lifecycle owner.
+
+        Returns
+        -------
+        object
+            Service belonging to the active scope.
+        """
+        return cls.scopedInstance()
+
+    @classmethod
+    async def pin(cls) -> None:
+        """Validate scope availability without retaining the service globally.
+
+        Returns
+        -------
+        None
+            Scoped attribute access is already direct.
+        """
+        cls.scopedInstance()
+
+    @classmethod
+    def unpin(cls) -> None:
+        """Leave lifetime management to the owning scope.
+
+        Returns
+        -------
+        None
+            No global instance exists to clear.
+        """

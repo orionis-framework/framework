@@ -167,8 +167,8 @@ sin usar se fusionan en la llamada final.
 - **Dispatch perezoso en las facades.** `FacadeMeta.__getattr__` devuelve una función
   normal cacheada; el contenedor solo se toca cuando el `_FacadeDispatch` resultante se
   awaita o se entra como context manager, lo que respeta los bindings transitorios.
-- **Sin `__slots__`.** `Container`, `ScopeManager` y `Binding` conservan `__dict__`;
-  solo `_FacadeDispatch` declara `__slots__`.
+- **Objetos scoped con slots.** `ScopeManager` y `_FacadeDispatch` declaran
+  `__slots__`; `Container` y `Binding` conservan `__dict__`.
 
 ---
 
@@ -488,6 +488,9 @@ Contenedor tipo diccionario para instancias scoped, en
 `orionis.container.context.manager`.
 
 - `__getitem__` devuelve `None` para claves ausentes en lugar de lanzar.
+- `isActive` solo es verdadero entre entrada y salida. Un scope se usa una vez;
+  reabrirlo o publicar servicios tras cerrarlo lanza `RuntimeError`, incluidos
+  resultados de resoluciones asíncronas que terminan después de la limpieza.
 - `__aenter__` publica el manager como scope activo y guarda el token de reset en
   `self._token`; ese atributo solo existe tras entrar, así que llamar antes a
   `__aexit__` lanza `AttributeError`.
@@ -500,6 +503,12 @@ Contenedor tipo diccionario para instancias scoped, en
   que incluye el caso de un valor que realmente es `None`.
 
 ### `ScopedContext`
+
+Fachadas por petición usan `ScopedFacade` de `facades/facade.py`, respaldada por
+`ScopedFacadeMeta`. Lee el servicio ya vinculado al `ScopeManager` actual y activo
+sin retener pins globales. `resolve()` sigue esa regla, `pin()` valida disponibilidad
+y `unpin()` no hace nada. Sin scope vivo o servicio vinculado lanza `RuntimeError`.
+`Session` usa esta base; fachadas singleton stateless como `Auth` conservan `Facade`.
 
 ```python
 class ScopedContext:

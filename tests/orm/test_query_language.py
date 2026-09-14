@@ -613,6 +613,24 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         )
         self.assertEqual(self.names(rows), ["Ada", "Ben", "Cid"])
 
+    async def testThreeUnionBranchesCompileWithoutNestedParentheses(self) -> None:
+        """Execute three UNION arms using the shared query engine."""
+        await self.seedUsers()
+        base = DB.table("users").select("name").where("country", "CO")
+        middle = DB.table("users").select("name").where("country", "MX")
+        last = DB.table("users").select("name").where("country", "AR")
+        rows = await base.union(middle).union(last).get()
+        self.assertEqual(self.names(rows), ["Ada", "Ben", "Cid", "Dot"])
+
+    async def testMixedUnionOperatorsPreserveLeftToRightSemantics(self) -> None:
+        """Preserve duplicates appended after a distinct compound result."""
+        await self.seedUsers()
+        first = DB.table("users").select("name").where("name", "Ada")
+        second = first.clone()
+        third = first.clone()
+        rows = await first.union(second).unionAll(third).get()
+        self.assertEqual(self.names(rows), ["Ada", "Ada"])
+
     def testLockForUpdateRendersRowLocking(self) -> None:
         """
         Request row locking on the selected rows.

@@ -18,7 +18,7 @@ class CreateModelHasPermissionsTable(Migration):
         async with Schema.create("model_has_permissions") as table:
             table.bigInteger("permission_id").foreign("permissions.id").comment("Permission ID")
             table.string("model_type", 255).comment("Model Class Name")
-            table.bigInteger("model_id").comment("Model ID")
+            table.string("model_id", 255).comment("Canonical Model ID")
 
             table.primaryKey("permission_id", "model_id", "model_type")
             table.index("model_id", "model_type")

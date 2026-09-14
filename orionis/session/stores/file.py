@@ -1,7 +1,7 @@
-from __future__ import annotations
 import asyncio
 import contextlib
 import os
+import re
 import secrets
 import threading
 import time
@@ -9,8 +9,11 @@ import msgspec
 import msgspec.json as _msgspec_json
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
+from zlib import crc32
+from filelock import FileLock
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
+from orionis.session.exceptions import SessionStorageException
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -44,6 +47,8 @@ _STALE_TEMP_SECONDS: float = 3600.0
 # Windows refuses a rename while another process swaps the same destination.
 _REPLACE_ATTEMPTS: int = 3
 _REPLACE_BACKOFF_SECONDS: float = 0.005
+_LOCK_STRIPES: int = 64
+_VALID_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
 
 class FileSessionStore(ISessionStore):
     """
@@ -73,7 +78,7 @@ class FileSessionStore(ISessionStore):
         Path to the directory where session files are stored.
     """
 
-    __slots__ = ("_directory", "_rename_lock")
+    __slots__ = ("_directory", "_locks", "_rename_lock")
 
     def __init__(self, directory: Path) -> None:
         """
@@ -94,6 +99,25 @@ class FileSessionStore(ISessionStore):
         # Writes run on worker threads, so publishing two payloads for the
         # same session must not overlap inside this process.
         self._rename_lock = threading.Lock()
+        self._locks = tuple(
+            FileLock(directory / f".session-lock-{index}", timeout=10)
+            for index in range(_LOCK_STRIPES)
+        )
+
+    def _lock(self, path: Path) -> FileLock:
+        """Select a bounded, stable cross-process lock for a session file.
+
+        Parameters
+        ----------
+        path : Path
+            Session file protected by the lock.
+
+        Returns
+        -------
+        FileLock
+            Reentrant lock serializing validation, replacement and deletion.
+        """
+        return self._locks[crc32(path.name.encode()) % _LOCK_STRIPES]
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -112,7 +136,15 @@ class FileSessionStore(ISessionStore):
         -------
         Path
             Full path to ``{session_id}.json`` inside the store directory.
+
+        Raises
+        ------
+        SessionStorageException
+            If an identifier contains path syntax or exceeds its limit.
         """
+        if not isinstance(session_id, str) or _VALID_ID.fullmatch(session_id) is None:
+            error_msg = "Invalid session identifier."
+            raise SessionStorageException(error_msg)
         return self._directory / f"{session_id}.json"
 
     def _serialize(self, record: SessionRecord) -> bytes:
@@ -269,7 +301,7 @@ class FileSessionStore(ISessionStore):
             else:
                 return
 
-    def _deleteFile(self, path: Path) -> None:
+    def _deleteFile(self, path: Path) -> bool:
         """
         Unlink *path*, silently ignoring a missing-file error.
 
@@ -280,9 +312,15 @@ class FileSessionStore(ISessionStore):
 
         Returns
         -------
-        None
+        bool
+            True when this call removed the session file.
         """
-        path.unlink(missing_ok=True)
+        with self._lock(path):
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                return False
+            return True
 
     def _readRecord(self, path: Path) -> SessionRecord | None:
         """
@@ -301,16 +339,21 @@ class FileSessionStore(ISessionStore):
         SessionRecord | None
             The live record, or ``None`` when absent, expired or corrupt.
         """
-        raw = self._readFile(path)
-        if raw is None:
-            return None
+        with self._lock(path):
+            raw = self._readFile(path)
+            if raw is None:
+                return None
 
-        record = self._deserialize(raw)
-        if record is None or record.expires_at <= datetime.now(UTC):
-            self._deleteFile(path)
-            return None
-
-        return record
+            record = self._deserialize(raw)
+            if (
+                record is None
+                or record.id != path.stem
+                or record.expires_at.tzinfo is None
+                or record.expires_at <= datetime.now(UTC)
+            ):
+                self._deleteFile(path)
+                return None
+            return record
 
     def _writeRecord(self, path: Path, record: SessionRecord) -> None:
         """
@@ -327,7 +370,29 @@ class FileSessionStore(ISessionStore):
         -------
         None
         """
-        self._writeFile(path, self._serialize(record))
+        with self._lock(path):
+            self._writeFile(path, self._serialize(record))
+
+    def _updateRecord(self, path: Path, record: SessionRecord) -> bool:
+        """Replace an existing live session under its cross-process lock.
+
+        Parameters
+        ----------
+        path : Path
+            Existing session file.
+        record : SessionRecord
+            Replacement record.
+
+        Returns
+        -------
+        bool
+            False when another worker deleted or expired the record.
+        """
+        with self._lock(path):
+            if self._readRecord(path) is None:
+                return False
+            self._writeRecord(path, record)
+            return True
 
     def _gcSweep(self) -> None:
         """
@@ -344,7 +409,6 @@ class FileSessionStore(ISessionStore):
         -------
         None
         """
-        now = datetime.now(UTC)
         stale_before = time.time() - _STALE_TEMP_SECONDS
         with os.scandir(self._directory) as it:
             for entry in it:
@@ -360,15 +424,8 @@ class FileSessionStore(ISessionStore):
                 if not entry.name.endswith(".json"):
                     continue
 
-                try:
-                    with open(entry.path, "rb") as fh:  # noqa: PTH123
-                        raw = fh.read()
-                    payload = _DECODER.decode(raw)
-                    if payload.expires_at <= now:
-                        os.unlink(entry.path)  # noqa: PTH108
-                except (ValueError, msgspec.DecodeError, OSError):
-                    with contextlib.suppress(OSError):
-                        os.unlink(entry.path)  # noqa: PTH108
+                with contextlib.suppress(OSError):
+                    self._readRecord(self._directory / entry.name)
 
     # ------------------------------------------------------------------
     # ISessionStore interface
@@ -408,7 +465,24 @@ class FileSessionStore(ISessionStore):
         """
         await asyncio.to_thread(self._writeRecord, self._path(record.id), record)
 
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        """Update only a live session without recreating a deleted file.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Replacement record.
+
+        Returns
+        -------
+        bool
+            Whether the session still existed and was updated.
+        """
+        return await asyncio.to_thread(
+            self._updateRecord, self._path(record.id), record,
+        )
+
+    async def delete(self, session_id: str) -> bool:
         """
         Remove the session file for *session_id* (no-op when absent).
 
@@ -419,10 +493,11 @@ class FileSessionStore(ISessionStore):
 
         Returns
         -------
-        None
+        bool
+            True only when a session file was deleted.
         """
         path = self._path(session_id)
-        await asyncio.to_thread(self._deleteFile, path)
+        return await asyncio.to_thread(self._deleteFile, path)
 
     async def gc(self) -> None:
         """

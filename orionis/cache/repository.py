@@ -1,7 +1,9 @@
-from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING, Any
+from aiocache import BaseCache
+from aiocache.lock import OptimisticLock, OptimisticLockError
 from orionis.cache.contracts.repository import ICacheRepository
+from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.locks.lock import CacheLock
 
 if TYPE_CHECKING:
@@ -56,6 +58,44 @@ class CacheRepository(ICacheRepository):
         return f"{self._prefix}:{key}" if self._prefix else key
 
     # ── Public API ──────────────────────────────────────────────────────────
+
+    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+        """Replace a live entry without resurrecting a deleted key.
+
+        Parameters
+        ----------
+        key : str
+            Existing cache key.
+        value : Any
+            Replacement value.
+        ttl : float | None
+            New lifetime in seconds, or None for no expiry.
+
+        Returns
+        -------
+        bool
+            True when the backend atomically accepted the replacement.
+
+        Raises
+        ------
+        CacheStoreException
+            If the backend has no atomic replacement primitive.
+        """
+        backend = self._backend
+        prefixed = self._k(key)
+        replace = getattr(backend, "replace", None)
+        if callable(replace):
+            return bool(await replace(prefixed, value, ttl=ttl))
+        if not isinstance(backend, BaseCache):
+            error_msg = "This cache backend does not support atomic replacement."
+            raise CacheStoreException(error_msg)
+        async with OptimisticLock(backend, prefixed) as lock:
+            if lock._token is None:  # noqa: SLF001
+                return False
+            try:
+                return await lock.cas(value, ttl=ttl)
+            except OptimisticLockError:
+                return False
 
     async def get(self, key: str) -> Any:
         """

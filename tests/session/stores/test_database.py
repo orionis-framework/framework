@@ -1,6 +1,7 @@
-from __future__ import annotations
 import asyncio
+import tempfile
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from orionis.database.connection import Connection
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String, Text
@@ -434,3 +435,32 @@ class TestDatabaseSessionStore(TestCase):
             {"id": "dead"},
         )
         self.assertEqual(rows, [])
+
+    async def testPrefixedStorePreservesRevocationAcrossConnections(self) -> None:
+        """Use prefixed IR queries and let deletion win over concurrent updates."""
+        with tempfile.TemporaryDirectory() as directory:
+            config = {
+                "driver": "sqlite",
+                "database": str(Path(directory) / "sessions.sqlite"),
+                "prefix": "app_",
+            }
+            first_connection = Connection("first", config)
+            second_connection = Connection("second", config)
+            first = DatabaseSessionStore(first_connection)
+            second = DatabaseSessionStore(second_connection)
+            try:
+                record = _make_record("concurrent")
+                await first.write(record)
+                await second._ensureSchema()
+                self.assertIsNotNone(await second.read(record.id))
+                await asyncio.gather(first.update(record), second.delete(record.id))
+                self.assertIsNone(await first.read(record.id))
+                self.assertFalse(await first.update(record))
+                rows = await first_connection.select(
+                    "SELECT name FROM sqlite_master WHERE name = :name",
+                    {"name": "app_sessions"},
+                )
+                self.assertEqual(len(rows), 1)
+            finally:
+                await first_connection.disconnect()
+                await second_connection.disconnect()

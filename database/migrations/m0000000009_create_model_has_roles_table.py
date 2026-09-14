@@ -17,7 +17,7 @@ class CreateModelHasRolesTable(Migration):
         async with Schema.create("model_has_roles") as table:
             table.bigInteger("role_id").foreign("roles.id").comment("Role ID")
             table.string("model_type", 255).comment("Model Class Name")
-            table.bigInteger("model_id").comment("Model ID")
+            table.string("model_id", 255).comment("Canonical Model ID")
 
             table.primaryKey("role_id", "model_id", "model_type")
             table.index("model_id", "model_type")

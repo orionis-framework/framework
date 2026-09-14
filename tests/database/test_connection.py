@@ -1,4 +1,5 @@
 from __future__ import annotations
+import traceback
 from orionis.database.connection import Connection
 from orionis.database.contracts.transaction import ITransaction
 from orionis.database.exceptions import (
@@ -195,6 +196,20 @@ class TestConnection(TestCase):
         """
         with self.assertRaises(QueryException):
             await self._connection.select("SELECT * FROM missing_table")
+
+    async def testQueryErrorsDoNotExposeBoundCredentials(self) -> None:
+        """Keep credentials out of SQL errors and their formatted exception chain."""
+        credential = "private-value-that-must-not-be-logged"
+        with self.assertRaises(QueryException) as caught:
+            await self._connection.execute(
+                "INSERT INTO missing_table (credential) VALUES (:value)",
+                {"value": credential},
+            )
+        self.assertNotIn(credential, str(caught.exception))
+        formatted = "".join(traceback.format_exception(caught.exception))
+        self.assertNotIn(credential, formatted)
+        self.assertIn("OperationalError", str(caught.exception))
+        self.assertTrue(caught.exception.__suppress_context__)
 
     # ── Transactions ──────────────────────────────────────────────────────────
 

@@ -190,7 +190,9 @@ def engine_options(
         Options such as pool class and driver connect arguments.
     """
     driver = resolve_driver(config)
-    options: dict[str, Any] = {"echo": False, "future": True}
+    options: dict[str, Any] = {
+        "echo": False, "future": True, "hide_parameters": True,
+    }
 
     if driver == "sqlite":
         # A shared in-memory database requires a single pooled connection.

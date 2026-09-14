@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
+from orionis.failure.contracts.catch import ICatch
 from orionis.http.middleware import BaseMiddleware
 from orionis.session.flash import apply_flash
 from orionis.session.manager import SessionManager
-from orionis.support.facades.session import Session
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -21,9 +21,9 @@ class StartSessionMiddleware(BaseMiddleware):
 
     # ruff: noqa: TC001 (Dependency Injection)
 
-    __slots__ = ("_manager",)
+    __slots__ = ("_catch", "_manager")
 
-    def __init__(self, manager: SessionManager) -> None:
+    def __init__(self, manager: SessionManager, catch: ICatch) -> None:
         """
         Initialise the middleware with the given session manager.
 
@@ -31,12 +31,15 @@ class StartSessionMiddleware(BaseMiddleware):
         ----------
         manager : SessionManager
             Session manager used for the start / save cycle.
+        catch : ICatch
+            Framework exception handler producing responses before persistence.
 
         Returns
         -------
         None
         """
         self._manager = manager
+        self._catch = catch
 
     async def handle(
         self,
@@ -65,28 +68,41 @@ class StartSessionMiddleware(BaseMiddleware):
         session = await self._manager.start(request)
         request.state.session = session
 
-        # Pin Session Facade.
-        await Session.pin()
+        try:
+            response = await self.__response(request, call_next)
+            flash_data = response.getFlashData()
+            if flash_data:
+                apply_flash(session, flash_data)
+            self.__storeCurrentUrl(request, response, session)
+            await self._manager.save(response, session)
+            return response
+        except BaseException:
+            await self._manager.abort(session)
+            raise
 
-       # Advance through the rest of the middleware pipeline.
-        response = await call_next()
+    async def __response(
+        self,
+        request: Request,
+        call_next: Callable[[], Awaitable[Response]],
+    ) -> Response:
+        """Render failures while the session is still available for persistence.
 
-        # Unpin Session Facade.
-        Session.unpin()
+        Parameters
+        ----------
+        request : Request
+            Incoming request.
+        call_next : Callable[[], Awaitable[Response]]
+            Remaining middleware and controller pipeline.
 
-        # Move data queued with ``Response.withFlash()`` into the flash bag.
-        flash_data = response.getFlashData()
-        if flash_data:
-            apply_flash(session, flash_data)
-
-        # Remember this page so a later failed submission can redirect back.
-        self.__storeCurrentUrl(request, response, session)
-
-        # Persist the session and set the cookie only when it was used.
-        await self._manager.save(response, session)
-
-        # Return the response to the client.
-        return response
+        Returns
+        -------
+        Response
+            Normal response or the framework's exception response.
+        """
+        try:
+            return await call_next()
+        except Exception as exc:  # noqa: BLE001
+            return await self._catch.exception(exc, request)
 
     @staticmethod
     def __storeCurrentUrl(

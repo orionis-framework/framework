@@ -355,7 +355,8 @@ class Connection(IConnection):
         Raises
         ------
         QueryException
-            If the statement fails to execute.
+            If the statement fails to execute. Driver messages and bound
+            values are excluded because they may contain credentials.
         """
         async with self._acquire() as connection:
             result = await self._run(connection, text(sql), dict(bindings or {}))
@@ -675,9 +676,10 @@ class Connection(IConnection):
             return await connection.execute(statement)
         except SQLAlchemyError as exc:
             error_msg = (
-                f"Query failed on connection '{self._name}': {exc}"
+                f"Query failed on connection '{self._name}' "
+                f"({type(exc).__name__})."
             )
-            raise QueryException(error_msg) from exc
+            raise QueryException(error_msg) from None
 
     async def _releaseIfSettled(
         self,

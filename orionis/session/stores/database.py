@@ -5,6 +5,13 @@ from typing import TYPE_CHECKING, Any
 import msgspec
 import msgspec.json as _msgjson
 from orionis.database.exceptions import QueryException
+from orionis.orm.query.expressions import (
+    DeletePlan,
+    InsertPlan,
+    SelectPlan,
+    UpdatePlan,
+    WhereClause,
+)
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String, Text
 from orionis.session.contracts.store import ISessionStore
@@ -80,13 +87,9 @@ class DatabaseSessionStore(ISessionStore):
 
     __slots__ = (
         "_connection",
+        "_definition",
         "_ready",
         "_ready_lock",
-        "_sql_delete",
-        "_sql_gc",
-        "_sql_insert",
-        "_sql_select",
-        "_sql_update",
         "_table",
     )
 
@@ -109,21 +112,7 @@ class DatabaseSessionStore(ISessionStore):
         self._table = table
         self._ready = False
         self._ready_lock = asyncio.Lock()
-
-        # Statements only depend on the table name: build them once instead of
-        # formatting a new SQL string on every session operation.
-        self._sql_select: str = (
-            f"SELECT payload, expires_at FROM {table} WHERE id = :id"  # noqa: S608
-        )
-        self._sql_update: str = (
-            f"UPDATE {table} SET payload = :p, expires_at = :e WHERE id = :id"  # noqa: S608
-        )
-        self._sql_insert: str = (
-            f"INSERT INTO {table} (id, payload, expires_at) "  # noqa: S608
-            "VALUES (:id, :p, :e)"
-        )
-        self._sql_delete: str = f"DELETE FROM {table} WHERE id = :id"  # noqa: S608
-        self._sql_gc: str = f"DELETE FROM {table} WHERE expires_at <= :now"  # noqa: S608
+        self._definition = _build_sessions_table(table)
 
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
@@ -140,7 +129,7 @@ class DatabaseSessionStore(ISessionStore):
         async with self._ready_lock:
             if self._ready:
                 return
-            await self._connection.createTable(_build_sessions_table(self._table))
+            await self._connection.createTable(self._definition)
             self._ready = True
 
     # ── ISessionStore ────────────────────────────────────────────────────────
@@ -162,8 +151,11 @@ class DatabaseSessionStore(ISessionStore):
         """
         await self._ensureSchema()
         rows = await self._connection.select(
-            self._sql_select,
-            {"id": session_id},
+            SelectPlan(
+                table=self._definition,
+                columns=("payload", "expires_at"),
+                wheres=[WhereClause("id", value=session_id)],
+            ),
         )
         if not rows:
             return None
@@ -171,7 +163,13 @@ class DatabaseSessionStore(ISessionStore):
         row = rows[0]
         expiration = row.get("expires_at")
         if expiration is None or expiration <= time.time():
-            await self.delete(session_id)
+            await self._connection.delete(DeletePlan(
+                table=self._definition,
+                wheres=[
+                    WhereClause("id", value=session_id),
+                    WhereClause("expires_at", value=expiration),
+                ],
+            ))
             return None
 
         data = self.__decode(row.get("payload"))
@@ -208,10 +206,11 @@ class DatabaseSessionStore(ISessionStore):
         await self._ensureSchema()
         payload = self.__encode(record.data)
 
-        updated = await self._connection.execute(
-            self._sql_update,
-            {"p": payload, "e": expiration, "id": record.id},
-        )
+        updated = await self._connection.update(UpdatePlan(
+            table=self._definition,
+            values={"payload": payload, "expires_at": expiration},
+            wheres=[WhereClause("id", value=record.id)],
+        ))
         if not updated:
             await self.__insertOrRetryUpdate(record.id, payload, expiration)
 
@@ -238,18 +237,53 @@ class DatabaseSessionStore(ISessionStore):
         None
         """
         try:
-            await self._connection.execute(
-                self._sql_insert,
-                {"id": session_id, "p": payload, "e": expiration},
-            )
+            async with self._connection.transaction():
+                await self._connection.insert(InsertPlan(
+                    table=self._definition,
+                    values=[{
+                        "id": session_id,
+                        "payload": payload,
+                        "expires_at": int(expiration),
+                    }],
+                ))
         except QueryException:
-            # Another writer inserted the row first; retry as an update.
-            await self._connection.execute(
-                self._sql_update,
-                {"p": payload, "e": expiration, "id": session_id},
-            )
+            updated = await self._connection.update(UpdatePlan(
+                table=self._definition,
+                values={"payload": payload, "expires_at": int(expiration)},
+                wheres=[WhereClause("id", value=session_id)],
+            ))
+            if not updated:
+                raise
 
-    async def delete(self, session_id: str) -> None:
+    async def update(self, record: SessionRecord) -> bool:
+        """Update only a live session row with a single SQL statement.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Replacement payload and expiration.
+
+        Returns
+        -------
+        bool
+            False when the session was deleted or expired.
+        """
+        await self._ensureSchema()
+        now = time.time()
+        expiration = int(record.expires_at.timestamp())
+        if expiration <= now:
+            return False
+        affected = await self._connection.update(UpdatePlan(
+            table=self._definition,
+            values={"payload": self.__encode(record.data), "expires_at": expiration},
+            wheres=[
+                WhereClause("id", value=record.id),
+                WhereClause("expires_at", operator=">", value=int(now)),
+            ],
+        ))
+        return affected > 0
+
+    async def delete(self, session_id: str) -> bool:
         """
         Remove the record for *session_id* (no-op when absent).
 
@@ -260,13 +294,15 @@ class DatabaseSessionStore(ISessionStore):
 
         Returns
         -------
-        None
+        bool
+            True only when a row was deleted.
         """
         await self._ensureSchema()
-        await self._connection.execute(
-            self._sql_delete,
-            {"id": session_id},
-        )
+        affected = await self._connection.delete(DeletePlan(
+            table=self._definition,
+            wheres=[WhereClause("id", value=session_id)],
+        ))
+        return affected > 0
 
     async def gc(self) -> None:
         """
@@ -280,10 +316,10 @@ class DatabaseSessionStore(ISessionStore):
         None
         """
         await self._ensureSchema()
-        await self._connection.execute(
-            self._sql_gc,
-            {"now": int(time.time())},
-        )
+        await self._connection.delete(DeletePlan(
+            table=self._definition,
+            wheres=[WhereClause("expires_at", operator="<=", value=int(time.time()))],
+        ))
 
     # ── Serialization helpers ────────────────────────────────────────────────
 
@@ -321,6 +357,7 @@ class DatabaseSessionStore(ISessionStore):
             return None
         data = raw.encode() if isinstance(raw, str) else raw
         try:
-            return _DECODER.decode(data)
-        except msgspec.DecodeError:
+            payload = _DECODER.decode(data)
+        except (msgspec.DecodeError, UnicodeDecodeError):
             return None
+        return payload if isinstance(payload, dict) else None

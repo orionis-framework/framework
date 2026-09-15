@@ -1,234 +1,335 @@
-<h1 align="center">Orionis Framework.</h1>
+<p align="center">
+  <img src="https://docs.orionis-framework.com/prologue/logo.png" alt="Orionis Framework" width="180" />
+</p>
 
-<h3 align="center">The async-first framework Python never had.</h3>
+<h1 align="center">Orionis Framework</h1>
 
-<p align="center"><em>One framework. Zero compromises.</em></p>
+<h3 align="center">Write Python. Build the whole application.</h3>
 
 <p align="center">
-  <img src="https://docs.orionis-framework.com/prologue/logo.png" alt="Orionis Framework" width="300" />
+  Async-first. Laravel-inspired. Built for Python 3.14+.
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/orionis/"><img src="https://img.shields.io/pypi/v/orionis?color=blue&style=flat-square" alt="PyPI version"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.14%2B-blue?style=flat-square" alt="Python"></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License: MIT"></a>
-  <a href="https://github.com/orgs/orionis-framework/discussions"><img src="https://img.shields.io/badge/discussions-GitHub-black?style=flat-square&logo=github" alt="GitHub Discussions"></a>
-  <a href="https://github.com/sponsors/rmunate"><img src="https://img.shields.io/badge/sponsor-GitHub-pink?style=flat-square&logo=github-sponsors" alt="Sponsor"></a>
+  <a href="https://pypi.org/project/orionis/"><img src="https://img.shields.io/pypi/v/orionis?color=007f8b&amp;style=flat-square" alt="PyPI version" /></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.14%2B-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.14+" /></a>
+  <a href="https://github.com/orionis-framework/framework/actions/workflows/test.yml"><img src="https://github.com/orionis-framework/framework/actions/workflows/test.yml/badge.svg?branch=1.x" alt="Test suite" /></a>
+  <a href="#project-status"><img src="https://img.shields.io/badge/status-alpha-d99a16?style=flat-square" alt="Status: alpha" /></a>
+  <a href="LICENCE"><img src="https://img.shields.io/badge/license-MIT-16803d?style=flat-square" alt="MIT license" /></a>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#a-real-endpoint">Code Tour</a> &bull;
+  <a href="#batteries-connected">Features</a> &bull;
+  <a href="#documentation">Documentation</a> &bull;
+  <a href="#build-it-with-us">Community</a>
 </p>
 
 ---
 
-> **Async-first. Rust-powered. Built for production.**
->
-> Orionis is a complete framework for building **APIs, web apps, sockets, queues, jobs, scheduled tasks, and CLI commands** — with the architecture and developer experience that Python has been missing.
+**The endpoint is just the beginning.**
 
-> **Not just another framework**
->
-> Orionis is not a router, not a microframework, not a toolkit. It's a **full-stack async-first framework**, designed to replace the need to assemble multiple tools in Python.
+Then come the database, authentication, validation, file uploads, scheduled
+work, and all the decisions that turn a demo into an application.
 
----
+**Orionis is an async-first, full-stack Python framework that connects those
+pieces.** A service container at the center. A fluent ORM for your data.
+Shared conventions across HTTP, console commands, and tests.
 
-## The Problem Isn't Python. It's the Tooling.
+For APIs, server-rendered applications, and internal tools that need more
+than an HTTP layer, without leaving the Python ecosystem.
 
-Most Python frameworks give you a router and leave the rest to you. You end up stitching together dozens of libraries, writing boilerplate, and fighting decisions that should have been made for you.
-
-**The result?** Inconsistent project structures. No clear conventions. Dependency management as an afterthought. Testing that feels like a chore.
-
-Orionis takes a different approach.
-
-> **A framework, not a toolkit**
->
-> Orionis ships with everything you need — dependency injection, service providers, middleware, facades, a CLI, and a testing engine — all designed to work together from day one. One framework. Zero glue code.
-
----
+> **Early access:** Orionis is in **alpha**. APIs may change before 1.0;
+> this is not a production-stability promise. Try it on a real problem,
+> tell us where it gets in your way, and help shape the framework.
 
 ## Why Orionis
 
-### Rust-Powered HTTP Core
+- **Structure that feels familiar.** Laravel-inspired providers, controllers,
+  facades, migrations, and fluent APIs, built around Python's `async/await`.
+- **Dependencies declared, not hunted down.** Type-hint a service contract;
+  the container resolves it in controllers, commands, and test methods.
+  Choose singleton, request-scoped, or transient lifetimes.
+- **APIs and HTML belong in the same app.** Return JSON, render an async
+  Jinja2 view, stream a file, or redirect with validation errors and old input.
+- **Your infrastructure has a home.** Configuration, caching, storage,
+  logging, and scheduling follow the same application lifecycle.
 
-Built on [Granian](https://github.com/emmett-framework/granian), the fastest HTTP server in the Python ecosystem. ASGI and RSGI support out of the box. **10x faster** than traditional Python servers.
+## Batteries, Connected
 
-### Async-First Architecture
+These are implemented capabilities, not a roadmap.
 
-Designed from the ground up for `async/await`. Not bolted on. Not optional. Every layer — from routing to middleware to DI — is natively asynchronous.
-
-### Reactor CLI
-
-A powerful command-line interface for scaffolding, task scheduling, and job processing. Run `python -B reactor schedule:work` and ship.
-
-### Built-In Testing Engine
-
-First-class testing with expressive assertions, async support, and parallel execution. No external test runners required.
-
-### Clean Architecture That Scales
-
-Service providers, middleware pipelines, dependency injection, and facades. Patterns that keep your codebase clean at 100 routes or 10,000.
-
-### Secure by Default
-
-OWASP-aligned security, built-in middleware protection, and authentication primitives. Security is not a plugin — it's the foundation.
-
----
-
-## Performance That Speaks for Itself
-
-> **Benchmarked. Not Estimated.**
->
-> Orionis runs on **Granian** — an HTTP server written in Rust. This isn't theoretical performance. These are real numbers on real hardware.
-
-### Choose Your Interface
-
-| Interface | Description |
+| Area | What you get today |
 |---|---|
-| **RSGI** *(Rust Server Gateway Interface)* | Granian's native Rust interface — unlocking maximum throughput and the lowest possible latency. When every microsecond matters. |
-| **ASGI** *(Asynchronous Server Gateway Interface)* | Compatible with the entire Python async ecosystem. Full interoperability with Uvicorn, Hypercorn, and Daphne. |
+| **HTTP** | Granian with ASGI and RSGI, named routes, typed path parameters, middleware, CORS, rate limiting, streaming, and file responses. |
+| **Validation** | `msgspec` schemas, nested payloads, field constraints, custom rules, and multi-error responses. Invalid API input becomes HTTP 422. |
+| **Authentication** | Session login and opaque personal access tokens, request-scoped identity, roles, permissions, and resource policies. |
+| **ORM & Database** | Async Active Record, a shared fluent query builder, relationships, eager loading, soft deletes, scopes, model events, pagination, transactions, and migrations. |
+| **Views & Sessions** | Async Jinja2, CSRF integration, flash messages, old form input, error bags, and file, memory, cache, or database session stores. |
+| **Cache** | Memory, file, Redis, Memcached, and database stores, with TTLs, counters, and lock APIs. |
+| **Storage** | Local and in-memory drivers, uploads, streams, and optional S3, Azure Blob, and Google Cloud Storage integrations. |
+| **Console & Scheduling** | Reactor commands, scaffolding, Rich output, and APScheduler tasks with memory, Redis, or database job stores. |
+| **Everyday Essentials** | Argon2id and bcrypt hashing, AES encryption, rotating logs, translations, collections, and date/time utilities. |
+| **Testing** | An integrated runner, async test cases, dependency injection, discovery, filtering, and CLI failure exit codes. |
 
-### Real-World Benchmarks
+Database backends include SQLite, PostgreSQL, MySQL, Oracle, and SQL Server.
+External services require configuration; cloud SDKs and some database drivers
+use the optional extras declared in [pyproject.toml](pyproject.toml).
 
-| Metric | Value |
-|---|---|
-| **Requests/sec** | **455k+** — Projected with Granian RSGI. Based on TechEmpower Framework Benchmarks Round 22. |
-| **Avg Latency** | **< 2ms** — Granian internal benchmarks. Sub-millisecond response times under real production conditions. |
-| **vs FastAPI** | **2.6x faster** — JSON serialization throughput. Orionis (~455k req/s) vs FastAPI (~177k req/s). |
-| **vs Django** | **6.6x faster** — JSON serialization throughput. Orionis (~455k req/s) vs Django (~69k req/s). |
+<details>
+<summary><strong>A place for every part of your application</strong></summary>
 
-<sub><em>Estimated: Granian RSGI scored 652k raw (TechEmpower R22). Orionis adds framework overhead, projected ~455k req/s.</em></sub>
+```text
+app/
+  http/          Controllers, schemas, and middleware
+  models/        Application models
+  contracts/     Service interfaces
+  services/      Business logic
+  providers/     Dependency bindings and startup hooks
+  console/       Commands and schedules
+bootstrap/       Application composition
+config/          Typed application configuration
+database/        Migrations
+resources/       Views and translations
+routes/          Web, API, and console entry points
+tests/           Application tests
+orionis/         Framework source in this development repository
+```
 
----
+</details>
 
-## Get Started in Minutes
+## Quick Start
 
-Explore the official documentation to get up and running quickly:
+You need **Python 3.14+** and [uv](https://docs.astral.sh/uv/).
+To explore the current implementation, run this repository's development app:
 
-| Resource | Description |
-|---|---|
-| [**Installation**](https://docs.orionis-framework.com/es/getting-started/installation/) | From zero to running in under 5 minutes. |
-| [**Project Structure**](https://docs.orionis-framework.com/es/getting-started/project-structure/) | Understand how Orionis organizes your application. |
-| [**Configuration**](https://docs.orionis-framework.com/es/getting-started/configuration/) | Fine-tune every aspect of the framework. |
-| [**Request Lifecycle**](https://docs.orionis-framework.com/es/architecture/request-lifecycle/) | Trace the full journey of an HTTP request. |
+```bash
+git clone --branch=1.x https://github.com/orionis-framework/framework.git
+cd framework
+uv sync --python=3.14
+```
 
----
+Copy [.env.example](.env.example) to `.env`: use `cp .env.example .env` on
+macOS/Linux or `Copy-Item .env.example .env` in PowerShell. Keep these local
+settings for a first run without external database or cache servers:
 
-## Quick Tour
+```dotenv
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+CACHE_STORE=memory
+SESSION_DRIVER=file
+```
 
-### Routing
+On Windows, set `$env:PYTHONIOENCODING = "utf-8"` before running Reactor.
+
+```bash
+uv run python reactor migrate
+uv run python reactor serve
+```
+
+Open the address printed by `serve`. This is a **framework development
+checkout**, not a generated application skeleton.
+
+Already have a Python project? `uv add orionis` installs the package;
+application bootstrap and configuration are still required.
+
+## A Real Endpoint
+
+Accept a project name, validate it, persist a model, and return **201 Created**.
+The supporting model and migration are included below.
+
+**Declare the input** in `app/http/schemas/create_project.py`:
 
 ```python
-# routes/api.py
-from app.http.controllers.home_controller import HomeController
+from orionis.schemas import Schema
+from orionis.schemas.constraints import MaxLength, MinLength
+from orionis.schemas.fields import Field
+
+
+class CreateProject(Schema):
+    name: Field[str, MinLength(3), MaxLength(120)]
+```
+
+**Write the action** in `app/http/controllers/project_controller.py`:
+
+```python
+from app.http.schemas.create_project import CreateProject
+from app.models.project import Project
+from orionis.http import HttpResponse, response
+
+
+class ProjectController:
+    __slots__ = ()
+
+    async def store(self, payload: CreateProject) -> HttpResponse:
+        project = await Project.create(payload.toDict())
+        return response.json(project.toDict(), status_code=201)
+```
+
+**Register the route** in [routes/api.py](routes/api.py):
+
+```python
+from app.http.controllers.project_controller import ProjectController
 from orionis.support.facades.router import Route
 
-Route.prefix("/home").group(
-    Route.get("/{slug:str}/{id:int}", [HomeController, "index"]),
-    Route.post("/", [HomeController, "store"]),
-    Route.put("/{id:int}", [HomeController, "update"]),
-    Route.delete("/{id:int}", [HomeController, "destroy"]),
+Route.post("/projects", [ProjectController, "store"]).name("projects.store")
+```
+
+The container supplies a validated `CreateProject` instance before the action
+runs. A missing, too-short, or too-long name produces **422 with field errors**.
+No manual body parsing or validation call in the controller.
+
+<details>
+<summary><strong>Complete the example: model and migration</strong></summary>
+
+Create `app/models/project.py`:
+
+```python
+from typing import ClassVar
+from orionis.orm import BigInteger, Model, String
+
+
+class Project(Model):
+    __slots__ = ()
+
+    fillable: ClassVar[list[str]] = ["name"]
+    timestamps: ClassVar[bool] = False
+
+    id = BigInteger().primary().autoIncrement()
+    name = String(120)
+```
+
+Add `m202609140001_create_projects_table.py` under `database/migrations/`:
+
+```python
+from orionis.database.contracts.migration import Migration
+from orionis.support.facades.schema import Schema
+
+
+class CreateProjectsTable(Migration):
+    __slots__ = ()
+
+    async def up(self) -> None:
+        async with Schema.create("projects") as table:
+            table.id()
+            table.string("name", 120)
+
+    async def down(self) -> None:
+        await Schema.drop("projects")
+```
+
+Run `uv run python reactor migrate` again, then send a JSON request body such
+as `{"name": "Orionis Playground"}` to the new route. This is a public demo
+endpoint; add authentication and authorization for protected application data.
+
+</details>
+
+### Models or Tables. One Query Language.
+
+Inside an async controller or service, after applying the migration:
+
+```python
+from app.models.project import Project
+from orionis.support.facades.db import DB
+
+page = await (
+    Project.where("name", "like", "Orionis%")
+    .orderBy("id", "desc")
+    .paginate(per_page=20, page=1)
 )
+
+rows = await DB.table("projects").select("id", "name").get()
 ```
 
-### Dependency Injection
+Models add hydration, casts, relationships, and lifecycle behavior. Direct table
+queries return records without requiring a model. Both use the same query
+language and **SQLAlchemy Core's async engine**, not SQLAlchemy's ORM session.
 
-```python
-# Define a contract
-class IMailer(ABC):
-    @abstractmethod
-    async def send(self, to: str, subject: str, body: str) -> bool: ...
+## Reactor, Every Day
 
-# Register in a service provider
-class MailServiceProvider(ServiceProvider):
-    def register(self) -> None:
-        self.app.singleton(IMailer, SmtpMailer)
+One entry point for the work around your application:
 
-# Consume via automatic injection — no manual resolution
-class ContactController:
-    async def send(self, mailer: IMailer) -> dict:
-        sent = await mailer.send("user@example.com", "Welcome", "Thanks!")
-        return {"sent": sent}
-```
+| Command | Purpose |
+|---|---|
+| `uv run python reactor serve` | Start the development HTTP server. |
+| `uv run python reactor make:command DailyReport` | Scaffold an application command. |
+| `uv run python reactor make:provider ProjectServiceProvider` | Scaffold a service provider. |
+| `uv run python reactor migrate` | Apply pending database migrations. |
+| `uv run python reactor migrate:status` | Inspect migration status. |
+| `uv run python reactor schedule:list` | Inspect registered scheduled tasks. |
+| `uv run python reactor schedule:work` | Run the scheduler. |
+| `uv run python reactor test --start-dir=tests/orm --verbosity=1` | Run a focused test suite in this checkout. |
+| `uv run python reactor list` | Discover the available commands. |
 
-Three service lifetimes: **Singleton** (one per process), **Scoped** (one per request), **Transient** (fresh every time).
+Custom commands can use the same injected services as your HTTP controllers.
+Scheduled tasks run those command signatures through APScheduler.
 
-### Reactor CLI
+## Familiar Foundations
 
-```bash
-python -B reactor serve                  # Start the development server
-python -B reactor make:provider name     # Scaffold a service provider
-python -B reactor make:command name      # Scaffold a console command
-python -B reactor schedule:work          # Run the task scheduler
-python -B reactor test                   # Run the test suite
-python -B reactor list                   # List all available commands
-```
+Orionis builds on the ecosystem rather than asking you to leave it:
 
-### Testing
+**[Granian](https://github.com/emmett-framework/granian)** for Rust-powered HTTP.
+**[msgspec](https://jcristharif.com/msgspec/)** for typed validation and encoding.
+**[SQLAlchemy Core](https://www.sqlalchemy.org/)** for async database execution.
+**[Jinja2](https://jinja.palletsprojects.com/)** for templates.
+**[APScheduler](https://apscheduler.readthedocs.io/)** for scheduling.
+**[Rich](https://rich.readthedocs.io/)** for the terminal.
 
-```python
-from orionis.test import TestCase
-from app.contracts.mailer import IMailer
-
-class TestMailer(TestCase):
-
-    async def testWelcomeEmailIsSent(self, mailer: IMailer):
-        sent = await mailer.send("jane@example.com", "Welcome", "Thanks!")
-        self.assertTrue(sent)
-```
-
-```bash
-python -B reactor test
-```
-
----
-
-## Architecture at a Glance
-
-```
-app/
-  console/       # Scheduled tasks and custom CLI commands
-  contracts/     # Interfaces and abstract types
-  providers/     # Service providers
-  services/      # Application services
-bootstrap/       # Application bootstrap
-config/          # Configuration files (app, cache, logging, database…)
-routes/
-  web.py         # HTTP routes
-  api.py         # API routes
-  console.py     # CLI command routes
-tests/           # Test suite (auto-discovered by the engine)
-orionis/         # Framework internals
-```
-
----
-
-## Requirements
-
-- Python **3.14+**
-
----
+Orionis supplies the application architecture that connects them. Its request
+path uses precompiled routing and cached reflection metadata; actual throughput
+depends on your routes, middleware, database, and deployment.
 
 ## Documentation
 
-Full documentation — including installation, guides, and API reference — is available at **[docs.orionis-framework.com](https://docs.orionis-framework.com)**.
+The [documentation website](https://docs.orionis-framework.com/) is still
+growing alongside the alpha. For implementation-level detail, start with these
+versioned guides:
+
+| Guide | Explore |
+|---|---|
+| [Container & DI](orionis/container/docs/README.md) | Providers, service lifetimes, scopes, and facades. |
+| [Validation](orionis/schemas/docs/README.md) | Schemas, field constraints, custom rules, and errors. |
+| [ORM & Database (Spanish)](orionis/orm/README.es.md) | Models, relationships, queries, migrations, and transactions. |
+| [Views](orionis/view/docs/README.md) | Async templates and their integration with forms and sessions. |
+| [Storage](orionis/storage/docs/README.md) | Disks, uploads, streams, and cloud drivers. |
+| [Testing](orionis/test/docs/README.md) | Async test cases, injected dependencies, and the runner. |
+
+Most module guides also have a sibling `README.es.md`. Authentication code
+lives in [orionis/auth](orionis/auth); the
+[project website](https://orionis-framework.com/) introduces the framework.
+
+## Project Status
+
+**Alpha. Open source. Actively evolving.** Pin the version you evaluate and
+review changes before upgrading. Compatibility and production readiness should
+be assessed against your own application requirements.
+
+Background tasks run **in process**, after a response; they are not a durable
+queue. Mail delivery, durable queues, WebSockets, and Inertia/Vite integrations
+are **not implemented yet**. Authentication currently covers sessions and
+personal access tokens, not JWT, OAuth, MFA, or password-reset flows.
+
+## Build It With Us
+
+The most useful contribution is a real use case. Build a small feature, bring
+a reproducible bug, improve an example, or tell us which API feels awkward.
+You do not need to know the whole framework to improve one part of it.
+
+- [Report a bug or request a feature](https://github.com/orionis-framework/framework/issues).
+- [Ask questions and share what you are building](https://github.com/orgs/orionis-framework/discussions).
+- Submit focused pull requests with relevant tests. Check the touched module
+  with Ruff and run its tests through Reactor; see the
+  [test workflow](.github/workflows/test.yml) for the current CI commands.
+- Send security-sensitive reports privately to
+  [raulmauriciounate@gmail.com](mailto:raulmauriciounate@gmail.com).
+
+[![Sponsor Orionis](https://img.shields.io/badge/Sponsor_Orionis-GitHub-db2777?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/rmunate)
+
+Created and maintained by
+[Raul Mauricio Uñate Castro](https://www.linkedin.com/in/raul-mauricio-unate-castro/).
+Released under the [MIT license](LICENCE).
 
 ---
 
-**Stop assembling. Start building for real.**
-
-Orionis gives you the architecture, performance, and developer experience to ship Python applications at scale.
-
-*Built for developers who refuse to compromise — on performance, architecture, or experience.*
-
----
-
-## Community & Contributing
-
-Orionis is open-source and welcomes contributions of all kinds.
-
-- **Bug reports & feature requests** — [GitHub Issues](https://github.com/orionis-framework/framework/issues)
-- **Discussions** — [GitHub Discussions](https://github.com/orgs/orionis-framework/discussions)
-- **LinkedIn** — [Raul Mauricio Unate Castro](https://www.linkedin.com/in/raul-mauricio-unate-castro/)
-- **Email** — [raulmauriciounate@gmail.com](mailto:raulmauriciounate@gmail.com)
-
-[![Become a Sponsor](https://img.shields.io/badge/-Become%20a%20Sponsor-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/rmunate)
-
----
-
-*Orionis — Build without limits.*
+<p align="center"><strong>The next part of your application already has a home.</strong></p>

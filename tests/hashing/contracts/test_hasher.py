@@ -12,6 +12,9 @@ _ABSTRACT_METHODS: frozenset[str] = frozenset(
     {"check", "getAlgorithm", "make", "needsRehash", "setRounds"},
 )
 
+# Operations that burn the configured cost and must never block the loop.
+_ASYNC_METHODS: frozenset[str] = frozenset({"check", "make"})
+
 # Concrete drivers shipped by the framework.
 _DRIVERS: tuple[type[IHasher], ...] = (Argon2Hasher, BcryptHasher)
 
@@ -29,10 +32,12 @@ def abstract_body_statements(method: object) -> list[ast.stmt]:
     -------
     list[ast.stmt]
         Statements found in the body, empty when the source does not
-        define a plain function.
+        define a function.
     """
     node = ast.parse(textwrap.dedent(inspect.getsource(method))).body[0]
-    return node.body if isinstance(node, ast.FunctionDef) else []
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return node.body
+    return []
 
 
 class TestIHasherDefinition(TestCase):
@@ -82,6 +87,19 @@ class TestIHasherDefinition(TestCase):
             self.assertEqual(len(statements), 1, msg=name)
             self.assertIsInstance(statements[0], ast.Expr, msg=name)
 
+    def testDeclaresTheCostlyOperationsAsCoroutines(self) -> None:
+        """
+        Declare hashing and verification as coroutine functions.
+
+        Validates the contract that lets every driver move its cost to a
+        worker thread instead of stalling the event loop.
+        """
+        for name in _ASYNC_METHODS:
+            self.assertTrue(
+                inspect.iscoroutinefunction(getattr(IHasher, name)),
+                msg=name,
+            )
+
 
 class TestIHasherImplementations(TestCase):
 
@@ -119,3 +137,17 @@ class TestIHasherImplementations(TestCase):
         """
         for driver in _DRIVERS:
             self.assertEqual(driver.__abstractmethods__, frozenset())
+
+    def testEveryDriverKeepsTheCostlyOperationsAsynchronous(self) -> None:
+        """
+        Implement hashing and verification as coroutine functions.
+
+        Validates that a driver never silently turns an awaited call into
+        a blocking one.
+        """
+        for driver in _DRIVERS:
+            for name in _ASYNC_METHODS:
+                self.assertTrue(
+                    inspect.iscoroutinefunction(getattr(driver, name)),
+                    msg=f"{driver.__name__}.{name}",
+                )

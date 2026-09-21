@@ -1,3 +1,4 @@
+import threading
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
 from orionis.hashing.hashers.argon2_hasher import (
@@ -33,6 +34,34 @@ def cheap_hasher(**overrides: int) -> Argon2Hasher:
     options = dict(_CHEAP_OPTIONS)
     options.update(overrides)
     return Argon2Hasher(**options)
+
+
+class _ThreadRecordingHasher(Argon2Hasher):
+    """Record the thread that performs the blocking hashing work."""
+
+    __slots__ = ("thread_ids",)
+
+    def __init__(self, **options: int) -> None:
+        """Start with an empty journal of worker threads."""
+        super().__init__(**options)
+        self.thread_ids: list[int] = []
+
+    def _make(
+        self,
+        value: str,
+        *,
+        rounds: int | None = None,
+        memory: int | None = None,
+        threads: int | None = None,
+    ) -> str:
+        """Record the executing thread before hashing."""
+        self.thread_ids.append(threading.get_ident())
+        return super()._make(value, rounds=rounds, memory=memory, threads=threads)
+
+    def _check(self, value: str, hashed: str) -> bool:
+        """Record the executing thread before verifying."""
+        self.thread_ids.append(threading.get_ident())
+        return super()._check(value, hashed)
 
 
 class TestArgon2HasherLayout(TestCase):
@@ -149,7 +178,7 @@ class TestArgon2HasherValidation(TestCase):
         self.assertIn("memory", message)
         self.assertIn("0", message)
 
-    def testRejectsInvalidOverridesAtCallTime(self) -> None:
+    async def testRejectsInvalidOverridesAtCallTime(self) -> None:
         """
         Reject invalid per-call overrides before hashing anything.
 
@@ -158,11 +187,11 @@ class TestArgon2HasherValidation(TestCase):
         """
         hasher = cheap_hasher()
         with self.assertRaises(HashConfigurationException):
-            hasher.make("secret", rounds=0)
+            await hasher.make("secret", rounds=0)
         with self.assertRaises(HashConfigurationException):
-            hasher.make("secret", memory=0)
+            await hasher.make("secret", memory=0)
         with self.assertRaises(HashConfigurationException):
-            hasher.make("secret", threads=0)
+            await hasher.make("secret", threads=0)
 
     def testRejectsInvalidFluentValues(self) -> None:
         """
@@ -212,31 +241,31 @@ class TestArgon2HasherBackend(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher._default(), hasher._default())
 
-    def testMakeReusesTheCachedBackend(self) -> None:
+    async def testMakeReusesTheCachedBackend(self) -> None:
         """
         Reuse the cached backend when no override is provided.
 
         Validates the fast path taken by the vast majority of calls.
         """
         hasher = cheap_hasher()
-        hasher.make("secret")
+        await hasher.make("secret")
         cached = hasher._backend
-        hasher.make("secret")
+        await hasher.make("secret")
         self.assertIs(hasher._backend, cached)
 
-    def testOverridesNeverReplaceTheCachedBackend(self) -> None:
+    async def testOverridesNeverReplaceTheCachedBackend(self) -> None:
         """
         Keep the cached backend untouched when a call overrides a cost.
 
         Validates that a per-call override stays scoped to that call.
         """
         hasher = cheap_hasher()
-        hasher.make("secret")
+        await hasher.make("secret")
         cached = hasher._backend
-        hasher.make("secret", memory=16)
+        await hasher.make("secret", memory=16)
         self.assertIs(hasher._backend, cached)
 
-    def testForeignHashNeverReachesTheBackendInstance(self) -> None:
+    async def testForeignHashNeverReachesTheBackendInstance(self) -> None:
         """
         Reject a foreign hash without building the backend instance.
 
@@ -244,81 +273,95 @@ class TestArgon2HasherBackend(TestCase):
         only needs the backend class to recognise the encoding.
         """
         hasher = cheap_hasher()
-        self.assertFalse(hasher.check("secret", _FOREIGN_HASH))
+        self.assertFalse(await hasher.check("secret", _FOREIGN_HASH))
         self.assertTrue(hasher.needsRehash(_FOREIGN_HASH))
         self.assertIsNone(hasher._backend)
+
+    async def testHashingRunsOutsideTheEventLoopThread(self) -> None:
+        """
+        Burn the hashing cost on a worker thread instead of the loop.
+
+        Validates that a login never stalls the other requests served by
+        the same worker.
+        """
+        hasher = _ThreadRecordingHasher(**_CHEAP_OPTIONS)
+        hashed = await hasher.make("secret")
+        self.assertTrue(await hasher.check("secret", hashed))
+        self.assertEqual(len(hasher.thread_ids), 2)
+        self.assertNotIn(threading.get_ident(), hasher.thread_ids)
 
 
 class TestArgon2HasherMake(TestCase):
 
-    def testProducesAnArgon2idHash(self) -> None:
+    async def testProducesAnArgon2idHash(self) -> None:
         """
         Produce a hash carrying the Argon2id identifier.
 
         Validates that the driver never falls back to another variant.
         """
-        self.assertTrue(cheap_hasher().make("secret").startswith("$argon2id$"))
+        hashed = await cheap_hasher().make("secret")
+        self.assertTrue(hashed.startswith("$argon2id$"))
 
-    def testNeverReturnsThePlainValue(self) -> None:
+    async def testNeverReturnsThePlainValue(self) -> None:
         """
         Keep the plain value out of the produced hash.
 
         Validates the most basic guarantee expected from the driver.
         """
-        self.assertNotIn("secret", cheap_hasher().make("secret"))
+        self.assertNotIn("secret", await cheap_hasher().make("secret"))
 
-    def testIsSaltedPerCall(self) -> None:
+    async def testIsSaltedPerCall(self) -> None:
         """
         Produce a different hash for every call on the same value.
 
         Validates that a random salt is generated per call.
         """
         hasher = cheap_hasher()
-        self.assertNotEqual(hasher.make("secret"), hasher.make("secret"))
+        self.assertNotEqual(await hasher.make("secret"), await hasher.make("secret"))
 
-    def testAppliesTheConfiguredCosts(self) -> None:
+    async def testAppliesTheConfiguredCosts(self) -> None:
         """
         Encode the configured costs inside the produced hash.
 
         Validates that the driver configuration reaches the backend.
         """
-        hashed = cheap_hasher().make("secret")
+        hashed = await cheap_hasher().make("secret")
         self.assertIn("m=32", hashed)
         self.assertIn("t=1", hashed)
         self.assertIn("p=1", hashed)
 
-    def testHonorsTheRoundsOverride(self) -> None:
+    async def testHonorsTheRoundsOverride(self) -> None:
         """
         Map the rounds override onto the Argon2id time cost.
 
         Validates the naming bridge between the shared contract and the
         Argon2id vocabulary.
         """
-        self.assertIn("t=2", cheap_hasher().make("secret", rounds=2))
+        self.assertIn("t=2", await cheap_hasher().make("secret", rounds=2))
 
-    def testHonorsTheMemoryOverride(self) -> None:
+    async def testHonorsTheMemoryOverride(self) -> None:
         """
         Apply the memory override to a single call.
 
         Validates the per-call tuning of the memory cost.
         """
-        self.assertIn("m=16", cheap_hasher().make("secret", memory=16))
+        self.assertIn("m=16", await cheap_hasher().make("secret", memory=16))
 
-    def testHonorsTheThreadsOverride(self) -> None:
+    async def testHonorsTheThreadsOverride(self) -> None:
         """
         Apply the parallelism override to a single call.
 
         Validates the per-call tuning of the number of lanes.
         """
-        self.assertIn("p=2", cheap_hasher().make("secret", threads=2))
+        self.assertIn("p=2", await cheap_hasher().make("secret", threads=2))
 
-    def testCombinesEveryOverrideInASingleCall(self) -> None:
+    async def testCombinesEveryOverrideInASingleCall(self) -> None:
         """
         Apply every override provided in the same call.
 
         Validates that the overrides are independent of each other.
         """
-        hashed = cheap_hasher().make("secret", rounds=2, memory=64, threads=2)
+        hashed = await cheap_hasher().make("secret", rounds=2, memory=64, threads=2)
         self.assertIn("m=64", hashed)
         self.assertIn("t=2", hashed)
         self.assertIn("p=2", hashed)
@@ -326,78 +369,78 @@ class TestArgon2HasherMake(TestCase):
 
 class TestArgon2HasherCheck(TestCase):
 
-    def testAcceptsTheOriginalValue(self) -> None:
+    async def testAcceptsTheOriginalValue(self) -> None:
         """
         Accept the value the hash was produced from.
 
         Validates the round trip application code depends on.
         """
         hasher = cheap_hasher()
-        self.assertTrue(hasher.check("secret", hasher.make("secret")))
+        self.assertTrue(await hasher.check("secret", await hasher.make("secret")))
 
-    def testRejectsADifferentValue(self) -> None:
+    async def testRejectsADifferentValue(self) -> None:
         """
         Reject any value other than the hashed one.
 
         Validates that verification is not vulnerable to a partial match.
         """
         hasher = cheap_hasher()
-        self.assertFalse(hasher.check("other", hasher.make("secret")))
+        self.assertFalse(await hasher.check("other", await hasher.make("secret")))
 
-    def testAcceptsAHashCreatedWithOtherCosts(self) -> None:
+    async def testAcceptsAHashCreatedWithOtherCosts(self) -> None:
         """
         Accept a hash produced with a different cost configuration.
 
         Validates that raising the costs never locks existing users out.
         """
-        legacy = cheap_hasher(time=1).make("secret")
-        self.assertTrue(cheap_hasher(time=2).check("secret", legacy))
+        legacy = await cheap_hasher(time=1).make("secret")
+        self.assertTrue(await cheap_hasher(time=2).check("secret", legacy))
 
-    def testRejectsAHashFromAnotherAlgorithm(self) -> None:
+    async def testRejectsAHashFromAnotherAlgorithm(self) -> None:
         """
         Reject a hash produced by another algorithm.
 
         Validates the guard that keeps the backend from parsing a foreign
         encoding.
         """
-        self.assertFalse(cheap_hasher().check("secret", _FOREIGN_HASH))
+        self.assertFalse(await cheap_hasher().check("secret", _FOREIGN_HASH))
 
-    def testRejectsAMalformedHash(self) -> None:
+    async def testRejectsAMalformedHash(self) -> None:
         """
         Reject an input that is not an encoded hash at all.
 
         Validates that unparsable data never raises through the driver.
         """
-        self.assertFalse(cheap_hasher().check("secret", "not-a-hash"))
+        self.assertFalse(await cheap_hasher().check("secret", "not-a-hash"))
 
-    def testRejectsAnEmptyHash(self) -> None:
+    async def testRejectsAnEmptyHash(self) -> None:
         """
         Reject an empty hash without touching the backend.
 
         Validates the guard protecting the verification path from a
         missing stored value.
         """
-        self.assertFalse(cheap_hasher().check("secret", ""))
+        self.assertFalse(await cheap_hasher().check("secret", ""))
 
 
 class TestArgon2HasherNeedsRehash(TestCase):
 
-    def testFreshHashIsUpToDate(self) -> None:
+    async def testFreshHashIsUpToDate(self) -> None:
         """
         Report a hash created with the current costs as up to date.
 
         Validates that no needless rehash is triggered on login.
         """
         hasher = cheap_hasher()
-        self.assertFalse(hasher.needsRehash(hasher.make("secret")))
+        self.assertFalse(hasher.needsRehash(await hasher.make("secret")))
 
-    def testOutdatedCostRequiresARehash(self) -> None:
+    async def testOutdatedCostRequiresARehash(self) -> None:
         """
         Report a hash created with lower costs as outdated.
 
         Validates the upgrade path after raising the configured costs.
         """
-        legacy = cheap_hasher(time=1).make("secret")
+        legacy = await cheap_hasher(time=1).make("secret")
         self.assertTrue(cheap_hasher(time=2).needsRehash(legacy))
 
     def testForeignAlgorithmRequiresARehash(self) -> None:
@@ -438,7 +481,7 @@ class TestArgon2HasherConfiguration(TestCase):
         self.assertIs(hasher.setMemory(64), hasher)
         self.assertIs(hasher.setThreads(2), hasher)
 
-    def testSetRoundsAppliesToLaterHashes(self) -> None:
+    async def testSetRoundsAppliesToLaterHashes(self) -> None:
         """
         Apply the new time cost to every subsequent hash.
 
@@ -446,9 +489,9 @@ class TestArgon2HasherConfiguration(TestCase):
         """
         hasher = cheap_hasher(time=1)
         hasher.setRounds(3)
-        self.assertIn("t=3", hasher.make("secret"))
+        self.assertIn("t=3", await hasher.make("secret"))
 
-    def testSetMemoryAppliesToLaterHashes(self) -> None:
+    async def testSetMemoryAppliesToLaterHashes(self) -> None:
         """
         Apply the new memory cost to every subsequent hash.
 
@@ -456,9 +499,9 @@ class TestArgon2HasherConfiguration(TestCase):
         """
         hasher = cheap_hasher()
         hasher.setMemory(64)
-        self.assertIn("m=64", hasher.make("secret"))
+        self.assertIn("m=64", await hasher.make("secret"))
 
-    def testSetThreadsAppliesToLaterHashes(self) -> None:
+    async def testSetThreadsAppliesToLaterHashes(self) -> None:
         """
         Apply the new parallelism to every subsequent hash.
 
@@ -466,7 +509,7 @@ class TestArgon2HasherConfiguration(TestCase):
         """
         hasher = cheap_hasher()
         hasher.setThreads(2)
-        self.assertIn("p=2", hasher.make("secret"))
+        self.assertIn("p=2", await hasher.make("secret"))
 
     def testEveryFluentSetterDropsTheCachedBackend(self) -> None:
         """
@@ -481,7 +524,7 @@ class TestArgon2HasherConfiguration(TestCase):
             getattr(hasher, setter)(value)
             self.assertIsNone(hasher._backend, msg=setter)
 
-    def testEarlierHashesRemainVerifiable(self) -> None:
+    async def testEarlierHashesRemainVerifiable(self) -> None:
         """
         Keep verifying hashes produced before a configuration change.
 
@@ -489,7 +532,7 @@ class TestArgon2HasherConfiguration(TestCase):
         credentials.
         """
         hasher = cheap_hasher(time=1)
-        hashed = hasher.make("secret")
+        hashed = await hasher.make("secret")
         hasher.setRounds(2)
         self.assertTrue(hasher.needsRehash(hashed))
-        self.assertTrue(hasher.check("secret", hashed))
+        self.assertTrue(await hasher.check("secret", hashed))

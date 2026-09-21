@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 from dataclasses import asdict
 from orionis.foundation.config.hashing.entities.hashing import Hashing
 from orionis.hashing.contracts.hash_manager import IHashManager
@@ -257,80 +257,81 @@ class TestHashManagerDriverResolution(TestCase):
         self.assertIn("argon2", message)
         self.assertIn("bcrypt", message)
 
-    def testAppliesTheConfiguredArgon2Costs(self) -> None:
+    async def testAppliesTheConfiguredArgon2Costs(self) -> None:
         """
         Hand the configured Argon2id costs to the driver.
 
         Validates that the configuration reaches the produced hash.
         """
-        hashed = build_manager().make("secret")
+        hashed = await build_manager().make("secret")
         self.assertIn("m=32", hashed)
         self.assertIn("t=1", hashed)
         self.assertIn("p=1", hashed)
 
-    def testAppliesTheConfiguredBcryptRounds(self) -> None:
+    async def testAppliesTheConfiguredBcryptRounds(self) -> None:
         """
         Hand the configured bcrypt cost factor to the driver.
 
         Validates that the configuration reaches the produced hash.
         """
-        hashed = build_manager("bcrypt").make("secret")
+        hashed = await build_manager("bcrypt").make("secret")
         self.assertTrue(hashed.startswith("$2b$04$"))
 
 
 class TestHashManagerDelegation(TestCase):
 
-    def testMakeUsesTheDefaultDriver(self) -> None:
+    async def testMakeUsesTheDefaultDriver(self) -> None:
         """
         Produce hashes with the configured default driver.
 
         Validates that application code never picks an algorithm.
         """
-        self.assertTrue(build_manager().make("secret").startswith("$argon2id$"))
+        hashed = await build_manager().make("secret")
+        self.assertTrue(hashed.startswith("$argon2id$"))
 
-    def testMakeAndCheckRoundTrip(self) -> None:
+    async def testMakeAndCheckRoundTrip(self) -> None:
         """
         Verify a value against the hash the manager produced.
 
         Validates the round trip application code depends on.
         """
         manager = build_manager()
-        hashed = manager.make("my-secret-password")
-        self.assertTrue(manager.check("my-secret-password", hashed))
+        hashed = await manager.make("my-secret-password")
+        self.assertTrue(await manager.check("my-secret-password", hashed))
 
-    def testCheckRejectsAnotherValue(self) -> None:
+    async def testCheckRejectsAnotherValue(self) -> None:
         """
         Reject a value that does not match the stored hash.
 
         Validates that verification is delegated without weakening it.
         """
         manager = build_manager()
-        hashed = manager.make("my-secret-password")
-        self.assertFalse(manager.check("wrong-password", hashed))
+        hashed = await manager.make("my-secret-password")
+        self.assertFalse(await manager.check("wrong-password", hashed))
 
-    def testMakeForwardsTheRoundsOverride(self) -> None:
+    async def testMakeForwardsTheRoundsOverride(self) -> None:
         """
         Forward the per-call cost override to the active driver.
 
         Validates the tuning hook exposed by the shared contract.
         """
-        self.assertIn("t=2", build_manager().make("secret", rounds=2))
+        self.assertIn("t=2", await build_manager().make("secret", rounds=2))
 
-    def testMakeForwardsTheMemoryOverride(self) -> None:
+    async def testMakeForwardsTheMemoryOverride(self) -> None:
         """
         Forward the per-call memory override to the active driver.
 
         Validates the tuning hook exposed by the shared contract.
         """
-        self.assertIn("m=16", build_manager().make("secret", memory=16))
+        self.assertIn("m=16", await build_manager().make("secret", memory=16))
 
-    def testMakeForwardsTheThreadsOverride(self) -> None:
+    async def testMakeForwardsTheThreadsOverride(self) -> None:
         """
         Forward the per-call parallelism override to the active driver.
 
         Validates the tuning hook exposed by the shared contract.
         """
-        self.assertIn("p=2", build_manager().make("secret", threads=2))
+        self.assertIn("p=2", await build_manager().make("secret", threads=2))
 
     def testGetAlgorithmReportsTheDefaultDriver(self) -> None:
         """
@@ -341,23 +342,23 @@ class TestHashManagerDelegation(TestCase):
         self.assertEqual(build_manager().getAlgorithm(), "argon2id")
         self.assertEqual(build_manager("bcrypt").getAlgorithm(), "bcrypt")
 
-    def testNeedsRehashFollowsTheConfiguration(self) -> None:
+    async def testNeedsRehashFollowsTheConfiguration(self) -> None:
         """
         Report a freshly produced hash as up to date.
 
         Validates that no needless rehash is triggered on login.
         """
         manager = build_manager()
-        self.assertFalse(manager.needsRehash(manager.make("secret")))
+        self.assertFalse(manager.needsRehash(await manager.make("secret")))
 
-    def testNeedsRehashDetectsAForeignAlgorithm(self) -> None:
+    async def testNeedsRehashDetectsAForeignAlgorithm(self) -> None:
         """
         Report a hash from another driver as outdated.
 
         Validates the migration path between the shipped drivers.
         """
         manager = build_manager()
-        legacy = manager.driver("bcrypt").make("secret")
+        legacy = await manager.driver("bcrypt").make("secret")
         self.assertTrue(manager.needsRehash(legacy))
 
     def testSetRoundsReturnsTheManager(self) -> None:
@@ -369,7 +370,7 @@ class TestHashManagerDelegation(TestCase):
         manager = build_manager()
         self.assertIs(manager.setRounds(2), manager)
 
-    def testSetRoundsUpdatesTheDefaultDriver(self) -> None:
+    async def testSetRoundsUpdatesTheDefaultDriver(self) -> None:
         """
         Apply the new cost to the default driver of the manager.
 
@@ -377,9 +378,9 @@ class TestHashManagerDelegation(TestCase):
         """
         manager = build_manager()
         manager.setRounds(2)
-        self.assertIn("t=2", manager.make("secret"))
+        self.assertIn("t=2", await manager.make("secret"))
 
-    def testSetRoundsMarksEarlierHashesForRehash(self) -> None:
+    async def testSetRoundsMarksEarlierHashesForRehash(self) -> None:
         """
         Flag hashes produced before the change for regeneration.
 
@@ -387,17 +388,17 @@ class TestHashManagerDelegation(TestCase):
         credentials.
         """
         manager = build_manager()
-        hashed = manager.make("secret")
+        hashed = await manager.make("secret")
         manager.setRounds(2)
         self.assertTrue(manager.needsRehash(hashed))
-        self.assertTrue(manager.check("secret", hashed))
+        self.assertTrue(await manager.check("secret", hashed))
 
 
 class TestHashManagerConcurrency(TestCase):
 
-    def testConcurrentHashingProducesVerifiableHashes(self) -> None:
+    async def testConcurrentHashingProducesVerifiableHashes(self) -> None:
         """
-        Hash from several threads without corrupting the shared cache.
+        Hash from several tasks without corrupting the shared cache.
 
         Validates the concurrency contract declared by the manager: the
         driver cache is written on first resolution and every later
@@ -405,11 +406,10 @@ class TestHashManagerConcurrency(TestCase):
         """
         manager = build_manager()
 
-        def round_trip(index: int) -> bool:
+        async def round_trip(index: int) -> bool:
             value = f"secret-{index}"
-            return manager.check(value, manager.make(value))
+            return await manager.check(value, await manager.make(value))
 
-        with ThreadPoolExecutor(max_workers=8) as pool:
-            results = list(pool.map(round_trip, range(16)))
+        results = await asyncio.gather(*[round_trip(index) for index in range(16)])
 
-        self.assertEqual(results, [True] * 16)
+        self.assertEqual(list(results), [True] * 16)

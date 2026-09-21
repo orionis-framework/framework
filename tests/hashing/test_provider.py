@@ -86,10 +86,10 @@ class TestHashProviderDefinition(TestCase):
         """
         Stay out of the deferred provider mechanism.
 
-        Validates the requirement imposed by the synchronous API: a
-        deferred provider would leave the Hash facade unpinned, so the
-        first call of a synchronous consumer would receive a dispatcher
-        instead of a value.
+        Validates the requirement imposed by the members that stay
+        synchronous: a deferred provider would leave the Hash facade
+        unpinned, so the first call of a synchronous consumer would
+        receive a dispatcher instead of a value.
         """
         self.assertFalse(issubclass(HashProvider, DeferrableProvider))
 
@@ -196,17 +196,18 @@ class TestHashFacade(TestCase):
         """
         Expose a pinned instance once the application has booted.
 
-        Validates the wiring that keeps the facade synchronous.
+        Validates the wiring that keeps facade access free of container
+        resolution.
         """
         self.assertIsInstance(Hash._pinned_instance, HashManager)
 
-    def testHashesAndVerifiesWithoutAwaiting(self) -> None:
+    async def testHashesAndVerifiesThroughThePinnedFacade(self) -> None:
         """
         Hash and verify a value through the pinned facade.
 
-        Validates the synchronous API application code depends on.
+        Validates the awaited API application code depends on.
         """
-        hashed = Hash.make("my-secret-password", **_CHEAP_COSTS)
+        hashed = await Hash.make("my-secret-password", **_CHEAP_COSTS)
         self.assertIsInstance(hashed, str)
-        self.assertTrue(Hash.check("my-secret-password", hashed))
-        self.assertFalse(Hash.check("other-password", hashed))
+        self.assertTrue(await Hash.check("my-secret-password", hashed))
+        self.assertFalse(await Hash.check("other-password", hashed))

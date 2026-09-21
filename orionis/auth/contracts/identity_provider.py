@@ -52,26 +52,22 @@ class IIdentityProvider(ABC):
         """
 
     @abstractmethod
-    def validateCredentials(
+    async def validateCredentials(
         self,
         identity: IAuthenticatable | None,
         credentials: Mapping[str, object],
     ) -> bool:
-        """Verify the submitted secret against the stored hash.
-
-        Implementations must spend a comparable amount of time when
-        ``identity`` is ``None`` so a missing identity is not observable
-        from the response time.
+        """Verify credentials without blocking the event loop.
 
         Parameters
         ----------
         identity : IAuthenticatable | None
-            Identity returned by ``retrieveByCredentials()``.
+            Identity whose stored password should be checked.
         credentials : Mapping[str, object]
             Submitted credentials.
 
         Returns
         -------
         bool
-            True only when the secret matches the stored hash.
+            True only when the credentials match the stored password.
         """

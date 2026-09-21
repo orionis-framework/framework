@@ -191,17 +191,18 @@ class ModelIdentityProvider(IIdentityProvider):
         model = self.model()
         return await model.query().where(self.__username_field, username).first()
 
-    def validateCredentials(
+    async def validateCredentials(
         self,
         identity: IAuthenticatable | None,
         credentials: Mapping[str, object],
     ) -> bool:
         """Verify the submitted password against the stored hash.
 
-        Unknown identities still perform password hashing work. This
-        reduces account enumeration signals without promising exact
-        timing equality across hash algorithms or historical cost settings.
-        Backend input errors are treated as invalid credentials.
+        The hashing module burns its cost on a worker thread, so the event
+        loop stays free. Unknown identities still perform password hashing
+        work. This reduces account enumeration signals without promising
+        exact timing equality across hash algorithms or historical cost
+        settings. Backend input errors are treated as invalid credentials.
 
         Parameters
         ----------
@@ -226,8 +227,8 @@ class ModelIdentityProvider(IIdentityProvider):
         try:
             stored = identity.getAuthPassword() if identity is not None else ""
             if not stored:
-                self.__hasher.make(password)
+                await self.__hasher.make(password)
                 return False
-            return self.__hasher.check(password, stored)
+            return await self.__hasher.check(password, stored)
         except ValueError:
             return False

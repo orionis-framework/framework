@@ -14,7 +14,7 @@ class IHasher(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def make(
+    async def make(
         self,
         value: str,
         *,
@@ -23,7 +23,7 @@ class IHasher(ABC):
         threads: int | None = None,
     ) -> str:
         """
-        Hash a plain text value.
+        Hash a plain text value off the event loop.
 
         Parameters
         ----------
@@ -47,7 +47,7 @@ class IHasher(ABC):
         """
 
     @abstractmethod
-    def check(self, value: str, hashed: str) -> bool:
+    async def check(self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against an encoded hash.
 

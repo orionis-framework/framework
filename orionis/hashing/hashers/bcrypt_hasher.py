@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
@@ -142,7 +143,7 @@ class BcryptHasher(IHasher):
             self._backend = self._build(self._rounds)
         return self._backend
 
-    def make(
+    def _make(
         self,
         value: str,
         *,
@@ -180,7 +181,47 @@ class BcryptHasher(IHasher):
         )
         return backend.hash(value)
 
-    def check(self, value: str, hashed: str) -> bool:
+    async def make(
+        self,
+        value: str,
+        *,
+        rounds: int | None = None,
+        memory: int | None = None,
+        threads: int | None = None,
+    ) -> str:
+        """
+        Hash a plain text value off the event loop.
+
+        Parameters
+        ----------
+        value : str
+            Plain text value to hash.
+        rounds : int | None
+            Per-call cost factor override.
+        memory : int | None
+            Ignored, bcrypt has no memory cost parameter.
+        threads : int | None
+            Ignored, bcrypt has no parallelism parameter.
+
+        Returns
+        -------
+        str
+            Encoded bcrypt hash.
+
+        Raises
+        ------
+        HashConfigurationException
+            If ``rounds`` falls outside the range supported by bcrypt.
+        """
+        return await asyncio.to_thread(
+            self._make,
+            value,
+            rounds=rounds,
+            memory=memory,
+            threads=threads,
+        )
+
+    def _check(self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against a bcrypt hash.
 
@@ -200,6 +241,24 @@ class BcryptHasher(IHasher):
         if not hashed or not self._identify(hashed):
             return False
         return self._default().verify(value, hashed)
+
+    async def check(self, value: str, hashed: str) -> bool:
+        """
+        Verify a plain text value off the event loop.
+
+        Parameters
+        ----------
+        value : str
+            Plain text value to verify.
+        hashed : str
+            Previously generated hash.
+
+        Returns
+        -------
+        bool
+            ``True`` when the value matches the hash, ``False`` otherwise.
+        """
+        return await asyncio.to_thread(self._check, value, hashed)
 
     def needsRehash(self, hashed: str) -> bool:
         """

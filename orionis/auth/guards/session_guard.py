@@ -1,4 +1,3 @@
-import asyncio
 import secrets
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -122,10 +121,8 @@ class SessionGuard(ISessionGuard):
         """
         identity = await self.__identities.retrieveByCredentials(credentials)
 
-        # Keep password verification off the request event loop.
-        valid = await asyncio.to_thread(
-            self.__identities.validateCredentials, identity, credentials,
-        )
+        # The identity provider burns the hashing cost on a worker thread.
+        valid = await self.__identities.validateCredentials(identity, credentials)
         if not valid:
             return None
         if identity is None:

@@ -8,8 +8,8 @@ class HashProvider(ServiceProvider):
     Service provider for the Orionis hashing system.
 
     Binds :class:`IHashManager` to :class:`HashManager` as a singleton and
-    pins the :class:`Hash` facade so ``Hash.make(...)`` resolves without
-    container overhead on every call.
+    pins the :class:`Hash` facade so every ``Hash`` call resolves without
+    container overhead, including the members that stay synchronous.
     """
 
     def register(self) -> None:

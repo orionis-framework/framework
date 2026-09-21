@@ -20,8 +20,9 @@ class HashManager(IHashManager):
     No locks are used. The only mutable state is the driver cache, written
     the first time a driver is resolved: a concurrent first resolution from
     several threads may build the same driver twice, and the last write
-    wins. Every operation is synchronous and never suspends, so tasks
-    sharing an event loop never observe a partially built cache.
+    wins. Driver resolution is synchronous and never suspends, so tasks
+    sharing an event loop never observe a partially built cache; only the
+    hashing work itself is awaited on a worker thread.
     ``setRounds`` mutates the cached driver, and the provider binds this
     class as a singleton, so the change is visible to the whole
     application.
@@ -137,7 +138,7 @@ class HashManager(IHashManager):
 
     # ── Hashing API ─────────────────────────────────────────────────────────
 
-    def make(
+    async def make(
         self,
         value: str,
         *,
@@ -147,6 +148,9 @@ class HashManager(IHashManager):
     ) -> str:
         """
         Hash a plain text value with the default driver.
+
+        The hashing work runs on a worker thread, so the event loop stays
+        free while the cost parameters are burned.
 
         Parameters
         ----------
@@ -164,16 +168,19 @@ class HashManager(IHashManager):
         str
             Encoded hash produced by the default driver.
         """
-        return self.driver().make(
+        return await self.driver().make(
             value,
             rounds=rounds,
             memory=memory,
             threads=threads,
         )
 
-    def check(self, value: str, hashed: str) -> bool:
+    async def check(self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against an encoded hash.
+
+        The verification runs on a worker thread, so the event loop stays
+        free while the hash is recomputed.
 
         Parameters
         ----------
@@ -187,7 +194,7 @@ class HashManager(IHashManager):
         bool
             ``True`` when the value matches the hash, ``False`` otherwise.
         """
-        return self.driver().check(value, hashed)
+        return await self.driver().check(value, hashed)
 
     def needsRehash(self, hashed: str) -> bool:
         """

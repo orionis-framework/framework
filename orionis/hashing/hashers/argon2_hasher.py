@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
@@ -159,7 +160,7 @@ class Argon2Hasher(IHasher):
             self._backend = self._build(self._memory, self._threads, self._time)
         return self._backend
 
-    def make(
+    def _make(
         self,
         value: str,
         *,
@@ -205,7 +206,47 @@ class Argon2Hasher(IHasher):
 
         return backend.hash(value)
 
-    def check(self, value: str, hashed: str) -> bool:
+    async def make(
+        self,
+        value: str,
+        *,
+        rounds: int | None = None,
+        memory: int | None = None,
+        threads: int | None = None,
+    ) -> str:
+        """
+        Hash a plain text value off the event loop.
+
+        Parameters
+        ----------
+        value : str
+            Plain text value to hash.
+        rounds : int | None
+            Per-call time cost override.
+        memory : int | None
+            Per-call memory cost override, in kibibytes.
+        threads : int | None
+            Per-call parallelism override.
+
+        Returns
+        -------
+        str
+            Encoded Argon2id hash.
+
+        Raises
+        ------
+        HashConfigurationException
+            If any override is not a positive integer.
+        """
+        return await asyncio.to_thread(
+            self._make,
+            value,
+            rounds=rounds,
+            memory=memory,
+            threads=threads,
+        )
+
+    def _check(self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against an Argon2id hash.
 
@@ -225,6 +266,24 @@ class Argon2Hasher(IHasher):
         if not hashed or not self._identify(hashed):
             return False
         return self._default().verify(value, hashed)
+
+    async def check(self, value: str, hashed: str) -> bool:
+        """
+        Verify a plain text value off the event loop.
+
+        Parameters
+        ----------
+        value : str
+            Plain text value to verify.
+        hashed : str
+            Previously generated hash.
+
+        Returns
+        -------
+        bool
+            ``True`` when the value matches the hash, ``False`` otherwise.
+        """
+        return await asyncio.to_thread(self._check, value, hashed)
 
     def needsRehash(self, hashed: str) -> bool:
         """

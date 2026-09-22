@@ -28,8 +28,9 @@ class BootstrapAppAuth(Auth):
     # Session guard used by the web routes.
     session: SessionAuth | dict = field(
         default_factory=lambda: SessionAuth(
-            key="_auth_identifier",
+            key="auth_identifier",
             redirect_to=Env.get("AUTH_REDIRECT_TO", "/login"),
+            home=Env.get("AUTH_HOME", "/home"),
         ),
     )
 

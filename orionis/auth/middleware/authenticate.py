@@ -24,11 +24,17 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
     page declared in ``auth.session.redirect_to`` when one is configured,
     and every other client receives a ``401`` response produced by the
     standard exception handler.
+
+    Responses of protected routes are marked as non-cacheable. Subclasses
+    opt out by setting ``cache_control`` to ``None``.
     """
 
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_redirect_to",)
+
+    # Cache-Control applied to every answer of a protected route.
+    cache_control: ClassVar[str | None] = "no-store, private"
 
     def __init__(
         self,
@@ -83,8 +89,14 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         """
         context = await self._establish(request)
         if context.isGuest:
-            return self._unauthenticated(request)
-        return await call_next()
+            response = self._unauthenticated(request)
+        else:
+            response = await call_next()
+
+        cache_control = self.cache_control
+        if cache_control:
+            response.setHeader("Cache-Control", cache_control)
+        return response
 
     def _unauthenticated(self, request: Request) -> Response:
         """Build the answer given to an anonymous request.

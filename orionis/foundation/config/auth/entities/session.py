@@ -18,6 +18,9 @@ class SessionAuth(BaseEntity):
     redirect_to : str | None
         Path browsers are redirected to when authentication is required.
         ``None`` renders the standard ``401`` error response instead.
+    home : str
+        Path browsers are redirected to once the login succeeds, and the
+        target guest-only pages send already authenticated visitors to.
     """
 
     key: str = field(
@@ -42,6 +45,16 @@ class SessionAuth(BaseEntity):
         },
     )
 
+    home: str = field(
+        default_factory=lambda: Env.get("AUTH_HOME", "/home"),
+        metadata={
+            "description": (
+                "Path browsers are redirected to once the login succeeds."
+            ),
+            "default": "/home",
+        },
+    )
+
     def __post_init__(self) -> None:
         """
         Validate the session authentication options after initialization.
@@ -54,10 +67,10 @@ class SessionAuth(BaseEntity):
         Raises
         ------
         TypeError
-            If ``key`` is not a string, or ``redirect_to`` is neither a
-            string nor ``None``.
+            If ``key`` or ``home`` is not a string, or ``redirect_to`` is
+            neither a string nor ``None``.
         ValueError
-            If ``key`` is empty.
+            If ``key`` or ``home`` is empty.
         """
         super().__post_init__()
 
@@ -74,3 +87,10 @@ class SessionAuth(BaseEntity):
                 "or null."
             )
             raise TypeError(error_msg)
+
+        if not isinstance(self.home, str):
+            error_msg = "The auth session 'home' option must be a string."
+            raise TypeError(error_msg)
+        if not self.home.strip():
+            error_msg = "The auth session 'home' option cannot be empty."
+            raise ValueError(error_msg)

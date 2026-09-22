@@ -28,6 +28,14 @@ class TestRouteType(TestCase):
         """
         self.assertEqual(RouteType.INVOKABLE, "invokable")
 
+    def testViewValue(self) -> None:
+        """
+        Confirm that the VIEW member has value 'view'.
+
+        Validates the string used to tag template-only route handlers.
+        """
+        self.assertEqual(RouteType.VIEW, "view")
+
     def testIsStrEnum(self) -> None:
         """
         Verify that RouteType members behave as plain strings.
@@ -40,8 +48,8 @@ class TestRouteType(TestCase):
 
     def testMemberCount(self) -> None:
         """
-        Verify that exactly three route types are defined.
+        Verify that exactly four route types are defined.
 
         Validates that no undocumented member has been introduced.
         """
-        self.assertEqual(len(list(RouteType)), 3)
+        self.assertEqual(len(list(RouteType)), 4)

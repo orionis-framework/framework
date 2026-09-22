@@ -16,7 +16,6 @@ from orionis.http.responses import (
 )
 from orionis.test import TestCase
 
-
 class _Money:
     """Domain value object that no JSON encoder handles natively."""
 
@@ -32,7 +31,6 @@ class _Money:
             Amount rendered by the custom encoder.
         """
         self.amount = amount
-
 
 class _StubPendingView:
     """Stand-in for the pending view returned by the view facade."""
@@ -52,7 +50,6 @@ class _StubPendingView:
         """
         self.template = template
         self.context = context
-
 
 class _StubViewFacade:
     """Facade double capturing the arguments the factory forwards."""
@@ -78,7 +75,6 @@ class _StubViewFacade:
         """
         cls.calls.append((template, context))
         return _StubPendingView(template, context)
-
 
 class TestResponseFactoryView(TestCase):
 
@@ -123,7 +119,6 @@ class TestResponseFactoryView(TestCase):
         self.assertEqual(result.template, "auth.login")
         self.assertEqual(result.context, {})
 
-
 class TestResponseFactoryHtml(TestCase):
 
     def testHtmlUsesSaneDefaults(self) -> None:
@@ -153,7 +148,6 @@ class TestResponseFactoryHtml(TestCase):
         self.assertEqual(result.getBody(), b"<p>hi</p>")
         self.assertEqual(result.getStatusCode(), 201)
         self.assertEqual(result.getHeader("x-source"), ["factory"])
-
 
 class TestResponseFactoryJson(TestCase):
 
@@ -205,7 +199,6 @@ class TestResponseFactoryJson(TestCase):
         self.assertEqual(result.getStatusCode(), 422)
         self.assertEqual(result.getHeader("x-trace"), ["abc"])
 
-
 class TestResponseFactoryText(TestCase):
 
     def testTextUsesSaneDefaults(self) -> None:
@@ -233,7 +226,6 @@ class TestResponseFactoryText(TestCase):
         self.assertEqual(result.getStatusCode(), 410)
         self.assertEqual(result.getHeader("x-reason"), ["expired"])
 
-
 class TestResponseFactoryRedirect(TestCase):
 
     def testRedirectDefaultsToFound(self) -> None:
@@ -257,7 +249,6 @@ class TestResponseFactoryRedirect(TestCase):
         result = response.redirect("/new", 301, {"x-legacy": "yes"})
         self.assertEqual(result.getStatusCode(), 301)
         self.assertEqual(result.getHeader("x-legacy"), ["yes"])
-
 
 class TestResponseFactoryStream(TestCase):
 
@@ -290,7 +281,6 @@ class TestResponseFactoryStream(TestCase):
         self.assertEqual(result.getHeader("x-partial"), ["1"])
         self.assertEqual(result.getMediaType(), "application/octet-stream")
 
-
 class _FileFactoryTestCase(TestCase):
     """Base case providing a temporary file on disk."""
 
@@ -312,7 +302,6 @@ class _FileFactoryTestCase(TestCase):
         Validates that the suite leaves no artefacts behind.
         """
         self._tmp.cleanup()
-
 
 class TestResponseFactoryFile(_FileFactoryTestCase):
 
@@ -351,7 +340,6 @@ class TestResponseFactoryFile(_FileFactoryTestCase):
             ['attachment; filename="invoice.pdf"'],
         )
 
-
 class TestResponseFactoryDownload(_FileFactoryTestCase):
 
     def testDownloadFallsBackToTheFileName(self) -> None:
@@ -385,7 +373,6 @@ class TestResponseFactoryDownload(_FileFactoryTestCase):
         )
         self.assertEqual(result.getHeader("x-export"), ["1"])
         self.assertEqual(result.getMediaType(), "text/plain")
-
 
 class TestResponseFactoryBareResponses(TestCase):
 
@@ -432,7 +419,6 @@ class TestResponseFactoryBareResponses(TestCase):
         self.assertEqual(result.getBody(), b"")
         self.assertEqual(result.getStatusCode(), 200)
         self.assertIsNone(result.getMediaType())
-
 
 class TestResponseFactoryInstance(TestCase):
 

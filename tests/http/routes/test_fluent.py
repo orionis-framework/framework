@@ -1,13 +1,20 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.routes.fluent import FluentRoute
 from orionis.test import TestCase
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+    from orionis.http.request import Request
+    from orionis.http.responses import Response
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
 def _view_handler() -> None:
-    """Standalone view function used as an action fixture."""
+    """Provide a standalone route action fixture."""
 
 class _InvokableController:
     def __call__(self) -> None:
@@ -21,11 +28,33 @@ class _RegularController:
         """Handle index action."""
 
 class _MW1(BaseMiddleware):
-    async def handle(self, _request, call_next):  # type: ignore[override]
+    async def handle(
+        self,
+        _request: Request,
+        call_next: Callable[[], Awaitable[Response]],
+    ) -> Response:
+        """Forward the request to the next middleware or handler.
+
+        Returns
+        -------
+        Response
+            Response produced by the remaining pipeline.
+        """
         return await call_next()
 
 class _MW2(BaseMiddleware):
-    async def handle(self, _request, call_next):  # type: ignore[override]
+    async def handle(
+        self,
+        _request: Request,
+        call_next: Callable[[], Awaitable[Response]],
+    ) -> Response:
+        """Forward the request to the next middleware or handler.
+
+        Returns
+        -------
+        Response
+            Response produced by the remaining pipeline.
+        """
         return await call_next()
 
 # ---------------------------------------------------------------------------
@@ -335,7 +364,7 @@ class TestFluentRouteExport(TestCase):
         Verify that export() returns a dict with all documented keys.
 
         Confirms that id, method, path, class, handler, callable_handler,
-        name, middleware, without_middleware, and kind are all present.
+        view, name, middleware, without_middleware, and kind are all present.
         """
         expected_keys = {
             "id",
@@ -344,6 +373,7 @@ class TestFluentRouteExport(TestCase):
             "class",
             "handler",
             "callable_handler",
+            "view",
             "name",
             "middleware",
             "without_middleware",

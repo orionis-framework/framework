@@ -1,5 +1,6 @@
 from __future__ import annotations
-from asyncio import CancelledError, create_task, suppress, to_thread
+from asyncio import CancelledError, create_task, shield, to_thread
+from contextlib import suppress
 from typing import TYPE_CHECKING
 from orionis.http.payload.contracts.stream_parser import IMultipartStreamParser
 from orionis.http.payload.form_data import FormData
@@ -36,9 +37,8 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
     task = create_task(to_thread(function, *args))
     try:
-        return await task
+        return await shield(task)
     except CancelledError:
-        task.cancel()
         with suppress(CancelledError):
             await task
         raise
@@ -420,7 +420,7 @@ class MultipartStreamParser(IMultipartStreamParser):
             length = index if index != -1 else max(0, len(buf) - tail_size)
             await self._writePart(current_part, length)
             self._discardPrefix(length)
-            return _STATE_SEARCH_BOUNDARY, current_part
+            return _STATE_READ_BODY, current_part
 
         await self._writePart(current_part, index)
         value = await self._finishPart(current_part)
@@ -478,7 +478,7 @@ class MultipartStreamParser(IMultipartStreamParser):
             body_marker,
             tail_size,
         )
-        return next_state, next_part, True
+        return next_state, next_part, next_state != _STATE_READ_BODY
 
     async def _parseParts(self, form_items: list[tuple[str, object]]) -> FormData:
         """

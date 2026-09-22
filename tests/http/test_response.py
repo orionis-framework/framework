@@ -27,18 +27,15 @@ if TYPE_CHECKING:
 
 _CREDENTIAL_FIELD: str = "password"
 
-
 class _Colour(Enum):
     """Enumeration used to exercise the JSON fallback encoder."""
 
     RED = "red"
 
-
 class _Opaque:
     """Object that no JSON encoder in the framework knows how to render."""
 
     __slots__ = ()
-
 
 async def _async_chunks() -> AsyncIterator[bytes]:
     """
@@ -51,7 +48,6 @@ async def _async_chunks() -> AsyncIterator[bytes]:
     """
     yield b"first"
     yield b"second"
-
 
 async def _drain(stream: AsyncIterator[bytes]) -> list[bytes]:
     """
@@ -68,7 +64,6 @@ async def _drain(stream: AsyncIterator[bytes]) -> list[bytes]:
         Chunks in the order they were produced.
     """
     return [chunk async for chunk in stream]
-
 
 class TestResponseConstruction(TestCase):
 
@@ -178,7 +173,6 @@ class TestResponseConstruction(TestCase):
         """
         self.assertFalse(hasattr(Response(), "__dict__"))
 
-
 class TestResponseRender(TestCase):
 
     def testRendersNoneAsAnEmptyBody(self) -> None:
@@ -231,7 +225,6 @@ class TestResponseRender(TestCase):
         body instead of raising.
         """
         self.assertEqual(Response(content=42).getBody(), b"42")
-
 
 class TestResponseHeaders(TestCase):
 
@@ -327,7 +320,6 @@ class TestResponseHeaders(TestCase):
         result = Response(headers={"X-A": "1"})
         result.addHeader("x-a", "2")
         self.assertEqual(result.getStringHeaders(), [("x-a", "1"), ("x-a", "2")])
-
 
 class TestResponseCookies(TestCase):
 
@@ -551,7 +543,6 @@ class TestResponseCookies(TestCase):
         self.assertIs(result.withoutCookie("sid"), result)
         self.assertIn("Max-Age=0", result.getHeader("set-cookie")[0])
 
-
 class TestResponseFlash(TestCase):
 
     def testNothingIsQueuedByDefault(self) -> None:
@@ -633,7 +624,6 @@ class TestResponseFlash(TestCase):
         self.assertIs(result.withInput({}), result)
         self.assertIs(result.withErrors({}), result)
 
-
 class TestResponseAccessors(TestCase):
 
     def testExposesTheStatusCodeAndMediaType(self) -> None:
@@ -685,7 +675,6 @@ class TestResponseAccessors(TestCase):
         await result.runBackground()
         self.assertEqual(executed, ["done"])
 
-
 class TestHtmlResponse(TestCase):
 
     def testAdvertisesTheHtmlContentType(self) -> None:
@@ -726,7 +715,6 @@ class TestHtmlResponse(TestCase):
         self.assertEqual(result.getBody(), b"")
         self.assertEqual(result.getStatusCode(), 200)
 
-
 class TestPlainTextResponse(TestCase):
 
     def testAdvertisesThePlainTextContentType(self) -> None:
@@ -750,7 +738,6 @@ class TestPlainTextResponse(TestCase):
         """
         result = PlainTextResponse("a,b", headers={"content-type": "text/csv"})
         self.assertEqual(result.getHeader("content-type"), ["text/csv"])
-
 
 class TestJsonResponse(TestCase):
 
@@ -847,7 +834,6 @@ class TestJsonResponse(TestCase):
         )
         self.assertEqual(result.getBody(), b'{"value":"opaque"}')
 
-
 class TestJsonResponseDefaultEncoder(TestCase):
 
     def testEncodesTemporalValuesAsIsoStrings(self) -> None:
@@ -911,7 +897,6 @@ class TestJsonResponseDefaultEncoder(TestCase):
         with self.assertRaises(TypeError) as captured:
             JSONResponse._defaultEncoder(_Opaque())
         self.assertIn("_Opaque", str(captured.exception))
-
 
 class TestRedirectResponse(TestCase):
 
@@ -978,7 +963,6 @@ class TestRedirectResponse(TestCase):
             headers={"content-type": "text/html"},
         )
         self.assertEqual(result.getHeader("content-type"), ["text/html"])
-
 
 class TestStreamingResponse(TestCase):
 
@@ -1076,7 +1060,6 @@ class TestStreamingResponse(TestCase):
             headers={"content-type": "text/csv"},
         )
         self.assertEqual(result.getHeader("content-type"), ["text/csv"])
-
 
 class TestFileResponse(TestCase):
 

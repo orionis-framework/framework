@@ -23,6 +23,7 @@ class TestBaseController(TestCase):
 
         class _MyController(BaseController):
             def index(self) -> str:
+                """Return the controller action result."""
                 return "ok"
 
         self.assertTrue(issubclass(_MyController, BaseController))
@@ -53,6 +54,7 @@ class TestBaseController(TestCase):
 
         class _UserController(BaseController):
             def show(self) -> str:
+                """Return the user action result."""
                 return "user"
 
         ctrl = _UserController()

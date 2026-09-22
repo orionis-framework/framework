@@ -3,7 +3,7 @@ from orionis.http.payload.parsers import parse_json, parse_text
 from orionis.test import TestCase
 
 class TestMediaTypeRegistryInit(TestCase):
-    """Unit tests for MediaTypeRegistry initialisation."""
+    """Verify MediaTypeRegistry initialisation."""
 
     def testEmptyRegistryReturnsNoneForAnyType(self) -> None:
         """
@@ -44,7 +44,7 @@ class TestMediaTypeRegistryInit(TestCase):
         self.assertIsNone(registry.get("text/plain"))
 
 class TestMediaTypeRegistryRegister(TestCase):
-    """Unit tests for MediaTypeRegistry.register()."""
+    """Verify MediaTypeRegistry.register()."""
 
     def testRegisterAddsParser(self) -> None:
         """
@@ -77,7 +77,7 @@ class TestMediaTypeRegistryRegister(TestCase):
         self.assertIs(registry.get("text/plain"), parse_text)
 
 class TestMediaTypeRegistryGet(TestCase):
-    """Unit tests for MediaTypeRegistry.get()."""
+    """Verify MediaTypeRegistry.get()."""
 
     def testGetReturnsParserlForRegisteredType(self) -> None:
         """
@@ -107,7 +107,7 @@ class TestMediaTypeRegistryGet(TestCase):
         self.assertIsNone(registry.get("application/x-custom"))
 
 class TestMediaTypeRegistryExtend(TestCase):
-    """Unit tests for MediaTypeRegistry.extend()."""
+    """Verify MediaTypeRegistry.extend()."""
 
     def testExtendReturnNewRegistry(self) -> None:
         """

@@ -1,5 +1,5 @@
-from orionis.http.routes.route_compiler import RouteCompiler
 from orionis.http.routes.enums.route_types import RouteType
+from orionis.http.routes.route_compiler import RouteCompiler
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
@@ -7,13 +7,13 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 
 def _handler_a() -> None:
-    """Route handler A fixture."""
+    """Provide the first importable route action fixture."""
 
 def _handler_b() -> None:
-    """Route handler B fixture."""
+    """Provide the second importable route action fixture."""
 
 def _handler_c() -> None:
-    """Route handler C fixture."""
+    """Provide the third importable route action fixture."""
 
 def _make_route_dict(
     method: str = "GET",

@@ -1,6 +1,11 @@
 from __future__ import annotations
+from dataclasses import replace
 from typing import TYPE_CHECKING, Any, ClassVar, Self
 import msgspec
+from orionis.auth.middleware.resolve_identity import (
+    ResolveSessionIdentityMiddleware,
+    ResolveTokenIdentityMiddleware,
+)
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.http import kernel as kernel_module
@@ -23,17 +28,17 @@ from orionis.http.routes.loader import RouteLoader
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.test import TestCase
+from tests.http._support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+    from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 _MODULE: str = __name__
-
 
 # ---------------------------------------------------------------------------
 # Route handlers resolved by the kernel dispatch tables.
 # ---------------------------------------------------------------------------
-
 
 def web_handler() -> Response:
     """
@@ -46,7 +51,6 @@ def web_handler() -> Response:
     """
     return Response(content="web")
 
-
 def api_handler() -> Response:
     """
     Return a plain response for an API-group route.
@@ -57,7 +61,6 @@ def api_handler() -> Response:
         Response carrying a fixed marker body.
     """
     return Response(content="api")
-
 
 def dict_handler() -> dict[str, int]:
     """
@@ -70,12 +73,10 @@ def dict_handler() -> dict[str, int]:
     """
     return {"answer": 42}
 
-
 class _Payload(msgspec.Struct):
     """Structured payload returned by a handler."""
 
     name: str
-
 
 def struct_handler() -> _Payload:
     """
@@ -88,7 +89,6 @@ def struct_handler() -> _Payload:
     """
     return _Payload(name="orionis")
 
-
 def invalid_handler() -> None:
     """
     Return nothing so the kernel rejects the handler result.
@@ -99,7 +99,6 @@ def invalid_handler() -> None:
         Deliberately not a response object.
     """
     return
-
 
 def failing_handler() -> Response:
     """
@@ -117,7 +116,6 @@ def failing_handler() -> Response:
     """
     error_msg = "handler exploded"
     raise RuntimeError(error_msg)
-
 
 def validation_handler() -> Response:
     """
@@ -137,7 +135,6 @@ def validation_handler() -> Response:
         ValidationFailure(field="email", rule="pattern", message="Invalid."),
     )
 
-
 def fallback_function() -> Response:
     """
     Return the response produced by a callable fallback.
@@ -148,7 +145,6 @@ def fallback_function() -> Response:
         Response carrying a fixed marker body.
     """
     return Response(content="fallback-function")
-
 
 class _Controller:
     """Controller resolved through the class dispatch table."""
@@ -166,7 +162,6 @@ class _Controller:
         """
         return Response(content="controller")
 
-
 class _FallbackController:
     """Controller registered as the route fallback."""
 
@@ -182,7 +177,6 @@ class _FallbackController:
             Response carrying a fixed marker body.
         """
         return Response(content="fallback-controller")
-
 
 class _BrokenFallbackController:
     """Fallback controller that does not honour the response contract."""
@@ -204,7 +198,6 @@ class _BrokenFallbackController:
 # ---------------------------------------------------------------------------
 # Middleware doubles.
 # ---------------------------------------------------------------------------
-
 
 class _RecordingMiddleware(BaseMiddleware):
     """Route middleware recording every invocation."""
@@ -234,7 +227,6 @@ class _RecordingMiddleware(BaseMiddleware):
         response.setHeader("x-route-middleware", "1")
         return response
 
-
 class _SessionMiddlewareDouble(BaseMiddleware):
     """Stand-in for the session middleware installed by the kernel."""
 
@@ -261,6 +253,14 @@ class _SessionMiddlewareDouble(BaseMiddleware):
         _SessionMiddlewareDouble.calls.append(request.path)
         return await call_next()
 
+class _IdentityMiddlewareDouble(BaseMiddleware):
+    """Leave identity resolution to the authentication integration suite."""
+
+    __slots__ = ()
+
+    async def handle(self, _request: Request, call_next: object) -> Response:
+        """Continue without adding authentication dependencies to kernel tests."""
+        return await call_next()
 
 class _DoubleNextMiddleware(BaseMiddleware):
     """Middleware that wrongly advances the pipeline twice."""
@@ -286,11 +286,9 @@ class _DoubleNextMiddleware(BaseMiddleware):
         await call_next()
         return await call_next()
 
-
 # ---------------------------------------------------------------------------
 # Application and transport doubles.
 # ---------------------------------------------------------------------------
-
 
 class _StubScope:
     """Container scope double recording per-request bindings."""
@@ -350,7 +348,6 @@ class _StubScope:
         """
         self.entries[key] = value
 
-
 class _StubDefaultResponses:
     """Default response factory double returning JSON payloads."""
 
@@ -395,7 +392,6 @@ class _StubDefaultResponses:
             headers=headers,
         )
 
-
 class _StubCatch:
     """Failure handler double translating exceptions into responses."""
 
@@ -423,7 +419,6 @@ class _StubCatch:
         """
         self.handled.append(exc)
         return Response(content=str(exc), status_code=500)
-
 
 class _StubRouteLoader:
     """Route loader double publishing pre-built compiled routes."""
@@ -467,7 +462,6 @@ class _StubRouteLoader:
         """
         return self._fallback
 
-
 class _StubRequestPrinter:
     """Debug request printer double recording its activity."""
 
@@ -507,7 +501,6 @@ class _StubRequestPrinter:
         """
         self.printed.append(response)
 
-
 class _StubResponseAdapter:
     """Response adapter double returning the response it would send."""
 
@@ -542,7 +535,6 @@ class _StubResponseAdapter:
         """
         self.sent.append(response)
         return response
-
 
 class _StubApp:
     """Application double resolving the kernel collaborators."""
@@ -690,11 +682,10 @@ class _StubApp:
         """
         return getattr(instance, method)(**kwargs)
 
-
 class _StubRsgiHeaders:
     """Header container mimicking the Granian RSGI header map."""
 
-    __slots__ = ("_data",)
+    __slots__ = ("_data", "get_all")
 
     def __init__(self, data: dict[str, list[str]]) -> None:
         """
@@ -706,6 +697,8 @@ class _StubRsgiHeaders:
             Header names mapped to their values.
         """
         self._data = data
+        # Expose the third-party header protocol through the local accessor.
+        self.get_all = self.getAll
 
     def __iter__(self) -> object:
         """
@@ -718,7 +711,7 @@ class _StubRsgiHeaders:
         """
         return iter(self._data)
 
-    def get_all(self, key: str) -> list[str]:
+    def getAll(self, key: str) -> list[str]:
         """
         Return every value stored for one header.
 
@@ -734,6 +727,45 @@ class _StubRsgiHeaders:
         """
         return self._data[key]
 
+class _ViewFactoryDouble:
+    """Record template rendering performed by a view route."""
+
+    def __init__(self) -> None:
+        """Initialize the list of rendered templates."""
+        self.templates: list[str] = []
+
+    async def make(self, name: str) -> Response:
+        """Render the selected template as a response carrying its name.
+
+        Parameters
+        ----------
+        name : str
+            Template selected by the route metadata.
+
+        Returns
+        -------
+        Response
+            Rendered view response sent to the client.
+        """
+        self.templates.append(name)
+        return Response(content=f"rendered:{name}")
+
+class _MaintenancePassThrough:
+    """Allow selected requests through the maintenance collaborator."""
+
+    def __init__(self) -> None:
+        """Initialize the record of checked paths."""
+        self.paths: list[str] = []
+
+    def handle(self, adapter: TransportAdapter) -> None:
+        """Record the request and permit subsequent security checks.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Incoming request adapter checked by the maintenance collaborator.
+        """
+        self.paths.append(adapter.path())
 
 class _StubRsgiScope:
     """Granian RSGI scope double exposing the fields the adapter reads."""
@@ -775,7 +807,6 @@ class _StubRsgiScope:
         self.authority = "orionis.test"
         self.headers = _StubRsgiHeaders({"host": ["orionis.test"]})
 
-
 class _StubRsgiProtocol:
     """RSGI protocol double yielding an empty request body."""
 
@@ -797,7 +828,6 @@ class _StubRsgiProtocol:
 # ---------------------------------------------------------------------------
 # Fixtures.
 # ---------------------------------------------------------------------------
-
 
 def make_route(  # noqa: PLR0913
     path: str,
@@ -850,7 +880,6 @@ def make_route(  # noqa: PLR0913
         compiled_middlewares=middlewares,
     )
 
-
 def make_routes() -> dict[str, dict]:
     """
     Build the compiled route tables used across the kernel tests.
@@ -893,7 +922,6 @@ def make_routes() -> dict[str, dict]:
         },
     }
 
-
 def make_http_config(
     *,
     csrf_enabled: bool = False,
@@ -925,7 +953,6 @@ def make_http_config(
         "rate_limit": rate_limit if rate_limit is not None else {},
         "csrf": {"enabled": csrf_enabled},
     }
-
 
 async def boot_kernel(  # noqa: PLR0913
     *,
@@ -968,6 +995,8 @@ async def boot_kernel(  # noqa: PLR0913
         ),
         DefaultResponses: responses,
         StartSessionMiddleware: _SessionMiddlewareDouble(),
+        ResolveSessionIdentityMiddleware: _IdentityMiddlewareDouble(),
+        ResolveTokenIdentityMiddleware: _IdentityMiddlewareDouble(),
         RSGIResponseAdapter: _StubResponseAdapter(),
         ASGIResponseAdapter: _StubResponseAdapter(),
         HTTPRequestPrinter: _StubRequestPrinter(),
@@ -986,7 +1015,6 @@ async def boot_kernel(  # noqa: PLR0913
     kernel = KernelHTTP(app=app, catch=catch)
     await kernel.boot()
     return kernel, app, responses, catch
-
 
 def make_asgi_scope(
     path: str,
@@ -1022,7 +1050,6 @@ def make_asgi_scope(
         "http_version": "1.1",
     }
 
-
 async def receive_empty() -> dict[str, Any]:
     """
     Return an empty ASGI request message.
@@ -1034,7 +1061,6 @@ async def receive_empty() -> dict[str, Any]:
     """
     return {"type": "http.request", "body": b"", "more_body": False}
 
-
 async def send_noop(_message: object) -> None:
     """
     Discard an ASGI response message.
@@ -1045,7 +1071,6 @@ async def send_noop(_message: object) -> None:
         Message produced by the response adapter.
     """
     return
-
 
 async def dispatch(
     kernel: KernelHTTP,
@@ -1078,7 +1103,6 @@ async def dispatch(
         send_noop,
     )
 
-
 def make_request_double(path: str) -> Request:
     """
     Build a lightweight request for middleware pipeline tests.
@@ -1102,11 +1126,9 @@ def make_request_double(path: str) -> Request:
         ),
     )
 
-
 # ---------------------------------------------------------------------------
 # Tests.
 # ---------------------------------------------------------------------------
-
 
 class TestMiddlewarePipeline(TestCase):
 
@@ -1119,6 +1141,13 @@ class TestMiddlewarePipeline(TestCase):
         expected = Response(content="terminal")
 
         async def terminal() -> Response:
+            """Return the expected terminal response.
+
+            Returns
+            -------
+            Response
+                Response whose identity must survive pipeline dispatch.
+            """
             return expected
 
         pipeline = kernel_module._MiddlewarePipeline((), None, terminal)
@@ -1134,6 +1163,13 @@ class TestMiddlewarePipeline(TestCase):
         request = make_request_double("/x")
 
         async def terminal() -> Response:
+            """Return the response reached after both middleware layers.
+
+            Returns
+            -------
+            Response
+                Response tagged by the middleware during unwinding.
+            """
             return Response(content="terminal")
 
         pipeline = kernel_module._MiddlewarePipeline(
@@ -1154,6 +1190,13 @@ class TestMiddlewarePipeline(TestCase):
         """
 
         async def terminal() -> Response:
+            """Return the response from the first terminal invocation.
+
+            Returns
+            -------
+            Response
+                Response produced before a repeated continuation is rejected.
+            """
             return Response(content="terminal")
 
         pipeline = kernel_module._MiddlewarePipeline(
@@ -1163,7 +1206,6 @@ class TestMiddlewarePipeline(TestCase):
         )
         with self.assertRaises(RuntimeError):
             await pipeline()
-
 
 class TestKernelBoot(TestCase):
 
@@ -1195,10 +1237,11 @@ class TestKernelBoot(TestCase):
 
         Validates the ordering the flash bag depends on.
         """
-        kernel, _app, _responses, _catch = await boot_kernel()
+        kernel, app, _responses, _catch = await boot_kernel()
         stack = kernel._KernelHTTP__web_middleware
         self.assertIsInstance(stack[0], _SessionMiddlewareDouble)
         self.assertIsInstance(stack[1], CSRFTokenMiddleware)
+        self.assertIs(stack[2], app.builds[ResolveSessionIdentityMiddleware])
 
     async def testPreloadsFunctionAndControllerHandlers(self) -> None:
         """
@@ -1273,8 +1316,24 @@ class TestKernelBoot(TestCase):
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertFalse(hasattr(kernel, "__dict__"))
 
-
 class TestKernelDispatch(TestCase):
+
+    async def testRendersAPreloadedViewRoute(self) -> None:
+        """Render a view route through its preloaded template descriptor."""
+        route = replace(
+            make_route("/page", function="api_handler"),
+            type=RouteType.VIEW,
+            action={"view": "pages.home"},
+        )
+        views = _ViewFactoryDouble()
+        routes = {"GET": {"static": {"/page": route}, "dynamic": []}}
+        with replace_attribute(kernel_module, "View", views):
+            kernel, _app, _responses, catch = await boot_kernel(routes=routes)
+            response = await dispatch(kernel, "/page")
+        self.assertEqual(response.getStatusCode(), 200)
+        self.assertEqual(response.getBody(), b"rendered:pages.home")
+        self.assertEqual(views.templates, ["pages.home"])
+        self.assertEqual(catch.handled, [])
 
     async def testServesAnApiRoute(self) -> None:
         """
@@ -1377,8 +1436,24 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(scope.tags["kernel"], KernelContext.HTTP)
         self.assertIsInstance(scope.entries[Request], Request)
 
-
 class TestKernelGlobalMiddleware(TestCase):
+
+    async def testMaintenancePassThroughStillEnforcesSecurity(self) -> None:
+        """Honor a maintenance pass-through and retain later security checks."""
+        kernel, _app, _responses, catch = await boot_kernel(maintenance=True)
+        maintenance = _MaintenancePassThrough()
+        with replace_attribute(
+            kernel, "_KernelHTTP__under_maintenance", maintenance,
+        ):
+            allowed = await dispatch(kernel, "/api")
+            rejected = await dispatch(
+                kernel, "/api",
+                headers=[(b"host", b"one.test"), (b"host", b"two.test")],
+            )
+        self.assertEqual(allowed.getBody(), b"api")
+        self.assertEqual(rejected.getStatusCode(), 400)
+        self.assertEqual(maintenance.paths, ["/api", "/api"])
+        self.assertEqual(catch.handled, [])
 
     async def testRejectsEveryRequestUnderMaintenance(self) -> None:
         """
@@ -1426,7 +1501,6 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(response.getStatusCode(), 204)
         self.assertTrue(response.hasHeader("access-control-allow-methods"))
 
-
 class TestKernelOptionsRequests(TestCase):
 
     async def testAdvertisesTheAllowedMethods(self) -> None:
@@ -1450,7 +1524,6 @@ class TestKernelOptionsRequests(TestCase):
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/api", "OPTIONS")
         self.assertTrue(response.hasHeader("Accept-Query"))
-
 
 class TestKernelValidationFailures(TestCase):
 
@@ -1476,8 +1549,16 @@ class TestKernelValidationFailures(TestCase):
         self.assertEqual(response.getStatusCode(), 422)
         self.assertTrue(responses.calls[-1][2])
 
-
 class TestKernelFailureHandling(TestCase):
+
+    async def testRejectsANoncallableFallbackDescriptor(self) -> None:
+        """Reject a fallback descriptor containing neither handler form."""
+        kernel, _app, _responses, catch = await boot_kernel(
+            fallback=(None, "not-a-callable"),
+        )
+        with self.assertRaisesRegex(TypeError, "Fallback handler must return"):
+            await dispatch(kernel, "/unmatched")
+        self.assertEqual(catch.handled, [])
 
     async def testDelegatesUnhandledErrorsToTheFailureHandler(self) -> None:
         """
@@ -1538,7 +1619,6 @@ class TestKernelFailureHandling(TestCase):
         with self.assertRaises(TypeError):
             await dispatch(kernel, "/nowhere")
 
-
 class TestKernelRequestLogging(TestCase):
 
     async def testLogsRequestsInDebugMode(self) -> None:
@@ -1565,7 +1645,6 @@ class TestKernelRequestLogging(TestCase):
         printer = app.builds[HTTPRequestPrinter]
         self.assertEqual(printer.timers, 0)
         self.assertEqual(printer.printed, [])
-
 
 class TestKernelRateLimiting(TestCase):
 
@@ -1611,7 +1690,6 @@ class TestKernelRateLimiting(TestCase):
         await dispatch(kernel, "/api")
         self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 429)
 
-
 class TestKernelRsgiEntryPoint(TestCase):
 
     async def testServesAnRsgiRequest(self) -> None:
@@ -1638,3 +1716,22 @@ class TestKernelRsgiEntryPoint(TestCase):
         kernel, app, _responses, _catch = await boot_kernel(debug=True)
         await kernel.handleRSGI(_StubRsgiScope("/api"), _StubRsgiProtocol())
         self.assertEqual(len(app.builds[HTTPRequestPrinter].printed), 1)
+
+class TestMiddlewareTerminalArguments(TestCase):
+    """Verify argument forwarding through the middleware terminal."""
+
+    async def testForwardsTerminalArgumentsAndConsumesOnce(self) -> None:
+        """Forward positional arguments and reject another terminal invocation."""
+        expected = Response(content="terminal")
+
+        async def terminal(first: object, second: object) -> Response:
+            """Assert terminal argument forwarding and return the response."""
+            self.assertEqual((first, second), ("request", "route"))
+            return expected
+
+        pipeline = kernel_module._MiddlewarePipeline(
+            (), None, terminal, ("request", "route"),
+        )
+        self.assertIs(await pipeline(), expected)
+        with self.assertRaises(RuntimeError):
+            await pipeline()

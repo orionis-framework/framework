@@ -3,12 +3,10 @@ from orionis.http.middleware import BaseMiddleware, NextCallable
 from orionis.http.responses import Response
 from orionis.test import TestCase
 
-
 class _BareMiddleware(BaseMiddleware):
     """Middleware that forgets to override the request hook."""
 
     __slots__ = ()
-
 
 class _PassThroughMiddleware(BaseMiddleware):
     """Middleware that simply advances the pipeline."""
@@ -39,7 +37,6 @@ class _PassThroughMiddleware(BaseMiddleware):
         response.setHeader("x-visited", "1")
         return response
 
-
 async def terminal() -> Response:
     """
     Return the response produced at the end of the pipeline.
@@ -50,7 +47,6 @@ async def terminal() -> Response:
         Response carrying a fixed marker body.
     """
     return Response(content="handler")
-
 
 class TestBaseMiddlewareContract(TestCase):
 
@@ -71,7 +67,6 @@ class TestBaseMiddlewareContract(TestCase):
         which is instantiated once per application boot.
         """
         self.assertFalse(hasattr(_PassThroughMiddleware(), "__dict__"))
-
 
 class TestBaseMiddlewareHandle(TestCase):
 

@@ -20,9 +20,8 @@ _BOUNDARY: str = "orionisboundary"
 _CREDENTIAL_FIELD: str = "password"
 _CSRF_VALUE: str = "abc123"
 
-
 class _StubRSGIAdapter:
-    """Adapter double exposing the dictionary view of a Granian RSGI scope."""
+    """Expose the dictionary view of a Granian RSGI scope for request tests."""
 
     __slots__ = ("_headers", "_scope")
 
@@ -66,7 +65,6 @@ class _StubRSGIAdapter:
         """
         return self._headers
 
-
 def make_receive(body: bytes) -> Callable[[], Coroutine[Any, Any, dict[str, Any]]]:
     """
     Build an ASGI receive callable delivering a whole body at once.
@@ -83,10 +81,10 @@ def make_receive(body: bytes) -> Callable[[], Coroutine[Any, Any, dict[str, Any]
     """
 
     async def receive() -> dict[str, Any]:
+        """Return the complete body as one ASGI request message."""
         return {"type": "http.request", "body": body, "more_body": False}
 
     return receive
-
 
 def make_asgi_request(  # noqa: PLR0913
     *,
@@ -150,7 +148,6 @@ def make_asgi_request(  # noqa: PLR0913
         params=params,
     )
 
-
 def make_rsgi_request(
     *,
     host: str | None = "orionis.test",
@@ -200,7 +197,6 @@ def make_rsgi_request(
         params={},
     )
 
-
 def make_multipart_body(fields: list[tuple[str, str]]) -> bytes:
     """
     Build a multipart payload carrying only text fields.
@@ -223,8 +219,8 @@ def make_multipart_body(fields: list[tuple[str, str]]) -> bytes:
     parts.append(f"--{_BOUNDARY}--\r\n")
     return "".join(parts).encode()
 
-
 class TestRequestConstruction(TestCase):
+    """Verify request construction and transport dependency wiring."""
 
     def testCoercesARawInterfaceValue(self) -> None:
         """
@@ -272,8 +268,8 @@ class TestRequestConstruction(TestCase):
         """
         self.assertFalse(hasattr(make_asgi_request(), "__dict__"))
 
-
 class TestRequestLine(TestCase):
+    """Verify request-line accessors and their cached values."""
 
     def testExposesTheHttpMethod(self) -> None:
         """
@@ -340,8 +336,8 @@ class TestRequestLine(TestCase):
         request = make_asgi_request(remove=("http_version",))
         self.assertEqual(request.httpVersion, "1.1")
 
-
 class TestAsgiRequestUrls(TestCase):
+    """Verify URL and origin construction from ASGI scopes."""
 
     def testUsesTheHostHeader(self) -> None:
         """
@@ -481,8 +477,8 @@ class TestAsgiRequestUrls(TestCase):
         request = make_asgi_request()
         self.assertIs(request.baseUrl, request.baseUrl)
 
-
 class TestRsgiRequestUrls(TestCase):
+    """Verify URL and query handling for RSGI scopes."""
 
     def testUrlUsesTheHostHeader(self) -> None:
         """
@@ -549,8 +545,18 @@ class TestRsgiRequestUrls(TestCase):
         request = make_rsgi_request(scope_overrides={"query_string": None})
         self.assertEqual(len(request.queryParams), 0)
 
-
 class TestRequestStructures(TestCase):
+    """Verify header, cookie, query, and request-state containers."""
+
+    def testStateIsCreatedOnFirstAccess(self) -> None:
+        """Create one isolated state namespace only when it is requested."""
+        first = make_asgi_request()
+        second = make_asgi_request()
+        self.assertIsNone(first._Request__state)
+        self.assertIsNone(first.csrfToken())
+        self.assertIsNone(first._Request__state)
+        self.assertIs(first.state, first.state)
+        self.assertIsNot(first.state, second.state)
 
     def testHeadersAreBuiltOnceAndCached(self) -> None:
         """
@@ -595,8 +601,8 @@ class TestRequestStructures(TestCase):
         request.state.tenant = "acme"
         self.assertEqual(request.state.tenant, "acme")
 
-
 class TestRequestClientInformation(TestCase):
+    """Verify client identity and forwarded transport information."""
 
     def testResolvesTheClientIpFromATuple(self) -> None:
         """
@@ -663,8 +669,8 @@ class TestRequestClientInformation(TestCase):
         self.assertEqual(request.forwarded, {"for": "10.0.0.7"})
         self.assertEqual(request.forwarded, {"for": "10.0.0.7"})
 
-
 class TestRequestIdentityHeaders(TestCase):
+    """Verify user-agent and authentication header accessors."""
 
     def testExposesTheUserAgent(self) -> None:
         """
@@ -736,8 +742,8 @@ class TestRequestIdentityHeaders(TestCase):
         request = make_asgi_request(headers=[(b"accept", b"text/html")])
         self.assertEqual(request.accept, "text/html")
 
-
 class TestRequestContentNegotiation(TestCase):
+    """Verify content negotiation and AJAX detection."""
 
     def testDetectsAJsonClient(self) -> None:
         """
@@ -816,8 +822,19 @@ class TestRequestContentNegotiation(TestCase):
         self.assertTrue(request.isAjax())
         self.assertFalse(make_asgi_request().isAjax())
 
-
 class TestRequestRouteParameters(TestCase):
+    """Verify route parameter lookup and mapping ownership."""
+
+    def testEmptyParameterMappingIsCreatedOnFirstAccess(self) -> None:
+        """Keep the exposed parameter mapping mutable and request-local."""
+        request = make_asgi_request()
+        self.assertIsNone(request._Request__path_params)
+        self.assertIsNone(request.routeParam("missing"))
+        params = request.routeParams()
+        params["id"] = 12
+        self.assertEqual(request.routeParam("id"), 12)
+        self.assertIs(request.routeParams(), params)
+        self.assertEqual(make_asgi_request().routeParams(), {})
 
     def testExposesEveryRouteParameter(self) -> None:
         """
@@ -845,8 +862,8 @@ class TestRequestRouteParameters(TestCase):
         """
         self.assertIsNone(make_asgi_request().routeParam("missing"))
 
-
 class TestRequestCsrfToken(TestCase):
+    """Verify CSRF token lookup from mutable request state."""
 
     def testReportsNoTokenBeforeTheMiddlewareRuns(self) -> None:
         """
@@ -869,8 +886,8 @@ class TestRequestCsrfToken(TestCase):
         self.assertEqual(request.csrfToken(), _CSRF_VALUE)
         self.assertEqual(request.csrf_token, _CSRF_VALUE)
 
-
 class TestRequestBodyReading(TestCase):
+    """Verify raw and decoded body access through the body stream."""
 
     async def testStreamsTheBodyInChunks(self) -> None:
         """
@@ -909,8 +926,8 @@ class TestRequestBodyReading(TestCase):
         request = make_asgi_request(body="ñandú".encode())
         self.assertEqual(await request.text(), "ñandú")
 
-
 class TestRequestJsonParsing(TestCase):
+    """Verify JSON parsing, caching, and error reporting."""
 
     async def testParsesAJsonBody(self) -> None:
         """
@@ -989,8 +1006,8 @@ class TestRequestJsonParsing(TestCase):
         with self.assertRaises(ValueError):
             await request.json()
 
-
 class TestRequestOtherParsers(TestCase):
+    """Verify XML, MessagePack, and URL-encoded body parsing."""
 
     async def testParsesAnXmlBody(self) -> None:
         """
@@ -1047,8 +1064,8 @@ class TestRequestOtherParsers(TestCase):
         with self.assertRaises(UnsupportedMediaTypeException):
             await request.formUrlEncoded()
 
-
 class TestRequestMultipartParsing(TestCase):
+    """Verify multipart parsing and content-type validation."""
 
     def _makeMultipartRequest(self, fields: list[tuple[str, str]]) -> Request:
         """
@@ -1108,8 +1125,8 @@ class TestRequestMultipartParsing(TestCase):
         with self.assertRaises(ValueError):
             await request.form()
 
-
 class TestRequestPayloadDispatch(TestCase):
+    """Verify parser selection through the media-type registry."""
 
     async def testFallsBackToRawBytesWithoutAContentType(self) -> None:
         """
@@ -1166,9 +1183,11 @@ class TestRequestPayloadDispatch(TestCase):
 
         Validates the extension point used to add custom formats.
         """
-        registry = MediaTypeRegistry(
-            {"application/vnd.custom": lambda raw: {"decoded": raw.decode()}},
-        )
+        def parse_custom_payload(raw: bytes) -> dict[str, str]:
+            """Decode custom request bytes into their expected mapping."""
+            return {"decoded": raw.decode()}
+
+        registry = MediaTypeRegistry({"application/vnd.custom": parse_custom_payload})
         request = make_asgi_request(
             body=b"value",
             headers=[(b"content-type", b"application/vnd.custom")],
@@ -1185,8 +1204,8 @@ class TestRequestPayloadDispatch(TestCase):
         request = make_asgi_request()
         self.assertIs(request._Request__registry, DEFAULT_MEDIA_TYPES)
 
-
 class TestRequestDataDictionary(TestCase):
+    """Verify body conversion into schema-validation dictionaries."""
 
     async def testParsesAJsonObject(self) -> None:
         """

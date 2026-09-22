@@ -116,7 +116,6 @@ class TestHttpPackageExports(TestCase):
         self.assertIs(http_package.response, factory_module.response)
         self.assertIsInstance(http_package.response, factory_module.ResponseFactory)
 
-
 class TestHttpResponseAlias(TestCase):
 
     def testAliasResolvesToTheResponseBaseClass(self) -> None:

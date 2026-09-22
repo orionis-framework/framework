@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.routes.functions import (
     flatten_middleware,
@@ -9,15 +11,20 @@ from orionis.http.routes.functions import (
 )
 from orionis.test import TestCase
 
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+    from orionis.http.request import Request
+    from orionis.http.responses import Response
+
 # ---------------------------------------------------------------------------
 # Helpers used across multiple tests
 # ---------------------------------------------------------------------------
 
 def _plain_handler() -> None:
-    """Standalone function used as a route action fixture."""
+    """Provide a synchronous route action fixture."""
 
 async def _async_handler() -> None:
-    """Async function used as a route action fixture."""
+    """Provide an asynchronous route action fixture."""
 
 class _InvokableCtrl:
     def __call__(self) -> None:
@@ -31,8 +38,18 @@ class _CtrlNoCall:
     """Controller that does not define __call__."""
 
 class _ConcreteMiddleware(BaseMiddleware):
-    async def handle(self, _request, call_next):  # type: ignore[override]
-        """Pass through to the next handler."""
+    async def handle(
+        self,
+        _request: Request,
+        call_next: Callable[[], Awaitable[Response]],
+    ) -> Response:
+        """Pass through to the next handler.
+
+        Returns
+        -------
+        Response
+            Response produced by the downstream handler.
+        """
         return await call_next()
 
 # ---------------------------------------------------------------------------
@@ -217,7 +234,18 @@ class TestFlattenMiddleware(TestCase):
         """
 
         class _MW2(BaseMiddleware):
-            async def handle(self, _request, call_next):  # type: ignore[override]
+            async def handle(
+                self,
+                _request: Request,
+                call_next: Callable[[], Awaitable[Response]],
+            ) -> Response:
+                """Forward execution to the next handler.
+
+                Returns
+                -------
+                Response
+                    Response produced downstream.
+                """
                 return await call_next()
 
         result = flatten_middleware(_ConcreteMiddleware, _MW2)

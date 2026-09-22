@@ -1,3 +1,4 @@
+from types import MappingProxyType
 from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.entities.resolved_route import ResolvedRoute
 from orionis.http.routes.enums.route_types import RouteType
@@ -156,3 +157,20 @@ class TestResolvedRoute(TestCase):
         compiled = _make_compiled_route()
         resolved = ResolvedRoute(route=compiled, params={})
         self.assertIs(resolved.route, compiled)
+
+    def testConstructorCopiesMutableParameterSources(self) -> None:
+        """Isolate results from external dicts and live read-only mapping views."""
+        compiled = _make_compiled_route(path="/users/{id:int}")
+        for wrap in (dict, MappingProxyType):
+            source = {"id": 42}
+            mapping = source if wrap is dict else wrap(source)
+            resolved = ResolvedRoute(route=compiled, params=mapping)
+            source["id"] = 99
+            self.assertEqual(resolved.params, {"id": 42})
+
+    def testConstructorDoesNotRetainAnEmptyMutableSource(self) -> None:
+        """Keep empty results isolated when their source mapping later changes."""
+        source = {}
+        resolved = ResolvedRoute(route=_make_compiled_route(), params=source)
+        source["id"] = 99
+        self.assertEqual(resolved.params, {})

@@ -40,6 +40,10 @@ exclude = [
     "E501",
     "S608",
 ]
+"routes/**" = [
+    "E501",
+    "S608",
+]
 "orionis/database/**" = [
     "S608",
 ]

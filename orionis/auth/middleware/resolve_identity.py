@@ -8,6 +8,7 @@ from orionis.auth.context.functions import (
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.auth.contracts.permission_repository import IPermissionRepository
 from orionis.auth.exceptions import AuthenticationException
+from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.http.middleware import BaseMiddleware
 
 if TYPE_CHECKING:
@@ -19,9 +20,9 @@ if TYPE_CHECKING:
 class ResolveIdentityMiddleware(BaseMiddleware):
     """Establish authentication while allowing anonymous requests to continue.
 
-    Register it globally when public pages need to know who is browsing
-    them. Guests simply reach the controller with a guest context, and
-    ``Auth.check()`` answers ``False``.
+    The HTTP kernel installs the session variant for web routes and the
+    token variant for API routes. Guests reach the controller with a guest
+    context, and ``Auth.check()`` answers ``False``.
 
     An authenticated context cannot be replaced by another guard. Repeated
     resolution by the same guard reuses the context, including guest results.
@@ -37,8 +38,8 @@ class ResolveIdentityMiddleware(BaseMiddleware):
 
     __slots__ = ("_manager", "_permissions")
 
-    # Guard used to resolve the identity. ``None`` uses the configured
-    # default guard.
+    # An unpinned middleware reuses the request guard. Before any resolution,
+    # ``None`` falls back to the configured default guard.
     guard: ClassVar[str | None] = None
 
     def __init__(
@@ -104,8 +105,8 @@ class ResolveIdentityMiddleware(BaseMiddleware):
             Context bound for the rest of the request.
         """
         async with authentication_lock():
-            guard = self._manager.guard(self.guard)
             context = current_auth_context()
+            guard = self._manager.guard(self.guard or context.guard)
             if context.guard == guard.name:
                 return context
             if context.isAuthenticated:
@@ -126,3 +127,19 @@ class ResolveIdentityMiddleware(BaseMiddleware):
 
             bind_auth_context(context)
             return context
+
+
+class ResolveSessionIdentityMiddleware(ResolveIdentityMiddleware):
+    """Resolve a web identity from the session without requiring a login."""
+
+    __slots__ = ()
+
+    guard: ClassVar[str | None] = Guards.SESSION.value
+
+
+class ResolveTokenIdentityMiddleware(ResolveIdentityMiddleware):
+    """Resolve an API identity from a Bearer token while allowing guests."""
+
+    __slots__ = ()
+
+    guard: ClassVar[str | None] = Guards.TOKEN.value

@@ -25,6 +25,9 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
     and every other client receives a ``401`` response produced by the
     standard exception handler.
 
+    With no explicit guard, reuse the identity established by the kernel.
+    Outside that pipeline, fall back to the configured default guard.
+
     Responses of protected routes are marked as non-cacheable. Subclasses
     opt out by setting ``cache_control`` to ``None``.
     """

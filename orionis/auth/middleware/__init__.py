@@ -9,7 +9,11 @@ from orionis.auth.middleware.authorize import (
 )
 from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.auth.middleware.policy import RequirePolicyMiddleware
-from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
+from orionis.auth.middleware.resolve_identity import (
+    ResolveIdentityMiddleware,
+    ResolveSessionIdentityMiddleware,
+    ResolveTokenIdentityMiddleware,
+)
 
 __all__ = [
     "AuthenticateMiddleware",
@@ -20,4 +24,6 @@ __all__ = [
     "RequirePolicyMiddleware",
     "RequireRoleMiddleware",
     "ResolveIdentityMiddleware",
+    "ResolveSessionIdentityMiddleware",
+    "ResolveTokenIdentityMiddleware",
 ]

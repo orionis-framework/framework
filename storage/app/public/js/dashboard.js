@@ -23,9 +23,12 @@
 
   const updateToggle = () => {
     const expanded = desktop.matches ? !collapsed : opened;
-    const label = desktop.matches
-      ? (collapsed ? toggle.dataset.labelExpand : toggle.dataset.labelCollapse)
-      : (opened ? toggle.dataset.labelClose : toggle.dataset.labelOpen);
+    let label;
+    if (desktop.matches) {
+      label = collapsed ? toggle.dataset.labelExpand : toggle.dataset.labelCollapse;
+    } else {
+      label = opened ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
+    }
     toggle.setAttribute('aria-expanded', String(expanded));
     toggle.setAttribute('aria-label', label);
     toggle.title = label;
@@ -99,7 +102,7 @@
     if (event.key !== 'Tab' || !opened) return;
     const controls = [...sidebar.querySelectorAll('a[href], button:not([hidden])')];
     const first = controls[0];
-    const last = controls[controls.length - 1];
+    const last = controls.at(-1);
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();

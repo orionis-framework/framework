@@ -105,7 +105,8 @@ repo = Cache.store("redis")          # _FacadeDispatch, NOT the repository
 repo = await Cache.store("redis")    # correct without pin (and pins as a side effect)
 
 # Pinned (after await Facade.pin() or the provider boot): direct passthrough
-Hash.make("secret")                  # synchronous, no await
+Hash.getAlgorithm()                  # synchronous, no await
+await Hash.make("secret")            # make/check are coroutines, always awaited
 ```
 
 - `_FacadeDispatch` implements `__await__`, `__aenter__` and `__aexit__`, so

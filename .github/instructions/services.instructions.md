@@ -56,9 +56,11 @@ docs do not enforce. If you change behaviour, update the manual in both language
 
 ## Hashing
 
-- **The API is synchronous on purpose**, which is exactly why `HashProvider` is
-  eager and not deferrable — a deferred provider would return `_FacadeDispatch` on
-  the first synchronous `Hash.make(...)`.
+- **`make()` and `check()` are coroutines** that run their blocking body through
+  `asyncio.to_thread` (`_make`/`_check`); `needsRehash`, `getAlgorithm`,
+  `setRounds` and `driver()` stay synchronous. That synchronous remainder is
+  exactly why `HashProvider` is eager and not deferrable — a deferred provider
+  would return `_FacadeDispatch` on the first `Hash.needsRehash(...)`.
 - Backends are imported lazily and cached in `_backend`; the cache must be
   invalidated by `setRounds`/`setMemory`/`setThreads`.
 - Both drivers call `identify()` first, so a foreign hash returns `False`/`True`

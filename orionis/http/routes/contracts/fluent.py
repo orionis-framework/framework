@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from orionis.http.middleware import BaseMiddleware
+    from orionis.http.routes.types import MiddlewareInput
 
 class IFluentRoute(ABC):
 
@@ -56,14 +57,14 @@ class IFluentRoute(ABC):
     @abstractmethod
     def middleware(
         self,
-        *middleware: type[BaseMiddleware] | list | tuple | set,
+        *middleware: MiddlewareInput,
     ) -> Self:
         """
         Add middleware to the route.
 
         Parameters
         ----------
-        *middleware : type[BaseMiddleware] | list | tuple | set
+        *middleware : MiddlewareInput
             One or more middleware classes (not instances) to attach.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
@@ -77,14 +78,14 @@ class IFluentRoute(ABC):
     @abstractmethod
     def withOutMiddleware(
         self,
-        *middleware: type[BaseMiddleware] | list | tuple | set,
+        *middleware: MiddlewareInput,
     ) -> Self:
         """
         Exclude one or more middleware classes from the route.
 
         Parameters
         ----------
-        *middleware : type[BaseMiddleware] | list | tuple | set
+        *middleware : MiddlewareInput
             One or more middleware classes to exclude from this route.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
@@ -120,6 +121,6 @@ class IFluentRoute(ABC):
         -------
         dict
             Dictionary with keys: id, method, path, class, handler,
-            callable_handler, name, middleware, without_middleware,
+            callable_handler, view, name, middleware, without_middleware,
             and kind.
         """

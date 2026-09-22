@@ -18,6 +18,8 @@ class IFormData(ABC):
     handles via the context-manager protocol.
     """
 
+    __slots__ = ()
+
     # Abstract property returning text fields grouped by name
     @property
     @abstractmethod

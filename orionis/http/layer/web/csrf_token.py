@@ -6,11 +6,12 @@ from orionis.http.middleware import BaseMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
+
     from orionis.http.request import Request
     from orionis.http.responses import Response
 
 # ---------------------------------------------------------------------------
-# Module-level constants — allocated once, never per-request.
+# HTTP methods, content types, headers, and field names used by CSRF checks.
 # ---------------------------------------------------------------------------
 
 # HTTP methods that do not mutate state: CSRF check is skipped entirely.
@@ -85,8 +86,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
         cfg = HTTPCsrf(**config)
         self._cfg: HTTPCsrf = cfg
 
-        # Cache hot-path flags at construction time to skip attribute
-        # look-ups on every request.
+        # Store the settings used by the token lifecycle.
         self._enabled: bool = cfg.enabled
         self._session_key: str = cfg.session_key
         self._token_length: int = cfg.token_length
@@ -132,69 +132,30 @@ class CSRFTokenMiddleware(BaseMiddleware):
         CSRFTokenMismatchException
             When an unsafe request does not supply a valid CSRF token.
         """
-        # ── Fast exit: middleware is administratively disabled ──────────
         if not self._enabled:
             return await call_next()
 
-        method: str = request.method
-
-        # ── Fast exit: safe methods never mutate state ──────────────────
-        if method in _SAFE_METHODS:
-            return await self.__handleSafe(request, call_next)
-
-        # ── Resolve or generate the session token ───────────────────────
+        # Publish the session token for forms rendered by downstream handlers.
         token = self.__resolveToken(request)
-
-        # Expose on request.state for template engines.
         request.state.csrf_token = token
 
-        # ── Extract submitted value (header-first for performance) ──────
-        submitted: str | None = self.__extractFromHeaders(request)
-        if submitted is None:
-            submitted = await self.__extractFromBody(request)
+        if request.method not in _SAFE_METHODS:
+            # Read submitted headers before parsing a form body.
+            submitted = self.__extractFromHeaders(request)
+            if submitted is None:
+                submitted = await self.__extractFromBody(request)
 
-        # ── Timing-safe comparison ───────────────────────────────────────
-        valid = submitted is not None and secrets.compare_digest(
-            token.encode(),
-            submitted.encode(),
-        )
-        if not valid:
-            error_msg = (
-                "CSRF token mismatch: the supplied token does not match "
-                "the one stored in the current session."
+            valid = submitted is not None and secrets.compare_digest(
+                token.encode(),
+                submitted.encode(),
             )
-            raise CSRFTokenMismatchException(error_msg)
+            if not valid:
+                error_msg = (
+                    "CSRF token mismatch: the supplied token does not match "
+                    "the one stored in the current session."
+                )
+                raise CSRFTokenMismatchException(error_msg)
 
-        response = await call_next()
-
-        # ── Optionally refresh the XSRF cookie ──────────────────────────
-        if self._xsrf_cookie:
-            self.__attachXsrfCookie(request, response, token)
-
-        return response
-
-    async def __handleSafe(
-        self,
-        request: Request,
-        call_next: Callable[[], Awaitable[Response]],
-    ) -> Response:
-        """
-        Process a safe HTTP method: attach the token and pass through.
-
-        Parameters
-        ----------
-        request : Request
-            Incoming safe-method request.
-        call_next : Callable[[], Awaitable[Response]]
-            Pipeline continuation.
-
-        Returns
-        -------
-        Response
-            Downstream response, optionally with the XSRF cookie set.
-        """
-        token = self.__resolveToken(request)
-        request.state.csrf_token = token
         response = await call_next()
         if self._xsrf_cookie:
             self.__attachXsrfCookie(request, response, token)

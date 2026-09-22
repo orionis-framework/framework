@@ -41,14 +41,17 @@ class FormData(IFormData):
             Always returns ``None``.
         """
         self._items: list[tuple[str, str | UploadedFile]] = list(items)
-        # Build a name-to-positions index for O(1) lookups.
-        index: dict[str, list[int]] = {}
-        for i, (k, _) in enumerate(self._items):
-            if k in index:
-                index[k].append(i)
+        # Store single values and collect repeated fields in order.
+        index: dict[str, str | UploadedFile | list[str | UploadedFile]] = {}
+        for key, value in self._items:
+            previous = index.get(key)
+            if previous is None:
+                index[key] = value
+            elif isinstance(previous, list):
+                previous.append(value)
             else:
-                index[k] = [i]
-        self._index: dict[str, list[int]] = index
+                index[key] = [previous, value]
+        self._index = index
 
     # ---- Backward-compatible grouped views ----
 
@@ -110,11 +113,10 @@ class FormData(IFormData):
         object | None
             Last ``str`` or ``UploadedFile`` for *key*, or *default*.
         """
-        # Use the index for O(1) lookup; last entry is most recently inserted.
-        indices = self._index.get(key)
-        if indices is None:
+        value = self._index.get(key)
+        if value is None:
             return default
-        return self._items[indices[-1]][1]
+        return value[-1] if isinstance(value, list) else value
 
     # Method returning all values for a given key in insertion order
     def getAll(self, key: str) -> list[str | UploadedFile]:
@@ -131,11 +133,10 @@ class FormData(IFormData):
         list[str | UploadedFile]
             All values for *key*, or an empty list if absent.
         """
-        # Resolve positions from the index then collect values.
-        indices = self._index.get(key)
-        if indices is None:
+        value = self._index.get(key)
+        if value is None:
             return []
-        return [self._items[i][1] for i in indices]
+        return value.copy() if isinstance(value, list) else [value]
 
     # Property exposing the raw (name, value) sequence without copying
     @property
@@ -196,7 +197,7 @@ class FormData(IFormData):
         bool
             ``True`` if *key* is present, ``False`` otherwise.
         """
-        # O(1) dict membership check via the pre-built index.
+        # Check whether the field name is present in the index.
         return key in self._index
 
     # Iterator over unique field names in first-seen insertion order

@@ -1,11 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    import xml.etree.ElementTree as ET
     from collections.abc import AsyncGenerator
     from types import SimpleNamespace
-    import xml.etree.ElementTree as ET
     from orionis.http.enums.interfaces import Interface
     from orionis.http.payload.estructures.cookies import Cookies
     from orionis.http.payload.estructures.headers import Headers
@@ -507,7 +507,7 @@ class IRequest(ABC):
         """
 
     @abstractmethod
-    def routeParam(self, key: str) -> dict[str, Any] | str | None:
+    def routeParam(self, key: str) -> object:
         """
         Return a specific path parameter by key.
 
@@ -518,9 +518,8 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any] | str | None
-            The specific parameter value if key exists, or None if key is not found.
-            if key exists, or None if key is not found.
+        object
+            Converted parameter value, or None when the key is absent.
         """
 
     @abstractmethod
@@ -551,20 +550,5 @@ class IRequest(ABC):
             The CSRF token string, or ``None`` when not available.
         """
 
-    @property
-    @abstractmethod
-    def csrf_token(self) -> str | None:
-        """
-        CSRF token for the current request (property alias).
-
-        Intended for use in template engines:
-
-        .. code-block:: html
-
-            <input type="hidden" name="_csrf" value="{{ request.csrf_token }}">
-
-        Returns
-        -------
-        str | None
-            The CSRF token string, or ``None`` when not available.
-        """
+    # Template-facing attribute shares the camelCase contract.
+    csrf_token = property(csrfToken)

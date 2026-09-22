@@ -48,8 +48,7 @@ class SecurityMiddleware:
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPSecurity(**config)
 
-        # Pre-build lowercase sets for O(1) membership tests.  Entries
-        # with a leading '*.' are treated as wildcard subdomain patterns.
+        # Separate exact host names from wildcard subdomain suffixes.
         exact: set[str] = set()
         suffixes: list[str] = []
         if isinstance(cfg.allowed_hosts, list):
@@ -120,10 +119,7 @@ class SecurityMiddleware:
             return True
 
         # Fall back to wildcard subdomain suffix matching.
-        return any(
-            host.endswith(suffix)
-            for suffix in self.__allowed_host_suffixes
-        )
+        return host.endswith(self.__allowed_host_suffixes)
 
     def handle(
         self,
@@ -164,8 +160,7 @@ class SecurityMiddleware:
                 )
 
         # 2. Reject requests that carry more than one Host header.
-        host_values = headers.getAll("host")
-        if len(host_values) > 1:
+        if headers.count("host") > 1:
             return self.__default_responses.error(
                 status_code=400,
                 content="Multiple Host headers not allowed.",

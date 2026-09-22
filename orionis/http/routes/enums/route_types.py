@@ -1,5 +1,6 @@
 from enum import StrEnum
 
+
 class RouteType(StrEnum):
     """
     Define enumeration of route types for the framework.
@@ -11,3 +12,4 @@ class RouteType(StrEnum):
     CONTROLLER = "controller"
     FUNCTION = "function"
     INVOKABLE = "invokable"
+    VIEW = "view"

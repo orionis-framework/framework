@@ -61,9 +61,9 @@ class MultipartPart(IMultipartPart):
         # A part is treated as a file upload when a filename is declared
         self.is_file: bool = self.filename is not None
 
-        # Pre-bind the write callable to avoid repeated attribute look-ups
+        # Select the file or field buffer writer for this part.
         self.data: UploadedFile | bytearray
-        self._write: Callable[[bytes], None]
+        self._write: Callable[[bytes | bytearray | memoryview], None]
         if self.is_file:
             # File parts accumulate bytes via a spill-aware UploadedFile
             self.data = UploadedFile(
@@ -134,7 +134,7 @@ class MultipartPart(IMultipartPart):
         attrs.update(extended)
         return attrs
 
-    def write(self, chunk: bytes) -> None:
+    def write(self, chunk: bytes | bytearray | memoryview) -> None:
         """
         Append *chunk* to this part's data buffer.
 
@@ -174,8 +174,8 @@ class MultipartPart(IMultipartPart):
         )
 
         if not self.is_file:
-            # Convert bytearray to immutable bytes before decoding
-            raw: bytes = bytes(self.data)  # type: ignore[arg-type]
+            # Decode the field buffer using its declared transfer encoding.
+            raw: bytes | bytearray = self.data  # type: ignore[assignment]
             # Apply CTE decoding when a transfer encoding is declared
             if cte == "base64":
                 raw = base64.b64decode(raw)
@@ -185,7 +185,7 @@ class MultipartPart(IMultipartPart):
             charset = "utf-8"
             content_type_hdr = self.headers.get("content-type", "")
             if content_type_hdr:
-                # Use a single find() to locate charset= instead of split+loop
+                # Extract the charset parameter from the Content-Type header.
                 cs_idx = content_type_hdr.lower().find("charset=")
                 if cs_idx != -1:
                     tail = content_type_hdr[cs_idx + 8:]

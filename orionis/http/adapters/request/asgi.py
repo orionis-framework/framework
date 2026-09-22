@@ -21,13 +21,11 @@ class ASGITransportAdapter(TransportAdapter):
 
     # ruff: noqa: ANN401
 
-    # Slots eliminate the per-instance __dict__, replacing hash-based dict
-    # lookups with direct indexed slot access for all hot-path attributes
+    # Store scope data, request state, and resolved fields.
     __slots__ = (
         "__client",
         "__headers",
         "__overrides",
-        "__raw_headers",
         "__scope",
         "__wants_json",
     )
@@ -46,15 +44,14 @@ class ASGITransportAdapter(TransportAdapter):
         None
             Return ``None``.
         """
-        # Store request scope and raw headers for fast repeated access.
+        # Store the request scope.
         self.__scope: dict = scope
-        self.__raw_headers: list[tuple[bytes, bytes]] = scope.get("headers", [])
         # Keep all overrides and computed fields in one dictionary.
         self.__overrides: dict[str, Any] = {}
-        # Lazily resolve expensive fields only when first requested.
+        # Mark fields to be resolved on their first access.
         self.__client: Any = _MISSING
         self.__wants_json: Any = _MISSING
-        # Build headers once since they are frequently read.
+        # Parse the request headers.
         self.__headers: Headers = self.__buildHeadersASGI()
 
     def __getitem__(self, key: str) -> object | None:
@@ -139,7 +136,7 @@ class ASGITransportAdapter(TransportAdapter):
         # Decode raw byte pairs to latin-1 strings.
         return Headers([
             (k.decode("latin-1"), v.decode("latin-1"))
-            for k, v in self.__raw_headers
+            for k, v in self.__scope.get("headers", ())
         ])
 
     def client(self) -> str | None:
@@ -307,7 +304,7 @@ class ASGITransportAdapter(TransportAdapter):
         dict
             Return original scope merged with overrides.
         """
-        # Fast path avoids allocation when there are no overrides.
+        # Return the original scope when no values have been overridden.
         if not self.__overrides:
             return self.__scope
 

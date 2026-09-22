@@ -66,10 +66,9 @@ class BodyStream(IBodyStream):
         self.__body: bytes | None = None
         # Track whether the raw transport stream has been consumed.
         self.__consumed: bool = False
-        # Pre-compute transport flag to avoid repeated enum comparisons.
+        # Record which transport provides the body chunks.
         self.__is_rsgi: bool = interface is Interface.RSGI
-        # Use sys.maxsize as sentinel so size check is always int comparison,
-        # eliminating a None branch in the streaming hot loop.
+        # Represent an unlimited body size with sys.maxsize.
         self.__max_size: int = (
             max_body_size if max_body_size is not None else _NO_LIMIT
         )
@@ -135,7 +134,7 @@ class BodyStream(IBodyStream):
         # Mark the stream consumed before iterating to prevent re-entry.
         self.__consumed = True
         total = 0
-        # Cache limit locally to avoid repeated attribute lookups in the loop.
+        # Apply the configured limit to the accumulated byte count.
         max_size = self.__max_size
 
         # RSGI (Granian): iterate the protocol object directly.
@@ -188,7 +187,7 @@ class BodyStream(IBodyStream):
         if body is not None:
             return body
 
-        # Collect all chunks then join once for a single allocation pass.
+        # Collect the transport chunks into the complete body buffer.
         chunks: list[bytes] = []
         async for chunk in self.stream():
             chunks.append(chunk)  # noqa: PERF401

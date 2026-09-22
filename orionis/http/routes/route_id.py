@@ -2,13 +2,13 @@ import itertools
 import os
 import time
 
-# avoids time.__dict__ lookup each call
+# Read the timestamp included in each route identifier.
 _time_ns = time.time_ns
 
-# C-level counter; faster than cls._counter += 1
+# Advance the process-local route sequence.
 _next_id = itertools.count(1).__next__
 
-# pre-converted; f-string skips int→str
+# Include the process identifier in generated route identifiers.
 _pid = str(os.getpid())
 
 class RouteID:

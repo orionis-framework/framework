@@ -1,14 +1,16 @@
 import importlib
 from typing import TYPE_CHECKING
+
+from orionis.cache.file_based_cache import FileBasedCache
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.routes.contracts.loader import IRouteLoader
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.route_cache import RouteCache
 from orionis.http.routes.route_compiler import RouteCompiler
-from orionis.cache.file_based_cache import FileBasedCache
 
 if TYPE_CHECKING:
     from pathlib import Path
+
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.http.layer.contracts.middleware import IBaseMiddleware
 
@@ -49,6 +51,7 @@ class RouteLoader(IRouteLoader):
         self.__app = app
         self.__app_middleware: list[type[IBaseMiddleware]] = app.getMiddleware()
         self.__routes: dict[str, dict] = {}
+        self.__loaded = False
         self.__fallback: tuple | None = None
         self.__use_cache = False
         self.__persistence: IFileBasedCache | None = self.__getCachePersistence()
@@ -150,20 +153,24 @@ class RouteLoader(IRouteLoader):
             Populates ``self.__routes`` and ``self.__fallback`` in place;
             no value is returned.
         """
-        if self.__routes:
+        if self.__loaded:
             return
 
         # ── Cache hit ────────────────────────────────────────────────────────
         if self.__use_cache and self.__persistence:
             cached = self.__persistence.get()
-            if cached:
+            if cached and cached.get("version") == RouteCache.VERSION:
                 self.__routes, self.__fallback = self.__cache.fromCache(cached)
+                self.__loaded = True
                 return
 
         # ── Cache miss: import → compile → persist ───────────────────────────
-        for kind in self._KINDS:
-            self.__router._setKind(kind)
-            self.__importFluentRoutes(kind)
+        try:
+            for kind in self._KINDS:
+                self.__router._setKind(kind)
+                self.__importFluentRoutes(kind)
+        finally:
+            self.__router._setKind("web")
 
         exported = self.__router.export()
         self.__routes, self.__fallback = self.__compiler.compile(
@@ -176,3 +183,4 @@ class RouteLoader(IRouteLoader):
             self.__persistence.save(
                 self.__cache.toCache(self.__routes, self.__fallback),
             )
+        self.__loaded = True

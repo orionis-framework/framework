@@ -14,6 +14,8 @@ class IMultipartStreamParser(ABC):
     parsed fields and uploaded files.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def parse(self) -> FormData:
         """

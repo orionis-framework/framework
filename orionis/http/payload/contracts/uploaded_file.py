@@ -15,6 +15,8 @@ class IUploadedFile(ABC):
     and ``save()``.
     """
 
+    __slots__ = ()
+
     @property
     @abstractmethod
     def size(self) -> int:
@@ -41,7 +43,7 @@ class IUploadedFile(ABC):
         """
 
     @abstractmethod
-    def write(self, chunk: bytes) -> None:
+    def write(self, chunk: bytes | bytearray | memoryview) -> None:
         """
         Append *chunk* to the file buffer.
 

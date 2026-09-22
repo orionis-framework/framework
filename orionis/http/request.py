@@ -24,12 +24,12 @@ _BEARER_PREFIX = "bearer "
 _BEARER_PREFIX_LEN = 7
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    from collections.abc import AsyncGenerator, Mapping
+    from xml.etree.ElementTree import Element as XMLElement
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.payload.contracts.body_stream import IBodyStream
     from orionis.http.payload.estructures.headers import Headers
     from orionis.http.payload.form_data import FormData
-    from xml.etree.ElementTree import Element as XMLElement
 
 class UnsupportedMediaTypeException(Exception):
     """Raised when the request Content-Type is not supported by the parser."""
@@ -72,7 +72,7 @@ class Request(IRequest):
         body_stream: IBodyStream,
         *,
         registry: MediaTypeRegistry | None = None,
-        params: dict[str, Any] | None = None,
+        params: Mapping[str, Any] | None = None,
     ) -> None:
         """
         Initialize an HTTP request from an interface, adapter, and body stream.
@@ -87,7 +87,7 @@ class Request(IRequest):
             Pre-constructed body stream.  Inject a stub for unit testing.
         registry : MediaTypeRegistry | None, optional
             Content-type parser registry.  Defaults to ``DEFAULT_MEDIA_TYPES``.
-        params : dict[str, Any] | None, optional
+        params : Mapping[str, Any] | None, optional
             Path parameters extracted from the URL. Defaults to None.
 
         Returns
@@ -125,8 +125,8 @@ class Request(IRequest):
         self.__cached_content_type = None
         self.__cached_path = None
         self.__cached_accept_lower = None
-        self.__path_params: dict[str, Any] = params if params is not None else {}
-        self.__state: SimpleNamespace = SimpleNamespace()
+        self.__path_params: dict[str, Any] | None = dict(params) if params else None
+        self.__state: SimpleNamespace | None = None
 
     def __buildUrlRSGI(self) -> str:
         """
@@ -261,7 +261,7 @@ class Request(IRequest):
             Return the media type and parsed parameters from the
             ``Content-Type`` header.
         """
-        # Cache parsed Content-Type data to avoid repeated parsing.
+        # Store the parsed Content-Type header on first access.
         if self.__cached_content_type is None:
             self.__cached_content_type = parse_content_type(
                 self.headers.get("content-type", ""),
@@ -343,7 +343,7 @@ class Request(IRequest):
         dict[str, Any]
             Merged mapping of multipart fields and uploaded files.
         """
-        # Collapse repeated keys into lists while preserving first-value fast path.
+        # Collect repeated field values in insertion order.
         form = await self.form()
         merged: dict[str, Any] = {}
         for k, v in form.allItems:
@@ -708,6 +708,8 @@ class Request(IRequest):
         types.SimpleNamespace
             The mutable state object for this request.
         """
+        if self.__state is None:
+            self.__state = SimpleNamespace()
         return self.__state
 
     @property
@@ -1084,7 +1086,7 @@ class Request(IRequest):
 
     # ---- Route Parameter Methods ----
 
-    def routeParam(self, key: str) -> dict[str, Any] | str | None:
+    def routeParam(self, key: str) -> object:
         """
         Return a specific path parameter by key.
 
@@ -1095,11 +1097,11 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any] | str | None
-            The specific parameter value if key exists, or None if key is not found.
-            if key exists, or None if key is not found.
+        object
+            Converted parameter value, or None when the key is absent.
         """
-        return self.__path_params.get(key)
+        params = self.__path_params
+        return params.get(key) if params is not None else None
 
     def routeParams(self) -> dict[str, Any]:
         """
@@ -1110,6 +1112,8 @@ class Request(IRequest):
         dict[str, Any]
             A dictionary of all path parameters.
         """
+        if self.__path_params is None:
+            self.__path_params = {}
         return self.__path_params
 
     # ---- CSRF Helpers ----
@@ -1129,21 +1133,5 @@ class Request(IRequest):
         """
         return getattr(self.__state, "csrf_token", None)
 
-    @property
-    def csrf_token(self) -> str | None:
-        """
-        CSRF token for the current request.
-
-        Convenience property that delegates to ``csrfToken()``.  Intended
-        for use in template engines:
-
-        .. code-block:: html
-
-            <input type="hidden" name="_csrf" value="{{ request.csrf_token }}">
-
-        Returns
-        -------
-        str | None
-            The CSRF token, or ``None`` when not available.
-        """
-        return getattr(self.__state, "csrf_token", None)
+    # Template-facing attribute shares the camelCase implementation.
+    csrf_token = property(csrfToken)

@@ -1,10 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Literal, Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal, Self
 
 if TYPE_CHECKING:
-    from datetime import datetime
     from collections.abc import AsyncIterable, Mapping
+    from datetime import datetime
 
 class IResponse(ABC):
 

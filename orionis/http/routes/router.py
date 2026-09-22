@@ -1,6 +1,11 @@
+from collections.abc import Sequence
+from importlib import import_module
+from itertools import chain
 from typing import TYPE_CHECKING
+
+from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
+from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.foundation.contracts.application import IApplication
-from orionis.http.middleware import BaseMiddleware
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.exceptions.fallback_route_already_registered import (
@@ -12,6 +17,8 @@ from orionis.http.routes.functions import (
     normalize_path,
     parse_action,
 )
+from orionis.http.routes.group import RouteGroup
+from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -44,19 +51,12 @@ class Router(IRouter):
             State is stored on the instance; no value is returned.
         """
         self.__app = app
-        self.__fallback: tuple[Callable | None, Callable | None] = (
+        self.__fallback: tuple[type | None, Callable | str | None] = (
             None,
             None,
         )
         self.__routes: dict[str, FluentRoute] = {}
-        self.__map_routes: dict[str, dict[str, str]] = {
-            "GET": {},
-            "POST": {},
-            "PUT": {},
-            "DELETE": {},
-            "PATCH": {},
-            "QUERY": {},
-        }
+        self.__replaceable_routes: dict[str, FluentRoute] = {}
         self.__current_kind: str = "web"
         self.__defaultRoutes()
 
@@ -86,7 +86,9 @@ class Router(IRouter):
         self,
         method: str,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
+        *,
+        view: str | None = None,
     ) -> FluentRoute:
         """
         Create and register a single HTTP route.
@@ -97,74 +99,29 @@ class Router(IRouter):
             HTTP method (e.g. ``'GET'``, ``'POST'``).
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+        view : str | None, optional
+            Template name rendered directly by the kernel, used instead of
+            *action* for view-only routes.
 
         Returns
         -------
         FluentRoute
             The registered FluentRoute instance.
         """
-        # Normalise path before any duplicate check so that '/users' and
-        # '/users/' are treated as the same route.
-        normalized_path = normalize_path(path)
-        method_upper = method.upper()
-
-        # Replace default system routes when the user re-registers them.
-        method_routes = self.__map_routes[method_upper]
-        previously_registered_id = method_routes.get(normalized_path)
-        if previously_registered_id and normalized_path in self._DEFAULT_PATHS:
-            del self.__routes[previously_registered_id]
-            del method_routes[normalized_path]
-
-        # Create and store the new route
-        fluent_router = (
-            FluentRoute(method, path, action)._kind(self.__current_kind) # noqa: SLF001
+        fluent_route = (
+            FluentRoute(method, path, action, view=view)._kind(self.__current_kind) # noqa: SLF001
         )
-        self.__routes[fluent_router.id] = fluent_router
-        method_routes[normalized_path] = fluent_router.id
-        return fluent_router
-
-    def __applyGroupToRoute(
-        self,
-        route: FluentRoute,
-        prefix: str | None,
-        middleware: list[type[BaseMiddleware]] | None,
-        without_middleware: list[type[BaseMiddleware]] | None,
-    ) -> None:
-        """
-        Apply a group prefix and middleware to a single route in place.
-
-        Parameters
-        ----------
-        route : FluentRoute
-            The route to modify.
-        prefix : str | None
-            URL prefix to prepend to the route path.
-        middleware : list[type[BaseMiddleware]] | None
-            Middleware classes to add, skipping any already on the route.
-        without_middleware : list[type[BaseMiddleware]] | None
-            Middleware classes to exclude from the route.
-
-        Returns
-        -------
-        None
-            The route is mutated in place; no value is returned.
-        """
-        if prefix:
-            route.prefix(prefix)
-
-        if middleware:
-            existing = set(route._existingMiddleware)  # noqa: SLF001
-            new_middleware = [
-                mw for mw in middleware if mw not in existing
-            ]
-            if new_middleware:
-                route.middleware(*new_middleware)
-
-        if without_middleware:
-            route.withOutMiddleware(*without_middleware)
+        normalized_path = fluent_route.path
+        if method == "GET" and normalized_path in self._DEFAULT_PATHS:
+            previous = self.__replaceable_routes.get(normalized_path)
+            if previous is not None and previous.path == normalized_path:
+                del self.__routes[previous.id]
+            self.__replaceable_routes[normalized_path] = fluent_route
+        self.__routes[fluent_route.id] = fluent_route
+        return fluent_route
 
     def _setKind(self, kind: str) -> None:
         """
@@ -187,10 +144,82 @@ class Router(IRouter):
         """
         self.__current_kind = kind
 
+    def auth(self) -> None:
+        """Register the built-in web login, registration and logout routes.
+
+        Call once from a web route file. Login and registration accept guests;
+        logout requires a session identity and accepts POST only. Session and
+        CSRF middleware are supplied by the kernel's web pipeline.
+
+        Returns
+        -------
+        None
+            Registers GET/POST login and sign-up plus POST logout. The POST
+            routes are named ``login``, ``register`` and ``logout``.
+
+        Raises
+        ------
+        ValueError
+            If registration is attempted outside the web route context.
+        """
+        if self.__current_kind != "web":
+            error_msg = "Route.auth() must be declared in a web route file."
+            raise ValueError(error_msg)
+
+        # Load optional auth controllers only when their routes are requested.
+        login = import_module(
+            "orionis.http.default.controllers.login_controller",
+        ).LoginController
+        register = import_module(
+            "orionis.http.default.controllers.register_controller",
+        ).RegisterController
+
+        self.group(middleware=GuestMiddleware, routes=[
+            self.get("/login", [login, "index"]),
+            self.post("/login", [login, "login"]).name("login"),
+            self.get("/sign-up", [register, "index"]),
+            self.post("/sign-up", [register, "register"]).name("register"),
+        ])
+        self.post("/logout", [login, "logout"]).name("logout").middleware(
+            AuthenticateSessionMiddleware,
+        )
+
+    def view(
+        self,
+        path: str,
+        view: str,
+    ) -> FluentRoute:
+        """
+        Register a GET route that renders a template with no controller.
+
+        Parameters
+        ----------
+        path : str
+            URL path for the route.
+        view : str
+            Template name in dot notation (e.g. ``'welcome'``) or a
+            relative path (e.g. ``'pages/welcome.html'``).
+
+        Returns
+        -------
+        FluentRoute
+            The registered FluentRoute instance.
+
+        Raises
+        ------
+        ValueError
+            If ``view`` is not a non-empty string.
+        """
+        if not isinstance(view, str) or not view.strip():
+            error_msg = "View name must be a non-empty string"
+            raise ValueError(error_msg)
+
+        return self.__addSingleRoute("GET", path, view=view.strip())
+
     def post(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a POST route.
@@ -199,7 +228,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -213,7 +242,7 @@ class Router(IRouter):
     def query(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a QUERY route.
@@ -222,7 +251,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -236,7 +265,7 @@ class Router(IRouter):
     def get(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a GET route.
@@ -245,7 +274,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -259,7 +288,7 @@ class Router(IRouter):
     def put(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a PUT route.
@@ -268,7 +297,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -282,7 +311,7 @@ class Router(IRouter):
     def delete(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a DELETE route.
@@ -291,7 +320,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -305,7 +334,7 @@ class Router(IRouter):
     def patch(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a PATCH route.
@@ -314,7 +343,7 @@ class Router(IRouter):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -327,17 +356,17 @@ class Router(IRouter):
 
     def fallback(
         self,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> None:
         """
-        Register the fallback handler for unmatched routes (HTTP 404/405).
+        Register the fallback handler for unmatched routes (HTTP 404).
 
         Only one fallback may be registered; a second call raises
         ``FallbackRouteAlreadyRegisteredException``.
 
         Parameters
         ----------
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -359,7 +388,9 @@ class Router(IRouter):
             raise FallbackRouteAlreadyRegisteredException(error_msg)
 
         _callable, _handler = parse_action(action)
-        if _callable and _handler is None:
+        if isinstance(_callable, type) and _handler is None:
+            self.__fallback = (_callable, "__call__")
+        elif _handler is None:
             self.__fallback = (None, _callable)
         else:
             self.__fallback = (_callable, _handler)
@@ -368,95 +399,107 @@ class Router(IRouter):
         self,
         *,
         prefix: str | None = None,
-        middleware: type[BaseMiddleware] | list | tuple | set | None = None,
-        without_middleware: (
-            type[BaseMiddleware] | list | tuple | set | None
-        ) = None,
-        routes: list[FluentRoute] | None = None,
-    ) -> None:
-        """
-        Register a group of routes with a shared prefix and middleware.
+        middleware: MiddlewareInput | None = None,
+        without_middleware: MiddlewareInput | None = None,
+        routes: Sequence[FluentRoute | RouteGroup] | None = None,
+    ) -> RouteGroup:
+        """Compose a group and return its flattened membership for nesting.
 
         Parameters
         ----------
         prefix : str | None, optional
-            URL prefix prepended to every route path in the group.
-        middleware : type[BaseMiddleware] | list | tuple | set | None, optional
-            Middleware classes to attach to every route in the group.
-            Accepts a single class or a container of classes.
-        without_middleware : type[BaseMiddleware] | list | tuple | set | None, optional
-            Middleware classes to exclude from every route in the group.
-            Accepts a single class or a container of classes.
-        routes : list[FluentRoute] | None, optional
-            FluentRoute instances to include in the group.
+            Prefix prepended to every descendant path.
+        middleware : MiddlewareInput | None, optional
+            Parent middleware executed before descendant middleware.
+        without_middleware : MiddlewareInput | None, optional
+            Exclusions applied to the final compiled middleware stack.
+        routes : Sequence[FluentRoute | RouteGroup] | None, optional
+            Routes or groups already registered by inner expressions.
 
         Returns
         -------
-        None
-            Routes are mutated and registered; no value is returned.
+        RouteGroup
+            Already registered routes, usable as members of another group.
 
         Raises
         ------
         ValueError
-            If *routes* is empty or ``None``.
-        ValueError
-            If *prefix* is not a ``str``.
-        ValueError
-            If any entry in *middleware* or *without_middleware* is not
-            a ``BaseMiddleware`` subclass.
+            If the group is empty, its context is invalid, or a route appears
+            more than once. Validation completes before any route is changed.
         TypeError
-            If any entry in *routes* is not a ``FluentRoute`` instance.
+            If membership is not a sequence of routes and groups.
         """
-        if not routes:
-            error_msg = (
-                "Group routes must be provided as a list of "
-                "FluentRoute instances."
-            )
-            raise ValueError(error_msg)
-
-        if prefix and not isinstance(prefix, str):
+        members = self.__groupMembers(routes)
+        if prefix is not None and not isinstance(prefix, str):
             error_msg = "Group prefix must be a string if provided."
             raise ValueError(error_msg)
-
+        normalized_prefix = normalize_path(prefix).rstrip("/") if prefix else ""
         try:
-            group_middleware = (
-                flatten_middleware(middleware) if middleware else None
+            parent_middleware = tuple(
+                flatten_middleware(middleware) if middleware is not None else (),
             )
-        except TypeError as exc:
-            error_msg = (
-                "Group middleware must be a BaseMiddleware subclass or "
-                "a list/tuple/set of BaseMiddleware subclasses."
-            )
-            raise ValueError(error_msg) from exc
-
-        try:
-            group_without_middleware = (
+            excluded = frozenset(
                 flatten_middleware(without_middleware)
-                if without_middleware
-                else None
+                if without_middleware is not None else (),
             )
         except TypeError as exc:
             error_msg = (
-                "Group without_middleware must be a BaseMiddleware "
-                "subclass or a list/tuple/set of BaseMiddleware "
-                "subclasses."
+                "Group middleware and without_middleware must contain "
+                "BaseMiddleware subclasses."
             )
             raise ValueError(error_msg) from exc
 
-        for route in routes:
-            if not isinstance(route, FluentRoute):
-                error_msg = (
-                    "All group routes must be instances of FluentRoute."
-                )
-                raise TypeError(error_msg)
-
-            self.__applyGroupToRoute(
-                route,
-                prefix,
-                group_middleware,
-                group_without_middleware,
-            )
+        for route in members:
+            route.inheritGroup(normalized_prefix, parent_middleware, excluded)
             self.__routes[route.id] = route
+        return RouteGroup(members)
+
+    @staticmethod
+    def __groupMembers(
+        routes: Sequence[FluentRoute | RouteGroup] | None,
+    ) -> tuple[FluentRoute, ...]:
+        """Validate and flatten membership without mutating any routes.
+
+        Returns
+        -------
+        tuple[FluentRoute, ...]
+            Unique leaf routes in declaration order.
+
+        Raises
+        ------
+        ValueError
+            If membership is empty or contains duplicate routes.
+        TypeError
+            If a member is neither a route nor a group.
+        """
+        if routes is not None and (
+            not isinstance(routes, Sequence)
+            or isinstance(routes, (str, bytes, bytearray))
+        ):
+            error_msg = "Group routes must be a sequence of routes or groups."
+            raise TypeError(error_msg)
+        if not routes:
+            error_msg = "Group routes must not be empty."
+            raise ValueError(error_msg)
+        members: list[FluentRoute] = []
+        seen: set[str] = set()
+        leaves = chain.from_iterable(
+            member.routes if isinstance(member, RouteGroup) else (member,)
+            for member in routes
+        )
+        for route in leaves:
+            if not isinstance(route, FluentRoute):
+                error_msg = "Group members must be FluentRoute or RouteGroup instances."
+                raise TypeError(error_msg)
+            if route.id in seen:
+                error_msg = "A route must occur only once within a group."
+                raise ValueError(error_msg)
+            seen.add(route.id)
+            members.append(route)
+        if not members:
+            error_msg = "Group routes must not be empty."
+            raise ValueError(error_msg)
+        return tuple(members)
 
     def export(self) -> dict:
         """

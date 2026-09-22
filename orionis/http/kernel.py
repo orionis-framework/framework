@@ -1,7 +1,11 @@
 import importlib
-from functools import partial
+from operator import attrgetter
 from typing import TYPE_CHECKING
 import msgspec
+from orionis.auth.middleware.resolve_identity import (
+    ResolveSessionIdentityMiddleware,
+    ResolveTokenIdentityMiddleware,
+)
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
@@ -29,6 +33,7 @@ from orionis.http.routes.loader import RouteLoader
 from orionis.http.routes.route_resolver import RouteResolver
 from orionis.http.validation import validation_response
 from orionis.schemas.exceptions.validation import ValidationException
+from orionis.support.facades.view import View
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -38,7 +43,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.contracts.loader import IRouteLoader
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
 
-# Pre-built tuple for isinstance checks avoids per-call reconstruction.
+# Handler return types that are serialized as JSON.
 _JSON_RESPONSE_TYPES: tuple[type, ...] = (dict, msgspec.Struct)
 
 # Kernel context identifier reused across all request scopes.
@@ -46,7 +51,7 @@ _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
 
 class _MiddlewarePipeline:
     """
-    Iterative middleware pipeline that replaces per-request closure allocation.
+    Middleware pipeline with request-local execution state.
 
     A single instance encapsulates the execution state for one middleware stack
     invocation.  Its ``__call__`` method acts as the ``next()`` callable passed
@@ -61,13 +66,15 @@ class _MiddlewarePipeline:
         "_n",
         "_request",
         "_terminal",
+        "_terminal_args",
     )
 
     def __init__(
         self,
         instances: tuple,
         request: Request,
-        terminal: Callable[[], Awaitable[Response]],
+        terminal: Callable[..., Awaitable[Response]],
+        terminal_args: tuple = (),
     ) -> None:
         """
         Store the middleware stack and terminal callable for one request.
@@ -78,8 +85,10 @@ class _MiddlewarePipeline:
             Ordered tuple of pre-built middleware instances.
         request : Request
             Incoming HTTP request forwarded to each layer.
-        terminal : Callable[[], Awaitable[Response]]
+        terminal : Callable[..., Awaitable[Response]]
             Async callable invoked after all middleware layers have run.
+        terminal_args : tuple, optional
+            Positional arguments forwarded to the terminal callable.
 
         Returns
         -------
@@ -88,6 +97,7 @@ class _MiddlewarePipeline:
         self._instances = instances
         self._request = request
         self._terminal = terminal
+        self._terminal_args = terminal_args
         self._n = len(instances)
         self._depth = 0
         self._called_mask = 0
@@ -107,26 +117,27 @@ class _MiddlewarePipeline:
             When ``next()`` is invoked more than once in the same layer.
         """
         depth = self._depth
-        # Reached the end of the stack; hand off to the terminal handler.
-        if depth >= self._n:
-            return await self._terminal()
         bit = 1 << depth
         # Guard against double invocation of next() from the same layer.
         if self._called_mask & bit:
             error_msg = "next() has already been called in this middleware layer."
             raise RuntimeError(error_msg)
         self._called_mask |= bit
+        # The terminal also consumes its continuation exactly once.
+        if depth >= self._n:
+            return await self._terminal(*self._terminal_args)
         self._depth = depth + 1
-        result = await self._instances[depth].handle(self._request, self)
-        # Restore depth index after the layer returns.
-        self._depth = depth
-        return result
+        try:
+            return await self._instances[depth].handle(self._request, self)
+        finally:
+            self._depth = depth
 
 class KernelHTTP(IKernelHTTP):
 
     # ruff: noqa:TC001 - For Dependency injection
 
     __slots__ = (
+        "__api_middleware",
         "__app",
         "__asgi_adapter",
         "__boot",
@@ -147,6 +158,7 @@ class KernelHTTP(IKernelHTTP):
         "__rsgi_adapter",
         "__security",
         "__under_maintenance",
+        "__view_dispatch",
         "__web_middleware",
     )
 
@@ -172,7 +184,7 @@ class KernelHTTP(IKernelHTTP):
         self.__app = app
         self.__boot: bool = False
         self.__catch: ICatch = catch
-        # Per-route middleware stacks resolved at boot to avoid runtime container calls.
+        # Associate each route middleware stack with its instances.
         self.__middleware_cache: dict[tuple, tuple] = {}
 
     async def boot(self) -> None:
@@ -210,10 +222,15 @@ class KernelHTTP(IKernelHTTP):
             under_maintenance=self.__app.underMaintenance(),
         )
 
-        # Ordered web-layer pipeline: session restoration then CSRF validation.
+        # Resolve web identities only after session restoration and CSRF checks.
         self.__web_middleware: tuple = (
             await self.__app.build(StartSessionMiddleware),
             CSRFTokenMiddleware(config=self.__app.config("http").get("csrf", {})),
+            await self.__app.build(ResolveSessionIdentityMiddleware),
+        )
+        # API identity resolution uses Bearer credentials without starting a session.
+        self.__api_middleware: tuple = (
+            await self.__app.build(ResolveTokenIdentityMiddleware),
         )
 
         # Protocol-level response adapters for RSGI and ASGI transports.
@@ -223,10 +240,10 @@ class KernelHTTP(IKernelHTTP):
         # Request logger; only active when the application runs in debug mode.
         self.__request_printer = await self.__app.build(HTTPRequestPrinter)
         self.__request_printer.setEnabled(enabled=self.__app.isDebug())
-        # Cache enabled flag to skip timer and log calls in the hot path.
+        # Record whether requests should be timed and logged.
         self.__printer_enabled: bool = self.__app.isDebug()
 
-        # Resolve and cache the fallback handler to avoid per-request lookups.
+        # Resolve the registered fallback handler.
         _raw_fallback = self.__routes.fallback()
         self.__fallback: tuple | None = (
             _raw_fallback
@@ -268,7 +285,8 @@ class KernelHTTP(IKernelHTTP):
 
         Populates two int-keyed dispatch tables using route object identity,
         eliminating per-request module imports, attribute lookups, and tuple
-        key construction from the handler invocation hot path.
+        key construction from the handler invocation hot path. View routes are
+        stored in a third table holding only their template name.
 
         Returns
         -------
@@ -276,28 +294,36 @@ class KernelHTTP(IKernelHTTP):
         """
         fn_dispatch: dict[int, object] = {}
         cls_dispatch: dict[int, tuple[type, str]] = {}
+        view_dispatch: dict[int, str] = {}
         module_cache: dict[str, object] = {}
 
         # Walk every registered route once and store fully resolved callables.
         for route in self.__routes.allRoutes():
             action = route.action
+            route_id = id(route)
+
+            # View routes have no Python handler; bind the template directly.
+            if route.type is RouteType.VIEW:
+                view_dispatch[route_id] = action["view"]
+                continue
+
             module_name = action["module"]
             module = module_cache.get(module_name)
             if module is None:
                 module = importlib.import_module(module_name)
                 module_cache[module_name] = module
 
-            route_id = id(route)
             if route.type is RouteType.FUNCTION:
-                fn_dispatch[route_id] = getattr(module, action["function"])
+                fn_dispatch[route_id] = attrgetter(action["function"])(module)
             else:
                 cls_dispatch[route_id] = (
-                    getattr(module, action["class"]),
+                    attrgetter(action["class"])(module),
                     action["method"],
                 )
 
         self.__fn_dispatch: dict[int, object] = fn_dispatch
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
+        self.__view_dispatch: dict[int, str] = view_dispatch
 
     def __defaultMiddleware(
         self,
@@ -341,9 +367,8 @@ class KernelHTTP(IKernelHTTP):
             under_maintenance=under_maintenance,
             default_responses=default_responses,
         )
-        # Cache the maintenance flag to skip the check on the hot path.
+        # Record whether maintenance and rate limiting are active.
         self.__maintenance_enabled = under_maintenance
-        # Cache the limiter's enabled state to skip async overhead when disabled.
         self.__rate_limit_enabled = self.__rate_limit.isEnabled()
 
     async def __rsgiResponse(
@@ -467,17 +492,17 @@ class KernelHTTP(IKernelHTTP):
                 built = [await self.__app.build(mw_class) for mw_class in stack]
                 self.__middleware_cache[stack] = tuple(built)
 
-    async def __webLayer(
+    async def __routeLayer(
         self,
         request: Request,
         resolved_route: ResolvedRoute,
     ) -> Response:
         """
-        Execute the web middleware pipeline for a web-group route.
+        Establish the web or API context before running route middleware.
 
-        Runs StartSessionMiddleware then CSRFTokenMiddleware through a
-        single-allocation iterative pipeline before delegating to
-        ``__webTerminal``.
+        Web routes restore the session, validate CSRF, and resolve the session
+        identity. API routes resolve only the token identity. Both allow guests;
+        access restrictions belong to the application's route middleware.
 
         Parameters
         ----------
@@ -491,11 +516,19 @@ class KernelHTTP(IKernelHTTP):
         Response
             HTTP response produced by the middleware pipeline.
         """
-        # Single pipeline object replaces the recursive closure chain.
+        if resolved_route.kind == "web":
+            instances = self.__web_middleware
+            terminal = self.__webTerminal
+        else:
+            instances = self.__api_middleware
+            terminal = self.__requestLayer
+
+        # Keep continuation state local to this request.
         pipeline = _MiddlewarePipeline(
-            instances=self.__web_middleware,
+            instances=instances,
             request=request,
-            terminal=partial(self.__webTerminal, request, resolved_route),
+            terminal=terminal,
+            terminal_args=(request, resolved_route),
         )
         return await pipeline()
 
@@ -548,9 +581,9 @@ class KernelHTTP(IKernelHTTP):
             HTTP response produced by the pipeline or the handler.
         """
         stack = resolved_route.route.compiled_middlewares
-        # Fast path: bypass pipeline construction when no route middleware exists.
+        # Invoke the handler directly when no route middleware is configured.
         if not stack:
-            return await self.__callHandler(resolved_route)
+            return await self.__callHandler(resolved_route, request)
 
         instances = self.__middleware_cache.get(stack)
         if instances is None:
@@ -558,17 +591,19 @@ class KernelHTTP(IKernelHTTP):
             instances = tuple(built)
             self.__middleware_cache[stack] = instances
 
-        # Single pipeline object replaces the recursive closure chain.
+        # Keep continuation state local to this request.
         pipeline = _MiddlewarePipeline(
             instances=instances,
             request=request,
-            terminal=partial(self.__callHandler, resolved_route),
+            terminal=self.__callHandler,
+            terminal_args=(resolved_route, request),
         )
         return await pipeline()
 
     async def __callHandler(
         self,
         resolved_route: ResolvedRoute,
+        request: Request,
     ) -> Response:
         """
         Dispatch the request to the pre-resolved route handler.
@@ -580,6 +615,8 @@ class KernelHTTP(IKernelHTTP):
         ----------
         resolved_route : ResolvedRoute
             Resolved route descriptor with handler reference and path params.
+        request : Request
+            Request-local parameters, including middleware changes.
 
         Returns
         -------
@@ -592,24 +629,34 @@ class KernelHTTP(IKernelHTTP):
             If the handler does not return a Response, dict, or msgspec.Struct.
         """
         route = resolved_route.route
+        params = request.routeParams()
         route_id = id(route)
         fn = self.__fn_dispatch.get(route_id)
 
         if fn is not None:
             # Function-based route: invoke directly through the DI container.
-            response = await self.__app.invoke(fn, **resolved_route.params)
+            response = await self.__app.invoke(fn, **params)
         else:
-            # Class-based route: build the controller and call its action method.
-            cls, method = self.__cls_dispatch[route_id]
-            instance = await self.__app.build(cls)
-            response = await self.__app.call(instance, method, **resolved_route.params)
-
-        # Coerce dict and msgspec.Struct return values into JSON responses.
-        if isinstance(response, _JSON_RESPONSE_TYPES):
-            response = JSONResponse(status_code=200, content=response)
+            handler = self.__cls_dispatch.get(route_id)
+            if handler is not None:
+                # Class-based route: build the controller and call its action.
+                cls, method = handler
+                instance = await self.__app.build(cls)
+                response = await self.__app.call(
+                    instance,
+                    method,
+                    **params,
+                )
+            else:
+                # View route: render the template bound at boot time.
+                response = await View.make(self.__view_dispatch[route_id])
 
         if isinstance(response, Response):
             return response
+
+        # Serialize structured handler results as JSON.
+        if isinstance(response, _JSON_RESPONSE_TYPES):
+            return JSONResponse(status_code=200, content=response)
 
         error_msg = "Route handler must return a Response object"
         raise TypeError(error_msg)
@@ -763,9 +810,7 @@ class KernelHTTP(IKernelHTTP):
             request_context[Request] = request  # type: ignore[index]
 
             # Dispatch through the web or API middleware pipeline.
-            if resolved_route.kind == "web":
-                return await self.__webLayer(request, resolved_route)
-            return await self.__requestLayer(request, resolved_route)
+            return await self.__routeLayer(request, resolved_route)
 
         except Exception as e:  # noqa: BLE001
             # Delegate all exceptions to the unified exception handler.

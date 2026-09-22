@@ -1,11 +1,17 @@
 from __future__ import annotations
+
 import inspect
 import re
+from collections.abc import Sequence
+from collections.abc import Set as AbstractSet
 from typing import TYPE_CHECKING
+
 from orionis.http.middleware import BaseMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 # Expected number of elements in a [Controller, method_name] action list.
 _ACTION_LIST_LENGTH: int = 2
@@ -86,7 +92,7 @@ def strip_regex_anchors(pattern: str) -> str:
     return pattern
 
 def flatten_middleware(
-    *middleware: type[BaseMiddleware] | list | tuple | set | frozenset,
+    *middleware: MiddlewareInput,
 ) -> list[type[BaseMiddleware]]:
     """
     Flatten and validate middleware arguments into a plain list.
@@ -95,9 +101,9 @@ def flatten_middleware(
     in a ``list``, ``tuple``, ``set`` or ``frozenset`` (one level of
     nesting), so all of these are equivalent::
 
-        flattenMiddleware(A, B)
-        flattenMiddleware([A, B])
-        flattenMiddleware((A,), B)
+        flatten_middleware(A, B)
+        flatten_middleware([A, B])
+        flatten_middleware((A,), B)
 
     Parameters
     ----------
@@ -119,17 +125,27 @@ def flatten_middleware(
     for entry in middleware:
         items = (
             entry
-            if isinstance(entry, (list, tuple, set, frozenset))
+            if isinstance(entry, (Sequence, AbstractSet))
             else (entry,)
         )
+        validated = []
         for m in items:
             if not isinstance(m, type) or not issubclass(m, BaseMiddleware):
                 error_msg = (
                     "All middleware must be subclasses of BaseMiddleware"
                 )
                 raise TypeError(error_msg)
-            flat.append(m)
+            validated.append(m)
+        # Unordered containers use import names for a repeatable execution order.
+        if isinstance(entry, AbstractSet):
+            validated.sort(key=_middleware_key)
+        flat.extend(validated)
     return flat
+
+
+def _middleware_key(middleware: type[BaseMiddleware]) -> tuple[str, str]:
+    """Return a stable ordering key for middleware supplied in sets."""
+    return middleware.__module__, middleware.__qualname__
 
 def is_valid_handler(action: Callable) -> bool:
     """
@@ -145,20 +161,12 @@ def is_valid_handler(action: Callable) -> bool:
     bool
         ``True`` if the action is a valid handler; ``False`` otherwise.
     """
-    # Reject coroutine functions; they cannot be used as route handlers.
-    if inspect.iscoroutine(action):
-        return False
-
-    # Reject non-callables
-    # only plain functions and invokable classes are valid handlers.
-    if not callable(action):
-        return False
-
-    # Reject plain lambdas; they cannot be used as route handlers.
-    return not (inspect.isfunction(action) and action.__name__ == "<lambda>")
+    return callable(action) and not inspect.iscoroutine(action) and not (
+        inspect.isfunction(action) and action.__name__ == "<lambda>"
+    )
 
 def parse_action(
-    action: Callable | list | type,
+    action: RouteAction | None,
 ) -> tuple[Callable, None] | tuple[type, str]:
     """
     Parse and validate a route action into a normalised tuple.
@@ -195,7 +203,13 @@ def parse_action(
     """
     # 1. Invokable controller: bare class passed directly
     if inspect.isclass(action):
-        if "__call__" not in action.__dict__:
+        handler = next((
+            base.__dict__["__call__"] for base in action.__mro__
+            if "__call__" in base.__dict__
+        ), None)
+        if isinstance(handler, (staticmethod, classmethod)):
+            handler = handler.__func__
+        if not callable(handler) or inspect.isabstract(action):
             error_msg = (
                 f"Class '{action.__name__}' cannot be used as an invokable "
                 "controller because it does not define __call__. "
@@ -205,11 +219,12 @@ def parse_action(
         return action, None
 
     # 2. Plain callable (function, coroutine function, …)
-    if is_valid_handler(action):
+    # Only functions can be restored from a function import descriptor.
+    if inspect.isfunction(action) and is_valid_handler(action):
         return action, None
 
     # 3. [ControllerClass, 'method_name'] list
-    if isinstance(action, list):
+    if isinstance(action, (list, tuple)):
         if len(action) != _ACTION_LIST_LENGTH:
             error_msg = (
                 "Action list must have exactly two elements: "

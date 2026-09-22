@@ -29,14 +29,17 @@ class QueryParams(metaclass=Final):
             keep_blank_values=True,
             strict_parsing=False,
         )
-        # Build a key-to-positions index for O(1) single-value lookups.
-        index: dict[str, list[int]] = {}
-        for i, (k, _) in enumerate(self._items):
-            if k in index:
-                index[k].append(i)
+        # Store single values and collect repeated parameters in order.
+        index: dict[str, str | list[str]] = {}
+        for key, value in self._items:
+            previous = index.get(key)
+            if previous is None:
+                index[key] = value
+            elif isinstance(previous, list):
+                previous.append(value)
             else:
-                index[k] = [i]
-        self._index: dict[str, list[int]] = index
+                index[key] = [previous, value]
+        self._index = index
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """
@@ -54,11 +57,8 @@ class QueryParams(metaclass=Final):
         str | None
             The last value associated with the key, or default if not found.
         """
-        # Use the index for O(1) lookup; last index is the most-recently inserted.
-        indices = self._index.get(key)
-        if indices is None:
-            return default
-        return self._items[indices[-1]][1]
+        value = self._index.get(key, default)
+        return value[-1] if isinstance(value, list) else value
 
     def getAll(self, key: str) -> list[str]:
         """
@@ -79,11 +79,10 @@ class QueryParams(metaclass=Final):
             All values for *key* in the order they appear in the query string.
             Returns an empty list when *key* is absent.
         """
-        # Resolve positions from the index then collect values in insertion order.
-        indices = self._index.get(key)
-        if indices is None:
+        value = self._index.get(key)
+        if value is None:
             return []
-        return [self._items[i][1] for i in indices]
+        return value.copy() if isinstance(value, list) else [value]
 
     def getList(self, key: str) -> list[str]:
         """
@@ -130,7 +129,7 @@ class QueryParams(metaclass=Final):
         bool
             True if the key exists, False otherwise.
         """
-        # O(1) dict membership check via the pre-built index.
+        # Check whether the field name is present in the index.
         return key in self._index
 
     def __getitem__(self, key: str) -> str:
@@ -179,7 +178,7 @@ class QueryParams(metaclass=Final):
         set[str]
             Set of all unique keys.
         """
-        # Build from index keys (unique by construction) instead of scanning _items.
+        # Return the set of indexed parameter names.
         return set(self._index)
 
     def values(self) -> list[str]:

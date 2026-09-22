@@ -1,14 +1,22 @@
 from __future__ import annotations
-from collections import defaultdict, deque
+from collections import deque
+from dataclasses import dataclass, field
 from time import monotonic
+
+@dataclass(slots=True)
+class _RateLimitBucket:
+    """Track accepted timestamps and the time the last one expires."""
+
+    expires_at: float
+    timestamps: deque[float] = field(default_factory=deque)
 
 class MemoryRateLimitStore:
 
-    # Using __slots__ to reduce memory overhead since we expect many instances.
-    __slots__ = ("__storage", "__ticks")
+    __slots__ = ("__keys", "__storage", "__ticks")
 
-    # Trigger a GC pass every this many calls to ``hit``.
-    _GC_INTERVAL: int = 1_000
+    # Inspect a bounded group of keys after each group of request attempts.
+    _GC_INTERVAL: int = 16
+    _GC_BATCH_SIZE: int = 64
 
     def __init__(self) -> None:
         """Initialize an empty rate-limit store.
@@ -17,8 +25,8 @@ class MemoryRateLimitStore:
         -------
         None
         """
-        self.__storage: dict[str, deque[float]] = defaultdict(deque)
-        # Counter that drives periodic removal of empty buckets.
+        self.__storage: dict[str, _RateLimitBucket] = {}
+        self.__keys: deque[str] = deque()
         self.__ticks: int = 0
 
     async def hit( # NOSONAR
@@ -29,8 +37,10 @@ class MemoryRateLimitStore:
     ) -> bool:
         """Record a request attempt and decide whether it is allowed.
 
-        Implements a **sliding-window** algorithm: only timestamps
-        within the last ``window`` seconds are counted.
+        Implements a sliding window over accepted attempts. Inactive keys are
+        reclaimed incrementally during subsequent attempts, including rejected
+        attempts. Each key should use a consistent window. Calls on one event
+        loop run atomically because this method contains no suspension points.
 
         Parameters
         ----------
@@ -48,42 +58,53 @@ class MemoryRateLimitStore:
             ``True`` when the request is within the limit,
             ``False`` when the quota is exceeded.
         """
-        # monotonic() is immune to wall-clock adjustments and slightly
-        # faster than time() for relative comparisons.
-        now: float = monotonic()
-        cutoff: float = now - window
-        bucket: deque[float] = self.__storage[key]
-
-        # Evict timestamps that have fallen outside the window (O(1) each).
-        while bucket and bucket[0] <= cutoff:
-            bucket.popleft()
-
-        count: int = len(bucket)
-        if count >= limit:
-            return False
-
-        bucket.append(now)
-
-        # Lazily remove empty buckets to prevent unbounded memory growth.
+        now = monotonic()
         self.__ticks += 1
         if self.__ticks >= self._GC_INTERVAL:
             self.__ticks = 0
-            self.__gc()
+            self.__gc(now)
 
+        if limit <= 0:
+            return False
+
+        entry = self.__storage.get(key)
+        if entry is None:
+            entry = _RateLimitBucket(now + window)
+            self.__storage[key] = entry
+            self.__keys.append(key)
+        bucket = entry.timestamps
+        cutoff = now - window
+
+        # Discard accepted attempts outside this key's sliding window.
+        while bucket and bucket[0] <= cutoff:
+            bucket.popleft()
+
+        if len(bucket) >= limit:
+            entry.expires_at = bucket[-1] + window
+            return False
+
+        bucket.append(now)
+        entry.expires_at = now + window
         return True
 
-    def __gc(self) -> None:
-        """Evict keys whose buckets have been fully drained.
+    def __gc(self, now: float) -> None:
+        """Inspect the next group of keys and remove expired buckets.
 
-        Called automatically every ``_GC_INTERVAL`` hits; may also be
-        invoked explicitly when an external caller needs to reclaim
-        memory immediately.
+        Parameters
+        ----------
+        now : float
+            Current monotonic timestamp.
 
         Returns
         -------
         None
         """
-        empty_keys = [k for k, v in self.__storage.items() if not v]
-        for k in empty_keys:
-            del self.__storage[k]
+        keys = self.__keys
+        storage = self.__storage
+        for _ in range(min(len(keys), self._GC_BATCH_SIZE)):
+            key = keys.popleft()
+            if storage[key].expires_at <= now:
+                del storage[key]
+            else:
+                keys.append(key)
 

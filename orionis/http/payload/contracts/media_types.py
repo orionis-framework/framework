@@ -13,6 +13,8 @@ class IMediaTypeRegistry(ABC):
     ``BodyParser`` callables and support non-destructive extension.
     """
 
+    __slots__ = ()
+
     # Register or overwrite a parser for the specified media type.
     @abstractmethod
     def register(self, media_type: str, parser: BodyParser) -> None:

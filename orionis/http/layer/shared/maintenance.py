@@ -7,7 +7,8 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 class UnderMaintenanceMiddleware:
-    """Reject every incoming request with 503 while in maintenance mode.
+    """
+    Reject every incoming request with 503 while in maintenance mode.
 
     The response format (HTML or JSON) is selected by inspecting the
     ``Accept`` header of the incoming request via ``adapter.wantsJson()``.

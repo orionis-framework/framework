@@ -22,8 +22,7 @@ class RSGITransportAdapter(TransportAdapter):
 
     # ruff: noqa: ANN401
 
-    # Slots eliminate the per-instance __dict__, replacing hash-based dict
-    # lookups with direct indexed slot access for all hot-path attributes
+    # Store scope data, request state, and resolved fields.
     __slots__ = (
         "__client",
         "__headers",
@@ -53,7 +52,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Resolve lazy fields on first access using the _MISSING sentinel.
         self.__client: Any = _MISSING
         self.__wants_json: Any = _MISSING
-        # Build headers once because they are read frequently.
+        # Parse the request headers.
         self.__headers: Headers = self.__buildHeadersRSGI()
 
     def __getitem__(self, key: str) -> object | None:
@@ -135,9 +134,9 @@ class RSGITransportAdapter(TransportAdapter):
         Headers
             Return parsed headers as lowercase name/value pairs.
         """
-        # Cache scope headers reference to avoid repeated attribute access.
+        # Read the scope header collection.
         scope_headers = self.__scope.headers
-        # Flatten multi-value headers into lowercase key/value tuples.
+        # Flatten multi-value headers into lowercase name/value tuples.
         raw: list[tuple[str, str]] = [
             (str(key).lower(), value)
             for key in scope_headers
@@ -165,10 +164,7 @@ class RSGITransportAdapter(TransportAdapter):
             return None
 
         # Parse host and port, including IPv6 forms with multiple colons.
-        if raw.count(":") > 1:
-            ip, port = raw.rsplit(":", 1)
-        else:
-            ip, port = raw.split(":", 1)
+        ip, port = raw.rsplit(":", 1)
 
         self.__client = ip
         # Expose resolved client data through the state layer.
@@ -190,7 +186,7 @@ class RSGITransportAdapter(TransportAdapter):
         None
             Return ``None`` after updating the cached client value.
         """
-        # Update both override state and the fast-access cached slot.
+        # Update the client address in state and the resolved field.
         self.__overrides["client"] = ip
         self.__client = ip
 
@@ -314,7 +310,7 @@ class RSGITransportAdapter(TransportAdapter):
         dict
             Return base scope fields merged with override values.
         """
-        # Cache scope reference to reduce repeated attribute lookups.
+        # Read the scope fields into a dictionary.
         scope = self.__scope
         base: dict[str, Any] = {
             "proto": scope.proto,

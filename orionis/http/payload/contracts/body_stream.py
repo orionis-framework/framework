@@ -15,6 +15,8 @@ class IBodyStream(ABC):
     times once the body has been fully buffered.
     """
 
+    __slots__ = ()
+
     @property
     @abstractmethod
     def isBuffered(self) -> bool:

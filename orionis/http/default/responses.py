@@ -3,9 +3,9 @@ import platform
 import re
 from pathlib import Path
 from typing import ClassVar
+from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.contracts.directory import IDirectory
 from orionis.foundation.directory import Directory
-from orionis.foundation.contracts.application import IApplication
 from orionis.http.default.contracts.responses import IDefaultResponses
 from orionis.http.enums.status import HTTPStatus
 from orionis.http.request import Request
@@ -64,6 +64,8 @@ class DefaultResponses(IDefaultResponses):
     # ruff: noqa: TC001
 
     _FAVICON_CACHE_CONTROL_AGE: str = "public, max-age=31536000, immutable"
+    _FAVICON_ICO_CONTENT_TYPE: str = "image/x-icon"
+    _ROBOTS_TXT_CONTENT_TYPE: str = "text/plain"
     _ROBOTS_TXT_CACHE_CONTROL_AGE: str = "public, max-age=3600"
     _SITEMAP_XML_CACHE_CONTROL_AGE: str = "public, max-age=600"
     _GENERAL_CACHE_CONTROL: str = "no-cache, no-store, must-revalidate"
@@ -76,22 +78,22 @@ class DefaultResponses(IDefaultResponses):
     _ASSETS_DIR: Path = Path(__file__).parent / "assets"
     _PAGES_DIR: Path = Path(__file__).parent / "pages"
 
-    # Ordered favicon candidates; tuple avoids per-call dict allocation
+    # Favicon candidates in order of preference.
     _FAVICON_CANDIDATES: tuple[tuple[str, str], ...] = (
-        ("favicon.ico", "image/x-icon"),
+        ("favicon.ico", _FAVICON_ICO_CONTENT_TYPE),
         ("favicon.png", "image/png"),
         ("favicon.svg", "image/svg+xml"),
     )
 
     # Lookup table mapping maintenance flag to all health-state constants
-    _HEALTH_STATES: ClassVar[dict[bool, tuple[HTTPStatus, str, str, str, str]]] = {
+    _HEALTH_STATES: ClassVar[dict[bool, tuple[HTTPStatus, str, str, str]]] = {
         False: (
             HTTPStatus.OK, "Online Application", "up",
-            "http_200:json", "state_page_200:html",
+            "state_page_200:html",
         ),
         True: (
             HTTPStatus.SERVICE_UNAVAILABLE, "Application in Maintenance", "down",
-            "http_503:json", "state_page_503:html",
+            "state_page_503:html",
         ),
     }
 
@@ -119,11 +121,11 @@ class DefaultResponses(IDefaultResponses):
         self.__app: IApplication = app
         self.__directory: IDirectory = directory
 
-        # Cache frequently accessed configuration values
+        # Store the application name and locale.
         self.__app_name: str = self.__app.config("app.name")
         self.__app_locale: str = self.__app.config("app.locale")
 
-        # Initialize memory cache for static asset responses
+        # Initialize storage for asset paths and rendered page bodies.
         self.__memory_cache: dict[str, object] = {}
 
     def __getitem__(self, key: str) -> object | None:
@@ -211,11 +213,18 @@ class DefaultResponses(IDefaultResponses):
             A FileResponse containing the favicon if found, otherwise a
             Response with status 404.
         """
-        # Return the cached favicon response on subsequent requests
+        # Build a response from the selected favicon path.
         cache = self.__memory_cache
         cached = cache.get("favicon")
         if cached is not None:
-            return cached  # type: ignore[return-value]
+            path, content_type = cached
+            return FileResponse(
+                path=path,
+                headers={
+                    "content-type": content_type,
+                    "cache-control": self._FAVICON_CACHE_CONTROL_AGE,
+                },
+            )
 
         public_storage: Path = self.__directory.storagePublic()
         cc_age = self._FAVICON_CACHE_CONTROL_AGE
@@ -228,7 +237,7 @@ class DefaultResponses(IDefaultResponses):
                     path=favicon_path,
                     headers={"content-type": content_type, "cache-control": cc_age},
                 )
-                cache["favicon"] = response
+                cache["favicon"] = (favicon_path, content_type)
                 return response
 
         # Fall back to the internal framework favicon asset
@@ -236,9 +245,12 @@ class DefaultResponses(IDefaultResponses):
         if fallback_path.exists():
             response = FileResponse(
                 path=fallback_path,
-                headers={"content-type": "image/x-icon", "cache-control": cc_age},
+                headers={
+                    "content-type": self._FAVICON_ICO_CONTENT_TYPE,
+                    "cache-control": cc_age,
+                },
             )
-            cache["favicon"] = response
+            cache["favicon"] = (fallback_path, self._FAVICON_ICO_CONTENT_TYPE)
             return response
 
         # Return 404 if no favicon is found anywhere
@@ -261,11 +273,17 @@ class DefaultResponses(IDefaultResponses):
         FileResponse or Response
             FileResponse with robots.txt if found, otherwise Response with 404.
         """
-        # Return the cached robots.txt response on subsequent requests
+        # Build a response from the selected robots.txt path.
         cache = self.__memory_cache
         cached = cache.get("robots_txt")
         if cached is not None:
-            return cached  # type: ignore[return-value]
+            return FileResponse(
+                path=cached,
+                headers={
+                    "content-type": self._ROBOTS_TXT_CONTENT_TYPE,
+                    "cache-control": self._ROBOTS_TXT_CACHE_CONTROL_AGE,
+                },
+            )
 
         public_storage: Path = self.__directory.storagePublic()
         robots_path = public_storage / "robots.txt"
@@ -274,11 +292,11 @@ class DefaultResponses(IDefaultResponses):
             response = FileResponse(
                 path=robots_path,
                 headers={
-                    "content-type": "text/plain",
+                    "content-type": self._ROBOTS_TXT_CONTENT_TYPE,
                     "cache-control": self._ROBOTS_TXT_CACHE_CONTROL_AGE,
                 },
             )
-            cache["robots_txt"] = response
+            cache["robots_txt"] = robots_path
             return response
 
         # Fall back to the internal framework robots.txt asset
@@ -287,11 +305,11 @@ class DefaultResponses(IDefaultResponses):
             response = FileResponse(
                 path=fallback_path,
                 headers={
-                    "content-type": "text/plain",
+                    "content-type": self._ROBOTS_TXT_CONTENT_TYPE,
                     "cache-control": self._ROBOTS_TXT_CACHE_CONTROL_AGE,
                 },
             )
-            cache["robots_txt"] = response
+            cache["robots_txt"] = fallback_path
             return response
 
         # Return 404 if robots.txt is not found anywhere
@@ -314,11 +332,17 @@ class DefaultResponses(IDefaultResponses):
         FileResponse or Response
             FileResponse with sitemap.xml if found, otherwise Response with status 404.
         """
-        # Return the cached sitemap.xml response on subsequent requests
+        # Build a response from the selected sitemap.xml path.
         cache = self.__memory_cache
         cached = cache.get("sitemap_xml")
         if cached is not None:
-            return cached  # type: ignore[return-value]
+            return FileResponse(
+                path=cached,
+                headers={
+                    "content-type": "application/xml",
+                    "cache-control": self._SITEMAP_XML_CACHE_CONTROL_AGE,
+                },
+            )
 
         public_storage: Path = self.__directory.storagePublic()
         sitemap_path = public_storage / "sitemap.xml"
@@ -331,7 +355,7 @@ class DefaultResponses(IDefaultResponses):
                     "cache-control": self._SITEMAP_XML_CACHE_CONTROL_AGE,
                 },
             )
-            cache["sitemap_xml"] = response
+            cache["sitemap_xml"] = sitemap_path
             return response
 
         # Return 404 if sitemap.xml is not found
@@ -360,30 +384,29 @@ class DefaultResponses(IDefaultResponses):
         """
         config_maintenance: bool = self.__app.config("app.maintenance")
 
-        # Resolve all state-dependent constants with a single table lookup
-        app_state, state_label, template_page, key_json, key_html = (
+        # Select constants for the current maintenance state.
+        app_state, state_label, template_page, key_html = (
             self._HEALTH_STATES[config_maintenance]
         )
 
         cache = self.__memory_cache
 
         if request.wantsJson():
-            # Return cached JSON health response for this maintenance state
-            cached = cache.get(key_json)
-            if cached is not None:
-                return cached  # type: ignore[return-value]
-            response = JSONResponse(
+            # Render the current health state into a response.
+            return JSONResponse(
                 content={"message": state_label},
                 status_code=app_state,
                 headers={"cache-control": self._GENERAL_CACHE_CONTROL},
             )
-            cache[key_json] = response
-            return response
 
-        # Build and cache the HTML state page for the current maintenance state
+        # Render the HTML state page and retain its encoded body.
         cached = cache.get(key_html)
         if cached is not None:
-            return cached  # type: ignore[return-value]
+            return HTMLResponse(
+                content=cached,
+                status_code=app_state,
+                headers={"cache-control": self._GENERAL_CACHE_CONTROL},
+            )
 
         state_page_path = self._PAGES_DIR / f"{template_page}.html"
         with state_page_path.open() as f:
@@ -397,7 +420,7 @@ class DefaultResponses(IDefaultResponses):
             status_code=app_state,
             headers={"cache-control": self._GENERAL_CACHE_CONTROL},
         )
-        cache[key_html] = response
+        cache[key_html] = response.getBody()
         return response
 
     def error(
@@ -435,11 +458,11 @@ class DefaultResponses(IDefaultResponses):
         # Ensure cache-control header is always present
         if headers is None:
             headers = {"cache-control": self._GENERAL_CACHE_CONTROL}
-        elif "cache-control" not in headers:
-            headers["cache-control"] = self._GENERAL_CACHE_CONTROL
+        elif not any(key.lower() == "cache-control" for key in headers):
+            headers = {**headers, "cache-control": self._GENERAL_CACHE_CONTROL}
 
         if expects_json:
-            # Build JSON payload, reusing the caller dict for dict content
+            # Use a message field for scalar JSON content.
             data: dict = content if isinstance(content, dict) else {"message": content}
             return JSONResponse(content=data, status_code=status_code, headers=headers)
 
@@ -460,17 +483,20 @@ class DefaultResponses(IDefaultResponses):
             plan = _compile_placeholders(template, _ERROR_PLACEHOLDER_RE)
             cache["error_page_plan"] = plan
 
-        # Compute status string once to eliminate repeated int-to-str conversions
+        # Resolve the status digits and human-readable label.
         status_str = str(status_code)
         message: str | None = _STATUS_MESSAGES.get(status_code)
         if message is None:
             message = HTTPStatus(status_code).name.replace("_", " ").title()
             _STATUS_MESSAGES[status_code] = message
-        description: str = (
-            content.get("message", json.dumps(content))
-            if isinstance(content, dict)
-            else content
-        )
+        if isinstance(content, dict):
+            description = (
+                str(content["message"])
+                if "message" in content
+                else json.dumps(content)
+            )
+        else:
+            description = content
 
         values: dict[str, str] = {
             "0": status_str[0],

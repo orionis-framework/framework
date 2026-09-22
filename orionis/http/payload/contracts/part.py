@@ -13,8 +13,10 @@ class IMultipartPart(ABC):
     the part into either a decoded string or an ``UploadedFile`` handle.
     """
 
+    __slots__ = ()
+
     @abstractmethod
-    def write(self, chunk: bytes) -> None:
+    def write(self, chunk: bytes | bytearray | memoryview) -> None:
         """
         Append *chunk* to this part's data buffer.
 

@@ -1,11 +1,17 @@
 from __future__ import annotations
+
 import importlib
-from orionis.http.routes.enums.route_types import RouteType
-from orionis.http.routes.entities.compiled_route import CompiledRoute
+from pkgutil import resolve_name
+
 from orionis.http.routes.contracts.route_cache import IRouteCache
+from orionis.http.routes.entities.compiled_route import CompiledRoute
+from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.route_compiler import RouteCompiler
 
+
 class RouteCache(IRouteCache):
+
+    VERSION = 2
 
     def toCache(
         self,
@@ -29,6 +35,7 @@ class RouteCache(IRouteCache):
             ``FileBasedCache.save()``.
         """
         return {
+            "version": self.VERSION,
             "fallback": self.__serializeFallback(fallback),
             "routes": {
                 method: {
@@ -64,16 +71,17 @@ class RouteCache(IRouteCache):
         """
         fallback = self.__deserializeFallback(cached.get("fallback"))
         routes: dict[str, dict] = {}
+        resolved_classes: dict[str, type] = {}
 
         for method, bucket in cached.get("routes", {}).items():
             routes[method] = {"static": {}, "dynamic": []}
             for path, route_data in bucket["static"].items():
                 routes[method]["static"][path] = (
-                    self.__deserializeCompiledRoute(route_data)
+                    self.__deserializeCompiledRoute(route_data, resolved_classes)
                 )
             for route_data in bucket["dynamic"]:
                 routes[method]["dynamic"].append(
-                    self.__deserializeCompiledRoute(route_data),
+                    self.__deserializeCompiledRoute(route_data, resolved_classes),
                 )
 
         return routes, fallback
@@ -122,7 +130,10 @@ class RouteCache(IRouteCache):
         }
 
     @staticmethod
-    def __deserializeCompiledRoute(route_data: dict) -> CompiledRoute:
+    def __deserializeCompiledRoute(
+        route_data: dict,
+        resolved_classes: dict[str, type],
+    ) -> CompiledRoute:
         """Rebuild a ``CompiledRoute`` from a cache dict.
 
         ``regex`` and ``converters`` are recomputed via
@@ -133,6 +144,8 @@ class RouteCache(IRouteCache):
         ----------
         route_data : dict
             Dict produced by :meth:`__serializeCompiledRoute`.
+        resolved_classes : dict[str, type]
+            Class references shared across this cache load.
 
         Returns
         -------
@@ -152,14 +165,16 @@ class RouteCache(IRouteCache):
             kind=route_data.get("kind", "web"),
             converters=converters,
             middleware=[
-                RouteCache.__resolveClass(s) for s in route_data["middleware"]
+                RouteCache.__resolveClass(s, resolved_classes)
+                for s in route_data["middleware"]
             ],
             without_middleware={
-                RouteCache.__resolveClass(s)
+                RouteCache.__resolveClass(s, resolved_classes)
                 for s in route_data["without_middleware"]
             },
             compiled_middlewares=tuple(
-                RouteCache.__resolveClass(s) for s in route_data["compiled_middlewares"]
+                RouteCache.__resolveClass(s, resolved_classes)
+                for s in route_data["compiled_middlewares"]
             ),
         )
 
@@ -225,14 +240,17 @@ class RouteCache(IRouteCache):
             return (None, func)
         if route_type == RouteType.INVOKABLE:
             cls_ref = RouteCache.__resolveClass(data["class"])
-            return (cls_ref, None)
+            return (cls_ref, "__call__")
         cls_ref = RouteCache.__resolveClass(data["class"])
         return (cls_ref, data["method"])
 
     # ── Shared utility ────────────────────────────────────────────────────────
 
     @staticmethod
-    def __resolveClass(dotted_path: str) -> type:
+    def __resolveClass(
+        dotted_path: str,
+        resolved_classes: dict[str, type] | None = None,
+    ) -> type:
         """Import and return a class given its fully-qualified dotted path.
 
         Parameters
@@ -240,15 +258,21 @@ class RouteCache(IRouteCache):
         dotted_path : str
             Fully-qualified class path,
             e.g. ``'app.http.middleware.Auth'``.
+        resolved_classes : dict[str, type] | None, optional
+            Memoized class references for one cache load.
 
         Returns
         -------
         type
             The imported class object.
         """
-        module_path, _, class_name = dotted_path.rpartition(".")
-        module = importlib.import_module(module_path)
-        return getattr(module, class_name)
+        if resolved_classes is None:
+            return resolve_name(dotted_path)
+        resolved = resolved_classes.get(dotted_path)
+        if resolved is None:
+            resolved = resolve_name(dotted_path)
+            resolved_classes[dotted_path] = resolved
+        return resolved
 
     @staticmethod
     def __resolveQualname(

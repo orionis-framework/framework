@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
 from orionis.http.responses import RedirectResponse
 
 if TYPE_CHECKING:
@@ -7,6 +8,68 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
     from orionis.schemas.exceptions.validation import ValidationException
+
+_DEFAULT_PORTS: dict[str, int] = {"http": 80, "https": 443}
+_FIRST_PRINTABLE_CODE: int = 32
+_DELETE_CODE: int = 127
+
+def _url_origin(url: str) -> tuple[str, str | None, int | None]:
+    """
+    Extract the normalized scheme, hostname, and effective port of a URL.
+
+    Parameters
+    ----------
+    url : str
+        Absolute URL whose origin is compared with the application origin.
+
+    Returns
+    -------
+    tuple[str, str | None, int | None]
+        Scheme, lowercase hostname, and explicit or default port.
+
+    Raises
+    ------
+    ValueError
+        If the authority or port is malformed or contains user credentials.
+    """
+    parsed = urlsplit(url)
+    if parsed.username is not None:
+        error_msg = "Redirect references cannot contain user credentials."
+        raise ValueError(error_msg)
+    port = parsed.port
+    return (
+        parsed.scheme,
+        parsed.hostname,
+        _DEFAULT_PORTS.get(parsed.scheme) if port is None else port,
+    )
+
+def _is_local_reference(reference: str, base_url: str) -> bool:
+    """
+    Accept a local path or an absolute reference with the application origin.
+
+    Parameters
+    ----------
+    reference : str
+        Untrusted referrer supplied by the client.
+    base_url : str
+        Base URL of the current application request.
+
+    Returns
+    -------
+    bool
+        Whether the referrer is suitable for a same-origin redirect.
+    """
+    if "\\" in reference or any(
+        ord(char) < _FIRST_PRINTABLE_CODE or ord(char) == _DELETE_CODE
+        for char in reference
+    ):
+        return False
+    if reference.startswith("/"):
+        return not reference.startswith("//")
+    try:
+        return _url_origin(reference) == _url_origin(base_url)
+    except ValueError:
+        return False
 
 async def validation_response(
     exc: ValidationException,
@@ -79,13 +142,8 @@ def previous_url(request: Request) -> str:
             return previous
 
     referer = request.headers.get("referer")
-    if referer:
-
-        # Only same-origin referrers are trusted, avoiding open redirects.
-        if referer.startswith(request.baseUrl):
-            return referer
-        if referer.startswith("/") and not referer.startswith("//"):
-            return referer
+    if referer and _is_local_reference(referer, request.baseUrl):
+        return referer
 
     # Forms usually post to the page that renders them.
     return request.url

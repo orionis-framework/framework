@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import re
 import tempfile
 from contextlib import suppress
 from pathlib import Path
 from typing import TYPE_CHECKING
+
 from orionis.http.payload.contracts.uploaded_file import IUploadedFile
 
 if TYPE_CHECKING:
@@ -36,6 +38,8 @@ class UploadedFile(IUploadedFile):
     __slots__ = (
         "_extension",
         "_file",
+        "_memory_threshold",
+        "_rolled",
         "_size",
         "content_type",
         "filename",
@@ -72,11 +76,13 @@ class UploadedFile(IUploadedFile):
         self.filename = self._sanitizeFilename(filename)
         self.content_type = content_type
         self._size = 0
+        self._memory_threshold = memory_threshold
+        self._rolled = False
         # SpooledTemporaryFile spills to disk once memory_threshold is exceeded
         self._file = tempfile.SpooledTemporaryFile(  # noqa: SIM115
             max_size=memory_threshold,
         )
-        # Compute extension once at init to avoid repeated Path object creation
+        # Extract and normalize the sanitized filename extension.
         dot = self.filename.rfind(".")
         self._extension: str = self.filename[dot:].lower() if dot > 0 else ""
 
@@ -100,7 +106,7 @@ class UploadedFile(IUploadedFile):
         str
             Sanitized filename safe for local persistence.
         """
-        # Normalize separators and extract basename without a Path allocation
+        # Normalize path separators and extract the filename.
         name = filename.replace("\\", "/").rsplit("/", 1)[-1]
         # Remove characters forbidden on POSIX and Windows filesystems
         name = _UNSAFE_FILENAME_RE.sub("", name)
@@ -108,7 +114,27 @@ class UploadedFile(IUploadedFile):
         name = _DOTFILE_RE.sub("", name)
         return name or "upload"
 
-    def write(self, chunk: bytes) -> None:
+    def requiresDiskWrite(self, size: int = 0) -> bool:
+        """
+        Determine whether the next write spills to the backing disk file.
+
+        Parameters
+        ----------
+        size : int, optional
+            Number of bytes that would be written in the next chunk.
+
+        Returns
+        -------
+        bool
+            ``True`` when the buffer is already rolled over or the next write
+            would exceed the in-memory threshold.
+        """
+        return self._rolled or bool(
+            self._memory_threshold
+            and self._size + size > self._memory_threshold,
+        )
+
+    def write(self, chunk: bytes | bytearray | memoryview) -> None:
         """
         Append *chunk* to the file buffer.
 
@@ -124,9 +150,11 @@ class UploadedFile(IUploadedFile):
         -------
         None
         """
-        # Track cumulative size before writing to the spooled buffer
-        self._size += len(chunk)
+        # Track whether this write uses the backing disk file.
+        size = len(chunk)
+        self._rolled = self.requiresDiskWrite(size)
         self._file.write(chunk)
+        self._size += size
 
     @property
     def size(self) -> int:
@@ -212,6 +240,9 @@ class UploadedFile(IUploadedFile):
         # Seek, truncate, then write to fully replace the buffered content
         self._file.seek(0)
         self._file.truncate(0)
+        self._rolled = self._rolled or bool(
+            self._memory_threshold and len(data) > self._memory_threshold,
+        )
         self._file.write(data)
         self._size = len(data)
 

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qsl
-from defusedxml.ElementTree import fromstring as _xml_fromstring
 import msgspec.json as _msgspec_json
 import msgspec.msgpack as _msgspec_msgpack
+from defusedxml.ElementTree import fromstring as _xml_fromstring
 
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element as XMLElement
@@ -24,7 +24,7 @@ def parse_content_type(header: str) -> tuple[str, dict[str, str]]:
         ``(media_type, params)`` where *media_type* is lowercase and
         *params* maps lowercase parameter names to unquoted values.
     """
-    # Fast path: avoid split allocation when no parameters are present.
+    # Handle a media type without parameters.
     sc = header.find(";")
     if sc == -1:
         return header.strip().lower(), {}
@@ -58,7 +58,7 @@ def parse_json(raw: bytes) -> object:
     msgspec.DecodeError
         If *raw* is not valid JSON.
     """
-    # Delegate to msgspec for high-performance, zero-copy JSON decoding.
+    # Decode the JSON bytes into a Python value.
     return _msgspec_json.decode(raw)
 
 def parse_msgpack(raw: bytes) -> object:
@@ -80,7 +80,7 @@ def parse_msgpack(raw: bytes) -> object:
     msgspec.DecodeError
         If *raw* is not valid MessagePack.
     """
-    # Delegate to msgspec for high-performance MessagePack decoding.
+    # Decode the MessagePack bytes into a Python value.
     return _msgspec_msgpack.decode(raw)
 
 def parse_urlencoded(raw: bytes) -> dict[str, str]:
@@ -188,5 +188,5 @@ def parse_binary(raw: bytes) -> bytes:
     bytes
         The same bytes object, unmodified.
     """
-    # Pass-through for raw binary content; no copy or allocation is made.
+    # Return the original binary payload.
     return raw

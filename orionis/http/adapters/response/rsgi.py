@@ -1,12 +1,17 @@
 from typing import TYPE_CHECKING
+
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
+from orionis.http.adapters.response.ranges import parse_range
 from orionis.http.responses import FileResponse, Response
 
 if TYPE_CHECKING:
     from granian.rsgi import HTTPProtocol
+
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class RSGIResponseAdapter(ResponseAdapter):
+
+    __slots__ = ()
 
     async def send(
         self,
@@ -37,8 +42,8 @@ class RSGIResponseAdapter(ResponseAdapter):
         # Extract the HTTP status code.
         status = response.getStatusCode()
 
-        # Convert raw bytes headers to (key, value) string tuples.
-        headers: list[tuple[str, str]] = self.__convertHeaders(response)
+        # Read response headers as name/value string tuples.
+        headers: list[tuple[str, str]] = response.getStringHeaders()
 
         # HEAD requests must receive an empty body.
         if adapter.method() == "HEAD":
@@ -51,12 +56,19 @@ class RSGIResponseAdapter(ResponseAdapter):
         if isinstance(response, FileResponse):
             file_path: str = str(response.getPath())
             file_size: int = response.getFileSize()
-            range_values: tuple[int, int] | None = self.__parseRange(
-                adapter, file_size,
+            range_values: tuple[int, int] | None = parse_range(
+                adapter.headers().get("range"), file_size,
             )
 
-            if range_values:
+            if range_values is not None:
                 start, end = range_values
+                headers = [
+                    pair for pair in headers
+                    if pair[0] not in {
+                        "content-length", "content-range", "accept-ranges",
+                    }
+                ]
+                headers.append(("content-length", str(end - start)))
                 headers.append(
                     ("content-range", f"bytes {start}-{end-1}/{file_size}"),
                 )
@@ -78,8 +90,14 @@ class RSGIResponseAdapter(ResponseAdapter):
         if response.hasStream():
             transport = protocol.response_stream(status, headers)
 
-            async for chunk in response.getStream():
-                await transport.send_bytes(chunk)
+            iterator = aiter(response.getStream())
+            try:
+                async for chunk in iterator:
+                    await transport.send_bytes(chunk)
+            finally:
+                close = getattr(iterator, "aclose", None)
+                if close is not None:
+                    await close()
 
             await response.runBackground()
             return
@@ -124,72 +142,3 @@ class RSGIResponseAdapter(ResponseAdapter):
             headers.append(("content-length", str(response.getFileSize())))
         elif not response.hasStream():
             headers.append(("content-length", str(len(response.getBody() or b""))))
-
-    def __convertHeaders(
-        self,
-        response: Response,
-    ) -> list[tuple[str, str]]:
-        """
-        Convert raw response headers to a list of string tuples.
-
-        Parameters
-        ----------
-        response : Response
-            Response object containing raw bytes headers.
-
-        Returns
-        -------
-        list of tuple of str
-            Headers represented as (key, value) string pairs.
-        """
-        # Build string headers directly from the internal dict, bypassing encode/decode.
-        return response.getStringHeaders()
-
-    def __parseRange(
-        self,
-        adapter: TransportAdapter,
-        file_size: int,
-    ) -> tuple[int, int] | None:
-        """
-        Parse the Range header from the incoming request.
-
-        Parameters
-        ----------
-        adapter : TransportAdapter
-            Transport adapter providing request headers.
-        file_size : int
-            Total size of the file in bytes.
-
-        Returns
-        -------
-        tuple of int or None
-            A (start, end) byte range if the header is valid,
-            otherwise None.
-        """
-        range_header: str | None = adapter.headers().get("range")
-        if not range_header:
-            return None
-
-        # Only the "bytes" range unit is supported per RFC 7233.
-        if not range_header.startswith("bytes="):
-            return None
-
-        try:
-            # Parse the range start and end from the "bytes=N-M" format.
-            start_str, end_str = range_header[6:].split("-", 1)
-
-            start: int = int(start_str) if start_str else 0
-            end: int = int(end_str) + 1 if end_str else file_size
-
-            # Clamp range boundaries to valid file bounds.
-            start = max(0, start)
-            end = min(end, file_size)
-
-            if start >= end:
-                return None
-
-            return start, end
-
-        except ValueError:
-            # Return None for malformed Range header values.
-            return None

@@ -2,12 +2,13 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
+from orionis.http.adapters.response.files import complete_file_read, open_file
+from orionis.http.adapters.response.ranges import parse_range
 from orionis.http.responses import FileResponse, Response
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Awaitable, Callable
     from pathlib import Path
-    from typing import ClassVar
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class ASGIResponseAdapter(ResponseAdapter):
@@ -15,12 +16,7 @@ class ASGIResponseAdapter(ResponseAdapter):
     RESPONSE_START = "http.response.start"
     RESPONSE_BODY = "http.response.body"
 
-    # Reusable event dict for the terminal empty body message sent at stream end.
-    _FINAL_BODY: ClassVar[dict[str, object]] = {
-        "type": "http.response.body",
-        "body": b"",
-        "more_body": False,
-    }
+    __slots__ = ()
 
     async def send(
         self,
@@ -56,7 +52,7 @@ class ASGIResponseAdapter(ResponseAdapter):
         status: int = response.getStatusCode()
         method: str = adapter.method()
 
-        # Build the raw headers list; extended in-place for partial content responses.
+        # Encode the response headers for ASGI messages.
         headers: list[tuple[bytes, bytes]] = response.getRawHeaders()
 
         # HEAD requests must receive an empty body.
@@ -67,71 +63,62 @@ class ASGIResponseAdapter(ResponseAdapter):
                 "status": status,
                 "headers": headers,
             })
-            await send(self._FINAL_BODY)
+            await send({
+                "type": self.RESPONSE_BODY,
+                "body": b"",
+                "more_body": False,
+            })
             await response.runBackground()
             return
 
-        # Handle FileResponse with optional byte-range support.
+        # Select the requested file interval or the response stream.
+        stream = response.getStream()
         if isinstance(response, FileResponse):
-            file_size: int = response.getFileSize()
-            range_values: tuple[int, int] | None = self.__parseRange(
-                adapter, file_size,
-            )
-
-            if range_values:
+            file_size = response.getFileSize()
+            range_values = parse_range(adapter.headers().get("range"), file_size)
+            if range_values is not None:
                 start, end = range_values
-                # Extend the existing headers list with byte-encoded range fields.
-                headers.append((
-                    b"content-range",
-                    f"bytes {start}-{end - 1}/{file_size}".encode("latin-1"),
+                headers = [
+                    pair for pair in headers
+                    if pair[0] not in {
+                        b"content-length", b"content-range", b"accept-ranges",
+                    }
+                ]
+                headers.extend((
+                    (b"content-length", str(end - start).encode("ascii")),
+                    (
+                        b"content-range",
+                        f"bytes {start}-{end - 1}/{file_size}".encode("ascii"),
+                    ),
+                    (b"accept-ranges", b"bytes"),
                 ))
-                headers.append((b"accept-ranges", b"bytes"))
-                await send({
-                    "type": self.RESPONSE_START,
-                    "status": 206,
-                    "headers": headers,
-                })
-                async for chunk in self.__fileRangeIterator(
-                    response.getPath(), start, end,
-                ):
-                    await send({
-                        "type": self.RESPONSE_BODY,
-                        "body": chunk,
-                        "more_body": True,
-                    })
-            else:
-                await send({
-                    "type": self.RESPONSE_START,
-                    "status": status,
-                    "headers": headers,
-                })
-                async for chunk in response.getStream():
-                    await send({
-                        "type": self.RESPONSE_BODY,
-                        "body": chunk,
-                        "more_body": True,
-                    })
+                status = 206
+                stream = self.__fileRangeIterator(response.getPath(), start, end)
 
-            await send(self._FINAL_BODY)
-            await response.runBackground()
-            return
-
-        # Stream the response body chunk by chunk when available.
-        if response.hasStream():
+        # Send the selected stream one chunk at a time.
+        if stream is not None:
             await send({
                 "type": self.RESPONSE_START,
                 "status": status,
                 "headers": headers,
             })
-
-            async for chunk in response.getStream():
-                await send({
-                    "type": self.RESPONSE_BODY,
-                    "body": chunk,
-                    "more_body": True,
-                })
-
-            await send(self._FINAL_BODY)
+            iterator = aiter(stream)
+            try:
+                async for chunk in iterator:
+                    await send({
+                        "type": self.RESPONSE_BODY,
+                        "body": chunk,
+                        "more_body": True,
+                    })
+            finally:
+                close = getattr(iterator, "aclose", None)
+                if close is not None:
+                    await close()
+            await send({
+                "type": self.RESPONSE_BODY,
+                "body": b"",
+                "more_body": False,
+            })
             await response.runBackground()
             return
 
@@ -200,70 +187,16 @@ class ASGIResponseAdapter(ResponseAdapter):
         loop = asyncio.get_running_loop()
         remaining = end - start
 
-        def _open_and_seek() -> object:
-            f = path.open("rb")
-            f.seek(start)
-            return f
-
-        file = await loop.run_in_executor(None, _open_and_seek)
+        executor = loop.run_in_executor
+        file = await open_file(path, start)
         try:
+            read = file.read
             while remaining > 0:
                 to_read = min(chunk_size, remaining)
-                chunk: bytes = await loop.run_in_executor(
-                    None, file.read, to_read,
-                )
+                chunk = await complete_file_read(executor(None, read, to_read))
                 if not chunk:
                     break
                 remaining -= len(chunk)
                 yield chunk
         finally:
-            await loop.run_in_executor(None, file.close)
-
-    def __parseRange(
-        self,
-        adapter: TransportAdapter,
-        file_size: int,
-    ) -> tuple[int, int] | None:
-        """
-        Parse the Range header from the incoming request.
-
-        Parameters
-        ----------
-        adapter : TransportAdapter
-            Transport adapter providing request headers.
-        file_size : int
-            Total size of the file in bytes.
-
-        Returns
-        -------
-        tuple of int or None
-            A (start, end) byte range if the header is valid,
-            otherwise None.
-        """
-        range_header: str | None = adapter.headers().get("range")
-        if not range_header:
-            return None
-
-        # Only the "bytes" range unit is supported per RFC 7233.
-        if not range_header.startswith("bytes="):
-            return None
-
-        try:
-            # Parse the range start and end from the "bytes=N-M" format.
-            start_str, end_str = range_header[6:].split("-", 1)
-
-            start: int = int(start_str) if start_str else 0
-            end: int = int(end_str) + 1 if end_str else file_size
-
-            # Clamp range boundaries to valid file bounds.
-            start = max(0, start)
-            end = min(end, file_size)
-
-            if start >= end:
-                return None
-
-            return start, end
-
-        except ValueError:
-            # Return None for malformed Range header values.
-            return None
+            await executor(None, file.close)

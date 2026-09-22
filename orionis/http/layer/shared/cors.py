@@ -282,18 +282,17 @@ class CORSMiddleware:
         if not origin:
             return None
 
-        # Origin not allowed.
-        if not self.__isAllowedOrigin(origin):
-            return None
-
-        # Not a preflight.
+        # Only preflight requests produce an early response.
         if not self.__isPreflight(
             adapter.method() or "",
             headers,
         ):
             return None
 
-        # Build preflight response
+        if not self.__isAllowedOrigin(origin):
+            return None
+
+        # Build the preflight response for the permitted origin.
         response = Response(status_code=204)
 
         # Origin

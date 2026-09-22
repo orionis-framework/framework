@@ -1,20 +1,59 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.http.middleware import BaseMiddleware
-    from orionis.http.routes.fluent import FluentRoute
+    from collections.abc import Sequence
 
+    from orionis.http.routes.fluent import FluentRoute
+    from orionis.http.routes.group import RouteGroup
+    from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 class IRouter(ABC):
+
+    @abstractmethod
+    def auth(self) -> None:
+        """Register the built-in web login, registration and logout routes.
+
+        Returns
+        -------
+        None
+            Routes are registered on this router.
+
+        Raises
+        ------
+        ValueError
+            If registration is attempted outside the web route context.
+        """
+
+    @abstractmethod
+    def view(
+        self,
+        path: str,
+        view: str,
+    ) -> FluentRoute:
+        """
+        Register a GET route that renders a template with no controller.
+
+        Parameters
+        ----------
+        path : str
+            URL path for the route.
+        view : str
+            Template name in dot notation (e.g. ``'welcome'``)
+
+        Returns
+        -------
+        FluentRoute
+            The registered FluentRoute instance.
+        """
 
     @abstractmethod
     def post(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a POST route.
@@ -23,7 +62,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -37,7 +76,7 @@ class IRouter(ABC):
     def query(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a QUERY route.
@@ -46,7 +85,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -60,7 +99,7 @@ class IRouter(ABC):
     def get(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a GET route.
@@ -69,7 +108,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -83,7 +122,7 @@ class IRouter(ABC):
     def put(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a PUT route.
@@ -92,7 +131,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -106,7 +145,7 @@ class IRouter(ABC):
     def delete(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a DELETE route.
@@ -115,7 +154,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -129,7 +168,7 @@ class IRouter(ABC):
     def patch(
         self,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute:
         """
         Register a PATCH route.
@@ -138,7 +177,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -151,17 +190,17 @@ class IRouter(ABC):
     @abstractmethod
     def fallback(
         self,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> None:
         """
-        Register the fallback handler for unmatched routes (HTTP 404/405).
+        Register the fallback handler for unmatched routes (HTTP 404).
 
         Only one fallback may be registered; a second call raises
         ``FallbackRouteAlreadyRegisteredException``.
 
         Parameters
         ----------
-        action : Callable | list | type | None, optional
+        action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
 
@@ -181,12 +220,10 @@ class IRouter(ABC):
         self,
         *,
         prefix: str | None = None,
-        middleware: type[BaseMiddleware] | list | tuple | set | None = None,
-        without_middleware: (
-            type[BaseMiddleware] | list | tuple | set | None
-        ) = None,
-        routes: list[FluentRoute] | None = None,
-    ) -> None:
+        middleware: MiddlewareInput | None = None,
+        without_middleware: MiddlewareInput | None = None,
+        routes: Sequence[FluentRoute | RouteGroup] | None = None,
+    ) -> RouteGroup:
         """
         Register a group of routes with a shared prefix and middleware.
 
@@ -194,19 +231,19 @@ class IRouter(ABC):
         ----------
         prefix : str | None, optional
             URL prefix prepended to every route path in the group.
-        middleware : type[BaseMiddleware] | list | tuple | set | None, optional
+        middleware : MiddlewareInput | None, optional
             Middleware classes to attach to every route in the group.
             Accepts a single class or a container of classes.
-        without_middleware : type[BaseMiddleware] | list | tuple | set | None, optional
+        without_middleware : MiddlewareInput | None, optional
             Middleware classes to exclude from every route in the group.
             Accepts a single class or a container of classes.
-        routes : list[FluentRoute] | None, optional
-            FluentRoute instances to include in the group.
+        routes : Sequence[FluentRoute | RouteGroup] | None, optional
+            Routes or nested groups to include.
 
         Returns
         -------
-        None
-            Routes are mutated and registered; no value is returned.
+        RouteGroup
+            Flattened membership for composition by another group.
 
         Raises
         ------
@@ -218,7 +255,7 @@ class IRouter(ABC):
             If any entry in *middleware* or *without_middleware* is not
             a ``BaseMiddleware`` subclass.
         TypeError
-            If any entry in *routes* is not a ``FluentRoute`` instance.
+            If membership contains neither routes nor groups.
         """
 
     @abstractmethod

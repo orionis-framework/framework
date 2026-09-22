@@ -26,16 +26,18 @@ class Headers(metaclass=Final):
             raw if type(raw) is list else list(raw)
         )
         self._items: list[tuple[str, str]] = items
-        # Build a lowercase-keyed index for O(1) single-value lookups.
-        index: dict[str, list[str]] = {}
+        # Store a single value until a header name occurs more than once.
+        index: dict[str, str | list[str]] = {}
         for k, v in items:
             key = k.lower()
             bucket = index.get(key)
             if bucket is None:
-                index[key] = [v]
-            else:
+                index[key] = v
+            elif isinstance(bucket, list):
                 bucket.append(v)
-        self._index: dict[str, list[str]] = index
+            else:
+                index[key] = [bucket, v]
+        self._index = index
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """
@@ -53,8 +55,15 @@ class Headers(metaclass=Final):
         str | None
             Last matching value, or ``default`` if not found.
         """
-        values = self._index.get(key.lower())
-        return values[-1] if values else default
+        value = self._index.get(key.lower(), default)
+        return value[-1] if isinstance(value, list) else value
+
+    def count(self, key: str) -> int:
+        """Return the number of occurrences of a case-insensitive header name."""
+        value = self._index.get(key.lower())
+        if value is None:
+            return 0
+        return len(value) if isinstance(value, list) else 1
 
     def getAll(
         self, key: str | None = None,
@@ -77,8 +86,14 @@ class Headers(metaclass=Final):
             empty list when the header is absent.
         """
         if key is None:
-            return dict(self._index)
-        return list(self._index.get(key.lower(), []))
+            return {
+                name: value.copy() if isinstance(value, list) else [value]
+                for name, value in self._index.items()
+            }
+        value = self._index.get(key.lower())
+        if value is None:
+            return []
+        return value.copy() if isinstance(value, list) else [value]
 
     def __contains__(self, key: str) -> bool:
         """

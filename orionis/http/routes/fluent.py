@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Self
+
 from orionis.http.routes.contracts.fluent import IFluentRoute
 from orionis.http.routes.functions import (
     flatten_middleware,
@@ -12,10 +14,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from orionis.http.middleware import BaseMiddleware
+    from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 class FluentRoute(IFluentRoute):
 
-    _ALLOWED_METHODS = frozenset({
+    _ALLOWED_METHODS: frozenset[str] = frozenset({
         "GET",
         "POST",
         "PUT",
@@ -28,7 +31,9 @@ class FluentRoute(IFluentRoute):
         self,
         method: str,
         path: str,
-        action: Callable | list | type,
+        action: RouteAction | None = None,
+        *,
+        view: str | None = None,
     ) -> None:
         """
         Initialize a FluentRoute instance.
@@ -39,7 +44,7 @@ class FluentRoute(IFluentRoute):
             HTTP method (e.g., 'GET', 'POST').
         path : str
             Route path.
-        action : Callable | list | type
+        action : RouteAction | None, optional
             Action to execute. Three forms are accepted:
 
             * **Invokable controller** - bare class that defines ``__call__``::
@@ -53,6 +58,11 @@ class FluentRoute(IFluentRoute):
             * **Callable** - plain function or coroutine function::
 
                   FluentRoute("GET", "/", my_view)
+
+            Ignored when *view* is provided.
+        view : str | None, optional
+            Template name rendered directly by the kernel. When given, the
+            route carries no Python handler and *action* is not parsed.
 
         Returns
         -------
@@ -75,9 +85,9 @@ class FluentRoute(IFluentRoute):
             raise TypeError(error_msg)
 
         # Initialize route attributes
-        self.__method = method_upper
-        self.__path = normalize_path(path)
-        self.__id = RouteID.next(method_upper, self.__path)
+        self.__method: str = method_upper
+        self.__path: str = normalize_path(path)
+        self.__id: str = RouteID.next(method_upper, self.__path)
         self.__class: type | None = None
         self.__handler: str | None = None
         self.__callable_handler: Callable | None = None
@@ -85,6 +95,15 @@ class FluentRoute(IFluentRoute):
         self.__middleware: list[type[BaseMiddleware]] = []
         self.__without_middleware: set[type[BaseMiddleware]] = set()
         self.__kind: str = "web"
+        self.__view: str | None = view
+
+        # A view route is rendered by the kernel and has no Python handler.
+        if view is not None:
+            if not isinstance(view, str) or not view.strip():
+                error_msg = "View name must be a non-empty string"
+                raise ValueError(error_msg)
+            self.__view = view.strip()
+            return
 
         # Parse the action and set the appropriate handler attributes
         _callable, _handler = parse_action(action)
@@ -93,6 +112,11 @@ class FluentRoute(IFluentRoute):
         else:
             self.__class = _callable
             self.__handler = _handler
+
+    @property
+    def path(self) -> str:
+        """Return the current canonical path, including inherited prefixes."""
+        return self.__path
 
     @property
     def id(self) -> str:
@@ -126,6 +150,7 @@ class FluentRoute(IFluentRoute):
         self.__class = _callable
         self.__handler = _handler
         self.__callable_handler = None
+        self.__view = None
         return self
 
     def name(self, name: str) -> Self:
@@ -145,19 +170,22 @@ class FluentRoute(IFluentRoute):
         if not isinstance(name, str):
             error_msg = "Route name must be a string"
             raise TypeError(error_msg)
+        if not name.strip():
+            error_msg = "Route name must not be empty"
+            raise ValueError(error_msg)
         self.__name = name.strip()
         return self
 
     def middleware(
         self,
-        *middleware: type[BaseMiddleware] | list | tuple | set,
+        *middleware: MiddlewareInput,
     ) -> Self:
         """
         Add middleware to the route.
 
         Parameters
         ----------
-        *middleware : type[BaseMiddleware] | list | tuple | set
+        *middleware : MiddlewareInput
             One or more middleware classes (not instances) to attach.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
@@ -172,14 +200,14 @@ class FluentRoute(IFluentRoute):
 
     def withOutMiddleware(
         self,
-        *middleware: type[BaseMiddleware] | list | tuple | set,
+        *middleware: MiddlewareInput,
     ) -> Self:
         """
         Exclude one or more middleware classes from the route.
 
         Parameters
         ----------
-        *middleware : type[BaseMiddleware] | list | tuple | set
+        *middleware : MiddlewareInput
             One or more middleware classes to exclude from this route.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
@@ -209,7 +237,39 @@ class FluentRoute(IFluentRoute):
         if not isinstance(prefix, str):
             error_msg = "Prefix must be a string"
             raise TypeError(error_msg)
-        self.__path = normalize_path(prefix.rstrip("/") + "/" + self.__path.lstrip("/"))
+        normalized = normalize_path(prefix).rstrip("/")
+        self.__path = (
+            normalized + self.__path if self.__path != "/" else normalized or "/"
+        )
+        return self
+
+    def inheritGroup(
+        self,
+        prefix: str,
+        middleware: tuple[type[BaseMiddleware], ...],
+        without_middleware: frozenset[type[BaseMiddleware]],
+    ) -> Self:
+        """Apply validated group context during registration.
+
+        Parameters
+        ----------
+        prefix : str
+            Canonical prefix without a trailing slash, or an empty string.
+        middleware : tuple[type[BaseMiddleware], ...]
+            Parent middleware, in declaration order.
+        without_middleware : frozenset[type[BaseMiddleware]]
+            Exclusions inherited by the route.
+
+        Returns
+        -------
+        Self
+            This route with the parent context prepended.
+        """
+        if prefix:
+            self.__path = prefix + self.__path if self.__path != "/" else prefix
+        # The compiler removes duplicates after all parent layers are known.
+        self.__middleware[:0] = middleware
+        self.__without_middleware.update(without_middleware)
         return self
 
     def _kind(self, kind: str) -> Self:
@@ -232,11 +292,6 @@ class FluentRoute(IFluentRoute):
         self.__kind = kind.strip().lower()
         return self
 
-    @property
-    def _existingMiddleware(self) -> list:
-        """Return the registered middleware list for the route."""
-        return self.__middleware
-
     def export(self) -> dict:
         """
         Export the route configuration as a plain dictionary.
@@ -245,7 +300,8 @@ class FluentRoute(IFluentRoute):
         -------
         dict
             Dictionary with keys: id, method, path, class, handler,
-            callable_handler, name, middleware, without_middleware, and kind.
+            callable_handler, view, name, middleware, without_middleware,
+            and kind.
         """
         return {
             "id": self.__id,
@@ -254,6 +310,7 @@ class FluentRoute(IFluentRoute):
             "class": self.__class,
             "handler": self.__handler,
             "callable_handler": self.__callable_handler,
+            "view": self.__view,
             "name": self.__name,
             "middleware": self.__middleware,
             "without_middleware": self.__without_middleware,

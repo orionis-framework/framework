@@ -17,7 +17,7 @@ class TransportAdapter(ABC):
 
     # ruff: noqa: ANN401
 
-    # Empty slots allow fully slotted subclasses to avoid __dict__ allocation
+    # Define the transport interface without instance state.
     __slots__ = ()
 
     @abstractmethod

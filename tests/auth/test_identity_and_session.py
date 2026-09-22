@@ -1,13 +1,16 @@
+import inspect
 import threading
 from types import SimpleNamespace
 from typing import Any
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.concerns.authorizable import Authorizable
+from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.exceptions import AuthException, IdentityProviderException
 from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.database.connection_manager import ConnectionManager
 from orionis.hashing.hash_manager import HashManager
+from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
 from orionis.orm import BigInteger, Boolean, Model, String
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
@@ -106,41 +109,37 @@ class _RecordingHasher:
         self.hashed: list[str] = []
         self.checked: list[tuple[str, str]] = []
 
-    def make(self, value: str, **_: object) -> str:
+    async def make(self, value: str, **_: object) -> str:
         """Record the hashing of a value and return a marker."""
         self.hashed.append(value)
         return f"hashed:{value}"
 
-    def check(self, value: str, hashed: str) -> bool:
+    async def check(self, value: str, hashed: str) -> bool:
         """Record a verification and answer against the marker."""
         self.checked.append((value, hashed))
         return hashed == f"hashed:{value}"
 
-class _ThreadRecordingProvider:
-    """Record the thread performing credential verification."""
+class _ThreadRecordingArgon2(Argon2Hasher):
+    """Argon2 driver recording the thread that burns the hashing cost."""
 
-    __slots__ = ("thread_id",)
+    __slots__ = ("thread_ids",)
 
     def __init__(self) -> None:
-        """Start without a verification thread."""
-        self.thread_id: int | None = None
+        """Start with an empty journal of worker threads."""
+        super().__init__(**_HASH_OPTIONS)
+        self.thread_ids: list[int] = []
 
-    async def retrieveByCredentials(self, credentials: object) -> None:
-        """Return no identity for the verification probe."""
-
-    def validateCredentials(
-        self, identity: object, credentials: object,  # noqa: ARG002
-    ) -> bool:
-        """Record the executing thread and reject the credentials."""
-        self.thread_id = threading.get_ident()
-        return False
+    def _check(self, value: str, hashed: str) -> bool:
+        """Record the executing thread before verifying."""
+        self.thread_ids.append(threading.get_ident())
+        return super()._check(value, hashed)
 
 class _InputRejectingHasher(_RecordingHasher):
     """Model a native password backend rejecting an invalid input value."""
 
     __slots__ = ()
 
-    def check(self, value: str, hashed: str) -> bool:  # noqa: ARG002
+    async def check(self, value: str, hashed: str) -> bool:  # noqa: ARG002
         """Raise a backend input error that must not escape authentication."""
         error_msg = "invalid password input"
         raise ValueError(error_msg)
@@ -159,7 +158,7 @@ class TestModelIdentityProvider(TestCase):
 
         self.hasher = HashManager(self.app)
         self.provider = ModelIdentityProvider(self.app, self.hasher)
-        self.hashed = self.hasher.make("secret")
+        self.hashed = await self.hasher.make("secret")
         await Account.create({
             "email": "ada@orionis.dev",
             "password": self.hashed,
@@ -171,7 +170,7 @@ class TestModelIdentityProvider(TestCase):
         ConnectionResolver.setManager(self._previous_manager)
         await self.connection.disconnect()
 
-    async def testResolvesTheConfiguredModel(self) -> None:
+    def testResolvesTheConfiguredModel(self) -> None:
         """Validates that the dotted path in configuration is imported.
 
         The framework never imports the application identity directly, so
@@ -180,7 +179,7 @@ class TestModelIdentityProvider(TestCase):
         self.assertIs(self.provider.model(), Account)
         self.assertIs(self.provider.model(), Account)
 
-    async def testRejectsAModelThatIsNotAuthenticatable(self) -> None:
+    def testRejectsAModelThatIsNotAuthenticatable(self) -> None:
         """Validates that a model without the mixin is refused.
 
         Accepting it would fail much later, when the guard asks for the
@@ -191,7 +190,7 @@ class TestModelIdentityProvider(TestCase):
         with self.assertRaises(IdentityProviderException):
             provider.model()
 
-    async def testRejectsAnUnimportableModel(self) -> None:
+    def testRejectsAnUnimportableModel(self) -> None:
         """Validates that a broken dotted path raises a module error.
 
         The failure must be an authentication error, not a bare
@@ -248,10 +247,26 @@ class TestModelIdentityProvider(TestCase):
         Authentication must never compare passwords by hand.
         """
         identity = await self.provider.retrieveById(1)
-        granted = self.provider.validateCredentials(
+        granted = await self.provider.validateCredentials(
             identity, {"password": "secret"},
         )
         self.assertTrue(granted)
+
+    def testCredentialVerificationIsASingleCoroutine(self) -> None:
+        """Validates that verification is one awaitable entry point.
+
+        A synchronous implementation would let a caller hand it to
+        ``asyncio.to_thread`` and read the unawaited coroutine as a truthy
+        answer, accepting every password.
+        """
+        self.assertTrue(
+            inspect.iscoroutinefunction(IIdentityProvider.validateCredentials),
+        )
+        self.assertTrue(
+            inspect.iscoroutinefunction(
+                ModelIdentityProvider.validateCredentials,
+            ),
+        )
 
     async def testRejectsAWrongPassword(self) -> None:
         """Validates that a mismatching secret is refused.
@@ -259,7 +274,7 @@ class TestModelIdentityProvider(TestCase):
         The stored hash must remain the only source of truth.
         """
         identity = await self.provider.retrieveById(1)
-        granted = self.provider.validateCredentials(
+        granted = await self.provider.validateCredentials(
             identity, {"password": "wrong"},
         )
         self.assertFalse(granted)
@@ -275,7 +290,7 @@ class TestModelIdentityProvider(TestCase):
         hasher = _RecordingHasher()
         provider = ModelIdentityProvider(self.app, hasher)
 
-        granted = provider.validateCredentials(None, {"password": "secret"})
+        granted = await provider.validateCredentials(None, {"password": "secret"})
 
         self.assertFalse(granted)
         self.assertEqual(hasher.hashed, ["secret"])
@@ -287,9 +302,9 @@ class TestModelIdentityProvider(TestCase):
         An empty password is a malformed request, not a candidate.
         """
         identity = await self.provider.retrieveById(1)
-        self.assertFalse(self.provider.validateCredentials(identity, {}))
+        self.assertFalse(await self.provider.validateCredentials(identity, {}))
         self.assertFalse(
-            self.provider.validateCredentials(identity, {"password": ""}),
+            await self.provider.validateCredentials(identity, {"password": ""}),
         )
 
     async def testBackendInputErrorsAreInvalidCredentials(self) -> None:
@@ -297,10 +312,10 @@ class TestModelIdentityProvider(TestCase):
         identity = await self.provider.retrieveById(1)
         provider = ModelIdentityProvider(self.app, _InputRejectingHasher())
         self.assertFalse(
-            provider.validateCredentials(identity, {"password": "invalid"}),
+            await provider.validateCredentials(identity, {"password": "invalid"}),
         )
         self.assertFalse(
-            provider.validateCredentials(None, {"password": "x" * 5000}),
+            await provider.validateCredentials(None, {"password": "x" * 5000}),
         )
 
 class TestSessionGuard(TestCase):
@@ -320,7 +335,7 @@ class TestSessionGuard(TestCase):
         self.guard = SessionGuard(self.app, self.provider)
         await Account.create({
             "email": "ada@orionis.dev",
-            "password": self.hasher.make("secret"),
+            "password": await self.hasher.make("secret"),
             "active": True,
         })
 
@@ -329,7 +344,7 @@ class TestSessionGuard(TestCase):
         ConnectionResolver.setManager(self._previous_manager)
         await self.connection.disconnect()
 
-    async def testExposesItsConfigurationName(self) -> None:
+    def testExposesItsConfigurationName(self) -> None:
         """Validates the name used to select the guard.
 
         The manager resolves guards by this exact string.
@@ -446,7 +461,7 @@ class TestSessionGuard(TestCase):
         with self.assertRaises(AuthException):
             self.guard.login(fake_request(None), identity)
 
-    async def testLogoutInvalidatesTheSession(self) -> None:
+    def testLogoutInvalidatesTheSession(self) -> None:
         """Validates that logging out destroys the session entirely.
 
         Only forgetting the key would leave the rest of the payload alive.
@@ -460,7 +475,7 @@ class TestSessionGuard(TestCase):
         self.assertTrue(session.invalidated)
         self.assertEqual(session.all(), {})
 
-    async def testLogoutWithoutSessionIsANoOperation(self) -> None:
+    def testLogoutWithoutSessionIsANoOperation(self) -> None:
         """Validates that logging out is safe outside the web pipeline.
 
         A request without a session is already anonymous.
@@ -468,12 +483,23 @@ class TestSessionGuard(TestCase):
         self.guard.logout(fake_request(None))
 
     async def testPasswordVerificationRunsOutsideTheEventLoopThread(self) -> None:
-        """Keep expensive password verification off the HTTP event loop."""
-        provider = _ThreadRecordingProvider()
-        guard = SessionGuard(self.app, provider)
-        await guard.attempt(fake_request(Session()), {})
-        self.assertIsNotNone(provider.thread_id)
-        self.assertNotEqual(provider.thread_id, threading.get_ident())
+        """Verify a password and record the thread that ran the hasher.
+
+        Validates that the expensive comparison never blocks the event
+        loop serving the HTTP request.
+        """
+        driver = _ThreadRecordingArgon2()
+        hasher = HashManager(self.app)
+        hasher._drivers["argon2"] = driver
+        guard = SessionGuard(self.app, ModelIdentityProvider(self.app, hasher))
+
+        await guard.attempt(
+            fake_request(Session()),
+            {"email": "ada@orionis.dev", "password": "secret"},
+        )
+
+        self.assertEqual(len(driver.thread_ids), 1)
+        self.assertNotIn(threading.get_ident(), driver.thread_ids)
 
     async def testLoginRotatesCsrfAndPreservesUnrelatedSessionData(self) -> None:
         """Rotate security credentials without losing the visitor's payload."""

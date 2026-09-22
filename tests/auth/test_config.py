@@ -68,6 +68,7 @@ class TestSessionAuthConfiguration(TestCase):
         session = SessionAuth()
         self.assertEqual(session.key, "_auth_identifier")
         self.assertIsNone(session.redirect_to)
+        self.assertEqual(session.home, "/home")
 
     def testAcceptsARedirectTarget(self) -> None:
         """Validates the browser friendly rejection setting.
@@ -75,6 +76,13 @@ class TestSessionAuthConfiguration(TestCase):
         Applications with a login page point at it here.
         """
         self.assertEqual(SessionAuth(redirect_to="/login").redirect_to, "/login")
+
+    def testAcceptsAHomeTarget(self) -> None:
+        """Validates the destination used once the login succeeds.
+
+        Applications landing somewhere other than ``/home`` point at it here.
+        """
+        self.assertEqual(SessionAuth(home="/dashboard").home, "/dashboard")
 
     def testRejectsInvalidOptions(self) -> None:
         """Validates the type and value guards of the section.
@@ -87,6 +95,10 @@ class TestSessionAuthConfiguration(TestCase):
             SessionAuth(key="")
         with self.assertRaises(TypeError):
             SessionAuth(redirect_to=1)
+        with self.assertRaises(TypeError):
+            SessionAuth(home=1)
+        with self.assertRaises(ValueError):
+            SessionAuth(home="")
 
 class TestTokensConfiguration(TestCase):
     """Validate the options of the personal access token guard."""

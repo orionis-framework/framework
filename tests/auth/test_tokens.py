@@ -105,7 +105,7 @@ class _DirectoryProvider:
         """Credential lookup is never used by the token guard."""
         return None
 
-    def validateCredentials(self, identity: object, credentials: object) -> bool:  # noqa: ARG002
+    async def validateCredentials(self, identity: object, credentials: object) -> bool:  # noqa: ARG002
         """Credential verification is never used by the token guard."""
         return False
 
@@ -516,7 +516,7 @@ class TestTokenGuard(_TokenCase):
         self.provider = _DirectoryProvider({1: self.identity})
         self.guard = TokenGuard(self.repository, self.provider)
 
-    async def testExposesItsConfigurationName(self) -> None:
+    def testExposesItsConfigurationName(self) -> None:
         """Validates the name used to select the guard.
 
         The manager resolves guards by this exact string.

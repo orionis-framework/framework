@@ -22,7 +22,7 @@ from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
 from orionis.container.context.manager import ScopeManager
 from orionis.http.middleware import BaseMiddleware
-from orionis.http.responses import RedirectResponse
+from orionis.http.responses import PlainTextResponse, RedirectResponse
 from orionis.test import TestCase
 
 class _Identity:
@@ -106,16 +106,23 @@ class _StaticRepository:
 class _StubApp:
     """Application double answering only the auth configuration."""
 
-    __slots__ = ("_redirect_to",)
+    __slots__ = ("_home", "_redirect_to")
 
-    def __init__(self, redirect_to: str | None = None) -> None:
-        """Store the configured redirect target."""
+    def __init__(
+        self,
+        redirect_to: str | None = None,
+        home: str | None = None,
+    ) -> None:
+        """Store the configured redirect and home targets."""
         self._redirect_to = redirect_to
+        self._home = home
 
     def config(self, key: str | None = None) -> Any:  # noqa: ANN401
-        """Answer the single key the middleware reads."""
+        """Answer the two keys the middleware reads."""
         if key == "auth.session.redirect_to":
             return self._redirect_to
+        if key == "auth.session.home":
+            return self._home
         return None
 
 class _RecordingAuthorizer:
@@ -179,6 +186,20 @@ async def call_next() -> str:
     """Terminal of the pipeline used by every middleware test."""
     return "handled"
 
+class _CacheableArea(AuthenticateMiddleware):
+    """Protected area opting out of the non-cacheable default."""
+
+    __slots__ = ()
+
+    cache_control: ClassVar[str | None] = None
+
+class _BackToRoot(GuestMiddleware):
+    """Guest route pinning its own redirect target."""
+
+    __slots__ = ()
+
+    redirect_to: ClassVar[str | None] = "/"
+
 class _CanViewUsers(RequirePermissionMiddleware):
     """Route guard requiring a single permission."""
 
@@ -226,6 +247,34 @@ class _MissingPolicy(RequirePolicyMiddleware):
 
 class TestResolveIdentityMiddleware(TestCase):
     """Validate the middleware that only establishes the context."""
+
+    async def testReusesTheRequestGuardInsteadOfTheConfiguredDefault(self) -> None:
+        """An unpinned middleware respects the kernel's web or API context."""
+        for identity in (None, _Identity(7)):
+            manager = _StubManager({"token": _StaticGuard("token", None)})
+            middleware = ResolveIdentityMiddleware(manager, _StaticRepository())
+            async with ScopeManager():
+                context = AuthenticationContext(identity=identity, guard="token")
+                bind_auth_context(context)
+                result = await middleware.handle(web_request(), call_next)
+                self.assertEqual(result, "handled")
+                self.assertIs(current_auth_context(), context)
+                self.assertEqual(manager.requested, ["token"])
+                self.assertEqual(manager.guards["token"].calls, 0)
+
+    async def testPinnedGuardCannotReplaceAnAuthenticatedRequest(self) -> None:
+        """Automatic identity resolution preserves the guard-switch protection."""
+        from orionis.auth.middleware import ResolveSessionIdentityMiddleware
+
+        manager = _StubManager({"session": _StaticGuard("session", None)})
+        middleware = ResolveSessionIdentityMiddleware(manager, _StaticRepository())
+        async with ScopeManager():
+            context = AuthenticationContext(identity=_Identity(7), guard="token")
+            bind_auth_context(context)
+            with self.assertRaises(AuthenticationException):
+                await middleware.handle(web_request(), call_next)
+            self.assertIs(current_auth_context(), context)
+            self.assertEqual(manager.guards["session"].calls, 0)
 
     async def testBindsTheResolvedIdentity(self) -> None:
         """Validates the normal path of identity resolution.
@@ -307,7 +356,8 @@ class TestAuthenticateMiddleware(TestCase):
     async def testAuthenticatedRequestsContinue(self) -> None:
         """Validates the happy path.
 
-        A resolved identity reaches the controller untouched.
+        A resolved identity reaches the controller, and the answer is
+        marked as non-cacheable because it carries private data.
         """
         guard = _StaticGuard(
             "session", GuardResult(identity=_Identity(1), guard="session"),
@@ -316,10 +366,36 @@ class TestAuthenticateMiddleware(TestCase):
             _StubApp(), _StubManager({None: guard}), _StaticRepository(),
         )
 
+        async def handled() -> PlainTextResponse:
+            return PlainTextResponse("handled")
+
         async with ScopeManager():
+            response = await middleware.handle(web_request(), handled)
+
+            self.assertEqual(response.getBody(), b"handled")
             self.assertEqual(
-                await middleware.handle(web_request(), call_next), "handled",
+                response.getHeader("cache-control"), ["no-store, private"],
             )
+
+    async def testTheCacheControlHeaderCanBeDisabled(self) -> None:
+        """Validates the opt-out of the non-cacheable default.
+
+        A subclass serving public data keeps the upstream headers intact.
+        """
+        guard = _StaticGuard(
+            "session", GuardResult(identity=_Identity(1), guard="session"),
+        )
+        middleware = _CacheableArea(
+            _StubApp(), _StubManager({None: guard}), _StaticRepository(),
+        )
+
+        async def handled() -> PlainTextResponse:
+            return PlainTextResponse("handled")
+
+        async with ScopeManager():
+            response = await middleware.handle(web_request(), handled)
+
+            self.assertIsNone(response.getHeader("cache-control"))
 
     async def testGuestsRaiseAnAuthenticationError(self) -> None:
         """Validates the ``401`` path without a redirect target.
@@ -649,6 +725,7 @@ class TestGuestMiddleware(TestCase):
     async def testGuestsReachTheForm(self) -> None:
         """Continue without inventing an authenticated identity."""
         middleware = GuestMiddleware(
+            _StubApp(),
             _StubManager({"session": _StaticGuard("session", None)}),
             _StaticRepository(),
         )
@@ -658,20 +735,35 @@ class TestGuestMiddleware(TestCase):
             )
 
     async def testAuthenticatedBrowsersLeaveTheGuestRoute(self) -> None:
-        """Redirect an authenticated browser away from the login form."""
+        """Redirect an authenticated browser to the configured home page."""
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(
+            _StubApp(home="/dashboard"),
             _StubManager({"session": _StaticGuard("session", result)}),
             _StaticRepository(),
         )
         async with ScopeManager():
             response = await middleware.handle(web_request(), call_next)
             self.assertEqual(response.getStatusCode(), 302)
+            self.assertEqual(response.getHeader("location"), ["/dashboard"])
+
+    async def testAnExplicitTargetOverridesTheConfiguredHome(self) -> None:
+        """Honour the destination pinned by a subclass."""
+        result = GuardResult(identity=_Identity(), guard="session")
+        middleware = _BackToRoot(
+            _StubApp(home="/dashboard"),
+            _StubManager({"session": _StaticGuard("session", result)}),
+            _StaticRepository(),
+        )
+        async with ScopeManager():
+            response = await middleware.handle(web_request(), call_next)
+            self.assertEqual(response.getHeader("location"), ["/"])
 
     async def testAuthenticatedJsonClientsAreForbidden(self) -> None:
         """Use 403 for a known identity denied access to a guest-only route."""
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(
+            _StubApp(),
             _StubManager({"session": _StaticGuard("session", result)}),
             _StaticRepository(),
         )

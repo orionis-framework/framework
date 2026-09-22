@@ -4,16 +4,20 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
-from app.http.controllers.auth.login_controller import LoginController
+from orionis.http.default.controllers.login_controller import LoginController
 from orionis.auth.authorization.authorizer import Authorizer
 from orionis.auth.authorization.policy import Policy
 from orionis.auth.authorization.registrar import PermissionRegistrar
 from orionis.auth.authorization.repository import DatabasePermissionRepository
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.concerns.authorizable import Authorizable
-from orionis.auth.context.functions import current_auth_context
+from orionis.auth.context.context import AuthenticationContext
+from orionis.auth.context.functions import (
+    authentication_lock,
+    bind_auth_context,
+    current_auth_context,
+)
 from orionis.auth.contracts.manager import IAuthManager  # noqa: TC001
-from orionis.auth.context.functions import authentication_lock
 from orionis.auth.exceptions import (
     AuthException,
     AuthenticationException,
@@ -24,10 +28,13 @@ from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.auth.manager import AuthManager
-from orionis.auth.middleware.authenticate import AuthenticateMiddleware
-from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
+from orionis.auth.middleware.resolve_identity import (
+    ResolveIdentityMiddleware,
+    ResolveSessionIdentityMiddleware,
+)
 from orionis.auth.tokens.repository import AccessTokenRepository
 from orionis.container.context.manager import ScopeManager
+from orionis.container.context.scope import ScopedContext
 from orionis.database.connection_manager import ConnectionManager
 from orionis.hashing.hash_manager import HashManager
 from orionis.http.request import Request
@@ -145,6 +152,15 @@ class _AccountPolicy(Policy):
         """Allow the update only for the owner of the account."""
         return account.id == identity.getAuthIdentifier()
 
+class _UnauthorizableIdentity(Authenticatable):
+    """Identity that can log in but can never own permissions."""
+
+    __slots__ = ("id",)
+
+    def __init__(self) -> None:
+        """Store the identifier a guard would read from the session."""
+        self.id = 99
+
 def build_table(
     name: str,
     columns: dict[str, Any],
@@ -245,12 +261,12 @@ class _ManagerCase(TestCase):
 
         self.ada = await Account.create({
             "email": "ada@orionis.dev",
-            "password": self.hasher.make("secret"),
+            "password": await self.hasher.make("secret"),
             "active": True,
         })
         self.bob = await Account.create({
             "email": "bob@orionis.dev",
-            "password": self.hasher.make("secret"),
+            "password": await self.hasher.make("secret"),
             "active": True,
         })
 
@@ -283,10 +299,11 @@ class _ManagerCase(TestCase):
 class TestAuthManagerSessionFlow(_ManagerCase):
     """Validate the web authentication lifecycle through the manager."""
 
-    async def testOutsideARequestEverythingIsAGuest(self) -> None:
-        """Validates the answer of the manager without a request.
+    def testOutsideARequestEverythingIsAGuest(self) -> None:
+        """Query the manager without any request in flight.
 
-        Console commands must not observe any identity.
+        Validates that console commands and background jobs never observe
+        an authenticated identity.
         """
         self.assertTrue(self.auth.guest())
         self.assertFalse(self.auth.check())
@@ -372,17 +389,19 @@ class TestAuthManagerSessionFlow(_ManagerCase):
             self.assertTrue(request.state.session.invalidated)
 
     async def testSessionOperationsRequireARequest(self) -> None:
-        """Validates the guard against using the manager out of band.
+        """Attempt a credential login with no request in the scope.
 
-        Without a request there is no session to write into.
+        Validates the guard against using the manager out of band: there
+        would be no session to write the identity into.
         """
         with self.assertRaises(AuthException):
             await self.auth.attempt({"email": "ada@orionis.dev"})
 
-    async def testGuardsAreResolvedByName(self) -> None:
-        """Validates the guard registry of the manager.
+    def testGuardsAreResolvedByName(self) -> None:
+        """Resolve the registered guards through the manager registry.
 
-        The default guard comes from the configuration.
+        Validates that the default comes from the configuration and that
+        an unknown name fails loudly instead of falling back.
         """
         self.assertEqual(self.auth.guard().name, "session")
         self.assertEqual(self.auth.guard("token").name, "token")
@@ -390,8 +409,12 @@ class TestAuthManagerSessionFlow(_ManagerCase):
             self.auth.guard("ldap")
 
     async def testExampleLoginControllerActuallyAuthenticates(self) -> None:
-        """Reject invalid credentials and establish a real session on success."""
-        controller = LoginController()
+        """Submit wrong and valid credentials through the shipped controller.
+
+        Validates that the manager drives a real login end to end and
+        that each outcome redirects to its own page.
+        """
+        controller = LoginController(self.app)
         for credential, expected in (("wrong", False), ("secret", True)):
             payload = {"email": self.ada.email, "password": credential}
             request = _LoginRequest(payload)
@@ -402,14 +425,18 @@ class TestAuthManagerSessionFlow(_ManagerCase):
                 )
                 self.assertEqual(self.auth.check(), expected)
                 location = dict(response.getStringHeaders()).get("location")
-                self.assertEqual(location, "/" if expected else "/login")
+                self.assertEqual(location, "/home" if expected else "/login")
 
     async def testUuidModelWorksAcrossSessionTokensAndPermissions(self) -> None:
-        """Authenticate a real UUID identity using its custom password accessor."""
+        """Drive a UUID identity through sessions, tokens and permissions.
+
+        Validates that a model with a native UUID key and a renamed hash
+        column is supported by every source the manager relies on.
+        """
         await self.connection.createTable(Member.__meta__.table)
         member = await Member.create({
             "email": "member@orionis.dev",
-            "credential_hash": self.hasher.make("secret"),
+            "credential_hash": await self.hasher.make("secret"),
         })
         self.app._tree["auth"]["identity"] = {
             "model": f"{__name__}.Member", "username": "email",
@@ -807,7 +834,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
         self.assertEqual(observed["bob"], (self.bob.id, False))
 
     async def testConcurrentResolutionReusesOneContext(self) -> None:
-        """Coalesce repeated middleware resolutions within one request."""
+        """Resolve the identity of one request from eight coroutines at once.
+
+        Validates that repeated middleware resolutions coalesce into a
+        single context instead of racing each other.
+        """
         middleware = ResolveIdentityMiddleware(self.auth, self.permissions)
         session = Session()
         session.put("_auth_identifier", self.ada.id)
@@ -820,7 +851,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
             self.assertEqual(len({id(context) for context in contexts}), 1)
 
     async def testLoginAndLogoutSerializeInOneRequest(self) -> None:
-        """Apply queued login and logout transitions in acquisition order."""
+        """Queue a login and a logout behind the same authentication lock.
+
+        Validates that both transitions apply in acquisition order, so a
+        request never ends up in a half authenticated state.
+        """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
             async with authentication_lock():
@@ -831,7 +866,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
             self.assertTrue(scope[Request].state.session.invalidated)
 
     async def testTokenAuthenticationCannotMintAnUnrestrictedCredential(self) -> None:
-        """Prevent a restricted PAT from issuing a fresh unrestricted PAT."""
+        """Issue a token from a request authenticated by a restricted token.
+
+        Validates the privilege escalation guard: a limited credential
+        must never be able to mint an unrestricted one.
+        """
         issued = await self.tokens.create(self.ada, "limited", abilities=[])
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
         async with ScopeManager() as scope:
@@ -842,63 +881,253 @@ class TestAuthManagerConcurrency(_ManagerCase):
                 await self.auth.createToken("escalated")
 
     async def testAnAuthenticatedRequestCannotSilentlySwitchGuards(self) -> None:
-        """Reject a session fallback that would remove token restrictions."""
+        """Resolve a session identity over a request already holding a token.
+
+        Validates that a session fallback can never replace a token
+        context, which would silently drop its ability restrictions.
+        """
         issued = await self.tokens.create(self.ada, "limited", abilities=[])
         token_middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
-        session_middleware = ResolveIdentityMiddleware(self.auth, self.permissions)
+        session_middleware = ResolveSessionIdentityMiddleware(
+            self.auth, self.permissions,
+        )
+        inherited_middleware = ResolveIdentityMiddleware(self.auth, self.permissions)
         async with ScopeManager() as scope:
             request = self.webRequest()
             request.bearerToken = issued.plain_text
             request.state.session.put("_auth_identifier", self.bob.id)
             scope[Request] = request
             await token_middleware._establish(request)
+            context = await inherited_middleware._establish(request)
+            self.assertEqual(context.guard, "token")
+            self.assertEqual(context.abilities, frozenset())
             with self.assertRaises(AuthenticationException):
                 await session_middleware._establish(request)
             self.assertEqual(self.auth.identifier(), self.ada.id)
 
-class TestAuthenticateMiddlewareIntegration(_ManagerCase):
-    """Validate the authentication middleware against the real stack."""
+class TestAuthManagerContext(_ManagerCase):
+    """Validate how the manager exposes the context of the request."""
 
-    async def testAuthenticatedRequestsReachTheController(self) -> None:
-        """Validates the happy path of the middleware.
+    def testTheAccessorMirrorsTheScopedContext(self) -> None:
+        """Compare the accessor against the scope bound context.
 
-        The pipeline continues and the context is bound.
+        Validates that the manager owns no state of its own and always
+        reads the context published by the running scope.
         """
-        middleware = AuthenticateMiddleware(
-            self.app, self.auth, self.permissions,
-        )
-        session = Session()
-        session.put("_auth_identifier", self.ada.id)
-        request = self.webRequest(session)
+        self.assertIs(self.auth.context(), current_auth_context())
 
-        async def call_next() -> str:
-            return "handled"
+    async def testTheContextCarriesTheAuthenticatedIdentity(self) -> None:
+        """Read the context right after a successful login.
+
+        Validates that the identity, the guard and the scope binding are
+        all visible through a single accessor.
+        """
+        async with ScopeManager() as scope:
+            scope[Request] = self.webRequest()
+            await self.auth.login(self.ada)
+
+            context = self.auth.context()
+
+            self.assertIs(context, current_auth_context())
+            self.assertIs(context.identity, self.ada)
+            self.assertEqual(context.guard, "session")
+
+
+class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
+    """Validate the immutable authorization view of a request."""
+
+    async def testExposesDirectAndInheritedGrants(self) -> None:
+        """Read the snapshot of an identity holding a role.
+
+        Validates that permissions and roles are resolved together, which
+        is what the authorizer intersects with the credential abilities.
+        """
+        await self.registrar.grantToRole("admin", "users.view")
+        await self.registrar.assignRole(self.ada, "admin")
+        await self.registrar.givePermissionTo(self.ada, "users.export")
 
         async with ScopeManager() as scope:
-            scope[Request] = request
-            result = await middleware.handle(request, call_next)
+            scope[Request] = self.webRequest()
+            await self.auth.login(self.ada)
 
-            self.assertEqual(result, "handled")
-            self.assertEqual(current_auth_context().identifier(), self.ada.id)
+            snapshot = await self.auth.authorization()
 
-    async def testAnonymousRequestsNeverReachTheController(self) -> None:
-        """Validates that the controller is skipped for guests.
+            self.assertEqual(
+                snapshot.permissions, frozenset({"users.view", "users.export"}),
+            )
+            self.assertEqual(snapshot.roles, frozenset({"admin"}))
+            self.assertIsNone(snapshot.abilities)
 
-        Running it would defeat the purpose of the middleware.
+    async def testAGuestSnapshotGrantsNothing(self) -> None:
+        """Read the snapshot of an anonymous request.
+
+        Validates the deny by default stance: an unauthenticated request
+        never reaches the permission store.
         """
-        middleware = AuthenticateMiddleware(
-            self.app, self.auth, self.permissions,
-        )
-        request = self.webRequest()
-        reached: list[str] = []
+        snapshot = await self.auth.authorization()
 
-        async def call_next() -> str:
-            reached.append("handled")
-            return "handled"
+        self.assertEqual(snapshot.permissions, frozenset())
+        self.assertEqual(snapshot.roles, frozenset())
+
+    async def testATokenNarrowsTheSnapshotAbilities(self) -> None:
+        """Read the snapshot of a token authenticated request.
+
+        Validates that the restriction of the presented credential is
+        reported next to what the identity owns.
+        """
+        await self.registrar.givePermissionTo(
+            self.ada, "users.view", "users.delete",
+        )
+        issued = await self.auth.createToken(
+            "reader", tokenable=self.ada, abilities=["users.view"],
+        )
+        middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async with ScopeManager() as scope:
+            request = self.apiRequest(issued.plain_text)
             scope[Request] = request
-            with self.assertRaises(AuthenticationException):
-                await middleware.handle(request, call_next)
+            await middleware._establish(request)
 
-        self.assertEqual(reached, [])
+            snapshot = await self.auth.authorization()
+
+            self.assertEqual(snapshot.abilities, frozenset({"users.view"}))
+            self.assertEqual(
+                snapshot.permissions, frozenset({"users.view", "users.delete"}),
+            )
+
+
+class TestAuthManagerPartialPermissionChecks(_ManagerCase):
+    """Validate the any-of permission check of the manager."""
+
+    async def testGrantsWhenASinglePermissionMatches(self) -> None:
+        """Ask for two permissions while the identity owns only one.
+
+        Validates the any-of semantics used by routes accepting several
+        equivalent rights.
+        """
+        await self.registrar.givePermissionTo(self.ada, "users.view")
+
+        async with ScopeManager() as scope:
+            scope[Request] = self.webRequest()
+            await self.auth.login(self.ada)
+
+            self.assertTrue(
+                await self.auth.canAny(["users.view", "users.delete"]),
+            )
+            self.assertFalse(
+                await self.auth.canAll(["users.view", "users.delete"]),
+            )
+
+    async def testDeniesWhenNoPermissionMatches(self) -> None:
+        """Ask for permissions the identity does not own at all.
+
+        Validates that the any-of check never degrades into an implicit
+        grant.
+        """
+        async with ScopeManager() as scope:
+            scope[Request] = self.webRequest()
+            await self.auth.login(self.ada)
+
+            self.assertFalse(
+                await self.auth.canAny(["users.view", "users.delete"]),
+            )
+
+    async def testGuestsAreDeniedEveryPartialCheck(self) -> None:
+        """Run the any-of check without an authenticated identity.
+
+        Validates that an anonymous request is refused before any store
+        is queried.
+        """
+        self.assertFalse(await self.auth.canAny(["users.view"]))
+
+
+class TestAuthManagerTokenOwnership(_ManagerCase):
+    """Validate which identities may own a personal access token."""
+
+    async def testRejectsAnOwnerThatCannotHoldPermissions(self) -> None:
+        """Issue a token for an identity that is not authorizable.
+
+        Validates the guard protecting the polymorphic owner columns: a
+        token row without a usable authorization key would be orphaned.
+        """
+        with self.assertRaises(AuthException) as captured:
+            await self.auth.createToken(
+                "ci",
+                tokenable=_UnauthorizableIdentity(),  # type: ignore[arg-type]
+            )
+
+        self.assertIn("IAuthorizable", str(captured.exception))
+        self.assertNotIsInstance(captured.exception, AuthenticationException)
+        self.assertNotIsInstance(captured.exception, AuthorizationException)
+
+    async def testARevocationRaceRevokesTheCredentialOnlyOnce(self) -> None:
+        """Queue a revocation behind a transition that logs the request out.
+
+        Validates the second credential check performed once the lock is
+        acquired: without it the manager would revoke a credential that
+        no longer belongs to the request.
+        """
+        issued = await self.auth.createToken("ci", tokenable=self.ada)
+        middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
+
+        async with ScopeManager() as scope:
+            request = self.apiRequest(issued.plain_text)
+            scope[Request] = request
+            await middleware._establish(request)
+
+            async with authentication_lock():
+                revocation = asyncio.create_task(
+                    self.auth.revokeCurrentToken(),
+                )
+                await asyncio.sleep(0)
+                bind_auth_context(AuthenticationContext(guard="token"))
+
+            revoked = await revocation
+
+        self.assertFalse(revoked)
+        self.assertIsNotNone(
+            await self.tokens.findByPlainText(issued.plain_text),
+        )
+
+
+class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
+    """Validate the guard protecting the session lifecycle operations."""
+
+    async def asyncSetUp(self) -> None:
+        """Detach the ambient scope installed by the test runner."""
+        await super().asyncSetUp()
+        self._scope_token = ScopedContext.setCurrentScope(None)
+
+    async def asyncTearDown(self) -> None:
+        """Restore the ambient scope before tearing the fixture down."""
+        ScopedContext.reset(self._scope_token)
+        await super().asyncTearDown()
+
+    async def testLoginIsRefusedWithoutAScope(self) -> None:
+        """Log an identity in from outside any container scope.
+
+        Validates the refusal a console command gets: there is no session
+        to remember the identity in.
+        """
+        with self.assertRaises(AuthException):
+            await self.auth.login(self.ada)
+
+    async def testLogoutIsRefusedWithoutAScope(self) -> None:
+        """Log out from outside any container scope.
+
+        Validates that the symmetric operation is refused for the very
+        same reason.
+        """
+        with self.assertRaises(AuthException):
+            await self.auth.logout()
+
+    async def testLoginIsRefusedWhenTheScopeCarriesNoRequest(self) -> None:
+        """Log an identity in inside a scope holding no request.
+
+        Validates the second half of the guard: an active scope is not
+        enough, the request itself must be reachable.
+        """
+        async with ScopeManager():
+            with self.assertRaises(AuthException):
+                await self.auth.login(self.ada)
+

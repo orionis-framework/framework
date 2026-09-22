@@ -5,13 +5,13 @@ from types import SimpleNamespace
 import msgspec
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.auth.contracts.manager import IAuthManager
+from orionis.auth.contracts.permission_repository import IPermissionRepository
 from orionis.auth.exceptions import AuthenticationException, AuthorizationException
 from orionis.auth.middleware.authenticate import (
     AuthenticateSessionMiddleware,
     AuthenticateTokenMiddleware,
 )
 from orionis.auth.middleware.authorize import RequirePermissionMiddleware
-from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager
@@ -175,7 +175,7 @@ def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
     guard = AuthenticateSessionMiddleware if web else AuthenticateTokenMiddleware
     middleware = (guard,) if path == "/logout" else (guard, _CanView)
     if path == "/public":
-        middleware = (ResolveIdentityMiddleware,)
+        middleware = ()
     return CompiledRoute(
         path=path,
         method="POST" if path == "/logout" else "GET",
@@ -205,6 +205,7 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         await super().asyncSetUp()
         self.http_app = _HttpApp(Path(self._tmp.name))
         self.http_app.instance(IAuthManager, self.auth)
+        self.http_app.instance(IPermissionRepository, self.permissions)
         self.http_app.instance(_Rendezvous, _Rendezvous())
         self.responses = http_fixtures._StubDefaultResponses()
         self.catch = _HttpCatch(self.responses)
@@ -232,9 +233,6 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             ),
             AuthenticateTokenMiddleware: AuthenticateTokenMiddleware(
                 self.app, self.auth, self.permissions,
-            ),
-            ResolveIdentityMiddleware: ResolveIdentityMiddleware(
-                self.auth, self.permissions,
             ),
             _CanView: _CanView(self.authorizer),
         }

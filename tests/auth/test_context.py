@@ -228,14 +228,14 @@ class TestAuthenticationContext(_ScopelessTestCase):
 class TestAuthenticationContextBinding(_ScopelessTestCase):
     """Validate how the context is stored in the container scope."""
 
-    async def testWithoutAScopeTheGuestContextIsReturned(self) -> None:
+    def testWithoutAScopeTheGuestContextIsReturned(self) -> None:
         """Validates the answer outside an HTTP request.
 
         Console commands and background tasks are anonymous by default.
         """
         self.assertIs(current_auth_context(), GUEST_CONTEXT)
 
-    async def testBindingRequiresAnActiveScope(self) -> None:
+    def testBindingRequiresAnActiveScope(self) -> None:
         """Validates that a context cannot be bound out of a request.
 
         Storing it globally would leak between concurrent requests.

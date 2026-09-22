@@ -158,7 +158,11 @@ class TestAuthFacadeInABootedApplication(TestCase):
         self.assertIsNone(AuthFacade.user())
 
     async def testContextInjectionIsScopedEvenBeforeAuthentication(self) -> None:
-        """Resolve independent guest contexts through the real application DI."""
+        """Resolve the authentication context through the real container.
+
+        Validates the scoped binding: one guest context per request, and
+        never the same instance across two scopes.
+        """
         app = Application()
         async with ScopeManager():
             first = await app.make(IAuthenticationContext)

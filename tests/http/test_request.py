@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from xml.etree.ElementTree import ParseError
-from msgspec import msgpack
+from msgspec import DecodeError, json, msgpack
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.body import BodyStream
@@ -954,6 +954,19 @@ class TestRequestJsonParsing(TestCase):
         )
         self.assertEqual(await request.json(), {"a": 1})
 
+    async def testParsesJsonArraysAndScalars(self) -> None:
+        """Decode and cache valid JSON values without requiring an object."""
+        for value in ([1, "value", None], "value", 42, 1.5, True):
+            with self.subTest(value=value):
+                request = make_asgi_request(
+                    body=json.encode(value),
+                    headers=[(b"content-type", b"application/json")],
+                )
+                parsed = await request.json()
+                self.assertEqual(parsed, value)
+                self.assertIs(type(parsed), type(value))
+                self.assertIs(await request.json(), parsed)
+
     async def testCachesAJsonNullLiteral(self) -> None:
         """
         Cache a decoded ``null`` literal instead of re-reading the body.
@@ -1037,6 +1050,15 @@ class TestRequestOtherParsers(TestCase):
         """
         request = make_asgi_request(body=msgpack.encode({"a": 1}))
         self.assertEqual(await request.msgpack(), {"a": 1})
+
+    async def testDecodesMessagePackArraysScalarsAndNull(self) -> None:
+        """Decode MessagePack values without requiring a map."""
+        for value in ([1, "value", None], "value", 42, 1.5, True, b"data", None):
+            with self.subTest(value=value):
+                request = make_asgi_request(body=msgpack.encode(value))
+                parsed = await request.msgpack()
+                self.assertEqual(parsed, value)
+                self.assertIs(type(parsed), type(value))
 
     async def testParsesAUrlEncodedBody(self) -> None:
         """
@@ -1255,21 +1277,29 @@ class TestRequestDataDictionary(TestCase):
             body=b"{oops}",
             headers=[(b"content-type", b"application/json")],
         )
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "Invalid JSON payload") as captured:
             await request.data()
+        self.assertIsInstance(captured.exception.__cause__, DecodeError)
 
-    async def testRejectsAJsonArray(self) -> None:
+    async def testRejectsNonObjectJsonValues(self) -> None:
         """
         Reject a JSON payload that is not an object.
 
-        Validates that schema validation always receives a mapping.
+        Require a mapping both before and after the JSON value is cached.
         """
-        request = make_asgi_request(
-            body=b"[1,2]",
-            headers=[(b"content-type", b"application/json")],
-        )
-        with self.assertRaises(TypeError):
-            await request.data()
+        for value in ([1, 2], "value", 42, 1.5, True, None):
+            for parse_first in (False, True):
+                with self.subTest(value=value, parse_first=parse_first):
+                    request = make_asgi_request(
+                        body=json.encode(value),
+                        headers=[(b"content-type", b"application/json")],
+                    )
+                    if parse_first:
+                        self.assertEqual(await request.json(), value)
+                    with self.assertRaisesRegex(
+                        TypeError, "JSON body must be an object",
+                    ):
+                        await request.data()
 
     async def testCollapsesRepeatedUrlEncodedFields(self) -> None:
         """
@@ -1329,21 +1359,28 @@ class TestRequestDataDictionary(TestCase):
             body=b"\xc1",
             headers=[(b"content-type", b"application/msgpack")],
         )
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+            ValueError, "Invalid MessagePack payload",
+        ) as captured:
             await request.data()
+        self.assertIsInstance(captured.exception.__cause__, DecodeError)
 
-    async def testRejectsAMessagePackArray(self) -> None:
+    async def testRejectsNonMapMessagePackValues(self) -> None:
         """
         Reject a MessagePack payload that is not a map.
 
         Validates that schema validation always receives a mapping.
         """
-        request = make_asgi_request(
-            body=msgpack.encode([1, 2]),
-            headers=[(b"content-type", b"application/msgpack")],
-        )
-        with self.assertRaises(TypeError):
-            await request.data()
+        for value in ([1, 2], "value", 42, 1.5, True, b"data", None):
+            with self.subTest(value=value):
+                request = make_asgi_request(
+                    body=msgpack.encode(value),
+                    headers=[(b"content-type", b"application/msgpack")],
+                )
+                with self.assertRaisesRegex(
+                    TypeError, "MessagePack body must be a map",
+                ):
+                    await request.data()
 
     async def testRejectsAnUnsupportedContentType(self) -> None:
         """

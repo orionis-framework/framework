@@ -202,7 +202,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
             if mapped is None:
                 continue
             status_code, content = mapped
-            response = self.__default_responses.error(
+            response = await self.__default_responses.error(
                 status_code=status_code,
                 content=content,
                 expects_json=wants_json,
@@ -216,7 +216,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         # Handle 500 server error — resolve adapter type once
         is_adapter = isinstance(request, TransportAdapter)
-        return self.__default_responses.exception(
+        return await self.__default_responses.exception(
             request_path=request.path() if is_adapter else request.path,
             request_method=request.method() if is_adapter else request.method,
             exception=exception,

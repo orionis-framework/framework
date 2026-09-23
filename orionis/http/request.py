@@ -32,7 +32,14 @@ if TYPE_CHECKING:
     from orionis.http.payload.form_data import FormData
 
 class UnsupportedMediaTypeException(Exception):
-    """Raised when the request Content-Type is not supported by the parser."""
+    """
+    Raise when the request Content-Type is unsupported by the parser.
+
+    Parameters
+    ----------
+    message : str, optional
+        Description of the unsupported media type.
+    """
 
 class Request(IRequest):
 
@@ -795,8 +802,8 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
-            The parsed JSON object.
+        object
+            The decoded JSON value: dict, list, str, int, float, bool, or None.
 
         Raises
         ------
@@ -834,8 +841,9 @@ class Request(IRequest):
         """
         Parse the request body as XML.
 
-        Uses ``defusedxml`` to guard against XML bomb, XXE, entity
-        expansion, and DTD-based attacks.
+        Uses ``defusedxml`` to reject internal and external entity declarations.
+        DTDs without entity declarations are allowed; external resources are
+        not resolved.
 
         Returns
         -------
@@ -845,19 +853,23 @@ class Request(IRequest):
         Raises
         ------
         xml.etree.ElementTree.ParseError
-            If the payload is malformed or contains forbidden constructs.
+            If the payload is malformed XML.
+        defusedxml.common.EntitiesForbidden
+            If the document declares an internal or external entity. This is a
+            subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
         """
         raw = await self.__body_stream.read()
         return parse_xml(raw)
 
-    async def msgpack(self) -> dict[str, Any]:
+    async def msgpack(self) -> object:
         """
         Decode the request body as MessagePack.
 
         Returns
         -------
-        dict[str, Any]
-            The decoded Python object.
+        object
+            The decoded MessagePack value, including maps, arrays, scalars,
+            binary data, extension values, or None.
 
         Raises
         ------
@@ -992,7 +1004,10 @@ class Request(IRequest):
         UnsupportedMediaTypeException
             Raise if ``Content-Type`` cannot be converted to a dictionary.
         ValueError
-            Raise if JSON or MessagePack content is not a mapping.
+            Raise if a JSON or MessagePack body is empty or cannot be decoded,
+            or if multipart parsing fails.
+        TypeError
+            Raise if decoded JSON or MessagePack content is not a mapping.
         """
         # Return the cached body dictionary if already parsed.
         if self.__cached_data is not None:

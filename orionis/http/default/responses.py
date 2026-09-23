@@ -1,6 +1,7 @@
 import json
 import platform
 import re
+from html import escape as escape_html
 from pathlib import Path
 from typing import ClassVar
 from orionis.foundation.contracts.application import IApplication
@@ -26,6 +27,37 @@ _ERROR_PLACEHOLDER_RE: re.Pattern = re.compile(
 
 # Human-readable status labels resolved once per HTTP status code.
 _STATUS_MESSAGES: dict[int, str] = {}
+_MIN_STATUS_CODE: int = 100
+_MAX_STATUS_CODE: int = 599
+
+def _validate_status_code(status_code: int | HTTPStatus) -> int:
+    """
+    Validate an HTTP status before either response format is rendered.
+
+    Parameters
+    ----------
+    status_code : int | HTTPStatus
+        HTTP status supplied to the default error response.
+
+    Returns
+    -------
+    int
+        Validated status, converting an HTTPStatus member to its value.
+
+    Raises
+    ------
+    TypeError
+        If status_code is not an integer.
+    ValueError
+        If status_code is outside the range 100 to 599.
+    """
+    if not isinstance(status_code, int):
+        error_msg = "status_code must be an integer"
+        raise TypeError(error_msg)
+    if not _MIN_STATUS_CODE <= status_code <= _MAX_STATUS_CODE:
+        error_msg = "status_code must be between 100 and 599"
+        raise ValueError(error_msg)
+    return status_code.value if isinstance(status_code, HTTPStatus) else status_code
 
 def _compile_placeholders(
     template: str,
@@ -437,9 +469,11 @@ class DefaultResponses(IDefaultResponses):
         Parameters
         ----------
         status_code : int | HTTPStatus
-            HTTP status code to display on the error page.
+            Integer HTTP status between 100 and 599. Unlisted codes use
+            an ``HTTP <code>`` label on the HTML page.
         content : str | dict
-            Content of the error to display.
+            Content of the error to display. HTML renders the description
+            as escaped text; JSON preserves the supplied values.
         expects_json : bool
             If True, returns a JSON response; otherwise, returns HTML.
         headers : dict[str, str] | None, optional
@@ -450,10 +484,16 @@ class DefaultResponses(IDefaultResponses):
         HTMLResponse or JSONResponse
             HTMLResponse with rendered error page, or JSONResponse if
             expects_json is True.
+
+        Raises
+        ------
+        TypeError
+            If status_code is not an integer.
+        ValueError
+            If status_code is outside the range 100 to 599.
         """
-        # Convert HTTPStatus enum to raw integer value
-        if isinstance(status_code, HTTPStatus):
-            status_code = status_code.value
+        # Validate both response formats before rendering or reading templates.
+        status_code = _validate_status_code(status_code)
 
         # Ensure cache-control header is always present
         if headers is None:
@@ -487,7 +527,10 @@ class DefaultResponses(IDefaultResponses):
         status_str = str(status_code)
         message: str | None = _STATUS_MESSAGES.get(status_code)
         if message is None:
-            message = HTTPStatus(status_code).name.replace("_", " ").title()
+            try:
+                message = HTTPStatus(status_code).name.replace("_", " ").title()
+            except ValueError:
+                message = f"HTTP {status_code}"
             _STATUS_MESSAGES[status_code] = message
         if isinstance(content, dict):
             description = (
@@ -504,7 +547,7 @@ class DefaultResponses(IDefaultResponses):
             "2": status_str[2],
             "error": status_str,
             "message": message,
-            "description": description,
+            "description": escape_html(description),
         }
 
         literals, keys = plan

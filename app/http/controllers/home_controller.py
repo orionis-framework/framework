@@ -1,16 +1,29 @@
-from orionis.http import HTMLResponse
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.auth.contracts.manager import IAuthManager
+from orionis.http import HTMLResponse, response
 from orionis.http.base import BaseController
-from orionis.support.facades import View
 
 class HomeController(BaseController):
 
-    async def index(self) -> HTMLResponse:
+    async def home(
+        self,
+        auth: IAuthManager,
+    ) -> HTMLResponse:
         """
-        Return the welcome page response.
+        Render the authenticated home page response.
+
+        Parameters
+        ----------
+        auth : IAuthManager
+            Authentication service bound to the current request.
 
         Returns
         -------
         HTMLResponse
-            Rendered response for the welcome page.
+            The rendered home page for the signed-in user.
         """
-        return await View.make("welcome")
+        identity: IAuthenticatable | None = auth.user()
+        return await response.view(
+            "home.index",
+            user={"name": identity.name, "email": identity.email},
+        )

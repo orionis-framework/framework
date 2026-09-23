@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
 from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.foundation.contracts.application import IApplication
-from orionis.http.default.controllers.login_controller import LoginController
-from orionis.http.default.controllers.register_controller import RegisterController
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.exceptions.fallback_route_already_registered import (
@@ -173,17 +171,20 @@ class Router(IRouter):
             error_msg = "Route.auth() must be declared in a web route file."
             raise ValueError(error_msg)
 
-        # Determine which controllers to use for login and registration.
-        login: type = (
-            login_controller
-            if login_controller is not None
-            else LoginController
-        )
-        register: type = (
-            register_controller
-            if register_controller is not None
-            else RegisterController
-        )
+        # Load built-in controllers only when their routes are requested.
+        login = login_controller
+        if login is None:
+            from orionis.http.default.controllers.login_controller import (  # noqa: PLC0415
+                LoginController,
+            )
+            login = LoginController
+
+        register = register_controller
+        if register is None:
+            from orionis.http.default.controllers.register_controller import (  # noqa: PLC0415
+                RegisterController,
+            )
+            register = RegisterController
 
         # Register the auth routes with the appropriate middleware and controllers.
         self.group(middleware=GuestMiddleware, routes=[

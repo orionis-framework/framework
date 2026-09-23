@@ -5,13 +5,18 @@ from html.parser import HTMLParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
+from markupsafe import Markup
 from orionis.http.default.responses import DefaultResponses
 from orionis.test import TestCase
+from orionis.view.engine import Jinja2Engine
+from orionis.view.environment import ViewEnvironment
 
 if TYPE_CHECKING:
     from orionis.http.responses import FileResponse
 
 class _DefaultFixture:
+
+    __slots__ = ("basePath", "directory", "settings")
 
     def __init__(self, directory: Path) -> None:
         """
@@ -28,11 +33,17 @@ class _DefaultFixture:
             No return value.
         """
         self.directory = directory
+        self.basePath = directory
         self.settings = {
             "app.name": "Example", "app.locale": "en", "app.maintenance": False,
+            "app.debug": True, "app.env": "testing", "app.interface": "asgi",
+            "view": {
+                "paths": [str(directory)], "cache_path": None,
+                "autoescape": True, "auto_reload": False,
+            },
         }
 
-    def config(self, key: str) -> str | bool:
+    def config(self, key: str) -> object:
         """
         Return the requested configuration value.
 
@@ -43,7 +54,7 @@ class _DefaultFixture:
 
         Returns
         -------
-        str | bool
+        object
             Stored configuration value.
         """
         return self.settings[key]
@@ -60,6 +71,8 @@ class _DefaultFixture:
         return self.directory
 
 class _Request:
+
+    __slots__ = ("wants_json",)
 
     def __init__(self, *, wants_json: bool) -> None:
         """
@@ -87,6 +100,22 @@ class _Request:
             Whether JSON is requested.
         """
         return self.wants_json
+
+
+class _RecordingEngine:
+    """Record awaited renders without using a second template implementation."""
+
+    __slots__ = ("calls", "content")
+
+    def __init__(self, content: str = "<main>Injected engine</main>") -> None:
+        """Store the response text and allocate an independent call history."""
+        self.content = content
+        self.calls: list[tuple[str, dict[str, object]]] = []
+
+    async def render(self, template: str, context: dict[str, object]) -> str:
+        """Record a render that was awaited and return its configured content."""
+        self.calls.append((template, context))
+        return self.content
 
 
 class _ErrorPage(HTMLParser):
@@ -148,38 +177,36 @@ def _defaults(directory: Path) -> DefaultResponses:
         Service configured for the test assets.
     """
     fixture = _DefaultFixture(directory)
-    return DefaultResponses(fixture, fixture)
+    return DefaultResponses(fixture, fixture, Jinja2Engine(ViewEnvironment(fixture)))
 
 
 class TestDefaultResponseCache(TestCase):
 
-    def testHealthResponsesDoNotShareMutableState(self) -> None:
+    async def testHealthResponsesDoNotShareMutableState(self) -> None:
         """Keep headers and flash data private to each health request."""
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             for wants_json in (True, False):
                 request = _Request(wants_json=wants_json)
-                first = defaults.health(request)
+                first = await defaults.health(request)
                 first.setHeader("x-private", "first")
                 first.withFlash("message", "private")
-                second = defaults.health(request)
+                second = await defaults.health(request)
                 self.assertIsNot(first, second)
                 self.assertEqual(first.getBody(), second.getBody())
                 self.assertFalse(second.hasHeader("x-private"))
                 self.assertIsNone(second.getFlashData())
-                if not wants_json:
-                    self.assertIs(first.getBody(), second.getBody())
 
-    def testErrorDoesNotSerializeUnusedDetails(self) -> None:
+    async def testErrorDoesNotSerializeUnusedDetails(self) -> None:
         """Render an explicit message without serializing other fields."""
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
-            result = defaults.error(
+            result = await defaults.error(
                 500, {"message": "Readable", "opaque": object()}, expects_json=False,
             )
             self.assertIn(b"Readable", result.getBody())
 
-    def testErrorRendersUntrustedDescriptionsAsText(self) -> None:
+    async def testErrorRendersUntrustedDescriptionsAsText(self) -> None:
         """Keep payloads out of markup and scripts across cached renders."""
         payload = (
             '</script><script>probe()</script><img src=x onerror="probe()">'
@@ -188,24 +215,24 @@ class TestDefaultResponseCache(TestCase):
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             baseline = _ErrorPage(
-                defaults.error(500, "Safe", expects_json=False).getBody(),
+                (await defaults.error(500, "Safe", expects_json=False)).getBody(),
             )
             for content, expected in (
                 (payload, payload),
+                (Markup(payload), payload),  # noqa: S704 - Test caller trust markers.
                 ({"message": payload, "opaque": object()}, payload),
                 ({"detail": payload}, json.dumps({"detail": payload})),
                 ("&lt;unchanged&gt;", "&lt;unchanged&gt;"),
                 ("Next response", "Next response"),
             ):
                 with self.subTest(content=content):
-                    parsed = _ErrorPage(
-                        defaults.error(500, content, expects_json=False).getBody(),
-                    )
+                    response = await defaults.error(500, content, expects_json=False)
+                    parsed = _ErrorPage(response.getBody())
                     self.assertEqual("".join(parsed.description), expected)
                     self.assertEqual(parsed.tags, baseline.tags)
                     self.assertEqual(parsed.scripts, baseline.scripts)
 
-    def testErrorJsonPreservesDescriptionValues(self) -> None:
+    async def testErrorJsonPreservesDescriptionValues(self) -> None:
         """Keep JSON strings and structured fields independent of HTML escaping."""
         payload = '<em title="quoted">A&B</em>\nEspañol'
         with TemporaryDirectory() as directory:
@@ -216,10 +243,10 @@ class TestDefaultResponseCache(TestCase):
                 ({"detail": payload}, {"detail": payload}),
             ):
                 with self.subTest(content=content):
-                    result = defaults.error(500, content, expects_json=True)
+                    result = await defaults.error(500, content, expects_json=True)
                     self.assertEqual(json.loads(result.getBody()), expected)
 
-    def testErrorAcceptsKnownAndUnlistedStatusCodesInBothFormats(self) -> None:
+    async def testErrorAcceptsKnownAndUnlistedStatusCodesInBothFormats(self) -> None:
         """Preserve custom status codes and existing labels on repeated renders."""
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
@@ -229,20 +256,20 @@ class TestDefaultResponseCache(TestCase):
             ):
                 with self.subTest(status=status):
                     for expects_json in (True, False, False):
-                        result = defaults.error(
+                        result = await defaults.error(
                             status, "Example", expects_json=expects_json,
                         )
                         self.assertEqual(result.getStatusCode(), status)
                         if not expects_json:
-                            title = f'<div class="error-title">{label}</div>'
+                            title = f'<h1 class="error-title">{label}</h1>'
                             self.assertIn(title.encode(), result.getBody())
 
-    def testErrorRejectsInvalidStatusesBeforeRendering(self) -> None:
+    async def testErrorRejectsInvalidStatusesBeforeRendering(self) -> None:
         """Validate type and range before reading templates or converting content."""
         with TemporaryDirectory() as directory:
-            defaults = _defaults(Path(directory))
-            # A missing template directory exposes validation performed too late.
-            defaults._PAGES_DIR = Path(directory) / "missing"
+            fixture = _DefaultFixture(Path(directory))
+            engine = _RecordingEngine()
+            defaults = DefaultResponses(fixture, fixture, engine)
             for value, exception in (
                 ("400", TypeError), (400.0, TypeError), (None, TypeError),
                 (-1, ValueError), (99, ValueError), (600, ValueError),
@@ -253,19 +280,22 @@ class TestDefaultResponseCache(TestCase):
                         self.subTest(value=value, expects_json=expects_json),
                         self.assertRaises(exception),
                     ):
-                        defaults.error(
+                        await defaults.error(
                             value, {"opaque": object()}, expects_json=expects_json,
                         )
+            self.assertEqual(engine.calls, [])
 
-    def testErrorPreservesCallerHeaders(self) -> None:
+    async def testErrorPreservesCallerHeaders(self) -> None:
         """Apply cache defaults without mutating the supplied mapping."""
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             headers = {"x-test": "value"}
-            result = defaults.error(500, "Error", expects_json=True, headers=headers)
+            result = await defaults.error(
+                500, "Error", expects_json=True, headers=headers,
+            )
             self.assertEqual(headers, {"x-test": "value"})
             self.assertTrue(result.hasHeader("cache-control"))
-            result = defaults.error(
+            result = await defaults.error(
                 500, "Error", expects_json=True, headers={"Cache-Control": "custom"},
             )
             self.assertEqual(result.getHeader("cache-control"), ["custom"])
@@ -282,9 +312,9 @@ class TestDefaultResponseCache(TestCase):
             ):
                 content = filename.encode("ascii")
                 (public / filename).write_bytes(content)
-                first = method()
+                first = await method()
                 first.setHeader("x-private", "first")
-                second = method()
+                second = await method()
                 self.assertIsNot(first, second)
                 self.assertFalse(second.hasHeader("x-private"))
 

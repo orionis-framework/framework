@@ -1,12 +1,10 @@
 from typing import Any
-
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.foundation.contracts.application import IApplication
 from orionis.http import HttpResponse, response
 from orionis.http.base import BaseController
 from orionis.http.default.schemas.login import LoginSchema
 from orionis.http.request import Request
-
 
 class LoginController(BaseController):
 

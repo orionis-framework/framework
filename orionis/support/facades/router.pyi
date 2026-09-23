@@ -1,57 +1,68 @@
-from collections.abc import Callable
+from collections.abc import Sequence
 from orionis.container.contracts.facade import IFacade
-from orionis.http.middleware import BaseMiddleware
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.fluent import FluentRoute
+from orionis.http.routes.group import RouteGroup
+from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 class Route(IRouter, IFacade):
+
+    @classmethod
+    def auth(cls) -> None: ...
+
+    @classmethod
+    def view(
+        cls,
+        path: str,
+        view: str,
+    ) -> FluentRoute: ...
 
     @classmethod
     def post(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def get(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def query(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def put(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def delete(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def patch(
         cls,
         path: str,
-        action: Callable | list | type | None = None,
+        action: RouteAction | None = None,
     ) -> FluentRoute: ...
 
     @classmethod
     def fallback(
         cls,
-        action: Callable | list | type | None = None,
+        action: RouteAction,
     ) -> None: ...
 
     @classmethod
@@ -59,9 +70,10 @@ class Route(IRouter, IFacade):
         cls,
         *,
         prefix: str | None = None,
-        middleware: type[BaseMiddleware] | list | tuple | set | None = None,
-        without_middleware: (
-            type[BaseMiddleware] | list | tuple | set | None
-        ) = None,
-        routes: list[FluentRoute] | None = None,
-    ) -> None: ...
+        middleware: MiddlewareInput | None = None,
+        without_middleware: MiddlewareInput | None = None,
+        routes: Sequence[FluentRoute | RouteGroup] | None = None,
+    ) -> RouteGroup: ...
+
+    @classmethod
+    def export(cls) -> dict: ...

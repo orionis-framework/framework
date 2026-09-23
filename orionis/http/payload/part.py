@@ -5,6 +5,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING
 from urllib.parse import unquote_to_bytes
 from orionis.http.payload.contracts.part import IMultipartPart
+from orionis.http.payload.parsers import _split_header_parameters
 from orionis.http.payload.uploaded_file import UploadedFile
 
 if TYPE_CHECKING:
@@ -82,6 +83,9 @@ class MultipartPart(IMultipartPart):
         """
         Parse a ``Content-Disposition`` header into a key-value dict.
 
+        Preserve semicolons within single- or double-quoted values and
+        prefer successfully decoded extended attributes over plain values.
+
         Parameters
         ----------
         disposition : str
@@ -97,7 +101,7 @@ class MultipartPart(IMultipartPart):
         # Extended values override plain fallbacks per RFC 6266 §4.1
         extended: dict[str, str] = {}
 
-        for row_part in disposition.split(";"):
+        for row_part in _split_header_parameters(disposition, quote_chars="\"'"):
             part = row_part.strip()
             # Skip directive tokens that carry no value assignment
             if "=" not in part:

@@ -4,7 +4,6 @@ from orionis.http.base import BaseController
 from orionis.http.default.schemas.register import RegisterSchema
 from orionis.support.facades import DB, Hash
 
-
 class RegisterController(BaseController):
 
     # ruff: noqa: TC001, BLE001

@@ -20,7 +20,7 @@ class _FakeDefaultResponses:
         """Initialise the recorder of the negotiated payload format."""
         self.expects_json: bool = False
 
-    def error(
+    async def error(
         self,
         status_code: int,
         content: dict,

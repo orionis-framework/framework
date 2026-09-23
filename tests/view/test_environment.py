@@ -123,14 +123,13 @@ class TestViewEnvironment(TestCase):
 
     def testSinglePathUsesFileSystemLoader(self) -> None:
         """
-        Use a FileSystemLoader when a single template path is configured.
+        Retain the application FileSystemLoader behind built-in templates.
 
-        Validates that the Jinja2 environment loader is a FileSystemLoader
-        when only one search path is provided.
+        Configured views remain available alongside the framework namespace.
         """
         env = self._buildEnv(paths=[self._tmpdir.name])
         jinja_env = env.getJinjaEnvironment()
-        self.assertIsInstance(jinja_env.loader, jinja2.FileSystemLoader)
+        self.assertIsInstance(jinja_env.loader.loaders[1], jinja2.FileSystemLoader)
 
     def testMultiplePathsUsesChoiceLoader(self) -> None:
         """
@@ -297,7 +296,7 @@ class TestViewEnvironment(TestCase):
         views_dir = Path(self._tmpdir.name) / "resources"
         views_dir.mkdir()
         env = self._buildEnv(paths=["resources"])
-        loader = env.getJinjaEnvironment().loader
+        loader = env.getJinjaEnvironment().loader.loaders[1]
         self.assertEqual(loader.searchpath, [str(views_dir)])
 
     def testAbsolutePathIsUsedVerbatim(self) -> None:
@@ -309,7 +308,7 @@ class TestViewEnvironment(TestCase):
         """
         absolute = Path(self._tmpdir.name).resolve()
         env = self._buildEnv(paths=[str(absolute)])
-        loader = env.getJinjaEnvironment().loader
+        loader = env.getJinjaEnvironment().loader.loaders[1]
         self.assertEqual(loader.searchpath, [str(absolute)])
 
     def testRelativeCachePathIsResolvedAgainstBasePath(self) -> None:
@@ -341,7 +340,16 @@ class TestViewEnvironment(TestCase):
         Validates that HTML escaping honours the declared setting.
         """
         env = self._buildEnv()
-        self.assertTrue(env.getJinjaEnvironment().autoescape)
+        self.assertTrue(env.getJinjaEnvironment().autoescape("application.html"))
+
+    def testBuiltinAutoescapeDoesNotChangeApplicationConfiguration(self) -> None:
+        """Always escape built-ins while honouring the application's flag."""
+        app = self._buildApp()
+        app.view_config["autoescape"] = False
+        env = ViewEnvironment(app).getJinjaEnvironment()
+        self.assertFalse(env.autoescape("application.html"))
+        self.assertFalse(env.autoescape(None))
+        self.assertTrue(env.autoescape("__orionis__/default/exception.html"))
 
     def testAutoReloadIsTakenFromConfiguration(self) -> None:
         """

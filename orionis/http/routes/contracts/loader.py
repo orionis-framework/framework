@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
-
 
 class IRouteLoader(ABC):
 
@@ -33,5 +31,6 @@ class IRouteLoader(ABC):
         tuple | None
             ``(class, method_name)`` for controller-based fallbacks,
             ``(None, callable)`` for callable-based fallbacks, or
-            ``None`` if no fallback has been registered.
+            ``None`` if no fallback has been registered, whether routes are
+            compiled on demand or restored from cache.
         """

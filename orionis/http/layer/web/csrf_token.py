@@ -36,11 +36,12 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
     Design decisions
     ----------------
-    * **Session-bound token** — a single token is generated per session and
-      reused for its entire lifetime.  Regeneration happens only on
-      privilege changes (login / logout) which must call
-      ``session.regenerate()`` explicitly; the middleware detects the fresh
-      session and issues a new token automatically.
+    * **Session-bound token** — an existing token is reused while its session
+      value is truthy. ``session.regenerate()`` requests an identifier rotation
+      and preserves the token along with the other session data.
+      ``SessionGuard.login()`` explicitly replaces the token; logout invalidates
+      the session and clears it. This middleware creates a token when the
+      configured session key is missing or has a falsy value.
     * **Cryptographic token** — ``secrets.token_urlsafe(n)`` produces
       URL-safe Base-64 output from the OS CSPRNG.  32 bytes → 256 bits of
       entropy, well above the OWASP minimum.
@@ -169,13 +170,13 @@ class CSRFTokenMiddleware(BaseMiddleware):
         """
         Return the CSRF token for this session, creating it if absent.
 
-        A new token is generated when:
+        An existing truthy token is returned unchanged, including after
+        ``session.regenerate()``. A new token is stored only when the configured
+        session key is missing or has a falsy value. Login token rotation and
+        logout clearing are handled explicitly by ``SessionGuard``.
 
-        * the session has no token yet (first request for this session), or
-        * the session was just regenerated (login / logout / privilege change).
-
-        The token is never regenerated on a per-request basis — this would
-        invalidate tokens in parallel tab scenarios.
+        Without an active session, return a fresh ephemeral token for this
+        request without persisting it.
 
         Parameters
         ----------

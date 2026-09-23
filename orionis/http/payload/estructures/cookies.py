@@ -1,3 +1,5 @@
+# Keep public view annotations resolvable through runtime introspection.
+from collections.abc import ItemsView, KeysView, ValuesView  # noqa: TC003
 from typing import TYPE_CHECKING
 from urllib.parse import unquote
 from orionis.support.patterns.final.meta import Final
@@ -115,7 +117,7 @@ class Cookies(metaclass=Final):
         """
         return key in self._data
 
-    def items(self) -> dict[str, str].items:
+    def items(self) -> ItemsView[str, str]:
         """
         Return a view of the cookie container's items.
 
@@ -126,7 +128,7 @@ class Cookies(metaclass=Final):
         """
         return self._data.items()
 
-    def keys(self) -> dict[str, str].keys:
+    def keys(self) -> KeysView[str]:
         """
         Return a view of the cookie container's keys.
 
@@ -137,7 +139,7 @@ class Cookies(metaclass=Final):
         """
         return self._data.keys()
 
-    def values(self) -> dict[str, str].values:
+    def values(self) -> ValuesView[str]:
         """
         Return a view of the cookie container's values.
 

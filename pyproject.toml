@@ -143,6 +143,7 @@ database = [
 
 [dependency-groups]
 dev = [
+    "coverage>=7.16.1",
     "ruff>=0.16.8",
 ]
 docs = [

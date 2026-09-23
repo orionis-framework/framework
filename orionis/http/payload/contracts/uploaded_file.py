@@ -47,9 +47,11 @@ class IUploadedFile(ABC):
         """
         Append *chunk* to the file buffer.
 
+        Append at the end even when a previous read moved the cursor.
+
         Parameters
         ----------
-        chunk : bytes
+        chunk : bytes | bytearray | memoryview
             Raw bytes to append.
 
         Returns

@@ -151,7 +151,8 @@ class RSGITransportAdapter(TransportAdapter):
         Returns
         -------
         str | None
-            Return the client IP string, or ``None`` when unavailable.
+            Return the client IP without IPv6 brackets, or ``None`` when
+            unavailable.
         """
         # Return cached result on subsequent calls.
         c = self.__client
@@ -165,6 +166,8 @@ class RSGITransportAdapter(TransportAdapter):
 
         # Parse host and port, including IPv6 forms with multiple colons.
         ip, port = raw.rsplit(":", 1)
+        if ip.startswith("[") and ip.endswith("]"):
+            ip = ip[1:-1]
 
         self.__client = ip
         # Expose resolved client data through the state layer.

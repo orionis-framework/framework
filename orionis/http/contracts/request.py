@@ -341,8 +341,8 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
-            The parsed JSON object.
+        object
+            The decoded JSON value: dict, list, str, int, float, bool, or None.
 
         Raises
         ------
@@ -403,6 +403,9 @@ class IRequest(ABC):
         """
         Parse the request body as XML and return the root element.
 
+        Entity declarations are rejected. DTDs without entity declarations
+        are allowed; external resources are not resolved.
+
         Returns
         -------
         ET.Element
@@ -411,18 +414,22 @@ class IRequest(ABC):
         Raises
         ------
         xml.etree.ElementTree.ParseError
-            If the XML body is malformed or contains forbidden constructs.
+            If the XML body is malformed.
+        defusedxml.common.EntitiesForbidden
+            If the document declares an internal or external entity. This is a
+            subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
         """
 
     @abstractmethod
-    async def msgpack(self) -> dict[str, Any]:
+    async def msgpack(self) -> object:
         """
         Decode the request body as MessagePack.
 
         Returns
         -------
-        dict[str, Any]
-            The decoded Python object.
+        object
+            The decoded MessagePack value, including maps, arrays, scalars,
+            binary data, extension values, or None.
 
         Raises
         ------
@@ -472,7 +479,10 @@ class IRequest(ABC):
         UnsupportedMediaTypeException
             If the ``Content-Type`` cannot be converted to a dictionary.
         ValueError
-            If a JSON or MessagePack body is not a mapping.
+            If a JSON or MessagePack body is empty or cannot be decoded,
+            or if multipart parsing fails.
+        TypeError
+            If a decoded JSON or MessagePack body is not a mapping.
         """
 
     @property

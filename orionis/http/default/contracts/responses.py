@@ -14,8 +14,10 @@ if TYPE_CHECKING:
 
 class IDefaultResponses(ABC):
 
+    __slots__ = ()
+
     @abstractmethod
-    def favicon(self) -> FileResponse | Response:
+    async def favicon(self) -> FileResponse | Response:
         """
         Return the favicon file response or a 404 response if not found.
 
@@ -32,7 +34,7 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
-    def robotsTxt(self) -> FileResponse | Response:
+    async def robotsTxt(self) -> FileResponse | Response:
         """
         Return the robots.txt file or a 404 response if not found.
 
@@ -46,12 +48,11 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
-    def sitemapXml(self) -> FileResponse | Response:
+    async def sitemapXml(self) -> FileResponse | Response:
         """
-        Return the sitemap.xml file or a 404 response if found, else 404.
+        Return the public sitemap.xml file, or a 404 response when absent.
 
-        Search for a sitemap.xml file in the public storage directory. If not found,
-        check for a fallback file. Cache the result for future calls.
+        Retain the selected path and read its current metadata for each response.
 
         Returns
         -------
@@ -60,7 +61,7 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
-    def health(self, request: Request) -> HTMLResponse | JSONResponse:
+    async def health(self, request: Request) -> HTMLResponse | JSONResponse:
         """
         Render the application health state as an HTML or JSON response.
 
@@ -78,7 +79,7 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
-    def error(
+    async def error(
         self,
         status_code: int | HTTPStatus,
         content: str | dict,
@@ -119,7 +120,7 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
-    def exception(
+    async def exception(
         self,
         request_path: str,
         request_method: str,
@@ -144,4 +145,19 @@ class IDefaultResponses(ABC):
         -------
         HTMLResponse
             Rendered exception page as an HTMLResponse with the given status code.
+        """
+
+    @abstractmethod
+    def asset(self, path: str) -> FileResponse | Response:
+        """Return an allowlisted framework asset, or a 404 response.
+
+        Parameters
+        ----------
+        path : str
+            Asset path relative to the framework's public asset prefix.
+
+        Returns
+        -------
+        FileResponse or Response
+            Packaged static file when allowed and present, otherwise a 404.
         """

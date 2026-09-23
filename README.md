@@ -293,6 +293,7 @@ versioned guides:
 | [ORM & Database (Spanish)](orionis/orm/README.es.md) | Models, relationships, queries, migrations, and transactions. |
 | [Views](orionis/view/docs/README.md) | Async templates and their integration with forms and sessions. |
 | [Storage](orionis/storage/docs/README.md) | Disks, uploads, streams, and cloud drivers. |
+| [Mail](orionis/mail/docs/README.md) | Mailables, direct sends, MIME, storage attachments, SMTP, and .eml files. |
 | [Testing](orionis/test/docs/README.md) | Async test cases, injected dependencies, and the runner. |
 
 Most module guides also have a sibling `README.es.md`. Authentication code
@@ -306,8 +307,9 @@ review changes before upgrading. Compatibility and production readiness should
 be assessed against your own application requirements.
 
 Background tasks run **in process**, after a response; they are not a durable
-queue. Mail delivery, durable queues, WebSockets, and Inertia/Vite integrations
-are **not implemented yet**. Authentication currently covers sessions and
+queue. Mail supports synchronous composition with asynchronous SMTP or file
+delivery. Durable queues, WebSockets, and Inertia/Vite integrations are
+**not implemented yet**. Authentication currently covers sessions and
 personal access tokens, not JWT, OAuth, MFA, or password-reset flows.
 
 ## Build It With Us

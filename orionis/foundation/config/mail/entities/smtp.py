@@ -31,10 +31,8 @@ class Smtp(BaseEntity):
     Raises
     ------
     TypeError
-        If any attribute does not meet type or value requirements.
+        If any attribute does not meet its structural type requirements.
     """
-
-    # ruff: noqa: C901
 
     driver : str = field(
         default="smtp",
@@ -102,11 +100,11 @@ class Smtp(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Validate initialization of SMTP configuration attributes.
+        Validate the structural types of SMTP configuration attributes.
 
-        Parameters
-        ----------
-        None
+        Effective ports, timeouts, encryption, and authentication are validated
+        by the selected SMTP transport after applying URL precedence. Unused
+        SMTP configurations must not prevent another mailer from starting.
 
         Returns
         -------
@@ -117,8 +115,6 @@ class Smtp(BaseEntity):
         ------
         TypeError
             If any attribute is not of the expected type.
-        ValueError
-            If any attribute has an invalid value.
         """
         # Validate 'url' type
         if not isinstance(self.url, str):
@@ -128,13 +124,10 @@ class Smtp(BaseEntity):
         if not isinstance(self.host, str):
             error_msg = "The 'host' attribute must be a string."
             raise TypeError(error_msg)
-        # Validate 'port' type and value
+        # Validate 'port' type
         if not isinstance(self.port, int):
             error_msg = "The 'port' attribute must be an integer."
             raise TypeError(error_msg)
-        if self.port < 0:
-            error_msg = "The 'port' attribute must be a non-negative integer."
-            raise ValueError(error_msg)
         # Validate 'encryption' type
         if not isinstance(self.encryption, str):
             error_msg = "The 'encryption' attribute must be a string."
@@ -147,15 +140,6 @@ class Smtp(BaseEntity):
         if not isinstance(self.password, str):
             error_msg = "The 'password' attribute must be a string."
             raise TypeError(error_msg)
-        # Validate 'timeout' type and value if not None
-        if self.timeout is not None:
-            if not isinstance(self.timeout, int):
-                error_msg = (
-                    "The 'timeout' attribute must be an integer or None."
-                )
-                raise TypeError(error_msg)
-            if self.timeout < 0:
-                error_msg = (
-                    "The 'timeout' attribute must be a non-negative integer or None."
-                )
-                raise ValueError(error_msg)
+        if self.timeout is not None and not isinstance(self.timeout, int):
+            error_msg = "The 'timeout' attribute must be an integer or None."
+            raise TypeError(error_msg)

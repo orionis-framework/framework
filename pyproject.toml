@@ -9,15 +9,17 @@ exclude = [
     "bootstrap*",
     "config*",
     "database*",
+    "docs*",
     "resources",
     "routes*",
     "storage*",
     "tests*",
-    ".venv*",
-    ".ruff_cache*",
-    ".vscode*",
     ".github*",
-    ".docs*",
+    ".venv*",
+    ".vscode*",
+    ".ruff_cache*",
+    ".env*",
+    "*.ps1"
 ]
 
 [project]

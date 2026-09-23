@@ -15,14 +15,14 @@ class Facade(metaclass=FacadeMeta):
     _pinned_instance: Any = None
 
     @classmethod
-    def getFacadeAccessor(cls) -> str:
+    def getFacadeAccessor(cls) -> str | type:
         """
         Return the container accessor key for this facade.
 
         Returns
         -------
-        str
-            Return the service key used to resolve the container binding.
+        str | type
+            Return the alias or contract class used to resolve the binding.
 
         Raises
         ------

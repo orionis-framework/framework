@@ -4,14 +4,14 @@ class IFacade(ABC):
 
     @classmethod
     @abstractmethod
-    def getFacadeAccessor(cls) -> str:
+    def getFacadeAccessor(cls) -> str | type:
         """
         Return the container accessor key for this facade.
 
         Returns
         -------
-        str
-            The service key used to resolve the container binding.
+        str | type
+            The alias or contract class used to resolve the container binding.
 
         Raises
         ------

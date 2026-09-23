@@ -1,11 +1,8 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed mailer option names
-_MAILER_OPTIONS: frozenset[str] = frozenset(f.name for f in fields(Mailers))
 
 @dataclass(frozen=True, kw_only=True)
 class Mail(BaseEntity):
@@ -15,15 +12,15 @@ class Mail(BaseEntity):
     Attributes
     ----------
     default : str
-        The default mailer transport to use.
+        The default configured mailer name, not its transport driver.
     mailers : Mailers or dict
-        The available mail transport configurations.
+        Conventional entities or arbitrary mailer names mapped to their settings.
     """
 
     default: str = field(
         default_factory=lambda: Env.get("MAIL_MAILER", "smtp"),
         metadata={
-            "description": "The default mailer transport to use.",
+            "description": "The default configured mailer name.",
             "default": "smtp",
         },
     )
@@ -31,46 +28,47 @@ class Mail(BaseEntity):
     mailers: Mailers | dict = field(
         default_factory=Mailers,
         metadata={
-            "description": "The available mail transport configurations.",
+            "description": "The available named mailer configurations.",
             "default": lambda: Mailers().toDict(),
         },
     )
 
     def __post_init__(self) -> None:
-        """
-        Validate the integrity of the Mail instance after initialization.
+        """Validate the configuration shape without resolving transports.
 
-        Ensures that the 'default' attribute is a string and matches one of the
-        available mailer options, and that the 'mailers' attribute is an instance
-        of Mailers or a dictionary.
+        Preserve named dictionary entries for driver registration by providers.
+        Transport availability and operational settings are checked on sending.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Copy dictionary entries without modifying the supplied configuration.
 
         Raises
         ------
         ValueError
-            If 'default' is not a valid string option.
+            If the default or a mailer name is empty or not a string.
         TypeError
-            If 'mailers' is not a Mailers object or a dictionary.
+            If mailers or their settings have an unsupported structure.
         """
-        # Validate 'default' attribute against pre-cached mailer options
-        options = _MAILER_OPTIONS
-        if not isinstance(self.default, str) or self.default not in options:
-            error_msg = (
-                f"The 'default' property must be a string and match one of the "
-                f"available options ({sorted(options)})."
-            )
+        if not isinstance(self.default, str) or not self.default.strip():
+            error_msg = "The 'default' property must be a non-empty mailer name."
             raise ValueError(error_msg)
 
-        # Validate 'mailers' attribute
         if not isinstance(self.mailers, (Mailers, dict)):
             error_msg = (
                 "The 'mailers' property must be an instance of Mailers or a dictionary."
             )
             raise TypeError(error_msg)
-        # Convert dict to Mailers if necessary
-        if isinstance(self.mailers, dict):
-            object.__setattr__(self, "mailers", Mailers(**self.mailers))
+        if not isinstance(self.mailers, dict):
+            return
+        entries = {}
+        for name, settings in self.mailers.items():
+            if not isinstance(name, str) or not name.strip():
+                error_msg = "Mailer names must be non-empty strings."
+                raise ValueError(error_msg)
+            if not isinstance(settings, (dict, BaseEntity)):
+                error_msg = "Mailer settings must be dictionaries or entities."
+                raise TypeError(error_msg)
+            entries[name] = dict(settings) if isinstance(settings, dict) else settings
+        object.__setattr__(self, "mailers", entries)

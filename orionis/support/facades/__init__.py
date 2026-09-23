@@ -8,6 +8,7 @@ from orionis.support.facades.encrypter import Crypt
 from orionis.support.facades.hash import Hash
 from orionis.support.facades.lang import Lang
 from orionis.support.facades.logger import Log
+from orionis.support.facades.mail import Mail
 from orionis.support.facades.reactor import Reactor
 from orionis.support.facades.router import Route
 from orionis.support.facades.schedule import Schedule
@@ -28,6 +29,7 @@ __all__ = [
     "Hash",
     "Lang",
     "Log",
+    "Mail",
     "Reactor",
     "Route",
     "Schedule",

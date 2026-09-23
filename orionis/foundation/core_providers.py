@@ -10,6 +10,7 @@ from orionis.hashing.provider import HashProvider
 from orionis.http.routes.provider import RouterProvider
 from orionis.localization.provider import LocalizationProvider
 from orionis.logging.provider import LoggerProvider
+from orionis.mail.provider import MailProvider
 from orionis.orm.provider import QueryBuilderProvider
 from orionis.storage.provider import StorageProvider
 from orionis.test.provider import TestingProvider
@@ -34,6 +35,7 @@ def get_core_providers_mapping() -> tuple:
         HashProvider,
         LocalizationProvider,
         LoggerProvider,
+        MailProvider,
         QueryBuilderProvider,
         ReactorProvider,
         RouterProvider,

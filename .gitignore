@@ -1,17 +1,17 @@
 # ========================
-# Orionis
+# Orionis runtime data
 # ========================
 storage/app/private/*
 storage/framework/*
 storage/logs/*
+storage/mail/*
 database/*.sqlite
-docs
+/docs
 
 # ========================
-# Orionis - Utilities
+# Orionis utilities
 # ========================
 *.ps1
-push.py
 
 # ========================
 # Python
@@ -20,29 +20,28 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.pyd
-*.pyo
-
-# ========================
-# Virtual environment (uv)
-# ========================
+!*.pyi
 .venv/
 venv/
 env/
 .env
 
 # ========================
-# Distribution / packaging
+# Testing and coverage
+# ========================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# ========================
+# Distribution and packaging
 # ========================
 build/
 dist/
 *.egg-info/
 .eggs/
-
-# ========================
-# uv
-# ========================
-uv.lock
 
 # ========================
 # IDEs
@@ -52,18 +51,18 @@ uv.lock
 .ruff_cache/
 
 # ========================
-# GitHub
+# Local GitHub configuration
 # ========================
 .github/*.md
 
 # ========================
-# OS
-# ========================
-.DS_Store
-Thumbs.db
-
-# ========================
-# Logs and Cache
+# Logs and caches
 # ========================
 *.log
 *.cache
+
+# ========================
+# Operating system
+# ========================
+.DS_Store
+Thumbs.db

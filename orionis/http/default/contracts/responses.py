@@ -92,11 +92,13 @@ class IDefaultResponses(ABC):
         Parameters
         ----------
         status_code : int | HTTPStatus
-            HTTP status code to display on the error page.
+            Integer HTTP status between 100 and 599. Unlisted codes use
+            an ``HTTP <code>`` label on the HTML page.
         content : str | dict
             Content of the error to display. A str is used as the message;
             a dict is serialised directly into the JSON payload or extracted
-            via its ``message`` key for HTML rendering.
+            via its ``message`` key for HTML rendering. The HTML description
+            is escaped text; JSON preserves the supplied values.
         expects_json : bool
             If True, returns a JSON response; otherwise, returns HTML.
         headers : dict[str, str] | None, optional
@@ -107,6 +109,13 @@ class IDefaultResponses(ABC):
         HTMLResponse or JSONResponse
             HTMLResponse with rendered error page, or JSONResponse if
             expects_json is True.
+
+        Raises
+        ------
+        TypeError
+            If status_code is not an integer.
+        ValueError
+            If status_code is outside the range 100 to 599.
         """
 
     @abstractmethod

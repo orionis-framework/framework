@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Self
-
 from orionis.http.routes.contracts.fluent import IFluentRoute
 from orionis.http.routes.functions import (
     flatten_middleware,
@@ -12,7 +10,6 @@ from orionis.http.routes.route_id import RouteID
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
     from orionis.http.middleware import BaseMiddleware
     from orionis.http.routes.types import MiddlewareInput, RouteAction
 
@@ -59,7 +56,8 @@ class FluentRoute(IFluentRoute):
 
                   FluentRoute("GET", "/", my_view)
 
-            Ignored when *view* is provided.
+            Ignored when *view* is provided. If omitted or None, set the
+            controller and method with ``action()`` before exporting.
         view : str | None, optional
             Template name rendered directly by the kernel. When given, the
             route carries no Python handler and *action* is not parsed.
@@ -68,6 +66,14 @@ class FluentRoute(IFluentRoute):
         -------
         None
             The instance is initialized; no value is returned.
+
+        Raises
+        ------
+        TypeError
+            If method or path is not a string, or a supplied action is invalid.
+        ValueError
+            If method is unsupported, view is invalid, or a controller pair
+            has an invalid length or names a missing method.
         """
         # Validate the method and path parameters
         if not isinstance(method, str):
@@ -103,6 +109,10 @@ class FluentRoute(IFluentRoute):
                 error_msg = "View name must be a non-empty string"
                 raise ValueError(error_msg)
             self.__view = view.strip()
+            return
+
+        # Allow the fluent action setter to complete registration later.
+        if action is None:
             return
 
         # Parse the action and set the appropriate handler attributes
@@ -294,7 +304,7 @@ class FluentRoute(IFluentRoute):
 
     def export(self) -> dict:
         """
-        Export the route configuration as a plain dictionary.
+        Export a complete route configuration as a plain dictionary.
 
         Returns
         -------
@@ -302,7 +312,22 @@ class FluentRoute(IFluentRoute):
             Dictionary with keys: id, method, path, class, handler,
             callable_handler, view, name, middleware, without_middleware,
             and kind.
+
+        Raises
+        ------
+        ValueError
+            If the route has neither a view nor an assigned action.
         """
+        if (
+            self.__view is None
+            and self.__callable_handler is None
+            and self.__class is None
+        ):
+            error_msg = (
+                f"Route {self.__method} '{self.__path}' has no action. "
+                "Call .action(controller, handler) before exporting routes."
+            )
+            raise ValueError(error_msg)
         return {
             "id": self.__id,
             "method": self.__method,

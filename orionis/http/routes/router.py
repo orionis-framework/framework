@@ -1,10 +1,11 @@
 from collections.abc import Sequence
-from importlib import import_module
 from itertools import chain
 from typing import TYPE_CHECKING
 from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
 from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.foundation.contracts.application import IApplication
+from orionis.http.default.controllers.login_controller import LoginController
+from orionis.http.default.controllers.register_controller import RegisterController
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.exceptions.fallback_route_already_registered import (
@@ -145,7 +146,11 @@ class Router(IRouter):
         """
         self.__current_kind = kind
 
-    def auth(self) -> None:
+    def auth(
+        self,
+        login_controller: type | None = None,
+        register_controller: type | None = None,
+    ) -> None:
         """Register the built-in web login, registration and logout routes.
 
         Call once from a web route file. Login and registration accept guests;
@@ -163,18 +168,24 @@ class Router(IRouter):
         ValueError
             If registration is attempted outside the web route context.
         """
+        # Ensure that the auth routes are only registered within the web context.
         if self.__current_kind != "web":
             error_msg = "Route.auth() must be declared in a web route file."
             raise ValueError(error_msg)
 
-        # Load optional auth controllers only when their routes are requested.
-        login = import_module(
-            "orionis.http.default.controllers.login_controller",
-        ).LoginController
-        register = import_module(
-            "orionis.http.default.controllers.register_controller",
-        ).RegisterController
+        # Determine which controllers to use for login and registration.
+        login: type = (
+            login_controller
+            if login_controller is not None
+            else LoginController
+        )
+        register: type = (
+            register_controller
+            if register_controller is not None
+            else RegisterController
+        )
 
+        # Register the auth routes with the appropriate middleware and controllers.
         self.group(middleware=GuestMiddleware, routes=[
             self.get("/login", [login, "index"]),
             self.post("/login", [login, "login"]).name("login"),

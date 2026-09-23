@@ -2,6 +2,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 from orionis.failure.base.handler import BaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
+from orionis.http.default.contracts.responses import IDefaultResponses
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import UnsupportedMediaTypeException
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
@@ -25,7 +26,7 @@ def _make_handler(
     BaseExceptionHandler
         A ready-to-use handler instance.
     """
-    mock_responses = MagicMock()
+    mock_responses = MagicMock(spec=IDefaultResponses)
     handler = BaseExceptionHandler(default_responses=mock_responses)
     if dont_catch is not None:
         type(handler).dont_catch = dont_catch  # type: ignore[assignment]
@@ -341,7 +342,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that the predefined HTTP status map is consulted and
         the correct status code is forwarded to the default responses.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=404)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -349,7 +350,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         req = self._make_request_mock()
         await handler.handleHTTP(exc, req)
 
-        mock_responses.error.assert_called_once()
+        mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 404)
 
@@ -360,7 +361,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that the predefined HTTP status map is consulted and
         the correct status code is forwarded to the default responses.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=405)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -368,7 +369,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         req = self._make_request_mock()
         await handler.handleHTTP(exc, req)
 
-        mock_responses.error.assert_called_once()
+        mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 405)
 
@@ -379,7 +380,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that the predefined HTTP status map is consulted and
         the correct status code is forwarded to the default responses.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=413)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -387,7 +388,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         req = self._make_request_mock()
         await handler.handleHTTP(exc, req)
 
-        mock_responses.error.assert_called_once()
+        mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 413)
 
@@ -398,7 +399,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that the predefined HTTP status map is consulted and
         the correct status code is forwarded to the default responses.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=415)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -406,7 +407,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         req = self._make_request_mock()
         await handler.handleHTTP(exc, req)
 
-        mock_responses.error.assert_called_once()
+        mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 415)
 
@@ -417,7 +418,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that a rejected CSRF token is reported as an expired
         page instead of an unhandled server error.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=419)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -425,7 +426,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         req = self._make_request_mock()
         await handler.handleHTTP(exc, req)
 
-        mock_responses.error.assert_called_once()
+        mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 419)
 
@@ -436,7 +437,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         Validates that handleHTTP short-circuits and produces no response
         for exception types listed in dont_catch.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(default_responses=mock_responses)
         type(handler).dont_catch = frozenset({RouteNotFound})  # type: ignore[assignment]
 
@@ -466,7 +467,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         Validates that any exception type not present in _HTTP_STATUS_MAP
         triggers the 500 exception-response path.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.exception.return_value = MagicMock(status_code=500)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
@@ -479,7 +480,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
 
         await handler.handleHTTP(exc, req)
 
-        mock_responses.exception.assert_called_once()
+        mock_responses.exception.assert_awaited_once()
         call_kwargs = mock_responses.exception.call_args[1]
         self.assertEqual(call_kwargs["status_code"], 500)
 
@@ -490,7 +491,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         Validates that the exception argument is forwarded unchanged so
         that response templates can render traceback details.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
         exc = RuntimeError("pass me through")
@@ -512,7 +513,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         Validates that the request's content-type preference is respected
         when constructing 4xx responses from the status map.
         """
-        mock_responses = MagicMock()
+        mock_responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(default_responses=mock_responses)
 
         exc = RouteNotFound("not found")

@@ -2,7 +2,6 @@ from collections.abc import Sequence
 from importlib import import_module
 from itertools import chain
 from typing import TYPE_CHECKING
-
 from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
 from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.foundation.contracts.application import IApplication
@@ -102,6 +101,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
         view : str | None, optional
             Template name rendered directly by the kernel, used instead of
             *action* for view-only routes.
@@ -231,6 +232,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -254,6 +257,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -277,6 +282,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -300,6 +307,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -323,6 +332,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -346,6 +357,8 @@ class Router(IRouter):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -356,7 +369,7 @@ class Router(IRouter):
 
     def fallback(
         self,
-        action: RouteAction | None = None,
+        action: RouteAction,
     ) -> None:
         """
         Register the fallback handler for unmatched routes (HTTP 404).
@@ -366,9 +379,10 @@ class Router(IRouter):
 
         Parameters
         ----------
-        action : RouteAction | None, optional
+        action : RouteAction
             Callable, invokable controller class (defining ``__call__``),
-            or ``[ControllerClass, 'method_name']`` list.
+            or ``[ControllerClass, 'method_name']`` list. Required because
+            fallback registration does not return a fluent route builder.
 
         Returns
         -------
@@ -379,6 +393,11 @@ class Router(IRouter):
         ------
         FallbackRouteAlreadyRegisteredException
             If a fallback handler has already been registered.
+        TypeError
+            If the action is None or is not an accepted handler form.
+        ValueError
+            If a controller pair has an invalid length or names a missing
+            method.
         """
         if self.__fallback != (None, None):
             error_msg = (
@@ -513,6 +532,11 @@ class Router(IRouter):
             - ``'routes'``: list of all registered routes as dicts.
             - ``'fallback'``: tuple
               ``(class_or_None, handler_or_callable)``.
+
+        Raises
+        ------
+        ValueError
+            If a registered route still has no action or view.
         """
         routes = [r.export() for r in self.__routes.values()]
         return {

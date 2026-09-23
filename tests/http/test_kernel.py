@@ -351,13 +351,25 @@ class _StubScope:
 class _StubDefaultResponses:
     """Default response factory double returning JSON payloads."""
 
-    __slots__ = ("calls",)
+    __slots__ = ("asset_paths", "calls", "health_calls")
 
     def __init__(self) -> None:
         """Initialise the call recorder."""
+        self.asset_paths: list[str] = []
         self.calls: list[tuple[int, object, bool]] = []
+        self.health_calls = 0
 
-    def error(
+    def health(self) -> Response:
+        """Expose instance reuse through an ordinary routed default action."""
+        self.health_calls += 1
+        return Response(content=f"health:{self.health_calls}")
+
+    def asset(self, path: str) -> Response:
+        """Record the packaged asset path and return its placeholder body."""
+        self.asset_paths.append(path)
+        return Response(content=f"asset:{path}")
+
+    async def error(
         self,
         status_code: int,
         content: object,
@@ -539,7 +551,9 @@ class _StubResponseAdapter:
 class _StubApp:
     """Application double resolving the kernel collaborators."""
 
-    __slots__ = ("builds", "config_data", "debug", "maintenance", "scopes")
+    __slots__ = (
+        "build_calls", "builds", "config_data", "debug", "maintenance", "scopes",
+    )
 
     def __init__(
         self,
@@ -564,6 +578,7 @@ class _StubApp:
             Whether the application is under maintenance.
         """
         self.builds = builds
+        self.build_calls: list[type] = []
         self.config_data = config_data
         self.debug = debug
         self.maintenance = maintenance
@@ -583,6 +598,7 @@ class _StubApp:
         object
             Instance served to the kernel.
         """
+        self.build_calls.append(concrete)
         registered = self.builds.get(concrete)
         if registered is not None:
             return registered
@@ -757,7 +773,7 @@ class _MaintenancePassThrough:
         """Initialize the record of checked paths."""
         self.paths: list[str] = []
 
-    def handle(self, adapter: TransportAdapter) -> None:
+    async def handle(self, adapter: TransportAdapter) -> None:
         """Record the request and permit subsequent security checks.
 
         Parameters
@@ -1318,6 +1334,27 @@ class TestKernelBoot(TestCase):
 
 class TestKernelDispatch(TestCase):
 
+    async def testReusesDefaultsAndBuildsOtherControllersPerRequest(self) -> None:
+        """Retain the bootstrapped default factory without sharing user controllers."""
+        routes = make_routes()
+        routes["GET"]["static"]["/health"] = replace(
+            make_route("/health", controller="DefaultResponses"),
+            action={
+                "module": "orionis.http.default.responses",
+                "class": "DefaultResponses", "method": "health",
+            },
+        )
+        kernel, app, responses, catch = await boot_kernel(routes=routes)
+        for index in (1, 2):
+            health = await dispatch(kernel, "/health")
+            controller = await dispatch(kernel, "/controller")
+            self.assertEqual(health.getBody(), f"health:{index}".encode())
+            self.assertEqual(controller.getBody(), b"controller")
+        self.assertEqual(responses.health_calls, 2)
+        self.assertEqual(app.build_calls.count(DefaultResponses), 1)
+        self.assertEqual(app.build_calls.count(_Controller), 2)
+        self.assertEqual(catch.handled, [])
+
     async def testRendersAPreloadedViewRoute(self) -> None:
         """Render a view route through its preloaded template descriptor."""
         route = replace(
@@ -1437,6 +1474,86 @@ class TestKernelDispatch(TestCase):
         self.assertIsInstance(scope.entries[Request], Request)
 
 class TestKernelGlobalMiddleware(TestCase):
+
+    async def testAssetsRemainAvailableDuringMaintenance(self) -> None:
+        """Serve default-page assets before maintenance or session middleware."""
+        _SessionMiddlewareDouble.calls = [] # NOSONAR
+        kernel, _app, responses, catch = await boot_kernel(maintenance=True)
+        for method in ("GET", "HEAD"):
+            with self.subTest(method=method):
+                response = await dispatch(
+                    kernel, "/_orionis/assets/css/default.css", method,
+                )
+                self.assertEqual(response.getStatusCode(), 200)
+        self.assertEqual(responses.asset_paths, ["css/default.css"] * 2)
+        self.assertEqual(_SessionMiddlewareDouble.calls, [])
+        self.assertEqual(responses.calls, [])
+        self.assertEqual(catch.handled, [])
+
+    async def testAssetsRemainAvailableAfterRateLimitRejections(self) -> None:
+        """Keep page assets available without consuming the request quota."""
+        kernel, _app, responses, catch = await boot_kernel(
+            rate_limit={
+                "rate_limit_enabled": True,
+                "rate_limit_requests": 1,
+                "rate_limit_window_seconds": 60,
+            },
+        )
+        before = await dispatch(kernel, "/_orionis/assets/css/default.css")
+        first = await dispatch(kernel, "/api")
+        rejected = await dispatch(kernel, "/api")
+        after = await dispatch(kernel, "/_orionis/assets/js/default.js")
+        self.assertEqual(before.getStatusCode(), 200)
+        self.assertEqual(first.getStatusCode(), 200)
+        self.assertEqual(rejected.getStatusCode(), 429)
+        self.assertEqual(after.getStatusCode(), 200)
+        self.assertEqual(
+            responses.asset_paths, ["css/default.css", "js/default.js"],
+        )
+        self.assertEqual(catch.handled, [])
+
+    async def testAssetsRetainSecurityChecksDuringMaintenance(self) -> None:
+        """Reject malformed headers before accessing packaged assets."""
+        kernel, _app, responses, catch = await boot_kernel(maintenance=True)
+        for headers in (
+            [(b"host", b"a.test"), (b"host", b"b.test")],
+            [(b"host", b"orionis.test"), (b"x-header", b"bad\r\nvalue")],
+        ):
+            with self.subTest(headers=headers):
+                response = await dispatch(
+                    kernel, "/_orionis/assets/css/default.css", headers=headers,
+                )
+                self.assertEqual(response.getStatusCode(), 400)
+        self.assertEqual(responses.asset_paths, [])
+        self.assertEqual(catch.handled, [])
+
+    async def testAssetsEnforceAllowedHosts(self) -> None:
+        """Retain the configured host allowlist on the asset request path."""
+        kernel, _app, responses, catch = await boot_kernel(maintenance=True)
+        security = kernel_module.SecurityMiddleware(
+            {"allowed_hosts": ["orionis.test"]}, responses,
+        )
+        with replace_attribute(kernel, "_KernelHTTP__security", security):
+            response = await dispatch(
+                kernel, "/_orionis/assets/css/default.css",
+                headers=[(b"host", b"untrusted.test")],
+            )
+        self.assertEqual(response.getStatusCode(), 400)
+        self.assertEqual(responses.asset_paths, [])
+        self.assertEqual(catch.handled, [])
+
+    async def testAssetsRejectUnsupportedMethods(self) -> None:
+        """Only permit GET and HEAD for the packaged asset namespace."""
+        kernel, _app, responses, catch = await boot_kernel(maintenance=True)
+        for method in ("POST", "PUT", "DELETE", "OPTIONS"):
+            with self.subTest(method=method):
+                response = await dispatch(
+                    kernel, "/_orionis/assets/css/default.css", method,
+                )
+                self.assertEqual(response.getStatusCode(), 405)
+                self.assertEqual(response.getHeader("Allow"), ["GET, HEAD"])
+        self.assertEqual(responses.asset_paths, [])
+        self.assertEqual(catch.handled, [])
 
     async def testMaintenancePassThroughStillEnforcesSecurity(self) -> None:
         """Honor a maintenance pass-through and retain later security checks."""
@@ -1691,6 +1808,18 @@ class TestKernelRateLimiting(TestCase):
         self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 429)
 
 class TestKernelRsgiEntryPoint(TestCase):
+
+    async def testServesPackagedAssetsDuringMaintenance(self) -> None:
+        """Serve assets through the shared path for the RSGI transport."""
+        kernel, app, responses, catch = await boot_kernel(maintenance=True)
+        response = await kernel.handleRSGI(
+            _StubRsgiScope("/_orionis/assets/css/default.css"),
+            _StubRsgiProtocol(),
+        )
+        self.assertEqual(response.getStatusCode(), 200)
+        self.assertEqual(responses.asset_paths, ["css/default.css"])
+        self.assertEqual(app.builds[RSGIResponseAdapter].sent, [response])
+        self.assertEqual(catch.handled, [])
 
     async def testServesAnRsgiRequest(self) -> None:
         """

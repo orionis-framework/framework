@@ -1,11 +1,9 @@
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
     from orionis.http.routes.fluent import FluentRoute
     from orionis.http.routes.group import RouteGroup
     from orionis.http.routes.types import MiddlewareInput, RouteAction
@@ -65,6 +63,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -88,6 +88,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -111,6 +113,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -134,6 +138,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -157,6 +163,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -180,6 +188,8 @@ class IRouter(ABC):
         action : RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
+            If omitted or None, call ``action(controller, handler)`` on the
+            returned route before exporting the router.
 
         Returns
         -------
@@ -190,7 +200,7 @@ class IRouter(ABC):
     @abstractmethod
     def fallback(
         self,
-        action: RouteAction | None = None,
+        action: RouteAction,
     ) -> None:
         """
         Register the fallback handler for unmatched routes (HTTP 404).
@@ -200,9 +210,10 @@ class IRouter(ABC):
 
         Parameters
         ----------
-        action : RouteAction | None, optional
+        action : RouteAction
             Callable, invokable controller class (defining ``__call__``),
-            or ``[ControllerClass, 'method_name']`` list.
+            or ``[ControllerClass, 'method_name']`` list. Required because
+            fallback registration does not return a fluent route builder.
 
         Returns
         -------
@@ -213,6 +224,11 @@ class IRouter(ABC):
         ------
         FallbackRouteAlreadyRegisteredException
             If a fallback handler has already been registered.
+        TypeError
+            If the action is None or is not an accepted handler form.
+        ValueError
+            If a controller pair has an invalid length or names a missing
+            method.
         """
 
     @abstractmethod
@@ -271,4 +287,9 @@ class IRouter(ABC):
             - ``'routes'``: list of all registered routes as dicts.
             - ``'fallback'``: tuple
               ``(class_or_None, handler_or_callable)``.
+
+        Raises
+        ------
+        ValueError
+            If a registered route still has no action or view.
         """

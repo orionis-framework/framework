@@ -98,7 +98,7 @@ async def validation_response(
         A ``422`` response, or a ``302`` redirect back to the previous page.
     """
     if request.wantsJson() or request.isAjax():
-        return responses.error(
+        return await responses.error(
             status_code=422,
             content=exc.error(),
             expects_json=True,

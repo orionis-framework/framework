@@ -8,7 +8,11 @@ from orionis.http.routes.types import MiddlewareInput, RouteAction
 class Route(IRouter, IFacade):
 
     @classmethod
-    def auth(cls) -> None: ...
+    def auth(
+        cls,
+        login_controller: type | None = None,
+        register_controller: type | None = None,
+    ) -> None: ...
 
     @classmethod
     def view(

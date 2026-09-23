@@ -1,0 +1,41 @@
+{% extends "layouts/dashboard.html" %}
+{% set page_title = __('Dashboard') %}
+{% set active_page = 'home' %}
+
+{% block dashboard_content %}
+<section class="orionis-dashboard-welcome" aria-labelledby="welcome-title">
+  <div>
+    <span class="orionis-section-label">{{ __('Your workspace') }}</span>
+    <h2 id="welcome-title">{{ __('Welcome back,') }} {{ user.name }}.</h2>
+    <p>{{ __('Manage your account and access the administration area from here.') }}</p>
+    <a href="{{ route('profile') }}" class="btn">{{ __('View my profile') }} <span aria-hidden="true">→</span></a>
+  </div>
+  <span class="orionis-dashboard-spark" aria-hidden="true">✦</span>
+</section>
+<div class="orionis-module-grid">
+  <a href="{{ route('profile') }}" class="card orionis-module-card">
+    <span class="orionis-module-symbol" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    </span>
+    <h2>{{ __('My account') }}</h2>
+    <p>{{ __('Review your details and keep your password up to date.') }}</p>
+    <span class="orionis-module-action">{{ __('Profile') }} <span aria-hidden="true">→</span></span>
+  </a>
+  <a href="{{ route('admin.roles') }}" class="card orionis-module-card">
+    <span class="orionis-module-symbol" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6l8-3Zm-4 9 3 3 5-6"/></svg>
+    </span>
+    <h2>{{ __('Roles') }}</h2>
+    <p>{{ __('The roles module will be available here in a future update.') }}</p>
+    <span class="orionis-module-action">{{ __('View section') }} <span aria-hidden="true">→</span></span>
+  </a>
+  <a href="{{ route('admin.users') }}" class="card orionis-module-card">
+    <span class="orionis-module-symbol" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m1-16a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 4v2"/></svg>
+    </span>
+    <h2>{{ __('Users') }}</h2>
+    <p>{{ __('The users module will be available here in a future update.') }}</p>
+    <span class="orionis-module-action">{{ __('View section') }} <span aria-hidden="true">→</span></span>
+  </a>
+</div>
+{% endblock %}

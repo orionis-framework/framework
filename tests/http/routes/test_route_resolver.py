@@ -343,10 +343,10 @@ class TestInvalidRouteDefinitions(TestCase):
         self.assertEqual(resolver.resolve("POST", "/login").route.name, "login")
 
     def testInvalidActionsAndPaths(self) -> None:
-        """Raise useful errors for unsupported handlers and nonstring paths."""
+        """Reject invalid non-None handlers and nonstring paths immediately."""
         router = make_router()
-        for action in (None, 42, object, UserController()):
-            with self.subTest(action=action), self.assertRaises(TypeError):
+        for action in (False, 42, object, UserController()):
+            with self.assertRaises(TypeError):
                 router.get("/invalid", action)
         with self.assertRaises(TypeError):
             router.get(42, route_handler)

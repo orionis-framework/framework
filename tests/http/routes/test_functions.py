@@ -1,6 +1,10 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
+from functools import partial
+from types import FunctionType
 from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
+from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.functions import (
     flatten_middleware,
     is_valid_handler,
@@ -9,7 +13,15 @@ from orionis.http.routes.functions import (
     parse_action,
     strip_regex_anchors,
 )
+from orionis.http.routes.route_resolver import RouteResolver
 from orionis.test import TestCase
+from tests.http.routes.test_nested_routing import (
+    ChildController,
+    UserController,
+    compile_router,
+    make_router,
+    route_handler,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -36,6 +48,76 @@ class _CtrlWithMethod:
 
 class _CtrlNoCall:
     """Controller that does not define __call__."""
+
+class _NonCallableFunctionImpostor:
+    """Appear function-like to inspection without supporting calls."""
+
+    __class__ = FunctionType
+    __name__ = "named"
+
+class _StaticInvokableCtrl:
+    @staticmethod
+    def __call__() -> None:
+        """Provide an invokable controller with a static method."""
+
+class _ClassInvokableCtrl:
+    @classmethod
+    def __call__(cls) -> None:
+        """Provide an invokable controller with a class method."""
+
+class _AbstractInvokableCtrl(ABC):
+    @abstractmethod
+    def __call__(self) -> None:
+        """Require a concrete invokable implementation."""
+
+class _UnconstructedInvokableCtrl:
+    def __init__(self) -> None:
+        """Fail if validation tries to construct a controller.
+
+        Raises
+        ------
+        AssertionError
+            Always, because validation must not construct a controller.
+        """
+        error_msg = "Route validation must not construct controllers"
+        raise AssertionError(error_msg)
+
+    def __call__(self) -> None:
+        """Fail if validation tries to execute an action.
+
+        Raises
+        ------
+        AssertionError
+            Always, because validation must not execute an action.
+        """
+        error_msg = "Route validation must not execute handlers"
+        raise AssertionError(error_msg)
+
+class _FailingHandlerDescriptor:
+    def __get__(self, _instance: object, _owner: type | None = None) -> object:
+        """Expose an unexpected failure while looking up the handler.
+
+        Raises
+        ------
+        RuntimeError
+            Always, to distinguish lookup failures from invalid action forms.
+        """
+        error_msg = "Unexpected handler lookup failure"
+        raise RuntimeError(error_msg)
+
+class _CtrlWithFailingDescriptor:
+    index = _FailingHandlerDescriptor()
+
+def _guard_handler() -> None:
+    """Fail if validation tries to execute a function handler.
+
+    Raises
+    ------
+    AssertionError
+        Always, because validation must not execute an action.
+    """
+    error_msg = "Route validation must not execute handlers"
+    raise AssertionError(error_msg)
 
 class _ConcreteMiddleware(BaseMiddleware):
     async def handle(
@@ -345,14 +427,14 @@ class TestIsValidHandler(TestCase):
 
         Confirms that integers and other non-callables return False.
         """
-        self.assertFalse(is_valid_handler(42))  # type: ignore[arg-type]
+        self.assertFalse(is_valid_handler(42))
 
     def testCoroutineObjectIsInvalid(self) -> None:
         """
         Verify that a coroutine instance (not function) is rejected.
 
-        Confirms that the guard for inspect.iscoroutine fires before
-        the callable check.
+        Confirms that coroutine objects are rejected while coroutine
+        functions remain supported.
         """
         coro = _async_handler()
         try:
@@ -360,13 +442,110 @@ class TestIsValidHandler(TestCase):
         finally:
             coro.close()
 
-    def testInvokableClassIsValid(self) -> None:
+    def testCallableInstanceIsInvalid(self) -> None:
         """
-        Verify that an invokable class instance is a valid handler.
+        Reject an invokable class instance as a route handler.
 
-        Confirms that objects with __call__ defined pass the check.
+        Require the controller class so the parser can describe its action.
         """
-        self.assertTrue(is_valid_handler(_InvokableCtrl()))
+        self.assertFalse(is_valid_handler(_InvokableCtrl()))
+
+    def testPredicateAcceptsParsedFormsWithoutExecutingThem(self) -> None:
+        """Accept function, invokable and pair forms without calling user code."""
+        cases = (
+            (_plain_handler, _plain_handler, None),
+            (_async_handler, _async_handler, None),
+            (_guard_handler, _guard_handler, None),
+            (_InvokableCtrl, _InvokableCtrl, None),
+            (ChildController, ChildController, None),
+            (_StaticInvokableCtrl, _StaticInvokableCtrl, None),
+            (_ClassInvokableCtrl, _ClassInvokableCtrl, None),
+            (_UnconstructedInvokableCtrl, _UnconstructedInvokableCtrl, None),
+            ([_CtrlWithMethod, "index"], _CtrlWithMethod, "index"),
+            ((_CtrlWithMethod, "index"), _CtrlWithMethod, "index"),
+        )
+        for action, expected_handler, expected_method in cases:
+            self.assertTrue(is_valid_handler(action), msg=repr(action))
+            handler, method = parse_action(action)
+            self.assertIs(handler, expected_handler)
+            self.assertEqual(method, expected_method)
+
+    def testRejectedActionsAgreeAndDoNotRegisterRoutesOrFallbacks(self) -> None:
+        """Reject unsupported forms consistently before any router registration."""
+        coroutine = _async_handler()
+        try:
+            cases = (
+                (_CtrlNoCall, TypeError),
+                (_AbstractInvokableCtrl, TypeError),
+                (_InvokableCtrl(), TypeError),
+                (_NonCallableFunctionImpostor(), TypeError),
+                (_CtrlWithMethod().index, TypeError),
+                (len, TypeError),
+                (partial(_plain_handler), TypeError),
+                (lambda: None, TypeError),
+                (coroutine, TypeError),
+                (None, TypeError),
+                ([], ValueError),
+                ((_CtrlWithMethod,), ValueError),
+                ([_CtrlWithMethod, "index", "extra"], ValueError),
+                (["not_a_class", "index"], TypeError),
+                ((_CtrlWithMethod, 99), TypeError),
+                ([_CtrlWithMethod, "missing"], ValueError),
+            )
+            for action, error_type in cases:
+                self.assertFalse(is_valid_handler(action), msg=repr(action))
+                with self.assertRaises(error_type):
+                    parse_action(action)
+                router = make_router()
+                original = router.export()
+                # None creates a pending route, rather than a ready handler.
+                if action is not None:
+                    with self.assertRaises(error_type):
+                        router.get("/rejected", action)
+                    self.assertEqual(router.export(), original)
+                with self.assertRaises(error_type):
+                    router.fallback(action)
+                self.assertEqual(router.export(), original)
+                router.fallback(route_handler)
+                self.assertEqual(
+                    router.export()["fallback"], (None, route_handler),
+                )
+        finally:
+            coroutine.close()
+
+    def testAcceptedActionsRegisterCompileAndResolve(self) -> None:
+        """Use accepted importable functions, controllers and pairs in the router."""
+        cases = (
+            (route_handler, RouteType.FUNCTION, (None, route_handler)),
+            (UserController, RouteType.INVOKABLE, (UserController, "__call__")),
+            (
+                [UserController, "index"],
+                RouteType.CONTROLLER,
+                (UserController, "index"),
+            ),
+            (
+                (UserController, "index"),
+                RouteType.CONTROLLER,
+                (UserController, "index"),
+            ),
+        )
+        for action, expected_type, expected_fallback in cases:
+            self.assertTrue(is_valid_handler(action), msg=repr(action))
+            router = make_router()
+            router.get("/accepted", action).name("accepted")
+            router.fallback(action)
+            self.assertEqual(router.export()["fallback"], expected_fallback)
+            resolved = RouteResolver(compile_router(router)).resolve(
+                "GET", "/accepted",
+            )
+            self.assertEqual(resolved.route.type, expected_type)
+            self.assertEqual(resolved.route.name, "accepted")
+
+    def testUnexpectedHandlerLookupErrorsPropagate(self) -> None:
+        """Keep unexpected descriptor failures visible through both validators."""
+        for validate in (is_valid_handler, parse_action):
+            with self.assertRaisesRegex(RuntimeError, "Unexpected handler lookup"):
+                validate([_CtrlWithFailingDescriptor, "index"])
 
 # ---------------------------------------------------------------------------
 # parseAction
@@ -443,7 +622,7 @@ class TestParseAction(TestCase):
         Confirms that the second list element must be a string method name.
         """
         with self.assertRaises(TypeError):
-            parse_action([_CtrlWithMethod, 99])  # type: ignore[list-item]
+            parse_action([_CtrlWithMethod, 99])
 
     def testListWithMissingMethodRaisesValueError(self) -> None:
         """
@@ -480,4 +659,4 @@ class TestParseAction(TestCase):
         Confirms that arbitrary objects are rejected.
         """
         with self.assertRaises(TypeError):
-            parse_action(12345)  # type: ignore[arg-type]
+            parse_action(12345)

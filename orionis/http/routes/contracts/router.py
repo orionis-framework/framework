@@ -11,8 +11,19 @@ if TYPE_CHECKING:
 class IRouter(ABC):
 
     @abstractmethod
-    def auth(self) -> None:
+    def auth(
+        self,
+        login_controller: type | None = None,
+        register_controller: type | None = None,
+    ) -> None:
         """Register the built-in web login, registration and logout routes.
+
+        Parameters
+        ----------
+        login_controller : type | None, optional
+            Controller for login and logout. Defaults to the built-in controller.
+        register_controller : type | None, optional
+            Controller for registration. Defaults to the built-in controller.
 
         Returns
         -------

@@ -1,150 +1,128 @@
 {% extends "layouts/app.html" %}
 
-{% block title %}
-{{ __('Welcome') }}
-{% endblock %}
+{% block title %}{{ __('Welcome') }}{% endblock %}
 
 {% block content %}
-  <div class="page page-center">
-    <div class="container container-normal py-4">
-      <div class="card card-md overflow-hidden">
-        <div class="row g-0">
-
-          <!-- LEFT PANEL -->
-          <div class="col-lg-7">
-            <div class="card-body p-4 p-lg-5">
-              <div class="text-uppercase text-secondary fw-bold mb-1" style="letter-spacing: .18em; font-size: .7rem;">{{ __('Your Application') }}</div>
-              <h1 class="h2 mb-4">{{ config('app.name') }}</h1>
-
-              <h2 class="h3 mb-1">{{ __("Let's get started") }}</h2>
-              <p class="text-secondary mb-4">
-                {{ __('Your Orionis application is ready.') }}<br>
-                {{ __('Here are a few things to help you get off the ground:') }}
-              </p>
-
-              <ul class="steps steps-vertical mb-4">
-                <li class="step-item">
-                  <div class="h4 m-0">{{ __('Read the documentation') }}</div>
-                  <div class="text-secondary">
-                    {{ __('Learn the framework at') }}
-                    <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">
-                      docs.orionis-framework.com
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </div>
-                </li>
-                <li class="step-item">
-                  <div class="h4 m-0">{{ __('Run your app with Reactor CLI') }}</div>
-                  <div class="text-secondary">
-                    {{ __('Start the development server with') }} <code>python reactor serve</code>
-                  </div>
-                </li>
-                <li class="step-item">
-                  <div class="h4 m-0">{{ __('Browse the source') }}</div>
-                  <div class="text-secondary">
-                    {{ __('The code lives on') }}
-                    <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer">
-                      GitHub
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </div>
-                </li>
-              </ul>
-
-              <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url('/login') }}" class="btn btn-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path>
-                    <path d="M9 12h12l-3 -3"></path>
-                    <path d="M18 15l3 -3"></path>
-                  </svg>
-                  {{ __('Sign in') }}
-                </a>
-                <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
-                    <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"></path>
-                    <path d="M3 6l0 13"></path>
-                    <path d="M12 6l0 13"></path>
-                    <path d="M21 6l0 13"></path>
-                  </svg>
-                  {{ __('Read Docs') }}
-                </a>
-                <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer" class="btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-2">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
-                  </svg>
-                  GitHub
-                </a>
-              </div>
-
-              <hr class="my-4">
-
-              <div class="text-secondary small">
-                Orionis <strong>v{{ framework_version() }}</strong> &mdash; Python {{ python_version() }}
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT PANEL -->
-          <div class="col-lg-5 border-start">
-            <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center h-100">
-              <div class="text-center mb-4">
-                <div class="display-6 fw-bold text-primary" style="letter-spacing: .2em;">ORIONIS</div>
-                <div class="text-uppercase text-secondary" style="letter-spacing: .28em; font-size: .7rem;">{{ __('Async-First Framework') }}</div>
-              </div>
-
-              <div class="list-group list-group-flush">
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col-auto"><span class="badge bg-primary"></span></div>
-                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Framework') }}</div>
-                    <div class="col-auto fw-bold">v{{ framework_version() }}</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col-auto"><span class="badge bg-green"></span></div>
-                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Runtime') }}</div>
-                    <div class="col-auto fw-bold">{{ python_version() }}</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col-auto"><span class="badge bg-yellow"></span></div>
-                    <div class="col text-secondary text-uppercase" style="letter-spacing: .12em; font-size: .7rem;">{{ __('Environment') }}</div>
-                    <div class="col-auto fw-bold">{{ config('app.env')|upper }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="text-center text-secondary mt-3 small">
-        Orionis Framework &mdash; {{ __('MIT License') }}
-        <span class="mx-1">&middot;</span>
+<div class="orionis-welcome">
+  <div class="container orionis-container-wide">
+    <header class="orionis-welcome-header">
+      <a href="{{ url('/') }}" class="orionis-brand" aria-label="{{ config('app.name') }}">
+        <img src="{{ asset('images/logo.png') }}" class="orionis-welcome-logo" alt="{{ config('app.name') }}">
+      </a>
+      <nav class="orionis-welcome-nav" aria-label="{{ __('Useful links') }}">
         <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">{{ __('Documentation') }}</a>
-        <span class="mx-1">&middot;</span>
         <a href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <span class="mx-1">&middot;</span>
-        <a href="https://pypi.org/project/orionis/" target="_blank" rel="noopener noreferrer">PyPI</a>
-      </div>
-    </div>
+        <a href="{{ url('/sign-up') }}" class="btn">{{ __('Sign up') }}</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="orionis-welcome-hero" aria-labelledby="welcome-heading">
+        <div class="orionis-welcome-intro">
+          <div class="orionis-welcome-kicker">
+            <span aria-hidden="true"></span>
+            {{ __('Your Application') }} <span class="orionis-welcome-kicker-divider" aria-hidden="true">/</span> {{ config('app.name') }}
+          </div>
+          <h1 id="welcome-heading">{{ __('Build something') }}<br><span>{{ __('extraordinary.') }}</span></h1>
+          <p>{{ __('Your Orionis application is ready.') }}<br>{{ __('From your first route to your next big project.') }}</p>
+          <div class="orionis-welcome-actions">
+            <a href="{{ url('/login') }}" class="btn orionis-welcome-primary">
+              {{ __('Sign in') }}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="orionis-icon" aria-hidden="true" focusable="false">
+                <path d="M4 12h16m-6-6 6 6-6 6"/>
+              </svg>
+            </a>
+            <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn orionis-welcome-secondary">{{ __('Read Docs') }}</a>
+          </div>
+        </div>
+
+        <div class="orionis-welcome-visual" aria-hidden="true">
+          <div class="orionis-welcome-orbit orionis-welcome-orbit-outer"></div>
+          <div class="orionis-welcome-orbit orionis-welcome-orbit-middle"></div>
+          <div class="orionis-welcome-orbit orionis-welcome-orbit-inner"></div>
+          <span class="orionis-welcome-star orionis-welcome-star-one"></span>
+          <span class="orionis-welcome-star orionis-welcome-star-two"></span>
+          <span class="orionis-welcome-star orionis-welcome-star-three"></span>
+          <svg class="orionis-welcome-spark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" focusable="false">
+            <path fill="currentColor" d="M80 4C73 61 61 73 4 80c57 7 69 19 76 76 7-57 19-69 76-76C99 73 87 61 80 4Z"/>
+          </svg>
+          <span class="orionis-welcome-orbit-label">ORIONIS <span>/</span> ASYNC FIRST</span>
+        </div>
+
+        <dl class="orionis-welcome-status">
+          <div>
+            <dt>{{ __('Framework') }}</dt>
+            <dd>Orionis <span>v{{ framework_version() }}</span></dd>
+          </div>
+          <div>
+            <dt>{{ __('Runtime') }}</dt>
+            <dd>Python <span>{{ python_version() }}</span></dd>
+          </div>
+          <div>
+            <dt>{{ __('Environment') }}</dt>
+            <dd><span class="orionis-welcome-environment-dot" aria-hidden="true"></span>{{ config('app.env')|upper }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="orionis-welcome-resources" aria-labelledby="getting-started-heading">
+        <div class="orionis-welcome-section-heading">
+          <div>
+            <h2 id="getting-started-heading">{{ __("Let's get started") }}</h2>
+            <p>{{ __('Here are a few things to help you get off the ground:') }}</p>
+          </div>
+          <span class="orionis-welcome-section-label">{{ __('Async-First Framework') }}</span>
+        </div>
+        <div class="orionis-welcome-resource-grid">
+          <a class="orionis-welcome-resource" href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer">
+            <div class="orionis-welcome-resource-top">
+              <span class="orionis-welcome-resource-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M12 6C9 4 5 4 3 5v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-2-1-6-1-9 1Zm0 0v14"/>
+                </svg>
+              </span>
+              <span class="orionis-welcome-resource-number" aria-hidden="true">01</span>
+            </div>
+            <h3>{{ __('Read the documentation') }}</h3>
+            <p>{{ __('Learn the framework at') }} docs.orionis-framework.com</p>
+            <span class="orionis-welcome-resource-link">{{ __('Read Docs') }} <span aria-hidden="true">↗</span></span>
+          </a>
+
+          <article class="orionis-welcome-resource orionis-welcome-resource-terminal">
+            <div class="orionis-welcome-resource-top">
+              <span class="orionis-welcome-resource-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="m4 6 6 6-6 6m9 0h7"/>
+                </svg>
+              </span>
+              <span class="orionis-welcome-resource-number" aria-hidden="true">02</span>
+            </div>
+            <h3>{{ __('Discover the power of the Orionis CLI') }}</h3>
+            <p>{{ __('List every available command with') }}</p>
+            <div class="orionis-welcome-command"><span aria-hidden="true">$</span><code>python -B reactor list</code></div>
+          </article>
+
+          <a class="orionis-welcome-resource" href="https://github.com/orionis-framework/" target="_blank" rel="noopener noreferrer">
+            <div class="orionis-welcome-resource-top">
+              <span class="orionis-welcome-resource-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="m7 7-5 5 5 5m10-10 5 5-5 5m-3-14-4 18"/>
+                </svg>
+              </span>
+              <span class="orionis-welcome-resource-number" aria-hidden="true">03</span>
+            </div>
+            <h3>{{ __('Browse the source') }}</h3>
+            <p>{{ __('The code lives on') }} GitHub.</p>
+            <span class="orionis-welcome-resource-link">GitHub <span aria-hidden="true">↗</span></span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="orionis-welcome-footer">
+      <span>Orionis Framework <span aria-hidden="true">·</span> {{ __('MIT License') }}</span>
+      <a href="https://pypi.org/project/orionis/" target="_blank" rel="noopener noreferrer">PyPI <span aria-hidden="true">↗</span></a>
+    </footer>
   </div>
+</div>
 {% endblock %}

@@ -104,7 +104,7 @@ class RateLimitMiddleware:
         # If the request exceeds the limit, return a 429 response with a
         # Retry-After header indicating when the client can retry.
         if not allowed:
-            return self.__default_responses.error(
+            return await self.__default_responses.error(
                 status_code=429,
                 content="Too Many Requests",
                 expects_json=adapter.wantsJson(),

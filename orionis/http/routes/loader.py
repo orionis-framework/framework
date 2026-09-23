@@ -1,6 +1,5 @@
 import importlib
 from typing import TYPE_CHECKING
-
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.routes.contracts.loader import IRouteLoader
@@ -10,7 +9,6 @@ from orionis.http.routes.route_compiler import RouteCompiler
 
 if TYPE_CHECKING:
     from pathlib import Path
-
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.http.layer.contracts.middleware import IBaseMiddleware
 
@@ -86,7 +84,8 @@ class RouteLoader(IRouteLoader):
         tuple | None
             ``(class, method_name)`` for controller-based fallbacks,
             ``(None, callable)`` for callable-based fallbacks, or
-            ``None`` if no fallback has been registered.
+            ``None`` if no fallback has been registered, whether routes are
+            compiled on demand or restored from cache.
         """
         self.__loadRoutes()
         return self.__fallback
@@ -145,7 +144,9 @@ class RouteLoader(IRouteLoader):
         On a cache hit the routes and fallback are deserialised directly.
         On a cache miss all route files are imported (which registers
         routes in the router), the compiler builds ``CompiledRoute``
-        objects, and the result is persisted for subsequent requests.
+        objects, and the result is persisted for subsequent requests. An
+        absent fallback is normalized to None before persistence, matching
+        the representation restored from cache.
 
         Returns
         -------
@@ -178,6 +179,9 @@ class RouteLoader(IRouteLoader):
             exported.get("fallback", None),
             self.__app_middleware,
         )
+        match self.__fallback:
+            case (None, None):
+                self.__fallback = None
 
         if self.__use_cache and self.__persistence:
             self.__persistence.save(

@@ -438,16 +438,16 @@ class KernelHTTP(IKernelHTTP):
             adapter, response, receive, send,
         )
 
-    def __globalMiddleware(
+    async def __globalMiddleware(
         self,
         adapter: TransportAdapter,
     ) -> Response | None:
         """
-        Execute the synchronous global middleware chain on the request.
+        Execute global middleware and serve packaged default-page assets.
 
         Process request through middleware pipeline: proxies detection,
-        security validation, and CORS negotiation.  Rate limiting is
-        handled separately by the dispatcher because it is asynchronous.
+        security validation, and CORS negotiation. Framework assets remain
+        available during maintenance and after rate-limit rejections.
 
         Parameters
         ----------
@@ -462,17 +462,27 @@ class KernelHTTP(IKernelHTTP):
         """
         # Apply trusted-proxy IP and scheme normalization.
         adapter = self.__proxies.handle(adapter)
+        # Default pages need their assets even when application access is denied.
+        path = adapter.path()
+        is_asset = path.startswith(DefaultResponses.ASSET_PREFIX)
         # Return 503 immediately when the application is in maintenance mode.
-        if self.__maintenance_enabled:
-            response = self.__under_maintenance.handle(adapter)
+        if self.__maintenance_enabled and not is_asset:
+            response = await self.__under_maintenance.handle(adapter)
             if response is not None:
                 return response
         # Enforce baseline security header policies.
-        response = self.__security.handle(adapter)
+        response = await self.__security.handle(adapter)
         if response is not None:
             return response
+        if is_asset and adapter.method() not in {"GET", "HEAD"}:
+            return Response(status_code=405, headers={"Allow": "GET, HEAD"})
         # Validate origin and handle CORS preflight requests.
-        return self.__cors.before(adapter)
+        response = self.__cors.before(adapter)
+        if response is not None or not is_asset:
+            return response
+        return self.__default_responses.asset(
+            path[len(DefaultResponses.ASSET_PREFIX):],
+        )
 
     async def __preloadMiddleware(self) -> None:
         """
@@ -639,9 +649,13 @@ class KernelHTTP(IKernelHTTP):
         else:
             handler = self.__cls_dispatch.get(route_id)
             if handler is not None:
-                # Class-based route: build the controller and call its action.
+                # Use the application-owned service for built-in response routes.
                 cls, method = handler
-                instance = await self.__app.build(cls)
+                instance = (
+                    self.__default_responses
+                    if cls is DefaultResponses
+                    else await self.__app.build(cls)
+                )
                 response = await self.__app.call(
                     instance,
                     method,
@@ -723,7 +737,7 @@ class KernelHTTP(IKernelHTTP):
         if isinstance(exc, ValidationException):
             # API routes always answer with the structured field errors; web
             # routes never reach this point (see __webTerminal).
-            return self.__default_responses.error(
+            return await self.__default_responses.error(
                 status_code=422,
                 content=exc.error(),
                 expects_json=True,
@@ -773,8 +787,8 @@ class KernelHTTP(IKernelHTTP):
         # Use the transport adapter as the request placeholder for early errors.
         request = adapter
         try:
-            # Execute the synchronous global middleware chain.
-            response = self.__globalMiddleware(adapter)
+            # Execute global middleware and resolve packaged static assets.
+            response = await self.__globalMiddleware(adapter)
             if response is None and self.__rate_limit_enabled:
                 response = await self.__rate_limit.handle(adapter)
             if response is not None:

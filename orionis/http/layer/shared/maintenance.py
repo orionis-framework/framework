@@ -39,7 +39,7 @@ class UnderMaintenanceMiddleware:
         self.__under_maintenance: bool = under_maintenance
         self.__default_responses: IDefaultResponses = default_responses
 
-    def handle(
+    async def handle(
         self,
         adapter: TransportAdapter,
     ) -> Response | None:
@@ -61,7 +61,7 @@ class UnderMaintenanceMiddleware:
         if not self.__under_maintenance:
             return None
 
-        return self.__default_responses.error(
+        return await self.__default_responses.error(
             status_code=503,
             content="The application is currently under maintenance.",
             expects_json=adapter.wantsJson(),

@@ -1,0 +1,14 @@
+{% extends "layouts/dashboard.html" %}
+{% set page_title = __('Roles') %}
+{% set active_page = 'roles' %}
+
+{% block dashboard_content %}
+<section class="card orionis-empty-state">
+  <span class="orionis-module-symbol" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6l8-3Zm-4 9 3 3 5-6"/></svg>
+  </span>
+  <h2>{{ __('Roles administration') }}</h2>
+  <p>{{ __('The roles module will be available here in a future update.') }}</p>
+  <a href="{{ route('home') }}" class="btn btn-primary">{{ __('Back to dashboard') }}</a>
+</section>
+{% endblock %}

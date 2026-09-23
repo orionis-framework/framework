@@ -129,17 +129,29 @@ coerced with `View(**raw)`; otherwise it is used as-is. Then:
 - One `jinja2.FileSystemLoader` per entry of `config.paths`. Relative
   paths are resolved against `app.basePath`; absolute paths are used
   untouched. More than one loader is wrapped in a `jinja2.ChoiceLoader`;
-  a single loader is used directly.
+  a single application loader is used directly. A framework loader is
+  searched first for `__orionis__/default/*`, resolving the packaged HTTP
+  pages independently of application template paths.
 - When `config.cache_path` is not `None`, the directory is created with
   `mkdir(parents=True, exist_ok=True)` (relative paths resolved against
   `app.basePath`) and an `OrionisBytecodeCache` is attached.
 - The environment is built with `enable_async=True`,
-  `autoescape=config.autoescape`, `auto_reload=config.auto_reload`,
+  autoescape enabled for built-in HTTP pages (otherwise `config.autoescape`),
+  `auto_reload=config.auto_reload`,
   `cache_size=config.cache_size`, `bytecode_cache=<cache or None>`,
   `undefined=jinja2.Undefined` and `keep_trailing_newline=True`.
 
 **Side effects:** creates the bytecode cache directory on disk when
 `cache_path` is configured.
+
+`DefaultResponses` receives `IViewEngine` through dependency injection and
+awaits it for health, maintenance, error and exception pages. Its `health`,
+`error`, `exception`, `favicon`, `robotsTxt` and `sitemapXml` methods must be
+awaited. These pages extend one packaged `base.html` and load one local
+`default.css` and `default.js`. Fonts and their licenses ship in the package;
+no CDN is required. The HTTP kernel serves the allowlisted assets under
+`/_orionis/assets/` for GET and HEAD after security validation, including
+during maintenance and rate limiting, without starting a session.
 
 | Method | Signature | Returns / raises |
 |---|---|---|

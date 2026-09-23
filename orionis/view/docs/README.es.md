@@ -131,17 +131,31 @@ con `View(**raw)`; en caso contrario se usa tal cual. Después:
 - Un `jinja2.FileSystemLoader` por cada entrada de `config.paths`. Las
   rutas relativas se resuelven contra `app.basePath`; las absolutas se
   usan sin tocar. Si hay más de un loader se envuelven en un
-  `jinja2.ChoiceLoader`; con uno solo se usa directamente.
+  `jinja2.ChoiceLoader`; con uno solo se usa directamente para la aplicación.
+  Un cargador del framework tiene prioridad para `__orionis__/default/*` y
+  resuelve las páginas HTTP incluidas en el paquete, independientemente de
+  las rutas de plantillas de la aplicación.
 - Cuando `config.cache_path` no es `None`, el directorio se crea con
   `mkdir(parents=True, exist_ok=True)` (rutas relativas resueltas contra
   `app.basePath`) y se adjunta un `OrionisBytecodeCache`.
 - El entorno se construye con `enable_async=True`,
-  `autoescape=config.autoescape`, `auto_reload=config.auto_reload`,
+  autoescape activado para las páginas HTTP internas (en las demás,
+  `config.autoescape`), `auto_reload=config.auto_reload`,
   `cache_size=config.cache_size`, `bytecode_cache=<caché o None>`,
   `undefined=jinja2.Undefined` y `keep_trailing_newline=True`.
 
 **Efectos secundarios:** crea en disco el directorio de la caché de
 bytecode cuando `cache_path` está configurado.
+
+`DefaultResponses` recibe `IViewEngine` por inyección de dependencias y lo
+espera con `await` para las páginas de salud, mantenimiento, error y
+excepción. Sus métodos `health`, `error`, `exception`, `favicon`, `robotsTxt`
+y `sitemapXml` requieren `await`. Estas páginas extienden un solo
+`base.html` y cargan un único `default.css` y `default.js` locales. Las
+fuentes y sus licencias se incluyen en el paquete; no se requiere CDN.
+El kernel HTTP sirve los recursos permitidos en `/_orionis/assets/` por
+GET y HEAD después de validar la seguridad, también durante mantenimiento
+y límites de solicitudes, sin iniciar una sesión.
 
 | Método | Firma | Devuelve / lanza |
 |---|---|---|

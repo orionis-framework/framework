@@ -61,6 +61,28 @@ class ViewEnvironment(IViewEnvironment):
             jinja2.ChoiceLoader(_loaders) if len(_loaders) > 1 else _loaders[0]
         )
 
+        # Keep built-in pages available independently of application view paths.
+        # FunctionLoader preserves the full template name during compilation,
+        # allowing autoescape to stay mandatory for framework error pages.
+        _default_prefix = "__orionis__/default/"
+        _default_loader = jinja2.FileSystemLoader(
+            str(Path(__file__).resolve().parents[1] / "http/default/pages"),
+        )
+
+        def load_default(name: str) -> tuple[str, str | None, Callable] | None:
+            if name.startswith(_default_prefix):
+                return _default_loader.get_source(
+                    self._jinja_env, name.removeprefix(_default_prefix),
+                )
+            return None
+
+        _loader = jinja2.ChoiceLoader([
+            jinja2.FunctionLoader(load_default), _loader,
+        ])
+
+        def autoescape(name: str | None) -> bool:
+            return bool(name and name.startswith(_default_prefix)) or _config.autoescape
+
         # Optional bytecode cache for production deployments
         _bytecode_cache: jinja2.BytecodeCache | None = None
         if _config.cache_path is not None:
@@ -76,7 +98,7 @@ class ViewEnvironment(IViewEnvironment):
         self._jinja_env: jinja2.Environment = jinja2.Environment(
             loader=_loader,
             enable_async=True,
-            autoescape=_config.autoescape,  # noqa: S701
+            autoescape=autoescape,  # noqa: S701 - built-ins always escape.
             auto_reload=_config.auto_reload,
             cache_size=_config.cache_size,
             bytecode_cache=_bytecode_cache,

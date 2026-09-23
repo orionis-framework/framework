@@ -739,7 +739,12 @@
             })();
 
             console.clear();
-            console.error("%cError {{error}}: {{message}} - {{description}}", "color: var(--red); font-size: 14px; font-weight: bold;");
+            console.error(
+                "%cError {{error}}: %s - %s",
+                "color: var(--red); font-size: 14px; font-weight: bold;",
+                document.querySelector('.error-title').textContent,
+                document.querySelector('.error-description').textContent
+            );
 
         });
     </script>

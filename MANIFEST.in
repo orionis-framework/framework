@@ -2,6 +2,7 @@ include README.md
 include LICENSE
 
 recursive-include orionis *.py *.pyi *.html *.stub
+recursive-include orionis/http/default/assets *.css *.js *.ttf *.woff *.woff2 *.ico *.txt *.md
 
 exclude app/*
 exclude bootstrap/*

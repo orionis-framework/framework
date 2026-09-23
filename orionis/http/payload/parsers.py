@@ -8,9 +8,61 @@ from defusedxml.ElementTree import fromstring as _xml_fromstring
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element as XMLElement
 
+def _split_header_parameters( # NOSONAR
+    header: str, *, quote_chars: str = '"',
+) -> list[str]:
+    """
+    Split header segments at semicolons outside quoted parameter values.
+
+    Quotes open only at the first non-whitespace character after the first
+    equals sign in a segment. Escaped characters cannot close a quoted value.
+    Segments retain their whitespace, quotes and escapes for the caller.
+    An unterminated quoted value consumes the remainder of the header.
+
+    Parameters
+    ----------
+    header : str
+        Header or parameter text to split.
+    quote_chars : str, optional
+        Characters that may delimit a quoted value; double quotes by default.
+
+    Returns
+    -------
+    list[str]
+        Original segments, excluding their separating semicolons.
+    """
+    parts: list[str] = []
+    start = 0
+    quote: str | None = None
+    escaped = False
+    value_started: bool | None = None
+    for position, char in enumerate(header):
+        if quote is not None:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            continue
+        if char == ";":
+            parts.append(header[start:position])
+            start = position + 1
+            value_started = None
+        elif value_started is None and char == "=":
+            value_started = False
+        elif value_started is False and not char.isspace():
+            value_started = True
+            if char in quote_chars:
+                quote = char
+    parts.append(header[start:])
+    return parts
+
 def parse_content_type(header: str) -> tuple[str, dict[str, str]]:
     """
     Parse a ``Content-Type`` header into a media-type and parameter dict.
+
+    Semicolons inside double-quoted parameter values are preserved.
 
     Parameters
     ----------
@@ -31,8 +83,8 @@ def parse_content_type(header: str) -> tuple[str, dict[str, str]]:
     # Isolate the bare media type before the first semicolon.
     media_type = header[:sc].strip().lower()
     params: dict[str, str] = {}
-    # Walk each semicolon-delimited segment and extract key=value pairs.
-    for part in header[sc + 1 :].split(";"):
+    # Extract parameters without splitting semicolons inside quoted values.
+    for part in _split_header_parameters(header[sc + 1 :]):
         if "=" in part:
             key, _, value = part.strip().partition("=")
             params[key.strip().lower()] = value.strip().strip('"')
@@ -134,10 +186,11 @@ def parse_urlencoded_multi(raw: bytes) -> dict[str, str | list[str]]:
 
 def parse_xml(raw: bytes) -> XMLElement:
     """
-    Parse an XML payload safely, preventing XXE and DTD attacks.
+    Parse an XML payload with entity declarations disabled.
 
-    Uses ``defusedxml`` to reject external entity references and DTD
-    expansions before they are evaluated.
+    Uses ``defusedxml`` to reject internal and external entity declarations.
+    DTDs without entity declarations are allowed; external resources are
+    not resolved.
 
     Parameters
     ----------
@@ -152,9 +205,12 @@ def parse_xml(raw: bytes) -> XMLElement:
     Raises
     ------
     xml.etree.ElementTree.ParseError
-        If *raw* is malformed or contains forbidden constructs.
+        If *raw* is malformed XML.
+    defusedxml.common.EntitiesForbidden
+        If the document declares an internal or external entity. This is a
+        subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
     """
-    # defusedxml.fromstring blocks XXE/DTD before any content is parsed.
+    # Defaults forbid entities and external access, but allow DTD declarations.
     return _xml_fromstring(raw)
 
 def parse_text(raw: bytes) -> str:

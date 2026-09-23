@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
@@ -115,7 +114,7 @@ class IFluentRoute(ABC):
     @abstractmethod
     def export(self) -> dict:
         """
-        Export the route configuration as a plain dictionary.
+        Export a complete route configuration as a plain dictionary.
 
         Returns
         -------
@@ -123,4 +122,9 @@ class IFluentRoute(ABC):
             Dictionary with keys: id, method, path, class, handler,
             callable_handler, view, name, middleware, without_middleware,
             and kind.
+
+        Raises
+        ------
+        ValueError
+            If the route has neither a view nor an assigned action.
         """

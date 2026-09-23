@@ -1,11 +1,10 @@
 from __future__ import annotations
-
 import re
 import tempfile
 from contextlib import suppress
+from io import SEEK_END
 from pathlib import Path
 from typing import TYPE_CHECKING
-
 from orionis.http.payload.contracts.uploaded_file import IUploadedFile
 
 if TYPE_CHECKING:
@@ -138,18 +137,21 @@ class UploadedFile(IUploadedFile):
         """
         Append *chunk* to the file buffer.
 
+        Seek to the end before writing, including after a partial read.
         ``SpooledTemporaryFile`` spills to a real temp file on disk
         automatically once *memory_threshold* bytes are exceeded.
 
         Parameters
         ----------
-        chunk : bytes
+        chunk : bytes | bytearray | memoryview
             Raw bytes to append.
 
         Returns
         -------
         None
         """
+        # Append independently of the cursor left by a previous read.
+        self._file.seek(0, SEEK_END)
         # Track whether this write uses the backing disk file.
         size = len(chunk)
         self._rolled = self.requiresDiskWrite(size)

@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 # Only plain navigations are worth remembering as the "previous page".
 _NAVIGATION_METHODS: frozenset[str] = frozenset({"GET", "HEAD"})
 
-# Status range that marks a response as a redirection.
-_REDIRECT_MIN: int = 300
-_REDIRECT_MAX: int = 400
+# Successful responses eligible to become the previous page.
+_SUCCESS_MIN: int = 200
+_SUCCESS_MAX: int = 300
 
 class StartSessionMiddleware(BaseMiddleware):
 
@@ -113,8 +113,9 @@ class StartSessionMiddleware(BaseMiddleware):
         """
         Record the current URL as the page to redirect back to.
 
-        Only successful, non-AJAX navigations are stored, so redirects,
-        background calls and form submissions never overwrite it.
+        Only GET/HEAD responses with status 200-299 are stored, excluding
+        AJAX and requests that want JSON. Other statuses, background calls
+        and form submissions never overwrite the previous page.
 
         Parameters
         ----------
@@ -134,9 +135,9 @@ class StartSessionMiddleware(BaseMiddleware):
         if request.isAjax() or request.wantsJson():
             return
 
-        # Redirections are transient; keep the page the user actually saw.
+        # Keep the last successful page across redirects and failed requests.
         status = response.getStatusCode()
-        if _REDIRECT_MIN <= status < _REDIRECT_MAX:
+        if not _SUCCESS_MIN <= status < _SUCCESS_MAX:
             return
 
         session.setPreviousUrl(request.url)

@@ -1,0 +1,26 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+<main class="orionis-page">
+  <div class="container orionis-container-auth py-4">
+    <div class="text-center mb-4">
+      <a href="{{ url('/') }}" aria-label="{{ config('app.name') }}" class="orionis-brand">
+        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="orionis-brand-logo">
+      </a>
+    </div>
+    <div class="card orionis-auth-card">
+      <div class="card-body">
+        <h1 class="h2 text-center mb-4">{% block auth_heading %}{% endblock %}</h1>
+        {% if errors.any() %}
+          <div class="alert alert-danger" role="alert">{{ errors.first() }}</div>
+        {% endif %}
+        {% if flash('success') %}
+          <div class="alert alert-success" role="alert">{{ flash('success') }}</div>
+        {% endif %}
+        {% block auth_form %}{% endblock %}
+      </div>
+    </div>
+    <div class="text-center text-secondary mt-3">{% block auth_footer %}{% endblock %}</div>
+  </div>
+</main>
+{% endblock %}

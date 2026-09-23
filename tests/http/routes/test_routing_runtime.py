@@ -305,7 +305,7 @@ class TestRoutingCache(TestCase):
         loader = RouteLoader(app, router, RouteCompiler(), RouteCache())
         self.assertEqual(loader.load(), {})
         self.assertEqual(loader.load(), {})
-        self.assertEqual(loader.fallback, (None, None))
+        self.assertIsNone(loader.fallback)
         self.assertEqual(router.exports, 1)
         self.assertEqual(
             router.kinds,

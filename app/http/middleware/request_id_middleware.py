@@ -1,9 +1,10 @@
 import secrets
-from orionis.http import BaseMiddleware, NextCallable
-from orionis.http import Request
-from orionis.http import Response
+from orionis.http import BaseMiddleware, NextCallable, Request, Response
 
 class RequestIDMiddleware(BaseMiddleware):
+    """Attach a unique correlation identifier to every incoming request."""
+
+    __slots__ = ()
 
     async def handle(
         self,

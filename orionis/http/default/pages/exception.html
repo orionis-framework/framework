@@ -1,1163 +1,136 @@
-<!DOCTYPE html>
-<html lang="{{locale}}">
-
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{exception}} | {{app_name}}</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <style>
-        /* ===== CSS VARIABLES ===== */
-        :root {
-            --bg-deep: #060a13;
-            --bg-panel: #0b1022;
-            --bg-card: #0d1429;
-            --cyan: #00e5ff;
-            --cyan-dim: rgba(0, 229, 255, 0.15);
-            --cyan-glow: rgba(0, 229, 255, 0.4);
-            --yellow: #f2c230;
-            --yellow-dim: rgba(242, 194, 48, 0.15);
-            --yellow-glow: rgba(242, 194, 48, 0.4);
-            --green: #00ff88;
-            --green-dim: rgba(0, 255, 136, 0.15);
-            --green-glow: rgba(0, 255, 136, 0.4);
-            --red: #ff3b3b;
-            --red-dim: rgba(255, 59, 59, 0.15);
-            --red-glow: rgba(255, 59, 59, 0.4);
-            --purple: #d2a8ff;
-            --purple-dim: rgba(210, 168, 255, 0.15);
-            --text-primary: rgba(255, 255, 255, 0.92);
-            --text-secondary: rgba(255, 255, 255, 0.55);
-            --text-dim: rgba(255, 255, 255, 0.3);
-            --border: rgba(0, 229, 255, 0.12);
-            --font-display: 'Orbitron', sans-serif;
-            --font-mono: 'Share Tech Mono', monospace;
-            --font-code: 'Fira Code', 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
-        }
-
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: var(--font-mono);
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ===== DOT GRID BACKGROUND ===== */
-        .grid-bg {
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(circle at 1.5px 1.5px, rgba(0, 229, 255, 0.06) 1px, transparent 0);
-            background-size: 32px 32px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ===== SCANLINE OVERLAY ===== */
-        .scanline-overlay {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 229, 255, 0.015) 2px, rgba(0, 229, 255, 0.015) 4px);
-            pointer-events: none;
-            z-index: 9999;
-            animation: scanlineShift 8s linear infinite;
-        }
-
-        @keyframes scanlineShift {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(4px); }
-        }
-
-        /* ===== NOISE OVERLAY ===== */
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9998;
-            opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-            background-size: 256px 256px;
-        }
-
-        /* ===== TOPBAR ===== */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            height: 40px;
-            background: rgba(6, 10, 19, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            font-size: 11px;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-        }
-
-        .topbar-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .topbar-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--red);
-            box-shadow: 0 0 6px var(--red-glow);
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .topbar-time {
-            color: var(--cyan);
-            font-family: var(--font-mono);
-        }
-
-        /* ===== MAIN LAYOUT ===== */
-        .main-container {
-            position: relative;
-            z-index: 10;
-            padding: 56px 24px 40px;
-            min-height: 100vh;
-        }
-
-        .content-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* ===== HEADER BAR ===== */
-        .header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            background: linear-gradient(165deg, var(--bg-card) 0%, var(--bg-panel) 100%);
-            border: 1px solid var(--border);
-            position: relative;
-            flex-wrap: wrap;
-        }
-
-        .header-bar::before,
-        .header-bar::after {
-            content: '';
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border-color: var(--red);
-            border-style: solid;
-        }
-
-        .header-bar::before {
-            top: -1px;
-            left: -1px;
-            border-width: 2px 0 0 2px;
-        }
-
-        .header-bar::after {
-            top: -1px;
-            right: -1px;
-            border-width: 2px 2px 0 0;
-        }
-
-        .error-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border: 1px solid var(--red-dim);
-            background: var(--red-dim);
-            font-size: 11px;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            flex-shrink: 0;
-        }
-
-        .error-badge-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--red);
-            animation: pulse-dot 1.5s ease-in-out infinite;
-        }
-
-        .error-badge-text {
-            color: var(--red);
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 10px;
-        }
-
-        .error-message {
-            flex: 1;
-            min-width: 0;
-            font-size: 12px;
-            color: var(--text-secondary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ===== GRID LAYOUT ===== */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-        }
-
-        @media (min-width: 1024px) {
-            .grid-layout {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        .main-col {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            min-width: 0;
-        }
-
-        .side-col {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* ===== HUD CARD ===== */
-        .hud-card {
-            position: relative;
-            background: linear-gradient(165deg, var(--bg-card) 0%, var(--bg-panel) 100%);
-            border: 1px solid var(--border);
-            animation: cardFadeIn 0.8s ease-out;
-        }
-
-        .hud-card::before,
-        .hud-card::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-color: var(--cyan);
-            border-style: solid;
-            z-index: 5;
-        }
-
-        .hud-card::before {
-            top: -1px;
-            left: -1px;
-            border-width: 2px 0 0 2px;
-        }
-
-        .hud-card::after {
-            top: -1px;
-            right: -1px;
-            border-width: 2px 2px 0 0;
-        }
-
-        .hud-card-bottom::before,
-        .hud-card-bottom::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-color: var(--cyan);
-            border-style: solid;
-            z-index: 5;
-        }
-
-        .hud-card-bottom::before {
-            bottom: -1px;
-            left: -1px;
-            border-width: 0 0 2px 2px;
-        }
-
-        .hud-card-bottom::after {
-            bottom: -1px;
-            right: -1px;
-            border-width: 0 2px 2px 0;
-        }
-
-        .hud-card.red-corners::before,
-        .hud-card.red-corners::after {
-            border-color: var(--red);
-        }
-
-        .hud-card.red-corners .hud-card-bottom::before,
-        .hud-card.red-corners .hud-card-bottom::after {
-            border-color: var(--red);
-        }
-
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.99); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-header-title {
-            font-family: var(--font-display);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-        }
-
-        .card-body {
-            padding: 20px;
-            position: relative;
-        }
-
-        /* ===== REQUEST INFO ===== */
-        .request-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .method-badge {
-            padding: 4px 12px;
-            font-family: var(--font-display);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            border: 1px solid;
-        }
-
-        .method-get { color: var(--green); border-color: rgba(0, 255, 136, 0.3); background: var(--green-dim); }
-        .method-post { color: var(--cyan); border-color: rgba(0, 229, 255, 0.3); background: var(--cyan-dim); }
-        .method-put { color: var(--yellow); border-color: rgba(242, 194, 48, 0.3); background: var(--yellow-dim); }
-        .method-delete { color: var(--red); border-color: rgba(255, 59, 59, 0.3); background: var(--red-dim); }
-        .method-patch { color: var(--purple); border-color: rgba(210, 168, 255, 0.3); background: var(--purple-dim); }
-        .method-default { color: var(--text-secondary); border-color: var(--border); background: rgba(255,255,255,0.03); }
-
-        .request-path {
-            font-size: 13px;
-            color: var(--text-secondary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ===== CODE BLOCK ===== */
-        .code-container {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 16px;
-            background: rgba(0, 229, 255, 0.03);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .code-header-dots {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .code-header-dots span {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: filter 0.2s;
-        }
-
-        .code-header-dots span:hover { filter: brightness(1.3); }
-        .code-header-dots .dot-red { background: var(--red); }
-        .code-header-dots .dot-yellow { background: var(--yellow); }
-        .code-header-dots .dot-green { background: var(--green); }
-
-        .code-header-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .code-lang-badge {
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--cyan);
-            padding: 2px 8px;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            background: rgba(0, 229, 255, 0.05);
-        }
-
-        .code-filename {
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-
-        .code-area {
-            position: relative;
-        }
-
-        .code-lines {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 48px;
-            background: rgba(0, 0, 0, 0.3);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            font-size: 12px;
-            line-height: 1.5rem;
-            padding-top: 16px;
-            color: var(--text-dim);
-            user-select: none;
-        }
-
-        .code-lines span {
-            padding: 0 12px;
-            text-align: right;
-            transition: all 0.15s;
-        }
-
-        .code-lines span:hover {
-            background: rgba(0, 229, 255, 0.05);
-            color: var(--cyan);
-        }
-
-        .code-lines span.error-line {
-            background: rgba(255, 59, 59, 0.1);
-            color: var(--yellow);
-        }
-
-        .code-scroll {
-            padding: 16px 16px 16px 60px;
-            overflow-x: auto;
-        }
-
-        .code-scroll::-webkit-scrollbar { height: 6px; }
-        .code-scroll::-webkit-scrollbar-track { background: var(--bg-deep); }
-        .code-scroll::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.15); border-radius: 3px; }
-        .code-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.3); }
-
-        .error-indicator {
-            position: absolute;
-            left: 48px;
-            top: 40px;
-            width: 3px;
-            height: 24px;
-            background: var(--red);
-            box-shadow: 0 0 8px var(--red-glow);
-            border-radius: 0 2px 2px 0;
-            animation: pulse-error 2s infinite;
-        }
-
-        @keyframes pulse-error {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-
-        .error-tooltip {
-            position: absolute;
-            right: 16px;
-            top: 16px;
-        }
-
-        .error-tooltip-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: var(--red-dim);
-            border: 1px solid rgba(255, 59, 59, 0.3);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .error-tooltip-badge:hover {
-            background: rgba(255, 59, 59, 0.2);
-            box-shadow: 0 0 12px var(--red-glow);
-        }
-
-        .error-tooltip-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--red);
-            animation: pulse-dot 1.5s ease-in-out infinite;
-        }
-
-        .error-tooltip-text {
-            color: var(--red);
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .error-tooltip-popup {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 8px;
-            width: 240px;
-            padding: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s;
-            z-index: 10;
-        }
-
-        .error-tooltip:hover .error-tooltip-popup {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .btn-search {
-            display: block;
-            width: 100%;
-            padding: 8px 12px;
-            font-family: var(--font-display);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--cyan);
-            background: transparent;
-            border: 1px solid var(--cyan);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .btn-search:hover {
-            background: rgba(0, 229, 255, 0.1);
-            box-shadow: 0 0 15px var(--cyan-glow), inset 0 0 15px rgba(0, 229, 255, 0.05);
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-
-        /* ===== FILE INFO ===== */
-        .file-info-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
-        }
-
-        .file-info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            background: rgba(0, 229, 255, 0.03);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .file-info-label {
-            font-size: 9px;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            flex-shrink: 0;
-        }
-
-        .file-info-value {
-            font-size: 12px;
-            color: var(--cyan);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .file-info-value a {
-            color: var(--cyan);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .file-info-value a:hover {
-            color: var(--text-primary);
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-
-        /* ===== STACK TRACE ===== */
-        .stack-trace-list {
-            max-height: 400px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .stack-trace-list::-webkit-scrollbar { width: 4px; }
-        .stack-trace-list::-webkit-scrollbar-track { background: transparent; }
-        .stack-trace-list::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.15); border-radius: 2px; }
-
-        .stack-trace-item {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .stack-trace-item:hover {
-            border-color: rgba(0, 229, 255, 0.3);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.05);
-        }
-
-        .stack-trace-item-header {
-            padding: 12px 14px;
-            transition: background 0.2s;
-        }
-
-        .stack-trace-item:hover .stack-trace-item-header {
-            background: rgba(0, 229, 255, 0.02);
-        }
-
-        .stack-trace-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .stack-trace-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--red);
-            box-shadow: 0 0 4px var(--red-glow);
-            flex-shrink: 0;
-        }
-
-        .stack-trace-file {
-            font-size: 11px;
-            color: var(--cyan);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .stack-trace-fn {
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            padding: 2px 8px;
-            background: var(--purple-dim);
-            color: var(--purple);
-            flex-shrink: 0;
-        }
-
-        .stack-trace-code {
-            padding: 10px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 229, 255, 0.06);
-            overflow: hidden;
-            margin: 0 14px 12px;
-        }
-
-        .stack-trace-code pre {
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .stack-trace-code code {
-            font-family: var(--font-code);
-            font-size: 11px;
-            color: var(--text-secondary);
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        /* ===== SYSTEM INFO ===== */
-        .sys-info-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 16px;
-        }
-
-        .sys-info-item {
-            position: relative;
-            padding: 12px 14px;
-            background: rgba(0, 229, 255, 0.03);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .sys-info-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 100%;
-            background: var(--cyan);
-            box-shadow: 0 0 6px var(--cyan-glow);
-        }
-
-        .sys-info-item:nth-child(2)::before { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
-        .sys-info-item:nth-child(3)::before { background: var(--yellow); box-shadow: 0 0 6px var(--yellow-glow); }
-        .sys-info-item:nth-child(4)::before { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
-        .sys-info-item:nth-child(5)::before { background: var(--purple); box-shadow: 0 0 6px rgba(210, 168, 255, 0.4); }
-        .sys-info-item:nth-child(6)::before { background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow); }
-
-        .sys-info-label {
-            font-size: 9px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 4px;
-        }
-
-        .sys-info-value {
-            font-size: 12px;
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-        }
-
-        /* ===== HIGHLIGHT.JS OVERRIDES ===== */
-        .hljs {
-            background: transparent !important;
-            padding: 0 !important;
-            font-family: var(--font-code) !important;
-            font-variant-ligatures: normal;
-            font-feature-settings: "liga" 1, "calt" 1;
-            line-height: 1.5;
-            color: #e6edf3 !important;
-        }
-
-        .hljs-keyword { color: #ff7b72 !important; font-weight: 500; }
-        .hljs-string { color: #a5d6ff !important; }
-        .hljs-number { color: #79c0ff !important; }
-        .hljs-comment { color: #8b949e !important; font-style: italic; }
-        .hljs-function { color: #d2a8ff !important; }
-        .hljs-variable { color: #ffa657 !important; }
-        .hljs-built_in { color: #79c0ff !important; font-weight: 500; }
-        .hljs-literal { color: #79c0ff !important; }
-        .hljs-title { color: #d2a8ff !important; font-weight: 600; }
-        .hljs-class { color: #ffa657 !important; }
-        .hljs-params { color: #e6edf3 !important; }
-
-        pre code {
-            display: block;
-            overflow-x: auto;
-            padding: 0;
-            font-size: 13px;
-            white-space: pre;
-            word-wrap: normal;
-            text-shadow: none;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .main-container { padding: 52px 12px 24px; }
-            .header-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .error-message { white-space: normal; }
-            .file-info-grid { grid-template-columns: 1fr; }
-            .card-body { padding: 14px; }
-            .topbar { font-size: 9px; padding: 0 12px; }
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Background layers -->
-    <div class="grid-bg"></div>
-    <div class="noise-overlay"></div>
-    <div class="scanline-overlay"></div>
-
-    <!-- Top system bar -->
-    <div class="topbar">
-        <div class="topbar-status">
-            <div class="topbar-dot"></div>
-            <span>SYS.EXCEPTION</span>
-            <span style="margin-left: 12px; color: rgba(255,255,255,0.2);">NAV:HALTED</span>
-        </div>
-        <span class="topbar-time" id="systemTime"></span>
-    </div>
-
-    <!-- Main content -->
-    <div class="main-container">
-        <div class="content-wrapper">
-
-            <!-- Header bar -->
-            <div class="header-bar">
-                <div class="error-badge">
-                    <div class="error-badge-dot"></div>
-                    <span id="main-error" class="error-badge-text"></span>
-                </div>
-                <p id="main-description" class="error-message"></p>
+{% extends "__orionis__/default/base.html" %}
+
+{% set frames = traceback.stack_trace %}
+{% set method = request_method|lower %}
+
+{% block title %}{% autoescape true %}{{ exception }} | {{ app_name }}{% endautoescape %}{% endblock %}
+
+{% block content %}{% autoescape true %}
+<main class="main-container">
+    <div class="content-wrapper">
+        <div class="header-bar">
+            <div class="error-summary">
+                <h1 class="error-badge">
+                    <span class="error-badge-dot" aria-hidden="true"></span>
+                    <span id="main-error" class="error-badge-text">{{ traceback.error_type }}</span>
+                </h1>
+                <p id="main-description" class="error-message">{{ traceback.error_message }}</p>
             </div>
-
-            <!-- Grid layout -->
-            <div class="grid-layout">
-
-                <!-- Main column -->
-                <div class="main-col">
-
-                    <!-- Exception Details -->
-                    <div class="hud-card red-corners">
-                        <div class="hud-card-bottom">
-                            <div class="card-header">
-                                <span class="card-header-title">Exception Details</span>
+            <fieldset class="exception-actions">
+                <legend class="exception-help-label">Get help with this exception</legend>
+                <a class="help-link" href="https://www.google.com/search?q={{ ('Python ' ~ traceback.error_type ~ ' Exception')|urlencode }}&amp;hl={{ locale|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Search Google for this exception" title="Search Google for this exception">
+                    <svg class="help-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                        <path fill="#4285f4" d="M22.56 12.25c0-.73-.06-1.42-.19-2.09H12v3.96h5.92c-.26 1.28-1.04 2.36-2.21 3.08v2.56h3.57c2.08-1.92 3.28-4.74 3.28-7.51Z" />
+                        <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.87 0-5.31-1.94-6.18-4.55H2.15v2.84A11 11 0 0 0 12 23Z" />
+                        <path fill="#fbbc05" d="M5.82 14.08a6.6 6.6 0 0 1 0-4.16V7.08H2.15a11 11 0 0 0 0 9.84l3.67-2.84Z" />
+                        <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.16-3.16A10.56 10.56 0 0 0 12 1a11 11 0 0 0-9.85 6.08l3.67 2.84A6.52 6.52 0 0 1 12 5.38Z" />
+                    </svg>
+                    <span>Google</span>
+                </a>
+                <a class="help-link" href="{{ chatgpt_url }}" target="_blank" rel="noopener noreferrer" aria-label="Ask ChatGPT with the error trace" title="Ask ChatGPT with the error trace{% if chatgpt_trace_truncated %} (shortened to fit the link){% endif %}">
+                    <svg class="help-icon" viewBox="0 0 41 41" width="16" height="16" aria-hidden="true" focusable="false">
+                        <path fill="#fff" d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" />
+                    </svg>
+                    <span>ChatGPT</span>
+                </a>
+            </fieldset>
+        </div>
+        <div class="grid-layout">
+            <div class="main-col">
+                <section class="hud-card red-corners" aria-labelledby="exception-details-title">
+                    <div class="hud-card-bottom">
+                        <div class="card-header">
+                            <h2 id="exception-details-title" class="card-header-title">Exception Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="request-info">
+                                <span id="request-method" class="method-badge method-{{ method if method in ['get', 'post', 'put', 'delete', 'patch'] else 'default' }}">{{ request_method }}</span>
+                                <span id="request-path" class="request-path">{{ request_path }}</span>
                             </div>
-                            <div class="card-body">
-
-                                <!-- Request info -->
-                                <div class="request-info">
-                                    <span id="request-method" class="method-badge method-default"></span>
-                                    <span id="request-path" class="request-path">{{path}}</span>
-                                </div>
-
-                                <!-- Code block -->
+                            {% for frame in frames %}
+                            <div id="trace-frame-{{ loop.index }}" class="trace-frame" data-trace-frame>
                                 <div class="code-container">
                                     <div class="code-header">
-                                        <div class="code-header-dots">
-                                            <span class="dot-red"></span>
-                                            <span class="dot-yellow"></span>
-                                            <span class="dot-green"></span>
+                                        <div class="code-header-dots" aria-hidden="true">
+                                            <span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span>
                                         </div>
                                         <div class="code-header-info">
                                             <span class="code-lang-badge">Python</span>
-                                            <span id="file-name" class="code-filename"></span>
+                                            <span class="code-filename">{{ frame.filename.replace('\\', '/').rsplit('/', 1)[-1] }}</span>
                                         </div>
                                     </div>
-                                    <div class="code-area">
-                                        <div id="code-lines" class="code-lines line-numbers"></div>
-                                        <div class="code-scroll">
-                                            <pre style="margin:0;"><code id="code-block" class="language-python hljs" style="font-size:13px;line-height:1.5rem;"></code></pre>
-                                        </div>
-                                        <div class="error-indicator"></div>
-                                        <div class="error-tooltip">
-                                            <div class="error-tooltip-badge">
-                                                <div class="error-tooltip-dot"></div>
-                                                <span id="code-context-error" class="error-tooltip-text"></span>
-                                            </div>
-                                            <div class="error-tooltip-popup">
-                                                <button onclick="searchHelp()" class="btn-search">Search Help In Google</button>
-                                            </div>
-                                        </div>
+                                    <div class="source-scroll" aria-label="Python source code">
+                                        {% for source in frame.code %}
+                                        <div class="source-row{% if frame.lines[loop.index0] == frame.lineno %} source-row-error{% endif %}"><span class="source-number" aria-label="Line {{ frame.lines[loop.index0] }}">{{ frame.lines[loop.index0] }}</span><pre><code class="source-code">{{ source }}</code></pre></div>
+                                        {% else %}
+                                        <p class="empty-state">Source code is not available for this frame.</p>
+                                        {% endfor %}
                                     </div>
                                 </div>
-
-                                <!-- File info -->
                                 <div class="file-info-grid">
                                     <div class="file-info-item">
                                         <span class="file-info-label">File:</span>
-                                        <span class="file-info-value"><a id="link-file" href="#" title="Open in VS Code"></a></span>
+                                        <span class="file-info-value"><a href="vscode://file/{{ frame.filename|urlencode }}:{{ frame.lineno|int }}" title="Open in VS Code">{{ frame.filename }}</a></span>
                                     </div>
                                     <div class="file-info-item">
                                         <span class="file-info-label">Line:</span>
-                                        <span id="lineno" class="file-info-value"></span>
+                                        <span class="file-info-value">{{ frame.lineno }}</span>
                                     </div>
                                 </div>
                             </div>
+                            {% else %}
+                            <p class="empty-state">No stack trace is available for this exception.</p>
+                            {% endfor %}
                         </div>
                     </div>
-
-                    <!-- Stack Trace -->
-                    <div class="hud-card">
-                        <div class="hud-card-bottom">
-                            <div class="card-header">
-                                <span class="card-header-title">Stack Trace</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="stack-trace-list" id="stack-trace"></div>
-                            </div>
+                </section>
+                <section class="hud-card" aria-labelledby="stack-trace-title">
+                    <div class="hud-card-bottom">
+                        <div class="card-header">
+                            <h2 id="stack-trace-title" class="card-header-title">Stack Trace</h2>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar -->
-                <div class="side-col">
-                    <div class="hud-card">
-                        <div class="hud-card-bottom">
-                            <div class="card-header">
-                                <span class="card-header-title">System Info</span>
-                            </div>
-
-                            <!-- link documentation -->
-                            <div style="padding: 16px 16px 0 16px;">
-                                <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn-search">Open Documentation</a>
-                            </div>
-
-                            <div class="sys-info-list">
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Orionis Framework</div>
-                                    <div id="framework-version" class="sys-info-value"></div>
-                                </div>
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Python</div>
-                                    <div id="python-version" class="sys-info-value"></div>
-                                </div>
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Environment</div>
-                                    <div id="environmente" class="sys-info-value"></div>
-                                </div>
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Debug Mode</div>
-                                    <div id="debug-mode" class="sys-info-value"></div>
-                                </div>
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Timezone</div>
-                                    <div id="timezone" class="sys-info-value"></div>
-                                </div>
-                                <div class="sys-info-item">
-                                    <div class="sys-info-label">Interface</div>
-                                    <div id="interface" class="sys-info-value"></div>
-                                </div>
+                        <div class="card-body">
+                            <div class="stack-trace-list" id="stack-trace">
+                                {% for frame in frames %}
+                                <a href="#trace-frame-{{ loop.index }}" class="stack-trace-item" data-frame-target="trace-frame-{{ loop.index }}" aria-controls="trace-frame-{{ loop.index }}">
+                                    <div class="stack-trace-item-header">
+                                        <div class="stack-trace-meta">
+                                            <span class="stack-trace-dot" aria-hidden="true"></span>
+                                            <span class="stack-trace-file" title="{{ frame.filename }}">{{ frame.filename }}:{{ frame.lineno }}</span>
+                                            <span class="stack-trace-fn">{{ frame.name }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="stack-trace-code"><pre><code class="source-code">{{ frame.line_code or '' }}</code></pre></div>
+                                </a>
+                                {% else %}
+                                <p class="empty-state">No stack frames were captured.</p>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
+            <aside class="side-col">
+                <section class="hud-card" aria-labelledby="system-info-title">
+                    <div class="hud-card-bottom">
+                        <div class="card-header">
+                            <h2 id="system-info-title" class="card-header-title">System Info</h2>
+                        </div>
+                        <div class="documentation-action">
+                            <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn-search">Open Documentation</a>
+                        </div>
+                        <dl class="sys-info-list">
+                            {% for label, value in [('Orionis Framework', framework_version), ('Python', python_version), ('Environment', environment), ('Debug Mode', debug_mode), ('Timezone', timezone), ('Interface', interface)] %}
+                            <div class="sys-info-item">
+                                <dt class="sys-info-label">{{ label }}</dt>
+                                <dd class="sys-info-value">{{ value }}</dd>
+                            </div>
+                            {% endfor %}
+                        </dl>
+                    </div>
+                </section>
+            </aside>
         </div>
     </div>
-
-    <!-- Highlight.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
-
-    <script>
-
-        /* ===== SYSTEM CLOCK ===== */
-        (function clock() {
-            var el = document.getElementById('systemTime');
-            function tick() {
-                var now = new Date();
-                el.textContent = now.toUTCString().split(' ').slice(4).join(' ').replace(' GMT', ' UTC');
-            }
-            tick();
-            setInterval(tick, 1000);
-        })();
-
-        // Global Error Context
-        var error_context = "{{error_context}}";
-
-        // Vars From Server
-        const framework_version = "{{framework_version}}";
-        const python_version = "{{python_version}}";
-        const environment = "{{environment}}";
-        const debug_mode = "{{debug_mode}}";
-        const timezone = "{{timezone}}";
-        const server_interface = "{{interface}}";
-        const request_path = "{{request_path}}";
-        const request_method = "{{request_method}}";
-        const trace_back = "{{traceback}}";
-
-        // Map HTTP methods to CSS classes
-        const method_class_map = {
-            "get": "method-get",
-            "post": "method-post",
-            "put": "method-put",
-            "delete": "method-delete",
-            "patch": "method-patch",
-            "options": "method-default",
-            "head": "method-default",
-            "trace": "method-default",
-            "connect": "method-default"
-        };
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // Set code lines and highlight the error line
-            setCodeLines(trace_back.stack_trace[0].lines, trace_back.stack_trace[0].lineno);
-
-            // Set code block with syntax highlighting
-            setCodeBlock(trace_back.stack_trace[0].code);
-
-            // Set file name
-            setFileName(trace_back.stack_trace[0].filename);
-
-            // Set error context
-            setExceptionErrorContext(trace_back.error_type);
-
-            // Set line number in the header
-            setLineNumber(trace_back.stack_trace[0].lineno);
-
-            // Set link to open file in VS Code
-            setLinkFile(trace_back.stack_trace[0].filename, trace_back.stack_trace[0].lineno);
-
-            // Set main error type
-            const mainError = document.getElementById('main-error');
-            mainError.textContent = trace_back.error_type;
-            error_context = trace_back.error_type;
-
-            // Set main error description
-            const mainDescription = document.getElementById('main-description');
-            mainDescription.textContent = trace_back.error_message;
-
-            // Set request method badge
-            const requestMethod = document.getElementById('request-method');
-            requestMethod.textContent = request_method;
-            var methodCls = method_class_map[request_method.toLowerCase()] || 'method-default';
-            requestMethod.classList.add(methodCls);
-
-            // Set framework version
-            document.getElementById('framework-version').textContent = framework_version;
-
-            // Set Python version
-            document.getElementById('python-version').textContent = python_version;
-
-            // Set environment
-            document.getElementById('environmente').textContent = environment;
-
-            // Set debug mode
-            document.getElementById('debug-mode').textContent = debug_mode;
-
-            // Set timezone
-            document.getElementById('timezone').textContent = timezone;
-
-            // Set interface
-            document.getElementById('interface').textContent = server_interface;
-
-            // Set Traceback
-            setStackTrace(trace_back.stack_trace);
-
-            const stackTraceItems = document.querySelectorAll('.stack-trace-item');
-            stackTraceItems.forEach(item => {
-                item.addEventListener('click', function () {
-                    const traceId = this.dataset.id;
-                    const trace = trace_back.stack_trace.find(t => t.id == traceId);
-                    if (trace) {
-                        setCodeLines(trace.lines, trace.lineno);
-                        setCodeBlock(trace.code);
-                        setFileName(trace.filename);
-                        setLineNumber(trace.lineno);
-                        setLinkFile(trace.filename, trace.lineno);
-
-                        const newCodeBlock = document.getElementById('code-block');
-                        delete newCodeBlock.dataset.highlighted;
-                        newCodeBlock.className = 'language-python hljs';
-                        newCodeBlock.style.fontSize = '13px';
-                        newCodeBlock.style.lineHeight = '1.5rem';
-                        hljs.highlightElement(newCodeBlock);
-                    }
-                });
-            });
-
-            // Configure Highlight.js
-            hljs.configure({
-                languages: ['python'],
-                ignoreUnescapedHTML: true
-            });
-
-            // Highlight all code blocks
-            hljs.highlightAll();
-        });
-
-        // Function to set the stack trace
-        function setStackTrace(trace_back) {
-            const stackTraceContainer = document.getElementById('stack-trace');
-            stackTraceContainer.innerHTML = '';
-
-            trace_back.forEach(trace => {
-                stackTraceContainer.innerHTML += '<div data-id="' + trace.id + '" class="stack-trace-item">' +
-                    '<div class="stack-trace-item-header">' +
-                        '<div class="stack-trace-meta">' +
-                            '<div class="stack-trace-dot"></div>' +
-                            '<span class="stack-trace-file" title="' + trace.filename + '">' + trace.filename + ':' + trace.lineno + '</span>' +
-                            '<span class="stack-trace-fn">' + trace.name + '</span>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="stack-trace-code">' +
-                        '<pre><code class="language-python" style="font-size:11px;">' + trace.line_code + '</code></pre>' +
-                    '</div>' +
-                '</div>';
-            });
-        }
-
-        // Function to set the link to open the file in VS Code
-        function setLinkFile(filename, lineno) {
-            const linkFile = document.getElementById('link-file');
-            linkFile.href = 'vscode://file/' + filename + ':' + lineno;
-            linkFile.textContent = filename;
-        }
-
-        // Function to set the line number
-        function setLineNumber(line) {
-            document.getElementById('lineno').textContent = line;
-        }
-
-        // Function to display error context
-        function setExceptionErrorContext(error) {
-            document.getElementById('code-context-error').textContent = error;
-        }
-
-        // Function to display code lines with error line highlighted
-        function setCodeLines(lines, line_error) {
-            const codeLinesContainer = document.getElementById('code-lines');
-            codeLinesContainer.innerHTML = '';
-            lines.forEach(line => {
-                const lineElement = document.createElement('span');
-                if (line === line_error) {
-                    lineElement.classList.add('error-line');
-                }
-                lineElement.textContent = line;
-                codeLinesContainer.appendChild(lineElement);
-            });
-        }
-
-        // Function to display code block with syntax highlighting
-        function setCodeBlock(code) {
-            const codeBlock = document.getElementById('code-block');
-            codeBlock.innerHTML = '';
-            code.forEach(line => {
-                codeBlock.innerHTML += line + '\n';
-            });
-            codeBlock.style.fontFamily = "var(--font-code)";
-            codeBlock.style.fontVariantLigatures = 'normal';
-            codeBlock.style.fontFeatureSettings = '"liga" 1, "calt" 1';
-        }
-
-        // Function to set the file name in the header
-        function setFileName(filename) {
-            document.getElementById('file-name').textContent = filename.split('/').pop().split('\\').pop();
-        }
-
-        // Helper function to search for Python exceptions
-        function searchHelp() {
-            var query_params = 'Python ' + error_context + ' Exception';
-            var url = "https://www.google.com/search?q=" + encodeURIComponent(query_params) + "&hl={{locale}}";
-            window.open(url, "_blank");
-        }
-    </script>
-</body>
-
-</html>
+</main>
+{% endautoescape %}{% endblock %}

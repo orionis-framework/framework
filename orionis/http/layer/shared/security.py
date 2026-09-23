@@ -121,7 +121,7 @@ class SecurityMiddleware:
         # Fall back to wildcard subdomain suffix matching.
         return host.endswith(self.__allowed_host_suffixes)
 
-    def handle(
+    async def handle(
         self,
         adapter: TransportAdapter,
     ) -> Response | None:
@@ -153,7 +153,7 @@ class SecurityMiddleware:
                 "\r" in name or "\n" in name
                 or "\r" in value or "\n" in value
             ):
-                return self.__default_responses.error(
+                return await self.__default_responses.error(
                     status_code=400,
                     content="Invalid header format.",
                     expects_json=adapter.wantsJson(),
@@ -161,7 +161,7 @@ class SecurityMiddleware:
 
         # 2. Reject requests that carry more than one Host header.
         if headers.count("host") > 1:
-            return self.__default_responses.error(
+            return await self.__default_responses.error(
                 status_code=400,
                 content="Multiple Host headers not allowed.",
                 expects_json=adapter.wantsJson(),
@@ -173,7 +173,7 @@ class SecurityMiddleware:
             if not raw_host or not self.__isAllowedHost(
                 self.__extractHostname(raw_host),
             ):
-                return self.__default_responses.error(
+                return await self.__default_responses.error(
                     status_code=400,
                     content="Host header not allowed.",
                     expects_json=adapter.wantsJson(),

@@ -1,6 +1,7 @@
 from dataclasses import FrozenInstanceError, asdict
 from config.mail import BootstrapMail
 from orionis.foundation.config.mail.entities.file import File
+from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
@@ -29,3 +30,21 @@ class TestMailConfiguration(TestCase):
         self.assertEqual(config.toDict()["mailers"]["file"]["path"], "storage/mail")
         with self.assertRaises(FrozenInstanceError):
             config.default = "smtp"
+
+    def testGlobalSenderAcceptsEntitiesAndDictionariesOnly(self) -> None:
+        """Expose a serializable global sender and reject other shapes."""
+        config = Mail(
+            from_address=FromAddress(address="no-reply@example.com", name="App"),
+        )
+        self.assertEqual(
+            config.toDict()["from_address"],
+            {"address": "no-reply@example.com", "name": "App"},
+        )
+        self.assertEqual(
+            Mail(from_address={"address": "a@b.co"}).from_address,
+            {"address": "a@b.co"},
+        )
+        with self.assertRaises(TypeError):
+            Mail(from_address="no-reply@example.com")
+        with self.assertRaises(TypeError):
+            FromAddress(address=None)

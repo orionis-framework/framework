@@ -2,6 +2,7 @@ from orionis.auth import concerns
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.concerns.authorizable import Authorizable
 from orionis.auth.concerns.functions import model_primary_key
+from orionis.auth.concerns.must_verify_email import MustVerifyEmail
 from orionis.test import TestCase
 
 
@@ -16,6 +17,7 @@ class TestConcernsPackage(TestCase):
         """
         self.assertIs(concerns.Authenticatable, Authenticatable)
         self.assertIs(concerns.Authorizable, Authorizable)
+        self.assertIs(concerns.MustVerifyEmail, MustVerifyEmail)
         self.assertIs(concerns.model_primary_key, model_primary_key)
 
     def testTheExportListStaysSorted(self) -> None:

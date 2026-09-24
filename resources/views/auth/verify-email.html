@@ -1,0 +1,27 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}{{ __('Verify your email address') }}{% endblock %}
+{% block auth_heading %}{{ __('Verify your email address') }}{% endblock %}
+
+{% block auth_form %}
+{% if state == 'verified' %}
+  <div class="alert alert-success" role="alert">
+    {{ __('Your email address has been verified and your account is now active.') }}
+  </div>
+  <a href="{{ url('/login') }}" class="btn btn-primary w-100">{{ __('Sign in') }}</a>
+{% elif state == 'already_verified' %}
+  <div class="alert alert-info" role="alert">
+    {{ __('This account was already verified. You can sign in right away.') }}
+  </div>
+  <a href="{{ url('/login') }}" class="btn btn-primary w-100">{{ __('Sign in') }}</a>
+{% else %}
+  <div class="alert alert-danger" role="alert">
+    {{ __('This verification link is invalid or is no longer available.') }}
+  </div>
+  <a href="{{ url('/sign-up') }}" class="btn btn-primary w-100">{{ __('Create new account') }}</a>
+{% endif %}
+{% endblock %}
+
+{% block auth_footer %}
+{{ __('Already have account?') }} <a href="{{ url('/login') }}">{{ __('Sign in') }}</a>
+{% endblock %}

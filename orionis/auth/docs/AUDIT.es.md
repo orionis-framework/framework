@@ -340,7 +340,7 @@ editor y se solicitó Sonar sobre las rutas críticas modificadas.
 - Las aplicaciones deben aplicar HTTPS, Secure/HttpOnly, rate limiting, límites
   de concurrencia operativos y reglas de suspensión/elegibilidad de identidad.
 - Los propietarios polimórficos requieren limpieza al borrarse y claves no
-  reutilizables. Auth no impone `active` ni administra usuarios globalmente.
+  reutilizables. `Auth.attempt()` solo acepta identidades con `active is True`.
 - Encrypter no participa en la seguridad de los PAT ni del ID de sesión: Auth
   usa secretos opacos, no payloads cifrados. Su suite no equivale a una certificación
   criptográfica de todos los usos posibles de Crypt.

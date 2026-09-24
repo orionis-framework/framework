@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
@@ -13,6 +14,8 @@ class Mail(BaseEntity):
     ----------
     default : str
         The default configured mailer name, not its transport driver.
+    from_address : FromAddress or dict
+        Global sender applied to every message that declares no From header.
     mailers : Mailers or dict
         Conventional entities or arbitrary mailer names mapped to their settings.
     """
@@ -22,6 +25,14 @@ class Mail(BaseEntity):
         metadata={
             "description": "The default configured mailer name.",
             "default": "smtp",
+        },
+    )
+
+    from_address: FromAddress | dict = field(
+        default_factory=FromAddress,
+        metadata={
+            "description": "The global sender used when a message declares none.",
+            "default": lambda: FromAddress().toDict(),
         },
     )
 
@@ -49,11 +60,19 @@ class Mail(BaseEntity):
         ValueError
             If the default or a mailer name is empty or not a string.
         TypeError
-            If mailers or their settings have an unsupported structure.
+            If the global sender, mailers or their settings have an
+            unsupported structure.
         """
         if not isinstance(self.default, str) or not self.default.strip():
             error_msg = "The 'default' property must be a non-empty mailer name."
             raise ValueError(error_msg)
+
+        if not isinstance(self.from_address, (FromAddress, dict)):
+            error_msg = (
+                "The 'from_address' property must be an instance of FromAddress "
+                "or a dictionary."
+            )
+            raise TypeError(error_msg)
 
         if not isinstance(self.mailers, (Mailers, dict)):
             error_msg = (

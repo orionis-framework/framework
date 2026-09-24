@@ -23,7 +23,8 @@ class IRouter(ABC):
         login_controller : type | None, optional
             Controller for login and logout. Defaults to the built-in controller.
         register_controller : type | None, optional
-            Controller for registration. Defaults to the built-in controller.
+            Controller for registration and email verification. Defaults to the
+            built-in controller.
 
         Returns
         -------

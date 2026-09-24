@@ -629,8 +629,9 @@ Respaldar datos reales; esta revisión no reinicia la base de la aplicación.
 
 - Exigir HTTPS y cookies Secure/HttpOnly en producción. Limitar login y emisión
   de tokens con los controles HTTP de la aplicación.
-- Auth no impone `active`: suspensión y elegibilidad corresponden al proveedor
-  de identidad o a scopes globales del modelo.
+- `Auth.attempt()` solo inicia sesión cuando `identity.active is True`.
+  Los valores ausentes, nulos o falsos se rechazan después de verificar la
+  contraseña.
 - Revocar no cancela trabajo ya autorizado. Operaciones estrictas deben revalidar
   en su propia transacción. El aislamiento de lectura depende del motor configurado.
 - Propietarios polimórficos no tienen FK hacia una tabla global de usuarios.

@@ -621,8 +621,8 @@ tables. Back up real data; this review never resets the application database.
 
 - Require HTTPS and Secure/HttpOnly session cookies in production. Rate-limit
   login and token issuance with the application's existing HTTP controls.
-- Auth imposes no `active` column. Account suspension and eligibility rules belong
-  to the identity provider or model global scopes.
+- `Auth.attempt()` starts a session only when `identity.active is True`.
+  Missing, null and false values are rejected after password verification.
 - Revocation does not cancel already-authorized work. Strict business operations
   must revalidate at their own transaction boundary. Read isolation is determined
   by the configured database engine.

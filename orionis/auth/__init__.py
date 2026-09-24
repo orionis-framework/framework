@@ -5,6 +5,7 @@ from orionis.auth.concerns.authorizable import Authorizable
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.entities.access_token import AccessToken
 from orionis.auth.entities.new_access_token import NewAccessToken
+from orionis.auth.concerns.must_verify_email import MustVerifyEmail
 from orionis.auth.exceptions import (
     AuthConfigurationException,
     AuthenticationException,
@@ -33,6 +34,7 @@ __all__ = [
     "AuthorizationSnapshot",
     "GuardNotFoundException",
     "IdentityProviderException",
+    "MustVerifyEmail",
     "NewAccessToken",
     "Policy",
     "PolicyNotFoundException",

@@ -156,8 +156,9 @@ class ReflectionConcrete(IReflectionConcrete):
         # Validate that the provided type is a concrete class
         if not _Reflection.isConcreteClass(concrete):
             error_msg = (
-                f"Argument 'concrete' must be a class type, got "
-                f"'{type(concrete).__name__}' instead."
+                f"Argument 'concrete' must be a concrete class type, but "
+                f"'{getattr(concrete, '__name__', repr(concrete))}' "
+                f"(type '{type(concrete).__name__}') was provided instead."
             )
             raise TypeError(error_msg)
 

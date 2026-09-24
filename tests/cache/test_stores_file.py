@@ -442,10 +442,13 @@ class TestFileCacheBackendConcurrency(TestCase):
         Validates that increment updates only the value, so the entry
         still expires at the deadline set by the initial write.
         """
-        await self._backend.set("ttl_counter", 1, ttl=0.05)
+        await self._backend.set("ttl_counter", 1, ttl=0.5)
+        await asyncio.sleep(0.3)
         self.assertEqual(await self._backend.increment("ttl_counter"), 2)
 
-        await asyncio.sleep(0.1)
+        # Read past the original deadline, but before a renewed 0.5 s TTL
+        # from increment would expire.
+        await asyncio.sleep(0.25)
         self.assertIsNone(await self._backend.get("ttl_counter"))
 
     async def testIncrementOverAnExpiredKeyRestartsWithoutExpiry(self) -> None:

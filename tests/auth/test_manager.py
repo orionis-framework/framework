@@ -70,6 +70,7 @@ class Member(Model, Authenticatable, Authorizable):
     id = Uuid().primary()
     email = String(255)
     credential_hash = String(255)
+    active = Boolean().nullable()
 
 class _LoginRequest:
     """Provide request state and a cached form payload to the example controller."""
@@ -437,6 +438,7 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         member = await Member.create({
             "email": "member@orionis.dev",
             "credential_hash": await self.hasher.make("secret"),
+            "active": True,
         })
         self.app._tree["auth"]["identity"] = {
             "model": f"{__name__}.Member", "username": "email",

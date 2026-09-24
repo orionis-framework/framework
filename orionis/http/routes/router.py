@@ -152,14 +152,17 @@ class Router(IRouter):
         """Register the built-in web login, registration and logout routes.
 
         Call once from a web route file. Login and registration accept guests;
-        logout requires a session identity and accepts POST only. Session and
-        CSRF middleware are supplied by the kernel's web pipeline.
+        email verification accepts anyone so a link opened from a signed-in
+        browser still works; logout requires a session identity and accepts
+        POST only. Session and CSRF middleware are supplied by the kernel's
+        web pipeline.
 
         Returns
         -------
         None
-            Registers GET/POST login and sign-up plus POST logout. The POST
-            routes are named ``login``, ``register`` and ``logout``.
+            Registers GET/POST login and sign-up, GET email verification plus
+            POST logout. The named routes are ``login``, ``register``,
+            ``verify-email`` and ``logout``.
 
         Raises
         ------
@@ -193,6 +196,7 @@ class Router(IRouter):
             self.get("/sign-up", [register, "index"]),
             self.post("/sign-up", [register, "register"]).name("register"),
         ])
+        self.get("/verify-email", [register, "verifyEmail"]).name("verify-email")
         self.post("/logout", [login, "logout"]).name("logout").middleware(
             AuthenticateSessionMiddleware,
         )

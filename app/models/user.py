@@ -1,9 +1,9 @@
 from typing import ClassVar
-from orionis.auth import Authenticatable, Authorizable
+from orionis.auth import Authenticatable, Authorizable, MustVerifyEmail
 from orionis.orm import Model
 from orionis.orm import BigInteger, String, DateTime, Boolean
 
-class User(Model, Authenticatable, Authorizable):
+class User(Model, Authenticatable, Authorizable, MustVerifyEmail):
 
     # Attribute type casting applied when reading/hydrating model values.
     casts: ClassVar[dict[str, str]] = {

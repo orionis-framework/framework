@@ -6,6 +6,8 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.mail.composer import MailComposer
 from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.contracts.transport import IMailTransport
+from orionis.mail.entities.address import Address
+from orionis.mail.entities.envelope import Envelope
 from orionis.mail.exceptions import MailConfigurationException
 from orionis.mail.functions import freeze_owned
 from orionis.mail.pending import PendingMail
@@ -16,7 +18,6 @@ from orionis.support.entities.base import BaseEntity
 if TYPE_CHECKING:
     from orionis.mail.entities.attachment import Attachment
     from orionis.mail.entities.content import Content
-    from orionis.mail.entities.envelope import Envelope
     from orionis.mail.entities.result import MailResult
     from orionis.mail.types import TransportFactory
 
@@ -136,6 +137,10 @@ class MailManager(PendingMail, IMailManager):
             error_msg = f"Mail driver [{driver}] has no registered implementation."
             raise MailConfigurationException(error_msg)
 
+        # Only messages without an explicit sender read the global setting.
+        if envelope.from_address is None:
+            envelope = self._applyGlobalSender(envelope)
+
         # Preparation runs first so a rendering or attachment failure never
         # opens a connection or publishes a file.
         prepared = await self._composer.prepare(envelope, content, attachments)
@@ -147,6 +152,49 @@ class MailManager(PendingMail, IMailManager):
             error_msg = "Mail driver factories must return an IMailTransport."
             raise MailConfigurationException(error_msg)
         return await transport.send(prepared, mailer=mailer, driver=driver)
+
+    def _applyGlobalSender(self, envelope: Envelope) -> Envelope:
+        """
+        Overlay the configured global sender on an envelope that declares none.
+
+        Parameters
+        ----------
+        envelope : Envelope
+            Operation-local envelope without a From header.
+
+        Returns
+        -------
+        Envelope
+            The received envelope when no global sender is configured, or an
+            equivalent copy carrying the configured mailbox.
+
+        Raises
+        ------
+        MailConfigurationException
+            If the configured sender is neither a mapping nor an entity.
+        MailCompositionException
+            If the configured mailbox or display name is invalid.
+        """
+        section = _configuration_mapping(self._app.config("mail"))
+        declared = section.get("from_address")
+        if declared is None:
+            return envelope
+
+        sender = _configuration_mapping(declared)
+        address = sender.get("address", "")
+        if not isinstance(address, str) or not address.strip():
+            return envelope
+
+        name = sender.get("name", "")
+        display = name.strip() if isinstance(name, str) else ""
+        return Envelope(
+            subject=envelope.subject,
+            from_address=Address(address.strip(), display or None),
+            to=envelope.to,
+            cc=envelope.cc,
+            bcc=envelope.bcc,
+            reply_to=envelope.reply_to,
+        )
 
     def _resolveMailer(
         self,

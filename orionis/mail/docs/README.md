@@ -61,6 +61,7 @@ The existing frozen bootstrap remains supported without additional fields:
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.mail.entities.file import File
+from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
@@ -71,6 +72,12 @@ from orionis.environment import Env
 class BootstrapMail(Mail):
     default: str = field(
         default_factory=lambda: Env.get("MAIL_MAILER", "smtp"),
+    )
+    from_address: FromAddress | dict = field(
+        default_factory=lambda: FromAddress(
+            address=Env.get("MAIL_FROM_ADDRESS", ""),
+            name=Env.get("MAIL_FROM_NAME", Env.get("APP_NAME", "Orionis")),
+        ),
     )
     mailers: Mailers | dict = field(
         default_factory=lambda: Mailers(
@@ -124,9 +131,12 @@ entities still validate structural types; SMTP **effective** ports, timeouts,
 encryption and authentication are validated on selection, after URL precedence.
 An unused invalid SMTP endpoint does not prevent a file send or facade pinning.
 
-There is no global sender field in this configuration. Declare one using
-`Envelope(from_address=...)` or `fromAddress()`. A missing final sender fails
-before transport; the SMTP username is never used as the sender.
+The `from_address` section declares a global sender, so a message only needs
+`fromAddress()` or `Envelope(from_address=...)` when it overrides it. An explicit
+sender always wins; the global one is read only when the final envelope carries
+none. An empty `address` keeps the sender mandatory per message. A message that
+ends without any sender fails before transport; the SMTP username is never used
+as the sender.
 
 ### SMTP options and MAIL_URL
 

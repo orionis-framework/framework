@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -889,7 +889,11 @@ class TestTask(TestCase):
         Second-based intervals do not support jitter and must reject the combination.
         """
         task = _make_task()
-        task.randomDelay(5)
+        with patch(
+            "orionis.console.fluent.task.secrets.randbelow",
+            return_value=5,
+        ):
+            task.randomDelay(5)
         with self.assertRaises(ValueError):
             task.everySeconds(10)
 

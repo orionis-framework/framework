@@ -123,9 +123,13 @@ class SessionGuard(ISessionGuard):
 
         # The identity provider burns the hashing cost on a worker thread.
         valid = await self.__identities.validateCredentials(identity, credentials)
-        if not valid:
+        if not valid or identity is None:
             return None
-        if identity is None:
+
+        # Missing, null and false status values all deny authentication.
+        # Keep the status check after password verification so inactive
+        # accounts follow the same hashing path as active accounts.
+        if getattr(identity, "active", None) is not True:
             return None
 
         self.login(request, identity)

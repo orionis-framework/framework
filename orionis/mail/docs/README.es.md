@@ -64,6 +64,7 @@ El bootstrap frozen existente sigue funcionando sin campos adicionales:
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.mail.entities.file import File
+from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
@@ -74,6 +75,12 @@ from orionis.environment import Env
 class BootstrapMail(Mail):
     default: str = field(
         default_factory=lambda: Env.get("MAIL_MAILER", "smtp"),
+    )
+    from_address: FromAddress | dict = field(
+        default_factory=lambda: FromAddress(
+            address=Env.get("MAIL_FROM_ADDRESS", ""),
+            name=Env.get("MAIL_FROM_NAME", Env.get("APP_NAME", "Orionis")),
+        ),
     )
     mailers: Mailers | dict = field(
         default_factory=lambda: Mailers(
@@ -129,9 +136,12 @@ cifrado y autenticación SMTP **efectivos** se validan al seleccionar el
 transporte, después de aplicar la URL. Una configuración SMTP no utilizada no
 impide enviar mediante file ni fijar la fachada.
 
-Esta configuración no tiene remitente global. Se declara con
-`Envelope(from_address=...)` o `fromAddress()`. Si falta el remitente final, el
-envío falla antes del transporte; nunca se deduce del username SMTP.
+La sección `from_address` declara un remitente global, por lo que un mensaje solo
+necesita `fromAddress()` o `Envelope(from_address=...)` cuando quiere anularlo. El
+remitente explícito siempre gana; el global solo se lee si el sobre final no lleva
+ninguno. Un `address` vacío mantiene el remitente obligatorio en cada envío. Si el
+mensaje termina sin remitente, el envío falla antes del transporte; nunca se
+deduce del username SMTP.
 
 ### Opciones SMTP y MAIL_URL
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, cast
 from orionis.foundation.config.mail.entities.file import File
+from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mail import Mail as MailConfig
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
@@ -212,3 +213,47 @@ class TestMailManager(TestCase):
             )
             self.assertEqual(str(parsed["To"]), f"user{index}@example.com")
             self.assertEqual(parsed.get_content().strip(), f"body {index}")
+
+    async def testGlobalSenderAppliesOnlyWhenNoneIsDeclared(self) -> None:
+        """
+        Apply the configured sender without overriding an explicit one.
+
+        Validates the Laravel-style global from section for both shapes.
+        """
+        self.settings["from_address"] = {
+            "address": "no-reply@example.com",
+            "name": "Example App",
+        }
+
+        implicit = await self.manager.to("ana@example.com").raw("global")
+        explicit = await self.base.raw("explicit")
+
+        self.assertEqual(
+            self._senderOf(implicit.file_path),
+            "Example App <no-reply@example.com>",
+        )
+        self.assertEqual(self._senderOf(explicit.file_path), "sender@example.com")
+
+    async def testGlobalSenderEntityIsReadAndBlankKeepsItMandatory(self) -> None:
+        """
+        Read the configuration entity and ignore a blank global mailbox.
+
+        Validates that an unset sender still fails before any transport runs.
+        """
+        self.app.mail_config = MailConfig(
+            default="file",
+            from_address=FromAddress(address="ops@example.com", name=""),
+            mailers=Mailers(file=File(path="entity")),
+        )
+        result = await self.manager.to("ana@example.com").raw("entity")
+        self.assertEqual(self._senderOf(result.file_path), "ops@example.com")
+
+        self.settings["from_address"] = {"address": "   ", "name": ""}
+        self.app.mail_config = self.settings
+        with self.assertRaises(MailCompositionException):
+            await self.manager.to("ana@example.com").raw("blank")
+
+    def _senderOf(self, path: Path) -> str:
+        """Return the From header of a stored message."""
+        parsed = BytesParser(policy=policy.default).parsebytes(path.read_bytes())
+        return str(parsed["From"])

@@ -21,6 +21,7 @@ _AUTH_ROUTES = (
     ("POST", "/login", LoginController, "login", "login", GuestMiddleware),
     ("GET", "/sign-up", RegisterController, "index", None, GuestMiddleware),
     ("POST", "/sign-up", RegisterController, "register", "register", GuestMiddleware),
+    ("GET", "/verify-email", RegisterController, "verifyEmail", "verify-email", None),
     (
         "POST", "/logout", LoginController, "logout", "logout",
         AuthenticateSessionMiddleware,
@@ -37,7 +38,7 @@ class TestRouteAuth(TestCase):
         facade = type("AuthRoutes", (Route,), {"_pinned_instance": router})
         initial = len(router.export()["routes"])
         self.assertIsNone(facade.auth())
-        self.assertEqual(len(router.export()["routes"]), initial + 5)
+        self.assertEqual(len(router.export()["routes"]), initial + 6)
         resolver = RouteResolver(compile_router(router))
         for method, path, controller, action, name, middleware in _AUTH_ROUTES:
             with self.subTest(method=method, path=path):
@@ -47,7 +48,8 @@ class TestRouteAuth(TestCase):
                 self.assertEqual(route.action["module"], controller.__module__)
                 self.assertEqual(route.action["class"], controller.__name__)
                 self.assertEqual(route.action["method"], action)
-                self.assertEqual(route.compiled_middlewares, (middleware,))
+                expected_middleware = (middleware,) if middleware else ()
+                self.assertEqual(route.compiled_middlewares, expected_middleware)
         self.assertEqual(resolver.options("/logout"), ["OPTIONS", "POST"])
 
     def testRejectsApiRegistrationBeforeMutatingRoutes(self) -> None:
@@ -76,7 +78,8 @@ class TestRouteAuth(TestCase):
             self.assertEqual(route.action, compiled[method]["static"][path].action)
             self.assertEqual(route.kind, "web")
             self.assertEqual(route.name, name)
-            self.assertEqual(route.compiled_middlewares, (middleware,))
+            expected_middleware = (middleware,) if middleware else ()
+            self.assertEqual(route.compiled_middlewares, expected_middleware)
 
     def testRepeatedRegistrationUsesTheNormalConflictValidation(self) -> None:
         """Repeated helpers must fail compilation instead of overwriting routes."""
@@ -99,10 +102,12 @@ class TestRouteAuth(TestCase):
         result = subprocess.run(
             [
                 sys.executable, "-B", "-c",
-                "import sys; from orionis.support.facades.router import Route; "
-                "print(int('app.models.user' in sys.modules)); "
-                "print(int('orionis.http.default.controllers.login_controller' "
-                "in sys.modules))",
+                (
+                    "import sys; from orionis.support.facades.router import Route; "
+                    "print(int('app.models.user' in sys.modules)); "
+                    "print(int('orionis.http.default.controllers.login_controller' "
+                    "in sys.modules))"
+                ),
             ],
             cwd=Path(__file__).resolve().parents[3],
             capture_output=True, text=True, check=False, timeout=15,

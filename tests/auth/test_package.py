@@ -5,6 +5,7 @@ from orionis.auth.authorization.policy import Policy
 from orionis.auth.authorization.snapshot import AuthorizationSnapshot
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.concerns.authorizable import Authorizable
+from orionis.auth.concerns.must_verify_email import MustVerifyEmail
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.entities.access_token import AccessToken
 from orionis.auth.entities.new_access_token import NewAccessToken
@@ -34,6 +35,7 @@ _EXPECTED_EXPORTS: dict[str, object] = {
     "AuthorizationSnapshot": AuthorizationSnapshot,
     "GuardNotFoundException": GuardNotFoundException,
     "IdentityProviderException": IdentityProviderException,
+    "MustVerifyEmail": MustVerifyEmail,
     "NewAccessToken": NewAccessToken,
     "Policy": Policy,
     "PolicyNotFoundException": PolicyNotFoundException,

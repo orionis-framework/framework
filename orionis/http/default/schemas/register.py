@@ -9,7 +9,6 @@ from orionis.schemas.constraints import (
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 
-
 class RegisterSchema(Schema):
 
     # ruff: noqa: TC001

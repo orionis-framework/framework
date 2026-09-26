@@ -41,7 +41,11 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable
     from collections.abc import Callable
     from granian.rsgi import (
-        Scope, HTTPProtocol, WebsocketProtocol, ProtocolError, ProtocolClosed,
+        Scope,
+        HTTPProtocol,
+        WebsocketProtocol,
+        ProtocolError,
+        ProtocolClosed,
     )
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.container.contracts.deferrable_provider import IDeferrableProvider
@@ -49,9 +53,9 @@ if TYPE_CHECKING:
 _SENTINEL = object()
 _CWD = Path.cwd()
 _ERR_NOT_CONFIGURED: str = (
-    "Application configuration is not initialized. "
-    "Please call create() first."
+    "Application configuration is not initialized. Please call create() first."
 )
+
 
 async def _asgi_receive_dispatcher(
     receive: Callable[[], Awaitable[dict[str, Any]]],
@@ -96,9 +100,9 @@ async def _asgi_receive_dispatcher(
     except asyncio.CancelledError:  # NOSONAR
         pass
 
-class Application(Container, IApplication):
 
-    # ruff: noqa: SLF001, ANN401, FBT001, FBT002
+class Application(Container, IApplication):
+    # ruff: noqa: SLF001, ANN401, FBT001
 
     # --- ASGI Application Handling ---
 
@@ -207,10 +211,12 @@ class Application(Container, IApplication):
 
             except Exception as exc:  # noqa: BLE001
                 error_msg: str = str(exc)
-                await send({
-                    "type": f"{message_type}.failed",
-                    "message": error_msg,
-                })
+                await send(
+                    {
+                        "type": f"{message_type}.failed",
+                        "message": error_msg,
+                    },
+                )
                 return
 
     async def __handle_http_asgi__(
@@ -266,7 +272,9 @@ class Application(Container, IApplication):
         # Concurrently consume the server channel and watch for disconnect
         dispatcher_task = loop.create_task(
             _asgi_receive_dispatcher(
-                receive, request_queue, disconnect_future,
+                receive,
+                request_queue,
+                disconnect_future,
             ),
         )
 
@@ -406,7 +414,6 @@ class Application(Container, IApplication):
         """
         # Initialize HTTP kernel if not already cached.
         if not self.__kernel_http_rsgi:
-
             # Set the application interface type for kernel resolution.
             self.config("app.interface", "rsgi")
 
@@ -518,9 +525,7 @@ class Application(Container, IApplication):
 
         # Validate that the loaded kernel implements the IKernelCLI interface
         if not isinstance(kernel_instance, IKernelCLI):
-            error_msg = (
-                f"Loaded CLI kernel does not implement IKernelCLI: {kernel_cls}"
-            )
+            error_msg = f"Loaded CLI kernel does not implement IKernelCLI: {kernel_cls}"
             raise TypeError(error_msg)
 
         # Return the loaded CLI kernel instance
@@ -555,7 +560,6 @@ class Application(Container, IApplication):
         """
         # Initialize CLI kernel if not already cached
         if not self.__kernel_cli:
-
             # Import lazily to avoid unnecessary overhead during application startup
             kernel_instance = await self.__loadCLIKernel()
 
@@ -728,9 +732,6 @@ class Application(Container, IApplication):
     def __init__(
         self,
         base_path: Path = _CWD,
-        compiled: bool = False,
-        compiled_path: str | None = None,
-        compiled_invalidation_paths: list[str] | None = None,
     ) -> None:
         """
         Initialize the Application instance.
@@ -739,12 +740,6 @@ class Application(Container, IApplication):
         ----------
         base_path : Path
             The base directory path of the application.
-        compiled : bool, optional
-            Whether to enable configuration caching (default is False).
-        compiled_path : str | None, optional
-            Path to the cache directory, or None.
-        compiled_invalidation_paths : list[str] | None, optional
-            List of paths to monitor for cache invalidation, or None.
 
         Returns
         -------
@@ -753,7 +748,6 @@ class Application(Container, IApplication):
         """
         # Ensure the application is initialized only once (singleton pattern).
         if not hasattr(self, "_Application__initialized"):
-
             # Call the base Container constructor to initialize dependency injection.
             super().__init__()
 
@@ -818,12 +812,37 @@ class Application(Container, IApplication):
             self.__compiled_path: Path | None = None
             self.__compiled_invalidation_paths_dirs: set[Path] = set()
             self.__compiled_invalidation_paths_files: set[Path] = set()
-            self.__bootCompiledState(
-                compiled, compiled_path, compiled_invalidation_paths,
-            )
 
             # Mark the Application as initialized to enforce singleton behavior.
             self._Application__initialized = True
+
+    def compile(
+        self,
+        path: str | None = None,
+        invalidation_paths: list[str] | None = None,
+    ) -> None:
+        """
+        Compile the application with the specified caching and invalidation settings.
+
+        Parameters
+        ----------
+        path : str | None, optional
+            The path where compiled files should be stored.
+            Defaults to None.
+        invalidation_paths : list[str] | None, optional
+            List of paths that trigger cache invalidation when modified.
+            Defaults to None.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        self.__bootCompiledState(
+            compiled=True,
+            compiled_path=path,
+            compiled_invalidation_paths=invalidation_paths,
+        )
 
     def __assertPythonVersion(self) -> None:
         """
@@ -982,7 +1001,6 @@ class Application(Container, IApplication):
 
         # Trigger startup lifecycle events and execute registered startup callbacks
         if runtime == Runtime.HTTP:
-
             # Start the Orionis startup generator.
             startup_gen = startup_orionis_generator(self)
             next(startup_gen)
@@ -996,7 +1014,6 @@ class Application(Container, IApplication):
                 next(startup_gen)
 
         elif runtime == Runtime.CLI:
-
             # Execute all registered startup callbacks (sync or async).
             for func in callbacks:
                 await self.invoke(func)
@@ -1027,7 +1044,6 @@ class Application(Container, IApplication):
 
         # Trigger shutdown lifecycle events and execute registered shutdown callbacks
         if runtime == Runtime.HTTP:
-
             # Start the Orionis shutdown generator.
             shutdown_gen = shutdown_orionis_generator(self)
             next(shutdown_gen)
@@ -1041,7 +1057,6 @@ class Application(Container, IApplication):
                 next(shutdown_gen)
 
         elif runtime == Runtime.CLI:
-
             # Execute all registered shutdown callbacks (sync or async).
             for func in callbacks:
                 await self.invoke(func)
@@ -1434,8 +1449,7 @@ class Application(Container, IApplication):
         # Validate that the provider is a class
         if not isinstance(provider_class, type):
             error_msg = (
-                f"Expected IServiceProvider class, got "
-                f"{type(provider_class).__name__}"
+                f"Expected IServiceProvider class, got {type(provider_class).__name__}"
             )
             raise TypeError(error_msg)
 
@@ -1597,10 +1611,10 @@ class Application(Container, IApplication):
             module = __import__(module_name, fromlist=["*"])
             for attribute in vars(module).values():
                 if (
-                    isinstance(attribute, type) and
-                    issubclass(attribute, ServiceProvider) and
-                    attribute is not ServiceProvider and
-                    attribute is not DeferrableProvider
+                    isinstance(attribute, type)
+                    and issubclass(attribute, ServiceProvider)
+                    and attribute is not ServiceProvider
+                    and attribute is not DeferrableProvider
                 ):
                     self.__storeProviderClass(attribute)
 
@@ -1763,17 +1777,20 @@ class Application(Container, IApplication):
 
         # Resolve and validate API routing files
         api_routers = self.__resolveAndValidateRoutingFiles(
-            api, {"orionis.support.facades.router"},
+            api,
+            {"orionis.support.facades.router"},
         )
 
         # Resolve and validate web routing files
         web_routers = self.__resolveAndValidateRoutingFiles(
-            web, {"orionis.support.facades.router"},
+            web,
+            {"orionis.support.facades.router"},
         )
 
         # Resolve and validate console routing files
         console_routers = self.__resolveAndValidateRoutingFiles(
-            console, {"orionis.support.facades.reactor"},
+            console,
+            {"orionis.support.facades.reactor"},
         )
 
         # Validate health route type
@@ -1836,7 +1853,6 @@ class Application(Container, IApplication):
 
         # Iterate through each provided path, validate existence and required imports
         for path in paths or []:
-
             # Resolve the absolute path for the routing file
             file_path = (self.__basePath / path).resolve()
 
@@ -1846,7 +1862,12 @@ class Application(Container, IApplication):
                 raise FileNotFoundError(error_msg)
 
             # Check if the file contains required routing imports
-            if not ModuleInspector.fileImportsAny(file_path, required_imports):
+            if file_path.read_text(
+                encoding="utf-8",
+            ).strip() and not ModuleInspector.fileImportsAny(
+                file_path,
+                required_imports,
+            ):
                 error_msg = (
                     f"The file '{path}' does not contain valid routing definitions."
                 )
@@ -1899,16 +1920,14 @@ class Application(Container, IApplication):
         # Validate handler is a class
         if not isinstance(handler, type):
             error_msg = (
-                "Expected exception handler class, got "
-                f"{type(handler).__name__}"
+                f"Expected exception handler class, got {type(handler).__name__}"
             )
             raise TypeError(error_msg)
 
         # Validate handler is a subclass of BaseExceptionHandler
         if not issubclass(handler, IBaseExceptionHandler):
             error_msg = (
-                "Expected BaseExceptionHandler subclass, got "
-                f"{type(handler).__name__}"
+                f"Expected BaseExceptionHandler subclass, got {type(handler).__name__}"
             )
             raise TypeError(error_msg)
 
@@ -2428,9 +2447,22 @@ class Application(Container, IApplication):
 
         # List of valid path keys
         keys = {
-            "app", "console", "exceptions", "http", "models", "providers",
-            "notifications", "services", "jobs", "bootstrap", "config",
-            "database", "resources", "routes", "storage", "tests",
+            "app",
+            "console",
+            "exceptions",
+            "http",
+            "models",
+            "providers",
+            "notifications",
+            "services",
+            "jobs",
+            "bootstrap",
+            "config",
+            "database",
+            "resources",
+            "routes",
+            "storage",
+            "tests",
         }
 
         # Initialize final paths with the root path
@@ -2481,6 +2513,7 @@ class Application(Container, IApplication):
         dict[str, Any]
             The merged configuration dictionary containing all sections.
         """
+
         # Helper function to update a config section
         def update_section(
             section: str,
@@ -2632,7 +2665,6 @@ class Application(Container, IApplication):
         """
         # Skip loading if already cached
         if not self.__is_compiled:
-
             # Ensure bootstrap configuration is initialized
             self.__ensureDefaultBootstrap()
 
@@ -2668,7 +2700,6 @@ class Application(Container, IApplication):
         """
         # Prevent duplicate initialization if already booted
         if not self.__booted:
-
             # Store the file path where the application was started.
             # inspect.stack() is portable across all standard Python implementations.
             self.__entry_point = inspect.stack()[1].filename
@@ -2928,8 +2959,7 @@ class Application(Container, IApplication):
         # Validate key type if provided
         if key is not None and not isinstance(key, str):
             error_msg = (
-                "Routing key must be a string or None. "
-                f"Got {type(key).__name__}"
+                f"Routing key must be a string or None. Got {type(key).__name__}"
             )
             raise TypeError(error_msg)
 

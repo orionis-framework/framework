@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -24,11 +24,10 @@ class SessionAuth(BaseEntity):
     """
 
     key: str = field(
-        default="_auth_identifier",
+        default_factory=lambda: Env.get("AUTH_SESSION_KEY", "_auth_identifier"),
         metadata={
             "description": (
-                "Session key holding the identifier of the authenticated "
-                "identity."
+                "Session key holding the identifier of the authenticated identity."
             ),
             "default": "_auth_identifier",
         },
@@ -48,9 +47,7 @@ class SessionAuth(BaseEntity):
     home: str = field(
         default_factory=lambda: Env.get("AUTH_HOME", "/home"),
         metadata={
-            "description": (
-                "Path browsers are redirected to once the login succeeds."
-            ),
+            "description": ("Path browsers are redirected to once the login succeeds."),
             "default": "/home",
         },
     )
@@ -83,8 +80,7 @@ class SessionAuth(BaseEntity):
 
         if self.redirect_to is not None and not isinstance(self.redirect_to, str):
             error_msg = (
-                "The auth session 'redirect_to' option must be a string "
-                "or null."
+                "The auth session 'redirect_to' option must be a string or null."
             )
             raise TypeError(error_msg)
 

@@ -16,9 +16,7 @@ class Memory(BaseEntity):
     driver: str = field(
         default="memory",
         metadata={
-            "description": (
-                "The driver type for the job store. Defaults to 'memory'."
-            ),
+            "description": ("The driver type for the job store. Defaults to 'memory'."),
             "default": "memory",
         },
     )
@@ -34,3 +32,8 @@ class Memory(BaseEntity):
         """
         # Delegate base-class field validation
         super().__post_init__()
+
+        # Ensure the driver is set to 'memory' for this store.
+        if self.driver != "memory":
+            message = f"Invalid driver for Memory store: {self.driver}"
+            raise ValueError(message)

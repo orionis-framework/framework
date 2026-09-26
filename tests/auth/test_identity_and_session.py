@@ -413,10 +413,10 @@ class TestSessionGuard(TestCase):
     async def testResolveRestoresTheIdentityFromTheSession(self) -> None:
         """Validates the per request restoration of a logged in user.
 
-        Only the identifier travels in the session; the row is reloaded.
+        The identifier and password fingerprint travel in the session.
         """
         session = Session()
-        session.put("_auth_identifier", 1)
+        self.guard.login(fake_request(session), await self.provider.retrieveById(1))
 
         result = await self.guard.resolve(fake_request(session))
 
@@ -461,7 +461,7 @@ class TestSessionGuard(TestCase):
         with self.assertRaises(AuthException):
             self.guard.login(fake_request(None), identity)
 
-    def testLogoutInvalidatesTheSession(self) -> None:
+    async def testLogoutInvalidatesTheSession(self) -> None:
         """Validates that logging out destroys the session entirely.
 
         Only forgetting the key would leave the rest of the payload alive.
@@ -470,17 +470,17 @@ class TestSessionGuard(TestCase):
         session.put("_auth_identifier", 1)
         session.put("cart", ["book"])
 
-        self.guard.logout(fake_request(session))
+        await self.guard.logout(fake_request(session))
 
         self.assertTrue(session.invalidated)
         self.assertEqual(session.all(), {})
 
-    def testLogoutWithoutSessionIsANoOperation(self) -> None:
+    async def testLogoutWithoutSessionIsANoOperation(self) -> None:
         """Validates that logging out is safe outside the web pipeline.
 
         A request without a session is already anonymous.
         """
-        self.guard.logout(fake_request(None))
+        await self.guard.logout(fake_request(None))
 
     async def testPasswordVerificationRunsOutsideTheEventLoopThread(self) -> None:
         """Verify a password and record the thread that ran the hasher.

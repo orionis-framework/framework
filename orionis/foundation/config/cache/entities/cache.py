@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.foundation.config.cache.entities.stores import Stores
 from orionis.foundation.config.cache.enums import Drivers
 from orionis.support.entities.base import BaseEntity
@@ -86,8 +86,7 @@ class Cache(BaseEntity):
         # Reject types that are neither Drivers enum nor string
         if not isinstance(self.default, (Drivers, str)):
             error_msg = (
-                "The default cache store must be an instance of "
-                "Drivers or a string."
+                "The default cache store must be an instance of Drivers or a string."
             )
             raise TypeError(error_msg)
 

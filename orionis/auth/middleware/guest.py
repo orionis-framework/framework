@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 _DEFAULT_HOME: str = "/home"
 
 class GuestMiddleware(ResolveIdentityMiddleware):
-    """Keep web login and registration routes restricted to guests.
+    """
+    Keep web login and registration routes restricted to guests.
 
     Authenticated browsers are sent to the page declared in
     ``auth.session.home``. Subclasses pin a different destination by
@@ -38,7 +39,8 @@ class GuestMiddleware(ResolveIdentityMiddleware):
         manager: IAuthManager,
         permissions: IPermissionRepository,
     ) -> None:
-        """Initialise the middleware with its collaborators.
+        """
+        Initialise the middleware with its collaborators.
 
         Parameters
         ----------
@@ -60,7 +62,8 @@ class GuestMiddleware(ResolveIdentityMiddleware):
         )
 
     async def handle(self, request: Request, call_next: NextCallable) -> Response:
-        """Continue for guests and reject authenticated access to guest routes.
+        """
+        Continue for guests and reject authenticated access to guest routes.
 
         Parameters
         ----------

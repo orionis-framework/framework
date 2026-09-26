@@ -14,8 +14,6 @@ class LoginController(BaseController):
     DEFAULT_LOGIN_PATH: str = "/login"
     LOGOUT_REDIRECT_PATH: str = "/"
     LOGIN_VIEW_NAME: str = "auth.login"
-    REMEMBER_COOKIE_MAX_AGE: int = 259200
-    REMEMBER_COOKIE_NAME: str = "usrname"
 
     def __init__(
         self,
@@ -81,7 +79,7 @@ class LoginController(BaseController):
         # Delegate the credential verification to the session guard.
         authenticated: bool = await auth.attempt({
             "email": payload.email, "password": payload.password,
-        })
+        }, remember=credentials.get("remember") == "on")
 
         # Report a generic error so existing emails are never disclosed.
         if not authenticated:
@@ -93,19 +91,9 @@ class LoginController(BaseController):
                         })
             )
 
-        # Persist the email in a cookie only when the checkbox was ticked.
-        remember: bool = credentials.get("remember", "off") == "on"
-        value_cookie: str = payload.email if remember else ""
-        max_age_cookie: int = self.REMEMBER_COOKIE_MAX_AGE if remember else 0
-
-        return (
-            response.redirect(self.redirect_to)
-                    .withCookie(
-                        self.REMEMBER_COOKIE_NAME,
-                        value_cookie,
-                        max_age=max_age_cookie,
-                    )
-        )
+        # The authentication middleware emits the credential's HttpOnly cookie.
+        # Retire the previous email-only preference cookie on successful login.
+        return response.redirect(self.redirect_to).withoutCookie("usrname")
 
     async def logout(
         self,

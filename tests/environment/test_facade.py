@@ -6,7 +6,7 @@ from typing import ClassVar
 from orionis.environment import facade as facade_module
 from orionis.environment.core.dot_env import DotEnv
 from orionis.environment.enums import EnvironmentValueType
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.patterns.singleton.meta import _MISSING
 from orionis.test import TestCase
 

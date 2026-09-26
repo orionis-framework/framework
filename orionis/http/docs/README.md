@@ -2861,10 +2861,15 @@ Internal loader hook: `kind: str` becomes the context for subsequent registratio
 **`auth`**
 
 ```python
-def auth(self) -> None:
+def auth(
+    self,
+    login_controller: type | None = None,
+    register_controller: type | None = None,
+    forgot_password_controller: type | None = None,
+) -> None:
 ```
 
-No parameters; returns `None`. Lazily imports the login and registration controllers, then registers GET/POST `/login`, GET/POST `/sign-up` under `GuestMiddleware`, and POST `/logout` under `AuthenticateSessionMiddleware`. The POST names are `login`, `register`, `logout`. Raises `ValueError` outside the web context; import and registration errors propagate. Repeated calls are not guarded here and create route conflicts detected during compilation.
+Each controller parameter is optional and independently defaults to the framework controller: login/logout, registration/email verification, or password recovery/reset. Returns `None`. Registers GET/POST `/login`, GET/POST `/sign-up`, GET/POST `/forgot-password`, GET/POST `/reset-password` under `GuestMiddleware`, GET `/verify-email`, and POST `/logout` under `AuthenticateSessionMiddleware`. The POST route names include `login`, `register`, `forgot-password`, `password.update`, and `logout`; the reset form is named `password.reset`, and email verification is `verify-email`. Raises `ValueError` outside the web context; import and registration errors propagate. Repeated calls create route conflicts detected during compilation.
 
 **`view`**
 
@@ -3700,10 +3705,15 @@ Abstract base class (`ABC`). Each declaration below uses `@abstractmethod`; inco
 
 ```python
 @abstractmethod
-def auth(self) -> None:
+def auth(
+    self,
+    login_controller: type | None = None,
+    register_controller: type | None = None,
+    forgot_password_controller: type | None = None,
+) -> None:
 ```
 
-No parameters; declares registration of built-in authentication routes, returning `None`; documents `ValueError` outside the web context. The abstract body performs no operation; see `Router.auth` for implementation effects and actual errors.
+The optional controller parameters declare overrides for login/logout, registration/email verification, and password recovery/reset routes. Returns `None`; documents `ValueError` outside the web context. The abstract body performs no operation; see `Router.auth` for implementation effects and actual errors.
 
 **`view`**
 

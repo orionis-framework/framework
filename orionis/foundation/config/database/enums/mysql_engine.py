@@ -11,13 +11,6 @@ class MySQLEngine(Enum):
     INNODB : str
         Default transactional storage engine, supports ACID compliance and
         foreign keys.
-    MYISAM : str
-        Legacy non-transactional storage engine, faster for read-heavy
-        workloads but lacks transaction support.
-    MEMORY : str
-        Stores all data in RAM for fast access, data is lost on server restart.
-    NDB : str
-        Clustered storage engine designed for distributed MySQL setups.
 
     Returns
     -------
@@ -25,7 +18,4 @@ class MySQLEngine(Enum):
         An enumeration member representing a MySQL storage engine.
     """
 
-    INNODB = "InnoDB"      # Default engine (transactional)
-    MYISAM = "MyISAM"      # Legacy engine (non-transactional)
-    MEMORY = "MEMORY"      # In-memory storage
-    NDB = "NDB"            # Clustered storage engine
+    INNODB = "InnoDB"  # Guaranteed default storage engine.

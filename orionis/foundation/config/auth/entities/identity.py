@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -24,19 +24,17 @@ class Identity(BaseEntity):
         default_factory=lambda: Env.get("AUTH_MODEL", "app.models.user.User"),
         metadata={
             "description": (
-                "Dotted path of the model backing the authenticated "
-                "identity."
+                "Dotted path of the model backing the authenticated identity."
             ),
             "default": "app.models.user.User",
         },
     )
 
     username: str = field(
-        default="email",
+        default_factory=lambda: Env.get("AUTH_USERNAME", "email"),
         metadata={
             "description": (
-                "Attribute used to look an identity up from the submitted "
-                "credentials."
+                "Attribute used to look an identity up from the submitted credentials."
             ),
             "default": "email",
         },
@@ -72,7 +70,9 @@ class Identity(BaseEntity):
                 raise ValueError(error_msg)
 
         # A dotted path is required to split the module from the class.
-        if "." not in self.model:
+        if "." not in self.model or not all(
+            part.isidentifier() for part in self.model.split(".")
+        ):
             error_msg = (
                 "The auth identity 'model' option must be a dotted path "
                 "such as 'app.models.user.User'."

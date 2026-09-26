@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.filesystems.entitites.disks import Disks
 from orionis.foundation.config.filesystems.enums.disk_name import DiskName
-from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozenset of valid disk names for O(1) membership checks
@@ -29,7 +29,7 @@ class Filesystems(BaseEntity):
                 "The default filesystem disk name. Can be a member of the "
                 "DiskName enum or a string (e.g., 'local', 's3')."
             ),
-            "default": DiskName.LOCAL.value,
+            "default": "local",
         },
     )
 
@@ -60,8 +60,7 @@ class Filesystems(BaseEntity):
         # Reject types that are neither DiskName enum nor string
         if not isinstance(self.default, (DiskName, str)):
             error_msg = (
-                "The 'default' attribute must be an instance of "
-                "DiskName or a string."
+                "The 'default' attribute must be an instance of DiskName or a string."
             )
             raise TypeError(error_msg)
 

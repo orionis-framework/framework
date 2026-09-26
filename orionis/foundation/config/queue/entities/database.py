@@ -1,8 +1,16 @@
 from __future__ import annotations
+
 import re
 from dataclasses import dataclass, field
+
 from orionis.foundation.config.queue.enums import Strategy
+from orionis.foundation.config.validation import (
+    normalize_enum,
+    validate_integer,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True)
 class Database(BaseEntity):
@@ -36,7 +44,7 @@ class Database(BaseEntity):
         member.
     """
 
-    driver : str = field(
+    driver: str = field(
         default="database",
         metadata={
             "description": "The driver type for the queue. Defaults to 'database'.",
@@ -93,8 +101,7 @@ class Database(BaseEntity):
         default=3,
         metadata={
             "description": (
-                "The maximum number of attempts for a job before it fails "
-                "permanently."
+                "The maximum number of attempts for a job before it fails permanently."
             ),
             "default": 3,
         },
@@ -104,8 +111,7 @@ class Database(BaseEntity):
         default=Strategy.FIFO.value,
         metadata={
             "description": (
-                "The strategy used for the queue. Options are FIFO, LIFO, or "
-                "PRIORITY."
+                "The strategy used for the queue. Options are FIFO, LIFO, or PRIORITY."
             ),
             "default": Strategy.FIFO.value,
         },
@@ -178,85 +184,25 @@ class Database(BaseEntity):
             raise ValueError(error_msg)
 
     def __post_init__(self) -> None:
-        """
-        Validate and normalize entity properties after initialization.
-
-        Parameters
-        ----------
-        self : Database
-            Instance of the Database entity.
-
-        Returns
-        -------
-        None
-            This method modifies the instance in place and returns None.
-
-        Raises
-        ------
-        TypeError
-            If any property is of an invalid type.
-        ValueError
-            If any property fails validation.
-        """
-        # Call the superclass post-init method for base validation
+        """Validate queue storage, retry limits, and ordering strategy."""
         super().__post_init__()
-
-        # Validate `jobs_table`: must be a string and match pattern
+        if self.driver != "database":
+            message = "The 'driver' property must be 'database'."
+            raise ValueError(message)
         self.__validateJobTable()
-
-        # Validate `failed_jobs_table`: must be a string and match pattern
         self.__validateFailedJobTable()
-
-        # Validate `queue`: must be a string with ASCII characters
-        if not isinstance(self.queue, str):
-            error_msg = "The 'queue' property must be a string."
-            raise TypeError(error_msg)
-        try:
-            self.queue.encode("ascii")
-        except UnicodeEncodeError:
-            error_msg = (
-                "The 'queue' property must contain only ASCII characters "
-                "(no UTF-8 or non-ASCII allowed)."
-            )
-            raise ValueError(error_msg) from None
-
-        # Validate `visibility_timeout`: must be a positive integer
-        if not isinstance(self.visibility_timeout, int) or self.visibility_timeout <= 0:
-            error_msg = (
-                "The 'visibility_timeout' property must be a positive integer."
-            )
-            raise ValueError(error_msg)
-
-        # Validate `retry_delay`: must be a positive integer
-        if not isinstance(self.retry_delay, int) or self.retry_delay <= 0:
-            error_msg = "The 'retry_delay' property must be a positive integer."
-            raise ValueError(error_msg)
-
-        # Validate `max_attempts`: must be a positive integer
-        if not isinstance(self.max_attempts, int) or self.max_attempts <= 0:
-            error_msg = (
-                "The 'max_attempts' property must be a positive integer."
-            )
-            raise ValueError(error_msg)
-
-        # Validate `strategy`: must be a string or Strategy enum
-        if not isinstance(self.strategy, (str, Strategy)):
-            error_msg = (
-                "The 'strategy' property must be a string or an instance of "
-                "Strategy."
-            )
-            raise TypeError(error_msg)
-        if isinstance(self.strategy, str):
-            # Normalize and validate the strategy string
-            options = Strategy._member_names_
-            _value = str(self.strategy).upper().strip()
-            if _value not in options:
-                error_msg = (
-                    "The 'strategy' property must be one of the following: "
-                    f"{', '.join(options)}."
-                )
-                raise ValueError(error_msg)
-            object.__setattr__(self, "strategy", Strategy[_value].value)
-        else:
-            # Convert enum to its value
-            object.__setattr__(self, "strategy", self.strategy.value)
+        validate_string(self.queue, "queue")
+        if not self.queue.isascii():
+            message = "The 'queue' property must contain only ASCII characters."
+            raise ValueError(message)
+        for name in ("visibility_timeout", "retry_delay", "max_attempts"):
+            validate_integer(getattr(self, name), name, minimum=1)
+        object.__setattr__(
+            self,
+            "strategy",
+            normalize_enum(
+                self.strategy,
+                Strategy,
+                "strategy",
+            ),
+        )

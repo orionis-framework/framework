@@ -9,7 +9,8 @@ if TYPE_CHECKING:
     from orionis.auth.entities.new_access_token import NewAccessToken
 
 class IAccessTokenRepository(ABC):
-    """Define the persistence operations of personal access tokens.
+    """
+    Define the persistence operations of personal access tokens.
 
     Only a hash of the secret is stored, so a leaked database row never
     reveals a usable credential.
@@ -26,7 +27,8 @@ class IAccessTokenRepository(ABC):
         abilities: Iterable[str] | None = None,
         expires_at: datetime | None = None,
     ) -> NewAccessToken:
-        """Issue a new personal access token for an identity.
+        """
+        Issue a new personal access token for an identity.
 
         Parameters
         ----------
@@ -50,7 +52,8 @@ class IAccessTokenRepository(ABC):
 
     @abstractmethod
     async def findByPlainText(self, plain_text: str) -> AccessToken | None:
-        """Resolve a token from the value presented by the client.
+        """
+        Resolve a token from the value presented by the client.
 
         Expired and revoked tokens are treated as absent.
 
@@ -67,7 +70,8 @@ class IAccessTokenRepository(ABC):
 
     @abstractmethod
     async def touch(self, token_id: object) -> bool:
-        """Confirm token validity and record its use atomically.
+        """
+        Confirm token validity and record its use atomically.
 
         Parameters
         ----------
@@ -82,7 +86,8 @@ class IAccessTokenRepository(ABC):
 
     @abstractmethod
     async def revoke(self, token_id: object) -> bool:
-        """Revoke a single token.
+        """
+        Revoke a single token.
 
         Parameters
         ----------
@@ -97,7 +102,8 @@ class IAccessTokenRepository(ABC):
 
     @abstractmethod
     async def revokeAll(self, tokenable: IAuthorizable) -> int:
-        """Revoke every active token of an identity.
+        """
+        Revoke every active token of an identity.
 
         Parameters
         ----------
@@ -112,7 +118,8 @@ class IAccessTokenRepository(ABC):
 
     @abstractmethod
     async def purgeExpired(self) -> int:
-        """Delete tokens that expired or were revoked.
+        """
+        Delete tokens that expired or were revoked.
 
         Returns
         -------

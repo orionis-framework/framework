@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from orionis.container.context.manager import ScopeManager
 
 class AuthenticationContext(IAuthenticationContext):
-    """Hold the authenticated state of one request.
+    """
+    Hold the authenticated state of one request.
 
     A context is created by the authentication middleware and stored in
     the container scope opened by the HTTP kernel. It is never attached
@@ -49,7 +50,8 @@ class AuthenticationContext(IAuthenticationContext):
         repository: IPermissionRepository | None = None,
         credential_id: object | None = None,
     ) -> None:
-        """Build the authentication context of a request.
+        """
+        Build the authentication context of a request.
 
         Parameters
         ----------
@@ -86,7 +88,8 @@ class AuthenticationContext(IAuthenticationContext):
         self.__lock = asyncio.Lock() if identity is not None else None
 
     def _bindToScope(self, scope: ScopeManager) -> None:
-        """Associate this context with one scope for its remaining lifetime.
+        """
+        Associate this context with one scope for its remaining lifetime.
 
         Parameters
         ----------
@@ -109,7 +112,8 @@ class AuthenticationContext(IAuthenticationContext):
         self.__scope = scope
 
     def __isCurrent(self) -> bool:
-        """Report whether this context still belongs to a live request.
+        """
+        Report whether this context still belongs to a live request.
 
         Returns
         -------
@@ -125,7 +129,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def identity(self) -> IAuthenticatable | None:
-        """Return the authenticated identity of the request.
+        """
+        Return the authenticated identity of the request.
 
         Returns
         -------
@@ -136,7 +141,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def guard(self) -> str | None:
-        """Return the name of the guard that resolved the identity.
+        """
+        Return the name of the guard that resolved the identity.
 
         Returns
         -------
@@ -147,7 +153,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def abilities(self) -> frozenset[str] | None:
-        """Return the abilities carried by the presented credential.
+        """
+        Return the abilities carried by the presented credential.
 
         Returns
         -------
@@ -158,7 +165,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def credentialId(self) -> object | None:
-        """Return the identifier of the credential that authenticated.
+        """
+        Return the identifier of the credential that authenticated.
 
         Returns
         -------
@@ -170,7 +178,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def isAuthenticated(self) -> bool:
-        """Report whether the request carries an authenticated identity.
+        """
+        Report whether the request carries an authenticated identity.
 
         Returns
         -------
@@ -181,7 +190,8 @@ class AuthenticationContext(IAuthenticationContext):
 
     @property
     def isGuest(self) -> bool:
-        """Report whether the request is anonymous.
+        """
+        Report whether the request is anonymous.
 
         Returns
         -------
@@ -191,7 +201,8 @@ class AuthenticationContext(IAuthenticationContext):
         return self.identity is None
 
     def identifier(self) -> object | None:
-        """Return the unique identifier of the authenticated identity.
+        """
+        Return the unique identifier of the authenticated identity.
 
         Returns
         -------
@@ -204,7 +215,8 @@ class AuthenticationContext(IAuthenticationContext):
         return identity.getAuthIdentifier()
 
     async def authorization(self) -> IAuthorizationSnapshot:
-        """Return the effective authorization snapshot of the request.
+        """
+        Return the effective authorization snapshot of the request.
 
         Returns
         -------
@@ -245,7 +257,8 @@ class AuthenticationContext(IAuthenticationContext):
             return snapshot
 
     def __repr__(self) -> str:
-        """Return a debugging representation of the context.
+        """
+        Return a debugging representation of the context.
 
         Returns
         -------

@@ -14,7 +14,8 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 class RequirePermissionMiddleware(BaseMiddleware):
-    """Require one or more permissions before reaching the controller.
+    """
+    Require one or more permissions before reaching the controller.
 
     The Orionis router attaches middleware classes, not parameterised
     instances, so the required permissions are declared by subclassing::
@@ -39,7 +40,8 @@ class RequirePermissionMiddleware(BaseMiddleware):
     requires_all: ClassVar[bool] = True
 
     def __init__(self, authorizer: IAuthorizer) -> None:
-        """Initialise the middleware with the authorizer.
+        """
+        Initialise the middleware with the authorizer.
 
         Parameters
         ----------
@@ -58,7 +60,8 @@ class RequirePermissionMiddleware(BaseMiddleware):
         request: Request,  # noqa: ARG002
         call_next: NextCallable,
     ) -> Response:
-        """Evaluate the permissions and continue when they are granted.
+        """
+        Evaluate the permissions and continue when they are granted.
 
         Parameters
         ----------
@@ -108,7 +111,8 @@ class RequirePermissionMiddleware(BaseMiddleware):
         return await call_next()
 
 class RequireRoleMiddleware(BaseMiddleware):
-    """Require one or more roles before reaching the controller.
+    """
+    Require one or more roles before reaching the controller.
 
     Roles are a grouping of permissions, so prefer
     :class:`RequirePermissionMiddleware` whenever the route protects a
@@ -127,7 +131,8 @@ class RequireRoleMiddleware(BaseMiddleware):
     requires_all: ClassVar[bool] = False
 
     def __init__(self, authorizer: IAuthorizer) -> None:
-        """Initialise the middleware with the authorizer.
+        """
+        Initialise the middleware with the authorizer.
 
         Parameters
         ----------
@@ -146,7 +151,8 @@ class RequireRoleMiddleware(BaseMiddleware):
         request: Request,  # noqa: ARG002
         call_next: NextCallable,
     ) -> Response:
-        """Evaluate the roles and continue when they are granted.
+        """
+        Evaluate the roles and continue when they are granted.
 
         Parameters
         ----------
@@ -198,7 +204,8 @@ class RequireRoleMiddleware(BaseMiddleware):
         context: object,
         required: tuple[str, ...],
     ) -> bool:
-        """Report whether the context satisfies the role requirement.
+        """
+        Report whether the context satisfies the role requirement.
 
         Parameters
         ----------

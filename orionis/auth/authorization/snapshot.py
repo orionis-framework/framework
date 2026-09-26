@@ -5,7 +5,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 class AuthorizationSnapshot(IAuthorizationSnapshot):
-    """Hold the immutable authorization picture of a single request.
+    """
+    Hold the immutable authorization picture of a single request.
 
     Effective authorization is the intersection of what the identity owns
     and what the presented credential is allowed to use::
@@ -29,7 +30,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
         roles: Iterable[str],
         abilities: Iterable[str] | None = None,
     ) -> None:
-        """Build a snapshot from the resolved authorization sources.
+        """
+        Build a snapshot from the resolved authorization sources.
 
         Parameters
         ----------
@@ -54,7 +56,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
 
     @property
     def permissions(self) -> frozenset[str]:
-        """Return the permissions owned by the identity.
+        """
+        Return the permissions owned by the identity.
 
         Returns
         -------
@@ -65,7 +68,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
 
     @property
     def roles(self) -> frozenset[str]:
-        """Return the roles assigned to the identity.
+        """
+        Return the roles assigned to the identity.
 
         Returns
         -------
@@ -76,7 +80,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
 
     @property
     def abilities(self) -> frozenset[str] | None:
-        """Return the abilities restricting the presented credential.
+        """
+        Return the abilities restricting the presented credential.
 
         Returns
         -------
@@ -86,7 +91,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
         return self.__abilities
 
     def can(self, permission: str) -> bool:
-        """Report whether the effective authorization grants a permission.
+        """
+        Report whether the effective authorization grants a permission.
 
         Parameters
         ----------
@@ -106,7 +112,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
         return abilities is None or permission in abilities
 
     def hasRole(self, role: str) -> bool:
-        """Report whether the identity owns a role.
+        """
+        Report whether the identity owns a role.
 
         Parameters
         ----------
@@ -121,7 +128,8 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
         return role in self.__roles
 
     def __repr__(self) -> str:
-        """Return a debugging representation of the snapshot.
+        """
+        Return a debugging representation of the snapshot.
 
         Returns
         -------

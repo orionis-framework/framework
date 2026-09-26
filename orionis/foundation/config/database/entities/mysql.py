@@ -1,11 +1,16 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment.facade import Env
 from orionis.foundation.config.database.enums import (
     MySQLCharset,
     MySQLCollation,
     MySQLEngine,
 )
-from orionis.environment.facade import Env
+from orionis.foundation.config.validation import (
+    validate_boolean,
+    validate_integer,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -43,215 +48,164 @@ class MySQL(BaseEntity):
         The storage engine for the MySQL database (optional).
     """
 
-    # ruff: noqa: C901
-
     driver: str = field(
-        default = "mysql",
-        metadata = {
+        default="mysql",
+        metadata={
             "description": "The database driver being used.",
             "default": "mysql",
         },
     )
 
     host: str = field(
-        default_factory = lambda: Env.get("DB_HOST", "127.0.0.1"),
-        metadata = {
+        default_factory=lambda: Env.get("DB_HOST", "127.0.0.1"),
+        metadata={
             "description": "The host address for the MySQL server.",
             "default": "127.0.0.1",
         },
     )
 
     port: int = field(
-        default_factory = lambda: Env.get("DB_PORT", 3306),
-        metadata = {
+        default_factory=lambda: Env.get("DB_PORT", 3306),
+        metadata={
             "description": "The port for connecting to the MySQL server.",
             "default": 3306,
         },
     )
 
     database: str = field(
-        default_factory = lambda: Env.get("DB_DATABASE", "orionis"),
-        metadata = {
+        default_factory=lambda: Env.get("DB_DATABASE", "orionis"),
+        metadata={
             "description": "The name of the MySQL database.",
             "default": "orionis",
         },
     )
 
     username: str = field(
-        default_factory = lambda: Env.get("DB_USERNAME", "root"),
-        metadata = {
+        default_factory=lambda: Env.get("DB_USERNAME", "root"),
+        metadata={
             "description": "The username for connecting to the MySQL database.",
             "default": "root",
         },
     )
 
     password: str = field(
-        default_factory = lambda: Env.get("DB_PASSWORD", ""),
-        metadata = {
+        default_factory=lambda: Env.get("DB_PASSWORD", ""),
+        metadata={
             "description": "The password for the MySQL database.",
             "default": "",
         },
     )
 
-    unix_socket: str = field(
-        default_factory = lambda: Env.get("DB_SOCKET", ""),
-        metadata = {
+    unix_socket: str | None = field(
+        default_factory=lambda: Env.get("DB_SOCKET", ""),
+        metadata={
             "description": "The path to the Unix socket for MySQL connections "
-                          "(optional).",
+            "(optional).",
             "default": "",
         },
     )
 
     charset: str | MySQLCharset = field(
-        default = MySQLCharset.UTF8MB4.value,
-        metadata = {
+        default_factory=lambda: (
+            Env.get("DB_CHARSET", MySQLCharset.UTF8MB4.value)
+            if str(Env.get("DB_CONNECTION", "sqlite")).strip().lower() == "mysql"
+            else MySQLCharset.UTF8MB4.value
+        ),
+        metadata={
             "description": "The charset used for the connection.",
-            "default": MySQLCharset.UTF8MB4.value,
+            "default": "utf8mb4",
         },
     )
 
     collation: str | MySQLCollation = field(
-        default = MySQLCollation.UTF8MB4_UNICODE_CI.value,
-        metadata = {
+        default_factory=lambda: Env.get(
+            "DB_COLLATION",
+            MySQLCollation.UTF8MB4_UNICODE_CI.value,
+        ),
+        metadata={
             "description": "The collation for the database.",
-            "default": MySQLCollation.UTF8MB4_UNICODE_CI.value,
+            "default": "utf8mb4_unicode_ci",
         },
     )
 
-    prefix: str = field(
-        default = "",
-        metadata = {
+    prefix: str | None = field(
+        default_factory=lambda: Env.get("DB_PREFIX", ""),
+        metadata={
             "description": "Prefix for table names.",
             "default": "",
         },
     )
 
     prefix_indexes: bool = field(
-        default = True,
-        metadata = {
+        default_factory=lambda: Env.get("DB_PREFIX_INDEXES", True),
+        metadata={
             "description": "Whether to prefix index names.",
             "default": True,
         },
     )
 
     strict: bool = field(
-        default = True,
-        metadata = {
+        default_factory=lambda: Env.get("DB_STRICT", True),
+        metadata={
             "description": "Whether to enforce strict SQL mode.",
             "default": True,
         },
     )
 
-    engine: str | MySQLEngine = field(
-        default = MySQLEngine.INNODB.value,
-        metadata = {
+    engine: str | MySQLEngine | None = field(
+        default_factory=lambda: Env.get("DB_ENGINE", MySQLEngine.INNODB.value),
+        metadata={
             "description": "The storage engine for the MySQL database (optional).",
-            "default": MySQLEngine.INNODB.value,
+            "default": "InnoDB",
         },
     )
 
-    def __post_init__(self) -> None:  # NOSONAR
+    def __post_init__(self) -> None:
         """
-        Perform post-initialization validation for MySQL configuration.
-
-        Validates all required fields for type and value correctness. Raises
-        descriptive exceptions if any validation fails.
+        Validate connection settings and normalize MySQL options.
 
         Parameters
         ----------
         self : MySQL
-            The instance of the MySQL configuration entity.
+            Instance of the MySQL configuration entity.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates the entity in place and returns no value.
 
         Raises
         ------
-        ValueError
-            If any attribute has an invalid value.
         TypeError
-            If any attribute has an incorrect type.
+            If a setting has an invalid type.
+        ValueError
+            If a setting has an invalid value.
         """
+        # Validate inherited entity fields before checking MySQL-specific options.
         super().__post_init__()
-
-        # Validate driver
         if self.driver != "mysql":
-            error_msg = (
-                "Invalid driver: expected 'mysql'. Please ensure the 'driver' "
-                "attribute is set to 'mysql'."
-            )
+            error_msg = "The 'driver' property must be 'mysql'."
             raise ValueError(error_msg)
+        for name in ("host", "database", "username"):
+            validate_string(getattr(self, name), name)
+        validate_integer(self.port, "port", minimum=1, maximum=65535)
+        validate_string(self.password, "password", allow_empty=True)
+        for name in ("unix_socket", "prefix"):
+            value = getattr(self, name)
+            if value is not None:
+                validate_string(value, name, allow_empty=True)
+        validate_boolean(self.prefix_indexes, "prefix_indexes")
+        validate_boolean(self.strict, "strict")
+        self.__validateCharset()
+        self.__validateCollation()
+        self.__validateEngine()
 
-        # Validate host
-        if not self.host or not isinstance(self.host, str):
-            error_msg = "Database host must be a non-empty string."
-            raise ValueError(error_msg)
-
-        # Validate port type
-        if not isinstance(self.port, int):
-            error_msg = "Database port must be an integer."
-            raise TypeError(error_msg)
-
-        # Validate port range
-        max_port = 65535
-        if self.port > max_port or self.port < 1:
-            error_msg = f"Database port must be between 1 and {max_port}."
-            raise ValueError(error_msg)
-
-        # Validate database name
-        if not self.database or not isinstance(self.database, str):
-            error_msg = "Database name must be a non-empty string."
-            raise ValueError(error_msg)
-
-        # Validate username
-        if not self.username or not isinstance(self.username, str):
-            error_msg = "Database username must be a non-empty string."
-            raise ValueError(error_msg)
-
-        # Validate password
-        if self.password is None or not isinstance(self.password, str):
-            error_msg = (
-                "Database password must be a string (can be empty for some setups)."
-            )
-            raise TypeError(error_msg)
-
-        # Validate unix_socket
-        if self.unix_socket is not None and not isinstance(self.unix_socket, str):
-            error_msg = "Unix socket path must be a string."
-            raise TypeError(error_msg)
-
-        # Validate charset
-        self.__ValidateCharset()
-
-        # Validate collation
-        self.__ValidateCollation()
-
-        # Validate prefix
-        if self.prefix is not None and not isinstance(self.prefix, str):
-            error_msg = "Prefix must be a string."
-            raise TypeError(error_msg)
-
-        # Validate prefix_indexes
-        if not isinstance(self.prefix_indexes, bool):
-            error_msg = "prefix_indexes must be a boolean value."
-            raise TypeError(error_msg)
-
-        # Validate strict
-        if not isinstance(self.strict, bool):
-            error_msg = "strict must be a boolean value."
-            raise TypeError(error_msg)
-
-        # Validate engine
-        self.__ValidateEngine()
-
-    def __ValidateCharset(self) -> None:
+    def __validateCharset(self) -> None:
         """
-        Validate and normalize the charset attribute.
+        Validate and normalize the MySQL charset.
 
-        Ensures that the charset is a non-empty string or a MySQLCharset enum.
-        Converts string values to the corresponding MySQLCharset enum value.
+        Accept a non-empty string or a ``MySQLCharset`` member and store the
+        corresponding canonical enum value.
 
         Parameters
         ----------
@@ -270,14 +224,12 @@ class MySQL(BaseEntity):
         ValueError
             If charset is not a valid MySQLCharset option.
         """
-        # Ensure charset is a valid string or enum
+        # Ensure the charset is a valid string or enum member.
         if not self.charset or not isinstance(self.charset, (str, MySQLCharset)):
-            error_msg = (
-                "Charset must be a non-empty string or MySQLCharset enum."
-            )
+            error_msg = "Charset must be a non-empty string or MySQLCharset enum."
             raise TypeError(error_msg)
 
-        # Convert string charset to MySQLCharset enum value
+        # Convert string input to the canonical enum value.
         if isinstance(self.charset, str):
             _value = str(self.charset).upper().strip()
             options_charsets = MySQLCharset._member_names_
@@ -291,12 +243,12 @@ class MySQL(BaseEntity):
         else:
             object.__setattr__(self, "charset", self.charset.value)
 
-    def __ValidateCollation(self) -> None:
+    def __validateCollation(self) -> None:
         """
-        Validate and normalize the collation attribute.
+        Validate and normalize the MySQL collation.
 
-        Ensure that the collation is a non-empty string or a MySQLCollation enum.
-        Convert string values to the corresponding MySQLCollation enum value.
+        Accept a non-empty string or a ``MySQLCollation`` member and store the
+        corresponding canonical enum value.
 
         Parameters
         ----------
@@ -315,14 +267,12 @@ class MySQL(BaseEntity):
         ValueError
             If collation is not a valid MySQLCollation option.
         """
-        # Ensure collation is a valid string or enum
+        # Ensure the collation is a valid string or enum member.
         if not self.collation or not isinstance(self.collation, (str, MySQLCollation)):
-            error_msg = (
-                "Collation must be a non-empty string or MySQLCollation enum."
-            )
+            error_msg = "Collation must be a non-empty string or MySQLCollation enum."
             raise TypeError(error_msg)
 
-        # Convert string collation to MySQLCollation enum value
+        # Convert string input to the canonical enum value.
         if isinstance(self.collation, str):
             _value = str(self.collation).upper().strip()
             options_collations = MySQLCollation._member_names_
@@ -336,9 +286,12 @@ class MySQL(BaseEntity):
         else:
             object.__setattr__(self, "collation", self.collation.value)
 
-    def __ValidateEngine(self) -> None:
+    def __validateEngine(self) -> None:
         """
-        Validate and normalize the engine attribute.
+        Validate and normalize the MySQL storage engine.
+
+        Accept a string or ``MySQLEngine`` member and store the corresponding
+        canonical enum value when an engine is configured.
 
         Parameters
         ----------
@@ -357,14 +310,14 @@ class MySQL(BaseEntity):
         ValueError
             If engine is not a valid MySQLEngine option.
         """
-        # Validate engine type and value
+        # Validate and normalize the optional engine setting.
         if self.engine is not None:
-            # Check if engine is a string or MySQLEngine enum
+            # Check whether the engine is a string or enum member.
             if not isinstance(self.engine, (str, MySQLEngine)):
                 error_msg = "Engine must be a string or MySQLEngine enum."
                 raise TypeError(error_msg)
 
-            # Convert engine to MySQLEngine enum if it's a string
+            # Convert string input to the canonical enum value.
             options_engines = MySQLEngine._member_names_
             if isinstance(self.engine, str):
                 _value = str(self.engine).upper().strip()

@@ -3,20 +3,12 @@ from dataclasses import dataclass, field
 from datetime import time
 from orionis.environment import Env
 from orionis.foundation.config.logging import (
-    Channels,
-    Chunked,
-    Daily,
-    Hourly,
-    Level,
-    Logging,
-    Monthly,
-    Stack,
-    Weekly,
+    Channels, Chunked, Daily, Hourly, Level, Logging,
+    Monthly, Stack, Weekly,
 )
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapLogging(Logging):
-
     # ----------------------------------------------------------------------------------
     # default : str, optional
     # --- The default logging channel name.
@@ -28,77 +20,66 @@ class BootstrapLogging(Logging):
 
     # ----------------------------------------------------------------------------------
     # channels : Channels | dict, optional
-    # --- Collection of available logging channels.
-    # --- Accepts a Channels instance or a dict.
+    # --- Configure each channel's environment keys and fallback values here.
+    # --- Shared LOG_PATH and LOG_RETENTION apply only to the selected channel.
+    # --- Use Env.get with dedicated keys for independent channel settings.
     # ----------------------------------------------------------------------------------
     channels: Channels | dict = field(
         default_factory=lambda: Channels(
-
             # --------------------------------------------------------------------------
-            # stack
-            # --- Logs to "storage/logs/stack.log" at INFO level.
-            # --- Used as the main stack channel.
+            # stack : Stack, optional
+            # --- Log file for entries without time or size rotation.
             # --------------------------------------------------------------------------
-            stack = Stack(
-                path = "storage/logs/stack.log",
-                level = Level.INFO,
+            stack=Stack(
+                path=Env.get("LOG_PATH", "storage/logs/stack.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
             ),
-
             # --------------------------------------------------------------------------
-            # hourly
-            # --- Logs to "storage/logs/hourly_{suffix}.log" at INFO level.
-            # --- Keeps logs for 24 hours.
+            # hourly : Hourly, optional
+            # --- Hourly log rotation with retention measured in hours.
             # --------------------------------------------------------------------------
-            hourly = Hourly(
-                path = "storage/logs/hourly_{suffix}.log",
-                level = Level.INFO,
-                retention_hours = 24,
+            hourly=Hourly(
+                path=Env.get("LOG_PATH", "storage/logs/hourly_{suffix}.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
+                retention_hours=Env.get("LOG_RETENTION", 24),
             ),
-
             # --------------------------------------------------------------------------
-            # daily
-            # --- Logs to "storage/logs/daily_{suffix}.log" at INFO level.
-            # --- Keeps logs for 7 days, rotates at midnight.
+            # daily : Daily, optional
+            # --- Daily log rotation with a configurable time and retention in days.
             # --------------------------------------------------------------------------
-            daily = Daily(
-                path = "storage/logs/daily_{suffix}.log",
-                level = Level.INFO,
-                retention_days = 7,
-                at = time(hour=0, minute=0, second=0, microsecond=0),
+            daily=Daily(
+                path=Env.get("LOG_PATH", "storage/logs/daily_{suffix}.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
+                retention_days=Env.get("LOG_RETENTION", 7),
+                at=Env.get("LOG_ROTATION_TIME", time(hour=0, minute=0, second=0)),
             ),
-
             # --------------------------------------------------------------------------
-            # weekly
-            # --- Logs to "storage/logs/weekly_{suffix}.log" at INFO level.
-            # --- Keeps logs for 4 weeks.
+            # weekly : Weekly, optional
+            # --- Weekly log rotation with retention measured in weeks.
             # --------------------------------------------------------------------------
-            weekly = Weekly(
-                path = "storage/logs/weekly_{suffix}.log",
-                level = Level.INFO,
-                retention_weeks = 4,
+            weekly=Weekly(
+                path=Env.get("LOG_PATH", "storage/logs/weekly_{suffix}.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
+                retention_weeks=Env.get("LOG_RETENTION", 4),
             ),
-
             # --------------------------------------------------------------------------
-            # monthly
-            # --- Logs to "storage/logs/monthly_{suffix}.log" at INFO level.
-            # --- Keeps logs for 4 months.
+            # monthly : Monthly, optional
+            # --- Monthly log rotation with retention measured in months.
             # --------------------------------------------------------------------------
-            monthly = Monthly(
-                path = "storage/logs/monthly_{suffix}.log",
-                level = Level.INFO,
-                retention_months = 4,
+            monthly=Monthly(
+                path=Env.get("LOG_PATH", "storage/logs/monthly_{suffix}.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
+                retention_months=Env.get("LOG_RETENTION", 12),
             ),
-
             # --------------------------------------------------------------------------
-            # chunked
-            # --- Logs to "storage/logs/chunked_{suffix}.log" at INFO level.
-            # --- Max file size 10 MB, keeps up to 5 files.
+            # chunked : Chunked, optional
+            # --- Rotation by file size, with a size limit and a retained file count.
             # --------------------------------------------------------------------------
-            chunked = Chunked(
-                path = "storage/logs/chunked_{suffix}.log",
-                level = Level.INFO,
-                mb_size = 10,
-                files = 5,
+            chunked=Chunked(
+                path=Env.get("LOG_PATH", "storage/logs/chunked_{suffix}.log"),
+                level=Env.get("LOG_LEVEL", Level.INFO),
+                mb_size=Env.get("LOG_MB_SIZE", 10),
+                files=Env.get("LOG_FILES", 5),
             ),
         ),
     )

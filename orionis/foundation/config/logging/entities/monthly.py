@@ -1,11 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed level name set: membership check replaces try/except KeyError.
-_LEVEL_NAMES: frozenset[str] = frozenset(lv.name for lv in Level)
 
 @dataclass(frozen=True, kw_only=True)
 class Monthly(BaseEntity):
@@ -23,7 +21,10 @@ class Monthly(BaseEntity):
     """
 
     path: str = field(
-        default="storage/logs/monthly_{suffix}.log",
+        default_factory=lambda: Env.get(
+            "LOG_PATH",
+            "storage/logs/monthly_{suffix}.log",
+        ),
         metadata={
             "description": "The file path where the log is stored.",
             "default": "storage/logs/monthly_{suffix}.log",
@@ -31,17 +32,17 @@ class Monthly(BaseEntity):
     )
 
     level: int | str | Level = field(
-        default=Level.INFO.value,
+        default_factory=lambda: Env.get("LOG_LEVEL", Level.INFO),
         metadata={
             "description": (
                 "The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)."
             ),
-            "default": Level.INFO.value,
+            "default": "INFO",
         },
     )
 
     retention_months: int = field(
-        default=4,
+        default_factory=lambda: Env.get("LOG_RETENTION", 4),
         metadata={
             "description": (
                 "The number of months to retain log files before deletion."
@@ -80,23 +81,13 @@ class Monthly(BaseEntity):
         IsValidPath(self.path, suffix=True)
 
         # Validate 'level' using the IsValidLevel validator.
-        IsValidLevel(self.level)
-
-        # Normalise the 'level' attribute to its integer value.
-        if isinstance(self.level, Level):
-            object.__setattr__(self, "level", self.level.value)
-        elif isinstance(self.level, str):
-            _key = self.level.strip().upper()
-            if _key not in _LEVEL_NAMES:
-                error_msg = (
-                    f"Invalid value for 'level': {self.level!r}. Must be a valid "
-                    "Level enum name."
-                )
-                raise ValueError(error_msg)
-            object.__setattr__(self, "level", Level[_key].value)
+        object.__setattr__(self, "level", IsValidLevel.normalize(self.level))
 
         # Validate 'retention_months' is an integer between 1 and 12.
-        if not isinstance(self.retention_months, int):
+        if not isinstance(self.retention_months, int) or isinstance(
+            self.retention_months,
+            bool,
+        ):
             error_msg = (
                 f"Invalid type for 'retention_months': expected int, got "
                 f"{type(self.retention_months).__name__}."

@@ -1,7 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.database.enums import PGSQLCharset, PGSQLSSLMode
-from orionis.environment.facade import Env
+from orionis.foundation.config.validation import normalize_enum, validate_integer
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -84,15 +85,19 @@ class PGSQL(BaseEntity):
     )
 
     charset: str | PGSQLCharset = field(
-        default_factory=lambda: Env.get("DB_CHARSET", PGSQLCharset.UTF8.value),
+        default_factory=lambda: (
+            Env.get("DB_CHARSET", PGSQLCharset.UTF8.value)
+            if str(Env.get("DB_CONNECTION", "sqlite")).strip().lower() == "pgsql"
+            else PGSQLCharset.UTF8.value
+        ),
         metadata={
             "description": "Database charset",
-            "default": PGSQLCharset.UTF8.value,
+            "default": "UTF8",
         },
     )
 
     prefix: str = field(
-        default="",
+        default_factory=lambda: Env.get("DB_PREFIX", ""),
         metadata={
             "description": "Table prefix",
             "default": "",
@@ -100,7 +105,7 @@ class PGSQL(BaseEntity):
     )
 
     prefix_indexes: bool = field(
-        default=True,
+        default_factory=lambda: Env.get("DB_PREFIX_INDEXES", True),
         metadata={
             "description": "Whether to prefix indexes",
             "default": True,
@@ -108,7 +113,7 @@ class PGSQL(BaseEntity):
     )
 
     search_path: str = field(
-        default="public",
+        default_factory=lambda: Env.get("DB_SEARCH_PATH", "public"),
         metadata={
             "description": "PostgreSQL schema search_path",
             "default": "public",
@@ -116,118 +121,93 @@ class PGSQL(BaseEntity):
     )
 
     sslmode: str | PGSQLSSLMode = field(
-        default=PGSQLSSLMode.PREFER.value,
+        default_factory=lambda: Env.get("DB_SSLMODE", PGSQLSSLMode.PREFER.value),
         metadata={
             "description": "Connection SSL mode",
             "default": PGSQLSSLMode.PREFER.value,
         },
     )
 
-    def __validateCharset(self) -> None:
+    def __validateCharset(self: PGSQL) -> None:
         """
-        Validate and normalize the `charset` attribute.
-
-        Ensures the `charset` attribute is a valid option from PGSQLCharset.
-        Converts string representations to their enum value.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-
-        Raises
-        ------
-        ValueError
-            If the `charset` attribute is not a valid option.
-        """
-        # Validate `charset` attribute against allowed enum options
-        options_charset = PGSQLCharset._member_names_
-        if isinstance(self.charset, str):
-            # Normalize and validate charset string
-            _value = self.charset.upper().strip()
-            if _value not in options_charset:
-                error_msg = (
-                    "The 'charset' attribute must be a valid option "
-                    f"{PGSQLCharset._member_names_!s}"
-                )
-                raise ValueError(error_msg)
-            object.__setattr__(self, "charset", PGSQLCharset[_value].value)
-        else:
-            object.__setattr__(self, "charset", self.charset.value)
-
-    def __validateSSLMode(self) -> None:
-        """
-        Validate and normalize the `sslmode` attribute.
-
-        Ensures the `sslmode` attribute is a valid option from PGSQLSSLMode.
-        Converts string representations to their enum value.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-
-        Raises
-        ------
-        ValueError
-            If the `sslmode` attribute is not a valid option.
-        """
-        # Validate `sslmode` attribute
-        if not isinstance(self.sslmode, (str, PGSQLSSLMode)):
-            error_msg = (
-                "The 'sslmode' attribute must be a string or PGSQLSSLMode. "
-                f"Received: {self.sslmode!r}"
-            )
-            raise TypeError(error_msg)
-
-        # Validate and normalize `sslmode` attribute
-        options_sslmode = PGSQLSSLMode._member_names_
-        if isinstance(self.sslmode, str):
-            # Normalize and validate sslmode string
-            _value = self.sslmode.upper().strip()
-            if _value not in options_sslmode:
-                error_msg = (
-                    "The 'sslmode' attribute must be a valid option "
-                    f"{PGSQLSSLMode._member_names_!s}"
-                )
-                raise ValueError(error_msg)
-            object.__setattr__(self, "sslmode", PGSQLSSLMode[_value].value)
-        else:
-            object.__setattr__(self, "sslmode", self.sslmode.value)
-
-    def __post_init__(self) -> None:
-        """
-        Validate and initialize the database entity attributes.
-
-        Ensures all attributes are of the correct type and value. Converts string
-        representations of enums to their values.
+        Normalize the PostgreSQL charset option.
 
         Parameters
         ----------
         self : PGSQL
-            The instance of the PGSQL configuration entity.
+            Configuration entity containing the charset to normalize.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method stores the canonical charset value in the entity.
+        """
+        # Store the canonical enum value for the configured charset.
+        object.__setattr__(
+            self,
+            "charset",
+            normalize_enum(
+                self.charset,
+                PGSQLCharset,
+                "charset",
+            ),
+        )
+
+    def __validateSSLMode(self: PGSQL) -> None:
+        """
+        Normalize the PostgreSQL SSL mode option.
+
+        Parameters
+        ----------
+        self : PGSQL
+            Configuration entity containing the SSL mode to normalize.
+
+        Returns
+        -------
+        None
+            This method stores the canonical SSL mode value in the entity.
+        """
+        # Store the canonical enum value for the configured SSL mode.
+        object.__setattr__(
+            self,
+            "sslmode",
+            normalize_enum(
+                self.sslmode,
+                PGSQLSSLMode,
+                "sslmode",
+            ),
+        )
+
+    def __post_init__(self: PGSQL) -> None:
+        """
+        Validate and initialize the PostgreSQL configuration attributes.
+
+        Validate scalar settings, normalize enum values, and preserve the
+        configured port representation after range validation.
+
+        Parameters
+        ----------
+        self : PGSQL
+            Configuration entity to validate and initialize.
+
+        Returns
+        -------
+        None
+            This method validates and normalizes the entity in place.
 
         Raises
         ------
         ValueError
-            If a required attribute is missing or invalid.
+            If a required attribute is missing or has an invalid value.
         TypeError
-            If an attribute is of incorrect type.
+            If an attribute has an invalid type.
         """
         # Call parent post-initialization
         super().__post_init__()
 
         # Validate `driver` attribute
-        if not isinstance(self.driver, str) or not self.driver:
-            error_msg = (
-                "The 'driver' attribute must be a non-empty string. "
-                f"Received: {self.driver!r}"
-            )
+        if self.driver != "pgsql":
+            error_msg = "The 'driver' property must be 'pgsql'."
             raise ValueError(error_msg)
 
         # Validate `host` attribute
@@ -239,12 +219,10 @@ class PGSQL(BaseEntity):
             raise ValueError(error_msg)
 
         # Validate `port` attribute
-        if not (isinstance(self.port, (str, int)) and str(self.port).isdigit()):
-            error_msg = (
-                "The 'port' attribute must be a numeric string or integer. "
-                f"Received: {self.port!r}"
-            )
-            raise TypeError(error_msg)
+        port = self.port
+        if isinstance(port, str) and port.isascii() and port.isdecimal():
+            port = int(port)
+        validate_integer(port, "port", minimum=1, maximum=65535)
 
         # Validate `database` attribute
         if not isinstance(self.database, str) or not self.database.strip():
@@ -276,8 +254,7 @@ class PGSQL(BaseEntity):
         # Validate `prefix` attribute
         if not isinstance(self.prefix, str):
             error_msg = (
-                "The 'prefix' attribute must be a string. "
-                f"Received: {self.prefix!r}"
+                f"The 'prefix' attribute must be a string. Received: {self.prefix!r}"
             )
             raise TypeError(error_msg)
 

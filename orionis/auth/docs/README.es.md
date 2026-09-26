@@ -181,14 +181,17 @@ class IGuard(ABC):
     async def resolve(self, request: Request) -> GuardResult | None: ...
 
 class ISessionGuard(IGuard):
-    async def attempt(self, request: Request, credentials: Mapping[str, object]) -> IAuthenticatable | None: ...
+    async def attempt(self, request: Request, credentials: Mapping[str, object], *, remember: bool = False) -> IAuthenticatable | None: ...
     def login(self, request: Request, identity: IAuthenticatable) -> None: ...
-    def logout(self, request: Request) -> None: ...
+    async def logout(self, request: Request) -> None: ...
 ```
 
 `SessionGuard.login()` exige una identidad con clave persistida, solicita rotar
 el ID de sesión y renueva inmediatamente CSRF con la configuración HTTP existente.
-La clave de identidad se guarda como texto canónico. `logout()` invalida la sesión.
+La clave de identidad se guarda como texto canónico. `await logout()` revoca el
+acceso persistente e invalida la sesión. `await Auth.attempt(credentials,
+remember=True)` conserva el acceso mediante una cookie independiente y revocable;
+consulta [Recordarme](REMEMBER_ME.es.md) para configuración y límites.
 Persistencia, borrado del ID anterior y cookies corresponden a
 `StartSessionMiddleware` y `SessionManager`; Auth no crea sesiones paralelas.
 

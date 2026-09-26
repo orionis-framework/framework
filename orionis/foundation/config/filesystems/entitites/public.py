@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from pathlib import Path
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -12,7 +12,7 @@ class Public(BaseEntity):
     Parameters
     ----------
     driver : str, default="local"
-        The filesystem driver type. Default is "local".
+        The filesystem driver name resolved by StorageManager.
     path : str
         The absolute or relative path where public files are stored.
     url : str
@@ -75,6 +75,9 @@ class Public(BaseEntity):
         """
         super().__post_init__()
 
+        # Driver names are resolved by StorageManager, including extensions.
+        validate_string(self.driver, "driver")
+
         # Validate that 'path' is a string
         if not isinstance(self.path, str):
             error_msg = "The 'path' attribute must be a string."
@@ -89,6 +92,3 @@ class Public(BaseEntity):
         if not self.path.strip() or not self.url.strip():
             error_msg = "The 'path' and 'url' attributes cannot be empty."
             raise ValueError(error_msg)
-
-        # Create the directory if it does not exist
-        Path(self.path.strip()).mkdir(parents=True, exist_ok=True)

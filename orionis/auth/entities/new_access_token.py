@@ -5,7 +5,8 @@ from orionis.auth.entities.access_token import AccessToken
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class NewAccessToken:
-    """Pair a freshly issued token with its plain text value.
+    """
+    Pair a freshly issued token with its plain text value.
 
     The plain text value only exists in the return value of the call that
     issued the token. It is never persisted and cannot be recovered later.
@@ -23,7 +24,8 @@ class NewAccessToken:
     plain_text: str = field(repr=False)
 
     def toDict(self) -> dict[str, object]:
-        """Serialize only public metadata; access plain_text explicitly to issue it.
+        """
+        Serialize only public metadata; access plain_text explicitly to issue it.
 
         Returns
         -------

@@ -119,7 +119,8 @@ class SessionGuard(ISessionGuard):
         self,
         request: Request,
         credentials: Mapping[str, object],
-        *, remember: bool = False,
+        *,
+        remember: bool = False,
     ) -> IAuthenticatable | None:
         """
         Validate credentials and start an authenticated session.

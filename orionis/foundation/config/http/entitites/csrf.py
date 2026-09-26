@@ -1,11 +1,16 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_boolean, validate_cookie_name
 from orionis.support.entities.base import BaseEntity
+
+_MIN_TOKEN_LENGTH = 32
 
 @dataclass(frozen=True, kw_only=True)
 class HTTPCsrf(BaseEntity):
-    """CSRF protection configuration for web routes.
+    """
+    CSRF protection configuration for web routes.
 
     Attributes
     ----------
@@ -40,7 +45,7 @@ class HTTPCsrf(BaseEntity):
 
     # Global toggle enabling or disabling CSRF validation
     enabled: bool = field(
-        default=True,
+        default_factory=lambda: Env.get("CSRF_ENABLED", True),
         metadata={
             "description": "Enable or disable CSRF validation globally.",
             "default": True,
@@ -49,7 +54,7 @@ class HTTPCsrf(BaseEntity):
 
     # Entropy byte length used when generating tokens via secrets.token_urlsafe
     token_length: int = field(
-        default=32,
+        default_factory=lambda: Env.get("CSRF_TOKEN_LENGTH", 32),
         metadata={
             "description": (
                 "Byte length for token generation via secrets.token_urlsafe. "
@@ -61,7 +66,7 @@ class HTTPCsrf(BaseEntity):
 
     # Session key under which the generated CSRF token is persisted
     session_key: str = field(
-        default="_csrf_token",
+        default_factory=lambda: Env.get("CSRF_SESSION_KEY", "_csrf_token"),
         metadata={
             "description": "Session key under which the CSRF token is stored.",
             "default": "_csrf_token",
@@ -70,7 +75,7 @@ class HTTPCsrf(BaseEntity):
 
     # Flag to emit a readable XSRF-TOKEN cookie for JS framework clients
     xsrf_cookie: bool = field(
-        default=False,
+        default_factory=lambda: Env.get("CSRF_XSRF_COOKIE", False),
         metadata={
             "description": (
                 "When True, set a readable XSRF-TOKEN cookie for Angular / Axios "
@@ -82,7 +87,7 @@ class HTTPCsrf(BaseEntity):
 
     # HTTP cookie name delivered to the browser
     cookie_name: str = field(
-        default="XSRF-TOKEN",
+        default_factory=lambda: Env.get("CSRF_COOKIE_NAME", "XSRF-TOKEN"),
         metadata={
             "description": "Name of the XSRF double-submit cookie.",
             "default": "XSRF-TOKEN",
@@ -91,7 +96,7 @@ class HTTPCsrf(BaseEntity):
 
     # Whether to enforce the Secure attribute on the XSRF cookie
     cookie_secure: bool = field(
-        default=False,
+        default_factory=lambda: Env.get("CSRF_COOKIE_SECURE", False),
         metadata={
             "description": (
                 "Force the Secure flag on the XSRF cookie. "
@@ -103,7 +108,7 @@ class HTTPCsrf(BaseEntity):
 
     # SameSite policy controlling cross-site cookie delivery
     cookie_same_site: Literal["lax", "strict", "none"] = field(
-        default="lax",
+        default_factory=lambda: Env.get("CSRF_COOKIE_SAME_SITE", "lax"),
         metadata={
             "description": "SameSite policy for the XSRF cookie.",
             "default": "lax",
@@ -112,7 +117,7 @@ class HTTPCsrf(BaseEntity):
 
     # URL path scope restricting where the cookie is sent
     cookie_path: str = field(
-        default="/",
+        default_factory=lambda: Env.get("CSRF_COOKIE_PATH", "/"),
         metadata={
             "description": "Path attribute for the XSRF cookie.",
             "default": "/",
@@ -121,7 +126,7 @@ class HTTPCsrf(BaseEntity):
 
     # Optional domain scope; None omits the Domain attribute entirely
     cookie_domain: str | None = field(
-        default=None,
+        default_factory=lambda: Env.get("CSRF_COOKIE_DOMAIN", None),
         metadata={
             "description": "Domain attribute for the XSRF cookie. None omits it.",
             "default": None,
@@ -129,7 +134,8 @@ class HTTPCsrf(BaseEntity):
     )
 
     def __post_init__(self) -> None:
-        """Validate all CSRF configuration fields after dataclass construction.
+        """
+        Validate all CSRF configuration fields after dataclass construction.
 
         Raises
         ------
@@ -152,13 +158,22 @@ class HTTPCsrf(BaseEntity):
         self.__validateTokenLength()
         self.__validateSessionKey()
         self.__validateXsrfCookie()
+        validate_boolean(self.cookie_secure, "cookie_secure")
         self.__validateCookieName()
         self.__validateCookieSameSite()
         self.__validateCookiePath()
         self.__validateCookieDomain()
+        if (
+            self.xsrf_cookie
+            and self.cookie_same_site == "none"
+            and not self.cookie_secure
+        ):
+            message = "SameSite none requires a secure XSRF cookie."
+            raise ValueError(message)
 
     def __validateEnabled(self) -> None:
-        """Validate that ``enabled`` is a boolean.
+        """
+        Validate that ``enabled`` is a boolean.
 
         Raises
         ------
@@ -176,7 +191,8 @@ class HTTPCsrf(BaseEntity):
             raise TypeError(error_msg)
 
     def __validateTokenLength(self) -> None:
-        """Validate that ``token_length`` is a plain integer >= 32.
+        """
+        Validate that ``token_length`` is a plain integer >= 32.
 
         Raises
         ------
@@ -193,20 +209,20 @@ class HTTPCsrf(BaseEntity):
         """
         # bool subclasses int; exclude it to prevent True/False being accepted
         if not isinstance(self.token_length, int) or isinstance(
-            self.token_length, bool,
+            self.token_length,
+            bool,
         ):
             error_msg = "Invalid type for 'token_length': expected an integer."
             raise TypeError(error_msg)
 
         # Enforce minimum entropy threshold: 32 bytes = 256 bits
-        if self.token_length < 32: # noqa: PLR2004
-            error_msg = (
-                "Invalid value for 'token_length': minimum 32 bytes (256 bits)."
-            )
+        if self.token_length < _MIN_TOKEN_LENGTH:
+            error_msg = "Invalid value for 'token_length': minimum 32 bytes (256 bits)."
             raise ValueError(error_msg)
 
     def __validateSessionKey(self) -> None:
-        """Validate that ``session_key`` is a non-empty string.
+        """
+        Validate that ``session_key`` is a non-empty string.
 
         Raises
         ------
@@ -219,14 +235,13 @@ class HTTPCsrf(BaseEntity):
             No value is returned; raises on invalid input.
         """
         # Empty keys would silently overwrite unrelated session entries
-        if not isinstance(self.session_key, str) or not self.session_key:
-            error_msg = (
-                "Invalid value for 'session_key': expected a non-empty string."
-            )
+        if not isinstance(self.session_key, str) or not self.session_key.strip():
+            error_msg = "Invalid value for 'session_key': expected a non-empty string."
             raise ValueError(error_msg)
 
     def __validateXsrfCookie(self) -> None:
-        """Validate that ``xsrf_cookie`` is a boolean.
+        """
+        Validate that ``xsrf_cookie`` is a boolean.
 
         Raises
         ------
@@ -244,27 +259,24 @@ class HTTPCsrf(BaseEntity):
             raise TypeError(error_msg)
 
     def __validateCookieName(self) -> None:
-        """Validate that ``cookie_name`` is a non-empty string.
+        """
+        Validate that ``cookie_name`` is acceptable by the response cookie serializer.
 
         Raises
         ------
         ValueError
-            If ``cookie_name`` is not a string or is an empty string.
+            If ``cookie_name`` is not valid.
 
         Returns
         -------
         None
             No value is returned; raises on invalid input.
         """
-        # An empty name would produce a malformed Set-Cookie header
-        if not isinstance(self.cookie_name, str) or not self.cookie_name:
-            error_msg = (
-                "Invalid value for 'cookie_name': expected a non-empty string."
-            )
-            raise ValueError(error_msg)
+        validate_cookie_name(self.cookie_name, "cookie_name")
 
     def __validateCookieSameSite(self) -> None:
-        """Validate that ``cookie_same_site`` is a recognised SameSite value.
+        """
+        Validate that ``cookie_same_site`` is a recognised SameSite value.
 
         Raises
         ------
@@ -279,15 +291,18 @@ class HTTPCsrf(BaseEntity):
         """
         # Only the three RFC-defined SameSite tokens are permitted
         valid = {"lax", "strict", "none"}
-        if self.cookie_same_site not in valid:
+        if (
+            not isinstance(self.cookie_same_site, str)
+            or self.cookie_same_site not in valid
+        ):
             error_msg = (
-                f"Invalid value for 'cookie_same_site': "
-                f"must be one of {valid!r}."
+                f"Invalid value for 'cookie_same_site': must be one of {valid!r}."
             )
             raise ValueError(error_msg)
 
     def __validateCookiePath(self) -> None:
-        """Validate that ``cookie_path`` is a string.
+        """
+        Validate that ``cookie_path`` is a string.
 
         Raises
         ------
@@ -305,7 +320,8 @@ class HTTPCsrf(BaseEntity):
             raise TypeError(error_msg)
 
     def __validateCookieDomain(self) -> None:
-        """Validate that ``cookie_domain`` is a string or ``None``.
+        """
+        Validate that ``cookie_domain`` is a string or ``None``.
 
         Raises
         ------
@@ -319,9 +335,8 @@ class HTTPCsrf(BaseEntity):
         """
         # None omits the Domain attribute from the Set-Cookie header
         if self.cookie_domain is not None and not isinstance(
-            self.cookie_domain, str,
+            self.cookie_domain,
+            str,
         ):
-            error_msg = (
-                "Invalid type for 'cookie_domain': expected a string or None."
-            )
+            error_msg = "Invalid type for 'cookie_domain': expected a string or None."
             raise TypeError(error_msg)

@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from orionis.auth.contracts.policy import IPolicy
 
 class Authorizer(IAuthorizer):
-    """Answer authorization questions for a given request context.
+    """
+    Answer authorization questions for a given request context.
 
     The authorizer never stores the current identity: every method takes
     the request context as its first argument. That keeps the service
@@ -30,7 +31,8 @@ class Authorizer(IAuthorizer):
     __slots__ = ("__app", "__registry")
 
     def __init__(self, app: IApplication) -> None:
-        """Initialise the authorizer with the application container.
+        """
+        Initialise the authorizer with the application container.
 
         Parameters
         ----------
@@ -47,7 +49,8 @@ class Authorizer(IAuthorizer):
         self.__registry = PolicyRegistry()
 
     def registry(self) -> PolicyRegistry:
-        """Return the policy registry backing this authorizer.
+        """
+        Return the policy registry backing this authorizer.
 
         Returns
         -------
@@ -57,7 +60,8 @@ class Authorizer(IAuthorizer):
         return self.__registry
 
     def registerPolicy(self, resource: type, policy: type[IPolicy]) -> None:
-        """Bind a policy class to a resource type.
+        """
+        Bind a policy class to a resource type.
 
         Parameters
         ----------
@@ -78,7 +82,8 @@ class Authorizer(IAuthorizer):
         context: IAuthenticationContext,
         permission: str,
     ) -> bool:
-        """Report whether the context grants a permission.
+        """
+        Report whether the context grants a permission.
 
         Parameters
         ----------
@@ -103,7 +108,8 @@ class Authorizer(IAuthorizer):
         context: IAuthenticationContext,
         permissions: Iterable[str],
     ) -> bool:
-        """Report whether the context grants at least one permission.
+        """
+        Report whether the context grants at least one permission.
 
         Parameters
         ----------
@@ -129,7 +135,8 @@ class Authorizer(IAuthorizer):
         context: IAuthenticationContext,
         permissions: Iterable[str],
     ) -> bool:
-        """Report whether the context grants every permission.
+        """
+        Report whether the context grants every permission.
 
         Parameters
         ----------
@@ -155,7 +162,8 @@ class Authorizer(IAuthorizer):
         context: IAuthenticationContext,
         role: str,
     ) -> bool:
-        """Report whether the context owns a role.
+        """
+        Report whether the context owns a role.
 
         Parameters
         ----------
@@ -180,7 +188,8 @@ class Authorizer(IAuthorizer):
         ability: str,
         resource: object,
     ) -> bool:
-        """Evaluate a policy ability against a concrete resource.
+        """
+        Evaluate a policy ability against a concrete resource.
 
         Parameters
         ----------

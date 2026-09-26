@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 class IAuthorizationSnapshot(ABC):
-    """Define the immutable authorization picture of a single request.
+    """
+    Define the immutable authorization picture of a single request.
 
     The snapshot is resolved at most once per request and answers every
     later ``can()`` call without touching the database again.
@@ -12,7 +13,8 @@ class IAuthorizationSnapshot(ABC):
     @property
     @abstractmethod
     def permissions(self) -> frozenset[str]:
-        """Return the permissions granted to the identity.
+        """
+        Return the permissions granted to the identity.
 
         Returns
         -------
@@ -24,7 +26,8 @@ class IAuthorizationSnapshot(ABC):
     @property
     @abstractmethod
     def roles(self) -> frozenset[str]:
-        """Return the role names assigned to the identity.
+        """
+        Return the role names assigned to the identity.
 
         Returns
         -------
@@ -35,7 +38,8 @@ class IAuthorizationSnapshot(ABC):
     @property
     @abstractmethod
     def abilities(self) -> frozenset[str] | None:
-        """Return the abilities restricting the current credential.
+        """
+        Return the abilities restricting the current credential.
 
         Returns
         -------
@@ -46,7 +50,8 @@ class IAuthorizationSnapshot(ABC):
 
     @abstractmethod
     def can(self, permission: str) -> bool:
-        """Report whether the effective authorization grants a permission.
+        """
+        Report whether the effective authorization grants a permission.
 
         Parameters
         ----------
@@ -62,7 +67,8 @@ class IAuthorizationSnapshot(ABC):
 
     @abstractmethod
     def hasRole(self, role: str) -> bool:
-        """Report whether the identity owns a role.
+        """
+        Report whether the identity owns a role.
 
         Parameters
         ----------

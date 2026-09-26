@@ -17,7 +17,8 @@ _ROLE_PERMISSIONS_TABLE: str = "role_has_permissions"
 _MAX_NAME_LENGTH: int = 255
 
 class PermissionRegistrar:
-    """Create permissions and roles, and attach them to identities.
+    """
+    Create permissions and roles, and attach them to identities.
 
     Database unique constraints decide concurrent insertions. Duplicate
     recovery uses a transaction or savepoint and verifies that the desired
@@ -35,7 +36,8 @@ class PermissionRegistrar:
     __slots__ = ("__db",)
 
     def __init__(self, db: IQueryBuilder) -> None:
-        """Initialise the registrar with the model-less query gateway.
+        """
+        Initialise the registrar with the model-less query gateway.
 
         Parameters
         ----------
@@ -50,7 +52,8 @@ class PermissionRegistrar:
         self.__db = db
 
     async def createPermission(self, name: str) -> object:
-        """Create a permission, or return the existing one.
+        """
+        Create a permission, or return the existing one.
 
         Parameters
         ----------
@@ -65,7 +68,8 @@ class PermissionRegistrar:
         return await self.__firstOrCreate(_PERMISSIONS_TABLE, name)
 
     async def createRole(self, name: str) -> object:
-        """Create a role, or return the existing one.
+        """
+        Create a role, or return the existing one.
 
         Parameters
         ----------
@@ -84,7 +88,8 @@ class PermissionRegistrar:
         authorizable: IAuthorizable,
         *permissions: str,
     ) -> None:
-        """Attach direct permissions to an identity.
+        """
+        Attach direct permissions to an identity.
 
         Parameters
         ----------
@@ -115,7 +120,8 @@ class PermissionRegistrar:
         authorizable: IAuthorizable,
         *permissions: str,
     ) -> None:
-        """Detach direct permissions from an identity.
+        """
+        Detach direct permissions from an identity.
 
         Parameters
         ----------
@@ -147,7 +153,8 @@ class PermissionRegistrar:
         authorizable: IAuthorizable,
         *roles: str,
     ) -> None:
-        """Attach roles to an identity.
+        """
+        Attach roles to an identity.
 
         Parameters
         ----------
@@ -178,7 +185,8 @@ class PermissionRegistrar:
         authorizable: IAuthorizable,
         *roles: str,
     ) -> None:
-        """Detach roles from an identity.
+        """
+        Detach roles from an identity.
 
         Parameters
         ----------
@@ -206,7 +214,8 @@ class PermissionRegistrar:
             )
 
     async def grantToRole(self, role: str, *permissions: str) -> None:
-        """Attach permissions to a role.
+        """
+        Attach permissions to a role.
 
         Parameters
         ----------
@@ -229,7 +238,8 @@ class PermissionRegistrar:
             )
 
     async def revokeFromRole(self, role: str, *permissions: str) -> None:
-        """Detach permissions from a role.
+        """
+        Detach permissions from a role.
 
         Parameters
         ----------
@@ -259,7 +269,8 @@ class PermissionRegistrar:
             )
 
     async def __findId(self, table: str, name: str) -> object | None:
-        """Return the identifier of a named permission or role.
+        """
+        Return the identifier of a named permission or role.
 
         Parameters
         ----------
@@ -281,7 +292,8 @@ class PermissionRegistrar:
         table: str,
         name: str,
     ) -> object:
-        """Return the identifier of a row, inserting it when missing.
+        """
+        Return the identifier of a row, inserting it when missing.
 
         The unique key decides concurrent insertions. A nested transaction
         rolls back a losing insert before the winning row is read, without
@@ -337,7 +349,8 @@ class PermissionRegistrar:
         return identifier
 
     async def __attach(self, table: str, values: dict[str, object]) -> None:
-        """Insert a pivot row, ignoring an already existing one.
+        """
+        Insert a pivot row, ignoring an already existing one.
 
         Parameters
         ----------

@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AccessToken:
-    """Describe a stored personal access token.
+    """
+    Describe a stored personal access token.
 
     The secret itself is never part of this entity, only the metadata
     needed to accept, restrict and audit the credential.
@@ -45,7 +46,8 @@ class AccessToken:
     revoked_at: datetime | None = None
 
     def toDict(self) -> dict[str, object]:
-        """Serialize token metadata without any usable credential material.
+        """
+        Serialize token metadata without any usable credential material.
 
         Returns
         -------

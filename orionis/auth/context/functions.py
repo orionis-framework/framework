@@ -8,7 +8,8 @@ from orionis.container.context.scope import ScopedContext
 _AUTH_LOCK = object()
 
 def authentication_lock() -> asyncio.Lock:
-    """Return the lock serializing authentication transitions in this scope.
+    """
+    Return the lock serializing authentication transitions in this scope.
 
     Returns
     -------
@@ -31,7 +32,8 @@ def authentication_lock() -> asyncio.Lock:
     return lock
 
 def current_auth_context() -> IAuthenticationContext:
-    """Return the authentication context bound to the current scope.
+    """
+    Return the authentication context bound to the current scope.
 
     The context lives in the container scope the HTTP kernel opens for
     every request, which is backed by ``contextvars``. Code running
@@ -54,7 +56,8 @@ def current_auth_context() -> IAuthenticationContext:
     return context
 
 def bind_auth_context(context: IAuthenticationContext) -> None:
-    """Bind an authentication context to the current scope.
+    """
+    Bind an authentication context to the current scope.
 
     Parameters
     ----------

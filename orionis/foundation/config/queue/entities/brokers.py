@@ -1,7 +1,10 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
+
 from orionis.foundation.config.queue.entities.database import Database
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True)
 class Brokers(BaseEntity):

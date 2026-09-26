@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -32,9 +32,7 @@ class Argon2(BaseEntity):
     threads: int = field(
         default_factory=lambda: Env.get("ARGON_THREADS", 4),
         metadata={
-            "description": (
-                "Degree of parallelism (lanes) used by Argon2id."
-            ),
+            "description": ("Degree of parallelism (lanes) used by Argon2id."),
             "default": 4,
         },
     )
@@ -42,9 +40,7 @@ class Argon2(BaseEntity):
     time: int = field(
         default_factory=lambda: Env.get("ARGON_TIME", 3),
         metadata={
-            "description": (
-                "Number of iterations (time cost) performed by Argon2id."
-            ),
+            "description": ("Number of iterations (time cost) performed by Argon2id."),
             "default": 3,
         },
     )
@@ -77,3 +73,8 @@ class Argon2(BaseEntity):
             if value < 1:
                 error_msg = f"The Argon2 '{name}' option must be at least 1."
                 raise ValueError(error_msg)
+
+        minimum_memory = 8 * self.threads
+        if self.memory < minimum_memory:
+            message = "Argon2 memory must be at least 8 KiB per thread."
+            raise ValueError(message)

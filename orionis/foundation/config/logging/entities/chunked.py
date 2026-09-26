@@ -1,11 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed level name set for O(1) membership checks.
-_LEVEL_NAMES: frozenset[str] = frozenset(lv.name for lv in Level)
 
 @dataclass(frozen=True, kw_only=True)
 class Chunked(BaseEntity):
@@ -32,7 +30,10 @@ class Chunked(BaseEntity):
     """
 
     path: str = field(
-        default="storage/logs/chunked_{suffix}.log",
+        default_factory=lambda: Env.get(
+            "LOG_PATH",
+            "storage/logs/chunked_{suffix}.log",
+        ),
         metadata={
             "description": "The file path where the log is stored.",
             "default": "storage/logs/chunked_{suffix}.log",
@@ -40,17 +41,17 @@ class Chunked(BaseEntity):
     )
 
     level: int | str | Level = field(
-        default=Level.INFO.value,
+        default_factory=lambda: Env.get("LOG_LEVEL", Level.INFO),
         metadata={
             "description": (
                 "The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)."
             ),
-            "default": Level.INFO.value,
+            "default": "INFO",
         },
     )
 
     mb_size: int = field(
-        default=10,
+        default_factory=lambda: Env.get("LOG_MB_SIZE", 10),
         metadata={
             "description": "Maximum size (in MB) of a log file before chunking.",
             "default": 10,
@@ -58,7 +59,7 @@ class Chunked(BaseEntity):
     )
 
     files: int = field(
-        default=5,
+        default_factory=lambda: Env.get("LOG_FILES", 5),
         metadata={
             "description": "Maximum number of log files to retain.",
             "default": 5,
@@ -99,18 +100,12 @@ class Chunked(BaseEntity):
         IsValidPath(self.path, suffix=True)
 
         # Validate 'level' using the IsValidLevel validator
-        IsValidLevel(self.level)
+        object.__setattr__(self, "level", IsValidLevel.normalize(self.level))
 
         # Normalise the level value to integer
-        if isinstance(self.level, Level):
-            object.__setattr__(self, "level", self.level.value)
-        elif isinstance(self.level, str):
-            _key = self.level.strip().upper()
-            if _key in _LEVEL_NAMES:
-                object.__setattr__(self, "level", Level[_key].value)
 
         # Validate 'mb_size' type and range
-        if not isinstance(self.mb_size, int):
+        if not isinstance(self.mb_size, int) or isinstance(self.mb_size, bool):
             error_msg = (
                 "'mb_size' must be an integer in MB, got "
                 f"{type(self.mb_size).__name__}."
@@ -125,15 +120,11 @@ class Chunked(BaseEntity):
             raise ValueError(error_msg)
 
         # Validate 'files' type and value
-        if not isinstance(self.files, int):
-            error_msg = (
-                "'files' must be an integer, got "
-                f"{type(self.files).__name__}."
-            )
+        if not isinstance(self.files, int) or isinstance(self.files, bool):
+            error_msg = f"'files' must be an integer, got {type(self.files).__name__}."
             raise TypeError(error_msg)
         if self.files < 1:
             error_msg = (
-                "'files' must be a positive integer greater than 0, got "
-                f"{self.files}."
+                f"'files' must be a positive integer greater than 0, got {self.files}."
             )
             raise ValueError(error_msg)

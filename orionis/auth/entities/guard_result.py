@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GuardResult:
-    """Carry what a guard learned about the incoming request.
+    """
+    Carry what a guard learned about the incoming request.
 
     Attributes
     ----------

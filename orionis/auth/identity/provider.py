@@ -24,7 +24,8 @@ _MAX_IDENTIFIER_LENGTH = 255
 _MAX_PASSWORD_LENGTH = 4096
 
 class ModelIdentityProvider(IIdentityProvider):
-    """Resolve identities from an Orionis model declared in configuration.
+    """
+    Resolve identities from an Orionis model declared in configuration.
 
     The model class is never imported at module load time. Its dotted
     path travels through ``config/auth.py``, which keeps the framework
@@ -48,7 +49,8 @@ class ModelIdentityProvider(IIdentityProvider):
     )
 
     def __init__(self, app: IApplication, hasher: IHashManager) -> None:
-        """Initialise the provider from the authentication configuration.
+        """
+        Initialise the provider from the authentication configuration.
 
         Parameters
         ----------
@@ -72,7 +74,8 @@ class ModelIdentityProvider(IIdentityProvider):
         self.__model: type[Model] | None = None
 
     def model(self) -> type[Model]:
-        """Return the model class backing the authenticated identity.
+        """
+        Return the model class backing the authenticated identity.
 
         Returns
         -------
@@ -113,7 +116,8 @@ class ModelIdentityProvider(IIdentityProvider):
         return resolved
 
     async def retrieveById(self, identifier: object) -> IAuthenticatable | None:
-        """Retrieve an identity by its primary key.
+        """
+        Retrieve an identity by its primary key.
 
         Parameters
         ----------
@@ -136,7 +140,8 @@ class ModelIdentityProvider(IIdentityProvider):
         return await model.query().where(primary_key, identifier).first()
 
     def __normalizeIdentifier(self, identifier: object) -> object | None:
-        """Restore a stored scalar key to the model column's native type.
+        """
+        Restore a stored scalar key to the model column's native type.
 
         Parameters
         ----------
@@ -171,7 +176,8 @@ class ModelIdentityProvider(IIdentityProvider):
         self,
         credentials: Mapping[str, object],
     ) -> IAuthenticatable | None:
-        """Retrieve an identity matching the public credential.
+        """
+        Retrieve an identity matching the public credential.
 
         Parameters
         ----------
@@ -191,12 +197,51 @@ class ModelIdentityProvider(IIdentityProvider):
         model = self.model()
         return await model.query().where(self.__username_field, username).first()
 
+    async def updateRememberToken(
+        self,
+        identity: IAuthenticatable,
+        expected: str | None,
+        token: str | None,
+    ) -> bool:
+        """
+        Compare and replace an identity's remember token atomically.
+
+        Parameters
+        ----------
+        identity : IAuthenticatable
+            Identity whose remember token should be updated.
+        expected : str | None
+            Current token expected in storage, or ``None`` if it is absent.
+        token : str | None
+            Replacement token, or ``None`` to revoke the current token.
+
+        Returns
+        -------
+        bool
+            True if exactly one eligible identity row was updated; otherwise,
+            False.
+        """
+        model = self.model()
+        if "remember_token" not in model.__meta__.columns:
+            return False
+        query = model.query().where(
+            identity.getAuthIdentifierName(), identity.getAuthIdentifier(),
+        ).where(identity.AUTH_PASSWORD, identity.getAuthPassword())
+        if expected is None:
+            query.whereNull("remember_token")
+        else:
+            query.where("remember_token", expected)
+        if token is not None:
+            query.where("active", True)  # noqa: FBT003 (SQL value)
+        return await query.update({"remember_token": token}) == 1
+
     async def validateCredentials(
         self,
         identity: IAuthenticatable | None,
         credentials: Mapping[str, object],
     ) -> bool:
-        """Verify the submitted password against the stored hash.
+        """
+        Verify the submitted password against the stored hash.
 
         The hashing module burns its cost on a worker thread, so the event
         loop stays free. Unknown identities still perform password hashing

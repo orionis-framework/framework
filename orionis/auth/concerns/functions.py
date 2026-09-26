@@ -6,7 +6,8 @@ _FALLBACK_PRIMARY_KEY: str = "id"
 _MAX_KEY_LENGTH: int = 255
 
 def authorizable_key(identity: object) -> tuple[str, str]:
-    """Normalize a persisted identity's polymorphic authorization key.
+    """
+    Normalize a persisted identity's polymorphic authorization key.
 
     Parameters
     ----------
@@ -44,7 +45,8 @@ def authorizable_key(identity: object) -> tuple[str, str]:
     return kind, key
 
 def model_primary_key(instance: object) -> str:
-    """Return the primary key attribute of a model instance.
+    """
+    Return the primary key attribute of a model instance.
 
     The lookup is duck typed on purpose: the authentication module must
     never import the ORM model class, so it only reads the metadata the

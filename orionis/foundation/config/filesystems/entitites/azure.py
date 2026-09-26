@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -15,7 +16,7 @@ class Azure(BaseEntity):
     Parameters
     ----------
     driver : str, default="azure"
-        The filesystem driver type. Default is "azure".
+        The filesystem driver name resolved by StorageManager.
     connection_string : str
         Azure storage connection string. When provided, it takes
         precedence over the account name and key.
@@ -99,8 +100,13 @@ class Azure(BaseEntity):
         ------
         TypeError
             If any attribute is of the wrong type.
+        ValueError
+            If the driver name is empty.
         """
         super().__post_init__()
+
+        # Driver names are resolved by StorageManager, including extensions.
+        validate_string(self.driver, "driver")
 
         # Validate `connection_string` attribute type
         if not isinstance(self.connection_string, str):

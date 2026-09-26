@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from orionis.auth.entities.new_access_token import NewAccessToken
 
 class IAuthManager(ABC):
-    """Define the public entry point of the authentication module.
+    """
+    Define the public entry point of the authentication module.
 
     The manager holds no per request state. Every call reads the
     authentication context from the container scope opened for the
@@ -24,7 +25,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def context(self) -> IAuthenticationContext:
-        """Return the authentication context of the current request.
+        """
+        Return the authentication context of the current request.
 
         Returns
         -------
@@ -35,7 +37,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def user(self) -> IAuthenticatable | None:
-        """Return the identity authenticated for the current request.
+        """
+        Return the identity authenticated for the current request.
 
         Returns
         -------
@@ -45,7 +48,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def identifier(self) -> object | None:
-        """Return the identifier of the authenticated identity.
+        """
+        Return the identifier of the authenticated identity.
 
         Returns
         -------
@@ -55,7 +59,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def check(self) -> bool:
-        """Report whether the current request is authenticated.
+        """
+        Report whether the current request is authenticated.
 
         Returns
         -------
@@ -65,7 +70,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def guest(self) -> bool:
-        """Report whether the current request is anonymous.
+        """
+        Report whether the current request is anonymous.
 
         Returns
         -------
@@ -75,7 +81,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def guard(self, name: str | None = None) -> IGuard:
-        """Return a configured guard by name.
+        """
+        Return a configured guard by name.
 
         Parameters
         ----------
@@ -94,13 +101,18 @@ class IAuthManager(ABC):
         """
 
     @abstractmethod
-    async def attempt(self, credentials: Mapping[str, object]) -> bool:
-        """Authenticate the current request from submitted credentials.
+    async def attempt(
+        self, credentials: Mapping[str, object], *, remember: bool = False,
+    ) -> bool:
+        """
+        Authenticate the current request from submitted credentials.
 
         Parameters
         ----------
         credentials : Mapping[str, object]
             Submitted credentials, typically username and password.
+        remember : bool, optional
+            Keep the browser signed in using a revocable persistent credential.
 
         Returns
         -------
@@ -110,7 +122,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def login(self, identity: IAuthenticatable) -> None:
-        """Authenticate an identity without verifying credentials.
+        """
+        Authenticate an identity without verifying credentials.
 
         Parameters
         ----------
@@ -125,7 +138,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def logout(self) -> None:
-        """Drop the authenticated state of the current request.
+        """
+        Drop the authenticated state of the current request.
 
         Returns
         -------
@@ -135,7 +149,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def authorization(self) -> IAuthorizationSnapshot:
-        """Return the effective authorization snapshot of the request.
+        """
+        Return the effective authorization snapshot of the request.
 
         Returns
         -------
@@ -145,7 +160,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def can(self, permission: str) -> bool:
-        """Report whether the current request grants a permission.
+        """
+        Report whether the current request grants a permission.
 
         Parameters
         ----------
@@ -160,7 +176,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def cannot(self, permission: str) -> bool:
-        """Report whether the current request lacks a permission.
+        """
+        Report whether the current request lacks a permission.
 
         Parameters
         ----------
@@ -175,7 +192,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def canAny(self, permissions: Iterable[str]) -> bool:
-        """Report whether at least one permission is granted.
+        """
+        Report whether at least one permission is granted.
 
         Parameters
         ----------
@@ -190,7 +208,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def canAll(self, permissions: Iterable[str]) -> bool:
-        """Report whether every permission is granted.
+        """
+        Report whether every permission is granted.
 
         Parameters
         ----------
@@ -205,7 +224,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def hasRole(self, role: str) -> bool:
-        """Report whether the identity owns a role.
+        """
+        Report whether the identity owns a role.
 
         Parameters
         ----------
@@ -220,7 +240,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def authorize(self, permission: str) -> None:
-        """Require a permission or abort the current operation.
+        """
+        Require a permission or abort the current operation.
 
         Parameters
         ----------
@@ -242,7 +263,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def allows(self, ability: str, resource: object) -> bool:
-        """Evaluate a policy ability against a resource.
+        """
+        Evaluate a policy ability against a resource.
 
         Parameters
         ----------
@@ -259,7 +281,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def denies(self, ability: str, resource: object) -> bool:
-        """Report whether a policy ability is denied for a resource.
+        """
+        Report whether a policy ability is denied for a resource.
 
         Parameters
         ----------
@@ -276,7 +299,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def authorizeResource(self, ability: str, resource: object) -> None:
-        """Require a policy ability or abort the current operation.
+        """
+        Require a policy ability or abort the current operation.
 
         Parameters
         ----------
@@ -300,7 +324,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     def registerPolicy(self, resource: type, policy: type[IPolicy]) -> None:
-        """Bind a policy class to a resource type.
+        """
+        Bind a policy class to a resource type.
 
         Parameters
         ----------
@@ -324,7 +349,8 @@ class IAuthManager(ABC):
         abilities: Iterable[str] | None = None,
         expires_at: datetime | None = None,
     ) -> NewAccessToken:
-        """Issue a personal access token.
+        """
+        Issue a personal access token.
 
         Parameters
         ----------
@@ -354,7 +380,8 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def revokeCurrentToken(self) -> bool:
-        """Revoke the presented token and clear this request's identity.
+        """
+        Revoke the presented token and clear this request's identity.
 
         Returns
         -------

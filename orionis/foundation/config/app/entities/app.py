@@ -1,13 +1,15 @@
-from __future__ import annotations
+import base64
 from dataclasses import dataclass, field
-from orionis.foundation.config.app.enums import Cipher, Environments
-from orionis.environment.facade import Env
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from orionis.environment import Env
 from orionis.environment.key.key_generator import SecureKeyGenerator
+from orionis.foundation.config.app.enums import Cipher, Environments
+from orionis.foundation.config.validation import (
+    normalize_enum,
+    validate_boolean,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed membership sets
-_ENV_NAMES: frozenset[str] = frozenset(Environments._member_names_)
-_CIPHER_NAMES: frozenset[str] = frozenset(Cipher._member_names_)
 
 @dataclass(frozen=True, kw_only=True)
 class App(BaseEntity):
@@ -34,13 +36,11 @@ class App(BaseEntity):
         'resources/lang/'.
     cipher : str | Cipher, optional
         The cipher used for encryption. Default is 'AES_256_CBC'.
-    key : str | None, optional
-        The encryption key for the application. Default is None.
-    maintenance : str, optional
-        The maintenance route for the application. Default is '/maintenance'.
+    key : str | bytes | None, optional
+        The encryption key, normalized to bytes. None generates a persistent key.
+    maintenance : bool, optional
+        Whether maintenance mode is enabled. Default is False.
     """
-
-    # ruff: noqa: PLR0912, C901, PLR0915
 
     name: str = field(
         default_factory=lambda: Env.get("APP_NAME", "Orionis Application"),
@@ -56,16 +56,16 @@ class App(BaseEntity):
         metadata={
             "description": "The environment in which the application is running. "
             "Defaults to 'DEVELOPMENT'.",
-            "default": Environments.DEVELOPMENT.value,
+            "default": "development",
         },
     )
 
     debug: bool = field(
-        default_factory=lambda: Env.get("APP_DEBUG", False),
+        default_factory=lambda: Env.get("APP_DEBUG", True),
         metadata={
             "description": "Flag indicating whether debug mode is enabled. "
-            "Defaults to False.",
-            "default": False,
+            "Defaults to True.",
+            "default": True,
         },
     )
 
@@ -106,17 +106,15 @@ class App(BaseEntity):
     cipher: str | Cipher = field(
         default_factory=lambda: Env.get("APP_CIPHER", Cipher.AES_256_CBC.value),
         metadata={
-            "description": "The cipher used for encryption. Defaults to "
-            "'AES_256_CBC'.",
-            "default": Cipher.AES_256_CBC.value,
+            "description": "The cipher used for encryption. Defaults to 'AES_256_CBC'.",
+            "default": "AES-256-CBC",
         },
     )
 
-    key: str | None = field(
+    key: str | bytes | None = field(
         default_factory=lambda: Env.get("APP_KEY"),
         metadata={
-            "description": "The encryption key for the application. "
-            "Defaults to None.",
+            "description": "The encryption key for the application. Defaults to None.",
             "default": None,
         },
     )
@@ -129,118 +127,72 @@ class App(BaseEntity):
         },
     )
 
-    def __post_init__(self) -> None:  # NOSONAR
-        """
-        Validate and normalize attributes after dataclass initialization.
-
-        Validates and normalizes all configuration fields, ensuring correct types
-        and valid values. Raises exceptions if any field is invalid.
-
-        Parameters
-        ----------
-        self : App
-            The App instance being initialized.
+    def __post_init__(self) -> None:
+        """Validate application options and normalize their values.
 
         Returns
         -------
         None
-            This method does not return a value.
-
-        Raises
-        ------
-        TypeError
-            If any attribute does not meet the required type constraints.
-        ValueError
-            If any attribute does not meet the required value constraints.
+            Complete validation and normalization in place.
         """
         super().__post_init__()
 
-        # Validate `name` attribute
-        if not isinstance(self.name, (str, Environments)) or not str(self.name).strip():
-            error_msg = (
-                "The 'name' attribute must be a non-empty string or an "
-                "Environments instance."
-            )
-            raise TypeError(error_msg)
+        # Validate scalar options before normalizing enum-backed values.
+        for name in ("name", "timezone", "locale", "fallback_locale", "language_path"):
+            validate_string(getattr(self, name), name)
+        validate_boolean(self.debug, "debug")
+        validate_boolean(self.maintenance, "maintenance")
 
-        # Validate `env` attribute using pre-cached frozenset
-        if isinstance(self.env, str):
-            _value = self.env.strip().upper()
-            if _value in _ENV_NAMES:
-                object.__setattr__(self, "env", Environments[_value].value)
-            else:
-                error_msg = (
-                    f"Invalid env value: {self.env}. Must be one of "
-                    f"{sorted(_ENV_NAMES)!s}."
+        # Store enum configuration as its canonical enum values.
+        object.__setattr__(self, "env", normalize_enum(self.env, Environments, "env"))
+        object.__setattr__(
+            self,
+            "cipher",
+            normalize_enum(self.cipher, Cipher, "cipher"),
+        )
+
+        # Reject timezones that the standard library cannot resolve.
+        try:
+            ZoneInfo(self.timezone)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            message = "'timezone' must identify a valid timezone."
+            raise ValueError(message) from exc
+
+        self.__validateKey()
+
+    def __validateKey(self) -> None:
+        """Validate and normalize the encryption key for cipher consumers.
+
+        Returns
+        -------
+        None
+            Store the validated key as bytes and persist generated keys.
+        """
+        # Generate a key only when the configuration does not provide one.
+        generated = self.key is None
+        key = SecureKeyGenerator.generate(self.cipher) if generated else self.key
+        if not isinstance(key, (bytes, str)) or not key:
+            message = "The 'key' attribute must be non-empty bytes or a string."
+            raise TypeError(message)
+        if isinstance(key, str):
+            # Decode the framework's explicit base64 key representation.
+            try:
+                raw_key = (
+                    base64.b64decode(key[7:], validate=True)
+                    if key.startswith("base64:")
+                    else key.encode("utf-8")
                 )
-                raise ValueError(error_msg)
-        elif isinstance(self.env, Environments):
-            object.__setattr__(self, "env", self.env.value)
+            except ValueError as exc:
+                message = "The 'key' attribute contains invalid base64."
+                raise ValueError(message) from exc
         else:
-            error_msg = (
-                "The 'env' attribute must be a string or Environments instance."
-            )
-            raise TypeError(error_msg)
+            raw_key = key
 
-        # Validate `debug` attribute
-        if not isinstance(self.debug, bool):
-            error_msg = "The 'debug' attribute must be a boolean."
-            raise TypeError(error_msg)
-
-        # Validate `timezone` attribute
-        if not isinstance(self.timezone, str) or not self.timezone.strip():
-            error_msg = "The 'timezone' attribute must be a non-empty string."
-            raise TypeError(error_msg)
-
-        # Validate `locale` attribute
-        if not isinstance(self.locale, str) or not self.locale.strip():
-            error_msg = "The 'locale' attribute must be a non-empty string."
-            raise TypeError(error_msg)
-
-        # Validate `fallback_locale` attribute
-        if (
-            not isinstance(self.fallback_locale, str)
-            or not self.fallback_locale.strip()
-        ):
-            error_msg = "The 'fallback_locale' attribute must be a non-empty string."
-            raise TypeError(error_msg)
-
-        # Validate `language_path` attribute
-        if not isinstance(self.language_path, str) or not self.language_path.strip():
-            error_msg = "The 'language_path' attribute must be a non-empty string."
-            raise TypeError(error_msg)
-
-        # Validate `cipher` attribute using pre-cached frozenset
-        if not isinstance(self.cipher, (Cipher, str)):
-            error_msg = "The 'cipher' attribute must be a Cipher or a string."
-            raise TypeError(error_msg)
-
-        if isinstance(self.cipher, str):
-            _value = self.cipher.strip().upper().replace("-", "_")
-            if _value in _CIPHER_NAMES:
-                object.__setattr__(self, "cipher", Cipher[_value].value)
-            else:
-                error_msg = (
-                    f"Invalid cipher value: {self.cipher}. Must be one of "
-                    f"{sorted(_CIPHER_NAMES)}."
-                )
-                raise ValueError(error_msg)
-        elif isinstance(self.cipher, Cipher):
-            object.__setattr__(self, "cipher", self.cipher.value)
-
-        # Validate `key` attribute
-        if self.key is None:
-            # Generate and set a secure key if not provided
-            generated_key = SecureKeyGenerator.generate()
-            object.__setattr__(self, "key", generated_key)
-            Env.set("APP_KEY", generated_key)
-        if not isinstance(self.key, (bytes, str)) or not str(self.key).strip():
-            error_msg = (
-                "The 'key' attribute must be a non-empty string or bytes."
-            )
-            raise TypeError(error_msg)
-
-        # Validate `maintenance` attribute
-        if not isinstance(self.maintenance, bool):
-            error_msg = "The 'maintenance' attribute must be a boolean."
-            raise TypeError(error_msg)
+        # Enforce the exact key length required by the selected cipher.
+        required_size = SecureKeyGenerator.KEY_SIZES[Cipher(self.cipher)]
+        if len(raw_key) != required_size:
+            message = f"The configured cipher requires a {required_size}-byte key."
+            raise ValueError(message)
+        if generated:
+            Env.set("APP_KEY", key)
+        object.__setattr__(self, "key", raw_key)

@@ -4,7 +4,8 @@ from orionis.auth.contracts.policy import IPolicy
 _MISSING: object = object()
 
 class PolicyRegistry:
-    """Map resource classes to the policy classes protecting them.
+    """
+    Map resource classes to the policy classes protecting them.
 
     Lookups walk the method resolution order once and memoise the result,
     so an inherited policy costs a single dictionary read after the first
@@ -20,7 +21,8 @@ class PolicyRegistry:
     __slots__ = ("__lookup", "__policies")
 
     def __init__(self) -> None:
-        """Initialise an empty registry.
+        """
+        Initialise an empty registry.
 
         Returns
         -------
@@ -31,7 +33,8 @@ class PolicyRegistry:
         self.__lookup: dict[type, type[IPolicy] | None] = {}
 
     def register(self, resource: type, policy: type[IPolicy]) -> None:
-        """Bind a policy class to a resource class.
+        """
+        Bind a policy class to a resource class.
 
         Parameters
         ----------
@@ -63,7 +66,8 @@ class PolicyRegistry:
         self.__lookup.clear()
 
     def policyFor(self, resource: type) -> type[IPolicy] | None:
-        """Return the policy protecting a resource class.
+        """
+        Return the policy protecting a resource class.
 
         Parameters
         ----------
@@ -92,7 +96,8 @@ class PolicyRegistry:
         return resolved
 
     def bindings(self) -> dict[type, type[IPolicy]]:
-        """Return a copy of the registered resource to policy bindings.
+        """
+        Return a copy of the registered resource to policy bindings.
 
         Returns
         -------

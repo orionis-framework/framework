@@ -1,11 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed level name set: used below to avoid try/except KeyError as flow control.
-_LEVEL_NAMES: frozenset[str] = frozenset(lv.name for lv in Level)
 
 @dataclass(frozen=True, kw_only=True)
 class Stack(BaseEntity):
@@ -28,7 +26,7 @@ class Stack(BaseEntity):
     """
 
     path: str = field(
-        default="storage/logs/stack.log",
+        default_factory=lambda: Env.get("LOG_PATH", "storage/logs/stack.log"),
         metadata={
             "description": "The file path where the log is stored.",
             "default": "storage/logs/stack.log",
@@ -36,58 +34,24 @@ class Stack(BaseEntity):
     )
 
     level: int | str | Level = field(
-        default=Level.INFO.value,
+        default_factory=lambda: Env.get("LOG_LEVEL", Level.INFO),
         metadata={
             "description": (
                 "The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)."
             ),
-            "default": Level.INFO.value,
+            "default": "INFO",
         },
     )
 
     def __post_init__(self) -> None:
         """
-        Validate the 'path' and 'level' attributes after dataclass initialization.
+        Validate the log path and normalize the configured level.
 
         Raises
         ------
         ValueError
-            If 'path' is not a non-empty string, or if 'level' is not a valid type
-            or value.
-        TypeError
-            If 'level' is of an unsupported type.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
+            If the log path is invalid.
         """
-        # Call the superclass's __post_init__ method.
         super().__post_init__()
-
-        # Validate 'path' using the IsValidPath validator.
-        try:
-            IsValidPath(self.path)
-        except Exception as e:
-            error_msg = f"Invalid path: {self.path}"
-            raise ValueError(error_msg) from e
-
-        # Validate 'level' using the IsValidLevel validator.
-        try:
-            IsValidLevel(self.level)
-        except TypeError as e:
-            error_msg = f"Invalid type for level: {self.level}"
-            raise TypeError(error_msg) from e
-        except Exception as e:
-            error_msg = f"Invalid value for level: {self.level}"
-            raise ValueError(error_msg) from e
-
-        # Normalise the level value to its integer representation.
-        if isinstance(self.level, Level):
-            object.__setattr__(self, "level", self.level.value)
-        elif isinstance(self.level, str):
-            _key = self.level.strip().upper()
-            if _key not in _LEVEL_NAMES:
-                error_msg = f"Invalid level string: {self.level}"
-                raise ValueError(error_msg)
-            object.__setattr__(self, "level", Level[_key].value)
+        IsValidPath(self.path)
+        object.__setattr__(self, "level", IsValidLevel.normalize(self.level))

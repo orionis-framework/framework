@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 
 class IAuthenticationContext(ABC):
-    """Define the authenticated state bound to a single request.
+    """
+    Define the authenticated state bound to a single request.
 
     The context is never stored on a singleton. It lives in the container
     scope opened by the HTTP kernel, so two concurrent requests can never
@@ -18,7 +19,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def identity(self) -> IAuthenticatable | None:
-        """Return the authenticated identity of the request.
+        """
+        Return the authenticated identity of the request.
 
         Returns
         -------
@@ -29,7 +31,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def guard(self) -> str | None:
-        """Return the name of the guard that resolved the identity.
+        """
+        Return the name of the guard that resolved the identity.
 
         Returns
         -------
@@ -40,7 +43,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def abilities(self) -> frozenset[str] | None:
-        """Return the abilities carried by the presented credential.
+        """
+        Return the abilities carried by the presented credential.
 
         Returns
         -------
@@ -52,7 +56,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def credentialId(self) -> object | None:
-        """Return the identifier of the credential that authenticated.
+        """
+        Return the identifier of the credential that authenticated.
 
         Returns
         -------
@@ -64,7 +69,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def isAuthenticated(self) -> bool:
-        """Report whether the request carries an authenticated identity.
+        """
+        Report whether the request carries an authenticated identity.
 
         Returns
         -------
@@ -75,7 +81,8 @@ class IAuthenticationContext(ABC):
     @property
     @abstractmethod
     def isGuest(self) -> bool:
-        """Report whether the request is anonymous.
+        """
+        Report whether the request is anonymous.
 
         Returns
         -------
@@ -85,7 +92,8 @@ class IAuthenticationContext(ABC):
 
     @abstractmethod
     def identifier(self) -> object | None:
-        """Return the unique identifier of the authenticated identity.
+        """
+        Return the unique identifier of the authenticated identity.
 
         Returns
         -------
@@ -95,7 +103,8 @@ class IAuthenticationContext(ABC):
 
     @abstractmethod
     async def authorization(self) -> IAuthorizationSnapshot:
-        """Return the effective authorization snapshot of the request.
+        """
+        Return the effective authorization snapshot of the request.
 
         The snapshot is built at most once and reused by every later
         authorization check performed during the same request.

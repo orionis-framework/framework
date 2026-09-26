@@ -1,18 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.foundation.config.scheduler import (
-    Scheduler,
-    Database,
-    Drivers,
-    Memory,
-    Redis,
-    Stores,
-)
 from orionis.environment import Env
+from orionis.foundation.config.scheduler import (
+    Database, Drivers, Memory, Redis, Scheduler, Stores,
+)
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapScheduler(Scheduler):
-
     # ----------------------------------------------------------------------------------
     # store : Drivers | str, optional
     # --- The default task store used by the task scheduler.
@@ -28,34 +22,31 @@ class BootstrapScheduler(Scheduler):
     # ----------------------------------------------------------------------------------
     stores: Stores | dict = field(
         default_factory=lambda: Stores(
-
             # --------------------------------------------------------------------------
-            # In-memory task store (default driver, process-scoped)
+            # memory : Memory, optional
+            # --- In-memory task store (default driver, process-scoped).
             # --------------------------------------------------------------------------
             memory=Memory(),
-
             # --------------------------------------------------------------------------
-            # Redis task store
+            # redis : Redis, optional
+            # --- Redis task store.
             # --------------------------------------------------------------------------
             redis=Redis(
                 host=Env.get("REDIS_HOST", "localhost"),
                 port=Env.get("REDIS_PORT", 6379),
                 db=Env.get("REDIS_DB", 0),
                 password=Env.get("REDIS_PASSWORD", None),
-                key=Env.get("TASKS_REDIS_KEY", "scheduler:tasks"),
-                run_times_key=Env.get(
-                    "TASKS_REDIS_RUN_TIMES_KEY", "scheduler:run_times",
-                ),
+                key=Env.get("REDIS_TASKS_KEY", "scheduler:tasks"),
+                run_times_key=Env.get("REDIS_RUN_TIMES_KEY", "scheduler:run_times"),
             ),
-
             # --------------------------------------------------------------------------
-            # Database task store
+            # database : Database, optional
+            # --- Database task store.
             # --------------------------------------------------------------------------
             database=Database(
-                connection=Env.get("DB_TASK_CONNECTION"),
+                connection=Env.get("DB_TASK_CONNECTION", None),
                 table=Env.get("DB_TASK_TABLE", "scheduler_tasks"),
             ),
-
         ),
     )
 
@@ -79,12 +70,12 @@ class BootstrapScheduler(Scheduler):
     )
 
     # ----------------------------------------------------------------------------------
-    # misfire_grace_time : int, optional
+    # misfire_grace_time : int | None, optional
     # --- Number of seconds a task is allowed to run late before it is
     # --- considered misfired.
     # --- Defaults to the TASKS_MISFIRE_GRACE_TIME env var or 30.
     # ----------------------------------------------------------------------------------
-    misfire_grace_time: int = field(
+    misfire_grace_time: int | None = field(
         default_factory=lambda: Env.get("TASKS_MISFIRE_GRACE_TIME", 30),
     )
 
@@ -110,4 +101,3 @@ class BootstrapScheduler(Scheduler):
     jitter: int = field(
         default_factory=lambda: Env.get("TASKS_JITTER", 0),
     )
-

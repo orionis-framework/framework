@@ -18,7 +18,8 @@ if TYPE_CHECKING:
 _REDIRECT_STATUS: int = 302
 
 class AuthenticateMiddleware(ResolveIdentityMiddleware):
-    """Require an authenticated identity before reaching the controller.
+    """
+    Require an authenticated identity before reaching the controller.
 
     Guests never reach the route handler. Browsers are redirected to the
     page declared in ``auth.session.redirect_to`` when one is configured,
@@ -45,7 +46,8 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         manager: IAuthManager,
         permissions: IPermissionRepository,
     ) -> None:
-        """Initialise the middleware with its collaborators.
+        """
+        Initialise the middleware with its collaborators.
 
         Parameters
         ----------
@@ -69,7 +71,8 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         request: Request,
         call_next: NextCallable,
     ) -> Response:
-        """Reject anonymous requests and continue authenticated ones.
+        """
+        Reject anonymous requests and continue authenticated ones.
 
         Parameters
         ----------
@@ -102,7 +105,8 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         return response
 
     def _unauthenticated(self, request: Request) -> Response:
-        """Build the answer given to an anonymous request.
+        """
+        Build the answer given to an anonymous request.
 
         Parameters
         ----------

@@ -1,16 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.session.enums import SameSitePolicy
 from orionis.foundation.config.session.enums.drivers import SessionDriver
-from orionis.environment.facade import Env
+from orionis.foundation.config.validation import validate_cookie_name
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozensets enable O(1) membership tests at validation time.
 _SAME_SITE_VALUES: frozenset[str] = frozenset(p.value for p in SameSitePolicy)
 _DRIVER_VALUES: frozenset[str] = frozenset(d.value for d in SessionDriver)
-
-# Characters forbidden inside a cookie name per RFC 6265 §4.1.1.
-_INVALID_COOKIE_CHARS: frozenset[str] = frozenset(" ;,")
 
 @dataclass(frozen=True, kw_only=True)
 class Session(BaseEntity):
@@ -58,7 +56,7 @@ class Session(BaseEntity):
         default_factory=lambda: Env.get("SESSION_DRIVER", SessionDriver.MEMORY),
         metadata={
             "description": "Session driver.",
-            "default": SessionDriver.MEMORY.value,
+            "default": "memory",
         },
     )
 
@@ -89,7 +87,7 @@ class Session(BaseEntity):
 
     # Database-driver: connection name used to persist session records.
     connection: str | None = field(
-        default_factory=lambda: Env.get("DB_CONNECTION"),
+        default_factory=lambda: Env.get("SESSION_DB_CONNECTION"),
         metadata={
             "description": "Database connection for session storage.",
             "default": None,
@@ -98,7 +96,7 @@ class Session(BaseEntity):
 
     # Database-driver: table name used to persist session records.
     table: str | None = field(
-        default_factory=lambda: Env.get("SESSION_TABLE", "sessions"),
+        default_factory=lambda: Env.get("SESSION_DB_TABLE", "sessions"),
         metadata={
             "description": "Database table for session storage.",
             "default": "sessions",
@@ -107,7 +105,7 @@ class Session(BaseEntity):
 
     # Cache-driver: named cache store used to persist session records.
     cache: str | None = field(
-        default_factory=lambda: Env.get("CACHE_STORE"),
+        default_factory=lambda: Env.get("SESSION_CACHE_STORE"),
         metadata={
             "description": "Cache store for session storage.",
             "default": None,
@@ -158,7 +156,7 @@ class Session(BaseEntity):
         default_factory=lambda: Env.get("SESSION_SAME_SITE", SameSitePolicy.LAX.value),
         metadata={
             "description": "SameSite cookie policy.",
-            "default": SameSitePolicy.LAX.value,
+            "default": "lax",
         },
     )
 
@@ -205,8 +203,7 @@ class Session(BaseEntity):
             normalized = self.driver.lower().strip()
             if normalized not in _DRIVER_VALUES:
                 error_msg = (
-                    "driver must be one of: "
-                    f"{', '.join(sorted(_DRIVER_VALUES))}"
+                    f"driver must be one of: {', '.join(sorted(_DRIVER_VALUES))}"
                 )
                 raise ValueError(error_msg)
             object.__setattr__(self, "driver", SessionDriver(normalized))
@@ -218,37 +215,21 @@ class Session(BaseEntity):
 
     def __validateCookie(self) -> None:
         """
-        Validate the *cookie* name field.
+        Validate the *cookie* field.
 
-        Ensure the name is a non-empty string that contains no
-        characters forbidden by RFC 6265 (spaces, semicolons, commas).
-
-        Parameters
-        ----------
-        self : Session
-            The Session instance being validated.
+        The cookie name must conform to the restrictions imposed by RFC 6265.
 
         Returns
         -------
         None
-            No value is returned.
+            This method performs validation and returns None.
 
         Raises
         ------
         ValueError
-            If the name is empty or contains forbidden characters.
+            If the cookie name is invalid.
         """
-        # Cookie name must be a non-empty string.
-        if not isinstance(self.cookie, str) or not self.cookie.strip():
-            error_msg = "cookie must be a non-empty string"
-            raise ValueError(error_msg)
-
-        # Reject characters that would break the Set-Cookie header.
-        if any(c in _INVALID_COOKIE_CHARS for c in self.cookie):
-            error_msg = (
-                "cookie must not contain spaces, semicolons, or commas"
-            )
-            raise ValueError(error_msg)
+        validate_cookie_name(self.cookie, "cookie")
 
     def __validateLifetime(self) -> None:
         """
@@ -275,7 +256,7 @@ class Session(BaseEntity):
             If *lifetime* is not strictly greater than zero.
         """
         # Guard against floats or other numeric types from env parsing.
-        if not isinstance(self.lifetime, int):
+        if not isinstance(self.lifetime, int) or isinstance(self.lifetime, bool):
             error_msg = "lifetime must be a positive integer"
             raise TypeError(error_msg)
 
@@ -353,8 +334,7 @@ class Session(BaseEntity):
             normalized = self.same_site.lower().strip()
             if normalized not in _SAME_SITE_VALUES:
                 error_msg = (
-                    "same_site must be one of: "
-                    f"{', '.join(sorted(_SAME_SITE_VALUES))}"
+                    f"same_site must be one of: {', '.join(sorted(_SAME_SITE_VALUES))}"
                 )
                 raise ValueError(error_msg)
             object.__setattr__(self, "same_site", normalized)
@@ -582,11 +562,12 @@ class Session(BaseEntity):
         self.__validateLifetime()
         self.__validateBooleans()
         self.__validateSameSite()
+        if self.same_site == "none" and not self.secure:
+            message = "SameSite none requires a secure session cookie."
+            raise ValueError(message)
         self.__validatePath()
         self.__validateDomain()
         self.__validateFiles()
         self.__validateConnection()
         self.__validateTable()
         self.__validateCache()
-
-

@@ -18,7 +18,7 @@ class CreateUsersTable(Migration):
             table.string("email", 255).unique().comment("Email Address")
             table.dateTime("email_verified_at").nullable().comment("Email Verification Timestamp")
             table.string("password", 255).comment("Hashed Password")
-            table.string("remember_token", 100).nullable().comment("Remember Me Token")
+            table.string("remember_token", 100).nullable().comment("Expiring Remember Me Token Digest")
             table.boolean("active").default(value=True).comment("Active Status")
             table.timestamps()
 

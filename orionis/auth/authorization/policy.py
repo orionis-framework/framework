@@ -1,7 +1,8 @@
 from orionis.auth.contracts.policy import IPolicy
 
 class Policy(IPolicy):
-    """Base class for resource policies.
+    """
+    Base class for resource policies.
 
     Subclasses declare one method per ability. Every ability receives the
     authenticated identity first and the resource second. Methods may be
@@ -19,7 +20,8 @@ class Policy(IPolicy):
     __slots__ = ()
 
     async def before(self, identity: object, ability: str) -> bool | None:  # noqa: ARG002
-        """Short circuit the policy before the ability method runs.
+        """
+        Short circuit the policy before the ability method runs.
 
         The default implementation never short circuits. Override it to
         grant every ability to a super administrator, for instance.

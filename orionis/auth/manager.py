@@ -34,7 +34,8 @@ if TYPE_CHECKING:
     from orionis.auth.entities.new_access_token import NewAccessToken
 
 class AuthManager(IAuthManager):
-    """Expose authentication and authorization to application code.
+    """
+    Expose authentication and authorization to application code.
 
     The manager owns no per request state. ``user()``, ``can()`` and
     friends read the context bound to the container scope of the running
@@ -69,7 +70,8 @@ class AuthManager(IAuthManager):
         token_guard: TokenGuard,
         tokens: IAccessTokenRepository,
     ) -> None:
-        """Initialise the manager with the configured collaborators.
+        """
+        Initialise the manager with the configured collaborators.
 
         Parameters
         ----------
@@ -109,7 +111,8 @@ class AuthManager(IAuthManager):
     # ── Authentication state ──────────────────────────────────────────
 
     def context(self) -> IAuthenticationContext:
-        """Return the authentication context of the current request.
+        """
+        Return the authentication context of the current request.
 
         Returns
         -------
@@ -120,7 +123,8 @@ class AuthManager(IAuthManager):
         return current_auth_context()
 
     def user(self) -> IAuthenticatable | None:
-        """Return the identity authenticated for the current request.
+        """
+        Return the identity authenticated for the current request.
 
         Returns
         -------
@@ -130,7 +134,8 @@ class AuthManager(IAuthManager):
         return current_auth_context().identity
 
     def identifier(self) -> object | None:
-        """Return the identifier of the authenticated identity.
+        """
+        Return the identifier of the authenticated identity.
 
         Returns
         -------
@@ -140,7 +145,8 @@ class AuthManager(IAuthManager):
         return current_auth_context().identifier()
 
     def check(self) -> bool:
-        """Report whether the current request is authenticated.
+        """
+        Report whether the current request is authenticated.
 
         Returns
         -------
@@ -150,7 +156,8 @@ class AuthManager(IAuthManager):
         return current_auth_context().isAuthenticated
 
     def guest(self) -> bool:
-        """Report whether the current request is anonymous.
+        """
+        Report whether the current request is anonymous.
 
         Returns
         -------
@@ -160,7 +167,8 @@ class AuthManager(IAuthManager):
         return current_auth_context().isGuest
 
     def guard(self, name: str | None = None) -> IGuard:
-        """Return a configured guard by name.
+        """
+        Return a configured guard by name.
 
         Parameters
         ----------
@@ -189,8 +197,11 @@ class AuthManager(IAuthManager):
 
     # ── Session lifecycle ─────────────────────────────────────────────
 
-    async def attempt(self, credentials: Mapping[str, object]) -> bool:
-        """Authenticate the current request from submitted credentials.
+    async def attempt(
+        self, credentials: Mapping[str, object], *, remember: bool = False,
+    ) -> bool:
+        """
+        Authenticate the current request from submitted credentials.
 
         Credential based login is a session operation, so it always runs
         through the session guard regardless of the default guard.
@@ -199,6 +210,8 @@ class AuthManager(IAuthManager):
         ----------
         credentials : Mapping[str, object]
             Submitted credentials, typically username and password.
+        remember : bool, optional
+            Persist a revocable credential for later browser sessions.
 
         Returns
         -------
@@ -207,7 +220,9 @@ class AuthManager(IAuthManager):
         """
         request = self.__request()
         async with authentication_lock():
-            identity = await self.__session_guard.attempt(request, credentials)
+            identity = await self.__session_guard.attempt(
+                request, credentials, remember=remember,
+            )
             if identity is None:
                 return False
 
@@ -215,7 +230,8 @@ class AuthManager(IAuthManager):
             return True
 
     async def login(self, identity: IAuthenticatable) -> None:
-        """Authenticate an identity without verifying credentials.
+        """
+        Authenticate an identity without verifying credentials.
 
         Parameters
         ----------
@@ -233,7 +249,8 @@ class AuthManager(IAuthManager):
             self.__rebind(identity, self.__session_guard.name)
 
     async def logout(self) -> None:
-        """Drop the authenticated state of the current request.
+        """
+        Drop the authenticated state of the current request.
 
         Returns
         -------
@@ -242,13 +259,14 @@ class AuthManager(IAuthManager):
         """
         request = self.__request()
         async with authentication_lock():
-            self.__session_guard.logout(request)
+            await self.__session_guard.logout(request)
             bind_auth_context(AuthenticationContext(guard=self.__session_guard.name))
 
     # ── Authorization ─────────────────────────────────────────────────
 
     async def authorization(self) -> IAuthorizationSnapshot:
-        """Return the effective authorization snapshot of the request.
+        """
+        Return the effective authorization snapshot of the request.
 
         Returns
         -------
@@ -258,7 +276,8 @@ class AuthManager(IAuthManager):
         return await current_auth_context().authorization()
 
     async def can(self, permission: str) -> bool:
-        """Report whether the current request grants a permission.
+        """
+        Report whether the current request grants a permission.
 
         Parameters
         ----------
@@ -273,7 +292,8 @@ class AuthManager(IAuthManager):
         return await self.__authorizer.can(current_auth_context(), permission)
 
     async def cannot(self, permission: str) -> bool:
-        """Report whether the current request lacks a permission.
+        """
+        Report whether the current request lacks a permission.
 
         Parameters
         ----------
@@ -289,7 +309,8 @@ class AuthManager(IAuthManager):
         return not granted
 
     async def canAny(self, permissions: Iterable[str]) -> bool:
-        """Report whether at least one permission is granted.
+        """
+        Report whether at least one permission is granted.
 
         Parameters
         ----------
@@ -306,7 +327,8 @@ class AuthManager(IAuthManager):
         )
 
     async def canAll(self, permissions: Iterable[str]) -> bool:
-        """Report whether every permission is granted.
+        """
+        Report whether every permission is granted.
 
         Parameters
         ----------
@@ -323,7 +345,8 @@ class AuthManager(IAuthManager):
         )
 
     async def hasRole(self, role: str) -> bool:
-        """Report whether the identity owns a role.
+        """
+        Report whether the identity owns a role.
 
         Parameters
         ----------
@@ -338,7 +361,8 @@ class AuthManager(IAuthManager):
         return await self.__authorizer.hasRole(current_auth_context(), role)
 
     async def authorize(self, permission: str) -> None:
-        """Require a permission or abort the current operation.
+        """
+        Require a permission or abort the current operation.
 
         Parameters
         ----------
@@ -368,7 +392,8 @@ class AuthManager(IAuthManager):
             raise AuthorizationException(error_msg)
 
     async def allows(self, ability: str, resource: object) -> bool:
-        """Evaluate a policy ability against a resource.
+        """
+        Evaluate a policy ability against a resource.
 
         Parameters
         ----------
@@ -387,7 +412,8 @@ class AuthManager(IAuthManager):
         )
 
     async def denies(self, ability: str, resource: object) -> bool:
-        """Report whether a policy ability is denied for a resource.
+        """
+        Report whether a policy ability is denied for a resource.
 
         Parameters
         ----------
@@ -405,7 +431,8 @@ class AuthManager(IAuthManager):
         return not allowed
 
     async def authorizeResource(self, ability: str, resource: object) -> None:
-        """Require a policy ability or abort the current operation.
+        """
+        Require a policy ability or abort the current operation.
 
         Parameters
         ----------
@@ -437,7 +464,8 @@ class AuthManager(IAuthManager):
             raise AuthorizationException(error_msg)
 
     def registerPolicy(self, resource: type, policy: type[IPolicy]) -> None:
-        """Bind a policy class to a resource type.
+        """
+        Bind a policy class to a resource type.
 
         Parameters
         ----------
@@ -463,7 +491,8 @@ class AuthManager(IAuthManager):
         abilities: Iterable[str] | None = None,
         expires_at: datetime | None = None,
     ) -> NewAccessToken:
-        """Issue a personal access token.
+        """
+        Issue a personal access token.
 
         Parameters
         ----------
@@ -517,7 +546,8 @@ class AuthManager(IAuthManager):
         )
 
     async def revokeCurrentToken(self) -> bool:
-        """Revoke the token that authenticated the current request.
+        """
+        Revoke the token that authenticated the current request.
 
         Returns
         -------
@@ -540,7 +570,8 @@ class AuthManager(IAuthManager):
     # ── Internals ─────────────────────────────────────────────────────
 
     def __rebind(self, identity: IAuthenticatable, guard: str) -> None:
-        """Bind a freshly authenticated identity to the current scope.
+        """
+        Bind a freshly authenticated identity to the current scope.
 
         Parameters
         ----------
@@ -564,7 +595,8 @@ class AuthManager(IAuthManager):
 
     @staticmethod
     def __request() -> Request:
-        """Return the request bound to the current container scope.
+        """
+        Return the request bound to the current container scope.
 
         Returns
         -------

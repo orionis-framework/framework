@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 class IAuthenticatable(ABC):
-    """Define the minimum surface an application identity must expose.
+    """
+    Define the minimum surface an application identity must expose.
 
     Authentication never depends on a concrete ``User`` class. Any object
     able to answer these three questions can be authenticated by Orionis.
@@ -11,7 +12,8 @@ class IAuthenticatable(ABC):
 
     @abstractmethod
     def getAuthIdentifierName(self) -> str:
-        """Return the attribute holding the unique identifier.
+        """
+        Return the attribute holding the unique identifier.
 
         Returns
         -------
@@ -21,7 +23,8 @@ class IAuthenticatable(ABC):
 
     @abstractmethod
     def getAuthIdentifier(self) -> object:
-        """Return the value uniquely identifying this identity.
+        """
+        Return the value uniquely identifying this identity.
 
         Returns
         -------
@@ -32,7 +35,8 @@ class IAuthenticatable(ABC):
 
     @abstractmethod
     def getAuthPassword(self) -> str:
-        """Return the stored password hash of this identity.
+        """
+        Return the stored password hash of this identity.
 
         Returns
         -------

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -16,7 +17,7 @@ class GCS(BaseEntity):
     Parameters
     ----------
     driver : str, default="gcs"
-        The filesystem driver type. Default is "gcs".
+        The filesystem driver name. Built-in names are "gcs" and "google".
     project_id : str
         Google Cloud project identifier.
     key_file : str | None, default=None
@@ -92,6 +93,9 @@ class GCS(BaseEntity):
             If any attribute is of the wrong type.
         """
         super().__post_init__()
+
+        # Driver names are resolved by StorageManager, including extensions.
+        validate_string(self.driver, "driver")
 
         # Validate `project_id` attribute type
         if not isinstance(self.project_id, str):

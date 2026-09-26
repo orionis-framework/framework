@@ -5,6 +5,7 @@ from orionis.auth.exceptions import (
     AuthorizationException,
 )
 from orionis.console.output.console import Console
+from orionis.foundation.contracts.application import IApplication
 from orionis.failure.contracts.handler import IBaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
@@ -40,9 +41,17 @@ class BaseExceptionHandler(IBaseExceptionHandler):
     def __init__(
         self,
         default_responses: DefaultResponses,
+        application: IApplication,
     ) -> None:
         """
         Initialize the BaseExceptionHandler instance.
+
+        Parameters
+        ----------
+        default_responses : DefaultResponses
+            Default responses for HTTP error handling.
+        application : IApplication
+            The application instance containing configuration and context.
 
         Returns
         -------
@@ -51,6 +60,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         """
         # Default responses for HTTP error handling
         self.__default_responses = default_responses
+        self.__application = application
 
     def toThrowable(
         self,
@@ -193,8 +203,10 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         if self.isExceptionIgnored(exception):
             return None
 
-        # Resolve response format and exception type once
-        wants_json = request.wantsJson()
+        # Determine if the client expects a JSON response
+        wants_json: bool = request.wantsJson()
+
+        # Preserve defined HTTP statuses in both debug and production modes.
         exc_type = type(exception)
 
         for ancestor in exc_type.__mro__:
@@ -214,8 +226,16 @@ class BaseExceptionHandler(IBaseExceptionHandler):
                 response.setHeader("WWW-Authenticate", "Bearer")
             return response
 
+        # Hide unhandled exception details when the application is not in debug mode.
+        if not self.__application.config("app.debug"):
+            return await self.__default_responses.error(
+                status_code=500,
+                content="Internal Server Error",
+                expects_json=wants_json,
+            )
+
         # Handle 500 server error — resolve adapter type once
-        is_adapter = isinstance(request, TransportAdapter)
+        is_adapter: bool = isinstance(request, TransportAdapter)
         return await self.__default_responses.exception(
             request_path=request.path() if is_adapter else request.path,
             request_method=request.method() if is_adapter else request.method,

@@ -26,7 +26,8 @@ _MAX_ABILITIES: int = 256
 _TOKEN_COLUMN: str = "token"  # noqa: S105
 
 class AccessTokenRepository(IAccessTokenRepository):
-    """Persist personal access tokens through the Orionis query builder.
+    """
+    Persist personal access tokens through the Orionis query builder.
 
     Tokens are opaque: the client receives a random secret and the store
     only keeps its SHA-256 digest in a unique column. Verification is a
@@ -46,7 +47,8 @@ class AccessTokenRepository(IAccessTokenRepository):
     __slots__ = ("__db", "__expiration", "__secret_bytes", "__table")
 
     def __init__(self, app: IApplication, db: IQueryBuilder) -> None:
-        """Initialise the repository from the token configuration.
+        """
+        Initialise the repository from the token configuration.
 
         Parameters
         ----------
@@ -75,7 +77,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         abilities: Iterable[str] | None = None,
         expires_at: datetime | None = None,
     ) -> NewAccessToken:
-        """Issue a new personal access token for an identity.
+        """
+        Issue a new personal access token for an identity.
 
         Parameters
         ----------
@@ -158,7 +161,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         return NewAccessToken(access_token=access_token, plain_text=plain_text)
 
     async def findByPlainText(self, plain_text: str) -> AccessToken | None:
-        """Resolve a token from the value presented by the client.
+        """
+        Resolve a token from the value presented by the client.
 
         Parameters
         ----------
@@ -212,7 +216,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
 
     async def touch(self, token_id: object) -> bool:
-        """Confirm token validity and record its use atomically.
+        """
+        Confirm token validity and record its use atomically.
 
         Parameters
         ----------
@@ -238,7 +243,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         return affected > 0
 
     async def revoke(self, token_id: object) -> bool:
-        """Revoke a single token.
+        """
+        Revoke a single token.
 
         Parameters
         ----------
@@ -263,7 +269,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         return affected > 0
 
     async def revokeAll(self, tokenable: IAuthorizable) -> int:
-        """Revoke every active token of an identity.
+        """
+        Revoke every active token of an identity.
 
         Parameters
         ----------
@@ -286,7 +293,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
 
     async def purgeExpired(self) -> int:
-        """Delete tokens that expired or were revoked.
+        """
+        Delete tokens that expired or were revoked.
 
         Returns
         -------
@@ -308,7 +316,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         return expired + revoked
 
 def _utc_now() -> datetime:
-    """Return the current UTC moment as a naive datetime.
+    """
+    Return the current UTC moment as a naive datetime.
 
     Token columns are declared without a timezone so every dialect stores
     the same value. Dropping the offset here keeps writes and reads
@@ -322,7 +331,8 @@ def _utc_now() -> datetime:
     return datetime.now(UTC).replace(tzinfo=None)
 
 def _as_datetime(value: object) -> datetime | None:
-    """Coerce a stored timestamp into a datetime.
+    """
+    Coerce a stored timestamp into a datetime.
 
     Queries over a table the builder knows no schema for come back with
     whatever the driver produced, and SQLite hands timestamps back as
@@ -360,7 +370,8 @@ def _as_datetime(value: object) -> datetime | None:
     return value
 
 def _unexpired_tokens(query: QueryBuilderBase) -> None:
-    """Group the nullable expiration constraint for token use.
+    """
+    Group the nullable expiration constraint for token use.
 
     Parameters
     ----------
@@ -375,7 +386,8 @@ def _unexpired_tokens(query: QueryBuilderBase) -> None:
     query.whereNull("expires_at").orWhere("expires_at", ">", _utc_now())
 
 def _is_expired(value: datetime | None) -> bool:
-    """Report whether an expiration moment already elapsed.
+    """
+    Report whether an expiration moment already elapsed.
 
     Parameters
     ----------
@@ -396,7 +408,8 @@ def _is_expired(value: datetime | None) -> bool:
     return moment <= datetime.now(UTC)
 
 def _encode_abilities(abilities: frozenset[str] | None) -> str | None:
-    """Serialise the abilities of a token for storage.
+    """
+    Serialise the abilities of a token for storage.
 
     Parameters
     ----------
@@ -413,7 +426,8 @@ def _encode_abilities(abilities: frozenset[str] | None) -> str | None:
     return msgspec.json.encode(sorted(abilities)).decode("utf-8")
 
 def _decode_abilities(value: object) -> frozenset[str] | None:
-    """Deserialise the abilities stored for a token.
+    """
+    Deserialise the abilities stored for a token.
 
     Parameters
     ----------
@@ -444,7 +458,8 @@ def _decode_abilities(value: object) -> frozenset[str] | None:
     return _normalize_abilities(value)
 
 def _normalize_abilities(abilities: Iterable[str] | None) -> frozenset[str] | None:
-    """Validate credential restrictions without coercing malformed values.
+    """
+    Validate credential restrictions without coercing malformed values.
 
     Parameters
     ----------

@@ -1,42 +1,50 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
 class HTTPRateLimit(BaseEntity):
+    """
+    Represent the rate-limiting configuration for HTTP.
+
+    Attributes
+    ----------
+    rate_limit_enabled : bool
+        Whether global rate limiting is enabled.
+    rate_limit_requests : int
+        Maximum number of requests allowed per window.
+    rate_limit_window_seconds : int
+        Time window in seconds for rate limit counting.
+    """
 
     rate_limit_enabled: bool = field(
         default_factory=lambda: Env.get("RATE_LIMIT_ENABLED", False),
         metadata={
-            "description": (
-                "Enable or disable global rate limiting."
-            ),
+            "description": ("Enable or disable global rate limiting."),
+            "default": False,
         },
     )
 
     rate_limit_requests: int = field(
-        default_factory=lambda: int(Env.get("RATE_LIMIT_REQUESTS", 100)),
+        default_factory=lambda: Env.get("RATE_LIMIT_REQUESTS", 100),
         metadata={
-            "description": (
-                "Maximum number of requests allowed "
-                "per window."
-            ),
+            "description": ("Maximum number of requests allowed per window."),
+            "default": 100,
         },
     )
 
     rate_limit_window_seconds: int = field(
-        default_factory=lambda: int(Env.get("RATE_LIMIT_WINDOW", 60)),
+        default_factory=lambda: Env.get("RATE_LIMIT_WINDOW", 60),
         metadata={
-            "description": (
-                "Time window in seconds for rate "
-                "limit counting."
-            ),
+            "description": ("Time window in seconds for rate limit counting."),
+            "default": 60,
         },
     )
 
     def __post_init__(self) -> None:
-        """Validate rate-limiting fields.
+        """
+        Validate rate-limiting fields.
 
         Raises
         ------
@@ -53,7 +61,8 @@ class HTTPRateLimit(BaseEntity):
         self.__validateRateLimiting()
 
     def __validateRateLimiting(self) -> None:
-        """Validate rate-limiting constraints.
+        """
+        Validate rate-limiting constraints.
 
         Check ``rate_limit_enabled``,
         ``rate_limit_requests``, and
@@ -74,9 +83,9 @@ class HTTPRateLimit(BaseEntity):
             error_msg = "Invalid type for 'rate_limit_enabled': expected a boolean."
             raise TypeError(error_msg)
 
-        if (
-            not isinstance(self.rate_limit_requests, int)
-            or isinstance(self.rate_limit_requests, bool)
+        if not isinstance(self.rate_limit_requests, int) or isinstance(
+            self.rate_limit_requests,
+            bool,
         ):
             error_msg = "Invalid type for 'rate_limit_requests': expected an integer."
             raise TypeError(error_msg)
@@ -87,9 +96,9 @@ class HTTPRateLimit(BaseEntity):
             )
             raise ValueError(error_msg)
 
-        if (
-            not isinstance(self.rate_limit_window_seconds, int)
-            or isinstance(self.rate_limit_window_seconds, bool)
+        if not isinstance(self.rate_limit_window_seconds, int) or isinstance(
+            self.rate_limit_window_seconds,
+            bool,
         ):
             error_msg = (
                 "Invalid type for 'rate_limit_window_seconds': expected an integer."

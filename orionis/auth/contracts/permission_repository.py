@@ -14,7 +14,8 @@ class IPermissionRepository(ABC):
         self,
         authorizable: IAuthorizable,
     ) -> tuple[frozenset[str], frozenset[str]]:
-        """Load the permissions and roles owned by an identity.
+        """
+        Load the permissions and roles owned by an identity.
 
         Parameters
         ----------

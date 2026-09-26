@@ -3,14 +3,17 @@ from dataclasses import dataclass, field
 from orionis.foundation.config.app.entities.app import App
 from orionis.foundation.config.auth.entities.auth import Auth
 from orionis.foundation.config.cache.entities.cache import Cache
-from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.database.entities.database import Database
 from orionis.foundation.config.filesystems.entitites.filesystems import Filesystems
+from orionis.foundation.config.hashing.entities.hashing import Hashing
+from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.logging.entities.logging import Logging
 from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.queue.entities.queue import Queue
+from orionis.foundation.config.scheduler.entities.scheduler import Scheduler
 from orionis.foundation.config.session.entities.session import Session
 from orionis.foundation.config.testing.entities.testing import Testing
+from orionis.foundation.config.view.entities.view import View
 from orionis.support.entities.base import BaseEntity
 
 # Dispatch table: maps each field name to its expected concrete type.
@@ -25,6 +28,9 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
     ("mail", Mail),
     ("queue", Queue),
     ("session", Session),
+    ("hashing", Hashing),
+    ("scheduler", Scheduler),
+    ("view", View),
     ("testing", Testing),
 )
 
@@ -49,6 +55,12 @@ class Configuration(BaseEntity):
         Logging configuration settings.
     mail : Mail | dict, optional
         Mail configuration settings.
+    hashing : Hashing | dict, optional
+        Password hashing configuration settings.
+    scheduler : Scheduler | dict, optional
+        Scheduled task configuration settings.
+    view : View | dict, optional
+        Template rendering configuration settings.
     http : HTTP | dict, optional
         HTTP configuration settings.
     queue : Queue | dict, optional
@@ -156,6 +168,12 @@ class Configuration(BaseEntity):
             "default": lambda: Testing().toDict(),
         },
     )
+
+    hashing: Hashing | dict = field(default_factory=Hashing)
+
+    scheduler: Scheduler | dict = field(default_factory=Scheduler)
+
+    view: View | dict = field(default_factory=View)
 
     def __post_init__(self) -> None:
         """

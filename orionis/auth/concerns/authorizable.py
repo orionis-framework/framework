@@ -3,7 +3,8 @@ from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authorizable import IAuthorizable
 
 class Authorizable:
-    """Let any Orionis model own permissions and roles.
+    """
+    Let any Orionis model own permissions and roles.
 
     Authorization rows are polymorphic: they store the type of the owner
     next to its identifier, so users, teams or API clients can all be
@@ -21,7 +22,8 @@ class Authorizable:
     AUTHORIZABLE_TYPE: ClassVar[str | None] = None
 
     def getAuthorizableType(self) -> str:
-        """Return the polymorphic type stored with the identifier.
+        """
+        Return the polymorphic type stored with the identifier.
 
         Returns
         -------
@@ -37,7 +39,8 @@ class Authorizable:
         return f"{owner.__module__}.{owner.__qualname__}"
 
     def getAuthorizableId(self) -> object:
-        """Return the identifier stored in the authorization tables.
+        """
+        Return the identifier stored in the authorization tables.
 
         Returns
         -------

@@ -10,6 +10,19 @@ from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.test import TestCase
 
+def _make_application() -> MagicMock:
+    """
+    Build an application mock with debug mode enabled for HTTP tests.
+
+    Returns
+    -------
+    MagicMock
+        A mocked application instance with debug mode enabled.
+    """
+    application = MagicMock()
+    application.config.return_value = True
+    return application
+
 def _make_handler(
     dont_catch: frozenset[type[BaseException]] | None = None,
 ) -> BaseExceptionHandler:
@@ -27,7 +40,10 @@ def _make_handler(
         A ready-to-use handler instance.
     """
     mock_responses = MagicMock(spec=IDefaultResponses)
-    handler = BaseExceptionHandler(default_responses=mock_responses)
+    handler = BaseExceptionHandler(
+        default_responses=mock_responses,
+        application=_make_application(),
+    )
     if dont_catch is not None:
         type(handler).dont_catch = dont_catch  # type: ignore[assignment]
     return handler
@@ -344,7 +360,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=404)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = RouteNotFound("not found")
         req = self._make_request_mock()
@@ -363,7 +382,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=405)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = MethodNotAllowed("not allowed")
         req = self._make_request_mock()
@@ -382,7 +404,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=413)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = PayloadTooLargeException("too large")
         req = self._make_request_mock()
@@ -401,7 +426,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=415)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = UnsupportedMediaTypeException("unsupported")
         req = self._make_request_mock()
@@ -420,7 +448,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=419)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = CSRFTokenMismatchException("token mismatch")
         req = self._make_request_mock()
@@ -438,7 +469,10 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         for exception types listed in dont_catch.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
         type(handler).dont_catch = frozenset({RouteNotFound})  # type: ignore[assignment]
 
         exc = RouteNotFound("ignored")
@@ -469,7 +503,10 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.exception.return_value = MagicMock(status_code=500)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = RuntimeError("unknown")
         req = MagicMock()
@@ -492,7 +529,10 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         that response templates can render traceback details.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = RuntimeError("pass me through")
         req = MagicMock()
@@ -514,7 +554,10 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         when constructing 4xx responses from the status map.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
-        handler = BaseExceptionHandler(default_responses=mock_responses)
+        handler = BaseExceptionHandler(
+            default_responses=mock_responses,
+            application=_make_application(),
+        )
 
         exc = RouteNotFound("not found")
         req = MagicMock()

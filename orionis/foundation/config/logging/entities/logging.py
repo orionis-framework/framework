@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field, fields
+from orionis.environment import Env
 from orionis.foundation.config.logging.entities.channels import Channels
-from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed channel option names
@@ -24,7 +24,7 @@ class Logging(BaseEntity):
         default_factory=lambda: Env.get("LOG_CHANNEL", "stack"),
         metadata={
             "description": "The default logging channel to use.",
-            "default": lambda: Env.get("LOG_CHANNEL", "stack"),
+            "default": "stack",
         },
     )
 

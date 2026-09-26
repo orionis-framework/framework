@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 # Table names must start and contain only lowercase letters or underscores.
@@ -71,14 +71,14 @@ class Database(BaseEntity):
     )
 
     lock_table: str | None = field(
-        default_factory=lambda: Env.get("DB_CACHE_LOCK_TABLE"),
+        default_factory=lambda: Env.get("DB_CACHE_LOCK_TABLE", "cache_locks"),
         metadata={
             "description": (
                 "The database table name used to store cache locks. "
                 "Defaults to the 'DB_CACHE_LOCK_TABLE' environment "
                 "variable or None."
             ),
-            "default": None,
+            "default": "cache_locks",
         },
     )
 
@@ -98,12 +98,8 @@ class Database(BaseEntity):
         ValueError
             If ``driver`` is an empty string.
         """
-        # Check type before truthiness to avoid misleading error messages
-        if not isinstance(self.driver, str):
-            error_msg = "The 'driver' property must be a string."
-            raise TypeError(error_msg)
-        if not self.driver:
-            error_msg = "The 'driver' property cannot be empty."
+        if self.driver != "database":
+            error_msg = "The 'driver' property must be 'database'."
             raise ValueError(error_msg)
 
     def __validateConnection(self) -> None:

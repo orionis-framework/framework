@@ -110,5 +110,18 @@
     "Reset password": "Reset password",
     "For your security, do not share this link with anyone. The :app team will never ask you for your password.": "For your security, do not share this link with anyone. The :app team will never ask you for your password.",
     "If you did not request a password reset, ignore this email. Your account will not change and the link will expire automatically.": "If you did not request a password reset, ignore this email. Your account will not change and the link will expire automatically.",
-    "ACCOUNT SECURITY": "ACCOUNT SECURITY"
+    "ACCOUNT SECURITY": "ACCOUNT SECURITY",
+    "Keep me signed in on this device": "Keep me signed in on this device",
+    "Enter your email address and we will send you a link to reset your password.": "Enter your email address and we will send you a link to reset your password.",
+    "Send reset link": "Send reset link",
+    "If an account matches that email, you will receive a password reset link.": "If an account matches that email, you will receive a password reset link.",
+    "Enter a valid email address.": "Enter a valid email address.",
+    "This password reset link is invalid or has expired.": "This password reset link is invalid or has expired.",
+    "Choose a new password for your account.": "Choose a new password for your account.",
+    "Request a new reset link": "Request a new reset link",
+    "Back to sign in": "Back to sign in",
+    "This password reset link expires in :minutes minutes.": "This password reset link expires in :minutes minutes.",
+    "Your password has been reset. Please log in.": "Your password has been reset. Please log in.",
+    "Your password was reset": "Your password was reset",
+    "Your password has been reset. If you did not make this change, contact support immediately.": "Your password has been reset. If you did not make this change, contact support immediately."
 }

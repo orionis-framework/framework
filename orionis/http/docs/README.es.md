@@ -2861,10 +2861,15 @@ Punto interno usado por el cargador: `kind: str` establece el contexto de los re
 **`auth`**
 
 ```python
-def auth(self) -> None:
+def auth(
+    self,
+    login_controller: type | None = None,
+    register_controller: type | None = None,
+    forgot_password_controller: type | None = None,
+) -> None:
 ```
 
-Sin parámetros; retorna `None`. Importa de forma diferida los controladores de acceso y registro; registra GET/POST `/login`, GET/POST `/sign-up` con `GuestMiddleware` y POST `/logout` con `AuthenticateSessionMiddleware`. Los nombres POST son `login`, `register`, `logout`. Lanza `ValueError` fuera del contexto web y propaga errores de importación y registro. No impide llamadas repetidas; estas crean conflictos detectados al compilar.
+Cada controlador es opcional y usa de forma independiente el controlador integrado correspondiente: acceso/cierre de sesión, registro/verificación de correo o recuperación/restablecimiento de contraseña. Retorna `None`. Registra GET/POST `/login`, GET/POST `/sign-up`, GET/POST `/forgot-password`, GET/POST `/reset-password` con `GuestMiddleware`, GET `/verify-email` y POST `/logout` con `AuthenticateSessionMiddleware`. Los nombres POST incluyen `login`, `register`, `forgot-password`, `password.update` y `logout`; el formulario de restablecimiento se llama `password.reset` y la verificación de correo `verify-email`. Lanza `ValueError` fuera del contexto web y propaga errores de importación y registro. Las llamadas repetidas crean conflictos detectados al compilar.
 
 **`view`**
 
@@ -3700,10 +3705,15 @@ Clase base abstracta (`ABC`). Cada declaración siguiente usa `@abstractmethod`;
 
 ```python
 @abstractmethod
-def auth(self) -> None:
+def auth(
+    self,
+    login_controller: type | None = None,
+    register_controller: type | None = None,
+    forgot_password_controller: type | None = None,
+) -> None:
 ```
 
-Sin parámetros; declara el registro de rutas de autenticación, retorna `None` y documenta `ValueError` fuera del contexto web. El cuerpo abstracto no realiza operaciones; véase `Router.auth` para efectos y errores reales de la implementación.
+Los controladores opcionales permiten sustituir, de manera independiente, los controladores de acceso/cierre de sesión, registro/verificación de correo y recuperación/restablecimiento de contraseña. Retorna `None` y documenta `ValueError` fuera del contexto web. El cuerpo abstracto no realiza operaciones; véase `Router.auth` para efectos y errores reales de la implementación.
 
 **`view`**
 

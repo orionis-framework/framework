@@ -90,7 +90,7 @@ def after_startup_orionis_generator(host: str, port: int) -> None:
         ("\n", ""),
         ("✅ The HTTP server has started successfully.\n", "bold green"),
         ("🔗 Service running at: ", "white"),
-        (f"http://{host}:{port}\n", "bold cyan"),
+        (f"http://{host}:{port}\n", "bold cyan"), # NOSONAR
         (f"🕒 Started at: {tz} - {now}   ", "dim"),
         (f"🆔 PID: {pid}\n", "dim"),
         ("⚡ Orionis Loop: ", "cyan"),

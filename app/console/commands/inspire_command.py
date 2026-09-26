@@ -4,17 +4,6 @@ from orionis.support.inspirational import Inspire
 
 class InspireCommand(BaseCommand):
 
-    # --------------------------------------------------------------------------
-    # Adding a signature to the command is required to invoke it.
-    # The command description clarifies its purpose when running 'help'.
-    # If your command takes arguments, define them in the options method.
-    # If it does not take arguments, you can omit the options method.
-    # The handle method executes the command logic. You can inject any
-    # services needed for your logic here. Remember, handle is async,
-    # so you can use await to call async service methods. If your logic
-    # does not require async, you can omit await and define it as sync.
-    # --------------------------------------------------------------------------
-
     # Command name, by convention in lowercase and starting with app.
     signature: str = "app:inspire"
 
@@ -23,7 +12,7 @@ class InspireCommand(BaseCommand):
 
     # Define command arguments using the Argument dataclass.
     # This example includes an optional argument for text capitalization.
-    arguments = [
+    arguments: list[Argument] = [
         Argument(
             name_or_flags=["--case", "-c"],
             type_=str,
@@ -39,7 +28,7 @@ class InspireCommand(BaseCommand):
 
         Parameters
         ----------
-        inspire : Inspire
+        inspire : Inspire [Dependency Injection]
             Service providing inspirational quotes.
 
         Returns

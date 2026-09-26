@@ -15,8 +15,9 @@ class IRouter(ABC):
         self,
         login_controller: type | None = None,
         register_controller: type | None = None,
+        forgot_password_controller: type | None = None,
     ) -> None:
-        """Register the built-in web login, registration and logout routes.
+        """Register the built-in web authentication routes.
 
         Parameters
         ----------
@@ -25,6 +26,9 @@ class IRouter(ABC):
         register_controller : type | None, optional
             Controller for registration and email verification. Defaults to the
             built-in controller.
+        forgot_password_controller : type | None, optional
+            Controller for forgot-password and password-reset routes. Defaults
+            to the built-in controller.
 
         Returns
         -------

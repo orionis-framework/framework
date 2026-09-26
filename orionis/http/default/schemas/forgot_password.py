@@ -3,9 +3,7 @@ from orionis.schemas.constraints import Email, MaxLength
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 
-
 class ForgotPasswordSchema(Schema):
-    """Validate email syntax without querying whether an account exists."""
 
     # ruff: noqa: TC001 (Runtime schema metadata)
 

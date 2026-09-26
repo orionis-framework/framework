@@ -1,18 +1,18 @@
 [lint]
 select = ["ALL"]
 ignore = [
-    "N818",
+    "CPY001",
     "D100",
-    "N802",
-    "D104",
     "D101",
+    "D104",
     "I001",
     "I002",
-    "TRY301",
-    "TRY300",
     "INP001",
-    "CPY001",
+    "N802",
+    "N818",
     "PLR0917",
+    "TRY300",
+    "TRY301",
 ]
 exclude = [
     "test/*",
@@ -20,21 +20,23 @@ exclude = [
 
 [lint.per-file-ignores]
 "app/**" = [
+    "ARG002",
+    "BLE001",
     "TC001",
     "TC002",
-    "ARG002",
-    "BLE001"
 ]
 "app/console/commands/**" = [
     "RUF012",
+]
+"app/http/schemas/constraints/**" = [
+    "PLR2004",
 ]
 "app/models/**" = [
     "FBT003",
     "RUF012",
 ]
-"app/http/schemas/constraints/**" = [
-    "ARG002",
-    "PLR2004",
+"config/**" = [
+    "E501",
 ]
 "database/**" = [
     "E501",

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 # Table names must start and contain only lowercase letters or underscores.
@@ -80,13 +80,10 @@ class Database(BaseEntity):
         ValueError
             If ``driver`` is an empty string.
         """
-        # Check type before truthiness to avoid misleading error messages
-        if not isinstance(self.driver, str):
-            error_msg = "The 'driver' property must be a string."
-            raise TypeError(error_msg)
-        if not self.driver:
-            error_msg = "The 'driver' property cannot be empty."
-            raise ValueError(error_msg)
+        # Ensure the driver is set to 'database' for this store.
+        if self.driver != "database":
+            message = f"Invalid driver for Database store: {self.driver}"
+            raise ValueError(message)
 
     def __validateConnection(self) -> None:
         """

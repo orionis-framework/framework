@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Strategy(Enum):
     """
     Represent different queue strategies supported by the system.

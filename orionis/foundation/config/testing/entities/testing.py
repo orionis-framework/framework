@@ -2,6 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.testing.enums import VerbosityMode
+from orionis.foundation.config.validation import validate_boolean, validate_string
+from orionis.foundation.config.validation import validate_integer
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed valid verbosity values: avoids building a list on every Testing() init.
@@ -39,7 +41,7 @@ class Testing(BaseEntity):
                 "Level of detail in test output. 0: silent, 1: standard, 2: detailed. "
                 "Defaults to 2 (detailed)."
             ),
-            "default": VerbosityMode.DETAILED.value,
+            "default": 2,
         },
     )
 
@@ -56,9 +58,7 @@ class Testing(BaseEntity):
     start_dir: str = field(
         default_factory=lambda: Env.get("TESTING_START_DIR", "tests"),
         metadata={
-            "description": (
-                "Directory to search for tests. Defaults to 'tests'."
-            ),
+            "description": ("Directory to search for tests. Defaults to 'tests'."),
             "default": "tests",
         },
     )
@@ -86,64 +86,35 @@ class Testing(BaseEntity):
     cache_results: bool = field(
         default_factory=lambda: Env.get("TESTING_CACHE_RESULTS", False),
         metadata={
-            "description": (
-                "Save a JSON file with the test results."
-            ),
+            "description": ("Save a JSON file with the test results."),
             "default": False,
         },
     )
 
     def __post_init__(self) -> None:
         """
-        Validate and normalize Testing configuration after initialization.
-
-        Parameters
-        ----------
-        self : Testing
-            Instance of Testing being initialized.
+        Validate runner options and normalize verbosity after construction.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method performs validation and normalization and returns None.
 
         Raises
         ------
-        TypeError
-            If any property does not match its expected type.
+        ValueError
+            If any of the runner options are invalid.
         """
-        # Validate verbosity using pre-cached frozenset
-        if isinstance(self.verbosity, int):
-            if self.verbosity not in _VERBOSITY_VALUES:
-                error_msg = (
-                    "verbosity must be a valid VerbosityMode "
-                    "value or VerbosityMode instance."
-                )
-                raise TypeError(error_msg)
-        elif not isinstance(self.verbosity, VerbosityMode):
-            error_msg = "verbosity must be int or VerbosityMode."
-            raise TypeError(error_msg)
-
-        # Normalize verbosity to int if it's a VerbosityMode instance
-        if isinstance(self.verbosity, VerbosityMode):
-            object.__setattr__(self, "verbosity", self.verbosity.value)
-
-        # Validate fail_fast is a boolean
-        if not isinstance(self.fail_fast, bool):
-            error_msg = "fail_fast must be bool."
-            raise TypeError(error_msg)
-
-        # Validate start_dir is a string
-        if not isinstance(self.start_dir, str):
-            error_msg = "start_dir must be str."
-            raise TypeError(error_msg)
-
-        # Validate file_pattern is a string
-        if not isinstance(self.file_pattern, str):
-            error_msg = "file_pattern must be str."
-            raise TypeError(error_msg)
-
-        # Validate method_pattern is a string
-        if not isinstance(self.method_pattern, str):
-            error_msg = "method_pattern must be str."
-            raise TypeError(error_msg)
+        super().__post_init__()
+        verbosity = self.verbosity
+        if isinstance(verbosity, VerbosityMode):
+            verbosity = verbosity.value
+        validate_integer(verbosity, "verbosity")
+        if verbosity not in _VERBOSITY_VALUES:
+            message = "verbosity must be a valid VerbosityMode value."
+            raise ValueError(message)
+        object.__setattr__(self, "verbosity", verbosity)
+        validate_boolean(self.fail_fast, "fail_fast")
+        validate_boolean(self.cache_results, "cache_results")
+        for name in ("start_dir", "file_pattern", "method_pattern"):
+            validate_string(getattr(self, name), name)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from pathlib import Path
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -44,8 +44,8 @@ class Local(BaseEntity):
         """
         Validate and initialize the 'path' attribute after object creation.
 
-        Ensures that the 'path' attribute is a non-empty string and creates the
-        directory if it does not exist.
+        Ensure that the 'path' attribute is a non-empty string. The selected
+        storage driver creates the directory when it is initialized.
 
         Parameters
         ----------
@@ -60,6 +60,9 @@ class Local(BaseEntity):
         # Call the superclass post-init method
         super().__post_init__()
 
+        # Custom drivers may reuse the local disk options.
+        validate_string(self.driver, "driver")
+
         # Ensure 'path' is a string
         if not isinstance(self.path, str):
             error_msg = "The 'path' attribute must be a string."
@@ -69,6 +72,3 @@ class Local(BaseEntity):
         if not self.path.strip():
             error_msg = "The 'path' attribute cannot be empty."
             raise ValueError(error_msg)
-
-        # Create the directory if it does not exist
-        Path(self.path.strip()).mkdir(parents=True, exist_ok=True)

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 class IPolicy(ABC):
-    """Define the contract shared by every resource policy.
+    """
+    Define the contract shared by every resource policy.
 
     A permission answers "may this identity perform this capability?".
     A policy answers "may this identity perform this operation on *this*
@@ -12,7 +13,8 @@ class IPolicy(ABC):
 
     @abstractmethod
     async def before(self, identity: object, ability: str) -> bool | None:
-        """Short circuit the policy before the ability method runs.
+        """
+        Short circuit the policy before the ability method runs.
 
         Parameters
         ----------

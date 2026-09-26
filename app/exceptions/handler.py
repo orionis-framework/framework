@@ -22,7 +22,7 @@ class ExceptionHandler(BaseExceptionHandler):
         ----------
         exception : Exception
             The exception instance that was caught.
-        log : ILogger
+        log : ILogger [Dependency Injection]
             The logger instance for error reporting.
 
         Returns
@@ -45,7 +45,7 @@ class ExceptionHandler(BaseExceptionHandler):
         ----------
         exception : Exception
             The exception instance that was caught.
-        console : Console
+        console : Console [Dependency Injection]
             The console instance for output.
 
         Returns
@@ -68,7 +68,7 @@ class ExceptionHandler(BaseExceptionHandler):
         ----------
         exception : Exception
             The exception instance that was caught.
-        request : Request
+        request : Request [Dependency Injection]
             The HTTP request instance that was being processed.
 
         Returns

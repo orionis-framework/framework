@@ -181,14 +181,19 @@ class IGuard(ABC):
     async def resolve(self, request: Request) -> GuardResult | None: ...
 
 class ISessionGuard(IGuard):
-    async def attempt(self, request: Request, credentials: Mapping[str, object]) -> IAuthenticatable | None: ...
+    async def attempt(self, request: Request, credentials: Mapping[str, object], *, remember: bool = False) -> IAuthenticatable | None: ...
     def login(self, request: Request, identity: IAuthenticatable) -> None: ...
-    def logout(self, request: Request) -> None: ...
+    async def logout(self, request: Request) -> None: ...
 ```
 
 `SessionGuard.login()` requires a persisted scalar identity, requests a session
 ID rotation and immediately rotates CSRF using the existing HTTP configuration.
-The identity key is stored as canonical text. `logout()` invalidates the session.
+The identity key is stored as canonical text. `await logout()` revokes persistent
+login and invalidates the session. `await Auth.attempt(credentials, remember=True)`
+opts into an independent, revocable cookie, requiring HTTPS by default. The
+`remember_token` column stores an expiring digest; each new remembered login
+replaces the previous device's grant. Restoration rotates the token without
+extending its original deadline. Password changes invalidate the credential.
 Persistence, old-ID deletion and cookies belong to `StartSessionMiddleware` and
 `SessionManager`; Auth has no parallel session system.
 

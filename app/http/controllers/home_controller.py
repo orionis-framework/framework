@@ -1,4 +1,5 @@
-from orionis.auth.contracts.authenticatable import IAuthenticatable
+from typing import cast
+from app.models.user import User
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.http import HTMLResponse, response
 from orionis.http.base import BaseController
@@ -22,8 +23,12 @@ class HomeController(BaseController):
         HTMLResponse
             The rendered home page for the signed-in user.
         """
-        identity: IAuthenticatable | None = auth.user()
+        identity: User = cast("User", auth.user())
+
         return await response.view(
             "home.index",
-            user={"name": identity.name, "email": identity.email},
+            user={
+                "name": identity.name,
+                "email": identity.email,
+            },
         )

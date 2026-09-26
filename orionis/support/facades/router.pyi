@@ -12,6 +12,7 @@ class Route(IRouter, IFacade):
         cls,
         login_controller: type | None = None,
         register_controller: type | None = None,
+        forgot_password_controller: type | None = None,
     ) -> None: ...
 
     @classmethod

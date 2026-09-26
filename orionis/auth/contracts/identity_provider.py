@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from orionis.auth.contracts.authenticatable import IAuthenticatable
 
 class IIdentityProvider(ABC):
-    """Define how a persisted identity becomes an application object.
+    """
+    Define how a persisted identity becomes an application object.
 
     Implementations decide where identities live. The rest of the module
     only knows this contract, so no component depends on a class named
@@ -15,9 +16,25 @@ class IIdentityProvider(ABC):
 
     __slots__ = ()
 
+    async def updateRememberToken( # NOSONAR
+        self,
+        identity: IAuthenticatable,  # noqa: ARG002
+        expected: str | None,  # noqa: ARG002
+        token: str | None,  # noqa: ARG002
+    ) -> bool:
+        """
+        Optionally compare and replace a persistent credential atomically.
+
+        Providers supporting remember-me must also compare the current password
+        and require an active identity when issuing a non-null token. Providers
+        without persistent login support return False and issue no cookie.
+        """
+        return False
+
     @abstractmethod
     async def retrieveById(self, identifier: object) -> IAuthenticatable | None:
-        """Retrieve an identity by its unique identifier.
+        """
+        Retrieve an identity by its unique identifier.
 
         Parameters
         ----------
@@ -35,7 +52,8 @@ class IIdentityProvider(ABC):
         self,
         credentials: Mapping[str, object],
     ) -> IAuthenticatable | None:
-        """Retrieve an identity matching the non secret credentials.
+        """
+        Retrieve an identity matching the non secret credentials.
 
         The password is deliberately ignored here so credential lookup and
         credential verification stay separate operations.
@@ -57,7 +75,8 @@ class IIdentityProvider(ABC):
         identity: IAuthenticatable | None,
         credentials: Mapping[str, object],
     ) -> bool:
-        """Verify credentials without blocking the event loop.
+        """
+        Verify credentials without blocking the event loop.
 
         Parameters
         ----------

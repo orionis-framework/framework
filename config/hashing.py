@@ -2,15 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.hashing import (
-    Argon2,
-    Bcrypt,
-    Drivers,
-    Hashing,
+    Argon2, Bcrypt, Drivers, Hashing,
 )
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHashing(Hashing):
-
     # ----------------------------------------------------------------------------------
     # driver : Drivers | str, optional
     # --- The default password hashing driver.

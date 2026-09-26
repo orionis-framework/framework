@@ -15,6 +15,7 @@ def build_auth_routes(
     router: IRouter,
     login_controller: type | None = None,
     register_controller: type | None = None,
+    forgot_password_controller: type | None = None,
 ) -> None:
     """
     Register the authentication routes on the given router.
@@ -27,6 +28,8 @@ def build_auth_routes(
         Controller type used for login and logout routes.
     register_controller : type | None, optional
         Controller type used for registration and email verification routes.
+    forgot_password_controller : type | None, optional
+        Controller type used for password recovery and reset routes.
 
     Returns
     -------
@@ -45,7 +48,11 @@ def build_auth_routes(
         else RegisterController
     )
 
-    forgot: type = ForgotPasswordController
+    forgot: type = (
+        forgot_password_controller
+        if forgot_password_controller is not None
+        else ForgotPasswordController
+    )
 
     router.group(middleware=GuestMiddleware, routes=[
         router.get("/login", [login, "index"]),

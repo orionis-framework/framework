@@ -16,6 +16,7 @@ from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.auth.middleware import AuthenticateSessionMiddleware, GuestMiddleware
 from orionis.auth.passwords.broker import PasswordBroker
 from orionis.auth.tokens.functions import hash_token_secret
+from orionis.background.task import BackgroundTask
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.schema.schema import Schema as DatabaseSchema
 from orionis.foundation.config.auth import Auth, PasswordReset
@@ -320,20 +321,29 @@ class TestPasswordResetController(TestCase):
         self.assertEqual(parse_qs(parsed.query)["email"], [email])
         self.assertEqual(content.data["expires_minutes"], 60)
 
-    async def testMailFailureLogsNoCredential(self) -> None:
-        """Background failures never escape or disclose exception parameters."""
+    async def testMailFailureUsesTheBackgroundTaskLogger(self) -> None:
+        """BackgroundTask logs delivery errors through the framework facade."""
         broker = SimpleNamespace(
             issue=AsyncMock(
                 side_effect=RuntimeError("secret-bearing-backend-error"),
             ),
         )
-        with self.assertLogs(level="ERROR") as logs:
-            await ForgotPasswordController()._sendLink(
-                "ada@example.com",
-                "http://192.168.1.20:8000",
-                broker,
-            )
-        self.assertNotIn("secret-bearing-backend-error", str(logs.output))
+        task = BackgroundTask(
+            ForgotPasswordController()._sendLink,
+            "ada@example.com",
+            "http://192.168.1.20:8000",
+            broker,
+        )
+        with patch("orionis.background.task.Log") as log:
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "secret-bearing-backend-error",
+            ):
+                await task()
+
+        log.error.assert_called_once()
+        self.assertIn("Background task", log.error.call_args.args[0])
+        log.info.assert_not_called()
 
     async def testSuccessRedirectsToLoginAndQueuesNotification(self) -> None:
         """Successful reset does not establish an authenticated session."""

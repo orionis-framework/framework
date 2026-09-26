@@ -7,6 +7,7 @@ from .oracle_nencoding import OracleNencoding
 from .pgsql_charsets import PGSQLCharset
 from .pgsql_collations import PGSQLCollation
 from .pgsql_mode import PGSQLSSLMode
+from .sqlserver_charset import SQLServerCharset
 from .sqlite_foreign_key import SQLiteForeignKey
 from .sqlite_journal import SQLiteJournalMode
 from .sqlite_synchronous import SQLiteSynchronous
@@ -21,6 +22,7 @@ __all__ = [
     "PGSQLCharset",
     "PGSQLCollation",
     "PGSQLSSLMode",
+    "SQLServerCharset",
     "SQLiteForeignKey",
     "SQLiteJournalMode",
     "SQLiteSynchronous",

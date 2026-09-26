@@ -13,18 +13,6 @@ class PGSQLCollation(Enum):
         Binary collation, fast, based on byte order.
     POSIX : str
         Similar to 'C', binary order.
-    EN_US : str
-        English (United States), case-sensitive.
-    EN_US_UTF8 : str
-        English (United States), UTF-8 encoding.
-    ES_ES : str
-        Spanish (Spain).
-    ES_ES_UTF8 : str
-        Spanish (Spain), UTF-8 encoding.
-    DE_DE : str
-        German (Germany).
-    DE_DE_UTF8 : str
-        German (Germany), UTF-8 encoding.
 
     Returns
     -------
@@ -34,9 +22,3 @@ class PGSQLCollation(Enum):
 
     C = "C"
     POSIX = "POSIX"
-    EN_US = "en_US"
-    EN_US_UTF8 = "en_US.utf8"
-    ES_ES = "es_ES"
-    ES_ES_UTF8 = "es_ES.utf8"
-    DE_DE = "de_DE"
-    DE_DE_UTF8 = "de_DE.utf8"

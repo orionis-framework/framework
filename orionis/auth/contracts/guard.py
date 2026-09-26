@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
 
 class IGuard(ABC):
-    """Define how an authenticated identity is extracted from a request.
+    """
+    Define how an authenticated identity is extracted from a request.
 
     A guard answers exactly one question: given the current HTTP context,
     is there an authenticated identity and which one is it?
@@ -17,7 +18,8 @@ class IGuard(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Return the configuration name of this guard.
+        """
+        Return the configuration name of this guard.
 
         Returns
         -------
@@ -27,7 +29,8 @@ class IGuard(ABC):
 
     @abstractmethod
     async def resolve(self, request: Request) -> GuardResult | None:
-        """Resolve the identity backing the incoming request.
+        """
+        Resolve the identity backing the incoming request.
 
         Parameters
         ----------

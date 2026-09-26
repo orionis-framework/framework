@@ -9,7 +9,8 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
 
 class TokenGuard(IGuard):
-    """Resolve the identity of API requests from a personal access token.
+    """
+    Resolve the identity of API requests from a personal access token.
 
     The token travels in the standard header::
 
@@ -34,7 +35,8 @@ class TokenGuard(IGuard):
         tokens: IAccessTokenRepository,
         identities: IIdentityProvider,
     ) -> None:
-        """Initialise the guard with its collaborators.
+        """
+        Initialise the guard with its collaborators.
 
         Parameters
         ----------
@@ -53,7 +55,8 @@ class TokenGuard(IGuard):
 
     @property
     def name(self) -> str:
-        """Return the configuration name of this guard.
+        """
+        Return the configuration name of this guard.
 
         Returns
         -------
@@ -63,7 +66,8 @@ class TokenGuard(IGuard):
         return Guards.TOKEN.value
 
     async def resolve(self, request: Request) -> GuardResult | None:
-        """Resolve the identity owning the presented access token.
+        """
+        Resolve the identity owning the presented access token.
 
         Parameters
         ----------

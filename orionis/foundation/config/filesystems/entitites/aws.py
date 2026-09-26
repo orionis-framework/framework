@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -11,7 +12,7 @@ class S3(BaseEntity):
     Parameters
     ----------
     driver : str, default="aws"
-        The filesystem driver type. Default is "aws".
+        The filesystem driver name. Built-in names are "aws" and "s3".
     key : str
         AWS access key ID.
     secret : str
@@ -122,6 +123,9 @@ class S3(BaseEntity):
         """
         super().__post_init__()
 
+        # Custom drivers may reuse the S3 disk options.
+        validate_string(self.driver, "driver")
+
         # Validate `key` attribute type
         if not isinstance(self.key, str):
             error_msg = "The 'key' attribute must be a string."
@@ -136,7 +140,7 @@ class S3(BaseEntity):
         if not isinstance(self.region, str):
             error_msg = "The 'region' attribute must be a string."
             raise TypeError(error_msg)
-        if not self.region:
+        if not self.region.strip():
             error_msg = "The 'region' attribute must be a non-empty string."
             raise ValueError(error_msg)
 
@@ -157,7 +161,5 @@ class S3(BaseEntity):
 
         # Validate `use_path_style_endpoint` attribute type
         if not isinstance(self.use_path_style_endpoint, bool):
-            error_msg = (
-                "The 'use_path_style_endpoint' attribute must be a boolean."
-            )
+            error_msg = "The 'use_path_style_endpoint' attribute must be a boolean."
             raise TypeError(error_msg)

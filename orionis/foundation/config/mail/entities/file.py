@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -14,7 +15,7 @@ class File(BaseEntity):
     """
 
     path: str = field(
-        default="storage/mail",
+        default_factory=lambda: Env.get("MAIL_FILE_PATH", "storage/mail"),
         metadata={
             "description": "The file path where outgoing emails are stored.",
             "default": "storage/mail",
@@ -36,6 +37,7 @@ class File(BaseEntity):
             This method does not return a value.
         """
         # Ensure 'path' is a non-empty string
+        super().__post_init__()
         if not isinstance(self.path, str) or self.path.strip() == "":
             error_msg = "The 'path' attribute must be a non-empty string."
             raise ValueError(error_msg)

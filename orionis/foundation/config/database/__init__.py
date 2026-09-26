@@ -5,6 +5,7 @@ from orionis.foundation.config.database.entities.oracle import Oracle
 from orionis.foundation.config.database.entities.pgsql import PGSQL
 from orionis.foundation.config.database.entities.sqlite import SQLite
 from orionis.foundation.config.database.entities.sqlserver import SQLServer
+from orionis.foundation.config.database.enums.sqlserver_charset import SQLServerCharset
 from orionis.foundation.config.database.enums.connection_name import ConnectionName
 from orionis.foundation.config.database.enums.mysql_charsets import MySQLCharset
 from orionis.foundation.config.database.enums.mysql_collations import MySQLCollation
@@ -36,6 +37,7 @@ __all__ = [
     "PGSQLCollation",
     "PGSQLSSLMode",
     "SQLServer",
+    "SQLServerCharset",
     "SQLite",
     "SQLiteForeignKey",
     "SQLiteJournalMode",

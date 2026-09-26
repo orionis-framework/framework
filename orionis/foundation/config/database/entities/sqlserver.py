@@ -1,6 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.database.enums.sqlserver_charset import (
+    SQLServerCharset,
+)
+from orionis.foundation.config.validation import normalize_enum, validate_boolean
 from orionis.support.entities.base import BaseEntity
 
 # Valid TCP port boundary for the SQL Server listener.
@@ -87,16 +91,20 @@ class SQLServer(BaseEntity):
         },
     )
 
-    charset: str = field(
-        default_factory=lambda: Env.get("DB_CHARSET", "utf8"),
+    charset: SQLServerCharset | str = field(
+        default_factory=lambda: (
+            Env.get("DB_CHARSET", SQLServerCharset.UTF8.value)
+            if str(Env.get("DB_CONNECTION", "sqlite")).strip().lower() == "sqlserver"
+            else SQLServerCharset.UTF8.value
+        ),
         metadata={
             "description": "The charset used for the connection.",
-            "default": "utf8",
+            "default": SQLServerCharset.UTF8.value,
         },
     )
 
     prefix: str = field(
-        default="",
+        default_factory=lambda: Env.get("DB_PREFIX", ""),
         metadata={
             "description": "Prefix for table names.",
             "default": "",
@@ -104,7 +112,7 @@ class SQLServer(BaseEntity):
     )
 
     prefix_indexes: bool = field(
-        default=True,
+        default_factory=lambda: Env.get("DB_PREFIX_INDEXES", True),
         metadata={
             "description": "Whether to prefix index names.",
             "default": True,
@@ -129,7 +137,8 @@ class SQLServer(BaseEntity):
 
     odbc_driver: str = field(
         default_factory=lambda: Env.get(
-            "DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server",
+            "DB_ODBC_DRIVER",
+            "ODBC Driver 18 for SQL Server",
         ),
         metadata={
             "description": "Name of the ODBC driver used by the connection.",
@@ -138,24 +147,21 @@ class SQLServer(BaseEntity):
     )
 
     def __post_init__(self) -> None:
-        """
-        Perform post-initialization validation for the configuration.
-
-        Validates connection endpoint, credentials, and driver options,
-        raising descriptive exceptions when any value is invalid.
+        """Validate the SQL Server configuration after initialization.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates the entity without returning a value.
 
         Raises
         ------
         ValueError
-            If any attribute has an invalid value.
+            If a configuration value is invalid.
         TypeError
-            If any attribute has an incorrect type.
+            If a configuration field has an incorrect type.
         """
+        # Validate settings in the order required by connection setup.
         super().__post_init__()
         self.__validateDriver()
         self.__validateEndpoint()
@@ -163,19 +169,19 @@ class SQLServer(BaseEntity):
         self.__validateOptions()
 
     def __validateDriver(self) -> None:
-        """
-        Validate the driver discriminator field.
+        """Require the SQL Server driver discriminator.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates the driver without returning a value.
 
         Raises
         ------
         ValueError
-            If the driver is not 'sqlserver'.
+            If the driver is not ``sqlserver``.
         """
+        # Reject configurations that select a different database backend.
         if self.driver != "sqlserver":
             error_msg = (
                 "Invalid driver: expected 'sqlserver'. Please ensure the "
@@ -184,53 +190,53 @@ class SQLServer(BaseEntity):
             raise ValueError(error_msg)
 
     def __validateEndpoint(self) -> None:
-        """
-        Validate host, port, and database fields.
+        """Validate the host, port, and database fields.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates the endpoint without returning a value.
 
         Raises
         ------
         ValueError
-            If the host, port, or database are invalid.
+            If the host, port, or database value is invalid.
         TypeError
             If the port is not an integer.
         """
-        if not self.host or not isinstance(self.host, str):
+        # Keep malformed endpoint values from reaching connection setup.
+        if not isinstance(self.host, str) or not self.host.strip():
             error_msg = "Database host must be a non-empty string."
             raise ValueError(error_msg)
 
-        if not isinstance(self.port, int):
+        if not isinstance(self.port, int) or isinstance(self.port, bool):
             error_msg = "Database port must be an integer."
             raise TypeError(error_msg)
         if self.port < 1 or self.port > _MAX_PORT:
             error_msg = f"Database port must be between 1 and {_MAX_PORT}."
             raise ValueError(error_msg)
 
-        if not self.database or not isinstance(self.database, str):
+        if not isinstance(self.database, str) or not self.database.strip():
             error_msg = "Database name must be a non-empty string."
             raise ValueError(error_msg)
 
     def __validateCredentials(self) -> None:
-        """
-        Validate username and password fields.
+        """Validate the username and password fields.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates credentials without returning a value.
 
         Raises
         ------
         TypeError
-            If the username or password have an incorrect type.
+            If the username or password has an incorrect type.
         ValueError
             If the username is empty.
         """
-        if not self.username or not isinstance(self.username, str):
+        # Require a username while permitting an empty password.
+        if not isinstance(self.username, str) or not self.username.strip():
             error_msg = "Database username must be a non-empty string."
             raise ValueError(error_msg)
         if not isinstance(self.password, str):
@@ -238,24 +244,47 @@ class SQLServer(BaseEntity):
             raise TypeError(error_msg)
 
     def __validateOptions(self) -> None:
-        """
-        Validate prefix and ODBC driver options.
+        """Validate the prefix, charset, and ODBC connection options.
 
         Returns
         -------
         None
-            This method does not return a value.
+            This method validates options without returning a value.
 
         Raises
         ------
         ValueError
-            If the ODBC driver name is empty.
+            If an option value is invalid.
         TypeError
-            If the prefix is not a string.
+            If an option has an incorrect type.
         """
+        # Validate options before the connection configuration is consumed.
         if not isinstance(self.prefix, str):
             error_msg = "Table prefix must be a string."
             raise TypeError(error_msg)
-        if not self.odbc_driver or not isinstance(self.odbc_driver, str):
+        if not isinstance(self.odbc_driver, str) or not self.odbc_driver.strip():
             error_msg = "The ODBC driver name must be a non-empty string."
+            raise ValueError(error_msg)
+
+        object.__setattr__(
+            self,
+            "charset",
+            normalize_enum(self.charset, SQLServerCharset, "charset"),
+        )
+        validate_boolean(self.prefix_indexes, "prefix_indexes")
+        validate_boolean(self.trust_server_certificate, "trust_server_certificate")
+        if not isinstance(self.encrypt, (bool, str)):
+            error_msg = "'encrypt' must be a boolean or a supported encryption mode."
+            raise TypeError(error_msg)
+        if isinstance(self.encrypt, str) and self.encrypt.strip().lower() not in {
+            "yes",
+            "no",
+            "true",
+            "false",
+            "on",
+            "off",
+            "1",
+            "0",
+        }:
+            error_msg = "'encrypt' is not a supported encryption mode."
             raise ValueError(error_msg)

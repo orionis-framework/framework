@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.foundation.config.hashing.entities.argon2 import Argon2
 from orionis.foundation.config.hashing.entities.bcrypt import Bcrypt
 from orionis.foundation.config.hashing.enums import Drivers
@@ -33,7 +33,7 @@ class Hashing(BaseEntity):
                 "The default password hashing driver. Can be a member of "
                 "the Drivers enum or a string ('argon2', 'bcrypt')."
             ),
-            "default": Drivers.ARGON2.value,
+            "default": "argon2",
         },
     )
 
@@ -76,8 +76,7 @@ class Hashing(BaseEntity):
         # Reject types that are neither Drivers enum nor string
         if not isinstance(self.driver, (Drivers, str)):
             error_msg = (
-                "The default hashing driver must be an instance of "
-                "Drivers or a string."
+                "The default hashing driver must be an instance of Drivers or a string."
             )
             raise TypeError(error_msg)
 

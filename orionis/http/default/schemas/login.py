@@ -3,7 +3,6 @@ from orionis.schemas.constraints import Email, MinLength
 from orionis.schemas.fields import Field, Nullable
 from orionis.schemas.metadata import Message
 
-
 class LoginSchema(Schema):
 
     # ruff: noqa: TC001

@@ -1,8 +1,6 @@
 from collections.abc import Sequence
 from itertools import chain
 from typing import TYPE_CHECKING
-from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
-from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.routes.contracts.router import IRouter
@@ -169,36 +167,18 @@ class Router(IRouter):
         ValueError
             If registration is attempted outside the web route context.
         """
-        # Ensure that the auth routes are only registered within the web context.
         if self.__current_kind != "web":
-            error_msg = "Route.auth() must be declared in a web route file."
+            error_msg = "The auth() helper can only be used in the web route file."
             raise ValueError(error_msg)
 
-        # Load built-in controllers only when their routes are requested.
-        login = login_controller
-        if login is None:
-            from orionis.http.default.controllers.login_controller import (  # noqa: PLC0415
-                LoginController,
-            )
-            login = LoginController
+        # Keep the application-specific auth controllers out of imports for
+        # applications that do not register the built-in auth routes.
+        from orionis.http.routes.auth import build_auth_routes  # noqa: PLC0415
 
-        register = register_controller
-        if register is None:
-            from orionis.http.default.controllers.register_controller import (  # noqa: PLC0415
-                RegisterController,
-            )
-            register = RegisterController
-
-        # Register the auth routes with the appropriate middleware and controllers.
-        self.group(middleware=GuestMiddleware, routes=[
-            self.get("/login", [login, "index"]),
-            self.post("/login", [login, "login"]).name("login"),
-            self.get("/sign-up", [register, "index"]),
-            self.post("/sign-up", [register, "register"]).name("register"),
-        ])
-        self.get("/verify-email", [register, "verifyEmail"]).name("verify-email")
-        self.post("/logout", [login, "logout"]).name("logout").middleware(
-            AuthenticateSessionMiddleware,
+        build_auth_routes(
+            self,
+            login_controller=login_controller,
+            register_controller=register_controller,
         )
 
     def view(

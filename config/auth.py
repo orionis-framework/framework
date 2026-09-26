@@ -80,6 +80,6 @@ class BootstrapAppAuth(Auth):
         default_factory=lambda: RememberAuth(
             cookie=Env.get("AUTH_REMEMBER_COOKIE", "orionis_remember"),
             lifetime=Env.get("AUTH_REMEMBER_LIFETIME", 43200),
-            secure=Env.get("AUTH_REMEMBER_SECURE", True),
+            secure=Env.get("AUTH_REMEMBER_SECURE", False),
         ),
     )

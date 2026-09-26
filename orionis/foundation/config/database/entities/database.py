@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.database.entities.connections import Connections
 from orionis.foundation.config.database.enums.connection_name import ConnectionName
-from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozenset of valid connection names for O(1) membership checks
@@ -29,7 +29,7 @@ class Database(BaseEntity):
                 "The default database connection name. Can be a member of the "
                 "ConnectionName enum or a string (e.g., 'sqlite', 'mysql')."
             ),
-            "default": ConnectionName.SQLITE.value,
+            "default": "sqlite",
         },
     )
 
@@ -47,7 +47,7 @@ class Database(BaseEntity):
 
         Validates that the 'default' attribute is a valid ConnectionName member
         or a string corresponding to one. Ensures that the 'connections' attribute
-        is an instance of Connections or a non-empty dictionary. Raises an
+        is an instance of Connections or a dictionary. Raises an
         exception if validation fails.
 
         Parameters
@@ -86,12 +86,13 @@ class Database(BaseEntity):
             object.__setattr__(self, "default", self.default.value)
 
         # Validate the 'connections' attribute
-        if not self.connections or not isinstance(
-            self.connections, (Connections, dict),
+        if not isinstance(
+            self.connections,
+            (Connections, dict),
         ):
             error_msg = (
                 "The 'connections' attribute must be an instance of Connections or a "
-                "non-empty dictionary."
+                "dictionary."
             )
             raise TypeError(error_msg)
         # Convert dict to Connections if necessary

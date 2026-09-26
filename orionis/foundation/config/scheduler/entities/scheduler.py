@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.foundation.config.scheduler.entities.stores import Stores
 from orionis.foundation.config.scheduler.enums.drivers import Drivers
+from orionis.foundation.config.validation import validate_integer
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed frozenset of valid driver names for O(1) membership checks
@@ -52,7 +53,7 @@ class Scheduler(BaseEntity):
                 "a member of the Drivers enum or a string (e.g., 'memory', "
                 "'redis')."
             ),
-            "default": Drivers.MEMORY.value,
+            "default": "memory",
         },
     )
 
@@ -68,7 +69,7 @@ class Scheduler(BaseEntity):
     )
 
     max_instances: int = field(
-        default=1,
+        default_factory=lambda: Env.get("TASKS_MAX_INSTANCES", 1),
         metadata={
             "description": (
                 "Maximum number of concurrently running instances allowed "
@@ -79,18 +80,17 @@ class Scheduler(BaseEntity):
     )
 
     coalesce: bool = field(
-        default=True,
+        default_factory=lambda: Env.get("TASKS_COALESCE", True),
         metadata={
             "description": (
-                "Whether missed runs of a job are collapsed into a single "
-                "run."
+                "Whether missed runs of a job are collapsed into a single run."
             ),
             "default": True,
         },
     )
 
-    misfire_grace_time: int = field(
-        default=30,
+    misfire_grace_time: int | None = field(
+        default_factory=lambda: Env.get("TASKS_MISFIRE_GRACE_TIME", 30),
         metadata={
             "description": (
                 "Number of seconds a job is allowed to run late before it "
@@ -101,7 +101,7 @@ class Scheduler(BaseEntity):
     )
 
     replace_existing: bool = field(
-        default=True,
+        default_factory=lambda: Env.get("TASKS_REPLACE_EXISTING", True),
         metadata={
             "description": (
                 "Whether adding a job with an already registered id "
@@ -112,7 +112,7 @@ class Scheduler(BaseEntity):
     )
 
     jitter: int = field(
-        default=0,
+        default_factory=lambda: Env.get("TASKS_JITTER", 0),
         metadata={
             "description": (
                 "Maximum number of seconds of random delay applied to job "
@@ -142,8 +142,7 @@ class Scheduler(BaseEntity):
         # Reject types that are neither Drivers enum nor string
         if not isinstance(self.store, (Drivers, str)):
             error_msg = (
-                "The default job store must be an instance of "
-                "Drivers or a string."
+                "The default job store must be an instance of Drivers or a string."
             )
             raise TypeError(error_msg)
 
@@ -206,7 +205,8 @@ class Scheduler(BaseEntity):
             If ``max_instances`` is lower than ``1``.
         """
         if not isinstance(self.max_instances, int) or isinstance(
-            self.max_instances, bool,
+            self.max_instances,
+            bool,
         ):
             error_msg = "The 'max_instances' property must be an integer."
             raise TypeError(error_msg)
@@ -244,22 +244,12 @@ class Scheduler(BaseEntity):
         Raises
         ------
         TypeError
-            If ``misfire_grace_time`` is not an integer.
+            If ``misfire_grace_time`` is not an integer or None.
         ValueError
-            If ``misfire_grace_time`` is negative.
+            If ``misfire_grace_time`` is lower than ``1``.
         """
-        if not isinstance(self.misfire_grace_time, int) or isinstance(
-            self.misfire_grace_time, bool,
-        ):
-            error_msg = (
-                "The 'misfire_grace_time' property must be an integer."
-            )
-            raise TypeError(error_msg)
-        if self.misfire_grace_time < 0:
-            error_msg = (
-                "The 'misfire_grace_time' property cannot be negative."
-            )
-            raise ValueError(error_msg)
+        if self.misfire_grace_time is not None:
+            validate_integer(self.misfire_grace_time, "misfire_grace_time", minimum=1)
 
     def __validateReplaceExisting(self) -> None:
         """
@@ -325,6 +315,9 @@ class Scheduler(BaseEntity):
         # Validate each property according to its type hint
         self.__validateStore()
         self.__validateStores()
+        if getattr(self.stores, self.store) is None:
+            message = "The selected scheduler store must be configured."
+            raise ValueError(message)
         self.__validateMaxInstances()
         self.__validateCoalesce()
         self.__validateMisfireGraceTime()

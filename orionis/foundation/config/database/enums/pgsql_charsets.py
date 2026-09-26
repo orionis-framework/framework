@@ -2,27 +2,25 @@ from enum import Enum
 
 class PGSQLCharset(Enum):
     """
-    Enumerate supported PostgreSQL character encodings.
+    Enumerate PostgreSQL encodings supported for database storage.
 
-    Each member represents a valid encoding name usable in PostgreSQL databases.
-    These encodings determine how text data is stored and interpreted.
+    PostgreSQL converts between the database encoding and the UTF-8 client
+    protocol used by ``asyncpg``. This enum contains server-side encodings
+    with built-in UTF-8 conversion, excluding client-only encodings,
+    ``MULE_INTERNAL``, and ``SQL_ASCII``.
 
     Attributes
     ----------
-    BIG5 : str
-        Traditional Chinese encoding.
     EUC_CN : str
         Extended Unix Code for Simplified Chinese.
     EUC_JP : str
         Extended Unix Code for Japanese.
+    EUC_JIS_2004 : str
+        Japanese EUC encoding for JIS X 0213.
     EUC_KR : str
         Extended Unix Code for Korean.
     EUC_TW : str
         Extended Unix Code for Traditional Chinese.
-    GB18030 : str
-        Chinese National Standard encoding.
-    GBK : str
-        Extended Guobiao encoding for Simplified Chinese.
     ISO_8859_5 : str
         ISO 8859-5 Cyrillic encoding.
     ISO_8859_6 : str
@@ -31,8 +29,6 @@ class PGSQLCharset(Enum):
         ISO 8859-7 Greek encoding.
     ISO_8859_8 : str
         ISO 8859-8 Hebrew encoding.
-    JOHAB : str
-        Korean Johab encoding.
     KOI8R : str
         KOI8-R Russian encoding.
     KOI8U : str
@@ -57,14 +53,6 @@ class PGSQLCharset(Enum):
         ISO 8859-15 Western European encoding with Euro.
     LATIN10 : str
         ISO 8859-16 South-Eastern European encoding.
-    MULE_INTERNAL : str
-        Mule internal encoding.
-    SJIS : str
-        Shift JIS Japanese encoding.
-    SQL_ASCII : str
-        No encoding; raw bytes.
-    UHC : str
-        Unified Hangul Code for Korean.
     UTF8 : str
         Unicode UTF-8 encoding.
     WIN866 : str
@@ -93,21 +81,18 @@ class PGSQLCharset(Enum):
     Returns
     -------
     PGSQLCharset
-        The enumeration member representing a PostgreSQL character encoding.
+        The enumeration member representing a PostgreSQL database encoding.
     """
 
-    BIG5 = "BIG5"
     EUC_CN = "EUC_CN"
     EUC_JP = "EUC_JP"
+    EUC_JIS_2004 = "EUC_JIS_2004"
     EUC_KR = "EUC_KR"
     EUC_TW = "EUC_TW"
-    GB18030 = "GB18030"
-    GBK = "GBK"
     ISO_8859_5 = "ISO_8859_5"
     ISO_8859_6 = "ISO_8859_6"
     ISO_8859_7 = "ISO_8859_7"
     ISO_8859_8 = "ISO_8859_8"
-    JOHAB = "JOHAB"
     KOI8R = "KOI8R"
     KOI8U = "KOI8U"
     LATIN1 = "LATIN1"
@@ -120,10 +105,6 @@ class PGSQLCharset(Enum):
     LATIN8 = "LATIN8"
     LATIN9 = "LATIN9"
     LATIN10 = "LATIN10"
-    MULE_INTERNAL = "MULE_INTERNAL"
-    SJIS = "SJIS"
-    SQL_ASCII = "SQL_ASCII"
-    UHC = "UHC"
     UTF8 = "UTF8"
     WIN866 = "WIN866"
     WIN874 = "WIN874"

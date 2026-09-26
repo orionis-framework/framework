@@ -1,13 +1,17 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, fields as dc_fields
+
+from dataclasses import dataclass, field
+from dataclasses import fields as dc_fields
+
+from orionis.environment import Env
 from orionis.foundation.config.queue.entities.brokers import Brokers
-from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 # Pre-computed broker field names
-_BROKER_OPTIONS: frozenset[str] = frozenset(
-    f.name for f in dc_fields(Brokers)
-) | {"async"}
+_BROKER_OPTIONS: frozenset[str] = frozenset(f.name for f in dc_fields(Brokers)) | {
+    "async",
+}
+
 
 @dataclass(frozen=True, kw_only=True)
 class Queue(BaseEntity):

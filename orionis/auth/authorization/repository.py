@@ -23,7 +23,8 @@ _ROLE_ID: str = "role_id"
 _PERMISSION_ID: str = "permission_id"
 
 class DatabasePermissionRepository(IPermissionRepository):
-    """Load permissions and roles from the framework authorization tables.
+    """
+    Load permissions and roles from the framework authorization tables.
 
     Roles, direct permissions and role permissions are resolved in one
     UNION statement, once per request. No intermediate role-ID list can
@@ -40,7 +41,8 @@ class DatabasePermissionRepository(IPermissionRepository):
     __slots__ = ("__db",)
 
     def __init__(self, db: IQueryBuilder) -> None:
-        """Initialise the repository with the model-less query gateway.
+        """
+        Initialise the repository with the model-less query gateway.
 
         Parameters
         ----------
@@ -58,7 +60,8 @@ class DatabasePermissionRepository(IPermissionRepository):
         self,
         authorizable: IAuthorizable,
     ) -> tuple[frozenset[str], frozenset[str]]:
-        """Load the permissions and roles owned by an identity.
+        """
+        Load the permissions and roles owned by an identity.
 
         Parameters
         ----------
@@ -92,7 +95,8 @@ class DatabasePermissionRepository(IPermissionRepository):
         model_type: str,
         model_id: object,
     ) -> IRawQueryBuilder:
-        """Build the role arm of the authorization statement.
+        """
+        Build the role arm of the authorization statement.
 
         Parameters
         ----------
@@ -125,7 +129,8 @@ class DatabasePermissionRepository(IPermissionRepository):
         model_type: str,
         model_id: object,
     ) -> IRawQueryBuilder:
-        """Build the direct-permission arm of the authorization statement.
+        """
+        Build the direct-permission arm of the authorization statement.
 
         Parameters
         ----------
@@ -158,7 +163,8 @@ class DatabasePermissionRepository(IPermissionRepository):
         model_type: str,
         model_id: object,
     ) -> IRawQueryBuilder:
-        """Build inherited permissions constrained to the current owner's roles.
+        """
+        Build inherited permissions constrained to the current owner's roles.
 
         Parameters
         ----------

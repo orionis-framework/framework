@@ -203,7 +203,8 @@ class TestAuthConfiguration(TestCase):
         """
         payload = Auth().toDict()
         self.assertEqual(
-            sorted(payload), ["default", "identity", "session", "tokens"],
+            sorted(payload),
+            ["default", "identity", "passwords", "remember", "session", "tokens"],
         )
         self.assertEqual(payload["tokens"]["table"], "personal_access_tokens")
 

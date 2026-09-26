@@ -110,5 +110,18 @@
     "Reset password": "Restablecer contraseña",
     "For your security, do not share this link with anyone. The :app team will never ask you for your password.": "Por tu seguridad, no compartas este enlace con nadie. El equipo de :app nunca te solicitará tu contraseña.",
     "If you did not request a password reset, ignore this email. Your account will not change and the link will expire automatically.": "Si no solicitaste restablecer tu contraseña, ignora este correo. Tu cuenta no cambiará y el enlace expirará automáticamente.",
-    "ACCOUNT SECURITY": "SEGURIDAD DE LA CUENTA"
+    "ACCOUNT SECURITY": "SEGURIDAD DE LA CUENTA",
+    "Keep me signed in on this device": "Mantener mi sesión en este dispositivo",
+    "Enter your email address and we will send you a link to reset your password.": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
+    "Send reset link": "Enviar enlace de recuperación",
+    "If an account matches that email, you will receive a password reset link.": "Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.",
+    "Enter a valid email address.": "Ingresa un correo electrónico válido.",
+    "This password reset link is invalid or has expired.": "Este enlace de recuperación no es válido o ha expirado.",
+    "Choose a new password for your account.": "Elige una nueva contraseña para tu cuenta.",
+    "Request a new reset link": "Solicitar otro enlace de recuperación",
+    "Back to sign in": "Volver al inicio de sesión",
+    "This password reset link expires in :minutes minutes.": "Este enlace de recuperación expira en :minutes minutos.",
+    "Your password has been reset. Please log in.": "Tu contraseña se ha restablecido. Inicia sesión.",
+    "Your password was reset": "Tu contraseña se ha restablecido",
+    "Your password has been reset. If you did not make this change, contact support immediately.": "Tu contraseña se ha restablecido. Si no realizaste este cambio, contacta a soporte inmediatamente."
 }

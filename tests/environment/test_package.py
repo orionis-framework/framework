@@ -1,6 +1,6 @@
 from types import ModuleType
 from orionis import environment as environment_package
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.environment.functions import env
 from orionis.test import TestCase
 

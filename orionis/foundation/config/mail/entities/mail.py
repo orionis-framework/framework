@@ -1,8 +1,13 @@
 from __future__ import annotations
+from copy import deepcopy
 from dataclasses import dataclass, field
+from orionis.environment import Env
+from orionis.foundation.config.mail.entities.file import File
 from orionis.foundation.config.mail.entities.from_address import FromAddress
 from orionis.foundation.config.mail.entities.mailers import Mailers
-from orionis.environment.facade import Env
+from orionis.foundation.config.mail.entities.smtp import Smtp
+from orionis.foundation.config.mail.enums.drivers import MailDriver
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -12,16 +17,16 @@ class Mail(BaseEntity):
 
     Attributes
     ----------
-    default : str
-        The default configured mailer name, not its transport driver.
+    default : str or MailDriver
+        The default configured mailer name or its transport driver.
     from_address : FromAddress or dict
         Global sender applied to every message that declares no From header.
     mailers : Mailers or dict
         Conventional entities or arbitrary mailer names mapped to their settings.
     """
 
-    default: str = field(
-        default_factory=lambda: Env.get("MAIL_MAILER", "smtp"),
+    default: str | MailDriver = field(
+        default_factory=lambda: Env.get("MAIL_MAILER", MailDriver.SMTP),
         metadata={
             "description": "The default configured mailer name.",
             "default": "smtp",
@@ -45,49 +50,71 @@ class Mail(BaseEntity):
     )
 
     def __post_init__(self) -> None:
-        """Validate the configuration shape without resolving transports.
+        """
+        Post-initialization processing for the Mail entity.
 
-        Preserve named dictionary entries for driver registration by providers.
-        Transport availability and operational settings are checked on sending.
-
-        Returns
-        -------
-        None
-            Copy dictionary entries without modifying the supplied configuration.
+        This method validates the default mailer, the from_address, and the mailers.
+        It ensures that the default mailer is declared in the mailers and that all
+        nested settings are correctly typed and structured.
 
         Raises
         ------
-        ValueError
-            If the default or a mailer name is empty or not a string.
         TypeError
-            If the global sender, mailers or their settings have an
-            unsupported structure.
+            If any of the attributes are not of the expected type.
+        ValueError
+            If the default mailer is not declared in the mailers.
         """
-        if not isinstance(self.default, str) or not self.default.strip():
-            error_msg = "The 'default' property must be a non-empty mailer name."
-            raise ValueError(error_msg)
-
+        super().__post_init__()
+        validate_string(self.default, "default")
         if not isinstance(self.from_address, (FromAddress, dict)):
-            error_msg = (
-                "The 'from_address' property must be an instance of FromAddress "
-                "or a dictionary."
-            )
-            raise TypeError(error_msg)
-
+            message = "'from_address' must be a FromAddress or dictionary."
+            raise TypeError(message)
+        if isinstance(self.from_address, dict):
+            FromAddress(**self.from_address)
+            object.__setattr__(self, "from_address", deepcopy(self.from_address))
         if not isinstance(self.mailers, (Mailers, dict)):
-            error_msg = (
-                "The 'mailers' property must be an instance of Mailers or a dictionary."
-            )
-            raise TypeError(error_msg)
-        if not isinstance(self.mailers, dict):
-            return
-        entries = {}
+            message = "'mailers' must be a Mailers or dictionary."
+            raise TypeError(message)
+        if isinstance(self.mailers, dict):
+            self.__validateMailers()
+            available = self.mailers
+        else:
+            available = self.mailers.toDict()
+        if self.default not in available:
+            message = "The default mailer must be declared in 'mailers'."
+            raise ValueError(message)
+
+    def __validateMailers(self) -> None:
+        """
+        Validate nested mailer settings and ensure they are correctly typed.
+
+        This method iterates over the mailers, checking that each mailer is either
+        a dictionary, Smtp, or File instance. If a mailer is a dictionary, it will
+        be validated and converted to the appropriate type.
+
+        Raises
+        ------
+        TypeError
+            If any of the mailer settings are not of the expected type.
+        ValueError
+            If the mailer settings are invalid or missing required keys.
+        """
         for name, settings in self.mailers.items():
-            if not isinstance(name, str) or not name.strip():
-                error_msg = "Mailer names must be non-empty strings."
-                raise ValueError(error_msg)
-            if not isinstance(settings, (dict, BaseEntity)):
-                error_msg = "Mailer settings must be dictionaries or entities."
-                raise TypeError(error_msg)
-            entries[name] = dict(settings) if isinstance(settings, dict) else settings
-        object.__setattr__(self, "mailers", entries)
+            validate_string(name, "mailer name")
+            if not isinstance(settings, (dict, Smtp, File)):
+                message = "Mailer settings must be a dictionary, Smtp, or File."
+                raise TypeError(message)
+            if isinstance(settings, dict):
+                driver = settings.get("driver", name)
+                validate_string(driver, "mailer driver")
+                if driver == "smtp":
+                    Smtp(**settings)
+                elif driver == "file":
+                    File(
+                        **{
+                            key: value
+                            for key, value in settings.items()
+                            if key != "driver"
+                        },
+                    )
+        object.__setattr__(self, "mailers", deepcopy(self.mailers))

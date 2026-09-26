@@ -36,34 +36,34 @@ class Stores(BaseEntity):
     )
 
     memory: Memory | dict | None = field(
-        default=None,
+        default_factory=Memory,
         metadata={
             "description": "In-memory cache storage configuration.",
-            "default": None,
+            "default": lambda: Memory().toDict(),
         },
     )
 
     redis: Redis | dict | None = field(
-        default=None,
+        default_factory=Redis,
         metadata={
             "description": "Redis cache storage configuration.",
-            "default": None,
+            "default": lambda: Redis().toDict(),
         },
     )
 
     memcached: Memcached | dict | None = field(
-        default=None,
+        default_factory=Memcached,
         metadata={
             "description": "Memcached cache storage configuration.",
-            "default": None,
+            "default": lambda: Memcached().toDict(),
         },
     )
 
     database: Database | dict | None = field(
-        default=None,
+        default_factory=Database,
         metadata={
             "description": "Database-backed cache storage configuration.",
-            "default": None,
+            "default": lambda: Database().toDict(),
         },
     )
 

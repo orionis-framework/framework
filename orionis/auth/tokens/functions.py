@@ -2,7 +2,8 @@ import hashlib
 import secrets
 
 def generate_token_secret(size: int) -> str:
-    """Generate the plain text secret of a personal access token.
+    """
+    Generate the plain text secret of a personal access token.
 
     Parameters
     ----------
@@ -19,7 +20,8 @@ def generate_token_secret(size: int) -> str:
     return secrets.token_urlsafe(size)
 
 def hash_token_secret(secret: str) -> str:
-    """Derive the value persisted for a personal access token.
+    """
+    Derive the value persisted for a personal access token.
 
     Only this digest reaches the database, so a leaked row never exposes
     a usable credential. SHA-256 is appropriate here because the input is

@@ -4,6 +4,9 @@ import subprocess
 import sys
 from pathlib import Path
 from orionis.auth.middleware import AuthenticateSessionMiddleware, GuestMiddleware
+from orionis.http.default.controllers.forgot_password_controller import (
+    ForgotPasswordController,
+)
 from orionis.http.default.controllers.login_controller import LoginController
 from orionis.http.default.controllers.register_controller import RegisterController
 from orionis.http.routes.route_cache import RouteCache
@@ -21,6 +24,22 @@ _AUTH_ROUTES = (
     ("POST", "/login", LoginController, "login", "login", GuestMiddleware),
     ("GET", "/sign-up", RegisterController, "index", None, GuestMiddleware),
     ("POST", "/sign-up", RegisterController, "register", "register", GuestMiddleware),
+    (
+        "GET", "/forgot-password", ForgotPasswordController,
+        "index", None, GuestMiddleware,
+    ),
+    (
+        "POST", "/forgot-password", ForgotPasswordController,
+        "sendResetLinkEmail", "forgot-password", GuestMiddleware,
+    ),
+    (
+        "GET", "/reset-password", ForgotPasswordController,
+        "showResetForm", "password.reset", GuestMiddleware,
+    ),
+    (
+        "POST", "/reset-password", ForgotPasswordController,
+        "resetPassword", "password.update", GuestMiddleware,
+    ),
     ("GET", "/verify-email", RegisterController, "verifyEmail", "verify-email", None),
     (
         "POST", "/logout", LoginController, "logout", "logout",
@@ -38,7 +57,7 @@ class TestRouteAuth(TestCase):
         facade = type("AuthRoutes", (Route,), {"_pinned_instance": router})
         initial = len(router.export()["routes"])
         self.assertIsNone(facade.auth())
-        self.assertEqual(len(router.export()["routes"]), initial + 6)
+        self.assertEqual(len(router.export()["routes"]), initial + len(_AUTH_ROUTES))
         resolver = RouteResolver(compile_router(router))
         for method, path, controller, action, name, middleware in _AUTH_ROUTES:
             with self.subTest(method=method, path=path):

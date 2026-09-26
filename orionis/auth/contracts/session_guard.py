@@ -17,8 +17,10 @@ class ISessionGuard(IGuard):
         self,
         request: Request,
         credentials: Mapping[str, object],
+        *, remember: bool = False,
     ) -> IAuthenticatable | None:
-        """Validate credentials and start an authenticated session.
+        """
+        Validate credentials and start an authenticated session.
 
         Parameters
         ----------
@@ -26,6 +28,8 @@ class ISessionGuard(IGuard):
             Incoming HTTP request owning the session.
         credentials : Mapping[str, object]
             Submitted credentials, typically the username and password.
+        remember : bool, optional
+            Issue a persistent login credential after verifying the password.
 
         Returns
         -------
@@ -36,7 +40,8 @@ class ISessionGuard(IGuard):
 
     @abstractmethod
     def login(self, request: Request, identity: IAuthenticatable) -> None:
-        """Persist an identity in the session of the current request.
+        """
+        Persist an identity in the session of the current request.
 
         The session identifier is rotated to close any session fixation
         window opened before the login.
@@ -55,8 +60,9 @@ class ISessionGuard(IGuard):
         """
 
     @abstractmethod
-    def logout(self, request: Request) -> None:
-        """Drop the authenticated state from the session.
+    async def logout(self, request: Request) -> None:
+        """
+        Drop the authenticated state from the session.
 
         Parameters
         ----------

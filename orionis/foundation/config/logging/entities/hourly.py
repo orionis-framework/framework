@@ -1,11 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
-
-# Pre-computed level name
-_LEVEL_NAMES: frozenset[str] = frozenset(lv.name for lv in Level)
 
 @dataclass(frozen=True, kw_only=True)
 class Hourly(BaseEntity):
@@ -28,7 +26,7 @@ class Hourly(BaseEntity):
     """
 
     path: str = field(
-        default="storage/logs/hourly_{suffix}.log",
+        default_factory=lambda: Env.get("LOG_PATH", "storage/logs/hourly_{suffix}.log"),
         metadata={
             "description": "The file path where the log is stored.",
             "default": "storage/logs/hourly_{suffix}.log",
@@ -36,21 +34,19 @@ class Hourly(BaseEntity):
     )
 
     level: int | str | Level = field(
-        default=Level.INFO.value,
+        default_factory=lambda: Env.get("LOG_LEVEL", Level.INFO),
         metadata={
             "description": (
                 "The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)."
             ),
-            "default": Level.INFO.value,
+            "default": "INFO",
         },
     )
 
     retention_hours: int = field(
-        default=24,
+        default_factory=lambda: Env.get("LOG_RETENTION", 24),
         metadata={
-            "description": (
-                "The number of hours to retain log files before deletion."
-            ),
+            "description": ("The number of hours to retain log files before deletion."),
             "default": 24,
         },
     )
@@ -83,18 +79,16 @@ class Hourly(BaseEntity):
         IsValidPath(self.path, suffix=True)
 
         # Validate 'level' using the IsValidLevel validator.
-        IsValidLevel(self.level)
+        object.__setattr__(self, "level", IsValidLevel.normalize(self.level))
 
         # Normalise the logging level to its integer value.
-        if isinstance(self.level, Level):
-            object.__setattr__(self, "level", self.level.value)
-        elif isinstance(self.level, str):
-            _key = self.level.strip().upper()
-            if _key in _LEVEL_NAMES:
-                object.__setattr__(self, "level", Level[_key].value)
 
         # Ensure 'retention_hours' is a non-negative integer.
-        if not isinstance(self.retention_hours, int) or self.retention_hours < 0:
+        if (
+            not isinstance(self.retention_hours, int)
+            or isinstance(self.retention_hours, bool)
+            or self.retention_hours < 0
+        ):
             error_msg = (
                 "File cache configuration error: 'retention_hours' must be a "
                 f"non-negative integer, got {self.retention_hours}."

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 # Number of random bytes used to build the secret half of a token.
@@ -23,7 +23,7 @@ class Tokens(BaseEntity):
     """
 
     table: str = field(
-        default="personal_access_tokens",
+        default_factory=lambda: Env.get("AUTH_TOKEN_TABLE", "personal_access_tokens"),
         metadata={
             "description": "Table storing the issued personal access tokens.",
             "default": "personal_access_tokens",
@@ -42,7 +42,7 @@ class Tokens(BaseEntity):
     )
 
     secret_bytes: int = field(
-        default=40,
+        default_factory=lambda: Env.get("AUTH_TOKEN_SECRET_BYTES", 40),
         metadata={
             "description": (
                 "Number of random bytes used to build the secret of a "
@@ -80,22 +80,22 @@ class Tokens(BaseEntity):
 
         if self.expiration is not None:
             if not isinstance(self.expiration, int) or isinstance(
-                self.expiration, bool,
+                self.expiration,
+                bool,
             ):
                 error_msg = (
-                    "The auth tokens 'expiration' option must be an integer "
-                    "or null."
+                    "The auth tokens 'expiration' option must be an integer or null."
                 )
                 raise TypeError(error_msg)
             if self.expiration <= 0:
                 error_msg = (
-                    "The auth tokens 'expiration' option must be greater "
-                    "than zero."
+                    "The auth tokens 'expiration' option must be greater than zero."
                 )
                 raise ValueError(error_msg)
 
         if not isinstance(self.secret_bytes, int) or isinstance(
-            self.secret_bytes, bool,
+            self.secret_bytes,
+            bool,
         ):
             error_msg = "The auth tokens 'secret_bytes' option must be an integer."
             raise TypeError(error_msg)

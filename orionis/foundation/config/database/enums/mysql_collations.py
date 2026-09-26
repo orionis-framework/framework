@@ -4,10 +4,9 @@ class MySQLCollation(Enum):
     """
     Enumerate common MySQL collations.
 
-    This enum provides string constants for various MySQL collations, including
-    those for UTF-8, UTF-8MB4, Latin1, ASCII, UCS2, UTF16, and UTF32 character
-    sets. Each member corresponds to a specific collation name as used in MySQL
-    databases.
+    This enum provides connection-compatible collation names for the UTF-8,
+    Latin1, ASCII, and GB18030 character sets. The selected collation must
+    match the configured connection character set.
 
     Attributes
     ----------
@@ -33,24 +32,12 @@ class MySQLCollation(Enum):
         ASCII, case-insensitive, general collation.
     ASCII_BIN : str
         ASCII, binary collation.
-    UCS2_GENERAL_CI : str
-        UCS2, case-insensitive, general collation.
-    UCS2_UNICODE_CI : str
-        UCS2, case-insensitive, Unicode collation.
-    UCS2_BIN : str
-        UCS2, binary collation.
-    UTF16_GENERAL_CI : str
-        UTF-16, case-insensitive, general collation.
-    UTF16_UNICODE_CI : str
-        UTF-16, case-insensitive, Unicode collation.
-    UTF16_BIN : str
-        UTF-16, binary collation.
-    UTF32_GENERAL_CI : str
-        UTF-32, case-insensitive, general collation.
-    UTF32_UNICODE_CI : str
-        UTF-32, case-insensitive, Unicode collation.
-    UTF32_BIN : str
-        UTF-32, binary collation.
+    GB18030_CHINESE_CI : str
+        GB18030 default Chinese collation.
+    GB18030_BIN : str
+        GB18030 binary collation.
+    GB18030_UNICODE_520_CI : str
+        GB18030 Unicode 5.2 collation.
     """
 
     UTF8_GENERAL_CI = "utf8_general_ci"
@@ -64,12 +51,6 @@ class MySQLCollation(Enum):
     LATIN1_BIN = "latin1_bin"
     ASCII_GENERAL_CI = "ascii_general_ci"
     ASCII_BIN = "ascii_bin"
-    UCS2_GENERAL_CI = "ucs2_general_ci"
-    UCS2_UNICODE_CI = "ucs2_unicode_ci"
-    UCS2_BIN = "ucs2_bin"
-    UTF16_GENERAL_CI = "utf16_general_ci"
-    UTF16_UNICODE_CI = "utf16_unicode_ci"
-    UTF16_BIN = "utf16_bin"
-    UTF32_GENERAL_CI = "utf32_general_ci"
-    UTF32_UNICODE_CI = "utf32_unicode_ci"
-    UTF32_BIN = "utf32_bin"
+    GB18030_CHINESE_CI = "gb18030_chinese_ci"
+    GB18030_BIN = "gb18030_bin"
+    GB18030_UNICODE_520_CI = "gb18030_unicode_520_ci"

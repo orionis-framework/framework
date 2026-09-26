@@ -1,5 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 # Highest valid TCP/UDP port number.
@@ -31,15 +33,13 @@ class Redis(BaseEntity):
     driver: str = field(
         default="redis",
         metadata={
-            "description": (
-                "The driver type for the job store. Defaults to 'redis'."
-            ),
+            "description": ("The driver type for the job store. Defaults to 'redis'."),
             "default": "redis",
         },
     )
 
     host: str = field(
-        default="localhost",
+        default_factory=lambda: Env.get("REDIS_HOST", "localhost"),
         metadata={
             "description": "Redis host address.",
             "default": "localhost",
@@ -47,7 +47,7 @@ class Redis(BaseEntity):
     )
 
     port: int = field(
-        default=6379,
+        default_factory=lambda: Env.get("REDIS_PORT", 6379),
         metadata={
             "description": "Redis port.",
             "default": 6379,
@@ -55,7 +55,7 @@ class Redis(BaseEntity):
     )
 
     db: int = field(
-        default=0,
+        default_factory=lambda: Env.get("REDIS_DB", 0),
         metadata={
             "description": "Redis database index.",
             "default": 0,
@@ -63,7 +63,7 @@ class Redis(BaseEntity):
     )
 
     password: str | None = field(
-        default=None,
+        default_factory=lambda: Env.get("REDIS_PASSWORD", None),
         metadata={
             "description": "Redis password for authentication.",
             "default": None,
@@ -71,21 +71,18 @@ class Redis(BaseEntity):
     )
 
     key: str = field(
-        default="scheduler:tasks",
+        default_factory=lambda: Env.get("REDIS_TASKS_KEY", "scheduler:tasks"),
         metadata={
-            "description": (
-                "Redis key used to store the serialized job definitions."
-            ),
+            "description": ("Redis key used to store the serialized job definitions."),
             "default": "scheduler:tasks",
         },
     )
 
     run_times_key: str = field(
-        default="scheduler:run_times",
+        default_factory=lambda: Env.get("REDIS_RUN_TIMES_KEY", "scheduler:run_times"),
         metadata={
             "description": (
-                "Redis key used to store the next-run-time index for "
-                "scheduled jobs."
+                "Redis key used to store the next-run-time index for scheduled jobs."
             ),
             "default": "scheduler:run_times",
         },
@@ -107,13 +104,10 @@ class Redis(BaseEntity):
         ValueError
             If ``driver`` is an empty string.
         """
-        # Check type before truthiness to avoid misleading error messages
-        if not isinstance(self.driver, str):
-            error_msg = "The 'driver' property must be a string."
-            raise TypeError(error_msg)
-        if not self.driver:
-            error_msg = "The 'driver' property cannot be empty."
-            raise ValueError(error_msg)
+        # Ensure the driver is set to 'redis' for this store.
+        if self.driver != "redis":
+            message = f"Invalid driver for Redis store: {self.driver}"
+            raise ValueError(message)
 
     def __validateHost(self) -> None:
         """
@@ -134,7 +128,7 @@ class Redis(BaseEntity):
         if not isinstance(self.host, str):
             error_msg = "The 'host' property must be a string."
             raise TypeError(error_msg)
-        if not self.host:
+        if not self.host.strip():
             error_msg = "The 'host' property cannot be empty."
             raise ValueError(error_msg)
 
@@ -158,9 +152,7 @@ class Redis(BaseEntity):
             error_msg = "The 'port' property must be an integer."
             raise TypeError(error_msg)
         if not (1 <= self.port <= _MAX_PORT):
-            error_msg = (
-                f"The 'port' property must be between 1 and {_MAX_PORT}."
-            )
+            error_msg = f"The 'port' property must be between 1 and {_MAX_PORT}."
             raise ValueError(error_msg)
 
     def __validateDb(self) -> None:
@@ -205,7 +197,7 @@ class Redis(BaseEntity):
         if not isinstance(self.key, str):
             error_msg = "The 'key' property must be a string."
             raise TypeError(error_msg)
-        if not self.key:
+        if not self.key.strip():
             error_msg = "The 'key' property cannot be empty."
             raise ValueError(error_msg)
 
@@ -228,7 +220,7 @@ class Redis(BaseEntity):
         if not isinstance(self.run_times_key, str):
             error_msg = "The 'run_times_key' property must be a string."
             raise TypeError(error_msg)
-        if not self.run_times_key:
+        if not self.run_times_key.strip():
             error_msg = "The 'run_times_key' property cannot be empty."
             raise ValueError(error_msg)
 
@@ -258,3 +250,9 @@ class Redis(BaseEntity):
         self.__validateDb()
         self.__validateKey()
         self.__validateRunTimesKey()
+
+        if self.password is not None:
+            validate_string(self.password, "password", allow_empty=True)
+        if self.key == self.run_times_key:
+            message = "Redis job and run time keys must be different."
+            raise ValueError(message)

@@ -14,7 +14,8 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 class RequirePolicyMiddleware(BaseMiddleware):
-    """Gate a route behind a policy ability declared on a resource class.
+    """
+    Gate a route behind a policy ability declared on a resource class.
 
     The middleware evaluates the ability against the resource **class**,
     which covers the gates that do not need a loaded row, such as
@@ -41,7 +42,8 @@ class RequirePolicyMiddleware(BaseMiddleware):
     resource: ClassVar[type | None] = None
 
     def __init__(self, authorizer: IAuthorizer) -> None:
-        """Initialise the middleware with the authorizer.
+        """
+        Initialise the middleware with the authorizer.
 
         Parameters
         ----------
@@ -60,7 +62,8 @@ class RequirePolicyMiddleware(BaseMiddleware):
         request: Request,  # noqa: ARG002
         call_next: NextCallable,
     ) -> Response:
-        """Evaluate the policy and continue when it allows the operation.
+        """
+        Evaluate the policy and continue when it allows the operation.
 
         Parameters
         ----------

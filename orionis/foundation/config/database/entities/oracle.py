@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.database.enums import OracleEncoding, OracleNencoding
-from orionis.environment.facade import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -109,21 +109,23 @@ class Oracle(BaseEntity):
 
     encoding: str | OracleEncoding = field(
         default_factory=lambda: Env.get(
-            "DB_ENCODING", OracleEncoding.AL32UTF8.value,
+            "DB_ENCODING",
+            OracleEncoding.AL32UTF8.value,
         ),
         metadata={
             "description": "Database charset (CHAR/VARCHAR2)",
-            "default": OracleEncoding.AL32UTF8.value,
+            "default": "AL32UTF8",
         },
     )
 
     nencoding: str | OracleNencoding = field(
         default_factory=lambda: Env.get(
-            "DB_NENCODING", OracleNencoding.AL32UTF8.value,
+            "DB_NENCODING",
+            OracleNencoding.AL16UTF16.value,
         ),
         metadata={
             "description": "Database charset (NCHAR/NVARCHAR2)",
-            "default": OracleNencoding.AL32UTF8.value,
+            "default": "AL16UTF16",
         },
     )
 
@@ -157,14 +159,17 @@ class Oracle(BaseEntity):
 
         # Validate port
         max_port = 65535
-        if not isinstance(self.port, int) or self.port <= 0 or self.port > max_port:
+        if (
+            not isinstance(self.port, int)
+            or isinstance(self.port, bool)
+            or self.port <= 0
+            or self.port > max_port
+        ):
             error_msg = f"Invalid 'port': must be an integer between 1 and {max_port}."
             raise ValueError(error_msg)
 
         # Ensure at least one of service_name or sid is provided
-        if (
-            self.service_name is None or not str(self.service_name).strip()
-        ) and (
+        if (self.service_name is None or not str(self.service_name).strip()) and (
             self.sid is None or not str(self.sid).strip()
         ):
             error_msg = (
@@ -174,20 +179,15 @@ class Oracle(BaseEntity):
             raise ValueError(error_msg)
 
         # Validate service_name if provided
-        if (
-            self.service_name is not None
-            and (
-                not isinstance(self.service_name, str)
-                or not self.service_name.strip()
-            )
+        if self.service_name is not None and (
+            not isinstance(self.service_name, str) or not self.service_name.strip()
         ):
             error_msg = "Invalid 'service_name': must be a non-empty string or None."
             raise ValueError(error_msg)
 
         # Validate sid if provided
-        if (
-            self.sid is not None
-            and (not isinstance(self.sid, str) or not self.sid.strip())
+        if self.sid is not None and (
+            not isinstance(self.sid, str) or not self.sid.strip()
         ):
             error_msg = "Invalid 'sid': must be a non-empty string or None."
             raise ValueError(error_msg)
@@ -230,9 +230,7 @@ class Oracle(BaseEntity):
         elif isinstance(self.encoding, OracleEncoding):
             object.__setattr__(self, "encoding", self.encoding.value)
         else:
-            error_msg = (
-                "Invalid 'encoding': must be a string or OracleEncoding."
-            )
+            error_msg = "Invalid 'encoding': must be a string or OracleEncoding."
             raise TypeError(error_msg)
 
     def __validateNencoding(self) -> None:
@@ -274,9 +272,7 @@ class Oracle(BaseEntity):
         elif isinstance(self.nencoding, OracleNencoding):
             object.__setattr__(self, "nencoding", self.nencoding.value)
         else:
-            error_msg = (
-                "Invalid 'nencoding': must be a string or OracleNencoding."
-            )
+            error_msg = "Invalid 'nencoding': must be a string or OracleNencoding."
             raise TypeError(error_msg)
 
     def __post_init__(self) -> None:
@@ -308,8 +304,8 @@ class Oracle(BaseEntity):
         super().__post_init__()
 
         # Validate driver
-        if not isinstance(self.driver, str) or self.driver.strip().lower() != "oracle":
-            error_msg = "Invalid 'driver': must be the string 'oracle'."
+        if self.driver != "oracle":
+            error_msg = "The 'driver' property must be 'oracle'."
             raise ValueError(error_msg)
 
         # Validate username
@@ -333,9 +329,7 @@ class Oracle(BaseEntity):
         if self.tns_name is not None and (
             not isinstance(self.tns_name, str) or not self.tns_name.strip()
         ):
-            error_msg = (
-                "Invalid 'tns_name': must be a non-empty string or None."
-            )
+            error_msg = "Invalid 'tns_name': must be a non-empty string or None."
             raise ValueError(error_msg)
 
         # If not using DSN or TNS, validate host/port/service_name/sid

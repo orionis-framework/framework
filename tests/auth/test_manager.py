@@ -844,6 +844,8 @@ class TestAuthManagerConcurrency(_ManagerCase):
         middleware = ResolveIdentityMiddleware(self.auth, self.permissions)
         session = Session()
         session.put("_auth_identifier", self.ada.id)
+        from orionis.auth.tokens.functions import hash_token_secret
+        session.put("_auth_identifier_password", hash_token_secret(self.ada.password))
         request = self.webRequest(session)
         async with ScopeManager() as scope:
             scope[Request] = request
@@ -898,6 +900,10 @@ class TestAuthManagerConcurrency(_ManagerCase):
             request = self.webRequest()
             request.bearerToken = issued.plain_text
             request.state.session.put("_auth_identifier", self.bob.id)
+            from orionis.auth.tokens.functions import hash_token_secret
+            request.state.session.put(
+                "_auth_identifier_password", hash_token_secret(self.bob.password),
+            )
             scope[Request] = request
             await token_middleware._establish(request)
             context = await inherited_middleware._establish(request)

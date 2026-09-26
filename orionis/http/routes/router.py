@@ -146,20 +146,33 @@ class Router(IRouter):
         self,
         login_controller: type | None = None,
         register_controller: type | None = None,
+        forgot_password_controller: type | None = None,
     ) -> None:
-        """Register the built-in web login, registration and logout routes.
+        """Register the built-in web authentication routes.
 
-        Call once from a web route file. Login and registration accept guests;
-        email verification accepts anyone so a link opened from a signed-in
-        browser still works; logout requires a session identity and accepts
-        POST only. Session and CSRF middleware are supplied by the kernel's
-        web pipeline.
+        Call once from a web route file. Each controller can be overridden
+        independently; omitted controllers use the framework defaults. Login,
+        registration and password recovery accept guests; email verification
+        accepts anyone so a link opened from a signed-in browser still works;
+        logout requires a session identity and accepts POST only. Session and
+        CSRF middleware are supplied by the kernel's web pipeline.
+
+        Parameters
+        ----------
+        login_controller : type | None, optional
+            Controller for login and logout.
+        register_controller : type | None, optional
+            Controller for registration and email verification.
+        forgot_password_controller : type | None, optional
+            Controller for forgot-password and password-reset routes.
 
         Returns
         -------
         None
-            Registers GET/POST login and sign-up, GET email verification plus
-            POST logout. The named routes are ``login``, ``register``,
+            Registers GET/POST login, sign-up, forgot-password and
+            reset-password routes, GET email verification, and POST logout.
+            The named routes include ``login``, ``register``,
+            ``forgot-password``, ``password.reset``, ``password.update``,
             ``verify-email`` and ``logout``.
 
         Raises
@@ -179,6 +192,7 @@ class Router(IRouter):
             self,
             login_controller=login_controller,
             register_controller=register_controller,
+            forgot_password_controller=forgot_password_controller,
         )
 
     def view(

@@ -10,6 +10,7 @@ from orionis.auth.exceptions import AuthenticationException
 from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.manager import AuthManager
+from orionis.auth.tokens.functions import hash_token_secret
 from orionis.auth.middleware import (
     AuthenticateMiddleware,
     AuthenticateSessionMiddleware,
@@ -77,6 +78,7 @@ class _Session:
         self.data: dict[str, object] = {"_csrf_token": _CSRF}
         if identifier:
             self.data["_auth_identifier"] = identifier
+            self.data["_auth_identifier_password"] = hash_token_secret("")
 
     def get(self, key: str) -> object:
         """Read a value as the session guard does in production."""

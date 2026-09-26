@@ -1,13 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
 from orionis.foundation.config.filesystems import (
     GCS, S3, Azure, DiskName, Disks, Filesystems, Local, Public,
 )
-from orionis.environment import Env
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapFilesystems(Filesystems):
-
     # ----------------------------------------------------------------------------------
     # default : DiskName | str, optional
     # --- Sets the default filesystem disk name.
@@ -21,13 +20,13 @@ class BootstrapFilesystems(Filesystems):
     # ----------------------------------------------------------------------------------
     # disks : Disks | dict, optional
     # --- Holds available filesystem disks for the app.
-    # --- Defaults to Disks with local, public, and AWS S3 configs.
+    # --- Configure local, public, AWS S3, Azure, and GCS disks here.
     # ----------------------------------------------------------------------------------
 
     disks: Disks | dict = field(
         default_factory=lambda: Disks(
-
             # --------------------------------------------------------------------------
+            # local : Local, optional
             # --- Local disk stores files in 'storage/app/private'.
             # --- Uses Local entity for private file storage path.
             # --- Defaults to 'storage/app/private' if not set.
@@ -35,8 +34,8 @@ class BootstrapFilesystems(Filesystems):
             local=Local(
                 path=Env.get("LOCAL_PATH", "storage/app/private"),
             ),
-
             # --------------------------------------------------------------------------
+            # public : Public, optional
             # --- Public disk stores files in 'storage/app/public'.
             # --- Uses Public entity for storage path and public URL.
             # --- Defaults to 'storage/app/public' and serves from '/static'.
@@ -45,8 +44,8 @@ class BootstrapFilesystems(Filesystems):
                 path=Env.get("PUBLIC_PATH", "storage/app/public"),
                 url=Env.get("PUBLIC_URL", "/static"),
             ),
-
             # --------------------------------------------------------------------------
+            # s3 : S3, optional
             # --- AWS S3 disk uses S3 entity for cloud storage.
             # --- Defaults to empty credentials and 'us-east-1' region.
             # --- Path style endpoint is disabled by default.
@@ -62,8 +61,8 @@ class BootstrapFilesystems(Filesystems):
                 endpoint=Env.get("S3_ENDPOINT", None),
                 use_path_style_endpoint=Env.get("S3_USE_PATH_STYLE_ENDPOINT", False),
             ),
-
             # --------------------------------------------------------------------------
+            # azure : Azure, optional
             # --- Azure disk uses Azure entity for Blob Storage.
             # --- Authenticate with a connection string or account name/key.
             # --- Requires the official Azure SDK (optional dependency):
@@ -76,8 +75,8 @@ class BootstrapFilesystems(Filesystems):
                 container=Env.get("AZURE_CONTAINER", ""),
                 url=Env.get("AZURE_URL", None),
             ),
-
             # --------------------------------------------------------------------------
+            # gcs : GCS, optional
             # --- GCS disk uses GCS entity for Google Cloud Storage.
             # --- Uses the key file or Application Default Credentials.
             # --- Requires the official Google SDK (optional dependency):
@@ -89,6 +88,5 @@ class BootstrapFilesystems(Filesystems):
                 bucket=Env.get("GCS_BUCKET", ""),
                 url=Env.get("GCS_URL", None),
             ),
-
         ),
     )

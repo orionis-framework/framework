@@ -1,10 +1,18 @@
 from __future__ import annotations
+import re
 from dataclasses import dataclass, field
+from orionis.environment import Env
+from orionis.foundation.config.validation import (
+    copy_string_list,
+    validate_boolean,
+    validate_integer,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
 
 # Module-level frozenset: avoids recreating the set per __validateAllowMethods call.
 _ALLOWED_HTTP_METHODS: frozenset[str] = frozenset(
-    {"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+    {"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "QUERY"},
 )
 
 @dataclass(frozen=True, kw_only=True)
@@ -33,7 +41,7 @@ class Cors(BaseEntity):
     """
 
     allow_origins: list[str] = field(
-        default_factory=list,
+        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", []),
         metadata={
             "description": 'List of allowed origins. Use ["*"] to allow all origins.',
             "default": [],
@@ -41,7 +49,7 @@ class Cors(BaseEntity):
     )
 
     allow_origin_regex: str | None = field(
-        default=None,
+        default_factory=lambda: Env.get("CORS_ALLOW_ORIGIN_REGEX", None),
         metadata={
             "description": "Regular expression pattern to match allowed origins.",
             "default": None,
@@ -49,7 +57,7 @@ class Cors(BaseEntity):
     )
 
     allow_methods: list[str] = field(
-        default_factory=list,
+        default_factory=lambda: Env.get("CORS_ALLOW_METHODS", []),
         metadata={
             "description": (
                 'List of allowed HTTP methods. Use ["*"] to allow all methods.'
@@ -59,7 +67,7 @@ class Cors(BaseEntity):
     )
 
     allow_headers: list[str] = field(
-        default_factory=list,
+        default_factory=lambda: Env.get("CORS_ALLOW_HEADERS", []),
         metadata={
             "description": (
                 'List of allowed HTTP headers. Use ["*"] to allow all headers.'
@@ -69,7 +77,7 @@ class Cors(BaseEntity):
     )
 
     expose_headers: list[str] = field(
-        default_factory=list,
+        default_factory=lambda: Env.get("CORS_EXPOSE_HEADERS", []),
         metadata={
             "description": "List of headers exposed to the browser.",
             "default": [],
@@ -77,7 +85,7 @@ class Cors(BaseEntity):
     )
 
     allow_credentials: bool = field(
-        default=False,
+        default_factory=lambda: Env.get("CORS_ALLOW_CREDENTIALS", False),
         metadata={
             "description": (
                 "Whether to allow credentials (cookies, authorization headers, etc.)."
@@ -87,7 +95,7 @@ class Cors(BaseEntity):
     )
 
     max_age: int | None = field(
-        default=600,
+        default_factory=lambda: Env.get("CORS_MAX_AGE", 600),
         metadata={
             "description": "Maximum time (in seconds) for preflight request caching.",
             "default": 600,
@@ -130,76 +138,33 @@ class Cors(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Validate CORS configuration attributes after initialization.
-
-        Ensure the types and values of the CORS configuration attributes conform to
-        expected types and constraints. Raises a TypeError if any attribute is invalid.
+        Validate CORS options and own the supplied mutable lists.
 
         Returns
         -------
         None
             This method does not return a value.
-
-        Raises
-        ------
-        TypeError
-            If any attribute does not match the expected type.
-        ValueError
-            If any attribute contains an invalid value.
         """
-        # Call the superclass's __post_init__ method
         super().__post_init__()
-
-        # Validate `allow_origins` attribute
-        if not isinstance(self.allow_origins, list):
-            error_msg = (
-                "Invalid type for 'allow_origins': expected a list of strings."
-            )
-            raise TypeError(error_msg)
-
-        # Validate `allow_origin_regex` attribute
-        if self.allow_origin_regex is not None and not isinstance(
-            self.allow_origin_regex, str,
+        for name in (
+            "allow_origins",
+            "allow_methods",
+            "allow_headers",
+            "expose_headers",
         ):
-            error_msg = (
-                "Invalid type for 'allow_origin_regex': expected a string or None."
-            )
-            raise TypeError(error_msg)
-
-        # Validate `allow_methods` attribute
-        if not isinstance(self.allow_methods, list):
-            error_msg = (
-                "Invalid type for 'allow_methods': expected a list of strings."
-            )
-            raise TypeError(error_msg)
-
-        # Validate the contents of `allow_methods`
+            object.__setattr__(self, name, copy_string_list(getattr(self, name), name))
         self.__validateAllowMethods()
-
-        # Validate `allow_headers` attribute
-        if not isinstance(self.allow_headers, list):
-            error_msg = (
-                "Invalid type for 'allow_headers': expected a list of strings."
+        validate_boolean(self.allow_credentials, "allow_credentials")
+        if self.max_age is not None:
+            validate_integer(self.max_age, "max_age")
+        if self.allow_origin_regex is not None:
+            validate_string(
+                self.allow_origin_regex,
+                "allow_origin_regex",
+                allow_empty=True,
             )
-            raise TypeError(error_msg)
-
-        # Validate `expose_headers` attribute
-        if not isinstance(self.expose_headers, list):
-            error_msg = (
-                "Invalid type for 'expose_headers': expected a list of strings."
-            )
-            raise TypeError(error_msg)
-
-        # Validate `allow_credentials` attribute
-        if not isinstance(self.allow_credentials, bool):
-            error_msg = (
-                "Invalid type for 'allow_credentials': expected a boolean."
-            )
-            raise TypeError(error_msg)
-
-        # Validate `max_age` attribute
-        if self.max_age is not None and not isinstance(self.max_age, int):
-            error_msg = (
-                "Invalid type for 'max_age': expected an integer or None."
-            )
-            raise TypeError(error_msg)
+            try:
+                re.compile(self.allow_origin_regex)
+            except re.error as exc:
+                message = "'allow_origin_regex' must be a valid regular expression."
+                raise ValueError(message) from exc

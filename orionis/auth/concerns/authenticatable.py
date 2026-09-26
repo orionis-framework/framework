@@ -3,7 +3,8 @@ from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 
 class Authenticatable:
-    """Turn any Orionis model into an authenticatable identity.
+    """
+    Turn any Orionis model into an authenticatable identity.
 
     Mix it into the model backing your users::
 
@@ -24,7 +25,8 @@ class Authenticatable:
     AUTH_PASSWORD: ClassVar[str] = "password"  # noqa: S105
 
     def getAuthIdentifierName(self) -> str:
-        """Return the attribute holding the unique identifier.
+        """
+        Return the attribute holding the unique identifier.
 
         Returns
         -------
@@ -34,7 +36,8 @@ class Authenticatable:
         return model_primary_key(self)
 
     def getAuthIdentifier(self) -> object:
-        """Return the value uniquely identifying this identity.
+        """
+        Return the value uniquely identifying this identity.
 
         Returns
         -------
@@ -45,7 +48,8 @@ class Authenticatable:
         return getattr(self, model_primary_key(self), None)
 
     def getAuthPassword(self) -> str:
-        """Return the stored password hash of this identity.
+        """
+        Return the stored password hash of this identity.
 
         Returns
         -------

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 class IAuthorizable(ABC):
-    """Define how an identity is addressed by the authorization tables.
+    """
+    Define how an identity is addressed by the authorization tables.
 
     Permissions and roles are attached through a polymorphic pair, so any
     model may own them without the module knowing its concrete class.
@@ -11,7 +12,8 @@ class IAuthorizable(ABC):
 
     @abstractmethod
     def getAuthorizableType(self) -> str:
-        """Return the polymorphic type stored alongside the identifier.
+        """
+        Return the polymorphic type stored alongside the identifier.
 
         Returns
         -------
@@ -22,7 +24,8 @@ class IAuthorizable(ABC):
 
     @abstractmethod
     def getAuthorizableId(self) -> object:
-        """Return the identifier stored in the authorization pivot tables.
+        """
+        Return the identifier stored in the authorization pivot tables.
 
         Returns
         -------

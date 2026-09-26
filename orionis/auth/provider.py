@@ -18,7 +18,8 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.auth import Auth as AuthFacade
 
 class AuthProvider(ServiceProvider):
-    """Service provider wiring the authentication module.
+    """
+    Service provider wiring the authentication module.
 
     The provider is deliberately eager: ``Auth.user()``, ``Auth.check()``
     and ``Auth.guest()`` are synchronous and are called from templates and
@@ -28,7 +29,8 @@ class AuthProvider(ServiceProvider):
     """
 
     def register(self) -> None:
-        """Bind stateless services and the request-scoped authentication context.
+        """
+        Bind stateless services and the request-scoped authentication context.
 
         Guards, repositories and the authorizer hold no per request
         state, so a single shared instance is safe. Everything that
@@ -58,7 +60,8 @@ class AuthProvider(ServiceProvider):
         self.app.singleton(IAuthManager, AuthManager)
 
     async def boot(self) -> None:
-        """Pin the Auth facade once every service is registered.
+        """
+        Pin the Auth facade once every service is registered.
 
         Returns
         -------

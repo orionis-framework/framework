@@ -19,6 +19,6 @@ class VerbosityMode(Enum):
         The selected verbosity level as an enumeration member.
     """
 
-    SILENT = 0        # 0: Silent mode, no output
-    MINIMAL = 1       # 1: Minimal output mode
-    DETAILED = 2      # 2: Detailed output mode (default)
+    SILENT = 0  # 0: Silent mode, no output
+    MINIMAL = 1  # 1: Minimal output mode
+    DETAILED = 2  # 2: Detailed output mode (default)

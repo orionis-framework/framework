@@ -4,6 +4,7 @@ import functools
 import inspect
 from typing import TYPE_CHECKING, Any
 from orionis.background.contracts.task import IBackgroundTask
+from orionis.support.facades.logger import Log
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -87,18 +88,27 @@ class BackgroundTask(IBackgroundTask):
         None
             This method does not return a value.
         """
-        # Await the coroutine function directly
-        if self.__is_async:
-            await self.__func(*self.__args, **self.__kwargs)  # type: ignore[arg-type]
-        # Run the synchronous function in a thread pool executor.
-        # functools.partial is required because run_in_executor only
-        # accepts positional arguments and does not forward **kwargs.
+        task_name: str = getattr(
+            self.__func, "__qualname__", self.__func.__class__.__name__,
+        )
+        try:
+            # Await the coroutine function directly
+            if self.__is_async:
+                await self.__func(*self.__args, **self.__kwargs)  # type: ignore[arg-type]
+            # Run the synchronous function in a thread pool executor.
+            # functools.partial is required because run_in_executor only
+            # accepts positional arguments and does not forward **kwargs.
+            else:
+                loop: asyncio.AbstractEventLoop = asyncio.get_running_loop()
+                bound: functools.partial[Any] = functools.partial(
+                    self.__func, *self.__args, **self.__kwargs,  # type: ignore[arg-type]
+                )
+                await loop.run_in_executor(None, bound)
+        except Exception as error:
+            Log.error(f"Background task '{task_name}' failed: {error}")
+            raise
         else:
-            loop: asyncio.AbstractEventLoop = asyncio.get_running_loop()
-            bound: functools.partial[Any] = functools.partial(
-                self.__func, *self.__args, **self.__kwargs,  # type: ignore[arg-type]
-            )
-            await loop.run_in_executor(None, bound)
+            Log.info(f"Background task '{task_name}' executed successfully.")
 
     async def run(self) -> None:
         """

@@ -5,6 +5,8 @@ from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.session_guard import ISessionGuard
 from orionis.auth.entities.guard_result import GuardResult
 from orionis.auth.exceptions import AuthException
+from orionis.auth.remember import RememberMe
+from orionis.auth.tokens.functions import hash_token_secret
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
 
@@ -18,7 +20,8 @@ if TYPE_CHECKING:
 _DEFAULT_SESSION_KEY: str = "_auth_identifier"
 
 class SessionGuard(ISessionGuard):
-    """Resolve the identity of web requests from the HTTP session.
+    """
+    Resolve the identity of web requests from the HTTP session.
 
     The guard never implements its own session storage: it reads and
     writes the session started by ``StartSessionMiddleware`` and reachable
@@ -32,10 +35,13 @@ class SessionGuard(ISessionGuard):
 
     # ruff: noqa: TC001 (Dependency Injection)
 
-    __slots__ = ("__csrf_key", "__csrf_length", "__identities", "__session_key")
+    __slots__ = (
+        "__csrf_key", "__csrf_length", "__identities", "__remember", "__session_key",
+    )
 
     def __init__(self, app: IApplication, identities: IIdentityProvider) -> None:
-        """Initialise the guard from the authentication configuration.
+        """
+        Initialise the guard from the authentication configuration.
 
         Parameters
         ----------
@@ -55,10 +61,12 @@ class SessionGuard(ISessionGuard):
         self.__identities = identities
         self.__csrf_key: str = app.config("http.csrf.session_key") or "_csrf_token"
         self.__csrf_length: int = app.config("http.csrf.token_length") or 32
+        self.__remember = RememberMe(app, identities)
 
     @property
     def name(self) -> str:
-        """Return the configuration name of this guard.
+        """
+        Return the configuration name of this guard.
 
         Returns
         -------
@@ -68,7 +76,8 @@ class SessionGuard(ISessionGuard):
         return Guards.SESSION.value
 
     async def resolve(self, request: Request) -> GuardResult | None:
-        """Resolve the identity remembered in the session.
+        """
+        Resolve the identity remembered in the session.
 
         A session pointing at an identity that no longer exists is
         cleaned up so the next request starts as a guest.
@@ -89,12 +98,20 @@ class SessionGuard(ISessionGuard):
 
         identifier = session.get(self.__session_key)
         if identifier is None:
-            return None
+            return await self.__restoreRemembered(request)
 
         identity = await self.__identities.retrieveById(identifier)
-        if identity is None:
+        fingerprint = session.get(self.__session_key + "_password")
+        if (
+            identity is None
+            or not isinstance(fingerprint, str)
+            or not secrets.compare_digest(
+                fingerprint, hash_token_secret(identity.getAuthPassword()),
+            )
+        ):
             session.forget(self.__session_key)
-            return None
+            session.forget(self.__session_key + "_password")
+            return await self.__restoreRemembered(request)
 
         return GuardResult(identity=identity, guard=Guards.SESSION.value)
 
@@ -102,8 +119,10 @@ class SessionGuard(ISessionGuard):
         self,
         request: Request,
         credentials: Mapping[str, object],
+        *, remember: bool = False,
     ) -> IAuthenticatable | None:
-        """Validate credentials and start an authenticated session.
+        """
+        Validate credentials and start an authenticated session.
 
         Parameters
         ----------
@@ -111,6 +130,8 @@ class SessionGuard(ISessionGuard):
             Incoming HTTP request owning the session.
         credentials : Mapping[str, object]
             Submitted credentials.
+        remember : bool, optional
+            Persist a revocable login credential after password verification.
 
         Returns
         -------
@@ -132,11 +153,36 @@ class SessionGuard(ISessionGuard):
         if getattr(identity, "active", None) is not True:
             return None
 
+        if remember:
+            await self.__remember.issue(request, identity)
+        else:
+            await self.__remember.forget(request, identity)
         self.login(request, identity)
         return identity
 
+    async def __restoreRemembered(self, request: Request) -> GuardResult | None:
+        """
+        Restore an identity from a persistent credential.
+
+        Parameters
+        ----------
+        request : Request
+            Incoming request carrying the remember-me credential.
+
+        Returns
+        -------
+        GuardResult | None
+            Authenticated session result, or ``None`` if restoration fails.
+        """
+        identity = await self.__remember.restore(request)
+        if identity is None:
+            return None
+        self.login(request, identity)
+        return GuardResult(identity=identity, guard=Guards.SESSION.value)
+
     def login(self, request: Request, identity: IAuthenticatable) -> None:
-        """Persist an identity in the session of the current request.
+        """
+        Persist an identity in the session of the current request.
 
         Parameters
         ----------
@@ -174,12 +220,17 @@ class SessionGuard(ISessionGuard):
             raise AuthException(error_msg)
         session.regenerate()
         session.put(self.__session_key, str(identifier))
+        session.put(
+            self.__session_key + "_password",
+            hash_token_secret(identity.getAuthPassword()),
+        )
         csrf = secrets.token_urlsafe(self.__csrf_length)
         session.put(self.__csrf_key, csrf)
         request.state.csrf_token = csrf
 
-    def logout(self, request: Request) -> None:
-        """Drop the authenticated state from the session.
+    async def logout(self, request: Request) -> None:
+        """
+        Drop the authenticated state from the session.
 
         Parameters
         ----------
@@ -189,19 +240,23 @@ class SessionGuard(ISessionGuard):
         Returns
         -------
         None
-            The session is invalidated as a side effect, which also
-            deletes the backing record and clears the cookie.
+            The persistent credential is revoked before invalidating the
+            session and clearing both cookies through the web pipeline.
         """
         session = self.__session(request)
         if session is None:
+            self.__remember.clearCookie(request)
             return
 
+        await self.__remember.revoke(request, session.get(self.__session_key))
         session.forget(self.__session_key)
+        session.forget(self.__session_key + "_password")
         session.invalidate()
 
     @staticmethod
     def __session(request: Request) -> ISession | None:
-        """Return the session attached to a request, when present.
+        """
+        Return the session attached to a request, when present.
 
         Parameters
         ----------

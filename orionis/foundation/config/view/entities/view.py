@@ -1,6 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import (
+    validate_boolean,
+    validate_integer,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -14,7 +19,7 @@ class View(BaseEntity):
         Ordered list of directory paths searched for templates.
     cache_size : int
         Maximum number of compiled templates kept in the LRU memory cache.
-        A value of ``0`` disables the cache entirely.
+        A value of ``0`` disables the cache; ``-1`` keeps templates without a limit.
     cache_path : str | None
         Optional filesystem path used for Jinja2 bytecode caching.
         ``None`` disables disk-based caching.
@@ -25,7 +30,7 @@ class View(BaseEntity):
         Enable automatic HTML escaping of all template variables.
     """
 
-    paths: list = field(
+    paths: list[str] | tuple[str, ...] = field(
         default_factory=lambda: Env.get("VIEW_PATHS", ["resources/views"]),
         metadata={
             "description": "Ordered list of directories searched for templates.",
@@ -34,26 +39,26 @@ class View(BaseEntity):
     )
 
     cache_size: int = field(
-        default_factory=lambda: int(Env.get("VIEW_CACHE_SIZE", 400)),
+        default_factory=lambda: Env.get("VIEW_CACHE_SIZE", 400),
         metadata={
             "description": (
                 "Maximum compiled templates kept in the LRU memory cache. "
-                "0 disables the cache."
+                "0 disables the cache; -1 removes the limit."
             ),
             "default": 400,
         },
     )
 
     cache_path: str | None = field(
-        default_factory=lambda: Env.get("VIEW_CACHE_PATH", None),
+        default_factory=lambda: Env.get("VIEW_CACHE_PATH", "storage/framework/views"),
         metadata={
             "description": "Optional filesystem path for Jinja2 bytecode cache.",
-            "default": None,
+            "default": "storage/framework/views",
         },
     )
 
     auto_reload: bool = field(
-        default_factory=lambda: bool(Env.get("APP_DEBUG", True)),
+        default_factory=lambda: Env.get("APP_DEBUG", True),
         metadata={
             "description": "Reload templates from disk when the source file changes.",
             "default": True,
@@ -61,7 +66,7 @@ class View(BaseEntity):
     )
 
     autoescape: bool = field(
-        default_factory=lambda: bool(Env.get("VIEW_AUTOESCAPE", True)),
+        default_factory=lambda: Env.get("VIEW_AUTOESCAPE", True),
         metadata={
             "description": "Enable automatic HTML escaping of template variables.",
             "default": True,
@@ -70,41 +75,33 @@ class View(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Validate view configuration fields after dataclass initialisation.
+        Validate template paths and cache settings without coercing values.
 
         Returns
         -------
         None
+            This method performs validation and normalization and returns None.
 
         Raises
         ------
         TypeError
-            If any field carries an unexpected type.
+            If any of the runner options are of an incorrect type.
         ValueError
-            If ``paths`` is empty or ``cache_size`` is negative.
+            If any of the runner options are invalid.
         """
         super().__post_init__()
-
         if not isinstance(self.paths, (list, tuple)):
-            error_msg = "View 'paths' must be a list or tuple of directory strings."
-            raise TypeError(error_msg)
-
+            message = "View 'paths' must be a list or tuple of directory strings."
+            raise TypeError(message)
         if not self.paths:
-            error_msg = "View 'paths' must contain at least one template directory."
-            raise ValueError(error_msg)
-
-        if not isinstance(self.cache_size, int) or self.cache_size < 0:
-            error_msg = "View 'cache_size' must be a non-negative integer."
-            raise ValueError(error_msg)
-
-        if self.cache_path is not None and not isinstance(self.cache_path, str):
-            error_msg = "View 'cache_path' must be a string or None."
-            raise TypeError(error_msg)
-
-        if not isinstance(self.auto_reload, bool):
-            error_msg = "View 'auto_reload' must be a boolean."
-            raise TypeError(error_msg)
-
-        if not isinstance(self.autoescape, bool):
-            error_msg = "View 'autoescape' must be a boolean."
-            raise TypeError(error_msg)
+            message = "View 'paths' must contain at least one template directory."
+            raise ValueError(message)
+        for path in self.paths:
+            validate_string(path, "paths")
+        if isinstance(self.paths, list):
+            object.__setattr__(self, "paths", list(self.paths))
+        validate_integer(self.cache_size, "cache_size", minimum=-1)
+        if self.cache_path is not None:
+            validate_string(self.cache_path, "cache_path")
+        validate_boolean(self.auto_reload, "auto_reload")
+        validate_boolean(self.autoescape, "autoescape")

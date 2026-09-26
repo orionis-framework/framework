@@ -2,7 +2,7 @@ from abc import ABC
 from inspect import isabstract, signature
 from typing import Any
 from orionis.environment.contracts.env import IEnv
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.test import TestCase
 
 # Abstract surface the contract is expected to publish.

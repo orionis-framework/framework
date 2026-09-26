@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -25,10 +25,13 @@ class FromAddress(BaseEntity):
     )
 
     name: str = field(
-        default_factory=lambda: Env.get("MAIL_FROM_NAME", ""),
+        default_factory=lambda: Env.get(
+            "MAIL_FROM_NAME",
+            Env.get("APP_NAME", "Orionis"),
+        ),
         metadata={
             "description": "The display name attached to the global sender.",
-            "default": "",
+            "default": "Orionis",
         },
     )
 
@@ -50,9 +53,11 @@ class FromAddress(BaseEntity):
             If 'address' or 'name' is not a string.
         """
         # Validate 'address' type
+        super().__post_init__()
         if not isinstance(self.address, str):
             error_msg = "The 'address' attribute must be a string."
             raise TypeError(error_msg)
+
         # Validate 'name' type
         if not isinstance(self.name, str):
             error_msg = "The 'name' attribute must be a string."

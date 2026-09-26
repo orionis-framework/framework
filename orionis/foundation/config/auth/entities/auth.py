@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.foundation.config.auth.entities.identity import Identity
+from orionis.foundation.config.auth.entities.password_reset import PasswordReset
+from orionis.foundation.config.auth.entities.remember import RememberAuth
 from orionis.foundation.config.auth.entities.session import SessionAuth
 from orionis.foundation.config.auth.entities.tokens import Tokens
 from orionis.foundation.config.auth.enums.guards import Guards
@@ -25,13 +27,17 @@ class Auth(BaseEntity):
         Options of the session guard used by web routes.
     tokens : Tokens | dict
         Options of the personal access token guard used by API routes.
+    passwords : PasswordReset | dict
+        Trusted reset URL, token table, lifetime and resend delay.
+    remember : RememberAuth | dict
+        Optional persistent login cookie name, lifetime and HTTPS requirement.
     """
 
     default: Guards | str = field(
         default_factory=lambda: Env.get("AUTH_GUARD", Guards.SESSION.value),
         metadata={
             "description": "Guard used when no explicit guard is named.",
-            "default": Guards.SESSION.value,
+            "default": "session",
         },
     )
 
@@ -39,20 +45,44 @@ class Auth(BaseEntity):
         default_factory=Identity,
         metadata={
             "description": (
-                "Where the application identity lives and how it is "
-                "verified."
+                "Where the application identity lives and how it is verified."
             ),
+            "default": lambda: Identity().toDict(),
         },
     )
 
     session: SessionAuth | dict = field(
         default_factory=SessionAuth,
-        metadata={"description": "Options of the session guard."},
+        metadata={
+            "description": "Options of the session guard.",
+            "default": lambda: SessionAuth().toDict(),
+        },
     )
 
     tokens: Tokens | dict = field(
         default_factory=Tokens,
-        metadata={"description": "Options of the personal access token guard."},
+        metadata={
+            "description": "Options of the personal access token guard.",
+            "default": lambda: Tokens().toDict(),
+        },
+    )
+
+    passwords: PasswordReset | dict = field(
+        default_factory=PasswordReset,
+        metadata={
+            "description": "Trusted reset URL, token table, lifetime and resend delay.",
+            "default": lambda: PasswordReset().toDict(),
+        },
+    )
+
+    remember: RememberAuth | dict = field(
+        default_factory=RememberAuth,
+        metadata={
+            "description": (
+                "Optional persistent login cookie name, lifetime and HTTPS requirement."
+            ),
+            "default": lambda: RememberAuth().toDict(),
+        },
     )
 
     def __post_init__(self) -> None:
@@ -98,6 +128,8 @@ class Auth(BaseEntity):
         self.__normalizeSection("identity", Identity)
         self.__normalizeSection("session", SessionAuth)
         self.__normalizeSection("tokens", Tokens)
+        self.__normalizeSection("passwords", PasswordReset)
+        self.__normalizeSection("remember", RememberAuth)
 
     def __normalizeSection(self, name: str, entity: type) -> None:
         """

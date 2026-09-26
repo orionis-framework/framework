@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 # Highest valid TCP/UDP port number.
@@ -27,8 +27,7 @@ class Memcached(BaseEntity):
         default="memcached",
         metadata={
             "description": (
-                "The driver type for the cache store. "
-                "Defaults to 'memcached'."
+                "The driver type for the cache store. Defaults to 'memcached'."
             ),
             "default": "memcached",
         },
@@ -66,12 +65,8 @@ class Memcached(BaseEntity):
         ValueError
             If ``driver`` is an empty string.
         """
-        # Check type before truthiness to avoid misleading error messages
-        if not isinstance(self.driver, str):
-            error_msg = "The 'driver' property must be a string."
-            raise TypeError(error_msg)
-        if not self.driver:
-            error_msg = "The 'driver' property cannot be empty."
+        if self.driver != "memcached":
+            error_msg = "The 'driver' property must be 'memcached'."
             raise ValueError(error_msg)
 
     def __validateEndpoint(self) -> None:
@@ -112,9 +107,7 @@ class Memcached(BaseEntity):
             error_msg = "The 'port' property must be an integer."
             raise TypeError(error_msg)
         if not (1 <= self.port <= _MAX_PORT):
-            error_msg = (
-                f"The 'port' property must be between 1 and {_MAX_PORT}."
-            )
+            error_msg = f"The 'port' property must be between 1 and {_MAX_PORT}."
             raise ValueError(error_msg)
 
     def __post_init__(self) -> None:

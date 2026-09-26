@@ -5,9 +5,7 @@ from orionis.schemas.constraints import (
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 
-
 class ResetPasswordSchema(ForgotPasswordSchema):
-    """Apply the application's password policy and confirmation to a reset."""
 
     # ruff: noqa: TC001 (Runtime schema metadata)
 

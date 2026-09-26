@@ -143,9 +143,9 @@ class _HttpCatch:
 
     __slots__ = ("handler",)
 
-    def __init__(self, responses: object) -> None:
+    def __init__(self, responses: object, application: object) -> None:
         """Build the standard exception handler."""
-        self.handler = BaseExceptionHandler(responses)
+        self.handler = BaseExceptionHandler(responses, application)
 
     async def exception(self, exc: Exception, request: object) -> Response:
         """Delegate error classification to Orionis."""
@@ -208,7 +208,7 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         self.http_app.instance(IPermissionRepository, self.permissions)
         self.http_app.instance(_Rendezvous, _Rendezvous())
         self.responses = http_fixtures._StubDefaultResponses()
-        self.catch = _HttpCatch(self.responses)
+        self.catch = _HttpCatch(self.responses, self.http_app)
         self.sessions = SessionManager(self.http_app, object())
         routes = {
             "GET": {"static": {
@@ -306,6 +306,8 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         await self.registrar.givePermissionTo(self.ada, "users.view")
         session = Session()
         session.put("_auth_identifier", str(self.ada.id))
+        from orionis.auth.tokens.functions import hash_token_secret
+        session.put("_auth_identifier_password", hash_token_secret(self.ada.password))
         csrf = "existing-csrf-value"
         session.put("_csrf_token", csrf)
         await self.sessions.save(Response(), session)

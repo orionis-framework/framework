@@ -4,12 +4,12 @@
 {% block auth_heading %}{{ __('Login to your account') }}{% endblock %}
 
 {% block auth_form %}
-<form action="{{ route('login') }}" method="post" autocomplete="off" novalidate="">
+<form action="{{ route('login') }}" method="post" novalidate="">
   {% csrf %}
   <div class="mb-3">
     <label for="email" class="form-label">{{ __('Email address') }}</label>
     <input type="email" id="email" name="email" class="form-control{% if errors.has('email') %} is-invalid{% endif %}"
-           placeholder="{{ __('your@email.com') }}" autocomplete="off" value="{{ old('email') }}" data-remembered-username
+           placeholder="{{ __('your@email.com') }}" autocomplete="username" value="{{ old('email') }}"
            {% if errors.has('email') %}aria-invalid="true" aria-describedby="email-error"{% endif %}>
     {% if errors.has('email') %}
       <div id="email-error" class="invalid-feedback">{{ errors.first('email') }}</div>
@@ -22,7 +22,7 @@
     </div>
     <div class="orionis-password">
       <input type="password" id="password" name="password" class="form-control{% if errors.has('password') %} is-invalid{% endif %}"
-             placeholder="{{ __('Your password') }}" autocomplete="off"
+             placeholder="{{ __('Your password') }}" autocomplete="current-password"
              {% if errors.has('password') %}aria-invalid="true" aria-describedby="password-error"{% endif %}>
       <button type="button" class="orionis-password-toggle" data-password-toggle="password"
               data-label-show="{{ __('Show password') }}" data-label-hide="{{ __('Hide password') }}"
@@ -51,8 +51,8 @@
   </div>
   <div class="mb-2">
     <label class="form-check">
-      <input type="checkbox" name="remember" class="form-check-input" {% if old('remember') %} checked{% endif %}>
-      <span class="form-check-label">{{ __('Remember me on this device') }}</span>
+      <input type="checkbox" name="remember" value="on" class="form-check-input" {% if old('remember') == 'on' %} checked{% endif %}>
+      <span class="form-check-label">{{ __('Keep me signed in on this device') }}</span>
     </label>
   </div>
   <div class="orionis-form-footer">

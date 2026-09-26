@@ -7,7 +7,8 @@ if TYPE_CHECKING:
     from orionis.auth.contracts.policy import IPolicy
 
 class IAuthorizer(ABC):
-    """Define the component answering authorization questions.
+    """
+    Define the component answering authorization questions.
 
     The authorizer never owns the current identity. It receives the
     request context on every call, which keeps it safe to register as a
@@ -22,7 +23,8 @@ class IAuthorizer(ABC):
         context: IAuthenticationContext,
         permission: str,
     ) -> bool:
-        """Report whether the context grants a permission.
+        """
+        Report whether the context grants a permission.
 
         Parameters
         ----------
@@ -43,7 +45,8 @@ class IAuthorizer(ABC):
         context: IAuthenticationContext,
         permissions: Iterable[str],
     ) -> bool:
-        """Report whether the context grants at least one permission.
+        """
+        Report whether the context grants at least one permission.
 
         Parameters
         ----------
@@ -64,7 +67,8 @@ class IAuthorizer(ABC):
         context: IAuthenticationContext,
         permissions: Iterable[str],
     ) -> bool:
-        """Report whether the context grants every permission.
+        """
+        Report whether the context grants every permission.
 
         Parameters
         ----------
@@ -85,7 +89,8 @@ class IAuthorizer(ABC):
         context: IAuthenticationContext,
         role: str,
     ) -> bool:
-        """Report whether the context owns a role.
+        """
+        Report whether the context owns a role.
 
         Parameters
         ----------
@@ -107,7 +112,8 @@ class IAuthorizer(ABC):
         ability: str,
         resource: object,
     ) -> bool:
-        """Evaluate a policy ability against a concrete resource.
+        """
+        Evaluate a policy ability against a concrete resource.
 
         Parameters
         ----------
@@ -132,7 +138,8 @@ class IAuthorizer(ABC):
 
     @abstractmethod
     def registerPolicy(self, resource: type, policy: type[IPolicy]) -> None:
-        """Bind a policy class to a resource type.
+        """
+        Bind a policy class to a resource type.
 
         Parameters
         ----------

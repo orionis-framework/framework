@@ -1,7 +1,6 @@
 from typing import cast
-from app.http.schemas.auth.change_password import ChangePasswordSchema
+from app.http.schemas.profile.change_password import ChangePasswordSchema
 from app.models.user import User
-from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.hashing.contracts.hash_manager import IHashManager
@@ -9,8 +8,6 @@ from orionis.http import HTMLResponse, RedirectResponse, response
 from orionis.http.base import BaseController
 
 class ProfileController(BaseController):
-
-    SLUG: str = "profile"
 
     async def index(self, auth: IAuthManager) -> HTMLResponse:
         """
@@ -27,12 +24,16 @@ class ProfileController(BaseController):
         HTMLResponse
             Rendered profile page exposing only public account attributes.
         """
-        # Read the identity established by the authentication middleware.
-        identity: IAuthenticatable | None = auth.user()
+        # Read and cast the identity to the expected User model.
+        identity: User = cast("User", auth.user())
 
         # Hand the template a minimal projection of the account.
         return await response.view(
-            "profile.index", user={"name": identity.name, "email": identity.email},
+            "profile.index",
+            user={
+                "name": identity.name,
+                "email": identity.email,
+            },
         )
 
     async def changePassword(
@@ -67,15 +68,15 @@ class ProfileController(BaseController):
             or a success message.
         """
         # Every outcome of this action returns to the same page.
-        redirect_to: str = f"/{self.SLUG}"
+        redirect_to: str = "/profile"
 
         # Update only the identity established by the authentication layer.
         user: User = cast("User", auth.user())
 
         # Verify the current password off the event loop, as login does.
         valid: bool = await identities.validateCredentials(
-            user,
-            {"password": payload.current_password},
+            identity=user,
+            credentials={"password": payload.current_password},
         )
 
         # Reject the change without disclosing anything about the stored hash.
@@ -87,6 +88,7 @@ class ProfileController(BaseController):
         # Hash off the event loop and persist the new credential.
         try:
             user.password = await hashing.make(payload.password)
+            user.remember_token = None
             saved: bool = await user.save()
         except Exception:
             # Never send ORM parameters, password hashes or backend errors back.

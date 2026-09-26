@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from orionis.environment.facade import Env
+from orionis.environment import Env
+from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -34,7 +35,7 @@ class Smtp(BaseEntity):
         If any attribute does not meet its structural type requirements.
     """
 
-    driver : str = field(
+    driver: str = field(
         default="smtp",
         metadata={
             "description": "The driver type for the mail transport.",
@@ -46,7 +47,7 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_URL", ""),
         metadata={
             "description": "The full URL for the SMTP service.",
-            "default": Env.get("MAIL_URL"),
+            "default": "",
         },
     )
 
@@ -54,7 +55,7 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_HOST", ""),
         metadata={
             "description": "The hostname of the SMTP server.",
-            "default": Env.get("MAIL_HOST", ""),
+            "default": "",
         },
     )
 
@@ -62,7 +63,7 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_PORT", 587),
         metadata={
             "description": "The port number used for SMTP communication.",
-            "default": Env.get("MAIL_PORT", 587),
+            "default": 587,
         },
     )
 
@@ -70,7 +71,7 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_ENCRYPTION", "TLS"),
         metadata={
             "description": "The encryption type used for secure communication.",
-            "default": Env.get("MAIL_ENCRYPTION", "TLS"),
+            "default": "TLS",
         },
     )
 
@@ -78,7 +79,7 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_USERNAME", ""),
         metadata={
             "description": "The username for authentication with the SMTP server.",
-            "default": Env.get("MAIL_USERNAME"),
+            "default": "",
         },
     )
 
@@ -86,12 +87,12 @@ class Smtp(BaseEntity):
         default_factory=lambda: Env.get("MAIL_PASSWORD", ""),
         metadata={
             "description": "The password for authentication with the SMTP server.",
-            "default": Env.get("MAIL_PASSWORD"),
+            "default": "",
         },
     )
 
     timeout: int | None = field(
-        default=None,
+        default_factory=lambda: Env.get("MAIL_TIMEOUT", None),
         metadata={
             "description": "The connection timeout duration in seconds.",
             "default": None,
@@ -100,46 +101,26 @@ class Smtp(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Validate the structural types of SMTP configuration attributes.
+        Validate the structural types of the SMTP settings.
 
-        Effective ports, timeouts, encryption, and authentication are validated
-        by the selected SMTP transport after applying URL precedence. Unused
-        SMTP configurations must not prevent another mailer from starting.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
+        This method ensures that the 'driver' is set to 'smtp' and that all other
+        attributes conform to their expected types. It allows 'timeout' to be None.
 
         Raises
         ------
         TypeError
-            If any attribute is not of the expected type.
+            If any attribute does not meet its structural type requirements.
         """
-        # Validate 'url' type
-        if not isinstance(self.url, str):
-            error_msg = "The 'url' attribute must be a string."
-            raise TypeError(error_msg)
-        # Validate 'host' type
-        if not isinstance(self.host, str):
-            error_msg = "The 'host' attribute must be a string."
-            raise TypeError(error_msg)
-        # Validate 'port' type
-        if not isinstance(self.port, int):
-            error_msg = "The 'port' attribute must be an integer."
-            raise TypeError(error_msg)
-        # Validate 'encryption' type
-        if not isinstance(self.encryption, str):
-            error_msg = "The 'encryption' attribute must be a string."
-            raise TypeError(error_msg)
-        # Validate 'username' type
-        if not isinstance(self.username, str):
-            error_msg = "The 'username' attribute must be a string."
-            raise TypeError(error_msg)
-        # Validate 'password' type
-        if not isinstance(self.password, str):
-            error_msg = "The 'password' attribute must be a string."
-            raise TypeError(error_msg)
-        if self.timeout is not None and not isinstance(self.timeout, int):
-            error_msg = "The 'timeout' attribute must be an integer or None."
-            raise TypeError(error_msg)
+        super().__post_init__()
+        if self.driver != "smtp":
+            message = "The 'driver' attribute must be 'smtp'."
+            raise TypeError(message)
+        for name in ("url", "host", "encryption", "username", "password"):
+            validate_string(getattr(self, name), name, allow_empty=True)
+        for name in ("port", "timeout"):
+            value = getattr(self, name)
+            if name == "timeout" and value is None:
+                continue
+            if not isinstance(value, int) or isinstance(value, bool):
+                message = f"'{name}' must be an integer."
+                raise TypeError(message)

@@ -34,3 +34,8 @@ class Memory(BaseEntity):
         """
         # Delegate base-class field validation
         super().__post_init__()
+
+        # Ensure the driver attribute is set to 'memory'
+        if self.driver != "memory":
+            message = f"The 'driver' attribute must be 'memory', but got {self.driver}."
+            raise TypeError(message)

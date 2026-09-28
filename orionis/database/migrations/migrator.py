@@ -1,4 +1,5 @@
 import time
+from heapq import nlargest
 from typing import TYPE_CHECKING, Any
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -6,6 +7,7 @@ from orionis.database.contracts.migration import Migration
 from orionis.database.contracts.migrator import IMigrator
 from orionis.database.exceptions import MigrationNotFoundException
 from orionis.database.migrations.events import NO_EVENTS, MigrationEvents
+from orionis.database.migrations.context import migration_connection_scope
 from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.introspection.modules.reflection import ReflectionModule
@@ -64,8 +66,7 @@ def _build_migrations_table(table: str) -> TableDefinition:
         primary_key="id",
     )
 
-# The tracking table shape is fixed; build it once instead of re-allocating
-# four ColumnDefinition instances on every run.
+# Define the columns used to track applied migrations.
 _MIGRATIONS_TABLE_DEFINITION: TableDefinition = _build_migrations_table(
     _MIGRATIONS_TABLE,
 )
@@ -386,7 +387,7 @@ class Migrator(IMigrator):
         Parameters
         ----------
         ran : list of dict
-            Every recorded migration.
+            Every recorded migration in ascending ``id`` order.
         steps : int or None
             Number of most recent batches to select; ``None`` selects
             all of them.
@@ -396,13 +397,11 @@ class Migrator(IMigrator):
         list of dict
             Selected rows, most recently applied first.
         """
+        # Read the recorded application order from newest to oldest.
         if steps is None:
-            selected = ran
-        else:
-            newest = sorted({row["batch"] for row in ran}, reverse=True)[:steps]
-            targets = set(newest)
-            selected = [row for row in ran if row["batch"] in targets]
-        return sorted(selected, key=lambda row: row["id"], reverse=True)
+            return list(reversed(ran))
+        targets = set(nlargest(steps, {row["batch"] for row in ran}))
+        return [row for row in reversed(ran) if row["batch"] in targets]
 
     async def __runStep(
         self,
@@ -446,14 +445,15 @@ class Migrator(IMigrator):
             # The schema change and its tracking record share one
             # transaction, so a failure can never record a migration
             # that did not fully apply on engines with transactional DDL.
-            async with connection.transaction():
-                instance = migration_cls()
-                if batch is None:
-                    await instance.down()
-                    await self.__deleteRecord(connection, name)
-                else:
-                    await instance.up()
-                    await self.__insertRecord(connection, name, batch)
+            with migration_connection_scope(connection):
+                async with connection.transaction():
+                    instance = migration_cls()
+                    if batch is None:
+                        await instance.down()
+                        await self.__deleteRecord(connection, name)
+                    else:
+                        await instance.up()
+                        await self.__insertRecord(connection, name, batch)
         except Exception:
             events.failed(name, time.perf_counter() - started_at)
             raise

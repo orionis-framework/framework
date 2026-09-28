@@ -1,4 +1,5 @@
 from __future__ import annotations
+from unittest.mock import patch
 from typing import TYPE_CHECKING, ClassVar
 
 from orionis.database.connection_manager import ConnectionManager
@@ -11,6 +12,7 @@ from orionis.orm import (
 )
 from orionis.orm.exceptions import MassAssignmentException
 from orionis.orm.resolver import ConnectionResolver
+from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.schema.table import TableDefinition
 from orionis.support.facades.db import DB
 from orionis.test import TestCase
@@ -40,7 +42,7 @@ class _StubApp:
         }
 
 
-def _pivotTable(name: str, first: str, second: str, *extra: str) -> TableDefinition:
+def _pivot_table(name: str, first: str, second: str, *extra: str) -> TableDefinition:
     """Build a bare pivot table with two integer keys and optional extras."""
     columns = {first: Integer(), second: Integer()}
     for extra_name in extra:
@@ -172,6 +174,9 @@ class _RelationsTestCase(TestCase):
         """Wire an isolated in-memory manager and create every table."""
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
+        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
+        facade.start()
+        self.addCleanup(facade.stop)
         connection = self._manager.connection()
         await connection.createTable(Author.__meta__.table)
         await connection.createTable(Book.__meta__.table)
@@ -182,10 +187,10 @@ class _RelationsTestCase(TestCase):
         await connection.createTable(Student.__meta__.table)
         await connection.createTable(Course.__meta__.table)
         await connection.createTable(
-            _pivotTable("book_tag", "book_id", "tag_id", "featured"),
+            _pivot_table("book_tag", "book_id", "tag_id", "featured"),
         )
         await connection.createTable(
-            _pivotTable("enrollments", "student_ref", "course_ref"),
+            _pivot_table("enrollments", "student_ref", "course_ref"),
         )
 
     async def asyncTearDown(self) -> None:
@@ -722,13 +727,13 @@ class TestEagerLoading(_RelationsTestCase):
         """
         Eager load a hasMany relationship across an entire result set.
 
-        Validates ``with_()`` populates ``getRelation()`` for every row.
+        Validates ``withRelations()`` populates ``getRelation()`` for every row.
         """
         ana = await Author.create({"name": "Ana"})
         bob = await Author.create({"name": "Bob"})
         await Book.create({"title": "Ana's book", "author_id": ana.id})
 
-        authors = await Author.query().with_("books").orderBy("name").get()
+        authors = await Author.query().withRelations("books").orderBy("name").get()
         self.assertTrue(authors[0].relationLoaded("books"))
         self.assertTrue(authors[1].relationLoaded("books"))
         loaded_titles = [b.title for b in authors[0].getRelation("books")]
@@ -739,7 +744,7 @@ class TestEagerLoading(_RelationsTestCase):
 
     async def testLoadAliasBehavesIdenticallyToWith(self) -> None:
         """
-        Use the ``load()`` alias interchangeably with ``with_()``.
+        Use the ``load()`` alias interchangeably with ``withRelations()``.
 
         Validates both spellings resolve to the same eager-loading path.
         """
@@ -753,12 +758,12 @@ class TestEagerLoading(_RelationsTestCase):
         """
         Eager load a relationship when only the first row is fetched.
 
-        Validates ``with_()`` integrates with the ``first()`` terminal.
+        Validates ``withRelations()`` integrates with the ``first()`` terminal.
         """
         author = await Author.create({"name": "Ana"})
         await AuthorProfile.create({"bio": "Bio", "author_id": author.id})
 
-        fetched = await Author.query().with_("profile").first()
+        fetched = await Author.query().withRelations("profile").first()
         self.assertTrue(fetched.relationLoaded("profile"))
         self.assertEqual(fetched.getRelation("profile").bio, "Bio")
 
@@ -766,13 +771,13 @@ class TestEagerLoading(_RelationsTestCase):
         """
         Eager load several relationships in a single call.
 
-        Validates that ``with_()`` accepts multiple relationship names.
+        Validates that ``withRelations()`` accepts multiple relationship names.
         """
         author = await Author.create({"name": "Ana"})
         await Book.create({"title": "One", "author_id": author.id})
         await AuthorProfile.create({"bio": "Bio", "author_id": author.id})
 
-        fetched = (await Author.query().with_("books", "profile").get())[0]
+        fetched = (await Author.query().withRelations("books", "profile").get())[0]
         self.assertTrue(fetched.relationLoaded("books"))
         self.assertTrue(fetched.relationLoaded("profile"))
 
@@ -780,12 +785,12 @@ class TestEagerLoading(_RelationsTestCase):
         """
         Start eager loading directly from the model class.
 
-        Validates ``Model.with_(...)`` forwards to ``Model.query()``.
+        Validates ``Model.withRelations(...)`` forwards to ``Model.query()``.
         """
         author = await Author.create({"name": "Ana"})
         await Book.create({"title": "One", "author_id": author.id})
 
-        fetched = (await Author.with_("books").get())[0]
+        fetched = (await Author.withRelations("books").get())[0]
         self.assertTrue(fetched.relationLoaded("books"))
 
     async def testEagerLoadedBelongsTo(self) -> None:
@@ -797,7 +802,7 @@ class TestEagerLoading(_RelationsTestCase):
         author = await Author.create({"name": "Ana"})
         await Book.create({"title": "One", "author_id": author.id})
 
-        books = await Book.query().with_("author").get()
+        books = await Book.query().withRelations("author").get()
         self.assertTrue(books[0].relationLoaded("author"))
         self.assertEqual(books[0].getRelation("author").name, "Ana")
 
@@ -812,7 +817,7 @@ class TestEagerLoading(_RelationsTestCase):
         fiction = await Tag.create({"name": "fiction"})
         await book.tags().attach(fiction.id)
 
-        books = await Book.query().with_("tags").get()
+        books = await Book.query().withRelations("tags").get()
         self.assertTrue(books[0].relationLoaded("tags"))
         self.assertEqual([t.name for t in books[0].getRelation("tags")], ["fiction"])
 
@@ -837,7 +842,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         """
         await Author.create({"name": "Ana"})
         with self.assertRaises(RelationNotFoundException):
-            await Author.query().with_("noSuchRelation").get()
+            await Author.query().withRelations("noSuchRelation").get()
 
     async def testNonRelationMethodRaises(self) -> None:
         """
@@ -847,7 +852,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         """
         await Book.create({"title": "One"})
         with self.assertRaises(RelationNotFoundException):
-            await Book.query().with_("save").get()
+            await Book.query().withRelations("save").get()
 
     async def testMassAssignmentStillEnforcedThroughRelationCreate(self) -> None:
         """

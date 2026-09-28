@@ -26,6 +26,8 @@ class IConnection(ABC):
 
     # ruff: noqa: ANN401
 
+    __slots__ = ()
+
     @abstractmethod
     def getName(self) -> str:
         """

@@ -7,6 +7,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class String(ColumnDefinition):
     """The base for all string and character types. In SQL, ``VARCHAR``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         length: int | None = DEFAULT_STRING_LENGTH,

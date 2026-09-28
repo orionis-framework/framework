@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictArray(ColumnDefinition):
     """Represent a SQL ``ARRAY`` type."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         item_type: ColumnDefinition,

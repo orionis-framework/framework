@@ -1,9 +1,9 @@
 from __future__ import annotations
+from unittest.mock import AsyncMock, Mock, patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.provider import ConnectionManagerProvider
-from orionis.foundation.application import Application
 from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 from orionis.orm.provider import QueryBuilderProvider
@@ -53,9 +53,17 @@ class TestConnectionManagerProvider(TestCase):
         """
         previous = ConnectionResolver._manager
         try:
-            provider = ConnectionManagerProvider(Application())
+            application = Mock()
+            application.config.return_value = {
+                "default": "sqlite",
+                "connections": {"sqlite": {"driver": "sqlite"}},
+            }
+            manager = ConnectionManager(application)
+            application.make = AsyncMock(return_value=manager)
+            provider = ConnectionManagerProvider(application)
             await provider.boot()
-            self.assertIsInstance(ConnectionResolver.manager(), ConnectionManager)
+            application.make.assert_awaited_once_with(IConnectionManager)
+            self.assertIs(ConnectionResolver.manager(), manager)
         finally:
             ConnectionResolver._manager = previous
 
@@ -80,15 +88,17 @@ class TestQueryBuilderProvider(TestCase):
 
         Validates the boot wiring against the booted application.
         """
-        previous = ConnectionResolver._manager
-        try:
-            application = Application()
-            await ConnectionManagerProvider(application).boot()
+        gateway = QueryBuilder(db_manager=None)
+        application = Mock(isBooted=True)
+        application.make = AsyncMock(return_value=gateway)
+        with (
+            patch.object(DB, "_application", application),
+            patch.object(DB, "_pinned_instance", None),
+        ):
             await QueryBuilderProvider(application).boot()
-            self.assertIsNotNone(DB._pinned_instance)
+            application.make.assert_awaited_once_with(IQueryBuilder)
+            self.assertIs(DB._pinned_instance, gateway)
             self.assertIsInstance(DB.table("users"), IRawQueryBuilder)
-        finally:
-            ConnectionResolver._manager = previous
 
 
 class TestDBFacade(TestCase):

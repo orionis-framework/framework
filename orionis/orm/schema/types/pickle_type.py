@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class PickleType(ColumnDefinition):
     """Holds Python objects, serialized using ``pickle``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         protocol: int = 5,

@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Uuid(ColumnDefinition):
     """Represent a database agnostic UUID datatype."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         *,

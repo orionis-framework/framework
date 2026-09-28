@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class DateTime(ColumnDefinition):
     """A type for ``datetime.datetime()`` objects."""
 
+    __slots__ = ()
+
     def __init__(self, *, timezone: bool = False) -> None:
         """
         Construct a new DateTime.

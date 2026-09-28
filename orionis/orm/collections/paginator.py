@@ -1,6 +1,5 @@
 from __future__ import annotations
 import json
-import math
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -49,10 +48,10 @@ class Paginator:
             If the page or page size are not positive integers.
         """
         # Validate pagination inputs to keep derived values consistent.
-        if not isinstance(page, int) or page < 1:
+        if not isinstance(page, int) or isinstance(page, bool) or page < 1:
             error_msg = "Page number must be a positive integer."
             raise ValueError(error_msg)
-        if not isinstance(per_page, int) or per_page < 1:
+        if not isinstance(per_page, int) or isinstance(per_page, bool) or per_page < 1:
             error_msg = "Items per page must be a positive integer."
             raise ValueError(error_msg)
 
@@ -100,7 +99,7 @@ class Paginator:
         return self._page
 
     @property
-    def per_page(self) -> int:
+    def perPage(self) -> int:
         """
         Return the configured page size.
 
@@ -112,7 +111,7 @@ class Paginator:
         return self._per_page
 
     @property
-    def last_page(self) -> int:
+    def lastPage(self) -> int:
         """
         Return the number of the last available page.
 
@@ -121,10 +120,10 @@ class Paginator:
         int
             Last page number, never lower than 1.
         """
-        return max(1, math.ceil(self._total / self._per_page))
+        return max(1, (self._total + self._per_page - 1) // self._per_page)
 
     @property
-    def has_next(self) -> bool:
+    def hasNext(self) -> bool:
         """
         Report whether a page exists after the current one.
 
@@ -133,10 +132,10 @@ class Paginator:
         bool
             ``True`` when the current page is not the last.
         """
-        return self._page < self.last_page
+        return self._page * self._per_page < self._total
 
     @property
-    def has_previous(self) -> bool:
+    def hasPrevious(self) -> bool:
         """
         Report whether a page exists before the current one.
 
@@ -163,9 +162,9 @@ class Paginator:
             "total": self._total,
             "page": self._page,
             "perPage": self._per_page,
-            "lastPage": self.last_page,
-            "hasNext": self.has_next,
-            "hasPrevious": self.has_previous,
+            "lastPage": self.lastPage,
+            "hasNext": self.hasNext,
+            "hasPrevious": self.hasPrevious,
         }
 
     def toJson(self, **kwargs: Any) -> str:  # noqa: ANN401

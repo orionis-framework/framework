@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictBigInt(ColumnDefinition):
     """The SQL ``BIGINT`` type."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a BIGINT column definition.

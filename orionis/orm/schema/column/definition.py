@@ -15,11 +15,13 @@ _NO_DEFAULT: object = object()
 # Field names copied from ColumnOptions onto every ColumnDefinition instance.
 _OPTION_FIELDS: tuple[str, ...] = tuple(field.name for field in fields(ColumnOptions))
 
-# Single attrgetter reading every option field in one native call instead of
-# one Python-level getattr() per field; built once and reused per column.
+# Read every declared column option in declaration order.
 _OPTION_GETTER: Callable[[ColumnOptions], tuple[Any, ...]] = operator.attrgetter(
     *_OPTION_FIELDS,
 )
+
+# Store the values used by columns with no type-specific options.
+_DEFAULT_OPTION_VALUES: tuple[Any, ...] = _OPTION_GETTER(ColumnOptions())
 
 class ColumnDefinition:
     """
@@ -96,9 +98,11 @@ class ColumnDefinition:
         # Attribute name is attached later by the model metaclass.
         self.name: str = ""
         self.column_type = column_type
-        resolved = options if options is not None else ColumnOptions()
+        values = (
+            _DEFAULT_OPTION_VALUES if options is None else _OPTION_GETTER(options)
+        )
         for field_name, value in zip(
-            _OPTION_FIELDS, _OPTION_GETTER(resolved), strict=True,
+            _OPTION_FIELDS, values, strict=True,
         ):
             setattr(self, field_name, value)
         self.is_primary: bool = False

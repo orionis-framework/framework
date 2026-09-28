@@ -13,38 +13,6 @@ if TYPE_CHECKING:
 # Strings interpreted as truthy when casting to bool.
 _TRUTHY_STRINGS: frozenset[str] = frozenset({"1", "true", "yes", "on"})
 
-def _cast_int(value: Any) -> int:  # noqa: ANN401
-    """
-    Cast a raw value to ``int``.
-
-    Parameters
-    ----------
-    value : Any
-        Raw attribute value.
-
-    Returns
-    -------
-    int
-        Integer representation of the value.
-    """
-    return int(value)
-
-def _cast_float(value: Any) -> float:  # noqa: ANN401
-    """
-    Cast a raw value to ``float``.
-
-    Parameters
-    ----------
-    value : Any
-        Raw attribute value.
-
-    Returns
-    -------
-    float
-        Float representation of the value.
-    """
-    return float(value)
-
 def _cast_bool(value: Any) -> bool:  # noqa: ANN401
     """
     Cast a raw value to ``bool`` handling common textual forms.
@@ -141,8 +109,8 @@ def _cast_uuid(value: Any) -> uuid.UUID:  # noqa: ANN401
 
 # Registry of supported cast names.
 _CAST_HANDLERS: dict[str, Callable[[Any], Any]] = {
-    "int": _cast_int,
-    "float": _cast_float,
+    "int": int,
+    "float": float,
     "bool": _cast_bool,
     "datetime": _cast_datetime,
     "date": _cast_date,
@@ -200,26 +168,21 @@ def serialize_for_storage(
     dict
         Values ready to be bound into an SQL statement.
     """
-    serialized: dict[str, Any] = {}
+    serialized = values.copy()
+    columns = meta.columns
     for key, value in values.items():
-        column = meta.columns.get(key)
-        if column is None or value is None:
-            serialized[key] = value
+        if value is None:
             continue
-
         # JSON structures need explicit encoding outside JSON columns.
-        is_structure = isinstance(value, (dict, list))
-        if is_structure and column.column_type is not ColumnType.JSON:
-            serialized[key] = json.dumps(value)
-            continue
-
+        if isinstance(value, (dict, list)):
+            column = columns.get(key)
+            if column is not None and column.column_type is not ColumnType.JSON:
+                serialized[key] = json.dumps(value)
         # UUID objects need their string form outside UUID columns.
-        is_uuid = isinstance(value, uuid.UUID)
-        if is_uuid and column.column_type is not ColumnType.UUID:
-            serialized[key] = str(value)
-            continue
-
-        serialized[key] = value
+        elif isinstance(value, uuid.UUID):
+            column = columns.get(key)
+            if column is not None and column.column_type is not ColumnType.UUID:
+                serialized[key] = str(value)
     return serialized
 
 class AttributesMixin:
@@ -357,6 +320,8 @@ class AttributesMixin:
         meta = self.__meta__
         hidden = meta.hidden
         accessors = meta.accessors
+        if not hidden and not accessors and not meta.appends:
+            return self._attributes.copy()
         data = {
             key: getattr(self, accessors[key])(value)
             if key in accessors
@@ -417,7 +382,7 @@ class AttributesMixin:
             if key in self._attributes
         }
 
-    def except_(self, *keys: str) -> dict[str, Any]:
+    def exclude(self, *keys: str) -> dict[str, Any]:
         """
         Return every attribute except the given keys.
 
@@ -437,21 +402,3 @@ class AttributesMixin:
             for key, value in self._attributes.items()
             if key not in excluded
         }
-
-    def exclude(self, *keys: str) -> dict[str, Any]:
-        """
-        Return every attribute except the given keys.
-
-        Alias of :meth:`except_` with a keyword-safe name.
-
-        Parameters
-        ----------
-        *keys : str
-            Attribute names to exclude.
-
-        Returns
-        -------
-        dict
-            Attribute values without the excluded keys.
-        """
-        return self.except_(*keys)

@@ -1,4 +1,7 @@
 from __future__ import annotations
+from copy import copy
+from orionis.orm.schema.column.definition import ColumnDefinition
+from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.constraints import ForeignReference
 from orionis.orm.schema.types import (
     ColumnType,
@@ -10,6 +13,38 @@ from orionis.orm.schema.types import (
 from orionis.test import TestCase
 
 class TestColumnDefinitions(TestCase):
+
+    def testTypedColumnsHaveNoInstanceDictionary(self) -> None:
+        """Keep typed column declarations inside their declared slots."""
+        for column in (Integer(), String(), Enum("active", "inactive")):
+            with self.subTest(column=type(column).__name__):
+                self.assertFalse(hasattr(column, "__dict__"))
+                with self.assertRaises(AttributeError):
+                    column.unknown_option = True
+
+    def testCopyPreservesAbsentAndExplicitDefaults(self) -> None:
+        """Copy declarations without changing their default semantics."""
+        original = Integer().primary().autoIncrement()
+        duplicate = copy(original)
+        duplicate.nullable()
+        self.assertTrue(duplicate.is_primary)
+        self.assertFalse(duplicate.hasDefault())
+        self.assertFalse(original.is_nullable)
+        self.assertTrue(copy(String().default(None)).hasDefault())
+
+    def testCustomOptionsRemainIndependentFromDefaultColumns(self) -> None:
+        """Preserve explicit options without changing later declarations."""
+        configured = ColumnDefinition(
+            ColumnType.STRING,
+            ColumnOptions(length=80, collation="utf8", as_uuid=False),
+        )
+        default = ColumnDefinition(ColumnType.STRING)
+        self.assertEqual(configured.length, 80)
+        self.assertEqual(configured.collation, "utf8")
+        self.assertFalse(configured.as_uuid)
+        self.assertIsNone(default.length)
+        self.assertIsNone(default.collation)
+        self.assertTrue(default.as_uuid)
 
     # ── Fluent constraints ────────────────────────────────────────────────────
 

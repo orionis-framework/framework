@@ -63,7 +63,8 @@ class EventsMixin:
                 f"{supported}."
             )
             raise OrmException(error_msg)
-        cls.__meta__.events.setdefault(event, []).append(listener)
+        meta = cls.__meta__
+        meta.events[event] = (*meta.events.get(event, ()), (object(), listener))
         return cls
 
     @classmethod
@@ -104,11 +105,11 @@ class EventsMixin:
         None
             This method does not return a value.
         """
-        events = cls.__meta__.events
+        meta = cls.__meta__
         if event is None:
-            events.clear()
+            meta.events.clear()
         else:
-            events.pop(event, None)
+            meta.events.pop(event, None)
 
     async def fireEvent(self, event: str) -> bool:
         """
@@ -130,7 +131,7 @@ class EventsMixin:
             return True
 
         haltable = event in _HALTABLE_EVENTS
-        for listener in listeners:
+        for _token, listener in listeners:
             result = listener(self)
             if inspect.isawaitable(result):
                 result = await result

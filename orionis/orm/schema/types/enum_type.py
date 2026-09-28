@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Enum(ColumnDefinition):
     """String-backed enumeration column."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         *enums: str,

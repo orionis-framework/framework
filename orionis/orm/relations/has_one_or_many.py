@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
@@ -88,6 +89,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
             for model in models
             if (value := getattr(model, self._local_key)) is not None
         }
+        self._eager_keys_empty = not keys
         self.whereIn(self._foreign_key, keys)
 
     def _groupByForeignKey(
@@ -107,9 +109,10 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         dict
             Related rows grouped by the parent key they belong to.
         """
-        groups: dict[Any, list[TRelated]] = {}
+        groups: dict[Any, list[TRelated]] = defaultdict(list)
+        foreign_key = self._foreign_key
         for row in results:
-            groups.setdefault(getattr(row, self._foreign_key), []).append(row)
+            groups[getattr(row, foreign_key)].append(row)
         return groups
 
     async def create(self, attributes: dict[str, Any]) -> TRelated:

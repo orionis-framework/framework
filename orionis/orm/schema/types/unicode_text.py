@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class UnicodeText(ColumnDefinition):
     """An unbounded-length Unicode string type, e.g. ``NCLOB``/``NTEXT``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         length: int | None = None,

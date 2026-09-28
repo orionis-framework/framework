@@ -69,8 +69,9 @@ class ConnectionManager(IConnectionManager):
             If the connection is not declared in the configuration.
         """
         resolved_name: str = name or self._default
-        if resolved_name in self._cached_connections:
-            return self._cached_connections[resolved_name]
+        cached = self._cached_connections.get(resolved_name)
+        if cached is not None:
+            return cached
 
         config: dict[str, Any] | None = self._connections.get(resolved_name)
         if config is None:

@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Interval(ColumnDefinition):
     """A type for ``datetime.timedelta()`` objects."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         *,

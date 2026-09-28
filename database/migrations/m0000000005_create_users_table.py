@@ -1,3 +1,4 @@
+from database.schemas.users_v1 import USERS_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
@@ -12,17 +13,7 @@ class CreateUsersTable(Migration):
         None
             The table is created as a side effect.
         """
-        async with Schema.create("users") as table:
-            table.id().comment("User ID")
-            table.string("name", 255).comment("Full Name")
-            table.string("email", 255).unique().comment("Email Address")
-            table.dateTime("email_verified_at").nullable().comment("Email Verification Timestamp")
-            table.string("password", 255).comment("Hashed Password")
-            table.string("remember_token", 100).nullable().comment("Expiring Remember Me Token Digest")
-            table.boolean("active").default(value=True).comment("Active Status")
-            table.timestamps()
-
-            table.comment("Table to store application users.")
+        await Schema.createFromDefinition(USERS_V1)
 
     async def down(self) -> None:
         """
@@ -33,4 +24,4 @@ class CreateUsersTable(Migration):
         None
             The table is dropped as a side effect.
         """
-        await Schema.drop("users")
+        await Schema.drop(USERS_V1.name)

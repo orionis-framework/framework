@@ -1,3 +1,4 @@
+from database.schemas.cache_locks_v1 import CACHE_LOCKS_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
@@ -12,12 +13,7 @@ class CreateCacheLocksTable(Migration):
         None
             The table is created as a side effect.
         """
-        async with Schema.create("cache_locks") as table:
-            table.string("cache_key", 255).primary().comment("Lock Key")
-            table.string("owner", 255).nullable().comment("Lock Owner")
-            table.double("expiration").nullable().comment("Expiration")
-
-            table.comment("Table to store atomic cache locks.")
+        await Schema.createFromDefinition(CACHE_LOCKS_V1)
 
     async def down(self) -> None:
         """
@@ -28,4 +24,4 @@ class CreateCacheLocksTable(Migration):
         None
             The table is dropped as a side effect.
         """
-        await Schema.drop("cache_locks")
+        await Schema.drop(CACHE_LOCKS_V1.name)

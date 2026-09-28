@@ -1,8 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
+from unittest.mock import patch
 
 from orionis.database.connection_manager import ConnectionManager
 from orionis.orm import Integer, Model, String
+from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
 from orionis.support.facades.db import DB
@@ -32,7 +34,7 @@ class _StubApp:
         }
 
 
-def _pivotTable(name: str, first: str, second: str) -> TableDefinition:
+def _pivot_table(name: str, first: str, second: str) -> TableDefinition:
     """Build a bare pivot table with two integer columns."""
     columns = {first: Integer(), second: Integer()}
     for key, column in columns.items():
@@ -91,12 +93,15 @@ class TestRelationsWithTransactions(TestCase):
         """Wire an isolated in-memory manager and create every table."""
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
+        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
+        facade.start()
+        self.addCleanup(facade.stop)
         self._connection = self._manager.connection()
         await self._connection.createTable(Team.__meta__.table)
         await self._connection.createTable(Player.__meta__.table)
         await self._connection.createTable(Member.__meta__.table)
         await self._connection.createTable(
-            _pivotTable("member_team", "member_id", "team_id"),
+            _pivot_table("member_team", "member_id", "team_id"),
         )
 
     async def asyncTearDown(self) -> None:
@@ -206,11 +211,14 @@ class TestRelationsWithDbTable(TestCase):
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
         connection = self._manager.connection()
+        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
+        facade.start()
+        self.addCleanup(facade.stop)
         await connection.createTable(Team.__meta__.table)
         await connection.createTable(Player.__meta__.table)
         await connection.createTable(Member.__meta__.table)
         await connection.createTable(
-            _pivotTable("member_team", "member_id", "team_id"),
+            _pivot_table("member_team", "member_id", "team_id"),
         )
 
     async def asyncTearDown(self) -> None:

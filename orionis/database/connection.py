@@ -1,6 +1,7 @@
 from __future__ import annotations
-from contextlib import AbstractAsyncContextManager
+from asyncio import current_task
 from contextvars import ContextVar
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,9 +20,11 @@ from orionis.database.exceptions import QueryException, TransactionException
 from orionis.database.transaction import Transaction
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
+    from contextlib import AbstractAsyncContextManager
     from sqlalchemy.engine import CursorResult
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
+    from sqlalchemy.sql.elements import TextClause
     from orionis.database.contracts.transaction import ITransaction
     from orionis.orm.query.expressions import (
         DeletePlan,
@@ -34,10 +37,15 @@ if TYPE_CHECKING:
 # Error message used when transaction control has no active transaction.
 _NO_ACTIVE_TRANSACTION: str = "No active transaction on this connection."
 
+@lru_cache(maxsize=256)
+def _text_statement(sql: str) -> TextClause:
+    """Parse a SQL string into a reusable parameterized statement."""
+    return text(sql)
+
 class _TransactionState:
     """Per-task stack of open transactions bound to one raw connection."""
 
-    __slots__ = ("connection", "transactions")
+    __slots__ = ("connection", "owner", "transactions")
 
     def __init__(
         self,
@@ -60,28 +68,8 @@ class _TransactionState:
             This method does not return a value.
         """
         self.connection = connection
+        self.owner = current_task()
         self.transactions: list[AsyncTransaction] = [transaction]
-
-class _ReusedConnection(AbstractAsyncContextManager):
-    """Async context manager exposing an already-open transactional connection."""
-
-    __slots__ = ("_connection",)
-
-    def __init__(self, connection: AsyncConnection) -> None:
-        """
-        Initialize the wrapper around an already-open connection.
-
-        Parameters
-        ----------
-        connection : AsyncConnection
-            Connection currently participating in an open transaction.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self._connection = connection
 
     async def __aenter__(self) -> AsyncConnection:
         """
@@ -92,7 +80,7 @@ class _ReusedConnection(AbstractAsyncContextManager):
         AsyncConnection
             The wrapped, already-open connection.
         """
-        return self._connection
+        return self.connection
 
     async def __aexit__(self, *exc_info: object) -> None:
         """
@@ -203,8 +191,8 @@ class Connection(IConnection):
             If the statement fails to compile or execute.
         """
         if isinstance(query, str):
-            statement: Any = text(query)
-            parameters = dict(bindings or {})
+            statement: Any = _text_statement(query)
+            parameters = bindings
         else:
             statement = self._compiler.compileSelect(query)
             parameters = None
@@ -236,10 +224,15 @@ class Connection(IConnection):
         QueryException
             If the statement fails to compile or execute.
         """
-        statement = self._compiler.compileInsert(plan)
+        parameters = (
+            plan.values if self._compiler.supportsBatchInsert(plan) else None
+        )
+        statement = self._compiler.compileInsert(
+            plan, parameterized=parameters is not None,
+        )
 
         async with self._acquire() as connection:
-            result = await self._run(connection, statement)
+            result = await self._run(connection, statement, parameters)
             # The generated key is only reported for single-row inserts.
             last_id: Any = None
             if len(plan.values) == 1:
@@ -359,7 +352,7 @@ class Connection(IConnection):
             values are excluded because they may contain credentials.
         """
         async with self._acquire() as connection:
-            result = await self._run(connection, text(sql), dict(bindings or {}))
+            result = await self._run(connection, _text_statement(sql), bindings)
             return int(result.rowcount or 0)
 
     async def statement(
@@ -390,7 +383,7 @@ class Connection(IConnection):
             If the statement fails to execute.
         """
         async with self._acquire() as connection:
-            await self._run(connection, text(sql), dict(bindings or {}))
+            await self._run(connection, _text_statement(sql), bindings)
             return True
 
     # ── Schema helpers ──────────────────────────────────────────────────────
@@ -426,7 +419,12 @@ class Connection(IConnection):
             table, if_not_exists=if_not_exists,
         )
         async with self._acquire() as connection:
-            await self._run(connection, statement)
+            try:
+                await connection.run_sync(
+                    statement.element.create, checkfirst=if_not_exists,
+                )
+            except SQLAlchemyError as exc:
+                raise self._queryException(exc) from None
             return True
 
     async def dropTable(
@@ -482,12 +480,16 @@ class Connection(IConnection):
         TransactionException
             If the transaction cannot be started.
         """
-        state = self._tx_state.get()
+        state = self._transactionState()
         try:
             if state is None:
                 # Open a dedicated raw connection with a root transaction.
                 raw = await self._getEngine().connect()
-                transaction = await raw.begin()
+                try:
+                    transaction = await raw.begin()
+                except BaseException:
+                    await raw.close()
+                    raise
                 self._tx_state.set(_TransactionState(raw, transaction))
             else:
                 # Nested calls open a savepoint on the same connection.
@@ -511,7 +513,7 @@ class Connection(IConnection):
         TransactionException
             If no transaction is active or the commit fails.
         """
-        state = self._tx_state.get()
+        state = self._transactionState()
         if state is None or not state.transactions:
             raise TransactionException(_NO_ACTIVE_TRANSACTION)
 
@@ -538,7 +540,7 @@ class Connection(IConnection):
         TransactionException
             If no transaction is active or the rollback fails.
         """
-        state = self._tx_state.get()
+        state = self._transactionState()
         if state is None or not state.transactions:
             raise TransactionException(_NO_ACTIVE_TRANSACTION)
 
@@ -572,7 +574,11 @@ class Connection(IConnection):
             ``True`` when at least one transaction level is open.
         """
         state = self._tx_state.get()
-        return state is not None and bool(state.transactions)
+        return (
+            state is not None
+            and state.owner is current_task()
+            and bool(state.transactions)
+        )
 
     # ── Lifecycle ───────────────────────────────────────────────────────────
 
@@ -586,8 +592,9 @@ class Connection(IConnection):
             This method does not return a value.
         """
         if self._engine is not None:
-            await self._engine.dispose()
+            engine = self._engine
             self._engine = None
+            await engine.dispose()
 
     # ── Internal plumbing ───────────────────────────────────────────────────
 
@@ -619,26 +626,39 @@ class Connection(IConnection):
             self._engine = engine
         return self._engine
 
-    def _acquire(self) -> AbstractAsyncContextManager[AsyncConnection]:
+    def _transactionState(self) -> _TransactionState | None:
+        """Resolve the transaction owned by the current asyncio task."""
+        state = self._tx_state.get()
+        if state is None or state.owner is current_task():
+            return state
+        if state.transactions:
+            error_msg = (
+                "An active transaction cannot be shared with a child task. "
+                "Execute its queries in the task that began the transaction."
+            )
+            raise TransactionException(error_msg)
+        self._tx_state.set(None)
+        return None
+
+    def _acquire(
+        self,
+    ) -> AbstractAsyncContextManager[AsyncConnection] | _TransactionState:
         """
         Resolve the connection context to execute statements on.
 
         Inside a transaction the transactional connection is reused;
         otherwise an ephemeral autocommit connection is opened. The
-        context manager is returned directly instead of through an
-        async generator, so entering and exiting it on every statement
-        skips the extra indirection layer generator-based context
-        managers add.
+        context manager is returned directly to the caller.
 
         Returns
         -------
         AbstractAsyncContextManager
             Context manager yielding the connection to execute on.
         """
-        state = self._tx_state.get()
+        state = self._transactionState()
         if state is not None:
             # Reuse the transactional connection without committing.
-            return _ReusedConnection(state.connection)
+            return state
 
         return self._getEngine().begin()
 
@@ -646,7 +666,7 @@ class Connection(IConnection):
         self,
         connection: AsyncConnection,
         statement: Any,
-        parameters: dict[str, Any] | None = None,
+        parameters: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
     ) -> CursorResult[Any]:
         """
         Execute a statement translating engine errors into Orionis errors.
@@ -657,8 +677,8 @@ class Connection(IConnection):
             Raw connection to execute on.
         statement : Any
             Executable statement or textual clause.
-        parameters : dict or None, optional
-            Bound parameters for textual statements.
+        parameters : Mapping, Sequence of Mapping or None, optional
+            Bound parameters for a statement or a batch of row mappings.
 
         Returns
         -------
@@ -675,11 +695,26 @@ class Connection(IConnection):
                 return await connection.execute(statement, parameters)
             return await connection.execute(statement)
         except SQLAlchemyError as exc:
-            error_msg = (
-                f"Query failed on connection '{self._name}' "
-                f"({type(exc).__name__})."
-            )
-            raise QueryException(error_msg) from None
+            raise self._queryException(exc) from None
+
+    def _queryException(self, error: SQLAlchemyError) -> QueryException:
+        """
+        Create a query exception without exposing SQL or bound values.
+
+        Parameters
+        ----------
+        error : SQLAlchemyError
+            Database error whose type identifies the failure.
+
+        Returns
+        -------
+        QueryException
+            Sanitized exception identifying the connection and error type.
+        """
+        return QueryException(
+            f"Query failed on connection '{self._name}' "
+            f"({type(error).__name__}).",
+        )
 
     async def _releaseIfSettled(
         self,

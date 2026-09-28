@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class BigInteger(ColumnDefinition):
     """A type for bigger ``int`` integers. Typically generates ``BIGINT``."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a big integer column definition.

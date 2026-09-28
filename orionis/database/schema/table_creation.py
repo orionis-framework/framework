@@ -2,33 +2,28 @@ from typing import TYPE_CHECKING
 from orionis.database.schema.blueprint import Blueprint
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
     from types import TracebackType
-    from orionis.database.schema.definitions import SchemaDefinition
     from orionis.database.schema.schema import Schema
 
 class TableCreation:
     """
-    Awaitable and async context manager returned by ``Schema.create``.
+    Async context manager returned by ``Schema.create``.
 
-    - ``await schema.create(name, *definitions)`` awaits this object
-      directly, creating the table from the definitions given up front.
-    - ``async with schema.create(name) as table:`` enters this object,
-      yielding a :class:`~orionis.database.schema.blueprint.Blueprint`
-      so columns can be declared inside the block; the table is created
-      on exit, unless the block raised an exception.
+    ``async with schema.create(name) as table:`` yields a
+    :class:`~orionis.database.schema.blueprint.Blueprint` so columns can
+    be declared inside the block; the table is created on exit unless
+    the block raised an exception.
     """
 
-    __slots__ = ("__blueprint", "__definitions", "__name", "__schema")
+    __slots__ = ("__blueprint", "__name", "__schema")
 
     def __init__(
         self,
         schema: Schema,
         name: str,
-        definitions: tuple[SchemaDefinition, ...],
     ) -> None:
         """
-        Store the pending table creation request.
+        Store the pending table declaration request.
 
         Parameters
         ----------
@@ -36,8 +31,6 @@ class TableCreation:
             The schema instance that will perform the creation.
         name : str
             The name of the table to create.
-        definitions : tuple
-            Schema definitions supplied to ``Schema.create``, if any.
 
         Returns
         -------
@@ -46,22 +39,7 @@ class TableCreation:
         """
         self.__schema = schema
         self.__name = name
-        self.__definitions = definitions
         self.__blueprint: Blueprint | None = None
-
-    def __await__(self) -> Generator[object, None, object]:
-        """
-        Create the table from the definitions given to ``create``.
-
-        Returns
-        -------
-        Generator
-            Iterator driving the underlying table creation coroutine.
-        """
-        return self.__schema._createTable(  # noqa: SLF001
-            self.__name,
-            self.__definitions,
-        ).__await__()
 
     async def __aenter__(self) -> Blueprint:
         """
@@ -99,6 +77,8 @@ class TableCreation:
             ``False`` to always propagate exceptions raised in the block.
         """
         if exc_type is None and self.__blueprint is not None:
-            combined = (*self.__definitions, *self.__blueprint.definitions())
-            await self.__schema._createTable(self.__name, combined)  # noqa: SLF001
+            await self.__schema._createTable(  # noqa: SLF001
+                self.__name,
+                self.__blueprint.definitions(),
+            )
         return False

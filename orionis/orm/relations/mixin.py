@@ -32,7 +32,7 @@ class RelationsMixin:
 
     The mixin also owns the ``_relations`` mapping every model instance
     carries, used to cache eager-loaded results
-    (:meth:`~orionis.orm.query.builder.ModelQueryBuilder.with_`).
+    (:meth:`~orionis.orm.query.builder.ModelQueryBuilder.withRelations`).
     """
 
     __slots__ = ()

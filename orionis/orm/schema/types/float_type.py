@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Float(ColumnDefinition):
     """Type representing floating point types, such as ``FLOAT`` or ``REAL``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         precision: int | None = None,

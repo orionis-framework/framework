@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Numeric(ColumnDefinition):
     """Base for non-integer numeric types, such as ``NUMERIC``/``DECIMAL``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         precision: int | None = None,

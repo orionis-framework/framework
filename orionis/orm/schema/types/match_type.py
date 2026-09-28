@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class MatchType(ColumnDefinition):
     """Refers to the return type of the ``MATCH`` operator."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a match type column definition.

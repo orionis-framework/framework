@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.transaction import ITransaction
 
 if TYPE_CHECKING:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 import re
+from copy import copy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 from orionis.orm.attributes import get_cast_handler
+from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
 
@@ -116,7 +118,7 @@ _FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset({
     "whereRaw",
     "whereRegexpMatch",
     "whereStartsWith",
-    "with_",
+    "withRelations",
     "withTrashed",
     "withoutGlobalScope",
     "withoutGlobalScopes",
@@ -217,8 +219,8 @@ class ModelMetadata:
         Local scope method names keyed by their fluent call name.
     global_scopes : dict of str to Callable
         Constraints applied to every query, keyed by scope name.
-    events : dict of str to list of Callable
-        Lifecycle listeners keyed by event name.
+    events : dict of str to tuple
+        Immutable (registration identity, listener) pairs keyed by event name.
     """
 
     table_name: str
@@ -242,7 +244,9 @@ class ModelMetadata:
     appends: frozenset[str] = frozenset()
     scopes: dict[str, str] = field(default_factory=dict)
     global_scopes: dict[str, Callable[[Any], None]] = field(default_factory=dict)
-    events: dict[str, list[Callable[..., Any]]] = field(default_factory=dict)
+    events: dict[str, tuple[tuple[object, Callable[..., Any]], ...]] = field(
+        default_factory=dict,
+    )
 
     def isFillable(self, key: str) -> bool:
         """
@@ -295,7 +299,7 @@ class ModelMeta(type):
     table name and primary key, and precompiles cast handlers.
     """
 
-    def __new__(
+    def __new__( # NOSONAR
         mcs,
         name: str,
         bases: tuple[type, ...],
@@ -330,11 +334,11 @@ class ModelMeta(type):
             cls.__meta__ = None
             return cls
 
-        columns = mcs._collectColumns(cls, namespace)
-        table_name = mcs._resolveTableName(cls, name, namespace)
-        primary_key = mcs._resolvePrimaryKey(cls, namespace, columns)
+        table = mcs._resolveTable(cls, name, namespace)
+        columns = table.columns
         casts = mcs._collectCasts(cls)
         accessors, mutators, scopes = mcs._collectBehaviours(cls)
+        events = mcs._inheritEvents(cls)
 
         # Timestamp columns are tracked only when actually declared.
         created = str(getattr(cls, "CREATED_AT", "created_at"))
@@ -345,18 +349,17 @@ class ModelMeta(type):
         deleted_column = deleted if soft_deletes and deleted in columns else None
 
         # A soft delete column must accept NULL to mark a live row.
-        if deleted_column is not None:
-            columns[deleted_column].nullable()
+        if deleted_column is not None and not columns[deleted_column].is_nullable:
+            if getattr(cls, "table_definition", None) is not None:
+                error_msg = "The shared soft delete column must be nullable."
+                raise OrmConfigurationException(error_msg)
+            columns[deleted_column] = copy(columns[deleted_column]).nullable()
 
         cls.__meta__ = ModelMetadata(
-            table_name=table_name,
-            table=TableDefinition(
-                name=table_name,
-                columns=columns,
-                primary_key=primary_key,
-            ),
+            table_name=table.name,
+            table=table,
             columns=columns,
-            primary_key=primary_key,
+            primary_key=table.primary_key,
             casts=casts,
             cast_lookup={
                 key: get_cast_handler(cast) for key, cast in casts.items()
@@ -376,7 +379,7 @@ class ModelMeta(type):
             appends=frozenset(getattr(cls, "appends", ()) or ()),
             scopes=scopes,
             global_scopes=mcs._inheritGlobalScopes(cls),
-            events=mcs._inheritEvents(cls),
+            events=events,
         )
         return cls
 
@@ -415,6 +418,58 @@ class ModelMeta(type):
         raise AttributeError(error_msg)
 
     # ── Discovery helpers ───────────────────────────────────────────────────
+
+    @staticmethod
+    def _resolveTable(
+        owner: type,
+        name: str,
+        namespace: dict[str, Any],
+    ) -> TableDefinition:
+        """
+        Resolve the shared table definition or inline model columns.
+
+        Parameters
+        ----------
+        owner : type
+            Model class being created.
+        name : str
+            Name of the model class.
+        namespace : dict of str to Any
+            Attributes declared in the model class body.
+
+        Returns
+        -------
+        TableDefinition
+            Resolved table definition for the model.
+
+        Raises
+        ------
+        OrmConfigurationException
+            If the shared definition is invalid, conflicts with model
+            settings, or is combined with inline column declarations.
+        """
+        definition = getattr(owner, "table_definition", None)
+        if definition is None:
+            columns = ModelMeta._collectColumns(owner, namespace)
+            return TableDefinition(
+                name=ModelMeta._resolveTableName(owner, name, namespace),
+                columns=columns,
+                primary_key=ModelMeta._resolvePrimaryKey(owner, namespace, columns),
+            )
+        if not isinstance(definition, TableDefinition):
+            error_msg = "Model.table_definition must be a TableDefinition."
+            raise OrmConfigurationException(error_msg)
+        if any(isinstance(value, ColumnDefinition) for value in namespace.values()):
+            error_msg = "Declare columns in table_definition or on the model."
+            raise OrmConfigurationException(error_msg)
+        for key, expected in (
+            ("table", definition.name), ("primary_key", definition.primary_key),
+        ):
+            configured = getattr(owner, key, None)
+            if configured is not None and configured != expected:
+                error_msg = f"Model.{key} conflicts with table_definition."
+                raise OrmConfigurationException(error_msg)
+        return definition
 
     @staticmethod
     def _collectPending(
@@ -681,7 +736,9 @@ class ModelMeta(type):
         return scopes
 
     @staticmethod
-    def _inheritEvents(owner: type) -> dict[str, list[Callable[..., Any]]]:
+    def _inheritEvents(
+        owner: type,
+    ) -> dict[str, tuple[tuple[object, Callable[..., Any]], ...]]:
         """
         Copy the lifecycle listeners declared by ancestor models.
 
@@ -692,15 +749,23 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to list of Callable
-            Listeners the new class starts with, detached from the
-            ancestor lists so registering never leaks upwards.
+        dict of str to tuple
+            Listener snapshots with their registration identities.
         """
-        events: dict[str, list[Callable[..., Any]]] = {}
-        for base in reversed(owner.__mro__[1:]):
+        events: dict[str, list[tuple[object, Callable[..., Any]]]] = {}
+        covered: set[type] = set()
+        seen: set[object] = set()
+        for base in owner.__mro__[1:]:
+            if base in covered:
+                continue
             base_meta = base.__dict__.get("__meta__")
             if base_meta is None:
                 continue
-            for event, listeners in base_meta.events.items():
-                events.setdefault(event, []).extend(listeners)
-        return events
+            covered.update(base.__mro__)
+            for event, registrations in base_meta.events.items():
+                for registration in registrations:
+                    token = registration[0]
+                    if token not in seen:
+                        seen.add(token)
+                        events.setdefault(event, []).append(registration)
+        return {event: tuple(entries) for event, entries in events.items()}

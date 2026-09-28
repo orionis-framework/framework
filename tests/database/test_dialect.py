@@ -176,9 +176,9 @@ class TestDialect(TestCase):
 
     # ── Engine options ────────────────────────────────────────────────────────
 
-    def testSqliteMemoryUsesStaticPool(self) -> None:
+    def testSqliteMemoryUsesSingleConnectionPool(self) -> None:
         """
-        Configure a static pool for in-memory SQLite databases.
+        Configure a single-connection pool for in-memory SQLite databases.
 
         Validates that the single shared connection semantics of the
         in-memory database are preserved.

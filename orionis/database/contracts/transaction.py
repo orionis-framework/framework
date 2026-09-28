@@ -14,6 +14,8 @@ class ITransaction(ABC):
     exception escapes the block.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     async def __aenter__(self) -> ITransaction:
         """

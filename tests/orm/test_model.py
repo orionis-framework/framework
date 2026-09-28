@@ -368,9 +368,9 @@ class TestModelCrud(TestCase):
         page = await Person.query().orderBy("id").paginate(page=2, per_page=2)
         self.assertEqual([p.name for p in page.items], ["user2", "user3"])
         self.assertEqual(page.total, 5)
-        self.assertEqual(page.last_page, 3)
-        self.assertTrue(page.has_next)
-        self.assertTrue(page.has_previous)
+        self.assertEqual(page.lastPage, 3)
+        self.assertTrue(page.hasNext)
+        self.assertTrue(page.hasPrevious)
 
     # ── Attributes and state ──────────────────────────────────────────────────
 
@@ -386,16 +386,16 @@ class TestModelCrud(TestCase):
         self.assertIn("name", data)
         self.assertNotIn("email", person.toJson())
 
-    async def testOnlyAndExceptSubsets(self) -> None:
+    async def testOnlyAndExcludeSubsets(self) -> None:
         """
-        Slice attributes with only() and except_().
+        Slice attributes with only() and exclude().
 
         Validates the attribute subset helpers.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         self.assertEqual(person.only("name"), {"name": "John"})
-        self.assertNotIn("name", person.except_("name"))
-        self.assertEqual(person.exclude("name"), person.except_("name"))
+        self.assertNotIn("name", person.exclude("name"))
+        self.assertIn("email", person.exclude("name"))
 
     async def testJsonCastRoundTrip(self) -> None:
         """

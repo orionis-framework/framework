@@ -87,6 +87,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
             for model in models
             if (value := getattr(model, self._foreign_key)) is not None
         }
+        self._eager_keys_empty = not keys
         self.whereIn(self._owner_key, keys)
 
     async def getResults(self) -> TRelated | None:

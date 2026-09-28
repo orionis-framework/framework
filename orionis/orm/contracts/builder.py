@@ -22,7 +22,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
     __slots__ = ()
 
     @abstractmethod
-    def with_(self, *names: str) -> Self:
+    def withRelations(self, *names: str) -> Self:
         """
         Eager load the given relationships alongside the query.
 
@@ -40,7 +40,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
     @abstractmethod
     def load(self, *names: str) -> Self:
         """
-        Eager load the given relationships; alias of ``with_``.
+        Eager load the given relationships; alias of ``withRelations``.
 
         Parameters
         ----------

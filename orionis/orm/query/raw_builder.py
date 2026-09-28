@@ -176,8 +176,9 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         InvalidQueryException
             If the page or page size are not positive integers.
         """
+        self.forPage(page, per_page)
         total = await self.count()
-        items = await self.forPage(page, per_page).get()
+        items = await self.get()
         return self._paginator(items, total, page, per_page)
 
     # ── Internal helpers ────────────────────────────────────────────────────

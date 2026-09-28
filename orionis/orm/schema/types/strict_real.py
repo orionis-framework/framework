@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictReal(ColumnDefinition):
     """The SQL ``REAL`` type."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         precision: int | None = None,

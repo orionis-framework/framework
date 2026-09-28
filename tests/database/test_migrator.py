@@ -1,5 +1,6 @@
 from __future__ import annotations
 import tempfile
+from asyncio import gather
 from pathlib import Path
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.migration import Migration
@@ -8,6 +9,7 @@ from orionis.database.exceptions import (
     MigrationNotFoundException,
 )
 from orionis.database.migrations.events import MigrationEvents
+from orionis.database.migrations.context import current_migration_connection
 from orionis.database.migrations.migrator import Migrator
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
@@ -38,6 +40,11 @@ class _StubApp:
                 "sqlite": {
                     "driver": "sqlite",
                     "database": self._database,
+                    "prefix": "",
+                },
+                "secondary": {
+                    "driver": "sqlite",
+                    "database": f"{self._database}.secondary",
                     "prefix": "",
                 },
             },
@@ -324,3 +331,48 @@ class TestMigrator(TestCase):
         """
         with self.assertRaises(ConnectionNotFoundException):
             await self._migrator.migrate(connection="ghost")
+
+    async def testNamedMigrationUsesItsTrackingConnection(self) -> None:
+        """Apply and revert unqualified migration operations on the target."""
+        await self._migrator.migrate(connection="secondary")
+        self.assertFalse(await self.tableExists("alpha"))
+        target = self._manager.connection("secondary")
+        rows = await target.select(
+            "SELECT name FROM sqlite_master WHERE name = 'alpha'",
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertIsNone(current_migration_connection())
+        self.assertIs(ConnectionResolver.connection(), self._manager.connection())
+        self.assertEqual(
+            await self._migrator.rollback(connection="secondary"),
+            ["m02_beta", "m01_alpha"],
+        )
+        rows = await target.select(
+            "SELECT name FROM sqlite_master WHERE name = 'alpha'",
+        )
+        self.assertEqual(rows, [])
+
+    async def testConcurrentMigrationsKeepTheirConnectionsSeparate(self) -> None:
+        """Isolate selected connections while two migration runs overlap."""
+        results = await gather(
+            self._migrator.migrate(),
+            self._migrator.migrate(connection="secondary"),
+        )
+        self.assertEqual(results, [
+            ["m01_alpha", "m02_beta"],
+            ["m01_alpha", "m02_beta"],
+        ])
+        for name in (None, "secondary"):
+            rows = await self._manager.connection(name).select(
+                "SELECT name FROM sqlite_master WHERE name = 'alpha'",
+            )
+            self.assertEqual(len(rows), 1)
+        self.assertIsNone(current_migration_connection())
+
+    async def testFailedMigrationRestoresTheConnectionScope(self) -> None:
+        """Restore the caller's connection after a named migration raises."""
+        self.useMigrations({"m01_broken": _Broken})
+        with self.assertRaises(RuntimeError):
+            await self._migrator.migrate(connection="secondary")
+        self.assertIsNone(current_migration_connection())
+        self.assertIs(ConnectionResolver.connection(), self._manager.connection())

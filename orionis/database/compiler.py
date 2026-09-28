@@ -6,6 +6,7 @@ from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
 from sqlalchemy.schema import CreateTable, DropTable
 from sqlalchemy.sql import CompoundSelect
+from sqlalchemy.sql.elements import ClauseElement
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     COLUMNLESS_WHERE_TYPES,
@@ -73,33 +74,10 @@ _PATTERN_OPERATORS: dict[str, Callable[[Any, Any], Any]] = {
 # Number of boundaries required by a BETWEEN condition.
 _BETWEEN_BOUNDS: int = 2
 
-# Sequence kinds a set-membership clause materializes before binding.
-_SEQUENCE_TYPES: tuple[type, ...] = (list, tuple, set, frozenset)
-
-def _membership_values(value: Any) -> Any:  # noqa: ANN401
-    """
-    Normalize the right-hand side of a set-membership condition.
-
-    Parameters
-    ----------
-    value : Any
-        Bound sequence, or an already compiled subquery statement.
-
-    Returns
-    -------
-    Any
-        A list for sequences, or the value untouched for subqueries.
-    """
-    if value is None:
-        return []
-    if isinstance(value, _SEQUENCE_TYPES):
-        return list(value)
-    return value
-
 # Handlers for where clause kinds with a single-expression translation.
 _SIMPLE_CLAUSES: dict[WhereType, Callable[[Any, Any], Any]] = {
-    WhereType.IN: lambda col, val: col.in_(_membership_values(val)),
-    WhereType.NOT_IN: lambda col, val: col.not_in(_membership_values(val)),
+    WhereType.IN: lambda col, val: col.in_(() if val is None else val),
+    WhereType.NOT_IN: lambda col, val: col.not_in(() if val is None else val),
     WhereType.NULL: lambda col, _val: col.is_(None),
     WhereType.NOT_NULL: lambda col, _val: col.is_not(None),
     WhereType.LIKE: lambda col, val: col.like(val),
@@ -122,7 +100,7 @@ class SQLCompiler:
     per compiler) and query plans into executable statements.
     """
 
-    __slots__ = ("_metadata", "_prefix", "_tables")
+    __slots__ = ("_definitions", "_metadata", "_prefix", "_tables")
 
     # Builders translating logical column types into engine types.
     _TYPE_BUILDERS: ClassVar[
@@ -219,6 +197,7 @@ class SQLCompiler:
         self._prefix = prefix or ""
         self._metadata = MetaData()
         self._tables: dict[str, Table] = {}
+        self._definitions: dict[str, TableDefinition] = {}
 
     # ── Statement compilation ───────────────────────────────────────────────
 
@@ -466,7 +445,7 @@ class SQLCompiler:
             This method does not return a value.
         """
         if table.columns:
-            return  # already has a real, declared schema
+            return
 
         identifier = alias or table.name
         bare_names = {
@@ -496,14 +475,11 @@ class SQLCompiler:
         None
             This method does not return a value.
         """
-        # Every source already has a declared schema in the common,
-        # model-backed case; skip scanning every clause for nothing.
-        joined_tables = [
-            join.table
+        # Collect references only when a source has no declared columns.
+        if plan.table.columns and all(
+            isinstance(join.table, SelectPlan) or join.table.columns
             for join in plan.joins
-            if not isinstance(join.table, SelectPlan)
-        ]
-        if plan.table.columns and all(table.columns for table in joined_tables):
+        ):
             return
         names = self._collectPlanColumnNames(plan)
         self._ensureRawColumns(plan.table, plan.alias, names)
@@ -666,18 +642,12 @@ class SQLCompiler:
             raise QueryException(error_msg)
 
         local_sources: SourceMap = {**sources, joined_name: joined_source}
-        expression: ColumnElement[bool] | None = None
-        for condition in join.conditions:
-            piece = self._joinConditionExpression(
-                local_sources, joined_source, condition,
-            )
-            if expression is None:
-                expression = piece
-            elif condition.boolean == "or":
-                expression = or_(expression, piece)
-            else:
-                expression = and_(expression, piece)
-        return expression
+        return self._combineExpressions(
+            self._joinConditionExpression,
+            local_sources,
+            joined_source,
+            join.conditions,
+        )
 
     def _joinConditionExpression(
         self,
@@ -782,11 +752,18 @@ class SQLCompiler:
         ColumnElement
             Textual element ready to be embedded in a statement.
         """
-        if raw.alias:
+        if raw.alias and not raw.bindings:
             return sqlalchemy.literal_column(raw.sql).label(raw.alias)
         element = sqlalchemy.text(raw.sql)
         if raw.bindings:
             element = element.bindparams(**raw.bindings)
+        if raw.alias:
+            # Group the bound fragment and expose its projection name.
+            return (
+                element.columns(sqlalchemy.column(raw.alias))
+                .scalar_subquery()
+                .label(raw.alias)
+            )
         return element
 
     def _projectionElement(
@@ -819,7 +796,8 @@ class SQLCompiler:
             return self._rawElement(entry)
         return self._resolveColumn(sources, default, entry)
 
-    def _applyOrderingAndPaging(        self,
+    def _applyOrderingAndPaging(
+        self,
         sources: SourceMap,
         default: SqlSource,
         statement: Select[Any],
@@ -844,19 +822,63 @@ class SQLCompiler:
         Select
             Statement with ordering and pagination applied.
         """
-        for order in plan.orders:
+        if len(plan.orders) == 1:
+            order = plan.orders[0]
             column = self._resolveColumn(sources, default, order.column)
-            descending = order.direction is SortDirection.DESC
             statement = statement.order_by(
-                column.desc() if descending else column.asc(),
+                column.desc() if order.direction is SortDirection.DESC
+                else column.asc(),
             )
+        elif plan.orders:
+            orders = []
+            for order in plan.orders:
+                column = self._resolveColumn(sources, default, order.column)
+                orders.append(
+                    column.desc()
+                    if order.direction is SortDirection.DESC
+                    else column.asc(),
+                )
+            statement = statement.order_by(*orders)
         if plan.limit_value is not None:
             statement = statement.limit(plan.limit_value)
         if plan.offset_value is not None:
             statement = statement.offset(plan.offset_value)
         return statement
 
-    def compileInsert(self, plan: InsertPlan) -> Insert:
+    @staticmethod
+    def supportsBatchInsert(plan: InsertPlan) -> bool:
+        """
+        Report whether an insert plan supports batch execution.
+
+        Parameters
+        ----------
+        plan : InsertPlan
+            Insert plan whose rows are checked for a shared parameter shape.
+
+        Returns
+        -------
+        bool
+            Whether the rows can be sent as one batch without SQL expressions.
+        """
+        rows = plan.values
+        if len(rows) <= 1:
+            return False
+        keys = rows[0].keys()
+        if plan.table.columns and keys > plan.table.columns.keys():
+            return False
+        for row in rows:
+            if row.keys() != keys or any(
+                isinstance(value, ClauseElement) for value in row.values()
+            ):
+                return False
+        return True
+
+    def compileInsert(
+        self,
+        plan: InsertPlan,
+        *,
+        parameterized: bool = False,
+    ) -> Insert:
         """
         Compile an insert plan into an executable INSERT statement.
 
@@ -864,6 +886,8 @@ class SQLCompiler:
         ----------
         plan : InsertPlan
             Engine-agnostic insert description.
+        parameterized : bool, optional
+            Leave row values for executemany parameters supplied at execution.
 
         Returns
         -------
@@ -888,6 +912,8 @@ class SQLCompiler:
             self._ensureRawColumns(plan.table, None, names)
 
         table = self._sqlTable(plan.table)
+        if parameterized:
+            return sqlalchemy.insert(table)
         rows = plan.values if len(plan.values) > 1 else plan.values[0]
         return sqlalchemy.insert(table).values(rows)
 
@@ -921,7 +947,7 @@ class SQLCompiler:
 
         table = self._sqlTable(plan.table)
         sources: SourceMap = {plan.table.name: table}
-        statement = sqlalchemy.update(table).values(dict(plan.values))
+        statement = sqlalchemy.update(table).values(plan.values)
         condition = self._whereExpression(sources, table, plan.wheres)
         if condition is not None:
             statement = statement.where(condition)
@@ -1064,8 +1090,14 @@ class SQLCompiler:
         physical = self._physicalName(definition.name)
         cache_key = self._cacheKey(physical, definition.schema)
         cached = self._tables.get(cache_key)
-        if cached is not None:
+        if cached is not None and (
+            not definition.columns or self._definitions.get(cache_key) is definition
+        ):
             return cached
+
+        # Replace metadata when a different declared schema version is supplied.
+        if cached is not None:
+            self._metadata.remove(cached)
 
         # Pre-register referenced tables so foreign key DDL can resolve
         # them even when their models are compiled later.
@@ -1078,8 +1110,8 @@ class SQLCompiler:
             )
 
         columns = [
-            self._sqlColumn(column)
-            for column in definition.columns.values()
+            self._sqlColumn(column, name)
+            for name, column in definition.columns.items()
         ]
         table = Table(
             physical,
@@ -1091,6 +1123,8 @@ class SQLCompiler:
             extend_existing=True,
         )
         self._tables[cache_key] = table
+        if definition.columns:
+            self._definitions[cache_key] = definition
         return table
 
     def _tableConstraints(self, definition: TableDefinition) -> list[Any]:
@@ -1186,7 +1220,11 @@ class SQLCompiler:
             ),
         )
 
-    def _sqlColumn(self, definition: ColumnDefinition) -> SqlColumn[Any]:
+    def _sqlColumn(
+        self,
+        definition: ColumnDefinition,
+        name: str | None = None,
+    ) -> SqlColumn[Any]:
         """
         Translate a column definition into an engine column.
 
@@ -1194,6 +1232,8 @@ class SQLCompiler:
         ----------
         definition : ColumnDefinition
             Orionis column definition.
+        name : str or None, optional
+            Authoritative column name from the table definition mapping.
 
         Returns
         -------
@@ -1205,7 +1245,10 @@ class SQLCompiler:
         QueryException
             If the logical column type has no registered builder.
         """
-        args: list[Any] = [definition.name, self._sqlType(definition)]
+        args: list[Any] = [
+            definition.name if name is None else name,
+            self._sqlType(definition),
+        ]
         if definition.foreign_ref is not None:
             reference = definition.foreign_ref
             args.append(
@@ -1372,16 +1415,59 @@ class SQLCompiler:
         ColumnElement or None
             Combined boolean expression, or ``None`` without clauses.
         """
-        expression: ColumnElement[bool] | None = None
-        for clause in clauses:
-            piece = self._clauseExpression(sources, default, clause)
-            if expression is None:
-                expression = piece
-            elif clause.boolean == "or":
-                expression = or_(expression, piece)
-            else:
-                expression = and_(expression, piece)
-        return expression
+        if not clauses:
+            return None
+        if len(clauses) == 1:
+            return self._clauseExpression(sources, default, clauses[0])
+        return self._combineExpressions(
+            self._clauseExpression, sources, default, clauses,
+        )
+
+    @staticmethod
+    def _combineExpressions(
+        compile_clause: Callable[..., ColumnElement[bool]],
+        sources: SourceMap,
+        default: SqlSource,
+        clauses: Sequence[WhereClause] | Sequence[JoinCondition],
+    ) -> ColumnElement[bool] | None:
+        """
+        Combine clauses using left-to-right boolean grouping.
+
+        Parameters
+        ----------
+        compile_clause : Callable
+            Function that translates one clause into a boolean expression.
+        sources : SourceMap
+            Sources available while resolving clause references.
+        default : SqlSource
+            Source used for unqualified column references.
+        clauses : Sequence of WhereClause or JoinCondition
+            Clauses to combine in their declared order.
+
+        Returns
+        -------
+        ColumnElement or None
+            Combined boolean expression, or ``None`` for an empty sequence.
+        """
+        iterator = iter(clauses)
+        first = next(iterator, None)
+        if first is None:
+            return None
+        expression = compile_clause(sources, default, first)
+        if len(clauses) == 1:
+            return expression
+
+        pieces = [expression]
+        previous_boolean = None
+        for clause in iterator:
+            boolean = clause.boolean
+            if previous_boolean is not None and boolean != previous_boolean:
+                combine = or_ if previous_boolean == "or" else and_
+                pieces = [combine(*pieces)]
+            pieces.append(compile_clause(sources, default, clause))
+            previous_boolean = boolean
+        combine = or_ if previous_boolean == "or" else and_
+        return combine(*pieces)
 
     def _columnlessExpression(
         self,
@@ -1450,12 +1536,11 @@ class SQLCompiler:
         QueryException
             If the clause uses an unsupported operator or shape.
         """
-        standalone = self._columnlessExpression(sources, default, clause)
-        if standalone is not None:
-            return standalone
+        kind = clause.where_type
+        if kind in COLUMNLESS_WHERE_TYPES:
+            return self._columnlessExpression(sources, default, clause)
 
         column = self._resolveColumn(sources, default, clause.column)
-        kind = clause.where_type
 
         if kind is WhereType.BASIC:
             return self._basicExpression(column, clause)

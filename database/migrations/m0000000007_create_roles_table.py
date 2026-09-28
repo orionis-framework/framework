@@ -1,3 +1,4 @@
+from database.schemas.roles_v1 import ROLES_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
@@ -12,12 +13,7 @@ class CreateRolesTable(Migration):
         None
             The table is created as a side effect.
         """
-        async with Schema.create("roles") as table:
-            table.id().comment("Role ID")
-            table.string("name", 255).unique().comment("Role Name")
-            table.timestamps()
-
-            table.comment("Table to store roles.")
+        await Schema.createFromDefinition(ROLES_V1)
 
     async def down(self) -> None:
         """
@@ -28,4 +24,4 @@ class CreateRolesTable(Migration):
         None
             The table is dropped as a side effect.
         """
-        await Schema.drop("roles")
+        await Schema.drop(ROLES_V1.name)

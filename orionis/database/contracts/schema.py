@@ -3,15 +3,13 @@ from abc import abstractmethod, ABC
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from orionis.database.schema.comment import Comment
-    from orionis.database.schema.foreign import ForeignKey
-    from orionis.database.schema.index import Index
-    from orionis.database.schema.primary import PrimaryKey
     from orionis.database.schema.table_creation import TableCreation
-    from orionis.database.schema.unique import Unique
-    from orionis.orm.schema.column import ColumnDefinition
+    from orionis.orm.model import Model
+    from orionis.orm.schema.table import TableDefinition
 
 class ISchema(ABC):
+
+    __slots__ = ()
 
     @abstractmethod
     def connection(self, name: str | None = None) -> Self:
@@ -39,43 +37,56 @@ class ISchema(ABC):
     def create(
         self,
         name: str,
-        *definitions: (
-            ColumnDefinition
-            | Comment
-            | ForeignKey
-            | Index
-            | PrimaryKey
-            | Unique
-        ),
     ) -> TableCreation:
         """
-        Create a new table with the given definitions.
+        Start a fluent table declaration block with ``async with``.
 
-        The result can be used two ways:
-
-        - ``await schema.create(name, *definitions)`` creates the table
-          immediately from the definitions passed here.
-        - ``async with schema.create(name) as table:`` yields a
-          ``Blueprint`` so columns can be declared fluently
-          (``table.string("username")``, ``table.timestamps()``, ...);
-          the table is created once the block exits without raising.
+        The block yields a ``Blueprint`` so columns can be declared
+        fluently; the table is created after the block exits successfully.
 
         Parameters
         ----------
         name : str
             The name of the table to create. If the table belongs to a
             non-default schema, use the ``schema.table`` format.
-        *definitions : ColumnDefinition | Comment | ForeignKey | Index |
-            PrimaryKey | Unique
-            Variable length argument list of schema definitions
-            (columns, constraints, indexes, etc.). Optional when the
-            async context-manager form is used instead.
 
         Returns
         -------
         TableCreation
-            Awaitable and async context manager that performs the
-            creation.
+            Async context manager that collects definitions and creates
+            the table after a successful block.
+        """
+
+    @abstractmethod
+    async def createFromDefinition(self, definition: TableDefinition) -> bool:
+        """
+        Create a table from a reusable, versioned schema definition.
+
+        Parameters
+        ----------
+        definition : TableDefinition
+            Definition shared by a model and a historical migration.
+
+        Returns
+        -------
+        bool
+            Whether table creation completed successfully.
+        """
+
+    @abstractmethod
+    async def createFromModel(self, model: type[Model]) -> bool:
+        """
+        Create the current table declared by a concrete model.
+
+        Parameters
+        ----------
+        model : type of Model
+            Model providing precompiled table and connection metadata.
+
+        Returns
+        -------
+        bool
+            Whether table creation completed successfully.
         """
 
     @abstractmethod

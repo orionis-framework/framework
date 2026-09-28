@@ -18,7 +18,7 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
-def _makeTable() -> TableDefinition:
+def _make_table() -> TableDefinition:
     """Build the table definition shared by the connection tests."""
     columns = {
         "id": Integer().primary().autoIncrement(),
@@ -36,7 +36,7 @@ class TestConnection(TestCase):
 
         Guarantees complete isolation between tests.
         """
-        self._table = _makeTable()
+        self._table = _make_table()
         self._connection = Connection(
             "sqlite",
             {"driver": "sqlite", "database": ":memory:", "prefix": ""},

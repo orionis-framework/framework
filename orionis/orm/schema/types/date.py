@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Date(ColumnDefinition):
     """A type for ``datetime.date()`` objects."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a date column definition.

@@ -1,5 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+import asyncio
+from collections import defaultdict
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any, Self
 from orionis.orm.contracts.belongs_to_many_relation import IBelongsToManyRelation
 from orionis.orm.metaclass import snake_case
 from orionis.orm.query.raw_builder import RawQueryBuilder
@@ -7,8 +10,8 @@ from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from orionis.orm.model import Model
+    from orionis.orm.query.expressions import AggregateFunction, WhereClause
 
 class BelongsToManyRelation[TRelated: "Model"](
     Relation[TRelated],
@@ -38,7 +41,9 @@ class BelongsToManyRelation[TRelated: "Model"](
         "_foreign_pivot_key",
         "_parent_key",
         "_parent_keys",
+        "_pivot_constraint",
         "_pivot_wheres",
+        "_prepare_lock",
         "_prepared",
         "_related_key",
         "_related_map",
@@ -101,6 +106,8 @@ class BelongsToManyRelation[TRelated: "Model"](
         self._parent_keys: tuple[Any, ...] = ()
         self._pivot_wheres: list[tuple[str, tuple[Any, ...]]] = []
         self._related_map: dict[Any, list[Any]] = {}
+        self._pivot_constraint: WhereClause | None = None
+        self._prepare_lock: asyncio.Lock | None = None
         self._prepared = False
         super().__init__(parent, related)
 
@@ -162,7 +169,9 @@ class BelongsToManyRelation[TRelated: "Model"](
             for model in models
             if (value := getattr(model, self._parent_key)) is not None
         }
+        self._invalidatePivot()
         self._parent_keys = tuple(keys)
+        self._eager_keys_empty = not keys
 
     def _pivotQuery(self) -> RawQueryBuilder:
         """
@@ -217,7 +226,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         by_related_key = {getattr(row, self._related_key): row for row in results}
         for model in models:
             parent_value = getattr(model, self._parent_key)
-            related_keys = self._related_map.get(parent_value, [])
+            related_keys = self._related_map.get(parent_value, ())
             items = [
                 by_related_key[key] for key in related_keys if key in by_related_key
             ]
@@ -238,17 +247,53 @@ class BelongsToManyRelation[TRelated: "Model"](
         bool
             ``True`` when at least one related id was found.
         """
-        if not self._prepared:
-            self._related_map = await self._resolvePivotMap()
-            self._prepared = True
-        related_ids = sorted(
-            {related_id for ids in self._related_map.values() for related_id in ids},
-            key=str,
-        )
-        if not related_ids:
-            return False
-        self.whereIn(self._related_key, related_ids)
-        return True
+        if self._prepared:
+            return bool(self._related_map)
+        if self._prepare_lock is None:
+            self._prepare_lock = asyncio.Lock()
+        async with self._prepare_lock:
+            if not self._prepared:
+                mapping = await self._resolvePivotMap()
+                related_ids = {
+                    related_id for ids in mapping.values() for related_id in ids
+                }
+                self.whereIn(self._related_key, related_ids)
+                self._pivot_constraint = self._plan.wheres[-1]
+                self._related_map = mapping
+                self._prepared = True
+        return bool(self._related_map)
+
+    def _invalidatePivot(self) -> None:
+        """
+        Discard the resolved pivot rows and generated membership clause.
+
+        Returns
+        -------
+        None
+            This method clears the cached pivot state in place.
+        """
+        constraint = self._pivot_constraint
+        if constraint is not None:
+            self._plan.wheres = [
+                clause for clause in self._plan.wheres if clause is not constraint
+            ]
+        self._pivot_constraint = None
+        self._related_map = {}
+        self._prepared = False
+
+    def clone(self) -> Self:
+        """
+        Copy query clauses and pivot filters into an independent builder.
+
+        Returns
+        -------
+        Self
+            Independent relationship builder with copied query state.
+        """
+        duplicate = super().clone()
+        duplicate._pivot_wheres = self._pivot_wheres.copy()  # noqa: SLF001
+        duplicate._prepare_lock = None  # noqa: SLF001
+        return duplicate
 
     async def _resolvePivotMap(self) -> dict[Any, list[Any]]:
         """
@@ -262,15 +307,17 @@ class BelongsToManyRelation[TRelated: "Model"](
         if not self._parent_keys:
             return {}
         builder = self._pivotQuery()
+        builder.select(self._foreign_pivot_key, self._related_pivot_key)
         builder.whereIn(self._foreign_pivot_key, self._parent_keys)
         for column, args in self._pivot_wheres:
             builder.where(column, *args)
         rows = await builder.get()
 
-        mapping: dict[Any, list[Any]] = {}
+        mapping: dict[Any, list[Any]] = defaultdict(list)
+        foreign_key = self._foreign_pivot_key
+        related_key = self._related_pivot_key
         for row in rows:
-            parent_id = row[self._foreign_pivot_key]
-            mapping.setdefault(parent_id, []).append(row[self._related_pivot_key])
+            mapping[row[foreign_key]].append(row[related_key])
         return mapping
 
     # ── Terminals resolving the pivot table before the related query ───────
@@ -301,18 +348,69 @@ class BelongsToManyRelation[TRelated: "Model"](
             return None
         return await super().first()
 
-    async def count(self) -> int:
+    async def _aggregate(
+        self,
+        function: AggregateFunction,
+        column: str,
+    ) -> Any:  # noqa: ANN401
         """
-        Count the related rows linked to the parent instance.
+        Constrain an aggregate query to the resolved pivot membership.
+
+        Parameters
+        ----------
+        function : AggregateFunction
+            Aggregate operation to perform.
+        column : str
+            Related-model column passed to the aggregate operation.
+
+        Returns
+        -------
+        Any
+            Result returned by the query builder's aggregate operation.
+        """
+        await self._prepare()
+        return await super()._aggregate(function, column)
+
+    async def update(self, values: dict[str, Any]) -> int:
+        """
+        Update related records linked through the pivot table.
+
+        Parameters
+        ----------
+        values : dict of str to Any
+            Column values to apply to the linked related records.
 
         Returns
         -------
         int
-            Number of linked related rows.
+            Number of related records updated.
         """
-        if not await self._prepare():
-            return 0
-        return await super().count()
+        await self._prepare()
+        return await super().update(values)
+
+    async def delete(self) -> int:
+        """
+        Delete related records linked through the pivot table.
+
+        Returns
+        -------
+        int
+            Number of linked related records deleted.
+        """
+        await self._prepare()
+        return await super().delete()
+
+    async def forceDelete(self) -> int:
+        """
+        Permanently delete records linked through the pivot table.
+
+        Returns
+        -------
+        int
+            Number of linked related records permanently deleted.
+        """
+        await self._prepare()
+        return await super().forceDelete()
 
     async def exists(self) -> bool:
         """
@@ -349,6 +447,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         BelongsToManyRelation
             The same relationship, enabling fluent chaining.
         """
+        self._invalidatePivot()
         self._pivot_wheres.append((column, args))
         return self
 
@@ -398,6 +497,7 @@ class BelongsToManyRelation[TRelated: "Model"](
             return 0
         builder = self._pivotQuery()
         result = await builder.insert(rows)
+        self._invalidatePivot()
         return result.row_count
 
     async def detach(self, ids: Any = None) -> int:  # noqa: ANN401
@@ -423,7 +523,9 @@ class BelongsToManyRelation[TRelated: "Model"](
             if not id_list:
                 return 0
             builder.whereIn(self._related_pivot_key, id_list)
-        return await builder.delete()
+        result = await builder.delete()
+        self._invalidatePivot()
+        return result
 
     async def sync(self, ids: Iterable[Any]) -> dict[str, list[Any]]:
         """
@@ -506,7 +608,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         list
             Related id values.
         """
-        if isinstance(ids, (list, tuple, set, frozenset, Collection)):
+        if isinstance(ids, Iterable) and not isinstance(ids, (str, bytes, dict)):
             return [self._extractId(item) for item in ids]
         return [self._extractId(ids)]
 

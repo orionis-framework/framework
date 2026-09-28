@@ -1,3 +1,4 @@
+from database.schemas.model_has_roles_v1 import MODEL_HAS_ROLES_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
@@ -14,14 +15,7 @@ class CreateModelHasRolesTable(Migration):
         None
             The table is created as a side effect.
         """
-        async with Schema.create("model_has_roles") as table:
-            table.bigInteger("role_id").foreign("roles.id").comment("Role ID")
-            table.string("model_type", 255).comment("Model Class Name")
-            table.string("model_id", 255).comment("Canonical Model ID")
-
-            table.primaryKey("role_id", "model_id", "model_type")
-            table.index("model_id", "model_type")
-            table.comment("Table to relate roles with any model (morph).")
+        await Schema.createFromDefinition(MODEL_HAS_ROLES_V1)
 
     async def down(self) -> None:
         """
@@ -32,4 +26,4 @@ class CreateModelHasRolesTable(Migration):
         None
             The table is dropped as a side effect.
         """
-        await Schema.drop("model_has_roles")
+        await Schema.drop(MODEL_HAS_ROLES_V1.name)

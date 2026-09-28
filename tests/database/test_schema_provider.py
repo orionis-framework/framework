@@ -33,7 +33,7 @@ class TestSchemaProvider(TestCase):
         Bind ISchema to Schema using a transient lifetime.
 
         Validates that no state leaks between resolutions, since Schema
-        accumulates per-call table name and pending definitions.
+        retains an explicit connection selection between operations.
         """
         app = _CaptureApp()
         provider = SchemaProvider(app)  # type: ignore[arg-type]

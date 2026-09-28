@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictSmallInt(ColumnDefinition):
     """The SQL ``SMALLINT`` type."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a SMALLINT column definition.

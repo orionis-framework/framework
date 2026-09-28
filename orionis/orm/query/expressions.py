@@ -315,18 +315,18 @@ class SelectPlan:
         return SelectPlan(
             table=self.table,
             alias=self.alias,
-            joins=list(self.joins),
+            joins=self.joins.copy(),
             columns=self.columns,
-            wheres=list(self.wheres),
-            orders=list(self.orders),
-            groups=list(self.groups),
-            havings=list(self.havings),
+            wheres=self.wheres.copy(),
+            orders=self.orders.copy(),
+            groups=self.groups.copy(),
+            havings=self.havings.copy(),
             limit_value=self.limit_value,
             offset_value=self.offset_value,
             aggregate=self.aggregate,
             distinct=self.distinct,
             lock=self.lock,
-            unions=list(self.unions),
+            unions=self.unions.copy(),
         )
 
 @dataclass(slots=True)

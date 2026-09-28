@@ -22,9 +22,9 @@ class TestPaginator(TestCase):
         Validates the pagination arithmetic.
         """
         paginator = self._make(total=5, page=2, per_page=2)
-        self.assertEqual(paginator.last_page, 3)
-        self.assertTrue(paginator.has_next)
-        self.assertTrue(paginator.has_previous)
+        self.assertEqual(paginator.lastPage, 3)
+        self.assertTrue(paginator.hasNext)
+        self.assertTrue(paginator.hasPrevious)
         self.assertEqual(len(paginator), 2)
 
     def testBoundaryPages(self) -> None:
@@ -34,12 +34,12 @@ class TestPaginator(TestCase):
         Validates the first and last page flags.
         """
         first = self._make(total=4, page=1, per_page=2)
-        self.assertFalse(first.has_previous)
-        self.assertTrue(first.has_next)
+        self.assertFalse(first.hasPrevious)
+        self.assertTrue(first.hasNext)
 
         last = self._make(total=4, page=2, per_page=2)
-        self.assertTrue(last.has_previous)
-        self.assertFalse(last.has_next)
+        self.assertTrue(last.hasPrevious)
+        self.assertFalse(last.hasNext)
 
     def testEmptyResultKeepsOnePage(self) -> None:
         """
@@ -53,8 +53,8 @@ class TestPaginator(TestCase):
             page=1,
             per_page=10,
         )
-        self.assertEqual(paginator.last_page, 1)
-        self.assertFalse(paginator.has_next)
+        self.assertEqual(paginator.lastPage, 1)
+        self.assertFalse(paginator.hasNext)
 
     def testInvalidPageArgumentsRaise(self) -> None:
         """

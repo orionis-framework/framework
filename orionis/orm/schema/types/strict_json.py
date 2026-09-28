@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictJson(ColumnDefinition):
     """Represent a SQL ``JSON`` type."""
 
+    __slots__ = ()
+
     def __init__(self, *, none_as_null: bool = False) -> None:
         """
         Construct a JSON type.

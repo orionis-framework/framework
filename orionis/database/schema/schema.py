@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Self
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.schema import ISchema
+from orionis.database.migrations.context import current_migration_connection
 from orionis.database.schema.column import Column
 from orionis.database.schema.comment import Comment
 from orionis.database.schema.definition_bucket import DefinitionBucket
@@ -12,17 +13,20 @@ from orionis.database.schema.table_creation import TableCreation
 from orionis.database.schema.timestamp import Timestamps
 from orionis.database.schema.unique import Unique
 from orionis.orm.schema.table import TableDefinition
+from orionis.orm.schema.column import ColumnDefinition
+from orionis.orm.metaclass import ModelMeta
 
 if TYPE_CHECKING:
     from orionis.database.schema.definitions import SchemaDefinition
-    from orionis.orm.schema.column import ColumnDefinition
+    from orionis.orm.model import Model
 
 class Schema(ISchema):
 
     # ruff: noqa: TC001
 
-    # Number of dot-separated parts in a "schema.table" identifier.
-    __SCHEMA_TABLE_PARTS: int = 2
+    __slots__ = (
+        "__conn_manager", "__connection_name", "__connection_selected",
+    )
 
     def __init__(self, conn_manager: IConnectionManager) -> None:
         """
@@ -40,6 +44,7 @@ class Schema(ISchema):
         # Initialize connection manager and state attributes
         self.__conn_manager: IConnectionManager = conn_manager
         self.__connection_name: str | None = None
+        self.__connection_selected = False
 
     def connection(self, name: str | None = None) -> Self:
         """
@@ -61,44 +66,98 @@ class Schema(ISchema):
             If connection name has already been defined.
         """
         # Prevent overwriting an already set connection name
-        if self.__connection_name is not None:
+        if self.__connection_selected:
             error_msg = "Connection name has already been defined."
             raise ValueError(error_msg)
         self.__connection_name = name
+        self.__connection_selected = True
         return self
 
-    def create(self, name: str, *definitions: SchemaDefinition) -> TableCreation:
+    def create(self, name: str) -> TableCreation:
         """
-        Create a new table with the given definitions.
+        Start a fluent table declaration block.
 
-        The result can be used two ways:
-
-        - ``await schema.create(name, *definitions)`` creates the table
-          immediately from the definitions passed here.
-        - ``async with schema.create(name) as table:`` yields a
-          :class:`~orionis.database.schema.blueprint.Blueprint` so columns
-          can be declared fluently (``table.string("username")``,
-          ``table.timestamps()``, ...); the table is created once the
-          block exits without raising.
+        ``async with schema.create(name) as table:`` yields a
+        :class:`~orionis.database.schema.blueprint.Blueprint` so columns
+        can be declared fluently (``table.string("username")``,
+        ``table.timestamps()``, ...); the table is created once the
+        block exits without raising.
 
         Parameters
         ----------
         name : str
             The name of the table to create. If the table belongs to a
             non-default schema, use the ``schema.table`` format.
-        *definitions : ColumnDefinition | Comment | ForeignKey | Index |
-            PrimaryKey | Unique
-            Variable length argument list of schema definitions
-            (columns, constraints, indexes, etc.). Optional when the
-            async context-manager form is used instead.
 
         Returns
         -------
         TableCreation
-            Awaitable and async context manager that performs the
-            creation.
+            Async context manager that collects definitions and creates
+            the table after a successful block.
         """
-        return TableCreation(self, name, definitions)
+        return TableCreation(self, name)
+
+    async def createFromDefinition(self, definition: TableDefinition) -> bool:
+        """
+        Create a table from its reusable, versioned definition.
+
+        Parameters
+        ----------
+        definition : TableDefinition
+            Schema shared with a model through ``table_definition``.
+            Historical migrations should import a versioned definition
+            that remains unchanged when the model adopts a newer version.
+
+        Returns
+        -------
+        bool
+            Whether table creation completed successfully.
+        """
+        return await self.__resolveConnection().createTable(definition)
+
+    async def createFromModel(self, model: type[Model]) -> bool:
+        """
+        Create the current schema declared by a concrete model.
+
+        Use this operation for bootstrap and temporary databases. A historical
+        migration should call ``createFromDefinition`` with a versioned table
+        definition so later model changes do not alter migration replay.
+
+        Parameters
+        ----------
+        model : type of Model
+            Concrete model providing table and connection metadata. An explicit
+            ``connection`` selection overrides the model's connection.
+
+        Returns
+        -------
+        bool
+            Whether table creation completed successfully.
+
+        Raises
+        ------
+        TypeError
+            If the argument is not a concrete model class.
+        """
+        metadata = (
+            model.__dict__.get("__meta__")
+            if isinstance(model, ModelMeta) else None
+        )
+        if metadata is None:
+            error_msg = "Expected a concrete model class with table metadata."
+            raise TypeError(error_msg)
+        connection_name = (
+            self.__connection_name if self.__connection_selected
+            else metadata.connection
+        )
+        connection = (
+            current_migration_connection()
+            if not self.__connection_selected and connection_name is None
+            else None
+        )
+        if connection is None:
+            connection = self.__conn_manager.connection(connection_name)
+        return await connection.createTable(metadata.table)
 
     async def drop(self, name: str) -> bool:
         """
@@ -151,7 +210,11 @@ class Schema(ISchema):
         IConnection
             The connection to use for schema operations.
         """
-        # Reuse the connection manager already bound to this instance
+        # Use the migration transaction for unqualified schema operations.
+        if not self.__connection_selected:
+            migration_connection = current_migration_connection()
+            if migration_connection is not None:
+                return migration_connection
         return self.__conn_manager.connection(self.__connection_name)
 
     def __buildTable(
@@ -180,17 +243,7 @@ class Schema(ISchema):
 
     def __collectDefinitions(
         self,
-        definitions: tuple[
-            type[
-                ColumnDefinition
-                | Comment
-                | ForeignKey
-                | Index
-                | PrimaryKey
-                | Unique
-            ],
-            ...,
-        ],
+        definitions: tuple[SchemaDefinition, ...],
     ) -> dict[str, object]:
         """
         Group heterogeneous schema definitions into constructor kwargs.
@@ -205,7 +258,7 @@ class Schema(ISchema):
         dict[str, object]
             Keyword arguments accepted by ``TableDefinition``.
         """
-        # Accumulate in O(n); tuples for TableDefinition are built once.
+        # Group columns and constraints by their declaration kinds.
         bucket = DefinitionBucket()
         for definition in definitions:
             self.__classifyDefinition(definition, bucket)
@@ -255,12 +308,8 @@ class Schema(ISchema):
         None
             The ``bucket`` accumulator is mutated in place.
         """
-        # Columns make up the bulk of a table's definitions, so they are
-        # routed with a single membership check against the marker types.
-        if not isinstance(
-            definition,
-            (Comment, Unique, ForeignKey, Index, PrimaryKey, Timestamps),
-        ):
+        # Register columns and collect their primary key declarations.
+        if isinstance(definition, ColumnDefinition):
             bucket.columns[definition.name] = definition
             # Column-level .primary() also defines the primary key.
             if definition.is_primary:
@@ -277,8 +326,11 @@ class Schema(ISchema):
             bucket.indexes.append(definition.constraint)
         elif isinstance(definition, PrimaryKey):
             self.__setPrimaryKey(list(definition.columns), bucket.kwargs)
-        else:
+        elif isinstance(definition, Timestamps):
             self.__addTimestampColumns(definition, bucket)
+        else:
+            error_msg = f"Unsupported schema definition: {type(definition).__name__}."
+            raise TypeError(error_msg)
 
     def __addTimestampColumns(
         self,
@@ -356,7 +408,8 @@ class Schema(ISchema):
             A tuple containing the schema name (or None if not specified)
             and the table name.
         """
-        parts = name.split(".")
-        if len(parts) == self.__SCHEMA_TABLE_PARTS:
-            return parts[0], parts[1]  # schema, table
-        return None, parts[0]  # no schema, just table
+        schema, separator, table = name.partition(".")
+        if not schema or (separator and (not table or "." in table)):
+            error_msg = "Expected a table name or a 'schema.table' identifier."
+            raise ValueError(error_msg)
+        return (schema, table) if separator else (None, schema)

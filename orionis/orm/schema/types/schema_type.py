@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class SchemaType(ColumnDefinition):
     """Adds schema-level DDL, mixed into :class:`Boolean`/:class:`Enum`."""
 
+    __slots__ = ()
+
     def __init__(self, name: str | None = None) -> None:
         """
         Initialize the schema-type placeholder definition.

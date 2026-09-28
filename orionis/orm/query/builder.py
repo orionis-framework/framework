@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, Self
 from orionis.orm.attributes import serialize_for_storage
 from orionis.orm.contracts.builder import IModelQueryBuilder
 from orionis.orm.exceptions import (
-    InvalidQueryException,
     ModelNotFoundException,
     RelationNotFoundException,
     ScopeNotFoundException,
@@ -64,13 +63,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         None
             This method does not return a value.
         """
-        super().__init__()
         meta = model.__meta__
+        super().__init__(meta.table)
         self._model = model
         self._meta = meta
         self._connection_name = meta.connection
-        self._plan.table = meta.table
-        self._eager_loads: list[str] = []
+        self._eager_loads: dict[str, None] = {}
         self._without_scopes: set[str] = set()
         self._trashed_mode: str = _TRASHED_EXCLUDE
         self._scopes_applied: bool = False
@@ -130,13 +128,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
     # ── Eager loading ───────────────────────────────────────────────────────
 
-    def with_(self, *names: str) -> Self:
+    def withRelations(self, *names: str) -> Self:
         """
         Eager load the given relationships alongside the query.
 
-        Named ``with_`` (trailing underscore) instead of ``with``, which
-        is a reserved Python keyword and cannot be used as a method
-        name; :meth:`load` is a keyword-free alias.
+        Each relationship is loaded once in declaration order;
+        :meth:`load` is an alias.
 
         Parameters
         ----------
@@ -148,12 +145,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
-        self._eager_loads.extend(names)
+        self._eager_loads.update(dict.fromkeys(names))
         return self
 
     def load(self, *names: str) -> Self:
         """
-        Eager load the given relationships; alias of :meth:`with_`.
+        Eager load the given relationships; alias of :meth:`withRelations`.
 
         Parameters
         ----------
@@ -165,7 +162,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
-        return self.with_(*names)
+        return self.withRelations(*names)
 
     # ── Scopes and soft deletes ─────────────────────────────────────────────
 
@@ -363,14 +360,16 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             If an eager-loaded relationship name does not resolve to one.
         """
         self._beforeExecute()
-        self._plan.limit_value = 1
-        rows = await self._connection().select(self._plan)
+        probe = self._plan.clone()
+        probe.limit_value = 1
+        rows = await self._connection().select(probe)
         if not rows:
             return None
         instance = self._model._newFromDatabase(rows[0])  # noqa: SLF001
-        await self._fireRetrieved([instance])
+        models = [instance]
+        await self._fireRetrieved(models)
         if self._eager_loads:
-            await self._eagerLoad([instance])
+            await self._eagerLoad(models)
         return instance
 
     async def firstOrFail(self) -> TModel:
@@ -496,10 +495,6 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         InvalidQueryException
             If the page or page size are not positive integers.
         """
-        if page < 1 or per_page < 1:
-            error_msg = "Page and per_page must be positive integers."
-            raise InvalidQueryException(error_msg)
-
         self.forPage(page, per_page)
 
         if self._connection().inTransaction():
@@ -530,7 +525,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             Detached copy carrying its own plan and eager-load list.
         """
         duplicate = super().clone()
-        duplicate._eager_loads = list(self._eager_loads)  # noqa: SLF001
+        duplicate._eager_loads = self._eager_loads.copy()  # noqa: SLF001
         duplicate._without_scopes = set(self._without_scopes)  # noqa: SLF001
         return duplicate
 

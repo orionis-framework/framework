@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictBlob(ColumnDefinition):
     """The SQL ``BLOB`` type."""
 
+    __slots__ = ()
+
     def __init__(self, length: int | None = None) -> None:
         """
         Construct a LargeBinary type.

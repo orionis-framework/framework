@@ -7,6 +7,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictVarChar(ColumnDefinition):
     """The SQL ``VARCHAR`` type."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         length: int | None = DEFAULT_STRING_LENGTH,

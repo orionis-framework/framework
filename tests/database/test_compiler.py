@@ -44,7 +44,7 @@ from orionis.orm.schema.types import (
 )
 from orionis.test import TestCase
 
-def _makeTable() -> TableDefinition:
+def _make_table() -> TableDefinition:
     """Build a small table definition used across the compiler tests."""
     columns = {
         "id": Integer().primary().autoIncrement(),
@@ -64,7 +64,7 @@ class TestSQLCompiler(TestCase):
         Guarantees isolation of the internal table cache.
         """
         self._compiler = SQLCompiler()
-        self._table = _makeTable()
+        self._table = _make_table()
 
     def _sql(self, statement) -> str:
         """Render a statement to normalized lowercase SQL."""
@@ -756,7 +756,7 @@ class TestSQLCompiler(TestCase):
         self.assertEqual(engine_table.comment, "Audit trail table.")
 
 
-def _makePostsTable() -> TableDefinition:
+def _make_posts_table() -> TableDefinition:
     """Build a small "posts" table definition referencing "users"."""
     columns = {
         "id": Integer().primary().autoIncrement(),
@@ -774,8 +774,8 @@ class TestSQLCompilerJoins(TestCase):
     def setUp(self) -> None:
         """Create a fresh compiler and both table definitions per test."""
         self._compiler = SQLCompiler()
-        self._users = _makeTable()
-        self._posts = _makePostsTable()
+        self._users = _make_table()
+        self._posts = _make_posts_table()
 
     def _sql(self, statement) -> str:
         """Render a statement to normalized lowercase SQL."""

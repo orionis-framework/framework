@@ -13,14 +13,17 @@ from orionis.orm.query.expressions import (
     WhereClause,
 )
 from orionis.orm.relations.mixin import RelationsMixin
+from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import ColumnType
 from orionis.orm.soft_deletes import SoftDeletesMixin
 from orionis.orm.state import StateMixin
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from orionis.database.contracts.connection import IConnection
     from orionis.orm.collections.paginator import Paginator  # noqa: F401
     from orionis.orm.metaclass import ModelMetadata
+    from orionis.orm.schema.table import TableDefinition
     from orionis.support.types.collection import Collection
 
 # Instance slots managed directly by the model machinery.
@@ -56,6 +59,9 @@ class Model(
 
     # Logical table name; derived from the class name when None.
     table: ClassVar[str | None] = None
+
+    # Versioned table definition shared with schema migrations.
+    table_definition: ClassVar[TableDefinition | None] = None
 
     # Named connection; the default connection is used when None.
     connection: ClassVar[str | None] = None
@@ -253,6 +259,25 @@ class Model(
             Fresh builder targeting the model table.
         """
         return ModelQueryBuilder(cls)
+
+    @classmethod
+    def getConnection(cls) -> IConnection:
+        """
+        Resolve the connection configured for this model.
+
+        Returns
+        -------
+        IConnection
+            Connection used for model queries and persistence.
+
+        Raises
+        ------
+        OrmConfigurationException
+            If no connection manager has been installed.
+        ConnectionNotFoundException
+            If the configured connection is not declared.
+        """
+        return ConnectionResolver.connection(cls.__meta__.connection)
 
     @classmethod
     def addGlobalScope(
@@ -540,7 +565,7 @@ class Model(
                 ),
             ],
         )
-        deleted = await self.query()._connection().delete(plan)  # noqa: SLF001
+        deleted = await self.getConnection().delete(plan)
         self._exists = False
         return deleted > 0
 
@@ -626,14 +651,17 @@ class Model(
             self._attributes[meta.primary_key] = self.newUniqueId()
 
         # Maintain creation and update timestamps on first persist.
-        if meta.created_column and meta.created_column not in self._attributes:
-            self._attributes[meta.created_column] = self.freshTimestamp()
-        if meta.updated_column and meta.updated_column not in self._attributes:
-            self._attributes[meta.updated_column] = self.freshTimestamp()
+        timestamp_columns = (meta.created_column, meta.updated_column)
+        timestamp = None
+        for column in timestamp_columns:
+            if column and column not in self._attributes:
+                if timestamp is None:
+                    timestamp = self.freshTimestamp()
+                self._attributes[column] = timestamp
 
         values = serialize_for_storage(meta, self._attributes)
         plan = InsertPlan(table=meta.table, values=[values])
-        result = await self.query()._connection().insert(plan)  # noqa: SLF001
+        result = await self.getConnection().insert(plan)
 
         # Adopt the database-generated primary key.
         generated = result.last_insert_id
@@ -683,8 +711,8 @@ class Model(
                 ),
             ],
         )
-        affected = await self.query()._connection().update(plan)  # noqa: SLF001
+        affected = await self.getConnection().update(plan)
 
-        self._changes = dict(dirty)
+        self._changes = dirty
         self.syncOriginal()
         return affected > 0

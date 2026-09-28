@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
+from orionis.database.migrations.context import current_migration_connection
 from orionis.orm.exceptions import OrmConfigurationException
 
 if TYPE_CHECKING:
@@ -79,6 +80,10 @@ class ConnectionResolver:
         ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
+        if name is None:
+            migration_connection = current_migration_connection()
+            if migration_connection is not None:
+                return migration_connection
         return cls.manager().connection(name)
 
     @classmethod

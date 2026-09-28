@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Boolean(ColumnDefinition):
     """A bool datatype, typically ``BOOLEAN`` or ``SMALLINT`` in DDL."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         *,

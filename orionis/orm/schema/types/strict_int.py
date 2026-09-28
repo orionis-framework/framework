@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictInt(ColumnDefinition):
     """Alias of ``INTEGER``."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize an INT column definition.

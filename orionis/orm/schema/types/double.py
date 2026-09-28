@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Double(ColumnDefinition):
     """A type for double ``FLOAT``. Typically generates ``DOUBLE``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         precision: int | None = None,

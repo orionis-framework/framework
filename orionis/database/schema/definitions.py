@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from orionis.database.schema.unique import Unique
     from orionis.orm.schema.column import ColumnDefinition
 
-# A single schema definition accepted by ``Schema.create``.
+# A schema definition collected by ``Blueprint`` and compiled by ``Schema``.
 type SchemaDefinition = (
     ColumnDefinition | Comment | ForeignKey | Index | PrimaryKey | Unique
 )

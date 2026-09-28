@@ -1,7 +1,9 @@
 from __future__ import annotations
+from unittest.mock import patch
 from orionis.database.connection_manager import ConnectionManager
 from orionis.orm.exceptions import InvalidQueryException
 from orionis.orm.resolver import ConnectionResolver
+from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Boolean, Integer, String
 from orionis.support.facades.db import DB
@@ -22,7 +24,7 @@ class _StubApp:
             },
         }
 
-def _usersTable() -> TableDefinition:
+def _users_table() -> TableDefinition:
     """Build the physical "users" table used by every test."""
     columns = {
         "id": Integer().primary().autoIncrement(),
@@ -34,7 +36,7 @@ def _usersTable() -> TableDefinition:
     return TableDefinition(name="users", columns=columns, primary_key="id")
 
 
-def _postsTable() -> TableDefinition:
+def _posts_table() -> TableDefinition:
     """Build the physical "posts" table used by the join test."""
     columns = {
         "id": Integer().primary().autoIncrement(),
@@ -58,9 +60,12 @@ class TestRawQueryBuilder(TestCase):
         """Wire an isolated in-memory manager and create both tables."""
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
+        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
+        facade.start()
+        self.addCleanup(facade.stop)
         connection = self._manager.connection()
-        await connection.createTable(_usersTable())
-        await connection.createTable(_postsTable())
+        await connection.createTable(_users_table())
+        await connection.createTable(_posts_table())
 
     async def asyncTearDown(self) -> None:
         """Dispose the manager and clear the resolver after each test."""

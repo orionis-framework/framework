@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictNVarChar(ColumnDefinition):
     """The SQL ``NVARCHAR`` type."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         length: int | None = None,

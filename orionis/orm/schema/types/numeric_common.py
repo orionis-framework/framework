@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class NumericCommon(ColumnDefinition):
     """Common mixin placeholder shared by :class:`Numeric` and :class:`Float`."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize the numeric-common placeholder definition.

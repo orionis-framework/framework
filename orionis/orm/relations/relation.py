@@ -1,12 +1,15 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, ClassVar
+from contextvars import ContextVar
+from typing import TYPE_CHECKING, Any
 from orionis.orm.contracts.relation import IRelation
 from orionis.orm.query.builder import ModelQueryBuilder
+from orionis.support.types.collection import Collection
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from orionis.orm.model import Model
-    from orionis.support.types.collection import Collection
+
+_CONSTRAINTS: ContextVar[bool] = ContextVar("orm_relation_constraints", default=True)
 
 class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
     """
@@ -20,12 +23,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
     below; the full fluent query API is inherited for free.
     """
 
-    __slots__ = ("_parent",)
-
-    # Suspended by `noConstraints` while eager loading builds a
-    # "template" instance purely to read its metadata (related model,
-    # foreign key, ...) without binding the query to one specific parent.
-    _constraints: ClassVar[bool] = True
+    __slots__ = ("_eager_keys_empty", "_parent")
 
     def __init__(self, parent: Model, related: type[TRelated]) -> None:
         """
@@ -45,7 +43,8 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         """
         super().__init__(related)
         self._parent = parent
-        if Relation._constraints:
+        self._eager_keys_empty = False
+        if _CONSTRAINTS.get():
             self.addConstraints()
 
     # ── Template methods (overridden per relationship kind) ─────────────────
@@ -105,6 +104,8 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Collection
             Every related row across the whole eager-loaded batch.
         """
+        if self._eager_keys_empty:
+            return Collection()
         return await self.get()
 
     def match(
@@ -159,9 +160,8 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Used by eager loading to read a relationship's metadata (related
         model, foreign key, ...) from a sample instance without binding
-        the query to that specific instance. Safe under concurrent
-        ``asyncio`` tasks: the callback never awaits, so no other task
-        can observe the flag while it is temporarily disabled.
+        the query to that specific instance. The setting is isolated to
+        the current execution context, including across worker threads.
 
         Parameters
         ----------
@@ -175,9 +175,8 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Relation
             The relationship built by ``callback``, unconstrained.
         """
-        previous = Relation._constraints
-        Relation._constraints = False
+        token = _CONSTRAINTS.set(False)
         try:
             return callback()
         finally:
-            Relation._constraints = previous
+            _CONSTRAINTS.reset(token)

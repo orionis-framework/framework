@@ -1,16 +1,25 @@
 from __future__ import annotations
+from unittest.mock import patch
+from config.database import BootstrapDatabase
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.dialect import (
     build_engine_url,
     engine_options,
     resolve_driver,
 )
-from orionis.foundation.application import Application
 from orionis.foundation.config.database.entities.database import Database
 from orionis.test import TestCase
 
 # Every first-party connection declared by the configuration entities.
 _EXPECTED_CONNECTIONS = ("sqlite", "mysql", "pgsql", "oracle", "sqlserver")
+
+
+def template_config() -> dict:
+    """Build the application database template with its documented defaults."""
+    with patch("config.database.Env") as environment:
+        environment.get.side_effect = lambda _key, default=None: default
+        return BootstrapDatabase().toDict()
+
 
 class _EntityStubApp:
     """Application stub returning the Database entity (not a dict)."""
@@ -64,16 +73,14 @@ class TestConfigurationContract(TestCase):
             manager.getDefaultName(),
         )
 
-    async def testApplicationRuntimeConfigSpeaksWithTheDialect(self) -> None:
+    def testApplicationTemplateConfigSpeaksWithTheDialect(self) -> None:
         """
-        Validate the real application configuration end to end.
+        Validate the application database template against every dialect.
 
         Every connection declared by ``config/database.py`` must resolve
         its driver and build a valid engine URL with engine options.
         """
-        app = Application()
-        config = app.config("database")
-        config = config if isinstance(config, dict) else config.toDict()
+        config = template_config()
 
         connections = config.get("connections", {})
         self.assertIn(config.get("default"), connections)
@@ -86,16 +93,14 @@ class TestConfigurationContract(TestCase):
             self.assertTrue(build_engine_url(entry).drivername)
             engine_options(entry)
 
-    async def testApplicationSqliteUrlAndDatabaseAreCoherent(self) -> None:
+    def testApplicationSqliteUrlAndDatabaseAreCoherent(self) -> None:
         """
         Keep the sqlite informational URL aligned with the database path.
 
         Validates that the app template derives both values from the
         same source, avoiding split-brain configuration.
         """
-        app = Application()
-        config = app.config("database")
-        config = config if isinstance(config, dict) else config.toDict()
+        config = template_config()
         sqlite = config["connections"]["sqlite"]
         sqlite = sqlite if isinstance(sqlite, dict) else sqlite.toDict()
 

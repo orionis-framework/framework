@@ -6,6 +6,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Unicode(ColumnDefinition):
     """A variable length Unicode string type, e.g. ``NVARCHAR``."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         length: int | None = None,

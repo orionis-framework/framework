@@ -10,6 +10,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class StrictDecimal(ColumnDefinition):
     """The SQL ``DECIMAL`` type."""
 
+    __slots__ = ()
+
     def __init__(
         self,
         precision: int | None = DEFAULT_DECIMAL_PRECISION,

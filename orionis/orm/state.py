@@ -46,10 +46,17 @@ class StateMixin:
         bool
             ``True`` when at least one tracked attribute changed.
         """
-        dirty = self.getDirty()
-        if not attributes:
-            return bool(dirty)
-        return any(key in dirty for key in attributes)
+        current = self._attributes
+        original = self._original
+        if attributes:
+            return any(
+                key in current and original.get(key, _UNSET) != current[key]
+                for key in attributes
+            )
+        return any(
+            original.get(key, _UNSET) != value
+            for key, value in current.items()
+        )
 
     def isClean(self, *attributes: str) -> bool:
         """

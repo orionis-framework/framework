@@ -5,6 +5,8 @@ from orionis.orm.schema.types.column_type import ColumnType
 class Time(ColumnDefinition):
     """A type for ``datetime.time()`` objects."""
 
+    __slots__ = ()
+
     def __init__(self) -> None:
         """
         Initialize a time column definition.

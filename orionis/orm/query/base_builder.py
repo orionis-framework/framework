@@ -65,9 +65,14 @@ class QueryBuilderBase:
 
     __slots__ = ("_connection_name", "_plan")
 
-    def __init__(self) -> None:
+    def __init__(self, table: TableDefinition | None = None) -> None:
         """
-        Initialize the builder with an empty, tableless plan.
+        Initialize the builder with a plan for the supplied table.
+
+        Parameters
+        ----------
+        table : TableDefinition or None, optional
+            Query target, or an empty definition until a table is selected.
 
         Returns
         -------
@@ -75,7 +80,9 @@ class QueryBuilderBase:
             This method does not return a value.
         """
         self._connection_name: str | None = None
-        self._plan = SelectPlan(table=TableDefinition(name=""))
+        self._plan = SelectPlan(
+            table=table if table is not None else TableDefinition(name=""),
+        )
 
     # ── Plan access ─────────────────────────────────────────────────────────
 
@@ -188,11 +195,9 @@ class QueryBuilderBase:
         # class, so importing it at module level would cycle.
         from orionis.orm.query.raw_builder import RawQueryBuilder  # noqa: PLC0415
 
-        builder = RawQueryBuilder()
+        builder = RawQueryBuilder(self._plan.table)
         builder.adoptConnection(self._connection_name)
-        builder.adoptPlan(
-            SelectPlan(table=self._plan.table, alias=self._plan.alias),
-        )
+        builder.toPlan().alias = self._plan.alias
         return builder
 
     def _serializeValues(self, values: dict[str, Any]) -> dict[str, Any]:
@@ -279,7 +284,7 @@ class QueryBuilderBase:
         QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
-        self._plan.columns = tuple(columns)
+        self._plan.columns = columns
         return self
 
     def addSelect(self, *columns: str) -> Self:
@@ -325,7 +330,7 @@ class QueryBuilderBase:
             The same builder, enabling fluent chaining.
         """
         expression = RawExpression(
-            sql=sql, bindings=dict(bindings or {}), alias=alias,
+            sql=sql, bindings=bindings.copy() if bindings else {}, alias=alias,
         )
         self._plan.columns = (*self._plan.columns, expression)
         return self
@@ -1486,10 +1491,16 @@ class QueryBuilderBase:
         InvalidQueryException
             If the page or page size are not positive integers.
         """
-        if page < 1 or per_page < 1:
+        if (
+            not isinstance(page, int) or isinstance(page, bool) or page < 1
+            or not isinstance(per_page, int)
+            or isinstance(per_page, bool) or per_page < 1
+        ):
             error_msg = "Page and per_page must be positive integers."
             raise InvalidQueryException(error_msg)
-        return self.limit(per_page).offset((page - 1) * per_page)
+        self._plan.limit_value = per_page
+        self._plan.offset_value = (page - 1) * per_page
+        return self
 
     # ── Locking and compounds ───────────────────────────────────────────────
 
@@ -2067,7 +2078,9 @@ class QueryBuilderBase:
             WhereClause(
                 column="",
                 where_type=WhereType.RAW,
-                value=RawExpression(sql=sql, bindings=dict(bindings or {})),
+                value=RawExpression(
+                    sql=sql, bindings=bindings.copy() if bindings else {},
+                ),
                 boolean=boolean,
             ),
         )

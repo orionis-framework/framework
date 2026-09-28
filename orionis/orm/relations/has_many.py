@@ -57,4 +57,4 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
         groups = self._groupByForeignKey(results)
         for model in models:
             key = getattr(model, self._local_key)
-            model.setRelation(name, Collection(groups.get(key, [])))
+            model.setRelation(name, Collection(groups.get(key)))

@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class IConnectionManager(ABC):
 
+    __slots__ = ()
+
     @abstractmethod
     def connection(self, name: str | None = None) -> IConnection:
         """

@@ -54,7 +54,9 @@ class HasOneRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
         None
             This method does not return a value.
         """
-        groups = self._groupByForeignKey(results)
+        first_by_key = {}
+        foreign_key = self._foreign_key
+        for row in results:
+            first_by_key.setdefault(getattr(row, foreign_key), row)
         for model in models:
-            related = groups.get(getattr(model, self._local_key))
-            model.setRelation(name, related[0] if related else None)
+            model.setRelation(name, first_by_key.get(getattr(model, self._local_key)))

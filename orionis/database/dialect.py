@@ -2,13 +2,14 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any
 from sqlalchemy import URL, event
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, QueuePool
 from orionis.database.exceptions import (
     MissingDatabaseDependencyException,
     UnsupportedDriverException,
 )
 
 if TYPE_CHECKING:
+    from sqlalchemy.engine import Connection as SqlConnection
     from sqlalchemy.ext.asyncio import AsyncEngine
 
 # Map of Orionis driver names to SQLAlchemy async dialect names.
@@ -195,9 +196,11 @@ def engine_options(
     }
 
     if driver == "sqlite":
-        # A shared in-memory database requires a single pooled connection.
+        # In-memory databases retain one connection with exclusive checkout.
         if _is_sqlite_memory(config):
-            options["poolclass"] = StaticPool
+            options["poolclass"] = QueuePool if sync else AsyncAdaptedQueuePool
+            options["pool_size"] = 1
+            options["max_overflow"] = 0
             options["connect_args"] = {"check_same_thread": False}
         return options
 
@@ -273,8 +276,15 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
         This function does not return a value.
     """
     statements = _session_statements(config)
-    if not statements:
+    sqlite = resolve_driver(config) == "sqlite"
+    if not statements and not sqlite:
         return
+
+    if sqlite:
+        @event.listens_for(engine.sync_engine, "begin")
+        def _begin_sqlite_transaction(connection: SqlConnection) -> None:
+            """Start a database transaction before statements or savepoints."""
+            connection.exec_driver_sql("BEGIN")
 
     # Register a Core pool event on the underlying sync engine; the async
     # adapters expose a synchronous cursor facade suitable for session setup.
@@ -283,10 +293,31 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
         dbapi_connection: object,
         _record: object,
     ) -> None:
+        """
+        Apply configured session settings to a new pooled connection.
+
+        Parameters
+        ----------
+        dbapi_connection : object
+            Synchronous DBAPI connection receiving the session settings.
+        _record : object
+            Pool record associated with the new connection; unused.
+
+        Returns
+        -------
+        None
+            This callback does not return a value.
+        """
+        if sqlite:
+            dbapi_connection.isolation_level = None
+        if not statements:
+            return
         cursor = dbapi_connection.cursor()
-        for statement in statements:
-            cursor.execute(statement)
-        cursor.close()
+        try:
+            for statement in statements:
+                cursor.execute(statement)
+        finally:
+            cursor.close()
 
 def _session_statements(config: dict[str, Any]) -> tuple[str, ...]:
     """

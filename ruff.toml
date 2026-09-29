@@ -19,6 +19,9 @@ exclude = [
 ]
 
 [lint.per-file-ignores]
+"**/__init__.py" = [
+    "E501",
+]
 "app/**" = [
     "ARG002",
     "BLE001",

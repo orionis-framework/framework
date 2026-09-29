@@ -14,6 +14,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         The rest of the module depends on the interface, never on the
         concrete class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(permissions=(), roles=())
         self.assertIsInstance(snapshot, IAuthorizationSnapshot)
@@ -23,6 +28,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         One snapshot is built per authenticated request, so it must not
         pay for a per instance dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(permissions=(), roles=())
         self.assertFalse(hasattr(snapshot, "__dict__"))
@@ -32,6 +42,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         Sharing a mutable set between coroutines would break the
         guarantee that the picture never changes mid request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=["users.view", "users.view"],
@@ -46,6 +61,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates the basic permission check.
 
         A permission present in the snapshot must be granted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view",), roles=(),
@@ -56,6 +76,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates that unknown permissions are denied.
 
         Authorization defaults to deny.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view",), roles=(),
@@ -67,6 +92,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates that a credential without abilities narrows nothing.
 
         Session authentication carries no abilities at all.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view", "users.delete"), roles=(),
@@ -80,6 +110,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         The effective set is the intersection of what the identity owns
         and what the token is allowed to use.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view", "users.create", "users.delete"),
@@ -95,6 +130,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         An ability the identity does not own must stay denied, otherwise
         a token could grant more than its owner.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view",),
@@ -108,6 +148,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates that a token with no ability is powerless.
 
         An empty tuple is a real restriction, unlike ``None``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view",), roles=(), abilities=(),
@@ -119,6 +164,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates role membership lookups.
 
         Roles are answered from the same immutable picture.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=(), roles=("admin", "editor"),
@@ -132,6 +182,11 @@ class TestAuthorizationSnapshot(TestCase):
 
         Roles describe who the identity is, not what the credential may
         do on this request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=(), roles=("admin",), abilities=(),
@@ -142,6 +197,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates the snapshot handed to guest requests.
 
         Guests must never resolve permissions from the database.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(EMPTY_SNAPSHOT.permissions, frozenset())
         self.assertEqual(EMPTY_SNAPSHOT.roles, frozenset())
@@ -153,6 +213,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates that debugging output stays free of authorization data.
 
         A snapshot may end up in a log line, so it only reports sizes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(
             permissions=("users.view",), roles=("admin",), abilities=(),
@@ -167,6 +232,11 @@ class TestAuthorizationSnapshot(TestCase):
         """Validates that an unrestricted credential is recognisable.
 
         ``None`` and an empty set mean opposite things.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = AuthorizationSnapshot(permissions=(), roles=())
         self.assertIn("abilities=unrestricted", repr(snapshot))

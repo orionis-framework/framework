@@ -89,7 +89,13 @@ def _request(range_header: str | None = None) -> ASGITransportAdapter:
 class TestResponseTransport(TestCase):
 
     def testRangesCoverPrefixSuffixAndMalformedInput(self) -> None:
-        """Parse one bounded interval and ignore malformed or empty intervals."""
+        """Parse one bounded interval and ignore malformed or empty intervals.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = {
             None: None, "bytes=0-2": (0, 3), "bytes=4-": (4, 10),
             "bytes=-3": (7, 10), "bytes=-20": (0, 10), "bytes=-0": None,
@@ -104,7 +110,13 @@ class TestResponseTransport(TestCase):
         self.assertIsNone(parse_range("bytes=0-", 0))
 
     def testTransportHeadersAndIpv6RemainReadable(self) -> None:
-        """Expose duplicate headers and parse the final client port separator."""
+        """Expose duplicate headers and parse the final client port separator.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         asgi = ASGITransportAdapter({
             "headers": [(b"X-Test", b"one"), (b"x-test", b"two")],
             "client": ("::1", 1234),
@@ -119,7 +131,13 @@ class TestResponseTransport(TestCase):
             self.assertEqual(adapter["port"], 1234)
 
     async def testFileOpenRunsOutsideTheEventLoop(self) -> None:
-        """Open disk streams on a worker thread."""
+        """Open disk streams on a worker thread.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"abcdef")
@@ -152,7 +170,13 @@ class TestResponseTransport(TestCase):
             self.assertNotEqual(threads, [get_ident()])
 
     async def testCancellationDuringFileOpenClosesTheHandle(self) -> None:
-        """Close a file opened by a worker after its consumer is cancelled."""
+        """Close a file opened by a worker after its consumer is cancelled.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"content")
@@ -206,7 +230,13 @@ class TestResponseTransport(TestCase):
             self.assertTrue(handles[0].closed)
 
     async def testDisconnectClosesAsgiAndRsgiIterators(self) -> None:
-        """Finalize asynchronous streams when the protocol rejects a chunk."""
+        """Finalize asynchronous streams when the protocol rejects a chunk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for protocol_name in ("asgi", "rsgi"):
             closed = []
 
@@ -233,8 +263,7 @@ class TestResponseTransport(TestCase):
                     record(True)
 
             async def send(event: _AsgiEvent) -> None:
-                """
-                Reject body chunks to simulate a disconnected client.
+                """Reject body chunks to simulate a disconnected client.
 
                 Parameters
                 ----------
@@ -245,14 +274,18 @@ class TestResponseTransport(TestCase):
                 -------
                 None
                     No return value.
+
+                Raises
+                ------
+                ConnectionError
+                    Raised by this helper to exercise the failure path.
                 """
                 if event["type"] == "http.response.body":
                     error_msg = "disconnected"
                     raise ConnectionError(error_msg)
 
             async def send_bytes(_chunk: bytes) -> None:
-                """
-                Reject the chunk to simulate a disconnected client.
+                """Reject the chunk to simulate a disconnected client.
 
                 Parameters
                 ----------
@@ -263,6 +296,11 @@ class TestResponseTransport(TestCase):
                 -------
                 None
                     No return value.
+
+                Raises
+                ------
+                ConnectionError
+                    Raised by this helper to exercise the failure path.
                 """
                 error_msg = "disconnected"
                 raise ConnectionError(error_msg)
@@ -300,7 +338,13 @@ class TestResponseTransport(TestCase):
             self.assertEqual(closed, [True])
 
     async def testDisconnectClosesFileAndRangeHandles(self) -> None:
-        """Close streamed files immediately after a failed protocol send."""
+        """Close streamed files immediately after a failed protocol send.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"content")
@@ -336,8 +380,7 @@ class TestResponseTransport(TestCase):
                     return file
 
                 async def send(event: _AsgiEvent) -> None:
-                    """
-                    Reject body chunks to simulate a disconnected client.
+                    """Reject body chunks to simulate a disconnected client.
 
                     Parameters
                     ----------
@@ -348,6 +391,11 @@ class TestResponseTransport(TestCase):
                     -------
                     None
                         No return value.
+
+                    Raises
+                    ------
+                    ConnectionError
+                        Raised by this helper to exercise the failure path.
                     """
                     if event["type"] == "http.response.body":
                         error_msg = "disconnected"
@@ -364,7 +412,13 @@ class TestResponseTransport(TestCase):
                 self.assertTrue(handles[0].closed)
 
     async def testCancellationWaitsForFileReadBeforeClosing(self) -> None:
-        """Finish a worker read before closing the same file handle."""
+        """Finish a worker read before closing the same file handle.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"content")
@@ -452,7 +506,13 @@ class TestResponseTransport(TestCase):
             self.assertEqual(close_states, [True])
 
     async def testAsgiRangeUsesPartialContentLength(self) -> None:
-        """Send only the requested suffix with matching length metadata."""
+        """Send only the requested suffix with matching length metadata.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"0123456789")
@@ -484,7 +544,13 @@ class TestResponseTransport(TestCase):
             self.assertEqual(b"".join(item["body"] for item in events[1:]), b"789")
 
     async def testRsgiRangeUsesPartialContentLength(self) -> None:
-        """Pass the requested interval and length to the RSGI protocol."""
+        """Pass the requested interval and length to the RSGI protocol.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"0123456789")
@@ -529,7 +595,13 @@ class TestResponseTransport(TestCase):
             self.assertEqual(dict(headers)["content-length"], "3")
 
     async def testAsgiFinalEventIsOwnedByEachRequest(self) -> None:
-        """Keep event mutations local to the protocol callback receiving them."""
+        """Keep event mutations local to the protocol callback receiving them.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         adapter = ASGIResponseAdapter()
         bodies = []
 

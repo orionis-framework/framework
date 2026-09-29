@@ -21,7 +21,7 @@ class StartSessionMiddleware(BaseMiddleware):
 
     # ruff: noqa: TC001 (Dependency Injection)
 
-    __slots__ = ("_catch", "_manager")
+    __slots__ = ("_catch", "_manager", "_track_previous_url")
 
     def __init__(self, manager: SessionManager, catch: ICatch) -> None:
         """
@@ -40,6 +40,7 @@ class StartSessionMiddleware(BaseMiddleware):
         """
         self._manager = manager
         self._catch = catch
+        self._track_previous_url = manager.tracksPreviousUrl
 
     async def handle(
         self,
@@ -73,7 +74,8 @@ class StartSessionMiddleware(BaseMiddleware):
             flash_data = response.getFlashData()
             if flash_data:
                 apply_flash(session, flash_data)
-            self.__storeCurrentUrl(request, response, session)
+            if self._track_previous_url:
+                self.__storeCurrentUrl(request, response, session)
             await self._manager.save(response, session)
             return response
         except BaseException:

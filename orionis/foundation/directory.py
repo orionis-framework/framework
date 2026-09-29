@@ -1,245 +1,194 @@
 from typing import TYPE_CHECKING
-from orionis.foundation.contracts.application import IApplication
+from orionis.foundation.contracts.application import IApplication  # noqa: TC001
 from orionis.foundation.contracts.directory import IDirectory
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 class Directory(IDirectory):
+    """Expose the configured application directories."""
 
-    # ruff: noqa: TC001
-
-    __slots__ = ("_all_paths", "_app")
+    __slots__ = ("_all_paths",)
 
     def __init__(self, app: IApplication) -> None:
-        """
-        Initialize the Directory service.
+        """Cache all application paths resolved by the application.
 
         Parameters
         ----------
         app : IApplication
-            The application instance used to resolve directory paths.
+            Application instance that owns the configured paths.
 
         Returns
         -------
         None
+            The directory accessors are initialized.
         """
-        self._app = app
-        self._all_paths = {
-            "root": self._app.path("root"),
-            "app": self._app.path("app"),
-            "console": self._app.path("console"),
-            "exceptions": self._app.path("exceptions"),
-            "http": self._app.path("http"),
-            "models": self._app.path("models"),
-            "providers": self._app.path("providers"),
-            "notifications": self._app.path("notifications"),
-            "services": self._app.path("services"),
-            "jobs": self._app.path("jobs"),
-            "bootstrap": self._app.path("bootstrap"),
-            "config": self._app.path("config"),
-            "database": self._app.path("database"),
-            "resources": self._app.path("resources"),
-            "routes": self._app.path("routes"),
-            "storage": self._app.path("storage"),
-            "storagePublic": self._app.path("storage") / "app" / "public",
-            "tests": self._app.path("tests"),
-        }
+        keys = (
+            "app", "app_console", "app_console_commands",
+            "app_console_listeners", "app_exceptions",
+            "app_http", "app_http_controllers", "app_http_middleware",
+            "app_http_schemas", "app_models", "app_providers", "app_emails",
+            "app_services", "app_jobs", "bootstrap", "config", "database",
+            "database_factories", "database_migrations", "database_schemas",
+            "database_seeders", "resources", "resources_css", "resources_js",
+            "resources_lang", "resources_views", "routes", "storage",
+            "storage_app", "storage_app_private", "storage_app_public",
+            "storage_framework", "storage_logs", "tests",
+        )
+        self._all_paths = {"root": app.path("root")}
+        self._all_paths.update({key: app.path(key) for key in keys})
+
+    def _path(self, key: str) -> Path:
+        """Return a cached path for a configured key.
+
+        Parameters
+        ----------
+        key : str
+            Key registered in the application path configuration.
+
+        Returns
+        -------
+        Path
+            Configured path for ``key``.
+        """
+        return self._all_paths[key]
 
     def root(self) -> Path:
-        """
-        Get the root directory of the application.
-
-        Returns
-        -------
-        Path
-            Path object representing the root directory.
-        """
-        return self._all_paths["root"]
+        """Return the application root directory."""
+        return self._path("root")
 
     def app(self) -> Path:
-        """
-        Get the main application directory.
+        """Return the application directory."""
+        return self._path("app")
 
-        Returns
-        -------
-        Path
-            Path object representing the application directory.
-        """
-        return self._all_paths["app"]
+    def appConsole(self) -> Path:
+        """Return the application console directory."""
+        return self._path("app_console")
 
-    def console(self) -> Path:
-        """
-        Get the console directory.
+    def appConsoleCommands(self) -> Path:
+        """Return the application console commands directory."""
+        return self._path("app_console_commands")
 
-        Returns
-        -------
-        Path
-            Path object representing the console directory.
-        """
-        return self._all_paths["console"]
+    def appConsoleListeners(self) -> Path:
+        """Return the application console listeners directory."""
+        return self._path("app_console_listeners")
 
-    def exceptions(self) -> Path:
-        """
-        Get the exceptions directory.
+    def appExceptions(self) -> Path:
+        """Return the application exceptions directory."""
+        return self._path("app_exceptions")
 
-        Returns
-        -------
-        Path
-            Path object representing the exceptions directory.
-        """
-        return self._all_paths["exceptions"]
+    def appHttp(self) -> Path:
+        """Return the application HTTP directory."""
+        return self._path("app_http")
 
-    def http(self) -> Path:
-        """
-        Get the HTTP directory.
+    def appHttpControllers(self) -> Path:
+        """Return the application controllers directory."""
+        return self._path("app_http_controllers")
 
-        Returns
-        -------
-        Path
-            Path object representing the HTTP directory.
-        """
-        return self._all_paths["http"]
+    def appHttpMiddleware(self) -> Path:
+        """Return the application HTTP middleware directory."""
+        return self._path("app_http_middleware")
 
-    def models(self) -> Path:
-        """
-        Get the models directory.
+    def appHttpSchemas(self) -> Path:
+        """Return the application HTTP schemas directory."""
+        return self._path("app_http_schemas")
 
-        Returns
-        -------
-        Path
-            Path object representing the models directory.
-        """
-        return self._all_paths["models"]
+    def appModels(self) -> Path:
+        """Return the application models directory."""
+        return self._path("app_models")
 
-    def providers(self) -> Path:
-        """
-        Get the providers directory.
+    def appProviders(self) -> Path:
+        """Return the application providers directory."""
+        return self._path("app_providers")
 
-        Returns
-        -------
-        Path
-            Path object representing the providers directory.
-        """
-        return self._all_paths["providers"]
+    def appEmails(self) -> Path:
+        """Return the application emails directory."""
+        return self._path("app_emails")
 
-    def notifications(self) -> Path:
-        """
-        Get the notifications directory.
+    def appServices(self) -> Path:
+        """Return the application services directory."""
+        return self._path("app_services")
 
-        Returns
-        -------
-        Path
-            Path object representing the notifications directory.
-        """
-        return self._all_paths["notifications"]
-
-    def services(self) -> Path:
-        """
-        Get the services directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the services directory.
-        """
-        return self._all_paths["services"]
-
-    def jobs(self) -> Path:
-        """
-        Get the jobs directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the jobs directory.
-        """
-        return self._all_paths["jobs"]
+    def appJobs(self) -> Path:
+        """Return the application jobs directory."""
+        return self._path("app_jobs")
 
     def bootstrap(self) -> Path:
-        """
-        Get the bootstrap directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the bootstrap directory.
-        """
-        return self._all_paths["bootstrap"]
+        """Return the bootstrap directory."""
+        return self._path("bootstrap")
 
     def config(self) -> Path:
-        """
-        Get the configuration directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the configuration directory.
-        """
-        return self._all_paths["config"]
+        """Return the configuration directory."""
+        return self._path("config")
 
     def database(self) -> Path:
-        """
-        Get the database directory.
+        """Return the database directory."""
+        return self._path("database")
 
-        Returns
-        -------
-        Path
-            Path object representing the database directory.
-        """
-        return self._all_paths["database"]
+    def databaseFactories(self) -> Path:
+        """Return the database factories directory."""
+        return self._path("database_factories")
+
+    def databaseMigrations(self) -> Path:
+        """Return the database migrations directory."""
+        return self._path("database_migrations")
+
+    def databaseSchemas(self) -> Path:
+        """Return the database schemas directory."""
+        return self._path("database_schemas")
+
+    def databaseSeeders(self) -> Path:
+        """Return the database seeders directory."""
+        return self._path("database_seeders")
 
     def resources(self) -> Path:
-        """
-        Get the resources directory.
+        """Return the resources directory."""
+        return self._path("resources")
 
-        Returns
-        -------
-        Path
-            Path object representing the resources directory.
-        """
-        return self._all_paths["resources"]
+    def resourcesCss(self) -> Path:
+        """Return the resources CSS directory."""
+        return self._path("resources_css")
+
+    def resourcesJs(self) -> Path:
+        """Return the resources JavaScript directory."""
+        return self._path("resources_js")
+
+    def resourcesLang(self) -> Path:
+        """Return the resources language directory."""
+        return self._path("resources_lang")
+
+    def resourcesViews(self) -> Path:
+        """Return the resources views directory."""
+        return self._path("resources_views")
 
     def routes(self) -> Path:
-        """
-        Get the routes directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the routes directory.
-        """
-        return self._all_paths["routes"]
+        """Return the routes directory."""
+        return self._path("routes")
 
     def storage(self) -> Path:
-        """
-        Get the storage directory.
+        """Return the storage directory."""
+        return self._path("storage")
 
-        Returns
-        -------
-        Path
-            Path object representing the storage directory.
-        """
-        return self._all_paths["storage"]
+    def storageApp(self) -> Path:
+        """Return the storage application directory."""
+        return self._path("storage_app")
 
-    def storagePublic(self) -> Path:
-        """
-        Get the public storage directory.
+    def storageAppPrivate(self) -> Path:
+        """Return the private storage application directory."""
+        return self._path("storage_app_private")
 
-        Returns
-        -------
-        Path
-            Path object representing the public storage directory.
-        """
-        return self._all_paths["storagePublic"]
+    def storageAppPublic(self) -> Path:
+        """Return the public storage application directory."""
+        return self._path("storage_app_public")
+
+    def storageFramework(self) -> Path:
+        """Return the framework storage directory."""
+        return self._path("storage_framework")
+
+    def storageLogs(self) -> Path:
+        """Return the storage logs directory."""
+        return self._path("storage_logs")
 
     def tests(self) -> Path:
-        """
-        Get the tests directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the tests directory.
-        """
-        return self._all_paths["tests"]
+        """Return the tests directory."""
+        return self._path("tests")

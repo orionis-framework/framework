@@ -18,7 +18,6 @@ _ASYNC_METHODS: frozenset[str] = frozenset({"check", "make"})
 # Concrete drivers shipped by the framework.
 _DRIVERS: tuple[type[IHasher], ...] = (Argon2Hasher, BcryptHasher)
 
-
 def abstract_body_statements(method: object) -> list[ast.stmt]:
     """
     Return the statements declared inside the body of a method.
@@ -39,48 +38,67 @@ def abstract_body_statements(method: object) -> list[ast.stmt]:
         return node.body
     return []
 
-
 class TestIHasherDefinition(TestCase):
 
     def testIsAnAbstractBaseClass(self) -> None:
-        """
-        Derive from the abstract base class machinery.
+        """Derive from the abstract base class machinery.
 
         Validates that the contract cannot be used as a plain mixin.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(IHasher, ABC))
 
     def testCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Refuse instantiation while abstract methods remain unimplemented.
+        """Refuse instantiation while abstract methods remain unimplemented.
 
         Validates that the contract is enforced at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IHasher()  # type: ignore[abstract]
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates the requirement that makes the slots of every driver
         effective instead of decorative.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IHasher.__dict__.get("__slots__"), ())
 
     def testExposesExactlyTheExpectedAbstractMethods(self) -> None:
-        """
-        Publish the hashing operations as the only abstract members.
+        """Publish the hashing operations as the only abstract members.
 
         Validates the surface every driver has to cover.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IHasher.__abstractmethods__, _ABSTRACT_METHODS)
 
     def testAbstractMethodsCarryNoImplementation(self) -> None:
-        """
-        Keep the abstract methods free of executable bodies.
+        """Keep the abstract methods free of executable bodies.
 
         Validates that no dead code hides behind the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in _ABSTRACT_METHODS:
             statements = abstract_body_statements(getattr(IHasher, name))
@@ -88,11 +106,15 @@ class TestIHasherDefinition(TestCase):
             self.assertIsInstance(statements[0], ast.Expr, msg=name)
 
     def testDeclaresTheCostlyOperationsAsCoroutines(self) -> None:
-        """
-        Declare hashing and verification as coroutine functions.
+        """Declare hashing and verification as coroutine functions.
 
         Validates the contract that lets every driver move its cost to a
         worker thread instead of stalling the event loop.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in _ASYNC_METHODS:
             self.assertTrue(
@@ -100,24 +122,31 @@ class TestIHasherDefinition(TestCase):
                 msg=name,
             )
 
-
 class TestIHasherImplementations(TestCase):
 
     def testEveryDriverImplementsTheContract(self) -> None:
-        """
-        Register both shipped drivers as implementations.
+        """Register both shipped drivers as implementations.
 
         Validates that the manager can treat them interchangeably.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for driver in _DRIVERS:
             self.assertTrue(issubclass(driver, IHasher))
 
     def testEveryDriverMatchesTheContractSignatures(self) -> None:
-        """
-        Keep the parameters of the drivers aligned with the contract.
+        """Keep the parameters of the drivers aligned with the contract.
 
         Validates that callers relying on the contract can invoke any
         driver unchanged.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for driver in _DRIVERS:
             for name in _ABSTRACT_METHODS:
@@ -130,20 +159,28 @@ class TestIHasherImplementations(TestCase):
                 )
 
     def testEveryDriverLeavesTheAbstractSetEmpty(self) -> None:
-        """
-        Implement every abstract member in the shipped drivers.
+        """Implement every abstract member in the shipped drivers.
 
         Validates that no driver is instantiable only by accident.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for driver in _DRIVERS:
             self.assertEqual(driver.__abstractmethods__, frozenset())
 
     def testEveryDriverKeepsTheCostlyOperationsAsynchronous(self) -> None:
-        """
-        Implement hashing and verification as coroutine functions.
+        """Implement hashing and verification as coroutine functions.
 
         Validates that a driver never silently turns an awaited call into
         a blocking one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for driver in _DRIVERS:
             for name in _ASYNC_METHODS:

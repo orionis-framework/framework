@@ -1,5 +1,4 @@
 from datetime import time
-
 from orionis.foundation.config.logging import (
     Chunked,
     Daily,
@@ -11,10 +10,15 @@ from orionis.foundation.config.logging import (
 )
 from tests.foundation.config.support import ConfigurationTestCase
 
-
 class TestLoggingConfiguration(ConfigurationTestCase):
     def testAllChannelsNormalizeTheSameLevelRepresentations(self) -> None:
-        """Match numeric, enum, and string log levels across every channel."""
+        """Match numeric, enum, and string log levels across every channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in (Stack, Hourly, Daily, Weekly, Monthly, Chunked):
             for level in Level:
                 for value in (level, level.value, level.name.lower()):
@@ -22,7 +26,13 @@ class TestLoggingConfiguration(ConfigurationTestCase):
                         self.assertEqual(cls(level=value).level, level.value)
 
     def testInvalidLevelsAreRejectedConsistently(self) -> None:
-        """Reject unknown names and numeric levels without losing type errors."""
+        """Reject unknown names and numeric levels without losing type errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in (Stack, Hourly, Daily, Weekly, Monthly, Chunked):
             for value in (True, None, "invalid", -1):
                 with (
@@ -32,7 +42,13 @@ class TestLoggingConfiguration(ConfigurationTestCase):
                     cls(level=value)
 
     def testDailyRotationTimeAcceptsItsDocumentedStringForm(self) -> None:
-        """Parse daily rotation strings and preserve validation exception causes."""
+        """Parse daily rotation strings and preserve validation exception causes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(Daily(at="12:30:00").at, time(12, 30))
         with self.assertRaises(ValueError) as failure:
             Daily(at="25:00:00")

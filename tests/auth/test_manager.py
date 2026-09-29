@@ -78,12 +78,29 @@ class _LoginRequest:
     __slots__ = ("payload", "state")
 
     def __init__(self, payload: dict[str, str]) -> None:
-        """Store the payload and an existing session instance."""
+        """Store the payload and an existing session instance.
+
+        Parameters
+        ----------
+        payload : dict[str, str]
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.payload = payload
         self.state = SimpleNamespace(session=Session())
 
     async def data(self) -> dict[str, str]:
-        """Return the already parsed login input."""
+        """Return the already parsed login input.
+
+        Returns
+        -------
+        dict[str, str]
+            Value produced by the helper.
+        """
         return self.payload
 
 class _StubApp:
@@ -92,7 +109,18 @@ class _StubApp:
     __slots__ = ("_tree",)
 
     def __init__(self, database: str) -> None:
-        """Build the configuration tree answered by ``config()``."""
+        """Build the configuration tree answered by ``config()``.
+
+        Parameters
+        ----------
+        database : str
+            Value supplied for ``database``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self._tree: dict[str, Any] = {
             "database": {
                 "default": "sqlite",
@@ -121,7 +149,18 @@ class _StubApp:
         }
 
     def config(self, key: str | None = None) -> Any:  # noqa: ANN401
-        """Resolve a dot-notated configuration key."""
+        """Resolve a dot-notated configuration key.
+
+        Parameters
+        ----------
+        key : str | None
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
         if key is None:
             return self._tree
         node: Any = self._tree
@@ -134,7 +173,18 @@ class _StubApp:
         return node
 
     async def build(self, target: type) -> object:
-        """Instantiate a policy class without a real container."""
+        """Instantiate a policy class without a real container.
+
+        Parameters
+        ----------
+        target : type
+            Value supplied for ``target``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return target()
 
 class _TokenIdentityMiddleware(ResolveIdentityMiddleware):
@@ -150,7 +200,20 @@ class _AccountPolicy(Policy):
     __slots__ = ()
 
     async def update(self, identity: object, account: Account) -> bool:
-        """Allow the update only for the owner of the account."""
+        """Allow the update only for the owner of the account.
+
+        Parameters
+        ----------
+        identity : object
+            Value supplied for ``identity``.
+        account : Account
+            Value supplied for ``account``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return account.id == identity.getAuthIdentifier()
 
 class _UnauthorizableIdentity(Authenticatable):
@@ -159,7 +222,13 @@ class _UnauthorizableIdentity(Authenticatable):
     __slots__ = ("id",)
 
     def __init__(self) -> None:
-        """Store the identifier a guard would read from the session."""
+        """Store the identifier a guard would read from the session.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.id = 99
 
 def build_table(
@@ -167,7 +236,22 @@ def build_table(
     columns: dict[str, Any],
     **kwargs: object,
 ) -> TableDefinition:
-    """Name every column and wrap them into a table definition."""
+    """Name every column and wrap them into a table definition.
+
+    Parameters
+    ----------
+    name : str
+        Value supplied for ``name``.
+    columns : dict[str, Any]
+        Value supplied for ``columns``.
+    **kwargs : object
+        Arguments forwarded to the wrapped callable.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     for column_name, column in columns.items():
         column.name = column_name
     return TableDefinition(name=name, columns=columns, **kwargs)
@@ -176,7 +260,13 @@ class _ManagerCase(TestCase):
     """Base case wiring the whole authentication stack over SQLite."""
 
     async def asyncSetUp(self) -> None:
-        """Create the schema, seed identities and build the manager."""
+        """Create the schema, seed identities and build the manager.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self._tmp = tempfile.TemporaryDirectory()
         database = str(Path(self._tmp.name) / "auth.sqlite")
 
@@ -272,13 +362,30 @@ class _ManagerCase(TestCase):
         })
 
     async def asyncTearDown(self) -> None:
-        """Release the connection and drop the temporary database."""
+        """Release the connection and drop the temporary database.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ConnectionResolver.setManager(self._previous_manager)
         await self.connection.disconnect()
         self._tmp.cleanup()
 
     def webRequest(self, session: Session | None = None) -> SimpleNamespace:
-        """Build a web request double carrying a session."""
+        """Build a web request double carrying a session.
+
+        Parameters
+        ----------
+        session : Session | None
+            Value supplied for ``session``.
+
+        Returns
+        -------
+        SimpleNamespace
+            Value produced by the helper.
+        """
         state = SimpleNamespace()
         state.session = session if session is not None else Session()
         return SimpleNamespace(
@@ -289,7 +396,18 @@ class _ManagerCase(TestCase):
         )
 
     def apiRequest(self, token: str | None) -> SimpleNamespace:
-        """Build an API request double carrying a bearer token."""
+        """Build an API request double carrying a bearer token.
+
+        Parameters
+        ----------
+        token : str | None
+            Value supplied for ``token``.
+
+        Returns
+        -------
+        SimpleNamespace
+            Value produced by the helper.
+        """
         return SimpleNamespace(
             state=SimpleNamespace(),
             bearerToken=token,
@@ -305,6 +423,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
 
         Validates that console commands and background jobs never observe
         an authenticated identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(self.auth.guest())
         self.assertFalse(self.auth.check())
@@ -315,6 +438,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         """Validates the full login path.
 
         The session is written and the context becomes visible at once.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = self.webRequest()
         async with ScopeManager() as scope:
@@ -335,6 +463,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         """Validates that a failed login changes nothing.
 
         The request must stay anonymous.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -350,6 +483,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         """Validates that a missing account behaves like a wrong secret.
 
         The two failures must be indistinguishable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -365,6 +503,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         """Validates the programmatic login used right after signup.
 
         No password is involved in this path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -378,6 +521,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
         """Validates that logging out leaves nothing behind.
 
         The session is destroyed and the context becomes a guest.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = self.webRequest()
         async with ScopeManager() as scope:
@@ -394,6 +542,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
 
         Validates the guard against using the manager out of band: there
         would be no session to write the identity into.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AuthException):
             await self.auth.attempt({"email": "ada@orionis.dev"})
@@ -403,6 +556,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
 
         Validates that the default comes from the configuration and that
         an unknown name fails loudly instead of falling back.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self.auth.guard().name, "session")
         self.assertEqual(self.auth.guard("token").name, "token")
@@ -414,6 +572,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
 
         Validates that the manager drives a real login end to end and
         that each outcome redirects to its own page.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         controller = LoginController(self.app)
         for credential, expected in (("wrong", False), ("secret", True)):
@@ -433,6 +596,11 @@ class TestAuthManagerSessionFlow(_ManagerCase):
 
         Validates that a model with a native UUID key and a renamed hash
         column is supported by every source the manager relies on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.connection.createTable(Member.__meta__.table)
         member = await Member.create({
@@ -467,6 +635,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates the default answer for anonymous requests.
 
         Authorization is deny by default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(await self.auth.can("users.view"))
         self.assertTrue(await self.auth.cannot("users.view"))
@@ -478,6 +651,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates the end-to-end direct permission flow.
 
         The permission is stored, resolved and answered.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
 
@@ -493,6 +671,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates the end-to-end role flow.
 
         Roles hand their permissions to every holder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.grantToRole("admin", "users.view", "users.delete")
         await self.registrar.assignRole(self.ada, "admin")
@@ -513,6 +696,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
 
         An authenticated identity without rights is forbidden, not
         unauthenticated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -525,6 +713,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates that permissions follow the identity.
 
         Two identities of the same model stay independent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
 
@@ -537,6 +730,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates the resource aware authorization path.
 
         Ownership rules live in the policy, not in a permission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.auth.registerPolicy(Account, _AccountPolicy)
 
@@ -554,6 +752,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
         """Validates that guests never reach a policy.
 
         Policies always receive a real identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.auth.registerPolicy(Account, _AccountPolicy)
         with self.assertRaises(AuthenticationException):
@@ -566,6 +769,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the common case of minting a token.
 
         The owner defaults to the identity of the current request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -580,6 +788,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates that a guest cannot mint a credential.
 
         There would be nobody to attach it to.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AuthenticationException):
             await self.auth.createToken("ci")
@@ -588,11 +801,23 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the API authentication path end-to-end.
 
         The bearer token resolves to the owning identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.auth.createToken("ci", tokenable=self.ada)
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async with ScopeManager() as scope:
@@ -608,6 +833,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the intersection rule on a real request.
 
         The identity owns two permissions but the token allows only one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(
             self.ada, "users.view", "users.delete",
@@ -618,6 +848,13 @@ class TestAuthManagerTokens(_ManagerCase):
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async with ScopeManager() as scope:
@@ -632,6 +869,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the security invariant of abilities.
 
         An ability the identity does not own stays denied.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         issued = await self.auth.createToken(
@@ -642,6 +884,13 @@ class TestAuthManagerTokens(_ManagerCase):
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async with ScopeManager() as scope:
@@ -656,11 +905,23 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the sign out path of an API client.
 
         The credential used right now is the one revoked.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.auth.createToken("ci", tokenable=self.ada)
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async with ScopeManager() as scope:
@@ -682,6 +943,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the answer for a session authenticated request.
 
         Session authentication carries no revocable credential.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -693,6 +959,11 @@ class TestAuthManagerTokens(_ManagerCase):
         """Validates the expiration path on a real request.
 
         The middleware leaves the request anonymous.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.auth.createToken(
             "stale",
@@ -703,6 +974,13 @@ class TestAuthManagerTokens(_ManagerCase):
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async with ScopeManager() as scope:
@@ -720,10 +998,29 @@ class TestAuthManagerConcurrency(_ManagerCase):
 
         Two logins running at the same time must never cross, which is
         exactly what a singleton holding the current user would break.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         observed: dict[str, list[object]] = {}
 
         async def handle(name: str, email: str) -> None:
+            """Handle a request in the isolated test scope.
+
+            Parameters
+            ----------
+            name : str
+                Value supplied for ``name``.
+            email : str
+                Value supplied for ``email``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 scope[Request] = self.webRequest()
                 await self.auth.attempt({"email": email, "password": "secret"})
@@ -745,11 +1042,30 @@ class TestAuthManagerConcurrency(_ManagerCase):
         """Validates that authorization follows the right identity.
 
         A shared snapshot would leak permissions across requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.delete")
         observed: dict[str, list[bool]] = {}
 
         async def handle(name: str, account: Account) -> None:
+            """Handle a request in the isolated test scope.
+
+            Parameters
+            ----------
+            name : str
+                Value supplied for ``name``.
+            account : Account
+                Value supplied for ``account``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 scope[Request] = self.webRequest()
                 await self.auth.login(account)
@@ -772,10 +1088,22 @@ class TestAuthManagerConcurrency(_ManagerCase):
         """Validates that an anonymous request stays anonymous.
 
         The guest context is shared, so it must never be mutated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         observed: dict[str, list[bool]] = {}
 
         async def authenticated() -> None:
+            """Run the authenticated request in an isolated scope.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 scope[Request] = self.webRequest()
                 await self.auth.login(self.ada)
@@ -784,6 +1112,13 @@ class TestAuthManagerConcurrency(_ManagerCase):
                 observed["auth"] = [self.auth.check()]
 
         async def anonymous() -> None:
+            """Run the anonymous request in an isolated scope.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 scope[Request] = self.webRequest()
                 seen: list[bool] = []
@@ -801,6 +1136,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
         """Validates isolation of token authenticated requests.
 
         Each request must resolve its own credential and abilities.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         await self.registrar.givePermissionTo(self.bob, "users.view")
@@ -814,9 +1154,30 @@ class TestAuthManagerConcurrency(_ManagerCase):
         observed: dict[str, tuple[object, bool]] = {}
 
         async def call_next() -> str:
+            """Return the handled response expected by the middleware.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "handled"
 
         async def handle(name: str, plain_text: str) -> None:
+            """Handle a request in the isolated test scope.
+
+            Parameters
+            ----------
+            name : str
+                Value supplied for ``name``.
+            plain_text : str
+                Value supplied for ``plain_text``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 request = self.apiRequest(plain_text)
                 scope[Request] = request
@@ -840,6 +1201,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
 
         Validates that repeated middleware resolutions coalesce into a
         single context instead of racing each other.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = ResolveIdentityMiddleware(self.auth, self.permissions)
         session = Session()
@@ -859,6 +1225,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
 
         Validates that both transitions apply in acquisition order, so a
         request never ends up in a half authenticated state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -874,6 +1245,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
 
         Validates the privilege escalation guard: a limited credential
         must never be able to mint an unrestricted one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.tokens.create(self.ada, "limited", abilities=[])
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
@@ -889,6 +1265,11 @@ class TestAuthManagerConcurrency(_ManagerCase):
 
         Validates that a session fallback can never replace a token
         context, which would silently drop its ability restrictions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.tokens.create(self.ada, "limited", abilities=[])
         token_middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
@@ -921,6 +1302,11 @@ class TestAuthManagerContext(_ManagerCase):
 
         Validates that the manager owns no state of its own and always
         reads the context published by the running scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(self.auth.context(), current_auth_context())
 
@@ -929,6 +1315,11 @@ class TestAuthManagerContext(_ManagerCase):
 
         Validates that the identity, the guard and the scope binding are
         all visible through a single accessor.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -949,6 +1340,11 @@ class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
 
         Validates that permissions and roles are resolved together, which
         is what the authorizer intersects with the credential abilities.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.grantToRole("admin", "users.view")
         await self.registrar.assignRole(self.ada, "admin")
@@ -971,6 +1367,11 @@ class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
 
         Validates the deny by default stance: an unauthenticated request
         never reaches the permission store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         snapshot = await self.auth.authorization()
 
@@ -982,6 +1383,11 @@ class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
 
         Validates that the restriction of the presented credential is
         reported next to what the identity owns.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(
             self.ada, "users.view", "users.delete",
@@ -1012,6 +1418,11 @@ class TestAuthManagerPartialPermissionChecks(_ManagerCase):
 
         Validates the any-of semantics used by routes accepting several
         equivalent rights.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
 
@@ -1031,6 +1442,11 @@ class TestAuthManagerPartialPermissionChecks(_ManagerCase):
 
         Validates that the any-of check never degrades into an implicit
         grant.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager() as scope:
             scope[Request] = self.webRequest()
@@ -1045,6 +1461,11 @@ class TestAuthManagerPartialPermissionChecks(_ManagerCase):
 
         Validates that an anonymous request is refused before any store
         is queried.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(await self.auth.canAny(["users.view"]))
 
@@ -1057,6 +1478,11 @@ class TestAuthManagerTokenOwnership(_ManagerCase):
 
         Validates the guard protecting the polymorphic owner columns: a
         token row without a usable authorization key would be orphaned.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AuthException) as captured:
             await self.auth.createToken(
@@ -1074,6 +1500,11 @@ class TestAuthManagerTokenOwnership(_ManagerCase):
         Validates the second credential check performed once the lock is
         acquired: without it the manager would revoke a credential that
         no longer belongs to the request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = await self.auth.createToken("ci", tokenable=self.ada)
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
@@ -1102,12 +1533,24 @@ class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
     """Validate the guard protecting the session lifecycle operations."""
 
     async def asyncSetUp(self) -> None:
-        """Detach the ambient scope installed by the test runner."""
+        """Detach the ambient scope installed by the test runner.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         await super().asyncSetUp()
         self._scope_token = ScopedContext.setCurrentScope(None)
 
     async def asyncTearDown(self) -> None:
-        """Restore the ambient scope before tearing the fixture down."""
+        """Restore the ambient scope before tearing the fixture down.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ScopedContext.reset(self._scope_token)
         await super().asyncTearDown()
 
@@ -1116,6 +1559,11 @@ class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
 
         Validates the refusal a console command gets: there is no session
         to remember the identity in.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AuthException):
             await self.auth.login(self.ada)
@@ -1125,6 +1573,11 @@ class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
 
         Validates that the symmetric operation is refused for the very
         same reason.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AuthException):
             await self.auth.logout()
@@ -1134,6 +1587,11 @@ class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
 
         Validates the second half of the guard: an active scope is not
         enough, the request itself must be reachable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager():
             with self.assertRaises(AuthException):

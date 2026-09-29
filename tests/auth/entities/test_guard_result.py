@@ -1,7 +1,6 @@
 from orionis.auth.entities.guard_result import GuardResult
 from orionis.test import TestCase
 
-
 class TestGuardResult(TestCase):
     """Validate the transport object returned by a guard."""
 
@@ -10,6 +9,11 @@ class TestGuardResult(TestCase):
 
         Validates that the object created once per request can never be
         rewritten nor grow an instance dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = GuardResult(identity=object(), guard="session")
         self.assertFalse(hasattr(result, "__dict__"))
@@ -22,6 +26,11 @@ class TestGuardResult(TestCase):
         Validates that a guard without revocable credentials reports no
         ability restriction, which keeps the identity authorization
         untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = GuardResult(identity=object(), guard="session")
         self.assertIsNone(result.abilities)
@@ -32,6 +41,11 @@ class TestGuardResult(TestCase):
 
         Validates the values the identity middleware copies into the
         authentication context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = object()
         result = GuardResult(
@@ -50,6 +64,11 @@ class TestGuardResult(TestCase):
 
         Validates the keyword only contract that keeps call sites
         readable as the entity grows.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             GuardResult(object(), "session")  # type: ignore[misc]

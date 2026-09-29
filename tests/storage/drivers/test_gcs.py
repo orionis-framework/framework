@@ -12,10 +12,14 @@ from orionis.test import TestCase
 class TestGoogleStorageDriver(TestCase):
 
     async def testUrlUsesCanonicalGoogleAddress(self) -> None:
-        """
-        Compose the canonical storage.googleapis.com URL.
+        """Compose the canonical storage.googleapis.com URL.
 
         Validates URL building and quoting without any SDK.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         self.assertEqual(
@@ -24,10 +28,14 @@ class TestGoogleStorageDriver(TestCase):
         )
 
     async def testUrlPrefersConfiguredBaseUrl(self) -> None:
-        """
-        Prefer the configured base URL over the canonical address.
+        """Prefer the configured base URL over the canonical address.
 
         Validates the url override option of the disk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = GoogleStorageDriver(
             GCS(bucket="media", url="https://cdn.example.com"),
@@ -38,31 +46,43 @@ class TestGoogleStorageDriver(TestCase):
         )
 
     async def testPathTraversalRejectedBeforeSdkBootstrap(self) -> None:
-        """
-        Reject invalid paths before touching the SDK.
+        """Reject invalid paths before touching the SDK.
 
         Validates that path safety never depends on the Google SDK.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         with self.assertRaises(StoragePathException):
             await driver.read("..\\escape")
 
     async def testSetVisibilityValidatesLevelWithoutSdk(self) -> None:
-        """
-        Reject unknown visibility levels before touching the SDK.
+        """Reject unknown visibility levels before touching the SDK.
 
         Validates the pure level validation of setVisibility().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
             await driver.setVisibility("f.txt", "secret")
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """
-        Surface the missing Google SDK with install instructions.
+        """Surface the missing Google SDK with install instructions.
 
         Only asserted when google-cloud-storage is absent from the
         environment, so the test remains valid anywhere.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         if importlib.util.find_spec("google") is not None:
             return

@@ -1688,7 +1688,7 @@ Reads app.name/app.locale and initializes an instance cache; returns None. Confi
 | Parameter | Type | Meaning |
 |---|---|---|
 | `app` | `IApplication` | Application service providing configuration, dependency resolution and scopes. |
-| `directory` | `Directory` | Application directory service; storagePublic() locates public assets. |
+| `directory` | `Directory` | Application directory service; storageAppPublic() locates public assets. |
 
 Declared return type: `None`.
 
@@ -1745,7 +1745,7 @@ Declared return type: `None`.
 def favicon(self) -> FileResponse | Response:
 ```
 
-Returns a new FileResponse, caching its path/type. Searches storagePublic() for favicon.ico, .png, .svg, then bundled assets/favicon.ico; otherwise returns HTML 404. Sets public max-age=31536000, immutable. Filesystem and response errors propagate, including a cached file subsequently removed.
+Returns a new FileResponse, caching its path/type. Searches storageAppPublic() for favicon.ico, .png, .svg, then bundled assets/favicon.ico; otherwise returns HTML 404. Sets public max-age=31536000, immutable. Filesystem and response errors propagate, including a cached file subsequently removed.
 
 Declared return type: `FileResponse | Response`.
 
@@ -1753,7 +1753,7 @@ Declared return type: `FileResponse | Response`.
 def robotsTxt(self) -> FileResponse | Response:
 ```
 
-Uses storagePublic()/robots.txt, then the bundled file, otherwise HTML 404; caches path and returns a new FileResponse with public max-age=3600. Filesystem/response errors propagate.
+Uses storageAppPublic()/robots.txt, then the bundled file, otherwise HTML 404; caches path and returns a new FileResponse with public max-age=3600. Filesystem/response errors propagate.
 
 Declared return type: `FileResponse | Response`.
 
@@ -1761,7 +1761,7 @@ Declared return type: `FileResponse | Response`.
 def sitemapXml(self) -> FileResponse | Response:
 ```
 
-Uses storagePublic()/sitemap.xml with public max-age=600; caches path and returns FileResponse, or HTML 404 when absent. No bundled sitemap fallback; filesystem/response errors propagate.
+Uses storageAppPublic()/sitemap.xml with public max-age=600; caches path and returns FileResponse, or HTML 404 when absent. No bundled sitemap fallback; filesystem/response errors propagate.
 
 Declared return type: `FileResponse | Response`.
 

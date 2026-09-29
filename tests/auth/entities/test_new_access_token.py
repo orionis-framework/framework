@@ -6,9 +6,14 @@ from orionis.test import TestCase
 # leaks through a representation or a serialization.
 _ISSUED_SECRET = "super-secret-value"  # noqa: S105
 
-
 def build_issued_token() -> NewAccessToken:
-    """Pair a stored token with the plain text value just issued."""
+    """Pair a stored token with the plain text value just issued.
+
+    Returns
+    -------
+    NewAccessToken
+        Value produced by the helper.
+    """
     return NewAccessToken(
         access_token=AccessToken(
             id=1,
@@ -19,7 +24,6 @@ def build_issued_token() -> NewAccessToken:
         plain_text=_ISSUED_SECRET,
     )
 
-
 class TestNewAccessToken(TestCase):
     """Validate the pair returned when a token is issued."""
 
@@ -28,6 +32,11 @@ class TestNewAccessToken(TestCase):
 
         Validates that the issued credential can never be swapped after
         the fact.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = build_issued_token()
         self.assertFalse(hasattr(issued, "__dict__"))
@@ -39,6 +48,11 @@ class TestNewAccessToken(TestCase):
 
         Validates that the caller responsible for handing the credential
         to the client can still reach it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(build_issued_token().plain_text, _ISSUED_SECRET)
 
@@ -47,6 +61,11 @@ class TestNewAccessToken(TestCase):
 
         Validates that the only copy of the credential never leaks
         through debugging output.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertNotIn(_ISSUED_SECRET, repr(build_issued_token()))
 
@@ -55,6 +74,11 @@ class TestNewAccessToken(TestCase):
 
         Validates that ``toDict`` publishes the stored metadata only, so
         issuing the credential stays an explicit decision.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = build_issued_token()
         payload = issued.toDict()

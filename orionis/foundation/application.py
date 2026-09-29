@@ -1713,7 +1713,7 @@ class Application(Container, IApplication):
         self.__discoverProviders(
             ModuleInspector.discoverModules(
                 base_path=self.__basePath,
-                target_path=config_paths["providers"],
+                target_path=config_paths["app_providers"],
             ),
         )
 
@@ -2710,6 +2710,7 @@ class Application(Container, IApplication):
         """
         # Skip loading if already cached
         if not self.__is_compiled:
+
             # Ensure bootstrap configuration is initialized
             self.__ensureDefaultBootstrap()
 
@@ -2745,6 +2746,7 @@ class Application(Container, IApplication):
         """
         # Prevent duplicate initialization if already booted
         if not self.__booted:
+
             # Store the file path where the application was started.
             try:
                 self.__entry_point = sys._getframe(1).f_code.co_filename

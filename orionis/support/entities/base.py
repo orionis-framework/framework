@@ -1,114 +1,121 @@
 from __future__ import annotations
-from dataclasses import asdict, fields, is_dataclass, MISSING
+from dataclasses import Field, MISSING, asdict, fields, is_dataclass
 from enum import Enum
+from typing import Any
 
-# Enum-to-value converter defined at module level: avoids re-creating a closure
-# on every toDict() call (each call previously allocated 2 function objects).
-def _enumSerializer(obj: object) -> object:
-    """Return the enum value if obj is an Enum, otherwise return obj unchanged."""
-    if isinstance(obj, Enum):
-        return obj.value
-    return obj
+# Cache normalized dataclass field metadata by entity class.
+_FIELD_METADATA_CACHE: dict[
+    type, tuple[tuple[Field[Any], tuple[str, ...]], ...],
+] = {}
 
-# Reusable dict factory: passed to asdict() so no lambda is built per call.
-def _dictFactory(items: list) -> dict:
-    """Construct a dictionary from key-value pairs, converting enum values."""
-    return {k: _enumSerializer(v) for k, v in items}
+# Serialize enum members while preserving other values.
+def _enum_serializer(value: object) -> object:
+    """
+    Serialize enum members and preserve all other values.
 
-# Module-level cache: maps each concrete class to its frozen tuple of Field objects.
-# dataclasses.fields() rebuilds a new tuple on every call; we pay that cost once.
-_FIELDS_CACHE: dict[type, tuple] = {}
+    Parameters
+    ----------
+    value : object
+        Value to serialize.
 
+    Returns
+    -------
+    object
+        The enum member's value, or the original value when it is not an enum.
+    """
+    if isinstance(value, Enum):
+        return value.value
+    return value
+
+# Build a dictionary while serializing enum field values.
+def _dict_factory(items: list[tuple[str, object]]) -> dict[str, object]:
+    """
+    Build a dictionary and serialize enum field values.
+
+    Parameters
+    ----------
+    items : list[tuple[str, object]]
+        Field names and values supplied by ``dataclasses.asdict``.
+
+    Returns
+    -------
+    dict[str, object]
+        A dictionary with enum values serialized.
+    """
+    return {key: _enum_serializer(value) for key, value in items}
+
+# Provide serialization and field metadata for dataclass entities.
 class BaseEntity:
+    """Provide dictionary serialization and field metadata for dataclass entities."""
 
-    # ruff: noqa: PLR0912, C901
+    __slots__ = ()
 
+    # Provide a no-op hook for subclass validation after initialization.
     def __post_init__(self) -> None:
         """
-        Perform additional initialization after dataclass instance creation.
-
-        This method is called automatically after all dataclass fields have been
-        initialized. Override in subclasses to add custom initialization logic
-        or field validation.
+        Provide a no-op initialization hook for subclass validation.
 
         Returns
         -------
         None
-            No value is returned.
+            No value; subclasses may override this hook for validation.
         """
 
     @classmethod
-    def _cachedDataclassFields(cls) -> tuple:
-        """Return the cached tuple of Field objects for this class.
+    # Cache field definitions and their normalized type names per class.
+    def _cachedFieldMetadata(
+        cls,
+    ) -> tuple[tuple[Field[Any], tuple[str, ...]], ...]:
+        """
+        Retrieve field definitions and normalized types cached by class.
 
         Returns
         -------
-        tuple
-            Immutable tuple of dataclasses.Field objects for the calling class.
+        tuple[tuple[Field[Any], tuple[str, ...]], ...]
+            Cached field definitions paired with their normalized type names.
         """
-        # Return cached result or populate the cache on first access per class.
         try:
-            return _FIELDS_CACHE[cls]
+            return _FIELD_METADATA_CACHE[cls]
         except KeyError:
-            _result = fields(cls)
-            _FIELDS_CACHE[cls] = _result
-            return _result
+            metadata = []
+            for field in fields(cls):
+                type_name = getattr(field.type, "__name__", None)
+                if type_name is None:
+                    type_names = tuple(
+                        part.strip() for part in str(field.type).split("|")
+                    )
+                else:
+                    type_names = (type_name,)
+                metadata.append((field, type_names))
+            result = tuple(metadata)
+            _FIELD_METADATA_CACHE[cls] = result
+            return result
 
-    def toDict(self) -> dict:
+    # Convert this dataclass instance into a recursively copied dictionary.
+    def toDict(self) -> dict[str, Any]:
         """
-        Convert the dataclass instance to a dictionary.
+        Convert the dataclass instance to a recursively copied dictionary.
 
         Returns
         -------
-        dict
-            Dictionary representation of the dataclass instance with enums
-            converted to their values.
+        dict[str, Any]
+            A recursively copied mapping of field names to values.
         """
-        # Use module-level dict_factory to avoid per-call closure allocation.
-        return asdict(self, dict_factory=_dictFactory)
+        return asdict(self, dict_factory=_dict_factory)
 
-    def getFields(self) -> list[dict]:  # NOSONAR
+    # Describe field names, normalized types, defaults, and metadata.
+    def getFields(self) -> list[dict[str, Any]]: # NOSONAR
         """
-        Get detailed information about each field in the dataclass instance.
+        Describe field names, normalized types, defaults, and metadata.
 
         Returns
         -------
-        list[dict]
-            List where each element contains field information with keys:
-            'name' (str), 'types' (list[str]), 'default' (Any),
-            'metadata' (dict).
-
-        Notes
-        -----
-        Handles complex field types including unions and generics.
-        Resolves defaults from field definition, factory, or metadata.
-        Normalizes dataclass and Enum values in defaults and metadata.
+        list[dict[str, Any]]
+            Field descriptions containing names, types, defaults, and metadata.
         """
-        # Store field information dictionaries
-        __fields = []
-
-        # Iterate over the cached field tuple instead of rebuilding it each call.
-        for _field in self._cachedDataclassFields():
-            # Extract field name
-            __name = _field.name
-
-            # Resolve simple type name; fall back to string-parsing for unions/generics
-            __type = getattr(_field.type, "__name__", None)
-            type_lst: list[str] = []
-
-            # Handle complex types (unions, generics)
-            if __type is None:
-                type_str = str(_field.type).split("|")
-                type_lst = [itype.strip() for itype in type_str]
-                __type = type_lst
-
-            # Normalise type representation to a list for consistency
-            __type = type_lst if isinstance(__type, list) else [__type]
-
-            # Extract and process metadata
-            metadata = dict(_field.metadata) if _field.metadata else {}
-
-            # Normalise metadata default value when present
+        result = []
+        for field, type_names in self._cachedFieldMetadata():
+            metadata = dict(field.metadata) if field.metadata else {}
             if "default" in metadata:
                 metadata_default = metadata["default"]
                 if callable(metadata_default):
@@ -119,40 +126,22 @@ class BaseEntity:
                     metadata_default = metadata_default.value
                 metadata["default"] = metadata_default
 
-            __metadata = metadata
-
-            # Resolve the field's effective default value
-            __default = None
-
-            # Branch 1: static default value
-            if _field.default is not MISSING:
-                __default = (_field.default() if callable(_field.default)
-                             else _field.default)
-                if is_dataclass(__default):
-                    __default = asdict(__default)
-                elif isinstance(__default, Enum):
-                    __default = __default.value
-
-            # Branch 2: default produced by a factory callable
-            elif _field.default_factory is not MISSING:
-                __default = (_field.default_factory()
-                             if callable(_field.default_factory)
-                             else _field.default_factory)
-                if is_dataclass(__default):
-                    __default = asdict(__default)
-                elif isinstance(__default, Enum):
-                    __default = __default.value
-
-            # Branch 3: fall back to the value stored in field metadata
+            if field.default is not MISSING:
+                default = field.default() if callable(field.default) else field.default
+            elif field.default_factory is not MISSING:
+                default = field.default_factory()
             else:
-                __default = __metadata.get("default", None)
+                default = metadata.get("default")
 
-            # Build field information dictionary
-            __fields.append({
-                "name": __name,
-                "types": __type,
-                "default": __default,
-                "metadata": __metadata,
+            if is_dataclass(default):
+                default = asdict(default)
+            elif isinstance(default, Enum):
+                default = default.value
+
+            result.append({
+                "name": field.name,
+                "types": list(type_names),
+                "default": default,
+                "metadata": metadata,
             })
-
-        return __fields
+        return result

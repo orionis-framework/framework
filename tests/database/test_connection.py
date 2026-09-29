@@ -19,7 +19,13 @@ from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
 def _make_table() -> TableDefinition:
-    """Build the table definition shared by the connection tests."""
+    """Build the table definition shared by the connection tests.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": Integer().primary().autoIncrement(),
         "name": String(),
@@ -31,10 +37,14 @@ def _make_table() -> TableDefinition:
 class TestConnection(TestCase):
 
     async def asyncSetUp(self) -> None:
-        """
-        Create an in-memory connection with a fresh table per test.
+        """Create an in-memory connection with a fresh table per test.
 
         Guarantees complete isolation between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._table = _make_table()
         self._connection = Connection(
@@ -44,35 +54,58 @@ class TestConnection(TestCase):
         await self._connection.createTable(self._table)
 
     async def asyncTearDown(self) -> None:
-        """
-        Dispose the engine after each test.
+        """Dispose the engine after each test.
 
         Releases the pooled in-memory database.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         await self._connection.disconnect()
 
     async def _insert(self, name: str):
-        """Insert a row and return the insert result."""
+        """Insert a row and return the insert result.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         plan = InsertPlan(table=self._table, values=[{"name": name}])
         return await self._connection.insert(plan)
 
     # ── CRUD plans ────────────────────────────────────────────────────────────
 
     async def testInsertReportsGeneratedKey(self) -> None:
-        """
-        Report the generated primary key for single-row inserts.
+        """Report the generated primary key for single-row inserts.
 
         Validates the InsertResult contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = await self._insert("alpha")
         self.assertEqual(result.last_insert_id, 1)
         self.assertEqual(result.row_count, 1)
 
     async def testMultiRowInsertOmitsGeneratedKey(self) -> None:
-        """
-        Omit the generated key when inserting several rows at once.
+        """Omit the generated key when inserting several rows at once.
 
         Validates the multi-row InsertResult contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = InsertPlan(
             table=self._table,
@@ -83,10 +116,14 @@ class TestConnection(TestCase):
         self.assertEqual(result.row_count, 2)
 
     async def testSelectReturnsPlainDictionaries(self) -> None:
-        """
-        Return rows as plain dictionaries keyed by column name.
+        """Return rows as plain dictionaries keyed by column name.
 
         Validates that no engine objects leak through select.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         rows = await self._connection.select(SelectPlan(table=self._table))
@@ -94,10 +131,14 @@ class TestConnection(TestCase):
         self.assertIsInstance(rows[0], dict)
 
     async def testSelectProjectsOnlyRequestedColumns(self) -> None:
-        """
-        Return only the projected columns in each row.
+        """Return only the projected columns in each row.
 
         Validates the column projection path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         plan = SelectPlan(table=self._table, columns=("name",))
@@ -105,10 +146,14 @@ class TestConnection(TestCase):
         self.assertEqual(rows, [{"name": "alpha"}])
 
     async def testUpdateReturnsAffectedRowCount(self) -> None:
-        """
-        Report the number of rows touched by an update.
+        """Report the number of rows touched by an update.
 
         Validates the update row count contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         await self._insert("beta")
@@ -120,10 +165,14 @@ class TestConnection(TestCase):
         self.assertEqual(await self._connection.update(plan), 1)
 
     async def testDeleteReturnsAffectedRowCount(self) -> None:
-        """
-        Report the number of rows removed by a delete.
+        """Report the number of rows removed by a delete.
 
         Validates the delete row count contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         await self._insert("beta")
@@ -131,20 +180,28 @@ class TestConnection(TestCase):
         self.assertEqual(await self._connection.delete(plan), 2)
 
     async def testScalarReturnsFirstColumn(self) -> None:
-        """
-        Return the first column of the first row for scalar plans.
+        """Return the first column of the first row for scalar plans.
 
         Validates the scalar execution path used by aggregates.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         plan = SelectPlan(table=self._table, columns=("name",))
         self.assertEqual(await self._connection.scalar(plan), "alpha")
 
     async def testScalarReturnsNoneWithoutRows(self) -> None:
-        """
-        Return None when the scalar query yields no rows.
+        """Return None when the scalar query yields no rows.
 
         Validates the empty scalar contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table, columns=("name",))
         self.assertIsNone(await self._connection.scalar(plan))
@@ -152,10 +209,14 @@ class TestConnection(TestCase):
     # ── Raw SQL ───────────────────────────────────────────────────────────────
 
     async def testRawSelectWithNamedBindings(self) -> None:
-        """
-        Run raw SQL with named parameter bindings.
+        """Run raw SQL with named parameter bindings.
 
         Validates the textual query path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         rows = await self._connection.select(
@@ -165,10 +226,14 @@ class TestConnection(TestCase):
         self.assertEqual(rows, [{"name": "alpha"}])
 
     async def testExecuteReturnsRowCount(self) -> None:
-        """
-        Report affected rows for raw data-modifying statements.
+        """Report affected rows for raw data-modifying statements.
 
         Validates the execute contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._insert("alpha")
         affected = await self._connection.execute(
@@ -178,10 +243,14 @@ class TestConnection(TestCase):
         self.assertEqual(affected, 1)
 
     async def testStatementRunsDdl(self) -> None:
-        """
-        Run DDL statements through the statement helper.
+        """Run DDL statements through the statement helper.
 
         Validates the DDL execution path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         done = await self._connection.statement(
             "CREATE TABLE extra (id INTEGER PRIMARY KEY)",
@@ -189,16 +258,26 @@ class TestConnection(TestCase):
         self.assertTrue(done)
 
     async def testQueryFailureRaisesQueryException(self) -> None:
-        """
-        Translate engine errors into QueryException.
+        """Translate engine errors into QueryException.
 
         Validates that engine exceptions never escape raw.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(QueryException):
             await self._connection.select("SELECT * FROM missing_table")
 
     async def testQueryErrorsDoNotExposeBoundCredentials(self) -> None:
-        """Keep credentials out of SQL errors and their formatted exception chain."""
+        """Keep credentials out of SQL errors and their formatted exception chain.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         credential = "private-value-that-must-not-be-logged"
         with self.assertRaises(QueryException) as caught:
             await self._connection.execute(
@@ -214,10 +293,14 @@ class TestConnection(TestCase):
     # ── Transactions ──────────────────────────────────────────────────────────
 
     async def testTransactionCommitPersistsChanges(self) -> None:
-        """
-        Persist rows written inside a committed transaction.
+        """Persist rows written inside a committed transaction.
 
         Validates the commit path of the context manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with self._connection.transaction():
             await self._insert("kept")
@@ -225,10 +308,19 @@ class TestConnection(TestCase):
         self.assertEqual(len(rows), 1)
 
     async def testTransactionRollbackDiscardsChanges(self) -> None:
-        """
-        Discard rows written inside a failed transaction.
+        """Discard rows written inside a failed transaction.
 
         Validates the rollback path of the context manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         with self.assertRaises(RuntimeError):
             async with self._connection.transaction():
@@ -239,10 +331,19 @@ class TestConnection(TestCase):
         self.assertEqual(rows, [])
 
     async def testNestedTransactionUsesSavepoints(self) -> None:
-        """
-        Roll back only the inner savepoint on nested failures.
+        """Roll back only the inner savepoint on nested failures.
 
         Validates savepoint-based nesting semantics.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         async with self._connection.transaction():
             await self._insert("outer")
@@ -255,10 +356,14 @@ class TestConnection(TestCase):
         self.assertEqual([row["name"] for row in rows], ["outer"])
 
     async def testExplicitBeginCommitRollback(self) -> None:
-        """
-        Drive the transaction through the explicit control methods.
+        """Drive the transaction through the explicit control methods.
 
         Validates begin, commit, rollback, and state reporting.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(self._connection.inTransaction())
         await self._connection.begin()
@@ -274,19 +379,27 @@ class TestConnection(TestCase):
         self.assertEqual([row["name"] for row in rows], ["explicit"])
 
     async def testCommitWithoutTransactionRaises(self) -> None:
-        """
-        Raise TransactionException for commits without a transaction.
+        """Raise TransactionException for commits without a transaction.
 
         Validates the transaction state guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TransactionException):
             await self._connection.commit()
 
     async def testRollbackWithoutTransactionRaises(self) -> None:
-        """
-        Raise TransactionException for rollbacks without a transaction.
+        """Raise TransactionException for rollbacks without a transaction.
 
         Validates the transaction state guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TransactionException):
             await self._connection.rollback()
@@ -294,29 +407,41 @@ class TestConnection(TestCase):
     # ── Schema helpers ────────────────────────────────────────────────────────
 
     async def testDropTableRemovesTable(self) -> None:
-        """
-        Drop the physical table through the schema helper.
+        """Drop the physical table through the schema helper.
 
         Validates the drop DDL execution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._connection.dropTable("items")
         with self.assertRaises(QueryException):
             await self._connection.select(SelectPlan(table=self._table))
 
     async def testCreateTableIfNotExistsFalseFailsOnDuplicate(self) -> None:
-        """
-        Fail to recreate an existing table without the IF NOT EXISTS guard.
+        """Fail to recreate an existing table without the IF NOT EXISTS guard.
 
         Validates that disabling if_not_exists surfaces the engine error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(QueryException):
             await self._connection.createTable(self._table, if_not_exists=False)
 
     async def testDropTableIfExistsFalseFailsOnMissingTable(self) -> None:
-        """
-        Fail to drop a missing table without the IF EXISTS guard.
+        """Fail to drop a missing table without the IF EXISTS guard.
 
         Validates that disabling if_exists surfaces the engine error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._connection.dropTable("items")
         with self.assertRaises(QueryException):
@@ -324,44 +449,64 @@ class TestConnection(TestCase):
     # ── Configuration and lifecycle ────────────────────────────────────────────────
 
     async def testUnsupportedDriverFailsAtConstruction(self) -> None:
-        """
-        Reject unsupported drivers when the connection is created.
+        """Reject unsupported drivers when the connection is created.
 
         Validates the fail-fast configuration guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(UnsupportedDriverException):
             Connection("bad", {"driver": "mssql-legacy"})
 
     async def testConnectionExposesItsName(self) -> None:
-        """
-        Expose the registered connection name.
+        """Expose the registered connection name.
 
         Validates the getName accessor.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._connection.getName(), "sqlite")
 
     async def testTransactionFactoryReturnsContract(self) -> None:
-        """
-        Build transaction objects honoring the ITransaction contract.
+        """Build transaction objects honoring the ITransaction contract.
 
         Validates the transaction factory return type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._connection.transaction(), ITransaction)
 
     async def testDisconnectIsIdempotent(self) -> None:
-        """
-        Allow disconnecting an already disposed connection.
+        """Allow disconnecting an already disposed connection.
 
         Validates the idempotent lifecycle contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._connection.disconnect()
         await self._connection.disconnect()
 
     async def testSqlitePragmasAreApplied(self) -> None:
-        """
-        Apply the configured PRAGMA settings on new connections.
+        """Apply the configured PRAGMA settings on new connections.
 
         Validates the connect-hook configuration path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = Connection(
             "tuned",

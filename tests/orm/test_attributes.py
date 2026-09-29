@@ -19,19 +19,27 @@ class _Doc(Model):
 class TestCastHandlers(TestCase):
 
     def testIntAndFloatCasts(self) -> None:
-        """
-        Cast textual and numeric inputs to int and float.
+        """Cast textual and numeric inputs to int and float.
 
         Validates the numeric cast handlers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(get_cast_handler("int")("42"), 42)
         self.assertEqual(get_cast_handler("float")("2.5"), 2.5)
 
     def testBoolCastHandlesTextualForms(self) -> None:
-        """
-        Interpret common textual forms as booleans.
+        """Interpret common textual forms as booleans.
 
         Validates the truthy string table and fallbacks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handler = get_cast_handler("bool")
         for truthy in ("1", "true", "YES", " on "):
@@ -42,10 +50,14 @@ class TestCastHandlers(TestCase):
         self.assertFalse(handler(0))
 
     def testDatetimeCastAcceptsMultipleShapes(self) -> None:
-        """
-        Cast datetimes from instances, ISO strings, and timestamps.
+        """Cast datetimes from instances, ISO strings, and timestamps.
 
         Validates every accepted datetime input shape.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handler = get_cast_handler("datetime")
         now = datetime.now(UTC)
@@ -56,10 +68,14 @@ class TestCastHandlers(TestCase):
         self.assertEqual(stamped, datetime.fromtimestamp(0, tz=UTC))
 
     def testDateCastAcceptsMultipleShapes(self) -> None:
-        """
-        Cast dates from datetimes, dates, and ISO strings.
+        """Cast dates from datetimes, dates, and ISO strings.
 
         Validates every accepted date input shape.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handler = get_cast_handler("date")
         today = date(2026, 7, 24)
@@ -69,10 +85,14 @@ class TestCastHandlers(TestCase):
         self.assertEqual(handler(moment), today)
 
     def testJsonCastDecodesStringsOnly(self) -> None:
-        """
-        Decode JSON strings and pass decoded structures through.
+        """Decode JSON strings and pass decoded structures through.
 
         Validates the JSON cast idempotency.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handler = get_cast_handler("json")
         self.assertEqual(handler('{"a": 1}'), {"a": 1})
@@ -80,10 +100,14 @@ class TestCastHandlers(TestCase):
         self.assertEqual(handler({"a": 1}), {"a": 1})
 
     def testUuidCastAcceptsStringAndInstance(self) -> None:
-        """
-        Cast UUIDs from strings and pass instances through.
+        """Cast UUIDs from strings and pass instances through.
 
         Validates the UUID cast idempotency.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handler = get_cast_handler("uuid")
         value = uuid.uuid4()
@@ -91,20 +115,28 @@ class TestCastHandlers(TestCase):
         self.assertEqual(handler(str(value)), value)
 
     def testUnsupportedCastRaises(self) -> None:
-        """
-        Raise OrmException for unsupported cast names.
+        """Raise OrmException for unsupported cast names.
 
         Validates the cast registry guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(OrmException):
             get_cast_handler("decimal128")
 
     def testGetCastHandlerNormalizesCaseAndWhitespace(self) -> None:
-        """
-        Normalize cast names before looking them up in the registry.
+        """Normalize cast names before looking them up in the registry.
 
         Validates that surrounding whitespace and casing never prevent
         a declared cast from resolving to its handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(get_cast_handler(" INT "), get_cast_handler("int"))
         self.assertIs(get_cast_handler("Bool"), get_cast_handler("bool"))
@@ -112,20 +144,28 @@ class TestCastHandlers(TestCase):
 class TestSerializeForStorage(TestCase):
 
     def testJsonStructureOnNonJsonColumnIsDumped(self) -> None:
-        """
-        Serialize structures targeting non-JSON columns to strings.
+        """Serialize structures targeting non-JSON columns to strings.
 
         Validates the storage-side JSON encoding rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _Doc.__meta__
         result = serialize_for_storage(meta, {"body": {"a": 1}})
         self.assertEqual(result["body"], '{"a": 1}')
 
     def testStructureOnJsonColumnPassesThrough(self) -> None:
-        """
-        Keep structures intact when the column is a JSON column.
+        """Keep structures intact when the column is a JSON column.
 
         Validates the JSON column passthrough.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _Doc.__meta__
         payload = {"a": 1}
@@ -133,10 +173,14 @@ class TestSerializeForStorage(TestCase):
         self.assertIs(result["payload"], payload)
 
     def testUuidOnNonUuidColumnIsStringified(self) -> None:
-        """
-        Serialize UUIDs targeting non-UUID columns to strings.
+        """Serialize UUIDs targeting non-UUID columns to strings.
 
         Validates the storage-side UUID encoding rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _Doc.__meta__
         value = uuid.uuid4()
@@ -144,10 +188,14 @@ class TestSerializeForStorage(TestCase):
         self.assertEqual(result["label"], str(value))
 
     def testUuidOnUuidColumnPassesThrough(self) -> None:
-        """
-        Keep UUID instances intact for UUID columns.
+        """Keep UUID instances intact for UUID columns.
 
         Validates the UUID column passthrough.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _Doc.__meta__
         value = uuid.uuid4()
@@ -155,10 +203,14 @@ class TestSerializeForStorage(TestCase):
         self.assertIs(result["token"], value)
 
     def testNoneAndUnknownColumnsPassThrough(self) -> None:
-        """
-        Keep None values and unknown columns untouched.
+        """Keep None values and unknown columns untouched.
 
         Validates the serialization fallbacks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _Doc.__meta__
         result = serialize_for_storage(meta, {"body": None, "ghost": 5})
@@ -168,30 +220,42 @@ class TestSerializeForStorage(TestCase):
 class TestAttributeHelpers(TestCase):
 
     def testGetAttributeReturnsDefaultWhenAbsent(self) -> None:
-        """
-        Return the provided default for missing attributes.
+        """Return the provided default for missing attributes.
 
         Validates the getAttribute fallback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         doc = _Doc()
         self.assertIsNone(doc.getAttribute("label"))
         self.assertEqual(doc.getAttribute("label", "n/a"), "n/a")
 
     def testSetAttributeAppliesDeclaredCast(self) -> None:
-        """
-        Apply declared casts on direct attribute assignment.
+        """Apply declared casts on direct attribute assignment.
 
         Validates the assignment-time cast path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         doc = _Doc()
         doc.body = '{"k": true}'
         self.assertEqual(doc.body, {"k": True})
 
     def testSerializeMatchesToDict(self) -> None:
-        """
-        Keep serialize() aligned with toDict().
+        """Keep serialize() aligned with toDict().
 
         Validates the collection serialization hook.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         doc = _Doc({"label": "x"})
         self.assertEqual(doc.serialize(), doc.toDict())

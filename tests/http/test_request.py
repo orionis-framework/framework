@@ -30,8 +30,7 @@ class _StubRSGIAdapter:
         scope: dict[str, Any],
         raw_headers: list[tuple[str, str]],
     ) -> None:
-        """
-        Store the scope view and the raw header pairs.
+        """Store the scope view and the raw header pairs.
 
         Parameters
         ----------
@@ -39,6 +38,11 @@ class _StubRSGIAdapter:
             Dictionary view of the RSGI scope.
         raw_headers : list[tuple[str, str]]
             Header name and value pairs for this request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._scope = scope
         self._headers = Headers(raw_headers)
@@ -81,7 +85,13 @@ def make_receive(body: bytes) -> Callable[[], Coroutine[Any, Any, dict[str, Any]
     """
 
     async def receive() -> dict[str, Any]:
-        """Return the complete body as one ASGI request message."""
+        """Return the complete body as one ASGI request message.
+
+        Returns
+        -------
+        dict[str, Any]
+            Value produced by the helper.
+        """
         return {"type": "http.request", "body": body, "more_body": False}
 
     return receive
@@ -223,48 +233,68 @@ class TestRequestConstruction(TestCase):
     """Verify request construction and transport dependency wiring."""
 
     def testCoercesARawInterfaceValue(self) -> None:
-        """
-        Accept the textual form of the interface enumeration.
+        """Accept the textual form of the interface enumeration.
 
         Validates that transports handing over a raw string still produce
         a fully typed request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(interface="asgi")
         self.assertIs(request.interface, Interface.ASGI)
 
     def testKeepsAnAlreadyTypedInterface(self) -> None:
-        """
-        Reuse the enumeration member supplied by the caller.
+        """Reuse the enumeration member supplied by the caller.
 
         Validates the fast path taken by the kernel on every request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(interface=Interface.ASGI)
         self.assertIs(request.interface, Interface.ASGI)
 
     def testDefaultsToAnEmptyParameterMapping(self) -> None:
-        """
-        Start with no path parameters when the router supplies none.
+        """Start with no path parameters when the router supplies none.
 
         Validates that static routes never receive a shared mutable
         default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(make_asgi_request().routeParams(), {})
 
     def testExposesTheRawTransportScope(self) -> None:
-        """
-        Expose the untouched transport scope.
+        """Expose the untouched transport scope.
 
         Validates the escape hatch used by tracing and ASGI-aware
         extensions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertEqual(request.scope["type"], "http")
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
-        """
-        Keep requests free of a per-instance dictionary.
+        """Keep requests free of a per-instance dictionary.
 
         Validates the slot layout that keeps the request hot path cheap.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(make_asgi_request(), "__dict__"))
 
@@ -272,66 +302,94 @@ class TestRequestLine(TestCase):
     """Verify request-line accessors and their cached values."""
 
     def testExposesTheHttpMethod(self) -> None:
-        """
-        Expose the HTTP method and cache it after the first read.
+        """Expose the HTTP method and cache it after the first read.
 
         Validates the value the router dispatches on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.method, "POST")
 
     def testExposesTheScheme(self) -> None:
-        """
-        Expose the scheme declared by the transport.
+        """Expose the scheme declared by the transport.
 
         Validates the value used to build absolute URLs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"scheme": "https"})
         self.assertEqual(request.scheme, "https")
         self.assertEqual(request.scheme, "https")
 
     def testSchemeFallsBackToHttp(self) -> None:
-        """
-        Assume plain HTTP when the transport omits the scheme.
+        """Assume plain HTTP when the transport omits the scheme.
 
         Validates the default applied by minimal ASGI servers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(make_asgi_request(remove=("scheme",)).scheme, "http")
 
     def testExposesThePath(self) -> None:
-        """
-        Expose the request path and cache it after the first read.
+        """Expose the request path and cache it after the first read.
 
         Validates the value matched against the route table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertEqual(request.path, "/users")
         self.assertEqual(request.path, "/users")
 
     def testPathFallsBackToRoot(self) -> None:
-        """
-        Assume the root path when the transport omits it.
+        """Assume the root path when the transport omits it.
 
         Validates the default applied by minimal ASGI servers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(make_asgi_request(remove=("path",)).path, "/")
 
     def testExposesTheHttpVersion(self) -> None:
-        """
-        Expose the negotiated HTTP version and cache it.
+        """Expose the negotiated HTTP version and cache it.
 
         Validates the value reported by the debug request printer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"http_version": "2"})
         self.assertEqual(request.httpVersion, "2")
         self.assertEqual(request.httpVersion, "2")
 
     def testHttpVersionFallsBackToOneDotOne(self) -> None:
-        """
-        Assume HTTP/1.1 when the transport omits the version.
+        """Assume HTTP/1.1 when the transport omits the version.
 
         Validates the default applied by minimal ASGI servers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(remove=("http_version",))
         self.assertEqual(request.httpVersion, "1.1")
@@ -340,20 +398,28 @@ class TestAsgiRequestUrls(TestCase):
     """Verify URL and origin construction from ASGI scopes."""
 
     def testUsesTheHostHeader(self) -> None:
-        """
-        Build the URL from the host the client actually requested.
+        """Build the URL from the host the client actually requested.
 
         Validates that redirects stay on the same origin so session
         cookies keep travelling with the request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"host", b"app.test:8000")])
         self.assertEqual(request.url, "http://app.test:8000/users")
 
     def testAppendsTheQueryString(self) -> None:
-        """
-        Append the decoded query string to the URL.
+        """Append the decoded query string to the URL.
 
         Validates that redirecting back preserves the current filters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"host", b"app.test")],
@@ -362,28 +428,40 @@ class TestAsgiRequestUrls(TestCase):
         self.assertEqual(request.url, "http://app.test/users?page=2")
 
     def testOmitsTheDefaultPortFromTheHost(self) -> None:
-        """
-        Drop the port when it matches the scheme default.
+        """Drop the port when it matches the scheme default.
 
         Validates the canonical origin used for referrer comparison.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"server": ("app.test", 80)})
         self.assertEqual(request.url, "http://app.test/users")
 
     def testKeepsANonDefaultPort(self) -> None:
-        """
-        Keep the port when it differs from the scheme default.
+        """Keep the port when it differs from the scheme default.
 
         Validates local development URLs such as ``:8000``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"server": ("app.test", 8000)})
         self.assertEqual(request.url, "http://app.test:8000/users")
 
     def testUsesTheSecureDefaultPort(self) -> None:
-        """
-        Drop port ``443`` for HTTPS requests.
+        """Drop port ``443`` for HTTPS requests.
 
         Validates the scheme-aware default-port table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             scope_overrides={"scheme": "https", "server": ("app.test", 443)},
@@ -391,19 +469,27 @@ class TestAsgiRequestUrls(TestCase):
         self.assertEqual(request.url, "https://app.test/users")
 
     def testFallsBackToTheBarePathWithoutAHost(self) -> None:
-        """
-        Return a relative URL when neither host nor server is known.
+        """Return a relative URL when neither host nor server is known.
 
         Validates that URL building never raises on a minimal scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(remove=("server",))
         self.assertEqual(request.url, "/users")
 
     def testFallsBackToTheBarePathWithQuery(self) -> None:
-        """
-        Return a relative URL carrying the query string.
+        """Return a relative URL carrying the query string.
 
         Validates that filters survive even on a minimal scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             remove=("server",),
@@ -412,46 +498,66 @@ class TestAsgiRequestUrls(TestCase):
         self.assertEqual(request.url, "/users?page=2")
 
     def testCachesTheBuiltUrl(self) -> None:
-        """
-        Build the URL once and reuse it afterwards.
+        """Build the URL once and reuse it afterwards.
 
         Validates the cache that keeps repeated reads free.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertIs(request.url, request.url)
 
     def testBaseUrlUsesTheHostHeader(self) -> None:
-        """
-        Build the base URL from the requested host.
+        """Build the base URL from the requested host.
 
         Validates the origin used to decide whether a referrer is local.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"host", b"app.test:8000")])
         self.assertEqual(request.baseUrl, "http://app.test:8000")
 
     def testBaseUrlIncludesTheRootPath(self) -> None:
-        """
-        Append the mount point to the base URL.
+        """Append the mount point to the base URL.
 
         Validates applications served under a sub-path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"root_path": "/admin"})
         self.assertEqual(request.baseUrl, "http://orionis.test/admin")
 
     def testBaseUrlKeepsANonDefaultPort(self) -> None:
-        """
-        Keep a non-default port in the base URL.
+        """Keep a non-default port in the base URL.
 
         Validates local development origins.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"server": ("app.test", 8080)})
         self.assertEqual(request.baseUrl, "http://app.test:8080")
 
     def testBaseUrlUsesTheSecureDefaultPort(self) -> None:
-        """
-        Drop port ``443`` from the HTTPS base URL.
+        """Drop port ``443`` from the HTTPS base URL.
 
         Validates the scheme-aware default-port table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             scope_overrides={"scheme": "https", "server": ("app.test", 443)},
@@ -459,20 +565,28 @@ class TestAsgiRequestUrls(TestCase):
         self.assertEqual(request.baseUrl, "https://app.test")
 
     def testBaseUrlFallsBackToLocalhost(self) -> None:
-        """
-        Fall back to ``localhost`` when the origin is unknown.
+        """Fall back to ``localhost`` when the origin is unknown.
 
         Validates that referrer checks still have a value to compare
         against.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(remove=("server",))
         self.assertEqual(request.baseUrl, "http://localhost")
 
     def testCachesTheBuiltBaseUrl(self) -> None:
-        """
-        Build the base URL once and reuse it afterwards.
+        """Build the base URL once and reuse it afterwards.
 
         Validates the cache that keeps repeated reads free.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertIs(request.baseUrl, request.baseUrl)
@@ -481,66 +595,94 @@ class TestRsgiRequestUrls(TestCase):
     """Verify URL and query handling for RSGI scopes."""
 
     def testUrlUsesTheHostHeader(self) -> None:
-        """
-        Build the URL from the host the client actually requested.
+        """Build the URL from the host the client actually requested.
 
         Validates parity with the ASGI transport, so redirects keep the
         session cookie.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(host="orionis.test:8000")
         self.assertEqual(request.url, "http://orionis.test:8000/users/create")
 
     def testUrlIncludesTheQueryString(self) -> None:
-        """
-        Append the query string to the built URL.
+        """Append the query string to the built URL.
 
         Validates that redirecting back preserves the current filters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(query="page=2")
         self.assertEqual(request.url, "http://orionis.test/users/create?page=2")
 
     def testUrlFallsBackToTheBoundAddress(self) -> None:
-        """
-        Fall back to the bound address when no host header is sent.
+        """Fall back to the bound address when no host header is sent.
 
         Validates that HTTP/1.0 style requests still produce a URL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(host=None)
         self.assertEqual(request.url, "http://127.0.0.1:8000/users/create")
 
     def testBaseUrlUsesTheHostHeader(self) -> None:
-        """
-        Build the base URL from the requested host.
+        """Build the base URL from the requested host.
 
         Validates the origin used to decide whether a referrer is local.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(host="orionis.test:8000")
         self.assertEqual(request.baseUrl, "http://orionis.test:8000")
 
     def testBaseUrlFallsBackToTheBoundAddress(self) -> None:
-        """
-        Fall back to the bound address for the base URL.
+        """Fall back to the bound address for the base URL.
 
         Validates the behaviour preserved for clients without a host
         header.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(host=None)
         self.assertEqual(request.baseUrl, "http://127.0.0.1:8000")
 
     def testQueryParamsReadTheRawScopeValue(self) -> None:
-        """
-        Parse the query string carried as text by the RSGI scope.
+        """Parse the query string carried as text by the RSGI scope.
 
         Validates the transport-specific branch of the parser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(query="page=2&page=3")
         self.assertEqual(request.queryParams.getAll("page"), ["2", "3"])
 
     def testQueryParamsTolerateAMissingQueryString(self) -> None:
-        """
-        Treat a null query string as an empty one.
+        """Treat a null query string as an empty one.
 
         Validates the guard protecting the RSGI branch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_rsgi_request(scope_overrides={"query_string": None})
         self.assertEqual(len(request.queryParams), 0)
@@ -549,7 +691,13 @@ class TestRequestStructures(TestCase):
     """Verify header, cookie, query, and request-state containers."""
 
     def testStateIsCreatedOnFirstAccess(self) -> None:
-        """Create one isolated state namespace only when it is requested."""
+        """Create one isolated state namespace only when it is requested.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         first = make_asgi_request()
         second = make_asgi_request()
         self.assertIsNone(first._Request__state)
@@ -559,20 +707,28 @@ class TestRequestStructures(TestCase):
         self.assertIsNot(first.state, second.state)
 
     def testHeadersAreBuiltOnceAndCached(self) -> None:
-        """
-        Build the header index once per request.
+        """Build the header index once per request.
 
         Validates the cache shared by every header-derived accessor.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"x-a", b"1")])
         self.assertIsInstance(request.headers, Headers)
         self.assertIs(request.headers, request.headers)
 
     def testQueryParamsAreDecodedAndCached(self) -> None:
-        """
-        Decode the ASGI query string and cache the result.
+        """Decode the ASGI query string and cache the result.
 
         Validates the parser used by controllers reading filters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"query_string": b"a=1&b=2"})
         self.assertIsInstance(request.queryParams, QueryParams)
@@ -580,10 +736,14 @@ class TestRequestStructures(TestCase):
         self.assertIs(request.queryParams, request.queryParams)
 
     def testCookiesAreParsedAndCached(self) -> None:
-        """
-        Parse the cookie header once per request.
+        """Parse the cookie header once per request.
 
         Validates the accessor used by the session middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"cookie", b"sid=abc; theme=dark")])
         self.assertIsInstance(request.cookies, Cookies)
@@ -591,11 +751,15 @@ class TestRequestStructures(TestCase):
         self.assertIs(request.cookies, request.cookies)
 
     def testStateIsAMutableNamespace(self) -> None:
-        """
-        Expose a mutable namespace shared by middleware and handlers.
+        """Expose a mutable namespace shared by middleware and handlers.
 
         Validates the channel used to publish the session and the CSRF
         token without polluting the scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         request.state.tenant = "acme"
@@ -605,63 +769,91 @@ class TestRequestClientInformation(TestCase):
     """Verify client identity and forwarded transport information."""
 
     def testResolvesTheClientIpFromATuple(self) -> None:
-        """
-        Read the client address from an ASGI ``(host, port)`` pair.
+        """Read the client address from an ASGI ``(host, port)`` pair.
 
         Validates the fallback used when no proxy middleware ran.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertEqual(request.ip, "127.0.0.1")
         self.assertEqual(request.ip, "127.0.0.1")
 
     def testResolvesTheClientIpFromAPlainString(self) -> None:
-        """
-        Read the client address normalised by the proxy middleware.
+        """Read the client address normalised by the proxy middleware.
 
         Validates the shape stored back into the scope by the adapter.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"client": "10.0.0.7"})
         self.assertEqual(request.ip, "10.0.0.7")
 
     def testReportsAnUnknownClientAsNone(self) -> None:
-        """
-        Report a missing client address as ``None``.
+        """Report a missing client address as ``None``.
 
         Validates that rate limiting can skip anonymous transports.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(make_asgi_request(remove=("client",)).ip)
 
     def testExposesTheClientPort(self) -> None:
-        """
-        Expose the client port published in the scope.
+        """Expose the client port published in the scope.
 
         Validates the accessor consumed by the request printer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(scope_overrides={"port": 51234})
         self.assertEqual(request.port, 51234)
         self.assertEqual(request.port, 51234)
 
     def testReportsAnUnknownPortAsNone(self) -> None:
-        """
-        Report a missing client port as ``None``.
+        """Report a missing client port as ``None``.
 
         Validates the default for transports that do not publish it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(make_asgi_request().port)
 
     def testForwardedDefaultsToAnEmptyMapping(self) -> None:
-        """
-        Report no forwarding metadata as an empty mapping.
+        """Report no forwarding metadata as an empty mapping.
 
         Validates that callers can index the result unconditionally.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(make_asgi_request().forwarded, {})
 
     def testExposesForwardedMetadata(self) -> None:
-        """
-        Expose the forwarding metadata stored by the proxy middleware.
+        """Expose the forwarding metadata stored by the proxy middleware.
 
         Validates the accessor used to audit the original client.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             scope_overrides={"forwarded": {"for": "10.0.0.7"}},
@@ -673,71 +865,103 @@ class TestRequestIdentityHeaders(TestCase):
     """Verify user-agent and authentication header accessors."""
 
     def testExposesTheUserAgent(self) -> None:
-        """
-        Expose the user agent advertised by the client.
+        """Expose the user agent advertised by the client.
 
         Validates the accessor used for logging and analytics.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"user-agent", b"orionis/1.0")])
         self.assertEqual(request.userAgent, "orionis/1.0")
 
     def testReportsAMissingUserAgentAsNone(self) -> None:
-        """
-        Report a missing user agent as ``None``.
+        """Report a missing user agent as ``None``.
 
         Validates that header-less clients do not break logging.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(make_asgi_request().userAgent)
 
     def testExposesTheAuthorizationHeader(self) -> None:
-        """
-        Expose the raw authorization header.
+        """Expose the raw authorization header.
 
         Validates the accessor used by custom authentication schemes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"authorization", b"Basic abc")])
         self.assertEqual(request.authorization, "Basic abc")
 
     def testExtractsTheBearerToken(self) -> None:
-        """
-        Strip the scheme prefix from a bearer authorization header.
+        """Strip the scheme prefix from a bearer authorization header.
 
         Validates the accessor used by token guards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"authorization", b"Bearer t0ken")])
         self.assertEqual(request.bearerToken, "t0ken")
 
     def testIgnoresANonBearerAuthorizationHeader(self) -> None:
-        """
-        Report ``None`` for a non-bearer authorization scheme.
+        """Report ``None`` for a non-bearer authorization scheme.
 
         Validates that basic credentials are never mistaken for a token.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"authorization", b"Basic abc")])
         self.assertIsNone(request.bearerToken)
 
     def testReportsAMissingBearerTokenAsNone(self) -> None:
-        """
-        Report a missing authorization header as ``None``.
+        """Report a missing authorization header as ``None``.
 
         Validates the guard protecting anonymous requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(make_asgi_request().bearerToken)
 
     def testExposesTheApiKeyHeader(self) -> None:
-        """
-        Expose the API key advertised by the client.
+        """Expose the API key advertised by the client.
 
         Validates the accessor used by machine-to-machine guards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"x-api-key", b"secret-key")])
         self.assertEqual(request.apiKey, "secret-key")
 
     def testExposesTheAcceptHeader(self) -> None:
-        """
-        Expose the raw accept header.
+        """Expose the raw accept header.
 
         Validates the value inspected during content negotiation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"accept", b"text/html")])
         self.assertEqual(request.accept, "text/html")
@@ -746,28 +970,40 @@ class TestRequestContentNegotiation(TestCase):
     """Verify content negotiation and AJAX detection."""
 
     def testDetectsAJsonClient(self) -> None:
-        """
-        Detect a client that asked for JSON.
+        """Detect a client that asked for JSON.
 
         Validates the branch that returns structured validation errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"accept", b"application/json")])
         self.assertTrue(request.wantsJson())
 
     def testDetectsAJsonSubtype(self) -> None:
-        """
-        Detect vendor media types ending in ``+json``.
+        """Detect vendor media types ending in ``+json``.
 
         Validates support for JSON API style clients.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"accept", b"application/vnd.api+json")])
         self.assertTrue(request.wantsJson())
 
     def testDetectsAnHtmlClient(self) -> None:
-        """
-        Detect a browser asking for markup or anything at all.
+        """Detect a browser asking for markup or anything at all.
 
         Validates the branch that renders the HTML error page.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(
             make_asgi_request(headers=[(b"accept", b"text/html")]).wantsHtml(),
@@ -777,10 +1013,14 @@ class TestRequestContentNegotiation(TestCase):
         )
 
     def testDetectsAnXmlClient(self) -> None:
-        """
-        Detect a client asking for XML in either spelling.
+        """Detect a client asking for XML in either spelling.
 
         Validates the branch used by legacy integrations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(
             make_asgi_request(headers=[(b"accept", b"application/xml")]).wantsXml(),
@@ -790,31 +1030,43 @@ class TestRequestContentNegotiation(TestCase):
         )
 
     def testMatchesAnArbitraryMediaType(self) -> None:
-        """
-        Match any media type case-insensitively.
+        """Match any media type case-insensitively.
 
         Validates the general-purpose negotiation helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(headers=[(b"accept", b"text/csv")])
         self.assertTrue(request.accepts("TEXT/CSV"))
         self.assertFalse(request.accepts("image/png"))
 
     def testTreatsAMissingAcceptHeaderAsNoPreference(self) -> None:
-        """
-        Report no preference when the accept header is absent.
+        """Report no preference when the accept header is absent.
 
         Validates the cached empty string used by the negotiation
         helpers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertFalse(request.wantsJson())
         self.assertFalse(request.wantsHtml())
 
     def testDetectsAnAjaxSubmission(self) -> None:
-        """
-        Detect a request issued by a JavaScript client.
+        """Detect a request issued by a JavaScript client.
 
         Validates the branch answering form posts with JSON.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"x-requested-with", b"XMLHttpRequest")],
@@ -826,7 +1078,13 @@ class TestRequestRouteParameters(TestCase):
     """Verify route parameter lookup and mapping ownership."""
 
     def testEmptyParameterMappingIsCreatedOnFirstAccess(self) -> None:
-        """Keep the exposed parameter mapping mutable and request-local."""
+        """Keep the exposed parameter mapping mutable and request-local.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         request = make_asgi_request()
         self.assertIsNone(request._Request__path_params)
         self.assertIsNone(request.routeParam("missing"))
@@ -837,28 +1095,40 @@ class TestRequestRouteParameters(TestCase):
         self.assertEqual(make_asgi_request().routeParams(), {})
 
     def testExposesEveryRouteParameter(self) -> None:
-        """
-        Expose the parameters extracted from the path.
+        """Expose the parameters extracted from the path.
 
         Validates the mapping forwarded to the handler by the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(params={"id": 7})
         self.assertEqual(request.routeParams(), {"id": 7})
 
     def testReadsASingleRouteParameter(self) -> None:
-        """
-        Read one path parameter by name.
+        """Read one path parameter by name.
 
         Validates the accessor used inside middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(params={"id": 7})
         self.assertEqual(request.routeParam("id"), 7)
 
     def testReportsAnUnknownRouteParameterAsNone(self) -> None:
-        """
-        Report an unknown parameter name as ``None``.
+        """Report an unknown parameter name as ``None``.
 
         Validates that optional segments do not raise.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(make_asgi_request().routeParam("missing"))
 
@@ -866,20 +1136,28 @@ class TestRequestCsrfToken(TestCase):
     """Verify CSRF token lookup from mutable request state."""
 
     def testReportsNoTokenBeforeTheMiddlewareRuns(self) -> None:
-        """
-        Report ``None`` when the CSRF middleware has not run.
+        """Report ``None`` when the CSRF middleware has not run.
 
         Validates that API routes can read the accessor safely.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertIsNone(request.csrfToken())
         self.assertIsNone(request.csrf_token)
 
     def testExposesTheTokenPublishedByTheMiddleware(self) -> None:
-        """
-        Expose the token published on the request state.
+        """Expose the token published on the request state.
 
         Validates both the method and the template-friendly property.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         request.state.csrf_token = _CSRF_VALUE
@@ -890,38 +1168,54 @@ class TestRequestBodyReading(TestCase):
     """Verify raw and decoded body access through the body stream."""
 
     async def testStreamsTheBodyInChunks(self) -> None:
-        """
-        Yield the body as it arrives from the transport.
+        """Yield the body as it arrives from the transport.
 
         Validates the generator consumed by streaming handlers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"payload")
         self.assertEqual([chunk async for chunk in request.stream()], [b"payload"])
 
     async def testBufferTheBodyOnce(self) -> None:
-        """
-        Buffer the body and reuse it on later reads.
+        """Buffer the body and reuse it on later reads.
 
         Validates that a handler can read the payload twice.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"payload")
         self.assertEqual(await request.body(), b"payload")
         self.assertEqual(await request.body(), b"payload")
 
     async def testExposesTheRawBody(self) -> None:
-        """
-        Expose the buffered body through the raw accessor.
+        """Expose the buffered body through the raw accessor.
 
         Validates the alias used by signature verification middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"payload")
         self.assertEqual(await request.raw(), b"payload")
 
     async def testDecodesTheBodyAsText(self) -> None:
-        """
-        Decode the body as UTF-8 text.
+        """Decode the body as UTF-8 text.
 
         Validates the accessor used by webhook handlers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body="ñandú".encode())
         self.assertEqual(await request.text(), "ñandú")
@@ -930,10 +1224,14 @@ class TestRequestJsonParsing(TestCase):
     """Verify JSON parsing, caching, and error reporting."""
 
     async def testParsesAJsonBody(self) -> None:
-        """
-        Decode a JSON body and cache the decoded value.
+        """Decode a JSON body and cache the decoded value.
 
         Validates the accessor used by API controllers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -943,10 +1241,14 @@ class TestRequestJsonParsing(TestCase):
         self.assertEqual(await request.json(), {"a": 1})
 
     async def testAcceptsAJsonSubtype(self) -> None:
-        """
-        Decode bodies advertised with a ``+json`` media type.
+        """Decode bodies advertised with a ``+json`` media type.
 
         Validates support for vendor-specific JSON payloads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -955,7 +1257,13 @@ class TestRequestJsonParsing(TestCase):
         self.assertEqual(await request.json(), {"a": 1})
 
     async def testParsesJsonArraysAndScalars(self) -> None:
-        """Decode and cache valid JSON values without requiring an object."""
+        """Decode and cache valid JSON values without requiring an object.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for value in ([1, "value", None], "value", 42, 1.5, True):
             with self.subTest(value=value):
                 request = make_asgi_request(
@@ -968,11 +1276,15 @@ class TestRequestJsonParsing(TestCase):
                 self.assertIs(await request.json(), parsed)
 
     async def testCachesAJsonNullLiteral(self) -> None:
-        """
-        Cache a decoded ``null`` literal instead of re-reading the body.
+        """Cache a decoded ``null`` literal instead of re-reading the body.
 
         Validates the sentinel that distinguishes ``null`` from
         "not parsed yet".
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"null",
@@ -982,10 +1294,14 @@ class TestRequestJsonParsing(TestCase):
         self.assertIsNone(await request.json())
 
     async def testRejectsANonJsonContentType(self) -> None:
-        """
-        Reject a body whose media type is not JSON.
+        """Reject a body whose media type is not JSON.
 
         Validates the guard protecting handlers from silent mis-parsing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -995,10 +1311,14 @@ class TestRequestJsonParsing(TestCase):
             await request.json()
 
     async def testRejectsAnEmptyJsonBody(self) -> None:
-        """
-        Reject an empty JSON body.
+        """Reject an empty JSON body.
 
         Validates the diagnostic returned for a missing payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"content-type", b"application/json")],
@@ -1007,10 +1327,14 @@ class TestRequestJsonParsing(TestCase):
             await request.json()
 
     async def testRejectsAMalformedJsonBody(self) -> None:
-        """
-        Reject a body that is not valid JSON.
+        """Reject a body that is not valid JSON.
 
         Validates that decoding errors are reported as value errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"{not json}",
@@ -1023,36 +1347,54 @@ class TestRequestOtherParsers(TestCase):
     """Verify XML, MessagePack, and URL-encoded body parsing."""
 
     async def testParsesAnXmlBody(self) -> None:
-        """
-        Parse an XML body into an element tree.
+        """Parse an XML body into an element tree.
 
         Validates the hardened parser used by legacy integrations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"<root><a>1</a></root>")
         element = await request.xml()
         self.assertEqual(element.tag, "root")
 
     async def testRejectsMalformedXml(self) -> None:
-        """
-        Reject an XML body that cannot be parsed.
+        """Reject an XML body that cannot be parsed.
 
         Validates that malformed payloads surface as parse errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"<root>")
         with self.assertRaises(ParseError):
             await request.xml()
 
     async def testDecodesAMessagePackBody(self) -> None:
-        """
-        Decode a MessagePack body.
+        """Decode a MessagePack body.
 
         Validates the binary payload format used by internal services.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=msgpack.encode({"a": 1}))
         self.assertEqual(await request.msgpack(), {"a": 1})
 
     async def testDecodesMessagePackArraysScalarsAndNull(self) -> None:
-        """Decode MessagePack values without requiring a map."""
+        """Decode MessagePack values without requiring a map.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for value in ([1, "value", None], "value", 42, 1.5, True, b"data", None):
             with self.subTest(value=value):
                 request = make_asgi_request(body=msgpack.encode(value))
@@ -1061,10 +1403,14 @@ class TestRequestOtherParsers(TestCase):
                 self.assertIs(type(parsed), type(value))
 
     async def testParsesAUrlEncodedBody(self) -> None:
-        """
-        Parse a URL-encoded body and cache the parsed fields.
+        """Parse a URL-encoded body and cache the parsed fields.
 
         Validates the accessor used by classic form posts.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"a=1&b=2",
@@ -1074,10 +1420,14 @@ class TestRequestOtherParsers(TestCase):
         self.assertEqual(await request.formUrlEncoded(), {"a": "1", "b": "2"})
 
     async def testRejectsANonUrlEncodedContentType(self) -> None:
-        """
-        Reject a body whose media type is not URL-encoded.
+        """Reject a body whose media type is not URL-encoded.
 
         Validates the guard protecting form handlers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"a=1",
@@ -1112,10 +1462,14 @@ class TestRequestMultipartParsing(TestCase):
         )
 
     async def testParsesMultipartFields(self) -> None:
-        """
-        Parse multipart fields and cache the resulting form.
+        """Parse multipart fields and cache the resulting form.
 
         Validates the streaming parser used by file uploads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = self._makeMultipartRequest([("a", "1")])
         form = await request.form()
@@ -1124,10 +1478,14 @@ class TestRequestMultipartParsing(TestCase):
         self.assertIs(await request.form(), form)
 
     async def testRejectsANonMultipartContentType(self) -> None:
-        """
-        Reject a body whose media type is not multipart.
+        """Reject a body whose media type is not multipart.
 
         Validates the guard protecting the streaming parser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"content-type", b"application/json")],
@@ -1136,10 +1494,14 @@ class TestRequestMultipartParsing(TestCase):
             await request.form()
 
     async def testRejectsAMissingBoundary(self) -> None:
-        """
-        Reject a multipart body without a boundary parameter.
+        """Reject a multipart body without a boundary parameter.
 
         Validates the diagnostic returned for a malformed header.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"content-type", b"multipart/form-data")],
@@ -1151,19 +1513,27 @@ class TestRequestPayloadDispatch(TestCase):
     """Verify parser selection through the media-type registry."""
 
     async def testFallsBackToRawBytesWithoutAContentType(self) -> None:
-        """
-        Return the raw body when no media type is advertised.
+        """Return the raw body when no media type is advertised.
 
         Validates the default for opaque payloads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"opaque")
         self.assertEqual(await request.payload(), b"opaque")
 
     async def testDispatchesToTheRegisteredParser(self) -> None:
-        """
-        Parse the body with the parser registered for its media type.
+        """Parse the body with the parser registered for its media type.
 
         Validates the registry lookup performed on every request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -1172,10 +1542,14 @@ class TestRequestPayloadDispatch(TestCase):
         self.assertEqual(await request.payload(), {"a": 1})
 
     async def testFallsBackToRawBytesForAnUnknownMediaType(self) -> None:
-        """
-        Return the raw body when no parser matches the media type.
+        """Return the raw body when no parser matches the media type.
 
         Validates that unknown formats reach the handler untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"raw",
@@ -1184,11 +1558,15 @@ class TestRequestPayloadDispatch(TestCase):
         self.assertEqual(await request.payload(), b"raw")
 
     async def testDelegatesMultipartToTheStreamingParser(self) -> None:
-        """
-        Route multipart payloads to the streaming parser.
+        """Route multipart payloads to the streaming parser.
 
         Validates that the registry never receives a pre-buffered
         multipart body.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=make_multipart_body([("a", "1")]),
@@ -1200,13 +1578,28 @@ class TestRequestPayloadDispatch(TestCase):
         self.assertIsInstance(await request.payload(), FormData)
 
     async def testUsesTheInjectedRegistry(self) -> None:
-        """
-        Honour a media-type registry supplied by the caller.
+        """Honour a media-type registry supplied by the caller.
 
         Validates the extension point used to add custom formats.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         def parse_custom_payload(raw: bytes) -> dict[str, str]:
-            """Decode custom request bytes into their expected mapping."""
+            """Decode custom request bytes into their expected mapping.
+
+            Parameters
+            ----------
+            raw : bytes
+                Value supplied for ``raw``.
+
+            Returns
+            -------
+            dict[str, str]
+                Value produced by the helper.
+            """
             return {"decoded": raw.decode()}
 
         registry = MediaTypeRegistry({"application/vnd.custom": parse_custom_payload})
@@ -1218,10 +1611,14 @@ class TestRequestPayloadDispatch(TestCase):
         self.assertEqual(await request.payload(), {"decoded": "value"})
 
     def testDefaultsToTheSharedRegistry(self) -> None:
-        """
-        Fall back to the framework registry when none is injected.
+        """Fall back to the framework registry when none is injected.
 
         Validates the default wiring performed by the kernel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request()
         self.assertIs(request._Request__registry, DEFAULT_MEDIA_TYPES)
@@ -1230,10 +1627,14 @@ class TestRequestDataDictionary(TestCase):
     """Verify body conversion into schema-validation dictionaries."""
 
     async def testParsesAJsonObject(self) -> None:
-        """
-        Return a JSON object as a flat dictionary and cache it.
+        """Return a JSON object as a flat dictionary and cache it.
 
         Validates the payload handed to schema validation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -1243,10 +1644,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertEqual(await request.data(), {"a": 1})
 
     async def testReusesAnAlreadyDecodedJsonBody(self) -> None:
-        """
-        Reuse the JSON value decoded by a previous call.
+        """Reuse the JSON value decoded by a previous call.
 
         Validates that the body is never read twice from the transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b'{"a":1}',
@@ -1256,10 +1661,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertEqual(await request.data(), {"a": 1})
 
     async def testRejectsAnEmptyJsonBody(self) -> None:
-        """
-        Reject an empty JSON body when building the dictionary.
+        """Reject an empty JSON body when building the dictionary.
 
         Validates the diagnostic returned for a missing payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             headers=[(b"content-type", b"application/json")],
@@ -1268,10 +1677,14 @@ class TestRequestDataDictionary(TestCase):
             await request.data()
 
     async def testRejectsAMalformedJsonBody(self) -> None:
-        """
-        Reject a malformed JSON body when building the dictionary.
+        """Reject a malformed JSON body when building the dictionary.
 
         Validates that decoding failures surface as value errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"{oops}",
@@ -1282,10 +1695,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertIsInstance(captured.exception.__cause__, DecodeError)
 
     async def testRejectsNonObjectJsonValues(self) -> None:
-        """
-        Reject a JSON payload that is not an object.
+        """Reject a JSON payload that is not an object.
 
         Require a mapping both before and after the JSON value is cached.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for value in ([1, 2], "value", 42, 1.5, True, None):
             for parse_first in (False, True):
@@ -1302,10 +1719,14 @@ class TestRequestDataDictionary(TestCase):
                         await request.data()
 
     async def testCollapsesRepeatedUrlEncodedFields(self) -> None:
-        """
-        Collapse repeated URL-encoded keys into a list.
+        """Collapse repeated URL-encoded keys into a list.
 
         Validates the multi-value semantics of HTML checkboxes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"tag=a&tag=b&name=x",
@@ -1317,11 +1738,15 @@ class TestRequestDataDictionary(TestCase):
         )
 
     async def testCollapsesRepeatedMultipartFields(self) -> None:
-        """
-        Collapse repeated multipart keys into a list.
+        """Collapse repeated multipart keys into a list.
 
         Validates that a third occurrence is appended to the existing
         list instead of replacing it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=make_multipart_body(
@@ -1338,10 +1763,14 @@ class TestRequestDataDictionary(TestCase):
         )
 
     async def testDecodesAMessagePackObject(self) -> None:
-        """
-        Return a MessagePack map as a flat dictionary.
+        """Return a MessagePack map as a flat dictionary.
 
         Validates the binary counterpart of the JSON path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=msgpack.encode({"a": 1}),
@@ -1350,10 +1779,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertEqual(await request.data(), {"a": 1})
 
     async def testRejectsAMalformedMessagePackBody(self) -> None:
-        """
-        Reject a MessagePack body that cannot be decoded.
+        """Reject a MessagePack body that cannot be decoded.
 
         Validates that decoding failures surface as value errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"\xc1",
@@ -1366,10 +1799,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertIsInstance(captured.exception.__cause__, DecodeError)
 
     async def testRejectsNonMapMessagePackValues(self) -> None:
-        """
-        Reject a MessagePack payload that is not a map.
+        """Reject a MessagePack payload that is not a map.
 
         Validates that schema validation always receives a mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for value in ([1, 2], "value", 42, 1.5, True, b"data", None):
             with self.subTest(value=value):
@@ -1383,10 +1820,14 @@ class TestRequestDataDictionary(TestCase):
                     await request.data()
 
     async def testRejectsAnUnsupportedContentType(self) -> None:
-        """
-        Reject a media type that cannot become a dictionary.
+        """Reject a media type that cannot become a dictionary.
 
         Validates the diagnostic naming the offending content type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"<xml/>",
@@ -1397,10 +1838,14 @@ class TestRequestDataDictionary(TestCase):
         self.assertIn("application/xml", str(captured.exception))
 
     async def testNamesAMissingContentTypeAsUnknown(self) -> None:
-        """
-        Report a missing content type as ``unknown``.
+        """Report a missing content type as ``unknown``.
 
         Validates the fallback used in the error message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(body=b"raw")
         with self.assertRaises(UnsupportedMediaTypeException) as captured:
@@ -1408,11 +1853,15 @@ class TestRequestDataDictionary(TestCase):
         self.assertIn("unknown", str(captured.exception))
 
     async def testStripsCredentialFieldsOnlyWhenFlashed(self) -> None:
-        """
-        Return the submitted payload verbatim, credentials included.
+        """Return the submitted payload verbatim, credentials included.
 
         Validates that stripping happens when flashing, not when parsing,
         so authentication handlers still receive the password.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = make_asgi_request(
             body=b"email=a%40b.test&password=hunter2",

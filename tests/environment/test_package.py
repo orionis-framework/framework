@@ -11,49 +11,69 @@ from orionis.test import TestCase
 class TestEnvironmentPackageSurface(TestCase):
 
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
-        """
-        Declare exactly the two documented public exports.
+        """Declare exactly the two documented public exports.
 
         Validates that ``__all__`` stays in sync with the facade and the
         helper the rest of the framework imports from this package.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(environment_package.__all__, ["Env", "env"])
 
     def testReExportsTheEnvFacade(self) -> None:
-        """
-        Re-export the very same ``Env`` facade object.
+        """Re-export the very same ``Env`` facade object.
 
         Validates that importing from the package root yields the class
         defined in ``orionis.environment.facade`` and not a copy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(environment_package.Env, Env)
 
     def testReExportsTheEnvHelperFunction(self) -> None:
-        """
-        Re-export the very same ``env`` helper function.
+        """Re-export the very same ``env`` helper function.
 
         Validates that importing from the package root yields the function
         defined in ``orionis.environment.functions``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(environment_package.env, env)
 
     def testNoExportShadowsASubmodule(self) -> None:
-        """
-        Keep every export free of collisions with a submodule name.
+        """Keep every export free of collisions with a submodule name.
 
         Validates that no public name is silently rebound by the import
         machinery, which would make the shadowed submodule unreachable
         through attribute access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in environment_package.__all__:
             self.assertNotIsInstance(getattr(environment_package, name), ModuleType)
 
     def testExposesNoUndocumentedPublicObjects(self) -> None:
-        """
-        Keep every non-module public attribute inside ``__all__``.
+        """Keep every non-module public attribute inside ``__all__``.
 
         Validates that no helper or imported symbol leaks into the package
         namespace without being declared as part of the public API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exported = {
             name

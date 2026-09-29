@@ -8,13 +8,32 @@ class TestCORSLifecycle(TestCase):
     """Exercise preflight and ordinary cross-origin response behavior."""
 
     def testChecksOrdinaryRequestOriginOnlyWhenWritingHeaders(self) -> None:
-        """Defer ordinary request origin validation until a response exists."""
+        """Defer ordinary request origin validation until a response exists.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = CORSMiddleware({"allow_origins": ["https://example.com"]})
         adapter = make_adapter([(b"origin", b"https://example.com")])
         origins: list[str] = []
 
         def allowed_origin(_middleware: CORSMiddleware, origin: str) -> bool:
-            """Record the checked origin and accept it for this request."""
+            """Record the checked origin and accept it for this request.
+
+            Parameters
+            ----------
+            _middleware : CORSMiddleware
+                Value supplied for ``_middleware``.
+            origin : str
+                Value supplied for ``origin``.
+
+            Returns
+            -------
+            bool
+                Value produced by the helper.
+            """
             origins.append(origin)
             return True
 
@@ -31,7 +50,13 @@ class TestCORSLifecycle(TestCase):
         )
 
     def testPreflightRetainsCredentialsRequestedHeadersAndVary(self) -> None:
-        """Publish the configured origin, credentials, methods, and header policy."""
+        """Publish the configured origin, credentials, methods, and header policy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = CORSMiddleware({
             "allow_origins": ["https://example.com"],
             "allow_credentials": True, "allow_methods": ["GET", "POST"],

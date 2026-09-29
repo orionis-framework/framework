@@ -12,7 +12,6 @@ from orionis.test import TestCase
 # Alias shared by the container binding and the facade accessor.
 _REACTOR_ALIAS = "x-orionis-IReactor"
 
-
 class _StubApp:
     """Application double capturing every binding it receives."""
 
@@ -52,7 +51,6 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete, alias))
 
-
 class _StubReactorFacade:
     """Facade double counting how many times it was pinned."""
 
@@ -78,61 +76,83 @@ class _StubReactorFacade:
         """
         self.pinned += 1
 
-
 class TestReactorProviderDefinition(TestCase):
 
     def testInheritsTheServiceProviderBase(self) -> None:
-        """
-        Extend the base ServiceProvider class.
+        """Extend the base ServiceProvider class.
 
         Validates the provider class hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(ReactorProvider, ServiceProvider))
 
     def testIsNotDeferred(self) -> None:
-        """
-        Stay out of the deferred provider mechanism.
+        """Stay out of the deferred provider mechanism.
 
         Validates that the reactor is available as soon as the application
         boots, which is what the CLI entry point expects.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(issubclass(ReactorProvider, DeferrableProvider))
 
     def testIsRegisteredAsACoreProvider(self) -> None:
-        """
-        Ship with the core providers booted by the framework.
+        """Ship with the core providers booted by the framework.
 
         Validates that IReactor is bound without the application having to
         register anything by hand.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(ReactorProvider, CORE_PROVIDERS)
 
     def testStoresTheApplicationReference(self) -> None:
-        """
-        Keep the container passed to the constructor.
+        """Keep the container passed to the constructor.
 
         Validates the container the provider binds services into.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         self.assertIs(ReactorProvider(app).app, app)  # type: ignore[arg-type]
 
     def testBootIsDeclaredAsynchronous(self) -> None:
-        """
-        Declare the boot phase as an asynchronous method.
+        """Declare the boot phase as an asynchronous method.
 
         Validates that boot can await the facade pinning.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(ReactorProvider.boot))
-
 
 class TestReactorProviderRegister(TestCase):
 
     def testBindsTheReactorContractAsASingleton(self) -> None:
-        """
-        Bind IReactor to the concrete Reactor implementation.
+        """Bind IReactor to the concrete Reactor implementation.
 
         Validates the single binding declared by the provider, including
         the alias used to reach it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
 
@@ -141,22 +161,29 @@ class TestReactorProviderRegister(TestCase):
         self.assertEqual(app.singletons, [(IReactor, Reactor, _REACTOR_ALIAS)])
 
     def testRegisteredAliasMatchesTheFacadeAccessor(self) -> None:
-        """
-        Register the alias the Reactor facade resolves.
+        """Register the alias the Reactor facade resolves.
 
         Validates that the facade and the binding cannot drift apart.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ReactorFacade.getFacadeAccessor(), _REACTOR_ALIAS)
-
 
 class TestReactorProviderBoot(TestCase):
 
     def setUp(self) -> None:
-        """
-        Replace the Reactor facade with a double before each test.
+        """Replace the Reactor facade with a double before each test.
 
         Prevents the boot phase from pinning the real facade, which would
         require a fully booted application.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._original_facade = provider_module.ReactorFacade
         self._facade = _StubReactorFacade()
@@ -164,28 +191,40 @@ class TestReactorProviderBoot(TestCase):
         self._app = _StubApp()
 
     def tearDown(self) -> None:
-        """
-        Restore the original Reactor facade after each test.
+        """Restore the original Reactor facade after each test.
 
         Guarantees that module level state never leaks between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         provider_module.ReactorFacade = self._original_facade
 
     async def testBootPinsTheReactorFacade(self) -> None:
-        """
-        Pin the Reactor facade once the services are registered.
+        """Pin the Reactor facade once the services are registered.
 
         Validates that facade access skips container resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await ReactorProvider(self._app).boot()  # type: ignore[arg-type]
 
         self.assertEqual(self._facade.pinned, 1)
 
     async def testBootRegistersNoAdditionalBinding(self) -> None:
-        """
-        Keep the boot phase free of container registrations.
+        """Keep the boot phase free of container registrations.
 
         Validates the separation between register() and boot().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await ReactorProvider(self._app).boot()  # type: ignore[arg-type]
 

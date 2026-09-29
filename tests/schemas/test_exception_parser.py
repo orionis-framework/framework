@@ -70,10 +70,14 @@ def _conversion_error(payload: object, schema: type) -> msgspec.ValidationError:
 class TestValidationErrorParserParse(TestCase):
 
     def testTypeErrorReportsTheOffendingField(self) -> None:
-        """
-        Report the field carried by the msgspec path suffix.
+        """Report the field carried by the msgspec path suffix.
 
         Validates that the dotted path is stripped into a field name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"name": "Alice", "age": "x"}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error, _SimpleSchema)
@@ -82,10 +86,14 @@ class TestValidationErrorParserParse(TestCase):
         self.assertEqual(failure.rule, "type")
 
     def testMissingRequiredFieldIsReported(self) -> None:
-        """
-        Report a missing required field with the ``missing`` rule.
+        """Report a missing required field with the ``missing`` rule.
 
         Validates the branch reading the field name from the message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error, _SimpleSchema)
@@ -93,20 +101,28 @@ class TestValidationErrorParserParse(TestCase):
         self.assertEqual(failure.rule, "missing")
 
     def testNestedFieldPathIsPreserved(self) -> None:
-        """
-        Preserve the dotted path of a nested field.
+        """Preserve the dotted path of a nested field.
 
         Validates that nested errors are attributed to the leaf field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"child": {"code": 9}, "value": 1}, _ParentSchema)
         failure = ValidationErrorParser.parse(error, _ParentSchema)
         self.assertEqual(failure.field, "child.code")
 
     def testParseWorksWithoutASchema(self) -> None:
-        """
-        Parse an error when no schema is supplied.
+        """Parse an error when no schema is supplied.
 
         Validates that custom message resolution is skipped gracefully.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"name": 1, "age": 30}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error)
@@ -114,30 +130,42 @@ class TestValidationErrorParserParse(TestCase):
         self.assertIsInstance(failure.message, str)
 
     def testMinLengthConstraintIsIdentified(self) -> None:
-        """
-        Identify the ``min_length`` rule from the msgspec message.
+        """Identify the ``min_length`` rule from the msgspec message.
 
         Validates the constraint detection for short strings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"token": "ab"}, _LengthSchema)
         failure = ValidationErrorParser.parse(error, _LengthSchema)
         self.assertEqual(failure.rule, "min_length")
 
     def testMaxLengthConstraintIsIdentified(self) -> None:
-        """
-        Identify the ``max_length`` rule from the msgspec message.
+        """Identify the ``max_length`` rule from the msgspec message.
 
         Validates the constraint detection for long strings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"tag": "toolong"}, _TagSchema)
         failure = ValidationErrorParser.parse(error, _TagSchema)
         self.assertEqual(failure.rule, "max_length")
 
     def testCustomConstraintMessageReplacesTheDefault(self) -> None:
-        """
-        Replace the msgspec message with the declared custom message.
+        """Replace the msgspec message with the declared custom message.
 
         Validates the constraint message lookup performed on the schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"token": "ab"}, _CustomMessageSchema)
         failure = ValidationErrorParser.parse(error, _CustomMessageSchema)
@@ -146,20 +174,28 @@ class TestValidationErrorParserParse(TestCase):
 class TestValidationErrorParserParseAt(TestCase):
 
     def testFieldPathIsPrefixedWithTheBase(self) -> None:
-        """
-        Prefix the reported field with the path of the converted value.
+        """Prefix the reported field with the path of the converted value.
 
         Validates the sub-conversion entry point used by the collector.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"code": 9}, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
         self.assertEqual(failure.field, "child.code")
 
     def testMissingFieldPathIsPrefixedWithTheBase(self) -> None:
-        """
-        Prefix a missing nested field with the path of its parent.
+        """Prefix a missing nested field with the path of its parent.
 
         Validates the missing-field branch of the sub-conversion parser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
@@ -167,10 +203,14 @@ class TestValidationErrorParserParseAt(TestCase):
         self.assertEqual(failure.rule, "missing")
 
     def testValueWithoutPathKeepsTheBaseAsField(self) -> None:
-        """
-        Attribute a path-less error to the converted value itself.
+        """Attribute a path-less error to the converted value itself.
 
         Validates the branch used when msgspec reports no path suffix.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error(5, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
@@ -179,34 +219,50 @@ class TestValidationErrorParserParseAt(TestCase):
 class TestValidationErrorParserJoinPath(TestCase):
 
     def testRelativePathIsReturnedWithoutABase(self) -> None:
-        """
-        Return the relative path when no base is supplied.
+        """Return the relative path when no base is supplied.
 
         Validates the root-level branch of the path builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ValidationErrorParser._joinPath("", "code"), "code")
 
     def testBaseIsReturnedWithoutARelativePath(self) -> None:
-        """
-        Return the base path when no relative path is supplied.
+        """Return the base path when no relative path is supplied.
 
         Validates the branch used for errors on the value itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ValidationErrorParser._joinPath("child", ""), "child")
 
     def testSequenceIndexIsAppendedWithoutASeparator(self) -> None:
-        """
-        Append a sequence index directly to the base path.
+        """Append a sequence index directly to the base path.
 
         Validates that indices never receive a leading dot.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ValidationErrorParser._joinPath("tags", "[0]"), "tags[0]")
 
     def testNestedFieldsAreJoinedWithADot(self) -> None:
-        """
-        Join a base path and a field name with a dot.
+        """Join a base path and a field name with a dot.
 
         Validates the default composition of dotted paths.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         joined = ValidationErrorParser._joinPath("child", "code")
         self.assertEqual(joined, "child.code")
@@ -214,10 +270,14 @@ class TestValidationErrorParserJoinPath(TestCase):
 class TestValidationErrorParserCustomMessage(TestCase):
 
     def testDeclaredMessageIsReturned(self) -> None:
-        """
-        Return the message declared for the violated constraint.
+        """Return the message declared for the violated constraint.
 
         Validates the lookup keyed by the detected constraint.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         raw = "Expected `str` of length >= 4"
         result = ValidationErrorParser._customMessage(
@@ -226,10 +286,14 @@ class TestValidationErrorParserCustomMessage(TestCase):
         self.assertEqual(result, "Token is too short.")
 
     def testUnknownConstraintReturnsNone(self) -> None:
-        """
-        Return None when the raw message matches no known constraint.
+        """Return None when the raw message matches no known constraint.
 
         Validates the guard applied before the message lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = ValidationErrorParser._customMessage(
             _CustomMessageSchema, "token", "an entirely unrelated failure",
@@ -237,10 +301,14 @@ class TestValidationErrorParserCustomMessage(TestCase):
         self.assertIsNone(result)
 
     def testFieldWithoutMessagesReturnsNone(self) -> None:
-        """
-        Return None for a field declaring no custom message.
+        """Return None for a field declaring no custom message.
 
         Validates the early exit of the message resolver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         raw = "Expected `str` of length >= 4"
         self.assertIsNone(
@@ -250,10 +318,14 @@ class TestValidationErrorParserCustomMessage(TestCase):
 class TestValidationErrorParserSchemaResolution(TestCase):
 
     def testPlainFieldResolvesToTheRootSchema(self) -> None:
-        """
-        Resolve a dot-less path against the root schema.
+        """Resolve a dot-less path against the root schema.
 
         Validates the fast path of the schema traversal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "value"),
@@ -261,10 +333,14 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         )
 
     def testNestedPathResolvesToTheChildSchema(self) -> None:
-        """
-        Resolve a dotted path to the schema owning the leaf field.
+        """Resolve a dotted path to the schema owning the leaf field.
 
         Validates the traversal used to find custom messages.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "child.code"),
@@ -272,10 +348,14 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         )
 
     def testUnresolvablePathFallsBackToTheRootSchema(self) -> None:
-        """
-        Fall back to the root schema when a path segment is not nested.
+        """Fall back to the root schema when a path segment is not nested.
 
         Validates the guard protecting the traversal from bad paths.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "value.deep"),
@@ -283,10 +363,14 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         )
 
     def testOptionalNestedTypeIsResolved(self) -> None:
-        """
-        Resolve a nested schema declared inside a union annotation.
+        """Resolve a nested schema declared inside a union annotation.
 
         Validates support for optional nested schemas.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         resolved = ValidationErrorParser._resolveNestedType(
             _OptionalParentSchema, "child",
@@ -294,20 +378,28 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         self.assertIs(resolved, _NestedChild)
 
     def testResolvedNestedTypeIsCached(self) -> None:
-        """
-        Return the cached nested type on repeated look-ups.
+        """Return the cached nested type on repeated look-ups.
 
         Validates the cache guarding the error path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = ValidationErrorParser._resolveNestedType(_ParentSchema, "child")
         second = ValidationErrorParser._resolveNestedType(_ParentSchema, "child")
         self.assertIs(first, second)
 
     def testUnknownFieldResolvesToNone(self) -> None:
-        """
-        Return None when the schema declares no such field.
+        """Return None when the schema declares no such field.
 
         Validates the fallback for paths that do not exist.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(
             ValidationErrorParser._resolveNestedType(_ParentSchema, "absent"),
@@ -316,20 +408,28 @@ class TestValidationErrorParserSchemaResolution(TestCase):
 class TestValidationErrorParserConstraintKeys(TestCase):
 
     def testUnknownMessageReturnsNone(self) -> None:
-        """
-        Return None when the message matches no registered pattern.
+        """Return None when the message matches no registered pattern.
 
         Validates the fallback that classifies an error as a type error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(
             ValidationErrorParser._matchConstraintKey("unrecognised failure text"),
         )
 
     def testGreaterThanIsDetected(self) -> None:
-        """
-        Detect the ``gt`` constraint from the message.
+        """Detect the ``gt`` constraint from the message.
 
         Validates the ordered pattern scan for exclusive lower bounds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ValidationErrorParser._matchConstraintKey("Expected `int` x > 0"),
@@ -337,10 +437,14 @@ class TestValidationErrorParserConstraintKeys(TestCase):
         )
 
     def testLessThanIsDetected(self) -> None:
-        """
-        Detect the ``lt`` constraint from the message.
+        """Detect the ``lt`` constraint from the message.
 
         Validates the ordered pattern scan for exclusive upper bounds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ValidationErrorParser._matchConstraintKey("Expected `int` x < 100"),
@@ -350,27 +454,39 @@ class TestValidationErrorParserConstraintKeys(TestCase):
 class TestFieldsMapCache(TestCase):
 
     def testFieldsMapIsCachedPerSchema(self) -> None:
-        """
-        Return the very same mapping object on repeated calls.
+        """Return the very same mapping object on repeated calls.
 
         Validates the cache that avoids re-inspecting struct fields.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(_get_fields_map(_TagSchema), _get_fields_map(_TagSchema))
 
     def testFieldsMapExposesDeclaredFields(self) -> None:
-        """
-        Expose every declared field of the inspected schema.
+        """Expose every declared field of the inspected schema.
 
         Validates the mapping consumed by the nested type resolver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(set(_get_fields_map(_ParentSchema)), {"child", "value"})
 
 class TestValidationErrorParserContract(TestCase):
 
     def testParserDeclaresSlots(self) -> None:
-        """
-        Confirm the parser stores no per-instance state.
+        """Confirm the parser stores no per-instance state.
 
         Validates that the class is purely static.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ValidationErrorParser.__slots__, ())

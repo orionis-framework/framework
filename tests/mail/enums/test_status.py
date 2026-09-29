@@ -5,10 +5,14 @@ from orionis.test import TestCase
 class TestMailStatus(TestCase):
 
     def testDeclaresTheThreeConfirmableOutcomes(self) -> None:
-        """
-        Expose exactly the outcomes a transport can confirm.
+        """Expose exactly the outcomes a transport can confirm.
 
         Validates that no member implies mailbox delivery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             [member.value for member in MailStatus],
@@ -16,10 +20,14 @@ class TestMailStatus(TestCase):
         )
 
     def testMembersCompareEqualToPlainStrings(self) -> None:
-        """
-        Keep members interchangeable with the serialized status strings.
+        """Keep members interchangeable with the serialized status strings.
 
         Validates that consumers may compare a result against a literal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(MailStatus, StrEnum))
         self.assertEqual(MailStatus.ACCEPTED, "accepted")
@@ -28,10 +36,14 @@ class TestMailStatus(TestCase):
         self.assertEqual(f"{MailStatus.STORED}", "stored")
 
     def testLooksUpMembersByValue(self) -> None:
-        """
-        Resolve a member from a configured or persisted string.
+        """Resolve a member from a configured or persisted string.
 
         Validates that an unknown status is rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(MailStatus("partial"), MailStatus.PARTIAL)
         with self.assertRaises(ValueError):

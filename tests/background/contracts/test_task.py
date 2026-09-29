@@ -1,5 +1,4 @@
 import inspect
-
 from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask
 from orionis.background.tasks import BackgroundTasks
@@ -58,58 +57,82 @@ class TestBackgroundTaskContract(TestCase):
     """Validate the abstract interface of a background task."""
 
     def testDeclaresTheExpectedAbstractSurface(self) -> None:
-        """
-        Declare exactly the documented abstract methods.
+        """Declare exactly the documented abstract methods.
 
         Validates that implementers know the complete set of methods they
         are required to provide.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IBackgroundTask.__abstractmethods__, _ABSTRACT_METHODS)
 
     def testDeclaresRunAsACoroutineMethod(self) -> None:
-        """
-        Declare the run method as a coroutine.
+        """Declare the run method as a coroutine.
 
         Validates that callers can await the contract method without
         inspecting the concrete implementation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(IBackgroundTask.run))
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots on the interface.
+        """Declare empty slots on the interface.
 
         Validates that implementations declaring slots do not gain an
         instance dictionary through the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IBackgroundTask.__slots__, ())
 
     def testCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Reject direct instantiation of the interface.
+        """Reject direct instantiation of the interface.
 
         Validates that the contract stays abstract and cannot be used as a
         concrete task by mistake.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IBackgroundTask()  # type: ignore[abstract]
 
     def testRejectsSubclassesThatDoNotImplementRun(self) -> None:
-        """
-        Reject subclasses leaving the run method unimplemented.
+        """Reject subclasses leaving the run method unimplemented.
 
         Validates that the abstract machinery keeps incomplete task
         implementations out of the system.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             _IncompleteTask()  # type: ignore[abstract]
 
     async def testAcceptsSubclassesImplementingRun(self) -> None:
-        """
-        Accept subclasses providing the run coroutine.
+        """Accept subclasses providing the run coroutine.
 
         Validates that implementing the single abstract method is enough
         to obtain a usable background task.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         task = _MinimalTask()
 
@@ -117,21 +140,29 @@ class TestBackgroundTaskContract(TestCase):
         self.assertEqual(task.executions, ["ran"])
 
     def testFrameworkImplementationsDeriveFromTheContract(self) -> None:
-        """
-        Derive the shipped task classes from the interface.
+        """Derive the shipped task classes from the interface.
 
         Validates that both concrete classes are substitutable wherever
         the contract is required.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(BackgroundTask, IBackgroundTask))
         self.assertTrue(issubclass(BackgroundTasks, IBackgroundTask))
 
     def testImplementationsMirrorTheContractSignature(self) -> None:
-        """
-        Mirror the contract signature in the implementation.
+        """Mirror the contract signature in the implementation.
 
         Validates that the shipped task exposes the run method with the
         parameters declared by the interface.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             parameter_names(BackgroundTask, "run"),

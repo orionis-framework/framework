@@ -24,7 +24,6 @@ _SPECIALISED = (
     TokenException,
 )
 
-
 class TestExceptionHierarchy(TestCase):
     """Validate the exception hierarchy exposed by the module."""
 
@@ -33,6 +32,11 @@ class TestExceptionHierarchy(TestCase):
 
         Validates that a caller may still fall back to a generic
         ``except Exception`` handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(AuthException, Exception))
 
@@ -41,6 +45,11 @@ class TestExceptionHierarchy(TestCase):
 
         Validates that a single ``except AuthException`` covers every
         failure the module can raise.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for exception in _SPECIALISED:
             self.assertTrue(issubclass(exception, AuthException), exception)
@@ -50,6 +59,11 @@ class TestExceptionHierarchy(TestCase):
 
         Validates that callers can tell one failure from another without
         parsing messages.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(len(set(_SPECIALISED)), len(_SPECIALISED))
         for exception in _SPECIALISED:
@@ -62,6 +76,11 @@ class TestExceptionHierarchy(TestCase):
 
         Validates that "not logged in" and "not allowed" stay two
         independent branches of the hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(
             issubclass(AuthorizationException, AuthenticationException),
@@ -79,6 +98,11 @@ class TestExceptionModuleSurface(TestCase):
 
         Validates that no helper or leaked import becomes part of the
         published surface.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         published = {
             name for name in vars(exceptions) if not name.startswith("_")
@@ -93,6 +117,11 @@ class TestExceptionModuleSurface(TestCase):
 
         Validates that the module stays self describing, which matters
         because the classes carry no behaviour of their own.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for exception in (AuthException, *_SPECIALISED):
             docstring = exception.__doc__ or ""
@@ -107,6 +136,16 @@ class TestExceptionBehaviour(TestCase):
 
         Validates that the classes add no formatting of their own to the
         message the framework assigns.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        exception
+            Raised when the helper reaches this failure path.
         """
         for exception in (AuthException, *_SPECIALISED):
             error_msg = f"Failure raised by {exception.__name__}."
@@ -119,6 +158,18 @@ class TestExceptionBehaviour(TestCase):
 
         Validates that chaining keeps the original traceback reachable
         for the exception renderer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        cause
+            Raised when the helper reaches this failure path.
+        exception
+            Raised when the helper reaches this failure path.
         """
         for exception in (AuthException, *_SPECIALISED):
             cause = ValueError("underlying failure")
@@ -134,6 +185,16 @@ class TestExceptionBehaviour(TestCase):
         """Catch each specialised failure through the shared base.
 
         Validates the single ``except`` clause application code relies on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        exception
+            Raised when the helper reaches this failure path.
         """
         for exception in _SPECIALISED:
             error_msg = "Caught through the module base."
@@ -150,6 +211,11 @@ class TestHttpStatusMapping(TestCase):
 
         Validates that ``401`` keeps meaning "no valid authenticated
         identity".
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         status, _ = _HTTP_STATUS_MAP[AuthenticationException]
         self.assertEqual(status, HTTPStatus.UNAUTHORIZED)
@@ -159,6 +225,11 @@ class TestHttpStatusMapping(TestCase):
 
         Validates that ``403`` keeps meaning "authenticated but not
         allowed".
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         status, _ = _HTTP_STATUS_MAP[AuthorizationException]
         self.assertEqual(status, HTTPStatus.FORBIDDEN)
@@ -168,6 +239,11 @@ class TestHttpStatusMapping(TestCase):
 
         Validates that collapsing them would never hide why a request was
         rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertNotEqual(
             _HTTP_STATUS_MAP[AuthenticationException],

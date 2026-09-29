@@ -28,11 +28,15 @@ class TestLocalizationManagerContract(TestCase):
     """Validate the manager interface and its implementation parity."""
 
     def testDeclaresTheExpectedAbstractSurface(self) -> None:
-        """
-        Declare exactly the documented abstract methods.
+        """Declare exactly the documented abstract methods.
 
         Validates that the manager exposes a single entry point to the
         shared translator.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             ILocalizationManager.__abstractmethods__,
@@ -40,31 +44,43 @@ class TestLocalizationManagerContract(TestCase):
         )
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots on the interface.
+        """Declare empty slots on the interface.
 
         Validates that implementations declaring slots do not gain an
         instance dictionary through the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ILocalizationManager.__slots__, ())
 
     def testFrameworkImplementationDerivesFromTheContract(self) -> None:
-        """
-        Derive the shipped manager from the interface.
+        """Derive the shipped manager from the interface.
 
         Validates that the container can resolve the manager through
         its contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(
             issubclass(LocalizationManager, ILocalizationManager),
         )
 
     def testImplementationMirrorsTheContractSignatures(self) -> None:
-        """
-        Mirror the contract signatures in the implementation.
+        """Mirror the contract signatures in the implementation.
 
         Validates that callers relying on the interface can invoke the
         implementation with the very same arguments.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for method in sorted(_ABSTRACT_METHODS):
             self.assertEqual(

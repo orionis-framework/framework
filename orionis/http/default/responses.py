@@ -356,7 +356,7 @@ class DefaultResponses(IDefaultResponses):
                 return response
             cache.pop(key, None)
 
-        public_storage = self.__directory.storagePublic()
+        public_storage = self.__directory.storageAppPublic()
         for file_name, headers in candidates:
             path = public_storage / file_name
             response = self.__fileResponse(path, headers)

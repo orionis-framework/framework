@@ -16,65 +16,89 @@ from orionis.test import TestCase
 class TestLocalStorageDriver(TestCase):
 
     def setUp(self) -> None:
-        """
-        Create a temporary root and a local driver before each test.
+        """Create a temporary root and a local driver before each test.
 
         Provides an isolated, writable directory so every test
         operates on its own filesystem state without side effects.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
         self._root = Path(self._tmpdir.name)
         self._driver = LocalStorageDriver(self._root)
 
     def tearDown(self) -> None:
-        """
-        Remove the temporary root after each test.
+        """Remove the temporary root after each test.
 
         Ensures all files created during the test are cleaned up
         regardless of the test outcome.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir.cleanup()
 
     # ── write / read ─────────────────────────────────────────────────────────
 
     async def testWriteAndReadRoundtrip(self) -> None:
-        """
-        Persist bytes and read them back unchanged.
+        """Persist bytes and read them back unchanged.
 
         Validates the basic happy path of the write/read pair,
         including automatic parent directory creation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("nested/dir/a.bin", b"hello")
         self.assertEqual(await self._driver.read("nested/dir/a.bin"), b"hello")
 
     async def testWriteEncodesStringsAsUtf8(self) -> None:
-        """
-        Encode string contents as UTF-8 on write.
+        """Encode string contents as UTF-8 on write.
 
         Validates that textual payloads land on disk as UTF-8 bytes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("a.txt", "café")
         self.assertEqual((self._root / "a.txt").read_bytes(), "café".encode())
 
     async def testWriteLeavesNoTempFileBehind(self) -> None:
-        """
-        Clean up the intermediate temp file used for atomic writes.
+        """Clean up the intermediate temp file used for atomic writes.
 
         Validates that only the final file remains after a write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("clean.txt", b"x")
         leftovers = [p.name for p in self._root.iterdir()]
         self.assertEqual(leftovers, ["clean.txt"])
 
     async def testConcurrentWritesToTheSamePathNeverMixPayloads(self) -> None:
-        """
-        Publish a whole payload when writers race on the same path.
+        """Publish a whole payload when writers race on the same path.
 
         Validates that every write stages its bytes in its own temp
         file, so a racing writer can neither publish a mix of two
         payloads nor steal another writer's staging file. Windows may
         still refuse a concurrent replace of the destination, which is
         an operating system limitation and never a lost staging file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payloads = [bytes([index]) * 4096 for index in range(1, 9)]
         results = await asyncio.gather(
@@ -96,11 +120,15 @@ class TestLocalStorageDriver(TestCase):
         )
 
     async def testFailedWriteRemovesItsTempFile(self) -> None:
-        """
-        Discard the staging file when the write cannot be committed.
+        """Discard the staging file when the write cannot be committed.
 
         Validates the cleanup path by targeting an existing directory,
         which no platform can replace with a file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         (self._root / "busy").mkdir()
         with self.assertRaises(OSError):
@@ -108,19 +136,27 @@ class TestLocalStorageDriver(TestCase):
         self.assertEqual([p.name for p in self._root.iterdir()], ["busy"])
 
     async def testReadMissingFileRaises(self) -> None:
-        """
-        Raise StorageFileNotFoundException when reading a missing file.
+        """Raise StorageFileNotFoundException when reading a missing file.
 
         Validates the documented failure contract of read().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._driver.read("absent.txt")
 
     async def testPathTraversalIsRejected(self) -> None:
-        """
-        Reject paths that escape the disk root.
+        """Reject paths that escape the disk root.
 
         Validates traversal protection with both separator styles.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             await self._driver.write("../evil.txt", b"x")
@@ -130,10 +166,14 @@ class TestLocalStorageDriver(TestCase):
     # ── streams ──────────────────────────────────────────────────────────────
 
     async def testReadStreamYieldsChunks(self) -> None:
-        """
-        Yield the file content in chunks of the requested size.
+        """Yield the file content in chunks of the requested size.
 
         Validates chunked iteration and full content reassembly.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("big.bin", b"abcdefghij")
         chunks = [
@@ -144,13 +184,24 @@ class TestLocalStorageDriver(TestCase):
         self.assertEqual(len(chunks), 3)
 
     async def testWriteStreamPersistsAllChunks(self) -> None:
-        """
-        Persist every chunk produced by an async generator.
+        """Persist every chunk produced by an async generator.
 
         Validates that streamed writes reassemble the payload and
         create parent directories.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async def producer():
+            """Yield the next storage payload chunk.
+
+            Yields
+            ------
+            object
+                Value produced by the helper.
+            """
             yield b"one"
             yield b"two"
 
@@ -161,13 +212,29 @@ class TestLocalStorageDriver(TestCase):
         )
 
     async def testFailedStreamWriteLeavesNothingBehind(self) -> None:
-        """
-        Discard the staging file when a streamed transfer fails.
+        """Discard the staging file when a streamed transfer fails.
 
         Validates that an interrupted stream creates no destination
         file and removes only its own temp file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async def producer():
+            """Yield the next storage payload chunk.
+
+            Yields
+            ------
+            object
+                Value produced by the helper.
+
+            Raises
+            ------
+            RuntimeError
+                Raised by this helper to exercise the failure path.
+            """
             yield b"one"
             error_msg = "producer exhausted unexpectedly"
             raise RuntimeError(error_msg)
@@ -179,10 +246,14 @@ class TestLocalStorageDriver(TestCase):
         self.assertFalse(await self._driver.exists("partial.bin"))
 
     async def testOpenWriteThenReadThroughStream(self) -> None:
-        """
-        Write through an open stream and read the content back.
+        """Write through an open stream and read the content back.
 
         Validates the async context-manager stream over local files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with self._driver.open("s.bin", "wb") as stream:
             await stream.write(b"streamed")
@@ -190,10 +261,14 @@ class TestLocalStorageDriver(TestCase):
             self.assertEqual(await stream.read(), b"streamed")
 
     def testOpenRejectsTextModes(self) -> None:
-        """
-        Reject non-binary stream modes.
+        """Reject non-binary stream modes.
 
         Validates the documented mode whitelist of open().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             self._driver.open("a.txt", "w")
@@ -201,30 +276,42 @@ class TestLocalStorageDriver(TestCase):
     # ── existence, deletion, copy, move ──────────────────────────────────────
 
     async def testExistsReflectsState(self) -> None:
-        """
-        Report existence only for stored files.
+        """Report existence only for stored files.
 
         Validates exists() before and after a write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(await self._driver.exists("f.txt"))
         await self._driver.write("f.txt", b"x")
         self.assertTrue(await self._driver.exists("f.txt"))
 
     async def testDeleteReturnsWhetherFileExisted(self) -> None:
-        """
-        Return True only when the deleted file existed.
+        """Return True only when the deleted file existed.
 
         Validates the boolean contract of delete().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         self.assertTrue(await self._driver.delete("f.txt"))
         self.assertFalse(await self._driver.delete("f.txt"))
 
     async def testCopyDuplicatesContent(self) -> None:
-        """
-        Duplicate the file content at the target path.
+        """Duplicate the file content at the target path.
 
         Validates that both source and copy exist afterwards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.copy("src.txt", "copies/dst.txt")
@@ -232,10 +319,14 @@ class TestLocalStorageDriver(TestCase):
         self.assertTrue(await self._driver.exists("src.txt"))
 
     async def testMoveRemovesSource(self) -> None:
-        """
-        Relocate the file content and drop the source file.
+        """Relocate the file content and drop the source file.
 
         Validates the move semantics of the driver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.move("src.txt", "moved/dst.txt")
@@ -245,19 +336,27 @@ class TestLocalStorageDriver(TestCase):
     # ── metadata ─────────────────────────────────────────────────────────────
 
     async def testSizeReturnsByteCount(self) -> None:
-        """
-        Return the exact stored byte count.
+        """Return the exact stored byte count.
 
         Validates size() against a known payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.bin", b"12345")
         self.assertEqual(await self._driver.size("f.bin"), 5)
 
     async def testLastModifiedIsTimezoneAware(self) -> None:
-        """
-        Return a timezone-aware UTC timestamp.
+        """Return a timezone-aware UTC timestamp.
 
         Validates the datetime contract of lastModified().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         stamp = await self._driver.lastModified("f.txt")
@@ -265,11 +364,15 @@ class TestLocalStorageDriver(TestCase):
         self.assertEqual(stamp.tzinfo, UTC)
 
     async def testVisibilityReturnsSupportedLevel(self) -> None:
-        """
-        Return one of the supported visibility levels.
+        """Return one of the supported visibility levels.
 
         Validates visibility() portability across platforms with
         partial POSIX permission support.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         self.assertIn(
@@ -278,30 +381,42 @@ class TestLocalStorageDriver(TestCase):
         )
 
     async def testSetVisibilityRejectsUnknownLevel(self) -> None:
-        """
-        Reject visibility levels outside the supported set.
+        """Reject visibility levels outside the supported set.
 
         Validates the failure contract of setVisibility().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
             await self._driver.setVisibility("f.txt", "secret")
 
     async def testHashMatchesHashlibDigest(self) -> None:
-        """
-        Compute the same digest as hashlib for the stored content.
+        """Compute the same digest as hashlib for the stored content.
 
         Validates hash() against a locally computed SHA-256.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.bin", b"payload")
         expected = hashlib.sha256(b"payload").hexdigest()
         self.assertEqual(await self._driver.hash("f.bin"), expected)
 
     async def testInfoReturnsFileInfoEntity(self) -> None:
-        """
-        Return an immutable FileInfo snapshot with coherent values.
+        """Return an immutable FileInfo snapshot with coherent values.
 
         Validates the info() aggregation of size, hashes, and MIME.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("docs/f.txt", b"abc")
         info = await self._driver.info("docs/f.txt")
@@ -315,10 +430,14 @@ class TestLocalStorageDriver(TestCase):
     # ── directories ──────────────────────────────────────────────────────────
 
     async def testCreateAndDeleteDirectory(self) -> None:
-        """
-        Create a nested directory and delete it with its contents.
+        """Create a nested directory and delete it with its contents.
 
         Validates createDirectory()/deleteDirectory() round trips.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.createDirectory("up/loads")
         self.assertTrue(await self._driver.directoryExists("up/loads"))
@@ -328,10 +447,14 @@ class TestLocalStorageDriver(TestCase):
         self.assertFalse(await self._driver.deleteDirectory("up"))
 
     async def testFilesListsDirectAndRecursiveEntries(self) -> None:
-        """
-        List direct children and full subtrees separately.
+        """List direct children and full subtrees separately.
 
         Validates the recursive flag of files().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("d/one.txt", b"1")
         await self._driver.write("d/sub/two.txt", b"2")
@@ -342,10 +465,14 @@ class TestLocalStorageDriver(TestCase):
         )
 
     async def testDirectoriesListsDirectAndRecursiveEntries(self) -> None:
-        """
-        List direct child directories and full subtrees separately.
+        """List direct child directories and full subtrees separately.
 
         Validates the recursive flag of directories().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("d/sub/deep/f.txt", b"x")
         self.assertEqual(await self._driver.directories("d"), ["d/sub"])
@@ -357,40 +484,56 @@ class TestLocalStorageDriver(TestCase):
     # ── URLs and downloads ───────────────────────────────────────────────────
 
     async def testUrlWithoutBaseUrlRaises(self) -> None:
-        """
-        Raise when the disk exposes no public URLs.
+        """Raise when the disk exposes no public URLs.
 
         Validates the failure contract of url() without a base URL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
             await self._driver.url("f.txt")
 
     async def testUrlComposedFromBaseUrl(self) -> None:
-        """
-        Compose the public URL from the configured base URL.
+        """Compose the public URL from the configured base URL.
 
         Validates URL building and path quoting.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = LocalStorageDriver(self._root, base_url="/static")
         await driver.write("img/a b.png", b"x")
         self.assertEqual(await driver.url("img/a b.png"), "/static/img/a%20b.png")
 
     async def testTemporaryUrlAlwaysRaises(self) -> None:
-        """
-        Raise since local disks cannot sign URLs.
+        """Raise since local disks cannot sign URLs.
 
         Validates the documented limitation of temporaryUrl().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
             await self._driver.temporaryUrl("f.txt", 60)
 
     async def testDownloadCopiesToLocalDestination(self) -> None:
-        """
-        Copy the stored file to a local destination path.
+        """Copy the stored file to a local destination path.
 
         Validates download() with both file and directory targets.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._driver.write("docs/report.pdf", b"pdf-bytes")
         with tempfile.TemporaryDirectory() as destination:

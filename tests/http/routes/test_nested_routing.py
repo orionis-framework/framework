@@ -20,18 +20,36 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
 
 def route_handler() -> Response:
-    """Return the terminal response for routing integration tests."""
+    """Return the terminal response for routing integration tests.
+
+    Returns
+    -------
+    Response
+        Value produced by the helper.
+    """
     return Response(content="routed")
 
 class UserController:
     """Provide both controller-action and invokable route fixtures."""
 
     def index(self) -> Response:
-        """Return a successful controller response."""
+        """Return a successful controller response.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         return route_handler()
 
     def __call__(self) -> Response:
-        """Return a successful invokable response."""
+        """Return a successful invokable response.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         return route_handler()
 
 class ChildController(UserController):
@@ -45,7 +63,20 @@ class OneMiddleware(BaseMiddleware):
         request: Request,
         call_next: Callable[[], Awaitable[Response]],
     ) -> Response:
-        """Record entry and exit around the downstream response."""
+        """Record entry and exit around the downstream response.
+
+        Parameters
+        ----------
+        request : Request
+            Value supplied for ``request``.
+        call_next : Callable[[], Awaitable[Response]]
+            Value supplied for ``call_next``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         trace = getattr(request.state, "routingTrace", None)
         if trace is None:
             trace = []
@@ -76,11 +107,30 @@ class Namespace:
         """Expose a nested middleware class for cache restoration."""
 
 def make_router() -> Router:
-    """Build a router with the same default routes as an application."""
+    """Build a router with the same default routes as an application.
+
+    Returns
+    -------
+    Router
+        Value produced by the helper.
+    """
     return Router(SimpleNamespace(routeHealthCheck="/up"))
 
 def compile_router(router: Router, middleware: list | None = None) -> dict:
-    """Compile the exported routes through the production compiler."""
+    """Compile the exported routes through the production compiler.
+
+    Parameters
+    ----------
+    router : Router
+        Value supplied for ``router``.
+    middleware : list | None
+        Value supplied for ``middleware``.
+
+    Returns
+    -------
+    dict
+        Value produced by the helper.
+    """
     exported = router.export()
     compiled, _ = RouteCompiler().compile(
         exported["routes"],
@@ -93,7 +143,13 @@ class TestNestedRouting(TestCase):
     """Exercise composition through the public router and fluent APIs."""
 
     def testSimpleRoutesAndExistingVerbs(self) -> None:
-        """Keep every existing registration method and fluent name working."""
+        """Keep every existing registration method and fluent name working.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for verb in ("get", "post", "put", "patch", "delete", "query"):
             route = getattr(router, verb)("/users", [UserController, "index"])
@@ -108,7 +164,13 @@ class TestNestedRouting(TestCase):
         )
 
     def testLegacySingleMiddlewareGroup(self) -> None:
-        """Keep the existing login-style registration expression valid."""
+        """Keep the existing login-style registration expression valid.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         group = router.group(
             middleware=OneMiddleware,
@@ -125,7 +187,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(resolver.resolve("POST", "/login").route.name, "login")
 
     def testNestedPrefixAndMiddlewareInheritance(self) -> None:
-        """Flatten parent context before child context and local middleware."""
+        """Flatten parent context before child context and local middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         leaf = router.get("/index", route_handler).middleware(FourMiddleware)
         router.group(
@@ -155,7 +223,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(leaf.path, "/admin/users/index")
 
     def testThreeLevelsAndNamedPostRoute(self) -> None:
-        """Keep names and methods while composing at least three levels."""
+        """Keep names and methods while composing at least three levels.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(
             prefix="api",
@@ -187,7 +261,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(route.compiled_middlewares, ())
 
     def testDepthDoesNotDependOnPythonRecursion(self) -> None:
-        """Compose more levels than Python's normal recursion limit."""
+        """Compose more levels than Python's normal recursion limit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         member = router.get("/leaf", route_handler)
         for _ in range(1100):
@@ -204,7 +284,13 @@ class TestNestedRouting(TestCase):
         )
 
     def testAllPrefixSpellingsAndRootPaths(self) -> None:
-        """Canonicalize group boundaries once, including whitespace and root."""
+        """Canonicalize group boundaries once, including whitespace and root.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for prefix in ("admin", "/admin", "admin/", "/admin/", " //admin// "):
             with self.subTest(prefix=prefix):
                 router = make_router()
@@ -227,7 +313,13 @@ class TestNestedRouting(TestCase):
                 self.assertEqual(resolver.resolve("POST", "/admin/users").params, {})
 
     def testGroupsWithoutPrefixesOrMiddleware(self) -> None:
-        """Accept optional context and preserve ungrouped sibling routes."""
+        """Accept optional context and preserve ungrouped sibling routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for prefix in (None, "", "/", " /// "):
             with self.subTest(prefix=prefix):
                 router = make_router()
@@ -243,7 +335,13 @@ class TestNestedRouting(TestCase):
                     self.assertEqual(resolver.resolve("GET", path).route.path, path)
 
     def testExclusionsAndDeduplicationUseFinalOrder(self) -> None:
-        """Apply exclusions after app, parent, child and route composition."""
+        """Apply exclusions after app, parent, child and route composition.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(
             middleware=[OneMiddleware, TwoMiddleware],
@@ -273,7 +371,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(route.compiled_middlewares, (FourMiddleware, OneMiddleware))
 
     def testGroupExcludesRouteMiddleware(self) -> None:
-        """Parent exclusions also remove middleware attached directly to leaves."""
+        """Parent exclusions also remove middleware attached directly to leaves.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(
             without_middleware=[OneMiddleware],
@@ -292,7 +396,13 @@ class TestNestedRouting(TestCase):
         )
 
     def testSetMiddlewareHasStableImportNameOrder(self) -> None:
-        """Keep set and frozenset compatibility with repeatable ordering."""
+        """Keep set and frozenset compatibility with repeatable ordering.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for middleware in (
             {TwoMiddleware, OneMiddleware},
             frozenset({TwoMiddleware, OneMiddleware}),
@@ -312,7 +422,13 @@ class TestNestedRouting(TestCase):
             )
 
     def testFacadeSupportsTheNestedExpression(self) -> None:
-        """Forward the public Route facade to nested Router.group calls."""
+        """Forward the public Route facade to nested Router.group calls.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         with replace_attribute(Route, "_pinned_instance", router):
             Route.group(
@@ -339,7 +455,13 @@ class TestNestedRouting(TestCase):
         )
 
     def testInvalidGroupsDoNotPartiallyApplyContext(self) -> None:
-        """Validate the whole group before mutating any already registered leaf."""
+        """Validate the whole group before mutating any already registered leaf.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for options in (
             {"prefix": False},
             {"prefix": 0},
@@ -361,7 +483,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(route.path, "/valid")
 
     def testInvalidMembershipAndDuplicates(self) -> None:
-        """Reject empty groups, invalid containers and ambiguous shared leaves."""
+        """Reject empty groups, invalid containers and ambiguous shared leaves.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for routes in (None, [], (), [RouteGroup(())]):
             with self.subTest(routes=routes), self.assertRaises(ValueError):
@@ -376,7 +504,13 @@ class TestNestedRouting(TestCase):
         self.assertEqual(route.path, "/once")
 
     def testExternalRoutesAndTupleMembershipRemainSupported(self) -> None:
-        """Register standalone fluent routes supplied through a group."""
+        """Register standalone fluent routes supplied through a group.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(routes=(FluentRoute("GET", "/x", route_handler),))
         self.assertEqual(
@@ -384,7 +518,13 @@ class TestNestedRouting(TestCase):
         )
 
     def testSiblingGroupsCanStartWithTheSameRelativePath(self) -> None:
-        """Defer path collision checks until all group prefixes are known."""
+        """Defer path collision checks until all group prefixes are known.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for prefix in ("one", "two"):
             router.group(prefix=prefix, routes=[router.get("/index", route_handler)])
@@ -393,7 +533,13 @@ class TestNestedRouting(TestCase):
             self.assertEqual(resolver.resolve("GET", path).route.path, path)
 
     def testDefaultOverrideDoesNotDeleteAPrefixedRoute(self) -> None:
-        """Keep a former default path after its fluent route has been prefixed."""
+        """Keep a former default path after its fluent route has been prefixed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/robots.txt", route_handler).prefix("admin")
         router.get("/robots.txt/", route_handler)
@@ -402,7 +548,13 @@ class TestNestedRouting(TestCase):
             self.assertEqual(resolver.resolve("GET", path).route.path, path)
 
     def testCompiledStackIsIndependentOfFurtherBuilderMutation(self) -> None:
-        """Freeze dispatch middleware even when a builder is subsequently changed."""
+        """Freeze dispatch middleware even when a builder is subsequently changed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         leaf = router.get("/x", route_handler).middleware(OneMiddleware)
         resolver = RouteResolver(compile_router(router))
@@ -415,7 +567,13 @@ class TestNestedRoutingExecution(TestCase):
     """Run compiled groups through the real HTTP kernel and its middleware."""
 
     async def testConcurrentRequestsKeepMiddlewareOrderAndLocalState(self) -> None:
-        """Execute parent-first stacks and unwind without sharing request state."""
+        """Execute parent-first stacks and unwind without sharing request state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         router.group(
@@ -443,7 +601,13 @@ class TestNestedRoutingExecution(TestCase):
             self.assertEqual(response.getHeader("x-trace"), [expected])
 
     async def testCachedNestedControllersMiddlewareAndFallbackExecute(self) -> None:
-        """Restore nested import names and dispatch inherited invokable actions."""
+        """Restore nested import names and dispatch inherited invokable actions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         router.group(

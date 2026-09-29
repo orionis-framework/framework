@@ -5,25 +5,39 @@ class TestBaseController(TestCase):
     """Unit tests for the BaseController marker class."""
 
     def testIsInstantiable(self) -> None:
-        """
-        Verify that BaseController can be instantiated without arguments.
+        """Verify that BaseController can be instantiated without arguments.
 
         Confirms the class has no required constructor parameters and
         does not raise on creation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = BaseController()
         self.assertIsInstance(instance, BaseController)
 
     def testSubclassInheritsFromBaseController(self) -> None:
-        """
-        Verify that a subclass of BaseController passes an issubclass check.
+        """Verify that a subclass of BaseController passes an issubclass check.
 
         Confirms that the inheritance hierarchy is correctly established.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _MyController(BaseController):
             def index(self) -> str:
-                """Return the controller action result."""
+                """Return the controller action result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "ok"
 
         self.assertTrue(issubclass(_MyController, BaseController))
@@ -31,11 +45,15 @@ class TestBaseController(TestCase):
         self.assertIsInstance(instance, BaseController)
 
     def testBaseControllerHasNoPublicMethods(self) -> None:
-        """
-        Verify that BaseController exposes no public instance methods.
+        """Verify that BaseController exposes no public instance methods.
 
         Confirms the marker-class contract by asserting that no user-
         defined methods are present on the class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         public_methods = [
             name
@@ -45,16 +63,26 @@ class TestBaseController(TestCase):
         self.assertEqual(public_methods, [])
 
     def testSubclassMethodsAreAccessible(self) -> None:
-        """
-        Verify that methods defined on a subclass are accessible.
+        """Verify that methods defined on a subclass are accessible.
 
         Confirms that extending BaseController does not interfere with
         method resolution in user-defined controllers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _UserController(BaseController):
             def show(self) -> str:
-                """Return the user action result."""
+                """Return the user action result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "user"
 
         ctrl = _UserController()

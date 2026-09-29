@@ -431,6 +431,7 @@ class Router(IRouter):
         middleware: MiddlewareInput | None = None,
         without_middleware: MiddlewareInput | None = None,
         routes: Sequence[FluentRoute | RouteGroup] | None = None,
+        public: bool | None = None,
     ) -> RouteGroup:
         """Compose a group and return its flattened membership for nesting.
 
@@ -444,6 +445,8 @@ class Router(IRouter):
             Exclusions applied to the final compiled middleware stack.
         routes : Sequence[FluentRoute | RouteGroup] | None, optional
             Routes or groups already registered by inner expressions.
+        public : bool | None, optional
+            Inherited stateless profile; explicit child choices take precedence.
 
         Returns
         -------
@@ -459,6 +462,9 @@ class Router(IRouter):
             If membership is not a sequence of routes and groups.
         """
         members = self.__groupMembers(routes)
+        if public is not None and not isinstance(public, bool):
+            error_msg = "The public group profile must be a boolean"
+            raise TypeError(error_msg)
         if prefix is not None and not isinstance(prefix, str):
             error_msg = "Group prefix must be a string if provided."
             raise ValueError(error_msg)
@@ -479,7 +485,9 @@ class Router(IRouter):
             raise ValueError(error_msg) from exc
 
         for route in members:
-            route.inheritGroup(normalized_prefix, parent_middleware, excluded)
+            route.inheritGroup(
+                normalized_prefix, parent_middleware, excluded, public=public,
+            )
             self.__routes[route.id] = route
         return RouteGroup(members)
 

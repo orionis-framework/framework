@@ -2,7 +2,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IPerformanceCounter(ABC):
-
     __slots__ = ()
 
     @abstractmethod
@@ -23,8 +22,7 @@ class IPerformanceCounter(ABC):
         """
         Start the performance counter asynchronously.
 
-        Records the current high-resolution time as the start time using the
-        event loop.
+        Records the current high-resolution time for an asynchronous measurement.
 
         Returns
         -------
@@ -49,6 +47,8 @@ class IPerformanceCounter(ABC):
         ------
         RuntimeError
             If called after asynchronous start.
+        ValueError
+            If called before start.
         """
 
     @abstractmethod

@@ -17,12 +17,29 @@ class _CountingBuffer(bytearray):
     """Count indexed padding-byte reads performed by the delimiter scanner."""
 
     def __init__(self) -> None:
-        """Create an empty byte buffer with a padding-read counter."""
+        """Create an empty byte buffer with a padding-read counter.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__()
         self.paddingReads = 0
 
     def __getitem__(self, key: int | slice) -> int | bytearray:
-        """Return a byte or slice and count reads of padding characters."""
+        """Return a byte or slice and count reads of padding characters.
+
+        Parameters
+        ----------
+        key : int | slice
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        int | bytearray
+            Value produced by the helper.
+        """
         value = super().__getitem__(key)
         if isinstance(key, int) and value in (32, 9):
             self.paddingReads += 1
@@ -87,7 +104,22 @@ def upload_factory(
         _content_type: str | None,
         _memory_threshold: int,
     ) -> UploadedFile:
-        """Return the concrete upload supplied for lifecycle assertions."""
+        """Return the concrete upload supplied for lifecycle assertions.
+
+        Parameters
+        ----------
+        _filename : str
+            Value supplied for ``_filename``.
+        _content_type : str | None
+            Value supplied for ``_content_type``.
+        _memory_threshold : int
+            Value supplied for ``_memory_threshold``.
+
+        Returns
+        -------
+        UploadedFile
+            Value produced by the helper.
+        """
         return upload
 
     return create_upload
@@ -96,7 +128,13 @@ class TestMultipartStreaming(TestCase):
     """Exercise multipart framing, limits, and resource ownership."""
 
     async def testAcceptsEveryChunkBoundary(self) -> None:
-        """Preserve fields when any delimiter or header is split in two."""
+        """Preserve fields when any delimiter or header is split in two.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = multipart_body(b"value")
         for position in range(len(body) + 1):
             parser = MultipartStreamParser(
@@ -106,7 +144,13 @@ class TestMultipartStreaming(TestCase):
                 self.assertEqual((await parser.parse()).get("field"), "value")
 
     async def testAcceptsSingleByteChunks(self) -> None:
-        """Recognize boundaries and headers delivered one byte at a time."""
+        """Recognize boundaries and headers delivered one byte at a time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = multipart_body(b"value")
         parser = MultipartStreamParser(
             stream_chunks([body[index:index + 1] for index in range(len(body))]),
@@ -115,7 +159,13 @@ class TestMultipartStreaming(TestCase):
         self.assertEqual((await parser.parse()).get("field"), "value")
 
     async def testPreservesBoundaryLikeBodyContent(self) -> None:
-        """Require the delimiter line prefix and suffix before ending a part."""
+        """Require the delimiter line prefix and suffix before ending a part.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         value = b"start--" + _BOUNDARY + b"\r\n--" + _BOUNDARY + b"X\r\nend"
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(value)]), _BOUNDARY,
@@ -123,7 +173,13 @@ class TestMultipartStreaming(TestCase):
         self.assertEqual((await parser.parse()).get("field"), value.decode())
 
     async def testPreservesClosingBoundaryPrefixesInsideFields(self) -> None:
-        """Require a complete closing delimiter line before ending a field."""
+        """Require a complete closing delimiter line before ending a field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         value = b"head\r\n--" + _BOUNDARY + b"--not-a-delimiter\r\ntail"
         body = multipart_body(value)
         for position in range(len(body) + 1):
@@ -134,7 +190,13 @@ class TestMultipartStreaming(TestCase):
                 self.assertEqual((await parser.parse()).get("field"), value.decode())
 
     async def testAcceptsDelimiterTransportPadding(self) -> None:
-        """Accept spaces and tabs before a delimiter line terminator."""
+        """Accept spaces and tabs before a delimiter line terminator.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = multipart_body(b"value").replace(
             b"--" + _BOUNDARY + b"\r\n", b"--" + _BOUNDARY + b" \t\r\n",
         ).replace(b"--\r\n", b"-- \t\r\n")
@@ -145,14 +207,26 @@ class TestMultipartStreaming(TestCase):
         self.assertEqual((await parser.parse()).get("field"), "value")
 
     async def testAcceptsClosingDelimiterWithoutFinalNewline(self) -> None:
-        """Recognize a closing delimiter ending at the end of the stream."""
+        """Recognize a closing delimiter ending at the end of the stream.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value")[:-2]]), _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), "value")
 
     async def testScansFragmentedDelimiterPaddingOnce(self) -> None:
-        """Keep padding scans linear across prefix removal and false markers."""
+        """Keep padding scans linear across prefix removal and false markers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         padding = b" \t" * 256
         value = b"body\r\n--" + _BOUNDARY + b"--" + padding + b"X\r\ntail"
         body = b"preamble\r\n" + multipart_body(value).replace(
@@ -168,11 +242,23 @@ class TestMultipartStreaming(TestCase):
         self.assertLess(buffer.paddingReads, len(padding) * 4)
 
     async def testBoundsPreambleBuffer(self) -> None:
-        """Discard preamble bytes while retaining a possible delimiter prefix."""
+        """Discard preamble bytes while retaining a possible delimiter prefix.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(stream_chunks([]), _BOUNDARY)
 
         async def preamble_stream() -> AsyncIterator[bytes]:
-            """Yield preamble fragments and verify the retained suffix bound."""
+            """Yield preamble fragments and verify the retained suffix bound.
+
+            Yields
+            ------
+            AsyncIterator[bytes]
+                Value produced by the helper.
+            """
             for _ in range(100):
                 yield b"x" * 1024
                 self.assertLessEqual(len(parser.buffer), len(_BOUNDARY) + 5)
@@ -182,7 +268,13 @@ class TestMultipartStreaming(TestCase):
         self.assertEqual((await parser.parse()).get("field"), "value")
 
     async def testRejectsOversizedHeaders(self) -> None:
-        """Reject an unterminated header block beyond the configured limit."""
+        """Reject an unterminated header block beyond the configured limit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([b"--" + _BOUNDARY + b"\r\n" + b"X" * 40]),
             _BOUNDARY,
@@ -192,7 +284,13 @@ class TestMultipartStreaming(TestCase):
             await parser.parse()
 
     async def testRejectsOversizedCompletedHeaders(self) -> None:
-        """Apply the header limit when the complete block arrives together."""
+        """Apply the header limit when the complete block arrives together.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value")]), _BOUNDARY,
             max_header_size=16,
@@ -201,14 +299,26 @@ class TestMultipartStreaming(TestCase):
             await parser.parse()
 
     async def testRejectsTruncatedBodies(self) -> None:
-        """Require a final delimiter before returning parsed form data."""
+        """Require a final delimiter before returning parsed form data.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = multipart_body(b"value").split(b"\r\n--")[0]
         parser = MultipartStreamParser(stream_chunks([body]), _BOUNDARY)
         with self.assertRaisesRegex(ValueError, "Incomplete multipart"):
             await parser.parse()
 
     async def testRejectsOversizedParts(self) -> None:
-        """Count all streamed field bytes against the part limit."""
+        """Count all streamed field bytes against the part limit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value")]), _BOUNDARY, max_part_size=4,
         )
@@ -216,7 +326,13 @@ class TestMultipartStreaming(TestCase):
             await parser.parse()
 
     async def testAcceptsExactPartLimit(self) -> None:
-        """Exclude delimiter CRLF bytes from the part's measured size."""
+        """Exclude delimiter CRLF bytes from the part's measured size.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = multipart_body(b"value")
         parser = MultipartStreamParser(
             stream_chunks([body[index:index + 1] for index in range(len(body))]),
@@ -226,7 +342,13 @@ class TestMultipartStreaming(TestCase):
         self.assertEqual(parser.current_part_size, 5)
 
     async def testRejectsFieldsBeforeReadingTheirBodies(self) -> None:
-        """Enforce the field count while processing the part headers."""
+        """Enforce the field count while processing the part headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value")]), _BOUNDARY, max_fields=0,
         )
@@ -234,7 +356,13 @@ class TestMultipartStreaming(TestCase):
             await parser.parse()
 
     async def testClosesRejectedUpload(self) -> None:
-        """Release a spooled file when its part exceeds the size limit."""
+        """Release a spooled file when its part exceeds the size limit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("file.txt", None, memory_threshold=1)
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value", b'name="f"; filename="f"')]),
@@ -248,11 +376,28 @@ class TestMultipartStreaming(TestCase):
         self.assertTrue(upload._file.closed)
 
     async def testClosesUploadOnCancellation(self) -> None:
-        """Release the active upload when transport consumption is cancelled."""
+        """Release the active upload when transport consumption is cancelled.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("file.txt", None)
 
         async def cancelled_stream() -> AsyncIterator[bytes]:
-            """Deliver upload headers before cancelling transport consumption."""
+            """Deliver upload headers before cancelling transport consumption.
+
+            Yields
+            ------
+            AsyncIterator[bytes]
+                Value produced by the helper.
+
+            Raises
+            ------
+            asyncio.CancelledError
+                Raised by this helper to exercise the failure path.
+            """
             yield multipart_body(b"value", b'name="f"; filename="f"')[:-25]
             raise asyncio.CancelledError
 
@@ -265,7 +410,13 @@ class TestMultipartStreaming(TestCase):
         self.assertTrue(upload._file.closed)
 
     async def testRetainsSuccessfulUploadUntilFormCloses(self) -> None:
-        """Transfer ownership of successful upload handles to FormData."""
+        """Transfer ownership of successful upload handles to FormData.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value", b'name="f"; filename="f"')]),
             _BOUNDARY, memory_threshold=1,
@@ -277,7 +428,13 @@ class TestMultipartStreaming(TestCase):
         self.assertTrue(upload._file.closed)
 
     async def testRunsDiskWritesOutsideTheEventLoop(self) -> None:
-        """Write a spilling upload on a worker thread while keeping its bytes."""
+        """Write a spilling upload on a worker thread while keeping its bytes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("file.txt", None, memory_threshold=1)
         original_write = upload.write
         loop_thread = get_ident()
@@ -287,7 +444,20 @@ class TestMultipartStreaming(TestCase):
             _file: UploadedFile,
             chunk: bytes | bytearray | memoryview,
         ) -> None:
-            """Record the worker identity and append the upload bytes."""
+            """Record the worker identity and append the upload bytes.
+
+            Parameters
+            ----------
+            _file : UploadedFile
+                Value supplied for ``_file``.
+            chunk : bytes | bytearray | memoryview
+                Value supplied for ``chunk``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             writer_threads.append(get_ident())
             original_write(chunk)
 
@@ -305,7 +475,13 @@ class TestMultipartStreaming(TestCase):
         self.assertNotIn(loop_thread, writer_threads)
 
     async def testCancellationWaitsForActiveDiskWrite(self) -> None:
-        """Finish a worker write before releasing its buffer and closing its file."""
+        """Finish a worker write before releasing its buffer and closing its file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("file.txt", None, memory_threshold=1)
         original_write = upload.write
         started = Event()
@@ -316,7 +492,20 @@ class TestMultipartStreaming(TestCase):
             _file: UploadedFile,
             chunk: bytes | bytearray | memoryview,
         ) -> None:
-            """Wait for cancellation before completing the concrete upload write."""
+            """Wait for cancellation before completing the concrete upload write.
+
+            Parameters
+            ----------
+            _file : UploadedFile
+                Value supplied for ``_file``.
+            chunk : bytes | bytearray | memoryview
+                Value supplied for ``chunk``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             started.set()
             release.wait(5)
             original_write(chunk)

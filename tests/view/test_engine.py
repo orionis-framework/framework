@@ -14,6 +14,15 @@ class _StubTemplate:
         html: str = "",
         error: Exception | None = None,
     ) -> None:
+        """Configure the template output or rendering failure.
+
+        Parameters
+        ----------
+        html : str, optional
+            HTML returned by ``render_async``.
+        error : Exception | None, optional
+            Exception raised by ``render_async`` when provided.
+        """
         self.html: str = html
         self.error: Exception | None = error
         self.calls: list[dict[str, object]] = []
@@ -35,6 +44,15 @@ class _StubJinjaEnvironment:
         template: _StubTemplate | None = None,
         error: Exception | None = None,
     ) -> None:
+        """Configure the template lookup result or failure.
+
+        Parameters
+        ----------
+        template : _StubTemplate | None, optional
+            Template returned by ``get_template``.
+        error : Exception | None, optional
+            Exception raised by ``get_template`` when provided.
+        """
         self.template: _StubTemplate | None = template
         self.error: Exception | None = error
         self.requested: list[str] = []
@@ -52,6 +70,13 @@ class _StubViewEnvironment:
     __slots__ = ("calls", "jinja")
 
     def __init__(self, jinja: _StubJinjaEnvironment) -> None:
+        """Store the Jinja2 environment used by the view double.
+
+        Parameters
+        ----------
+        jinja : _StubJinjaEnvironment
+            Environment returned by ``getJinjaEnvironment``.
+        """
         self.jinja: _StubJinjaEnvironment = jinja
         self.calls: int = 0
 

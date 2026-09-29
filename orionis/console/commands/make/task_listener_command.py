@@ -82,7 +82,7 @@ class MakeTaskListener(BaseCommand):
             stub = stub.replace("{{class_name}}", class_name)
 
             # Resolve the target directory and normalise the file name
-            listeners_dir = app.path("console") / "listeners"
+            listeners_dir: Path = app.path("app_console_listeners")
 
             if not name.lower().endswith("listener"):
                 name = name.rstrip("_") + "_listener"

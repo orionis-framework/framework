@@ -6,10 +6,14 @@ from orionis.test import TestCase
 class TestMailEnumsPackage(TestCase):
 
     def testDeclaresBothEnumerationsAsPublicExports(self) -> None:
-        """
-        Expose the encryption and status enumerations from the package.
+        """Expose the encryption and status enumerations from the package.
 
         Validates the public surface consumers may import.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             enums_package.__all__,
@@ -17,10 +21,14 @@ class TestMailEnumsPackage(TestCase):
         )
 
     def testReExportsBindEachEnumeration(self) -> None:
-        """
-        Bind every exported name to its real enumeration.
+        """Bind every exported name to its real enumeration.
 
         Validates that the re-exports are not shadowing aliases.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(enums_package.MailEncryption, MailEncryption)
         self.assertIs(enums_package.MailStatus, MailStatus)

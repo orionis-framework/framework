@@ -23,7 +23,20 @@ class _CompleteEnv(IEnv):
 
     @classmethod
     def get(cls, key: str, default: object | None = None) -> object:
-        """Return the supplied default for every key."""
+        """Return the supplied default for every key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        default : object | None
+            Value supplied for ``default``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return default
 
     @classmethod
@@ -35,22 +48,64 @@ class _CompleteEnv(IEnv):
         *,
         only_os: bool = False,
     ) -> bool:
-        """Pretend the assignment always succeeds."""
+        """Pretend the assignment always succeeds.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        value : str | float | bool | list | dict | tuple | set
+            Value supplied for ``value``.
+        type_hint : str | None
+            Value supplied for ``type_hint``.
+        only_os : bool
+            Value supplied for ``only_os``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     @classmethod
     def unset(cls, key: str, *, only_os: bool = False) -> bool:
-        """Pretend the removal always succeeds."""
+        """Pretend the removal always succeeds.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        only_os : bool
+            Value supplied for ``only_os``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     @classmethod
     def all(cls) -> dict[str, Any]:
-        """Return an empty mapping of variables."""
+        """Return an empty mapping of variables.
+
+        Returns
+        -------
+        dict[str, Any]
+            Value produced by the helper.
+        """
         return {}
 
     @classmethod
     def reload(cls) -> bool:
-        """Pretend the reload always succeeds."""
+        """Pretend the reload always succeeds.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
 class _IncompleteEnv(IEnv):
@@ -60,7 +115,20 @@ class _IncompleteEnv(IEnv):
 
     @classmethod
     def get(cls, key: str, default: object | None = None) -> object:
-        """Return the supplied default for every key."""
+        """Return the supplied default for every key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        default : object | None
+            Value supplied for ``default``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return default
 
 # ---------------------------------------------------------------------------
@@ -70,59 +138,83 @@ class _IncompleteEnv(IEnv):
 class TestEnvContract(TestCase):
 
     def testIsAnAbstractBaseClass(self) -> None:
-        """
-        Expose the environment contract as an abstract base class.
+        """Expose the environment contract as an abstract base class.
 
         Validates that the contract cannot be used as a concrete service
         and participates in the ABC registration machinery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(IEnv, ABC))
         self.assertTrue(isabstract(IEnv))
 
     def testPublishesExactlyTheDocumentedAbstractSurface(self) -> None:
-        """
-        Publish exactly the documented abstract method surface.
+        """Publish exactly the documented abstract method surface.
 
         Validates that no method is silently added to or removed from the
         contract without updating its implementations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IEnv.__abstractmethods__, _EXPECTED_ABSTRACTS)
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates that implementations declaring ``__slots__`` do not
         inherit an unwanted instance dictionary from the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IEnv.__dict__.get("__slots__"), ())
 
     def testCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Reject direct instantiation of the contract.
+        """Reject direct instantiation of the contract.
 
         Validates that callers are forced to depend on a concrete facade
         implementation instead of the interface itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IEnv()
 
     def testRejectsPartialImplementations(self) -> None:
-        """
-        Reject subclasses that leave abstract methods unimplemented.
+        """Reject subclasses that leave abstract methods unimplemented.
 
         Validates that a half-finished facade fails at construction time
         rather than at the first call site.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             _IncompleteEnv()
 
     def testAcceptsCompleteImplementations(self) -> None:
-        """
-        Accept subclasses that implement the whole contract.
+        """Accept subclasses that implement the whole contract.
 
         Validates that the abstract surface is satisfiable without any
         additional hook or attribute.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_CompleteEnv.get("KEY", "default"), "default")
         self.assertTrue(_CompleteEnv.set("KEY", "value"))
@@ -131,11 +223,15 @@ class TestEnvContract(TestCase):
         self.assertTrue(_CompleteEnv.reload())
 
     def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
-        """
-        Match the parameter names published by the shipped facade.
+        """Match the parameter names published by the shipped facade.
 
         Validates that ``Env`` can be substituted wherever the contract is
         expected without changing call sites.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in sorted(_EXPECTED_ABSTRACTS):
             expected = list(signature(getattr(IEnv, name)).parameters)
@@ -143,11 +239,15 @@ class TestEnvContract(TestCase):
             self.assertEqual(actual, expected)
 
     def testIsImplementedByTheShippedFacade(self) -> None:
-        """
-        Recognise the shipped facade as a valid implementation.
+        """Recognise the shipped facade as a valid implementation.
 
         Validates that ``Env`` actually derives from the contract used
         across the framework.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(Env, IEnv))
         self.assertEqual(Env.__abstractmethods__, frozenset())

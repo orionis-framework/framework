@@ -65,7 +65,7 @@ from orionis.support.performance import PerformanceCounter
 PerformanceCounter() -> None
 ```
 
-A `__slots__`-based object (`_start_time`, `_end_time`, `_diff_time`,
+A `__slots__`-based object (`_start_time`, `_diff_time`,
 `_is_async_mode`) with no constructor arguments. Every "start" and
 "stop" method returns `self`, so calls can be chained; every "get"
 method reads the elapsed time recorded by the last `start()`/`stop()`
@@ -73,9 +73,9 @@ method reads the elapsed time recorded by the last `start()`/`stop()`
 
 | Method | Signature | Description |
 |---|---|---|
-| `start` | `start() -> PerformanceCounter` | Records the current `time.perf_counter()` reading as the start time and marks the instance as **synchronous** mode. Returns `self`. |
+| `start` | `start() -> PerformanceCounter` | Records the current `time.perf_counter()` reading as the start time, clears the previous result and marks the instance as **synchronous** mode. Returns `self`. |
 | `astart` | `astart() -> PerformanceCounter` *(async)* | Same as `start()`, but marks the instance as **asynchronous** mode. Returns `self`. |
-| `stop` | `stop() -> PerformanceCounter` | Records the end time and computes the elapsed time since `start()`. Returns `self`. Raises `RuntimeError` if the counter was started with `astart()` (use `astop()` instead). |
+| `stop` | `stop() -> PerformanceCounter` | Reads the clock and computes the elapsed time since `start()`. Returns `self`. Raises `RuntimeError` if the counter was started with `astart()` (use `astop()` instead) or `ValueError` if it was never started. |
 | `astop` | `astop() -> PerformanceCounter` *(async)* | Records the end time and computes the elapsed time since `astart()`. Returns `self`. Raises `RuntimeError` if the counter was started with `start()` (use `stop()` instead). |
 | `elapsedTime` | `elapsedTime() -> float` | Elapsed time in seconds since the last completed `start()`/`stop()` cycle. Raises `ValueError` if the counter has not been started and stopped. |
 | `aelapsedTime` | `aelapsedTime() -> float` *(async)* | Async equivalent of `elapsedTime()`. Same `ValueError` behavior. |
@@ -195,8 +195,8 @@ asyncio.run(main())
   durations — it is **not** wall-clock/calendar time and its absolute
   value has no meaning outside of computing differences between two
   readings from the same process.
-- The class is `__slots__`-based (`_start_time`, `_end_time`,
-  `_diff_time`, `_is_async_mode`), so each instance has a small, fixed
+- The class is `__slots__`-based (`_start_time`, `_diff_time`,
+  `_is_async_mode`), so each instance has a small, fixed
   memory footprint with no `__dict__` overhead.
 - The `a`-prefixed methods (`astart`, `astop`, `aelapsedTime`,
   `agetSeconds`, `agetMilliseconds`, `agetMicroseconds`, `agetMinutes`,
@@ -211,11 +211,12 @@ asyncio.run(main())
   timing state.
 - A `PerformanceCounter` instance is **not thread-safe** and is not
   meant to be shared across concurrent tasks/threads: it holds a single
-  mutable start/end/elapsed state, so measuring multiple overlapping
+  mutable start/elapsed state, so measuring multiple overlapping
   operations requires one instance per operation (or reusing one
   instance sequentially via `restart()`).
-- All operations are `O(1)` — there is no allocation, iteration, or
-  external I/O involved beyond the two clock reads.
+- All operations are `O(1)` and use fixed-size state. Clock reads and
+  arithmetic produce float objects, and each awaited `async def` call
+  creates a coroutine object; there is no iteration or external I/O.
 
 ## Design notes
 
@@ -238,7 +239,7 @@ asyncio.run(main())
   than the concrete `PerformanceCounter` class.
 - **`__slots__` for a value-like object**: as a small, frequently
   instantiated timing utility, `PerformanceCounter` avoids the per-instance
-  `__dict__` by declaring `__slots__` for its four attributes.
+  `__dict__` by declaring `__slots__` for its three attributes.
 
 ## Compatibility notes
 

@@ -8,14 +8,24 @@ from orionis.test import TestCase
 class TestMessage(TestCase):
 
     def setUp(self) -> None:
-        """Create a configurator that starts from an empty declaration."""
+        """Create a configurator that starts from an empty declaration.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.message = Message()
 
     def testEveryMutatorReturnsTheSameInstance(self) -> None:
-        """
-        Return the received configurator from every mutator.
+        """Return the received configurator from every mutator.
 
         Validates that a callback can chain calls on one message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mutations = (
             self.message.fromAddress("sender@example.com"),
@@ -30,10 +40,14 @@ class TestMessage(TestCase):
             self.assertIs(mutation, self.message)
 
     def testBuildsTheDeclaredEnvelope(self) -> None:
-        """
-        Collect every declared field into one envelope.
+        """Collect every declared field into one envelope.
 
         Validates the declaration handed to the delivery pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.message.fromAddress("sender@example.com", "Sender")
         self.message.to(["ana@example.com", "luis@example.com"])
@@ -57,10 +71,14 @@ class TestMessage(TestCase):
         self.assertEqual(envelope.reply_to[0].address, "support@example.com")
 
     def testScalarsAreReplacedAndCollectionsAccumulate(self) -> None:
-        """
-        Replace the sender and subject while appending recipients.
+        """Replace the sender and subject while appending recipients.
 
         Validates the documented merge rules of successive calls.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.message.fromAddress("first@example.com").fromAddress("last@example.com")
         self.message.subject("first").subject("last")
@@ -75,10 +93,14 @@ class TestMessage(TestCase):
         self.assertEqual(len(options.attachments), 2)
 
     def testStartsFromTheSuppliedChainSnapshot(self) -> None:
-        """
-        Continue the declaration supplied by a pending chain.
+        """Continue the declaration supplied by a pending chain.
 
         Validates that a callback receives the chain state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         options = MailOptions(mailer="file", to=(Address("chain@example.com"),))
         message = Message(options)
@@ -89,10 +111,14 @@ class TestMessage(TestCase):
         self.assertEqual(len(snapshot.to), 2)
 
     def testSnapshotsAreImmutableAndDetached(self) -> None:
-        """
-        Detach a snapshot from later mutations of the configurator.
+        """Detach a snapshot from later mutations of the configurator.
 
         Validates that a captured declaration cannot change afterwards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.message.subject("before")
         snapshot = self.message._snapshot()
@@ -103,10 +129,14 @@ class TestMessage(TestCase):
         self.assertFalse(hasattr(self.message, "__dict__"))
 
     def testRejectsInvalidDeclarations(self) -> None:
-        """
-        Reject unsafe headers, ambiguous names, and invalid attachments.
+        """Reject unsafe headers, ambiguous names, and invalid attachments.
 
         Validates that mutators fail immediately instead of at send time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             self.message.subject("Notice\r\nBcc: x@y")
@@ -118,10 +148,14 @@ class TestMessage(TestCase):
             self.message.attach("guide.pdf")
 
     def testDoesNotExposeForbiddenSenderAliases(self) -> None:
-        """
-        Expose one canonical sender method and no alias.
+        """Expose one canonical sender method and no alias.
 
         Validates the naming rule of the public composition API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in ("from_", "from", "From", "sender", "setFrom"):
             self.assertFalse(hasattr(self.message, name))

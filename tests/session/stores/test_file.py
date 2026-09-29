@@ -43,21 +43,29 @@ class TestFileSessionStore(TestCase):
     """Unit tests for the filesystem-backed FileSessionStore."""
 
     def setUp(self) -> None:
-        """
-        Create an isolated temporary directory before each test.
+        """Create an isolated temporary directory before each test.
 
         Provides a fresh directory for every test so file-system
         operations cannot leak state between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
         self._directory = Path(self._tmpdir.name)
 
     def tearDown(self) -> None:
-        """
-        Remove the temporary directory and its contents after each test.
+        """Remove the temporary directory and its contents after each test.
 
         Ensures that all session files created during a test are cleaned
         up regardless of whether the test passed or failed.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir.cleanup()
 
@@ -75,22 +83,30 @@ class TestFileSessionStore(TestCase):
     # ── construction ─────────────────────────────────────────────────────────
 
     def testInitCreatesDirectoryWhenMissing(self) -> None:
-        """
-        Create the storage directory on instantiation if absent.
+        """Create the storage directory on instantiation if absent.
 
         Validates that FileSessionStore.mkdir() is invoked so that a
         nested path that does not yet exist is created automatically.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         nested = self._directory / "deep" / "nested"
         FileSessionStore(directory=nested)
         self.assertTrue(nested.is_dir())
 
     def testInitAcceptsExistingDirectory(self) -> None:
-        """
-        Accept a pre-existing directory without error.
+        """Accept a pre-existing directory without error.
 
         Validates that constructing the store when the directory already
         exists does not raise an exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         self.assertIsNotNone(store)
@@ -98,11 +114,15 @@ class TestFileSessionStore(TestCase):
     # ── _path helper ─────────────────────────────────────────────────────────
 
     def testPathReturnsCorrectFilename(self) -> None:
-        """
-        Return the expected .json file path for a given session ID.
+        """Return the expected .json file path for a given session ID.
 
         Validates that _path() appends the .json extension and places
         the file inside the store directory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         p = store._path("my-session")
@@ -111,11 +131,15 @@ class TestFileSessionStore(TestCase):
     # ── _serialize / _deserialize round-trip ─────────────────────────────────
 
     def testSerializeDeserializeRoundTrip(self) -> None:
-        """
-        Recover the original record after serialisation and deserialisation.
+        """Recover the original record after serialisation and deserialisation.
 
         Validates that _serialize() followed by _deserialize() produces
         a record equal to the original in all fields.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         original = _make_record("rt", data={"user": "bob", "age": 30})
@@ -126,22 +150,30 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(recovered.data, original.data)  # type: ignore[union-attr]
 
     def testDeserializeCorruptBytesReturnsNone(self) -> None:
-        """
-        Return None when the raw bytes are not valid JSON.
+        """Return None when the raw bytes are not valid JSON.
 
         Validates that _deserialize() gracefully handles corruption
         without raising an exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         result = store._deserialize(b"not-json-at-all!!!")
         self.assertIsNone(result)
 
     def testDeserializeEmptyBytesReturnsNone(self) -> None:
-        """
-        Return None when given an empty byte string.
+        """Return None when given an empty byte string.
 
         Validates that _deserialize() handles the empty-input edge case
         without raising.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         result = store._deserialize(b"")
@@ -150,11 +182,15 @@ class TestFileSessionStore(TestCase):
     # ── _readFile / _writeFile ────────────────────────────────────────────────
 
     def testWriteFileAndReadFileRoundTrip(self) -> None:
-        """
-        Recover bytes written by _writeFile via _readFile.
+        """Recover bytes written by _writeFile via _readFile.
 
         Validates the low-level file I/O helpers produce identical
         content on the round trip.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         path = self._directory / "test.bin"
@@ -164,22 +200,30 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(result, content)
 
     def testReadFileMissingReturnsNone(self) -> None:
-        """
-        Return None when the target file does not exist.
+        """Return None when the target file does not exist.
 
         Validates that _readFile() signals absence with None rather
         than propagating a FileNotFoundError.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         result = store._readFile(self._directory / "absent.bin")
         self.assertIsNone(result)
 
     def testWriteFileIsAtomic(self) -> None:
-        """
-        Leave no .tmp artefact after a successful write.
+        """Leave no .tmp artefact after a successful write.
 
         Validates that _writeFile() cleans up the temporary file and
         only the final destination exists after the call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         path = self._directory / "atomic.json"
@@ -195,22 +239,30 @@ class TestFileSessionStore(TestCase):
     # ── read ─────────────────────────────────────────────────────────────────
 
     async def testReadAbsentSessionReturnsNone(self) -> None:
-        """
-        Return None for a session identifier with no corresponding file.
+        """Return None for a session identifier with no corresponding file.
 
         Validates that reading a non-existent session ID from the file
         store signals a cache miss without raising.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         result = await store.read("ghost-session")
         self.assertIsNone(result)
 
     async def testReadReturnsLiveRecord(self) -> None:
-        """
-        Return the record for a live, non-expired session file.
+        """Return the record for a live, non-expired session file.
 
         Validates the basic write/read round-trip at the async API level,
         including that the session data payload is preserved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         record = _make_record("live-session", data={"token": "xyz"})
@@ -221,11 +273,15 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(result.data, {"token": "xyz"})  # type: ignore[union-attr]
 
     async def testReadExpiredRecordReturnsNone(self) -> None:
-        """
-        Return None and delete the file for an expired session.
+        """Return None and delete the file for an expired session.
 
         Validates that a session file whose expires_at is in the past is
         treated as a cache miss and lazily evicted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         record = _make_record("expired-session", offset_seconds=-1)
@@ -234,11 +290,15 @@ class TestFileSessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testReadExpiredRecordDeletesFile(self) -> None:
-        """
-        Remove the session file when an expired record is read.
+        """Remove the session file when an expired record is read.
 
         Validates that lazy eviction occurs so the storage directory
         does not accumulate stale session files indefinitely.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         record = _make_record("stale-session", offset_seconds=-5)
@@ -248,11 +308,15 @@ class TestFileSessionStore(TestCase):
         self.assertFalse(path.exists())
 
     async def testReadCorruptFileReturnsNone(self) -> None:
-        """
-        Return None when the session file contains invalid JSON.
+        """Return None when the session file contains invalid JSON.
 
         Validates that a corrupt file is treated as a cache miss and
         does not propagate a decode exception to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         path = store._path("corrupt-session")
@@ -261,11 +325,15 @@ class TestFileSessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testReadCorruptFileDeletesFile(self) -> None:
-        """
-        Delete the session file when it contains invalid JSON.
+        """Delete the session file when it contains invalid JSON.
 
         Validates that corrupt files are removed during the lazy eviction
         triggered by a read attempt.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         path = store._path("corrupt-del")
@@ -276,11 +344,15 @@ class TestFileSessionStore(TestCase):
     # ── write ────────────────────────────────────────────────────────────────
 
     async def testWriteCreatesSessionFile(self) -> None:
-        """
-        Persist a session record as a JSON file on disk.
+        """Persist a session record as a JSON file on disk.
 
         Validates that write() creates the expected file in the store
         directory so that a subsequent read() can retrieve it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.write(_make_record("new-file"))
@@ -288,11 +360,15 @@ class TestFileSessionStore(TestCase):
         self.assertTrue(path.exists())
 
     async def testWriteOverwritesExistingFile(self) -> None:
-        """
-        Replace the existing session file on a second write.
+        """Replace the existing session file on a second write.
 
         Validates that writing the same session ID twice leaves only one
         file containing the latest data.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         record_v1 = _make_record("over", data={"v": 1})
@@ -306,11 +382,15 @@ class TestFileSessionStore(TestCase):
     # ── delete ───────────────────────────────────────────────────────────────
 
     async def testDeleteRemovesSessionFile(self) -> None:
-        """
-        Delete the session file via the async delete() method.
+        """Delete the session file via the async delete() method.
 
         Validates that after delete() the file is absent from disk and
         subsequent reads return None.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.write(_make_record("to-delete"))
@@ -319,21 +399,29 @@ class TestFileSessionStore(TestCase):
         self.assertFalse(path.exists())
 
     async def testDeleteAbsentSessionIsNoOp(self) -> None:
-        """
-        Silently ignore delete() when no file exists for the identifier.
+        """Silently ignore delete() when no file exists for the identifier.
 
         Validates that calling delete() on an unknown session ID does
         not raise a FileNotFoundError or any other exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.delete("nonexistent-session")
 
     async def testDeleteDoesNotAffectOtherSessions(self) -> None:
-        """
-        Preserve unrelated session files when one is deleted.
+        """Preserve unrelated session files when one is deleted.
 
         Validates that delete() targets only the specified identifier
         and does not remove adjacent session files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.write(_make_record("keep-me"))
@@ -345,11 +433,15 @@ class TestFileSessionStore(TestCase):
     # ── gc ───────────────────────────────────────────────────────────────────
 
     async def testGcRemovesExpiredFiles(self) -> None:
-        """
-        Evict expired session files during the gc sweep.
+        """Evict expired session files during the gc sweep.
 
         Validates that gc() identifies and deletes files whose
         expires_at timestamps are in the past.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.write(_make_record("live", offset_seconds=3600))
@@ -359,11 +451,15 @@ class TestFileSessionStore(TestCase):
         self.assertFalse(store._path("dead").exists())
 
     async def testGcRemovesCorruptFiles(self) -> None:
-        """
-        Delete corrupt JSON files during the gc sweep.
+        """Delete corrupt JSON files during the gc sweep.
 
         Validates that _gcSweep() removes files that cannot be decoded,
         preventing stale garbage from accumulating in the session directory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         corrupt_path = self._directory / "bad.json"
@@ -372,11 +468,15 @@ class TestFileSessionStore(TestCase):
         self.assertFalse(corrupt_path.exists())
 
     async def testGcKeepsLiveFiles(self) -> None:
-        """
-        Leave valid, non-expired session files untouched during gc().
+        """Leave valid, non-expired session files untouched during gc().
 
         Validates that the garbage-collection sweep does not evict
         sessions that are still within their lifetime.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.write(_make_record("session-a", offset_seconds=7200))
@@ -386,11 +486,15 @@ class TestFileSessionStore(TestCase):
         self.assertTrue(store._path("session-b").exists())
 
     async def testGcOnEmptyDirectoryIsNoOp(self) -> None:
-        """
-        Execute gc() on an empty directory without raising.
+        """Execute gc() on an empty directory without raising.
 
         Validates that the gc sweep handles the trivial case of no
         session files gracefully.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         await store.gc()
@@ -398,11 +502,15 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(remaining, [])
 
     async def testGcIgnoresNonJsonFiles(self) -> None:
-        """
-        Leave non-JSON files untouched during the gc sweep.
+        """Leave non-JSON files untouched during the gc sweep.
 
         Validates that gc() only processes .json files and does not
         interfere with any other content in the session directory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         other_file = self._directory / "readme.txt"
@@ -411,11 +519,15 @@ class TestFileSessionStore(TestCase):
         self.assertTrue(other_file.exists())
 
     async def testGcIgnoresDirectories(self) -> None:
-        """
-        Leave sub-directories untouched during the gc sweep.
+        """Leave sub-directories untouched during the gc sweep.
 
         Validates that a directory whose name ends in ``.json`` is
         skipped instead of being treated as a session file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         nested = self._directory / "nested.json"
@@ -427,20 +539,28 @@ class TestFileSessionStoreAtomicWrites(TestCase):
     """Regression tests for the staging file backing every write."""
 
     def setUp(self) -> None:
-        """
-        Create an isolated temporary directory before each test.
+        """Create an isolated temporary directory before each test.
 
         Provides a fresh directory so staging files from one test can
         never influence another.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
         self._directory = Path(self._tmpdir.name)
 
     def tearDown(self) -> None:
-        """
-        Remove the temporary directory and its contents after each test.
+        """Remove the temporary directory and its contents after each test.
 
         Ensures no session or staging file survives the test run.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmpdir.cleanup()
 
@@ -471,11 +591,15 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         ]
 
     def testTempPathIsUniquePerCall(self) -> None:
-        """
-        Derive a different staging path on every call.
+        """Derive a different staging path on every call.
 
         Validates that two writers of the same session never share a
         staging file, which would let them publish a mixed payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         path = self._directory / "abc.json"
@@ -489,11 +613,15 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         self.assertTrue(second.name.endswith(".tmp"))
 
     async def testConcurrentWritesToTheSameSessionAllSucceed(self) -> None:
-        """
-        Publish every concurrent write of one session without failing.
+        """Publish every concurrent write of one session without failing.
 
         Validates that parallel requests sharing a session identifier
         neither raise nor leave the stored payload half written.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         expires = datetime.now(UTC) + timedelta(hours=1)
@@ -522,11 +650,15 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         self.assertEqual(self._temps(), [])
 
     async def testFailedWriteRemovesItsTempFile(self) -> None:
-        """
-        Reclaim the staging file when the write cannot be published.
+        """Reclaim the staging file when the write cannot be published.
 
         Validates that a rename failure propagates without leaking an
         orphaned staging file into the session directory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
 
@@ -545,11 +677,15 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         self.assertEqual(self._temps(), [])
 
     async def testGcReclaimsStaleTempFiles(self) -> None:
-        """
-        Remove staging files left behind by an interrupted write.
+        """Remove staging files left behind by an interrupted write.
 
         Validates that an orphan too old to belong to a live write is
         swept instead of accumulating forever.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         orphan = self._directory / "abc.json.deadbeefdeadbeef.tmp"
@@ -562,11 +698,15 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         self.assertFalse(orphan.exists())
 
     async def testGcKeepsTempFilesOfInFlightWrites(self) -> None:
-        """
-        Preserve a staging file that a concurrent write may still fill.
+        """Preserve a staging file that a concurrent write may still fill.
 
         Validates that the sweep only reclaims staging files old enough
         to be certain no writer owns them.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = self._store()
         in_flight = self._directory / "abc.json.cafebabecafebabe.tmp"

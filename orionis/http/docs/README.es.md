@@ -1688,7 +1688,7 @@ Lee app.name/app.locale e inicializa caché de instancia; devuelve None. Propaga
 | Parámetro | Tipo | Significado |
 |---|---|---|
 | `app` | `IApplication` | Servicio de aplicación que proporciona configuración, resolución de dependencias y scopes. |
-| `directory` | `Directory` | Servicio de directorios de la aplicación; storagePublic() localiza recursos públicos. |
+| `directory` | `Directory` | Servicio de directorios de la aplicación; storageAppPublic() localiza recursos públicos. |
 
 Tipo de retorno declarado: `None`.
 
@@ -1745,7 +1745,7 @@ Tipo de retorno declarado: `None`.
 def favicon(self) -> FileResponse | Response:
 ```
 
-Devuelve FileResponse nueva y cachea ruta/tipo. Busca favicon.ico, .png, .svg en storagePublic(), luego assets/favicon.ico incluido; en otro caso HTML 404. Establece public max-age=31536000, immutable. Propaga errores de archivo/respuesta, incluido un archivo cacheado eliminado después.
+Devuelve FileResponse nueva y cachea ruta/tipo. Busca favicon.ico, .png, .svg en storageAppPublic(), luego assets/favicon.ico incluido; en otro caso HTML 404. Establece public max-age=31536000, immutable. Propaga errores de archivo/respuesta, incluido un archivo cacheado eliminado después.
 
 Tipo de retorno declarado: `FileResponse | Response`.
 
@@ -1753,7 +1753,7 @@ Tipo de retorno declarado: `FileResponse | Response`.
 def robotsTxt(self) -> FileResponse | Response:
 ```
 
-Usa storagePublic()/robots.txt, luego el archivo incluido o HTML 404; cachea ruta y devuelve FileResponse nueva con public max-age=3600. Propaga errores de archivo/respuesta.
+Usa storageAppPublic()/robots.txt, luego el archivo incluido o HTML 404; cachea ruta y devuelve FileResponse nueva con public max-age=3600. Propaga errores de archivo/respuesta.
 
 Tipo de retorno declarado: `FileResponse | Response`.
 
@@ -1761,7 +1761,7 @@ Tipo de retorno declarado: `FileResponse | Response`.
 def sitemapXml(self) -> FileResponse | Response:
 ```
 
-Usa storagePublic()/sitemap.xml con public max-age=600; cachea ruta y devuelve FileResponse, o HTML 404 si falta. No hay sitemap alternativo incluido; propaga errores de archivo/respuesta.
+Usa storageAppPublic()/sitemap.xml con public max-age=600; cachea ruta y devuelve FileResponse, o HTML 404 si falta. No hay sitemap alternativo incluido; propaga errores de archivo/respuesta.
 
 Tipo de retorno declarado: `FileResponse | Response`.
 

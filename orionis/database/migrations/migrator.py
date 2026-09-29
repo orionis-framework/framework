@@ -489,10 +489,10 @@ class Migrator(IMigrator):
         Returns
         -------
         Path
-            Absolute path to the ``database/migrations`` directory under
+            Absolute path to the ``database_migrations`` directory under
             the application base path.
         """
-        return self.__app.path("database") / "migrations"
+        return self.__app.path("database_migrations")
 
     def __discover(self) -> dict[str, type[Migration]]:
         """

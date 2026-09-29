@@ -1,6 +1,7 @@
 from __future__ import annotations
 import functools
 import inspect
+from types import MethodType
 from typing import Any
 import msgspec
 from orionis.introspection.dependencies.contracts.reflection import (
@@ -176,7 +177,7 @@ def _build_dependencies(signature: inspect.Signature) -> Signature:  # NOSONAR
     )
 
 @functools.lru_cache(maxsize=1024)
-def _get_resolved_signature(target: Any) -> Signature:
+def _cached_resolved_signature(target: Any, *, bound: bool = False) -> Signature:
     """
     Return the cached dependency signature for ``target``.
 
@@ -184,6 +185,8 @@ def _get_resolved_signature(target: Any) -> Signature:
     ----------
     target : Any
         Object whose inspectable signature is resolved into dependencies.
+    bound : bool, optional
+        Whether the first positional parameter is supplied by method binding.
 
     Returns
     -------
@@ -202,10 +205,42 @@ def _get_resolved_signature(target: Any) -> Signature:
     """
     try:
         sig = _get_signature(target)
+        if bound:
+            parameters = tuple(sig.parameters.values())
+            if not parameters or parameters[0].kind in (
+                inspect.Parameter.KEYWORD_ONLY,
+                inspect.Parameter.VAR_KEYWORD,
+            ):
+                message = "Invalid signature for a bound method."
+                raise ValueError(message)
+            if parameters[0].kind is not inspect.Parameter.VAR_POSITIONAL:
+                sig = sig.replace(parameters=parameters[1:])
     except (ValueError, TypeError) as e:
         error_msg = f"Unable to inspect signature of {target}: {e!s}"
         raise ValueError(error_msg) from e
     return _build_dependencies(sig)
+
+def _get_resolved_signature(target: Any) -> Signature:
+    """
+    Return dependency metadata without caching a bound method's receiver.
+
+    Parameters
+    ----------
+    target : Any
+        Callable whose parameters are inspected.
+
+    Returns
+    -------
+    Signature
+        Shared metadata keyed by the underlying function and binding mode.
+    """
+    if isinstance(target, MethodType):
+        return _cached_resolved_signature(target.__func__, bound=True)
+    return _cached_resolved_signature(target)
+
+
+_get_resolved_signature.cache_clear = _cached_resolved_signature.cache_clear
+_get_resolved_signature.cache_info = _cached_resolved_signature.cache_info
 
 class ReflectDependencies(IReflectDependencies):
     """

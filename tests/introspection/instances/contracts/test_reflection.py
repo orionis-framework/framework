@@ -14,199 +14,730 @@ class _StubInstance(IReflectionInstance):
     """
 
     def getInstance(self):
+        """Implement the ``getInstance`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return object()
 
     def getClass(self):
+        """Implement the ``getClass`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return object
 
     def getClassName(self):
+        """Implement the ``getClassName`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return "object"
 
     def getModuleName(self):
+        """Implement the ``getModuleName`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return "builtins"
 
     def getModuleWithClassName(self):
+        """Implement the ``getModuleWithClassName`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return "builtins.object"
 
     def getDocstring(self):
-        return None
+        """Implement the ``getDocstring`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getBaseClasses(self):
+        """Implement the ``getBaseClasses`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return (object,)
 
     def getSourceCode(self, _method=None):
-        return None
+        """Implement the ``getSourceCode`` contract stub.
+
+        Parameters
+        ----------
+        _method : object
+            Value supplied for ``_method``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getFile(self):
-        return None
+        """Implement the ``getFile`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getAnnotations(self):
+        """Implement the ``getAnnotations`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def hasAttribute(self, _name):
+        """Implement the ``hasAttribute`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return False
 
     def getAttribute(self, _name, _default=None):
+        """Implement the ``getAttribute`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+        _default : object
+            Value supplied for ``_default``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return _default
 
     def setAttribute(self, _name, _value):
+        """Implement the ``setAttribute`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+        _value : object
+            Value supplied for ``_value``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def removeAttribute(self, _name):
+        """Implement the ``removeAttribute`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def getAttributes(self):
+        """Implement the ``getAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def getPublicAttributes(self):
+        """Implement the ``getPublicAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def getProtectedAttributes(self):
+        """Implement the ``getProtectedAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def getPrivateAttributes(self):
+        """Implement the ``getPrivateAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def getDunderAttributes(self):
+        """Implement the ``getDunderAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def getMagicAttributes(self):
+        """Implement the ``getMagicAttributes`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return {}
 
     def hasMethod(self, _name):
+        """Implement the ``hasMethod`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return False
 
     def setMethod(self, _name, _method):
+        """Implement the ``setMethod`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+        _method : object
+            Value supplied for ``_method``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def removeMethod(self, _name):
-        return None
+        """Implement the ``removeMethod`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getMethodSignature(self, _name):
+        """Implement the ``getMethodSignature`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return inspect.signature(lambda: None)
 
     def getMethodDocstring(self, _name):
-        return None
+        """Implement the ``getMethodDocstring`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getMethods(self):
+        """Implement the ``getMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicMethods(self):
+        """Implement the ``getPublicMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicSyncMethods(self):
+        """Implement the ``getPublicSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicAsyncMethods(self):
+        """Implement the ``getPublicAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedMethods(self):
+        """Implement the ``getProtectedMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedSyncMethods(self):
+        """Implement the ``getProtectedSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedAsyncMethods(self):
+        """Implement the ``getProtectedAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateMethods(self):
+        """Implement the ``getPrivateMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateSyncMethods(self):
+        """Implement the ``getPrivateSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateAsyncMethods(self):
+        """Implement the ``getPrivateAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicClassMethods(self):
+        """Implement the ``getPublicClassMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicClassSyncMethods(self):
+        """Implement the ``getPublicClassSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicClassAsyncMethods(self):
+        """Implement the ``getPublicClassAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedClassMethods(self):
+        """Implement the ``getProtectedClassMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedClassSyncMethods(self):
+        """Implement the ``getProtectedClassSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedClassAsyncMethods(self):
+        """Implement the ``getProtectedClassAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateClassMethods(self):
+        """Implement the ``getPrivateClassMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateClassSyncMethods(self):
+        """Implement the ``getPrivateClassSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateClassAsyncMethods(self):
+        """Implement the ``getPrivateClassAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicStaticMethods(self):
+        """Implement the ``getPublicStaticMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicStaticSyncMethods(self):
+        """Implement the ``getPublicStaticSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicStaticAsyncMethods(self):
+        """Implement the ``getPublicStaticAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedStaticMethods(self):
+        """Implement the ``getProtectedStaticMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedStaticSyncMethods(self):
+        """Implement the ``getProtectedStaticSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedStaticAsyncMethods(self):
+        """Implement the ``getProtectedStaticAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateStaticMethods(self):
+        """Implement the ``getPrivateStaticMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateStaticSyncMethods(self):
+        """Implement the ``getPrivateStaticSyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateStaticAsyncMethods(self):
+        """Implement the ``getPrivateStaticAsyncMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getDunderMethods(self):
+        """Implement the ``getDunderMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getMagicMethods(self):
+        """Implement the ``getMagicMethods`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProperties(self):
+        """Implement the ``getProperties`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPublicProperties(self):
+        """Implement the ``getPublicProperties`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProtectedProperties(self):
+        """Implement the ``getProtectedProperties`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getPrivateProperties(self):
+        """Implement the ``getPrivateProperties`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return []
 
     def getProperty(self, _name):
-        return None
+        """Implement the ``getProperty`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getPropertySignature(self, _name):
+        """Implement the ``getPropertySignature`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return inspect.signature(lambda: None)
 
     def getPropertyDocstring(self, _name):
+        """Implement the ``getPropertyDocstring`` contract stub.
+
+        Parameters
+        ----------
+        _name : object
+            Value supplied for ``_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return ""
 
     def constructorSignature(self):
-        return None
+        """Implement the ``constructorSignature`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def methodSignature(self, _method_name):
-        return None
+        """Implement the ``methodSignature`` contract stub.
+
+        Parameters
+        ----------
+        _method_name : object
+            Value supplied for ``_method_name``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def clearCache(self):
-        return None
+        """Implement the ``clearCache`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
 class _OnlyGetInstance(IReflectionInstance):
     """
@@ -217,6 +748,13 @@ class _OnlyGetInstance(IReflectionInstance):
     """
 
     def getInstance(self):
+        """Implement the ``getInstance`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return object()
 
 class TestIReflectionInstanceIsABC(TestCase):
@@ -259,6 +797,18 @@ class TestIReflectionInstanceIsABC(TestCase):
 class TestIReflectionInstanceAbstractMethods(TestCase):
 
     def _assertAbstract(self, name: str) -> None:
+        """Run the assert abstract helper.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.assertIn(name, IReflectionInstance.__abstractmethods__)
 
     def testGetInstanceIsAbstract(self) -> None:

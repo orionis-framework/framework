@@ -59,7 +59,13 @@ class TestPasswordReset(TestCase):
     """Exercise persistence, races, hashing and revocation through the broker."""
 
     async def asyncSetUp(self) -> None:
-        """Create independent disk-backed storage and a real password hasher."""
+        """Create independent disk-backed storage and a real password hasher.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self.temp = tempfile.TemporaryDirectory()
         self.app = build_app()
         self.app._config["database"]["connections"]["sqlite"]["database"] = str(
@@ -85,13 +91,25 @@ class TestPasswordReset(TestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """Disconnect and remove only this test's temporary database."""
+        """Disconnect and remove only this test's temporary database.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ConnectionResolver.setManager(self.previous)
         await self.connection.disconnect()
         self.temp.cleanup()
 
     async def testStoresOnlyDigestAndDoesNotChangePassword(self) -> None:
-        """Issuance must not change the account or store a bearer credential."""
+        """Issuance must not change the account or store a bearer credential.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(" ADA@example.com ")
         row = await self.db.table("password_reset_tokens").first()
         self.assertEqual(row["token"], hash_token_secret(token))
@@ -105,12 +123,24 @@ class TestPasswordReset(TestCase):
         self.assertTrue(await self.broker.valid(self.user.email, token))
 
     async def testUnknownEmailDoesNotCreateAToken(self) -> None:
-        """Unknown addresses do not grow the reset store."""
+        """Unknown addresses do not grow the reset store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertIsNone(await self.broker.issue("missing@example.com"))
         self.assertEqual(await self.db.table("password_reset_tokens").count(), 0)
 
     async def testCooldownAndReplacementInvalidatePreviousLink(self) -> None:
-        """Resends are throttled and only the newest link remains usable."""
+        """Resends are throttled and only the newest link remains usable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         self.assertIsNone(await self.broker.issue(self.user.email))
         await self.db.table("password_reset_tokens").update(
@@ -123,7 +153,13 @@ class TestPasswordReset(TestCase):
         self.assertTrue(await self.broker.valid(self.user.email, replacement))
 
     async def testConcurrentIssueCreatesExactlyOneCredential(self) -> None:
-        """The primary key arbitrates first requests across separate tasks."""
+        """The primary key arbitrates first requests across separate tasks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         results = await asyncio.gather(
             *(self.broker.issue(self.user.email) for _ in range(6)),
         )
@@ -131,7 +167,13 @@ class TestPasswordReset(TestCase):
         self.assertEqual(await self.db.table("password_reset_tokens").count(), 1)
 
     async def testExpiredTamperedAndWrongAccountLinksAreRejected(self) -> None:
-        """A token is bound to its recipient and expires at the boundary."""
+        """A token is bound to its recipient and expires at the boundary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         self.assertFalse(await self.broker.valid("other@example.com", token))
         self.assertFalse(await self.broker.valid(self.user.email, "!" * 43))
@@ -150,7 +192,13 @@ class TestPasswordReset(TestCase):
         )
 
     async def testResetHashesPasswordRevokesTokensAndSessions(self) -> None:
-        """A successful reset requires fresh login and invalidates old access."""
+        """A successful reset requires fresh login and invalidates old access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         guard = SessionGuard(self.app, ModelIdentityProvider(self.app, self.hashing))
         request = fake_request(Session())
         guard.login(request, self.user)
@@ -173,7 +221,13 @@ class TestPasswordReset(TestCase):
         self.assertIsNone(await self.broker.issue(self.user.email))
 
     async def testConcurrentConsumptionHasOneWinner(self) -> None:
-        """One credential can commit exactly one update across concurrent tasks."""
+        """One credential can commit exactly one update across concurrent tasks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         results = await asyncio.gather(
             *(
@@ -184,7 +238,13 @@ class TestPasswordReset(TestCase):
         self.assertEqual(sum(result is not None for result in results), 1)
 
     async def testTransactionFailureRestoresPasswordAndToken(self) -> None:
-        """A failure after the password write must roll back both mutations."""
+        """A failure after the password write must roll back both mutations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         with (
             patch.object(
@@ -202,7 +262,13 @@ class TestPasswordReset(TestCase):
         )
 
     async def testIndependentPasswordChangeInvalidatesTheLink(self) -> None:
-        """A link must not survive a password change through another flow."""
+        """A link must not survive a password change through another flow.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         await (
             Account.query()
@@ -216,7 +282,13 @@ class TestPasswordReset(TestCase):
         self.assertFalse(await self.broker.valid(self.user.email, token))
 
     async def testDeletedAccountCannotTransferLinkToReplacement(self) -> None:
-        """Reusing an email address must not transfer a previous reset grant."""
+        """Reusing an email address must not transfer a previous reset grant.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _, token = await self.broker.issue(self.user.email)
         await Account.query().where("id", self.user.id).delete()
         await Account.create(
@@ -229,7 +301,13 @@ class TestPasswordReset(TestCase):
         self.assertFalse(await self.broker.valid(self.user.email, token))
 
     async def testLegacySessionWithoutPasswordFingerprintIsRejected(self) -> None:
-        """Pre-upgrade sessions must log in again rather than evade revocation."""
+        """Pre-upgrade sessions must log in again rather than evade revocation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         session = Session()
         session.put("_auth_identifier", self.user.id)
         guard = SessionGuard(self.app, ModelIdentityProvider(self.app, self.hashing))
@@ -241,7 +319,13 @@ class TestPasswordResetValidation(TestCase):
     """Enforce credential policy and trusted link configuration."""
 
     def testRejectsWeakMismatchedAndOversizedPasswords(self) -> None:
-        """Schema validation includes inherited email rules and confirmation."""
+        """Schema validation includes inherited email rules and confirmation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         valid = {
             "email": "ada@example.com",
             "token": "x" * 43,
@@ -260,7 +344,13 @@ class TestPasswordResetValidation(TestCase):
                 Validator.validate({**valid, **changes}, ResetPasswordSchema)
 
     def testPasswordResetLimitsMustBePositive(self) -> None:
-        """Reset lifetime and cooldown must be positive integers."""
+        """Reset lifetime and cooldown must be positive integers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertIsInstance(
             Auth(passwords={"expiration": 15}).passwords,
             PasswordReset,
@@ -274,19 +364,54 @@ class _View:
     """Record explicit context and errors without a live view container."""
 
     def __init__(self, context: dict) -> None:
-        """Capture template context."""
+        """Capture template context.
+
+        Parameters
+        ----------
+        context : dict
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.context = context
         self.errors = None
 
     def withErrors(self, errors):
-        """Capture field errors without persisting any submitted input."""
+        """Capture field errors without persisting any submitted input.
+
+        Parameters
+        ----------
+        errors : object
+            Value supplied for ``errors``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         self.errors = errors
         return self
 
     def __await__(self) -> Generator[object, None, HTMLResponse]:
-        """Return an ordinary response from the awaitable view double."""
+        """Return an ordinary response from the awaitable view double.
+
+        Returns
+        -------
+        Generator[object, None, HTMLResponse]
+            Value produced by the helper.
+        """
 
         async def render():
+            """Return an HTML form response.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             return HTMLResponse("form")
 
         return render().__await__()
@@ -296,7 +421,13 @@ class TestPasswordResetController(TestCase):
     """Test browser responses and mail construction without sending email."""
 
     async def testMailUsesRequestBaseUrlAndEncodedRecipient(self) -> None:
-        """Mail uses the request origin and encodes the recipient."""
+        """Mail uses the request origin and encodes the recipient.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = ForgotPasswordController()
         email = "ada+test@example.com"
         broker = SimpleNamespace(
@@ -322,7 +453,13 @@ class TestPasswordResetController(TestCase):
         self.assertEqual(content.data["expires_minutes"], 60)
 
     async def testMailFailureUsesTheBackgroundTaskLogger(self) -> None:
-        """BackgroundTask logs delivery errors through the framework facade."""
+        """BackgroundTask logs delivery errors through the framework facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         broker = SimpleNamespace(
             issue=AsyncMock(
                 side_effect=RuntimeError("secret-bearing-backend-error"),
@@ -334,19 +471,27 @@ class TestPasswordResetController(TestCase):
             "http://192.168.1.20:8000",
             broker,
         )
-        with patch("orionis.background.task.Log") as log:
-            with self.assertRaisesRegex(
+        with (
+            patch("orionis.background.task.Log") as log,
+            self.assertRaisesRegex(
                 RuntimeError,
                 "secret-bearing-backend-error",
-            ):
-                await task()
+            ),
+        ):
+            await task()
 
         log.error.assert_called_once()
         self.assertIn("Background task", log.error.call_args.args[0])
         log.info.assert_not_called()
 
     async def testSuccessRedirectsToLoginAndQueuesNotification(self) -> None:
-        """Successful reset does not establish an authenticated session."""
+        """Successful reset does not establish an authenticated session.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(
             valid=AsyncMock(return_value=True),
@@ -371,7 +516,13 @@ class TestPasswordResetController(TestCase):
         self.assertNotIn("token", str(result.getFlashData()))
 
     async def testReceiptIsIdenticalAndLookupRunsAfterResponse(self) -> None:
-        """Known and unknown emails follow the same immediate response path."""
+        """Known and unknown emails follow the same immediate response path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(issue=AsyncMock(return_value=None))
         request = SimpleNamespace(baseUrl="http://192.168.1.20:8000")
@@ -395,7 +546,13 @@ class TestPasswordResetController(TestCase):
         broker.issue.assert_awaited_once()
 
     async def testInvalidLinkRendersWithoutEchoingSecrets(self) -> None:
-        """An invalid link gets a safe form state and private response headers."""
+        """An invalid link gets a safe form state and private response headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(valid=AsyncMock(return_value=False))
         view = _View({})
@@ -417,7 +574,13 @@ class TestPasswordResetController(TestCase):
         )
 
     async def testValidationFailureNeverConsumesOrFlashesPassword(self) -> None:
-        """Passwords stay out of context and flash data when confirmation fails."""
+        """Passwords stay out of context and flash data when confirmation fails.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(valid=AsyncMock(return_value=True), reset=AsyncMock())
         data = {
@@ -445,7 +608,13 @@ class TestPasswordResetWeb(TestCase):
     """Compile production routes, reject missing CSRF and render real views."""
 
     async def testRoutesAreWebAndPostRequiresCsrf(self) -> None:
-        """Reset endpoints inherit the web pipeline's CSRF protection."""
+        """Reset endpoints inherit the web pipeline's CSRF protection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.auth()
         compiled = compile_router(router)
@@ -461,6 +630,20 @@ class TestPasswordResetWeb(TestCase):
         original_build = _StubApp.build
 
         async def build(app, concrete):
+            """Build middleware dependencies for the route.
+
+            Parameters
+            ----------
+            app : object
+                Value supplied for ``app``.
+            concrete : object
+                Value supplied for ``concrete``.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             if concrete in (GuestMiddleware, AuthenticateSessionMiddleware):
                 return _IdentityMiddlewareDouble()
             return await original_build(app, concrete)
@@ -475,7 +658,13 @@ class TestPasswordResetWeb(TestCase):
             self.assertIsInstance(catch.handled[-1], CSRFTokenMismatchException)
 
     async def testTemplatesRenderWithEscapingAndCsrf(self) -> None:
-        """Real forms escape attributes, include CSRF and leave passwords empty."""
+        """Real forms escape attributes, include CSRF and leave passwords empty.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         environment = Environment(
             loader=FileSystemLoader("resources/views"),
             extensions=[CsrfExtension],

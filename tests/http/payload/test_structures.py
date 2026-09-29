@@ -12,7 +12,13 @@ class TestPayloadStructures(TestCase):
     """Validate repeated values, ownership, and slotted payload instances."""
 
     def testHeadersPreserveBlankAndRepeatedValues(self) -> None:
-        """Keep case-insensitive lookup and ordered repeated headers."""
+        """Keep case-insensitive lookup and ordered repeated headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         headers = Headers([("X-Name", ""), ("x-name", "second"), ("Host", "")])
         self.assertEqual(headers.get("X-NAME"), "second")
         self.assertEqual(headers.get("host"), "")
@@ -23,7 +29,13 @@ class TestPayloadStructures(TestCase):
         self.assertEqual(headers.getAll("missing"), [])
 
     def testHeadersReturnIndependentGroupedLists(self) -> None:
-        """Prevent edits to returned header groups from mutating the index."""
+        """Prevent edits to returned header groups from mutating the index.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         headers = Headers([("X", "1"), ("x", "2"), ("Y", "3")])
         groups = headers.getAll()
         groups["x"].clear()
@@ -31,7 +43,13 @@ class TestPayloadStructures(TestCase):
         self.assertEqual(headers.getAll(), {"x": ["1", "2"], "y": ["3"]})
 
     def testQueryParamsPreserveOrderAndRepeatedValues(self) -> None:
-        """Return the last scalar and all ordered values for repeated keys."""
+        """Return the last scalar and all ordered values for repeated keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         params = QueryParams("a=&b=1&a=2&a=3")
         self.assertEqual(params.get("a"), "3")
         self.assertEqual(params.getAll("a"), ["", "2", "3"])
@@ -43,7 +61,13 @@ class TestPayloadStructures(TestCase):
         self.assertEqual(params.getList("a"), ["", "2", "3"])
 
     def testFormPreservesMixedValuesAndDefaultIdentity(self) -> None:
-        """Allow fields and uploaded files to share a name without reordering."""
+        """Allow fields and uploaded files to share a name without reordering.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("f", None)
         with FormData([("a", ""), ("a", upload), ("b", "v")]) as form:
             self.assertIs(form.get("a"), upload)
@@ -54,7 +78,13 @@ class TestPayloadStructures(TestCase):
             self.assertEqual(list(form), ["a", "b"])
 
     def testPayloadContractsDoNotIntroduceInstanceDictionaries(self) -> None:
-        """Keep concrete payload object storage limited to declared slots."""
+        """Keep concrete payload object storage limited to declared slots.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         upload = UploadedFile("f", None)
         try:
             objects = (

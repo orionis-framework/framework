@@ -41,19 +41,27 @@ class _Invoice(_BaseAudit):
 class TestNamingHelpers(TestCase):
 
     def testSnakeCaseSplitsCamelWords(self) -> None:
-        """
-        Convert CamelCase names into snake_case.
+        """Convert CamelCase names into snake_case.
 
         Validates the class-name normalization helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(snake_case("UserProfile"), "user_profile")
         self.assertEqual(snake_case("User"), "user")
 
     def testPluralizeAppliesEnglishHeuristics(self) -> None:
-        """
-        Pluralize words with the conventional English rules.
+        """Pluralize words with the conventional English rules.
 
         Validates the y/ies, sibilant/es, and default/s branches.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(pluralize("user"), "users")
         self.assertEqual(pluralize("category"), "categories")
@@ -63,28 +71,40 @@ class TestNamingHelpers(TestCase):
 class TestModelMetaclass(TestCase):
 
     def testTableNameDerivedFromClassName(self) -> None:
-        """
-        Derive the table name from the pluralized class name.
+        """Derive the table name from the pluralized class name.
 
         Validates the naming convention.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_User.__meta__.table_name, "users")
         self.assertEqual(_Category.__meta__.table_name, "categories")
         self.assertEqual(_Box.__meta__.table_name, "boxes")
 
     def testExplicitTableNameIsRespected(self) -> None:
-        """
-        Respect an explicitly declared table name.
+        """Respect an explicitly declared table name.
 
         Validates the declaration override.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_Account.__meta__.table_name, "ledger_accounts")
 
     def testColumnsAreDiscoveredAndDetached(self) -> None:
-        """
-        Discover the declared columns and detach them from the class.
+        """Discover the declared columns and detach them from the class.
 
         Validates column discovery and namespace cleanup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _User.__meta__
         self.assertEqual(set(meta.columns), {"id", "name", "active"})
@@ -93,30 +113,42 @@ class TestModelMetaclass(TestCase):
         self.assertNotIn("name", _User.__dict__)
 
     def testPrimaryKeyFromColumnFlag(self) -> None:
-        """
-        Resolve the primary key from the primary column flag.
+        """Resolve the primary key from the primary column flag.
 
         Validates primary key discovery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_User.__meta__.primary_key, "id")
         self.assertEqual(_CustomKey.__meta__.primary_key, "uuid")
         self.assertFalse(_CustomKey.__meta__.incrementing)
 
     def testCastsAndHiddenArePrecomputed(self) -> None:
-        """
-        Precompute cast handlers and hidden attribute sets.
+        """Precompute cast handlers and hidden attribute sets.
 
         Validates the metadata precomputation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _User.__meta__
         self.assertIn("active", meta.cast_lookup)
         self.assertEqual(meta.hidden, frozenset({"active"}))
 
     def testAbstractModelsDeferColumnsToChildren(self) -> None:
-        """
-        Inherit columns and casts from abstract parents.
+        """Inherit columns and casts from abstract parents.
 
         Validates the abstract model support.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(_BaseAudit.__meta__)
         meta = _Invoice.__meta__
@@ -128,19 +160,27 @@ class TestModelMetaclass(TestCase):
         self.assertEqual(set(meta.casts), {"id", "total"})
 
     def testTimestampColumnsOnlyWhenDeclared(self) -> None:
-        """
-        Track timestamp columns only when they are declared.
+        """Track timestamp columns only when they are declared.
 
         Validates the timestamp column detection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(_User.__meta__.created_column)
         self.assertIsNone(_User.__meta__.updated_column)
 
     def testFillableRulesPrecedence(self) -> None:
-        """
-        Resolve mass assignment rules with whitelist precedence.
+        """Resolve mass assignment rules with whitelist precedence.
 
         Validates isFillable across fillable, guarded, and wildcard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         open_meta = _User.__meta__
         self.assertTrue(open_meta.isFillable("name"))
@@ -172,10 +212,14 @@ class TestModelMetaclass(TestCase):
         self.assertFalse(meta.isFillable("name"))
 
     def testTimestampsDisabledClearsTimestampColumns(self) -> None:
-        """
-        Ignore timestamp columns when timestamps are disabled.
+        """Ignore timestamp columns when timestamps are disabled.
 
         Validates the timestamps switch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _Frozen(Model):
@@ -189,10 +233,14 @@ class TestModelMetaclass(TestCase):
         self.assertIsNone(meta.updated_column)
 
     def testCustomTimestampColumnNames(self) -> None:
-        """
-        Honor overridden CREATED_AT and UPDATED_AT names.
+        """Honor overridden CREATED_AT and UPDATED_AT names.
 
         Validates the timestamp column overrides.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _Renamed(Model):
@@ -205,10 +253,14 @@ class TestModelMetaclass(TestCase):
         self.assertIsNone(meta.updated_column)
 
     def testApplyCastsSkipsNoneValues(self) -> None:
-        """
-        Skip cast application for None values.
+        """Skip cast application for None values.
 
         Validates the hydration cast pass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         meta = _User.__meta__
         row = {"id": 1, "name": "a", "active": None}
@@ -217,37 +269,53 @@ class TestModelMetaclass(TestCase):
         self.assertIs(row_cast["active"], True)
 
     def testBaseModelHasNoMetadata(self) -> None:
-        """
-        Keep the abstract base model without metadata.
+        """Keep the abstract base model without metadata.
 
         Validates the abstract base detection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(Model.__meta__)
 
     def testUnknownAttributeRaisesAttributeError(self) -> None:
-        """
-        Raise AttributeError for names outside the forwarded builder set.
+        """Raise AttributeError for names outside the forwarded builder set.
 
         Validates the metaclass __getattr__ fallback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AttributeError):
             _User.totallyUnknownAttribute  # noqa: B018
 
     def testForwardedMethodOnAbstractModelRaisesAttributeError(self) -> None:
-        """
-        Raise AttributeError for forwarded methods on an abstract model.
+        """Raise AttributeError for forwarded methods on an abstract model.
 
         Validates that a builder method name never crashes when the
         owning class has no metadata to build a query from.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AttributeError):
             Model.where("name", "x")
 
     def testPrimaryKeyDefaultsToIdWithoutAnyPrimaryFlag(self) -> None:
-        """
-        Default the primary key name to "id" without a primary flag.
+        """Default the primary key name to "id" without a primary flag.
 
         Validates the final fallback of primary key resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _NoFlaggedPrimary(Model):
@@ -257,11 +325,15 @@ class TestModelMetaclass(TestCase):
         self.assertEqual(_NoFlaggedPrimary.__meta__.primary_key, "id")
 
     def testConcreteParentColumnsAreInherited(self) -> None:
-        """
-        Inherit columns from a concrete, non-abstract parent model.
+        """Inherit columns from a concrete, non-abstract parent model.
 
         Validates that __meta__.columns (not just __pending_columns__)
         feeds the discovery of a subclass built from a real model.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         class _ConcreteParent(Model):

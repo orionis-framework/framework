@@ -9,10 +9,14 @@ _CONCURRENT_CALLERS = 20
 class TestChunkedSuffixResolverSuffix(TestCase):
 
     def testSuffixUsesTheTimestampAndCounterPattern(self) -> None:
-        """
-        Build the suffix from the timestamp and an incremental counter.
+        """Build the suffix from the timestamp and an incremental counter.
 
         Validates the naming scheme that keeps every size based chunk unique.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         moment = datetime(2025, 4, 9, 14, 30, 5, tzinfo=UTC)
         self.assertEqual(
@@ -21,11 +25,15 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         )
 
     def testSuffixDefaultsToTheCurrentTimestamp(self) -> None:
-        """
-        Resolve the current timestamp when no datetime is supplied.
+        """Resolve the current timestamp when no datetime is supplied.
 
         Validates that the handler can request a suffix without tracking time
         by itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertRegex(
             ChunkedSuffixResolver().getSuffix(),
@@ -33,11 +41,15 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         )
 
     def testSuffixCounterGrowsOnEveryCall(self) -> None:
-        """
-        Increment the counter on every suffix request.
+        """Increment the counter on every suffix request.
 
         Validates that two chunks written within the same second never share a
         file name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         resolver = ChunkedSuffixResolver()
         moment = datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
@@ -52,11 +64,15 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         )
 
     def testSuffixCounterIsThreadSafe(self) -> None:
-        """
-        Serialise concurrent suffix requests.
+        """Serialise concurrent suffix requests.
 
         Validates that competing threads never obtain the same counter, which
         would make two chunks share a single file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         resolver = ChunkedSuffixResolver()
         moment = datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
@@ -64,7 +80,13 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         guard = Lock()
 
         def collect() -> None:
-            """Store one suffix produced by the resolver."""
+            """Store one suffix produced by the resolver.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             suffix = resolver.getSuffix(dt=moment)
             with guard:
                 produced.append(suffix)
@@ -80,11 +102,15 @@ class TestChunkedSuffixResolverSuffix(TestCase):
 class TestChunkedSuffixResolverRotation(TestCase):
 
     def testNextRotationIsOneHourAhead(self) -> None:
-        """
-        Schedule the next rotation one hour after the supplied moment.
+        """Schedule the next rotation one hour after the supplied moment.
 
         Validates the fallback schedule of a strategy driven by file size
         rather than by time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         current = datetime(2025, 4, 9, 10, 0, 0, tzinfo=UTC)
         self.assertEqual(

@@ -24,6 +24,18 @@ class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     def config(self, key: str) -> dict:  # noqa: ARG002
+        """Run the config helper.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -83,10 +95,14 @@ class Remote(Model):
 class TestModelCrud(TestCase):
 
     async def asyncSetUp(self) -> None:
-        """
-        Wire an isolated in-memory manager and create the tables.
+        """Wire an isolated in-memory manager and create the tables.
 
         Guarantees complete isolation between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
@@ -99,10 +115,14 @@ class TestModelCrud(TestCase):
         await replica.createTable(Remote.__meta__.table)
 
     async def asyncTearDown(self) -> None:
-        """
-        Dispose the manager and clear the resolver after each test.
+        """Dispose the manager and clear the resolver after each test.
 
         Restores the global resolver state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         await self._manager.disconnect()
         ConnectionResolver.clear()
@@ -110,30 +130,42 @@ class TestModelCrud(TestCase):
     # ── Create / find ─────────────────────────────────────────────────────────
 
     async def testCreatePersistsAndAssignsPrimaryKey(self) -> None:
-        """
-        Persist a new model and adopt the generated primary key.
+        """Persist a new model and adopt the generated primary key.
 
         Validates the create entry point and key assignment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         self.assertEqual(person.id, 1)
         self.assertTrue(person._exists)
 
     async def testCreateMaintainsTimestamps(self) -> None:
-        """
-        Fill creation and update timestamps on first persist.
+        """Fill creation and update timestamps on first persist.
 
         Validates the automatic timestamp maintenance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         self.assertIsInstance(person.created_at, datetime)
         self.assertIsInstance(person.updated_at, datetime)
 
     async def testFindReturnsHydratedModel(self) -> None:
-        """
-        Retrieve a model by primary key with casts applied.
+        """Retrieve a model by primary key with casts applied.
 
         Validates hydration and cast application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "John", "active": True})
         person = await Person.find(1)
@@ -142,27 +174,39 @@ class TestModelCrud(TestCase):
         self.assertIsInstance(person.active, bool)
 
     async def testFindReturnsNoneWhenAbsent(self) -> None:
-        """
-        Return None when the primary key does not exist.
+        """Return None when the primary key does not exist.
 
         Validates the miss behavior of find.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(await Person.find(99))
 
     async def testFindOrFailRaisesWhenAbsent(self) -> None:
-        """
-        Raise ModelNotFoundException for missing primary keys.
+        """Raise ModelNotFoundException for missing primary keys.
 
         Validates the fail-fast retrieval contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ModelNotFoundException):
             await Person.findOrFail(99)
 
     async def testFirstOrFailRaisesOnEmptyTable(self) -> None:
-        """
-        Raise ModelNotFoundException when no row matches.
+        """Raise ModelNotFoundException when no row matches.
 
         Validates the firstOrFail contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ModelNotFoundException):
             await Person.where("name", "nobody").firstOrFail()
@@ -170,10 +214,14 @@ class TestModelCrud(TestCase):
     # ── Query chains ──────────────────────────────────────────────────────────
 
     async def testWhereChainFiltersOrdersAndLimits(self) -> None:
-        """
-        Combine where, orderBy, and limit into a fluent chain.
+        """Combine where, orderBy, and limit into a fluent chain.
 
         Validates the Eloquent-style chained query experience.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for index in range(5):
             await Person.create({
@@ -188,10 +236,14 @@ class TestModelCrud(TestCase):
         self.assertEqual([p.name for p in people], ["user4", "user2"])
 
     async def testAllReturnsCollection(self) -> None:
-        """
-        Retrieve every row wrapped in a Collection.
+        """Retrieve every row wrapped in a Collection.
 
         Validates the all entry point return type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "a"})
         await Person.create({"name": "b"})
@@ -200,10 +252,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(people.count(), 2)
 
     async def testWhereInAndNullFilters(self) -> None:
-        """
-        Filter with whereIn, whereNull, and whereNotNull.
+        """Filter with whereIn, whereNull, and whereNotNull.
 
         Validates the specialized where clauses end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "a", "email": "a@x.com"})
         await Person.create({"name": "b"})
@@ -219,10 +275,14 @@ class TestModelCrud(TestCase):
         self.assertEqual({p.name for p in with_email}, {"a"})
 
     async def testWhereBetweenAndLike(self) -> None:
-        """
-        Filter with whereBetween and whereLike.
+        """Filter with whereBetween and whereLike.
 
         Validates range and pattern conditions end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in ("alpha", "beta", "alberto"):
             await Person.create({"name": name})
@@ -234,10 +294,14 @@ class TestModelCrud(TestCase):
         self.assertEqual({p.name for p in like}, {"alpha", "alberto"})
 
     async def testOrWhereCombinesConditions(self) -> None:
-        """
-        Combine conditions with the OR connector.
+        """Combine conditions with the OR connector.
 
         Validates the orWhere clause end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "a"})
         await Person.create({"name": "b"})
@@ -246,10 +310,14 @@ class TestModelCrud(TestCase):
         self.assertEqual({p.name for p in rows}, {"a", "c"})
 
     async def testLatestOrdersByPrimaryKeyWithoutTimestamps(self) -> None:
-        """
-        Order latest() by the created timestamp column when present.
+        """Order latest() by the created timestamp column when present.
 
         Validates the latest/oldest defaults.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "first"})
         await Person.create({"name": "second"})
@@ -257,10 +325,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(newest.name, "second")
 
     async def testInvalidWhereArgumentsRaise(self) -> None:
-        """
-        Raise InvalidQueryException for malformed where calls.
+        """Raise InvalidQueryException for malformed where calls.
 
         Validates the builder argument guards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidQueryException):
             Person.query().where("name")
@@ -272,10 +344,14 @@ class TestModelCrud(TestCase):
     # ── Aggregates ────────────────────────────────────────────────────────────
 
     async def testAggregateTerminals(self) -> None:
-        """
-        Compute count, exists, max, min, avg, and sum.
+        """Compute count, exists, max, min, avg, and sum.
 
         Validates every aggregate terminal end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for index in range(1, 5):
             await Person.create({"name": f"user{index}"})
@@ -289,20 +365,28 @@ class TestModelCrud(TestCase):
         self.assertEqual(await Person.query().sum("id"), 10)
 
     async def testSumOnEmptyTableReturnsZero(self) -> None:
-        """
-        Return zero when summing an empty result set.
+        """Return zero when summing an empty result set.
 
         Validates the sum null-coalescing rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await Person.query().sum("id"), 0)
 
     # ── Update / delete ───────────────────────────────────────────────────────
 
     async def testInstanceUpdateWritesOnlyDirty(self) -> None:
-        """
-        Persist only the dirty attributes on update.
+        """Persist only the dirty attributes on update.
 
         Validates the dirty-write behavior and change tracking.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         await person.update({"name": "Peter"})
@@ -313,20 +397,28 @@ class TestModelCrud(TestCase):
         self.assertEqual(fresh.name, "Peter")
 
     async def testSaveWithoutChangesIsNoOp(self) -> None:
-        """
-        Treat save on a clean model as a successful no-op.
+        """Treat save on a clean model as a successful no-op.
 
         Validates the clean-save short circuit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(await person.save())
         self.assertFalse(person.wasChanged())
 
     async def testMassUpdateThroughBuilder(self) -> None:
-        """
-        Mass update every row matched by the query.
+        """Mass update every row matched by the query.
 
         Validates the builder update terminal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "a", "active": False})
         await Person.create({"name": "b", "active": False})
@@ -334,10 +426,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(affected, 2)
 
     async def testDeleteRemovesRow(self) -> None:
-        """
-        Delete the model row and flag the instance as unsaved.
+        """Delete the model row and flag the instance as unsaved.
 
         Validates the instance delete contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(await person.delete())
@@ -345,10 +441,14 @@ class TestModelCrud(TestCase):
         self.assertFalse(await person.delete())
 
     async def testDestroyDeletesByPrimaryKeys(self) -> None:
-        """
-        Delete multiple rows by primary key in one statement.
+        """Delete multiple rows by primary key in one statement.
 
         Validates the destroy entry point.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in ("a", "b", "c"):
             await Person.create({"name": name})
@@ -358,10 +458,14 @@ class TestModelCrud(TestCase):
     # ── Pagination ────────────────────────────────────────────────────────────
 
     async def testPaginateReturnsLengthAwarePage(self) -> None:
-        """
-        Paginate the query into a length-aware page.
+        """Paginate the query into a length-aware page.
 
         Validates items, totals, and navigation flags.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for index in range(5):
             await Person.create({"name": f"user{index}"})
@@ -375,10 +479,14 @@ class TestModelCrud(TestCase):
     # ── Attributes and state ──────────────────────────────────────────────────
 
     async def testHiddenAttributesAreOmittedFromSerialization(self) -> None:
-        """
-        Omit hidden attributes from toDict and toJson.
+        """Omit hidden attributes from toDict and toJson.
 
         Validates the serialization visibility rules.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         data = person.toDict()
@@ -387,10 +495,14 @@ class TestModelCrud(TestCase):
         self.assertNotIn("email", person.toJson())
 
     async def testOnlyAndExcludeSubsets(self) -> None:
-        """
-        Slice attributes with only() and exclude().
+        """Slice attributes with only() and exclude().
 
         Validates the attribute subset helpers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         self.assertEqual(person.only("name"), {"name": "John"})
@@ -398,10 +510,14 @@ class TestModelCrud(TestCase):
         self.assertIn("email", person.exclude("name"))
 
     async def testJsonCastRoundTrip(self) -> None:
-        """
-        Store and reload JSON structures through the json cast.
+        """Store and reload JSON structures through the json cast.
 
         Validates the cast round trip against the database.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"tags": ["a", "b"], "level": 3}
         person = await Person.create({"name": "John", "meta": payload})
@@ -409,10 +525,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(fresh.meta, payload)
 
     async def testDirtyTrackingLifecycle(self) -> None:
-        """
-        Track dirty state across assignment and synchronization.
+        """Track dirty state across assignment and synchronization.
 
         Validates isDirty, isClean, getOriginal, and syncOriginal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(person.isClean())
@@ -429,10 +549,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(person.getOriginal("name"), "Peter")
 
     async def testFillableWhitelistBlocksOtherColumns(self) -> None:
-        """
-        Reject mass assignment of columns outside the whitelist.
+        """Reject mass assignment of columns outside the whitelist.
 
         Validates the fillable enforcement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         secret = await Secret.create({"name": "ok"})
         self.assertEqual(secret.name, "ok")
@@ -440,19 +564,27 @@ class TestModelCrud(TestCase):
             await Secret.create({"name": "x", "token": "leak"})
 
     async def testFillRejectsUnknownColumns(self) -> None:
-        """
-        Reject mass assignment of keys that are not columns.
+        """Reject mass assignment of keys that are not columns.
 
         Validates the unknown-attribute guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MassAssignmentException):
             Person({"ghost": 1})
 
     async def testDirectAssignmentBypassesMassAssignment(self) -> None:
-        """
-        Allow direct attribute assignment regardless of fillable.
+        """Allow direct attribute assignment regardless of fillable.
 
         Validates the distinction between fill and direct writes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         secret = Secret()
         secret.name = "n"
@@ -462,10 +594,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(fresh.token, "t")
 
     async def testGuardedListBlocksListedColumns(self) -> None:
-        """
-        Block mass assignment only for guarded columns.
+        """Block mass assignment only for guarded columns.
 
         Validates the guarded blacklist enforcement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guarded = await Guarded.create({"name": "ok"})
         self.assertEqual(guarded.name, "ok")
@@ -473,18 +609,26 @@ class TestModelCrud(TestCase):
             await Guarded.create({"name": "x", "role": "admin"})
 
     async def testDestroyWithoutKeysReturnsZero(self) -> None:
-        """
-        Return zero when destroy receives no primary keys.
+        """Return zero when destroy receives no primary keys.
 
         Validates the destroy no-op contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await Person.destroy(), 0)
 
     async def testMultiRowInsertThroughBuilder(self) -> None:
-        """
-        Insert several rows in a single builder call.
+        """Insert several rows in a single builder call.
 
         Validates the batch insert terminal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = await Person.query().insert(
             [{"name": "a"}, {"name": "b"}],
@@ -493,39 +637,55 @@ class TestModelCrud(TestCase):
         self.assertEqual(await Person.count(), 2)
 
     async def testCastsApplyOnDirectAssignment(self) -> None:
-        """
-        Apply declared casts when attributes are assigned directly.
+        """Apply declared casts when attributes are assigned directly.
 
         Validates the assignment-time cast application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = Person()
         person.active = "1"
         self.assertIs(person.active, True)
 
     async def testUnknownAttributeAccessRaises(self) -> None:
-        """
-        Raise AttributeError for names that are not columns.
+        """Raise AttributeError for names that are not columns.
 
         Validates the attribute access guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = Person({"name": "x"})
         with self.assertRaises(AttributeError):
             _ = person.ghost
 
     async def testDeclaredColumnDefaultsToNoneWhenUnloaded(self) -> None:
-        """
-        Serve None for declared but unloaded columns.
+        """Serve None for declared but unloaded columns.
 
         Validates the Eloquent-style column access default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = Person()
         self.assertIsNone(person.email)
 
     async def testNonColumnAssignmentStaysOutOfAttributes(self) -> None:
-        """
-        Keep non-column assignments out of the persisted payload.
+        """Keep non-column assignments out of the persisted payload.
 
         Validates the attribute routing rules.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = Person({"name": "x"})
         person.transient = "note"
@@ -533,20 +693,28 @@ class TestModelCrud(TestCase):
         self.assertNotIn("transient", person.toDict())
 
     async def testReprIncludesPrimaryKey(self) -> None:
-        """
-        Include the class name and primary key in the repr.
+        """Include the class name and primary key in the repr.
 
         Validates the developer representation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "x"})
         self.assertIn("Person", repr(person))
         self.assertIn("id=1", repr(person))
 
     async def testFreshTimestampAwarenessFollowsColumnType(self) -> None:
-        """
-        Produce aware or naive timestamps matching the column type.
+        """Produce aware or naive timestamps matching the column type.
 
         Validates the timestamp awareness rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         aware = Person.freshTimestamp()
         self.assertIsNotNone(aware.tzinfo)
@@ -554,10 +722,14 @@ class TestModelCrud(TestCase):
         self.assertIsNone(naive.tzinfo)
 
     async def testModelWithNamedConnectionUsesIt(self) -> None:
-        """
-        Route model queries through the declared named connection.
+        """Route model queries through the declared named connection.
 
         Validates the per-model connection selection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         remote = await Remote.create({"name": "far"})
         self.assertEqual(remote.id, 1)
@@ -569,10 +741,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(default_rows, [])
 
     async def testMassUpdateRefreshesUpdatedTimestamp(self) -> None:
-        """
-        Refresh the update timestamp during mass updates.
+        """Refresh the update timestamp during mass updates.
 
         Validates the automatic timestamp maintenance in builders.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "a"})
         self.assertIsNotNone(person.updated_at)
@@ -585,11 +761,15 @@ class TestModelCrud(TestCase):
     # ── Classmethod shortcuts ─────────────────────────────────────────────────
 
     async def testFirstReturnsModelOrNoneClassmethod(self) -> None:
-        """
-        Retrieve the first row, or None, through the class shortcut.
+        """Retrieve the first row, or None, through the class shortcut.
 
         Validates the Model.first() classmethod, not only the builder
         it delegates to.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(await Person.first())
         await Person.create({"name": "a"})
@@ -599,10 +779,14 @@ class TestModelCrud(TestCase):
         self.assertEqual(first.name, "a")
 
     async def testFirstOrFailClassmethodReturnsModel(self) -> None:
-        """
-        Retrieve the first row through the class shortcut, or raise.
+        """Retrieve the first row through the class shortcut, or raise.
 
         Validates the Model.firstOrFail() success path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await Person.create({"name": "only"})
         person = await Person.firstOrFail()
@@ -610,13 +794,17 @@ class TestModelCrud(TestCase):
         self.assertEqual(person.name, "only")
 
     async def testUpdateTargetsOriginalPrimaryKeyWhenDirty(self) -> None:
-        """
-        Locate the row via the original primary key while it is dirty.
+        """Locate the row via the original primary key while it is dirty.
 
         Validates that _primaryKeyValue() targets the row using the
         original primary key value, even though the dirty diff still
         lets the primary key column itself be persisted with its new
         value once the matching row is found.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         person = await Person.create({"name": "John"})
         person.id = 999
@@ -630,11 +818,15 @@ class TestModelCrud(TestCase):
     async def testFreshTimestampDefaultsToAwareWithoutTimestampColumns(
         self,
     ) -> None:
-        """
-        Default to an aware timestamp without any timestamp column.
+        """Default to an aware timestamp without any timestamp column.
 
         Validates the freshTimestamp fallback when a model neither
         declares timestamp columns nor enables automatic timestamps.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         moment = Secret.freshTimestamp()
         self.assertIsNotNone(moment.tzinfo)

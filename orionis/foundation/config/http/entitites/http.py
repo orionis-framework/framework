@@ -15,7 +15,24 @@ from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
 class HTTP(BaseEntity):
-    """Configure HTTP request handling and security."""
+    """Configure HTTP request handling and security.
+
+    Parameters
+    ----------
+    monitor_disconnects : bool, optional
+        Cancel handlers proactively when a client disconnects. Defaults to
+        False, executing handlers in the server task with direct body reads.
+        External server cancellation still propagates in both modes. The
+        application snapshots this setting during create().
+    """
+
+    monitor_disconnects: bool = field(
+        default=False,
+        metadata={
+            "description": "Monitor client disconnects during handler execution.",
+            "default": False,
+        },
+    )
 
     proxies: HTTPProxies | dict = field(
         default_factory=HTTPProxies,
@@ -74,6 +91,9 @@ class HTTP(BaseEntity):
         None
         """
         super().__post_init__()
+        if not isinstance(self.monitor_disconnects, bool):
+            error_msg = "monitor_disconnects must be a bool."
+            raise TypeError(error_msg)
         self.__validateProxies()
         self.__validateSecurity()
         self.__validateRateLimit()

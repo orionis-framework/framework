@@ -21,12 +21,17 @@ from orionis.orm.query.expressions import (
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer
 
-
 class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
     """Exercise connection isolation and compiler behavior without application DI."""
 
     async def asyncSetUp(self) -> None:
-        """Create a private in-memory database for each test."""
+        """Create a private in-memory database for each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.connection = Connection(
             "runtime", {"driver": "sqlite", "database": ":memory:"},
         )
@@ -35,13 +40,25 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """Dispose the private database after each test."""
+        """Dispose the private database after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         if self.connection.inTransaction():
             await self.connection.rollback()
         await self.connection.disconnect()
 
     async def testChildCannotUseInheritedTransaction(self) -> None:
-        """Reject transaction use from a child without changing the owner state."""
+        """Reject transaction use from a child without changing the owner state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.begin()
         operations = (
             self.connection.begin,
@@ -49,24 +66,43 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
             self.connection.rollback,
         )
         for operation in operations:
-            with self.assertRaisesRegex(TransactionException, "child task"):
+            with self.assertRaisesRegex(TransactionException, "child task"): # NOSONAR
                 await asyncio.create_task(operation())
             self.assertTrue(self.connection.inTransaction())
 
-        with self.assertRaisesRegex(TransactionException, "child task"):
+        with self.assertRaisesRegex(TransactionException, "child task"): # NOSONAR
             await asyncio.create_task(self.connection.select("SELECT 1"))
         self.assertFalse(await asyncio.create_task(self._childInTransaction()))
         await self.connection.rollback()
 
     async def _childInTransaction(self) -> bool:
-        """Read transaction ownership from the calling task."""
+        """Read transaction ownership from the calling task.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return self.connection.inTransaction()
 
     async def testChildDiscardsSettledInheritedState(self) -> None:
-        """Allow a child to query after its inherited transaction has settled."""
+        """Allow a child to query after its inherited transaction has settled.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         ready = asyncio.Event()
 
         async def query_after_commit() -> list[dict]:
+            """Query the connection after the transaction commits.
+
+            Returns
+            -------
+            list[dict]
+                Value produced by the helper.
+            """
             await ready.wait()
             return await self.connection.select("SELECT 1 AS value")
 
@@ -77,13 +113,25 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await task, [{"value": 1}])
 
     async def testTransactionReusesItsContext(self) -> None:
-        """Return the same connection context throughout a transaction."""
+        """Return the same connection context throughout a transaction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.begin()
-        self.assertIs(self.connection._acquire(), self.connection._acquire())
+        self.assertIs(self.connection._acquire(), self.connection._acquire()) # NOSONAR
         await self.connection.rollback()
 
     async def testRootRollbackIncludesFirstSavepoint(self) -> None:
-        """Keep a first-write savepoint inside its enclosing root transaction."""
+        """Keep a first-write savepoint inside its enclosing root transaction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.begin()
         await self.connection.begin()
         await self.connection.execute("INSERT INTO items (name) VALUES ('nested')")
@@ -92,7 +140,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.connection.select("SELECT * FROM items"), [])
 
     async def testRootRollbackUndoesDdl(self) -> None:
-        """Keep table creation inside the active root transaction."""
+        """Keep table creation inside the active root transaction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.begin()
         await self.connection.statement("CREATE TABLE rolled_back (id INTEGER)")
         await self.connection.rollback()
@@ -102,11 +156,24 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rows, [])
 
     async def testMemoryDatabaseSerializesIndependentTransactions(self) -> None:
-        """Keep another task's commit outside a transaction being rolled back."""
+        """Keep another task's commit outside a transaction being rolled back.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         started = asyncio.Event()
         release = asyncio.Event()
 
         async def rollback_owner() -> None:
+            """Hold the transaction while another task waits.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             await self.connection.begin()
             await self.connection.execute(
                 "INSERT INTO items (name) VALUES ('rolled back')",
@@ -122,7 +189,7 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
                 "INSERT INTO items (name) VALUES ('committed')",
             ))
             try:
-                with self.assertRaises(TimeoutError):
+                with self.assertRaises(TimeoutError): # NOSONAR
                     await asyncio.wait_for(asyncio.shield(writer), 0.05)
             finally:
                 release.set()
@@ -131,7 +198,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rows, [{"name": "committed"}])
 
     async def testRawBindingsRemainIndependent(self) -> None:
-        """Reuse SQL text while preserving each immutable parameter mapping."""
+        """Reuse SQL text while preserving each immutable parameter mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         query = "SELECT :value AS value"
         first = MappingProxyType({"value": 1})
         second = MappingProxyType({"value": 2})
@@ -140,7 +213,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(dict(first), {"value": 1})
 
     async def testBatchInsertUsesExecutemany(self) -> None:
-        """Execute homogeneous rows using one reusable insert statement."""
+        """Execute homogeneous rows using one reusable insert statement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         executions = []
 
         def capture_insert(
@@ -151,6 +230,28 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
             _context,
             executemany,
         ) -> None:
+            """Record executions of INSERT statements.
+
+            Parameters
+            ----------
+            _connection : object
+                Value supplied for ``_connection``.
+            _cursor : object
+                Value supplied for ``_cursor``.
+            statement : object
+                Value supplied for ``statement``.
+            _parameters : object
+                Value supplied for ``_parameters``.
+            _context : object
+                Value supplied for ``_context``.
+            executemany : object
+                Value supplied for ``executemany``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             if statement.startswith("INSERT"):
                 executions.append((statement, executemany))
 
@@ -170,7 +271,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(count, [{"n": 1000}])
 
     async def testBatchInsertFailureRollsBackEveryRow(self) -> None:
-        """Roll back the entire batch after a later row violates a constraint."""
+        """Roll back the entire batch after a later row violates a constraint.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         plan = InsertPlan(
             table=TableDefinition("items"),
             values=[{"id": 1, "name": "first"}, {"id": 1, "name": "duplicate"}],
@@ -180,7 +287,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.connection.select("SELECT * FROM items"), [])
 
     async def testBatchInsertPreservesColumnDefaults(self) -> None:
-        """Apply client defaults for every parameter group in a batch."""
+        """Apply client defaults for every parameter group in a batch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         definition = TableDefinition("defaults", {
             "id": Integer().primary().autoIncrement(),
             "value": Integer().default(7),
@@ -194,7 +307,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([row["value"] for row in rows], [7, 7, 7])
 
     async def testInsertExpressionsKeepTheirSqlSemantics(self) -> None:
-        """Keep per-row SQL expressions on the explicit VALUES path."""
+        """Keep per-row SQL expressions on the explicit VALUES path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         result = await self.connection.insert(InsertPlan(
             table=TableDefinition("items"),
             values=[{"name": literal("one")}, {"name": literal("two")}],
@@ -204,7 +323,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rows, [{"name": "one"}, {"name": "two"}])
 
     async def testAliasedRawProjectionKeepsBindings(self) -> None:
-        """Bind special characters in a raw projection carrying an alias."""
+        """Bind special characters in a raw projection carrying an alias.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.execute("INSERT INTO items (name) VALUES ('sample')")
         value = "x'); DROP TABLE items; --"
         plan = SelectPlan(
@@ -216,7 +341,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rows, [{"name": "sample"}])
 
     async def testAliasedBoundAggregatePreservesGrouping(self) -> None:
-        """Keep bound aggregate fragments in the surrounding GROUP BY query."""
+        """Keep bound aggregate fragments in the surrounding GROUP BY query.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.statement(
             "CREATE TABLE metrics (category INTEGER, amount INTEGER)",
         )
@@ -237,7 +368,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         )
 
     async def testAliasedBoundFragmentPreservesCorrelation(self) -> None:
-        """Resolve an outer column inside a bound raw scalar projection."""
+        """Resolve an outer column inside a bound raw scalar projection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.execute("INSERT INTO items (name) VALUES ('a'), ('b')")
         table = TableDefinition("items")
         nested = SelectPlan(
@@ -265,7 +402,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         )
 
     async def testMixedBooleanConnectorsPreserveGrouping(self) -> None:
-        """Preserve left-to-right AND/OR semantics while combining runs."""
+        """Preserve left-to-right AND/OR semantics while combining runs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.statement(
             "CREATE TABLE flags (id INTEGER, a INTEGER, b INTEGER, c INTEGER)",
         )
@@ -288,7 +431,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([row["id"] for row in rows], [0, 5, 6, 7])
 
     def testRawMetadataCanBecomeDeclaredMetadata(self) -> None:
-        """Apply real types when a declared table follows a schemaless query."""
+        """Apply real types when a declared table follows a schemaless query.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         compiler = SQLCompiler()
         compiler.compileSelect(SelectPlan(
             table=TableDefinition("entries"), columns=("id",),
@@ -301,7 +450,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertIn("PRIMARY KEY (id)", ddl)
 
     def testMemoryPoolUsesExclusiveCheckout(self) -> None:
-        """Select single-connection queue pools for both engine variants."""
+        """Select single-connection queue pools for both engine variants.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         config = {"driver": "sqlite", "database": ":memory:"}
         options = engine_options(config)
         self.assertIs(options["poolclass"], AsyncAdaptedQueuePool)
@@ -310,7 +465,13 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertIs(engine_options(config, sync=True)["poolclass"], QueuePool)
 
     def testDefinitionKeysProvideUnboundColumnNames(self) -> None:
-        """Use table mapping names without mutating shared column definitions."""
+        """Use table mapping names without mutating shared column definitions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         column = Integer().primary()
         definition = TableDefinition("named", {"key": column})
         ddl = str(SQLCompiler().compileCreateTable(definition))
@@ -318,15 +479,26 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(column.name, "")
 
     def testConnectionHasNoInstanceDictionary(self) -> None:
-        """Keep connection instances constrained to their declared slots."""
-        self.assertFalse(hasattr(self.connection, "__dict__"))
+        """Keep connection instances constrained to their declared slots.
 
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertFalse(hasattr(self.connection, "__dict__"))
 
 class TestTransactionStartFailures(unittest.IsolatedAsyncioTestCase):
     """Verify acquired resources are released when a transaction cannot begin."""
 
     async def testBeginFailureClosesRawConnection(self) -> None:
-        """Close a connection whose root transaction failed to start."""
+        """Close a connection whose root transaction failed to start.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         raw = MagicMock()
         raw.begin = AsyncMock(side_effect=SQLAlchemyError("failed"))
         raw.close = AsyncMock()
@@ -340,7 +512,13 @@ class TestTransactionStartFailures(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(connection.inTransaction())
 
     async def testBeginCancellationClosesRawConnection(self) -> None:
-        """Close a connection when cancellation interrupts transaction start."""
+        """Close a connection when cancellation interrupts transaction start.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         raw = MagicMock()
         raw.begin = AsyncMock(side_effect=asyncio.CancelledError)
         raw.close = AsyncMock()

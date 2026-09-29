@@ -15,7 +15,13 @@ class _BodyBytes(bytes):
 class TestResponseResources(TestCase):
 
     def testFileConstructionUsesOneStat(self) -> None:
-        """Read file type and size from the same metadata result."""
+        """Read file type and size from the same metadata result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"data")
@@ -49,7 +55,13 @@ class TestResponseResources(TestCase):
             self.assertEqual(response.getFileSize(), 4)
 
     def testFileRejectsInvalidChunkSizes(self) -> None:
-        """Reject chunk sizes that cannot produce a bounded byte stream."""
+        """Reject chunk sizes that cannot produce a bounded byte stream.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory) / "file.txt"
             path.write_bytes(b"data")
@@ -60,12 +72,24 @@ class TestResponseResources(TestCase):
                 FileResponse(path, chunk_size="invalid")
 
     def testBytesSubclassIsPreserved(self) -> None:
-        """Treat byte subclasses as encoded response bodies."""
+        """Treat byte subclasses as encoded response bodies.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         content = _BodyBytes(b"raw")
         self.assertIs(Response(content).getBody(), content)
 
     async def testSyncStreamAcceptsBytesSubclasses(self) -> None:
-        """Preserve byte subclass chunks in synchronous streams."""
+        """Preserve byte subclass chunks in synchronous streams.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         content = _BodyBytes(b"raw")
         response = StreamingResponse([content])
         chunks = [chunk async for chunk in response.getStream()]

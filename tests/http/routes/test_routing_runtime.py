@@ -39,7 +39,20 @@ class LoaderApplicationDouble:
         compiled: bool = False,
         import_error: Exception | None = None,
     ) -> None:
-        """Store cache configuration and the requested import outcome."""
+        """Store cache configuration and the requested import outcome.
+
+        Parameters
+        ----------
+        compiled : bool
+            Value supplied for ``compiled``.
+        import_error : Exception | None
+            Value supplied for ``import_error``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.compiled = compiled
         self.import_error = import_error
         self.compiledPath = Path("compiled")
@@ -59,6 +72,16 @@ class LoaderApplicationDouble:
     def routingPaths(self, _kind: str) -> None:
         """Report no route modules or raise the configured import error.
 
+        Parameters
+        ----------
+        _kind : str
+            Value supplied for ``_kind``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
         Raises
         ------
         Exception
@@ -71,13 +94,35 @@ class LoaderRouterDouble:
     """Record route exports and changes to the registration kind."""
 
     def __init__(self, fallback: tuple | None = None) -> None:
-        """Store the fallback and initialize call records."""
+        """Store the fallback and initialize call records.
+
+        Parameters
+        ----------
+        fallback : tuple | None
+            Value supplied for ``fallback``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.fallback = fallback
         self.exports = 0
         self.kinds: list[str] = []
 
     def _setKind(self, kind: str) -> None:
-        """Record the registration kind selected by the loader."""
+        """Record the registration kind selected by the loader.
+
+        Parameters
+        ----------
+        kind : str
+            Value supplied for ``kind``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.kinds.append(kind)
 
     def export(self) -> dict[str, object]:
@@ -95,7 +140,18 @@ class RoutePersistenceDouble:
     """Record cache reads and saved compiled route snapshots."""
 
     def __init__(self, cached: dict[str, object]) -> None:
-        """Store the cache snapshot and initialize read and write records."""
+        """Store the cache snapshot and initialize read and write records.
+
+        Parameters
+        ----------
+        cached : dict[str, object]
+            Value supplied for ``cached``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.cached = cached
         self.reads = 0
         self.saved: list[dict[str, object]] = []
@@ -112,7 +168,18 @@ class RoutePersistenceDouble:
         return self.cached
 
     def save(self, value: dict[str, object]) -> None:
-        """Record a compiled route snapshot written by the loader."""
+        """Record a compiled route snapshot written by the loader.
+
+        Parameters
+        ----------
+        value : dict[str, object]
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.saved.append(value)
 
 class DoubleNextMiddleware(BaseMiddleware):
@@ -123,12 +190,36 @@ class DoubleNextMiddleware(BaseMiddleware):
         _request: Request,
         call_next: Callable[[], Awaitable[Response]],
     ) -> Response:
-        """Try advancing the same continuation twice."""
+        """Try advancing the same continuation twice.
+
+        Parameters
+        ----------
+        _request : Request
+            Value supplied for ``_request``.
+        call_next : Callable[[], Awaitable[Response]]
+            Value supplied for ``call_next``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         await call_next()
         return await call_next()
 
 def item_handler(item: int) -> Response:
-    """Expose the parameter ultimately passed to the handler."""
+    """Expose the parameter ultimately passed to the handler.
+
+    Parameters
+    ----------
+    item : int
+        Value supplied for ``item``.
+
+    Returns
+    -------
+    Response
+        Value produced by the helper.
+    """
     return Response(content=str(item))
 
 class RewriteParamMiddleware(BaseMiddleware):
@@ -139,7 +230,20 @@ class RewriteParamMiddleware(BaseMiddleware):
         request: Request,
         call_next: Callable[[], Awaitable[Response]],
     ) -> Response:
-        """Increment the parameter only for the current request."""
+        """Increment the parameter only for the current request.
+
+        Parameters
+        ----------
+        request : Request
+            Value supplied for ``request``.
+        call_next : Callable[[], Awaitable[Response]]
+            Value supplied for ``call_next``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         request.routeParams()["item"] += 1
         return await call_next()
 
@@ -147,7 +251,13 @@ class TestRoutingRuntime(TestCase):
     """Check request isolation and middleware continuation correctness."""
 
     async def testLastMiddlewareCannotExecuteTheHandlerTwice(self) -> None:
-        """Count terminal invocations when the final layer calls next twice."""
+        """Count terminal invocations when the final layer calls next twice.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         calls = []
 
         async def terminal() -> Response:
@@ -167,11 +277,22 @@ class TestRoutingRuntime(TestCase):
         self.assertEqual(calls, ["called"])
 
     async def testContinuationRemainsConsumedAfterHandlerFailure(self) -> None:
-        """Restore pipeline depth while preserving the at-most-once guard."""
+        """Restore pipeline depth while preserving the at-most-once guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         calls = []
 
         async def terminal() -> Response:
             """Record the terminal invocation and raise its failure.
+
+            Returns
+            -------
+            Response
+                Value produced by the helper.
 
             Raises
             ------
@@ -190,7 +311,13 @@ class TestRoutingRuntime(TestCase):
         self.assertEqual(calls, ["called"])
 
     def testRequestParamsRemainMutableAndIsolated(self) -> None:
-        """Copy resolved params at the request boundary, preserving the public API."""
+        """Copy resolved params at the request boundary, preserving the public API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/items/{id:int}", route_handler)
         resolver = RouteResolver(compile_router(router))
@@ -206,7 +333,13 @@ class TestRoutingRuntime(TestCase):
         self.assertEqual(resolver.resolve("GET", "/items/1").params["id"], 1)
 
     async def testMiddlewareParamChangesReachOnlyTheCurrentHandler(self) -> None:
-        """Preserve middleware rewriting without leaking writes through the cache."""
+        """Preserve middleware rewriting without leaking writes through the cache.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         router.get("/items/{item:int}", item_handler).middleware(RewriteParamMiddleware)
@@ -220,7 +353,13 @@ class TestRoutingCache(TestCase):
     """Exercise the real cache serializer and loader bootstrap boundaries."""
 
     def testJsonRoundTripPreservesNestedGroupsAndMiddleware(self) -> None:
-        """Round-trip paths, exclusions, names, converters and nested classes."""
+        """Round-trip paths, exclusions, names, converters and nested classes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         router.group(
@@ -260,7 +399,13 @@ class TestRoutingCache(TestCase):
         self.assertEqual(result.route.without_middleware, {TwoMiddleware})
 
     def testMiddlewareImportsAreSharedWithinOneCacheLoad(self) -> None:
-        """Resolve a shared class once while restoring many compiled routes."""
+        """Resolve a shared class once while restoring many compiled routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(
             middleware=Namespace.Middleware,
@@ -276,6 +421,11 @@ class TestRoutingCache(TestCase):
 
         def record_import(path: str) -> object:
             """Record a class import and delegate to the real resolver.
+
+            Parameters
+            ----------
+            path : str
+                Value supplied for ``path``.
 
             Returns
             -------
@@ -299,7 +449,13 @@ class TestRoutingCache(TestCase):
             )
 
     def testEmptyRouteTablesAreLoadedOnlyOnce(self) -> None:
-        """Track completion independently from the truthiness of compiled routes."""
+        """Track completion independently from the truthiness of compiled routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         app = LoaderApplicationDouble()
         router = LoaderRouterDouble((None, None))
         loader = RouteLoader(app, router, RouteCompiler(), RouteCache())
@@ -317,7 +473,13 @@ class TestRoutingCache(TestCase):
         )
 
     def testCacheVersionInvalidatesOlderCompositionRules(self) -> None:
-        """Recompile stale snapshots while accepting the current format."""
+        """Recompile stale snapshots while accepting the current format.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for version in (None, RouteCache.VERSION):
             with self.subTest(version=version):
                 app = LoaderApplicationDouble(compiled=True)
@@ -333,6 +495,13 @@ class TestRoutingCache(TestCase):
                     **_options: object,
                 ) -> RoutePersistenceDouble:
                     """Return the cache backend configured for this load.
+
+                    Parameters
+                    ----------
+                    backend : RoutePersistenceDouble
+                        Value supplied for ``backend``.
+                    **_options : object
+                        Arguments passed to the wrapped callable.
 
                     Returns
                     -------
@@ -359,7 +528,13 @@ class TestRoutingCache(TestCase):
                     self.assertEqual(persistence.saved, [])
 
     def testLoaderRestoresKindAfterAnImportError(self) -> None:
-        """Do not leave subsequent route registrations in an API import context."""
+        """Do not leave subsequent route registrations in an API import context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         app = LoaderApplicationDouble(import_error=RuntimeError("import failed"))
         router = LoaderRouterDouble()
         loader = RouteLoader(app, router, RouteCompiler(), RouteCache())

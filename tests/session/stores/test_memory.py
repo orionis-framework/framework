@@ -37,22 +37,30 @@ class TestMemorySessionStore(TestCase):
     # ── read ─────────────────────────────────────────────────────────────────
 
     async def testReadAbsentKeyReturnsNone(self) -> None:
-        """
-        Return None for a session identifier that was never written.
+        """Return None for a session identifier that was never written.
 
         Validates that reading from an empty store does not raise and
         correctly signals a cache miss.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         result = await store.read("nonexistent")
         self.assertIsNone(result)
 
     async def testReadReturnsStoredRecord(self) -> None:
-        """
-        Return the record previously written under the given identifier.
+        """Return the record previously written under the given identifier.
 
         Validates the basic write/read round-trip for a live, non-expired
         session record.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record = _make_record("abc")
@@ -62,11 +70,15 @@ class TestMemorySessionStore(TestCase):
         self.assertEqual(result.id, "abc")  # type: ignore[union-attr]
 
     async def testReadReturnsNoneForExpiredRecord(self) -> None:
-        """
-        Evict and return None for an expired session record.
+        """Evict and return None for an expired session record.
 
         Validates that a record whose expires_at is in the past is
         treated as a cache miss and removed from the internal store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record = _make_record("expired", offset_seconds=-1)
@@ -75,11 +87,15 @@ class TestMemorySessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testReadRemovesExpiredRecordFromStorage(self) -> None:
-        """
-        Delete an expired record during the read operation.
+        """Delete an expired record during the read operation.
 
         Validates that after reading an expired record the internal
         dictionary no longer contains the entry.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record = _make_record("stale", offset_seconds=-10)
@@ -88,11 +104,15 @@ class TestMemorySessionStore(TestCase):
         self.assertNotIn("stale", store._storage)
 
     async def testReadPreservesDataPayload(self) -> None:
-        """
-        Return the exact data payload stored with the session record.
+        """Return the exact data payload stored with the session record.
 
         Validates that arbitrary key-value pairs inside the data field
         survive a write/read cycle without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record = SessionRecord(
@@ -108,11 +128,15 @@ class TestMemorySessionStore(TestCase):
     # ── write ────────────────────────────────────────────────────────────────
 
     async def testWriteCreatesNewEntry(self) -> None:
-        """
-        Insert a record into the store under its identifier.
+        """Insert a record into the store under its identifier.
 
         Validates that after a write the record is retrievable and
         the store contains exactly one entry.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record = _make_record("new-entry")
@@ -120,11 +144,15 @@ class TestMemorySessionStore(TestCase):
         self.assertIn("new-entry", store._storage)
 
     async def testWriteOverwritesExistingEntry(self) -> None:
-        """
-        Replace an existing record when the same identifier is written again.
+        """Replace an existing record when the same identifier is written again.
 
         Validates that a second write for the same session ID replaces
         the previous record without leaving a duplicate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         record_v1 = SessionRecord(
@@ -144,11 +172,15 @@ class TestMemorySessionStore(TestCase):
         self.assertEqual(result.data, {"v": 2})  # type: ignore[union-attr]
 
     async def testWriteMultipleDistinctKeys(self) -> None:
-        """
-        Store several records without cross-contamination.
+        """Store several records without cross-contamination.
 
         Validates that writing multiple session records with different
         identifiers keeps each record independently retrievable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.write(_make_record("s1"))
@@ -163,11 +195,15 @@ class TestMemorySessionStore(TestCase):
     # ── delete ───────────────────────────────────────────────────────────────
 
     async def testDeleteRemovesExistingRecord(self) -> None:
-        """
-        Remove a previously written record from the store.
+        """Remove a previously written record from the store.
 
         Validates that delete() causes subsequent read() calls to
         return None for the deleted identifier.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.write(_make_record("to-delete"))
@@ -176,21 +212,29 @@ class TestMemorySessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testDeleteAbsentKeyIsNoOp(self) -> None:
-        """
-        Silently ignore delete() calls for non-existent identifiers.
+        """Silently ignore delete() calls for non-existent identifiers.
 
         Validates that calling delete() on an unknown session ID does
         not raise any exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.delete("ghost")
 
     async def testDeleteDoesNotAffectOtherRecords(self) -> None:
-        """
-        Preserve unrelated records when a specific one is deleted.
+        """Preserve unrelated records when a specific one is deleted.
 
         Validates that delete() targets only the specified identifier
         and leaves all other records intact.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.write(_make_record("keep"))
@@ -202,11 +246,15 @@ class TestMemorySessionStore(TestCase):
     # ── gc ───────────────────────────────────────────────────────────────────
 
     async def testGcRemovesExpiredRecords(self) -> None:
-        """
-        Evict all records whose expiry is in the past during gc().
+        """Evict all records whose expiry is in the past during gc().
 
         Validates that the garbage-collection sweep identifies and
         removes stale records from the internal dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.write(_make_record("live", offset_seconds=3600))
@@ -216,11 +264,15 @@ class TestMemorySessionStore(TestCase):
         self.assertNotIn("dead", store._storage)
 
     async def testGcKeepsLiveRecords(self) -> None:
-        """
-        Leave non-expired records untouched during gc().
+        """Leave non-expired records untouched during gc().
 
         Validates that the garbage-collection sweep does not evict
         records that are still within their lifetime window.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.write(_make_record("session-a", offset_seconds=7200))
@@ -229,11 +281,15 @@ class TestMemorySessionStore(TestCase):
         self.assertEqual(len(store._storage), 2)
 
     async def testGcOnEmptyStoreIsNoOp(self) -> None:
-        """
-        Execute gc() on an empty store without raising.
+        """Execute gc() on an empty store without raising.
 
         Validates that the garbage-collection sweep handles the
         trivial case of an empty internal dictionary gracefully.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         store = MemorySessionStore()
         await store.gc()

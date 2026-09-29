@@ -15,14 +15,14 @@ class IBaseExceptionHandler(ABC):
     @abstractmethod
     def toThrowable(
         self,
-        exception: Exception,
+        exception: BaseException,
     ) -> Throwable:
         """
         Convert an exception to a structured Throwable object.
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             Exception instance to be converted.
 
         Returns
@@ -35,14 +35,14 @@ class IBaseExceptionHandler(ABC):
     @abstractmethod
     def isExceptionIgnored(
         self,
-        exception: Exception,
+        exception: BaseException,
     ) -> bool:
         """
         Determine whether the given exception should be ignored.
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance to check.
 
         Returns
@@ -54,7 +54,7 @@ class IBaseExceptionHandler(ABC):
     @abstractmethod
     async def report(
         self,
-        exception: Exception,
+        exception: BaseException,
         log: ILogger,
     ) -> Throwable | None:
         """
@@ -62,7 +62,7 @@ class IBaseExceptionHandler(ABC):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         log : ILogger
             The logger instance for error reporting.
@@ -76,7 +76,7 @@ class IBaseExceptionHandler(ABC):
     @abstractmethod
     async def handleCLI(
         self,
-        exception: Exception,
+        exception: BaseException,
         console: IConsole,
     ) -> None:
         """
@@ -84,7 +84,7 @@ class IBaseExceptionHandler(ABC):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         console : IConsole
             The console instance for output.
@@ -98,7 +98,7 @@ class IBaseExceptionHandler(ABC):
     @abstractmethod
     async def handleHTTP(
         self,
-        exception: Exception,
+        exception: BaseException,
         request: Request | TransportAdapter,
     ) -> Response | None:
         """
@@ -106,7 +106,7 @@ class IBaseExceptionHandler(ABC):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         request : Request | TransportAdapter
             The HTTP request instance or transport adapter that was being processed.

@@ -23,15 +23,18 @@ _UNAVAILABLE_SOURCE: str = (
     "raise HasherNotAvailable('argon2')\n"
 )
 
-
 class TestImportHasherBackendSuccess(TestCase):
 
     def testReturnsTheRequestedBackendClass(self) -> None:
-        """
-        Return the backend class published by the imported module.
+        """Return the backend class published by the imported module.
 
         Validates that the helper resolves the attribute instead of the
         module itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         backend = import_hasher_backend(
             _INSTALLED_MODULE,
@@ -41,11 +44,15 @@ class TestImportHasherBackendSuccess(TestCase):
         self.assertIs(backend, PwdlibArgon2Hasher)
 
     def testDoesNotInstantiateTheBackend(self) -> None:
-        """
-        Return the class itself and never an instance of it.
+        """Return the class itself and never an instance of it.
 
         Validates the lazy contract the drivers rely on to stay
         constructible without paying the cost of a backend.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         backend = import_hasher_backend(
             _INSTALLED_MODULE,
@@ -55,45 +62,60 @@ class TestImportHasherBackendSuccess(TestCase):
         self.assertIsInstance(backend, type)
 
     def testUnknownAttributeIsNotSwallowed(self) -> None:
-        """
-        Propagate the failure raised by an unknown backend attribute.
+        """Propagate the failure raised by an unknown backend attribute.
 
         Validates that a typo in the module coordinates surfaces as a
         plain AttributeError instead of a misleading dependency error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(AttributeError):
             import_hasher_backend(_INSTALLED_MODULE, "Missing", _PACKAGE)
 
-
 class TestImportHasherBackendMissingModule(TestCase):
 
     def testMissingModuleIsReportedAsAMissingDependency(self) -> None:
-        """
-        Translate an unresolvable module into a module level failure.
+        """Translate an unresolvable module into a module level failure.
 
         Validates that callers only have to catch the exception published
         by the hashing module.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MissingHashDependencyException):
             import_hasher_backend(_ABSENT_MODULE, _INSTALLED_CLASS, _PACKAGE)
 
     def testMissingModulePreservesTheOriginalImportError(self) -> None:
-        """
-        Preserve the import failure that triggered the translation.
+        """Preserve the import failure that triggered the translation.
 
         Validates that the original traceback stays reachable for
         diagnostics.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MissingHashDependencyException) as captured:
             import_hasher_backend(_ABSENT_MODULE, _INSTALLED_CLASS, _PACKAGE)
         self.assertIsInstance(captured.exception.__cause__, ImportError)
 
     def testMissingModuleExplainsHowToInstallThePackage(self) -> None:
-        """
-        Report the distribution the driver needs to become usable.
+        """Report the distribution the driver needs to become usable.
 
         Validates that the message names the package and the command that
         installs it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MissingHashDependencyException) as captured:
             import_hasher_backend(_ABSENT_MODULE, _INSTALLED_CLASS, _PACKAGE)
@@ -101,15 +123,18 @@ class TestImportHasherBackendMissingModule(TestCase):
         self.assertIn(_PACKAGE, message)
         self.assertIn(f"pip install {_PACKAGE}", message)
 
-
 class TestImportHasherBackendUnavailableBackend(TestCase):
 
     def setUp(self) -> None:
-        """
-        Publish a module that reports itself as unavailable.
+        """Publish a module that reports itself as unavailable.
 
         Reproduces the state of an installation where the optional
         backend of a driver is not present.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._workspace = tempfile.TemporaryDirectory()
         source = Path(self._workspace.name) / f"{_UNAVAILABLE_MODULE}.py"
@@ -118,11 +143,15 @@ class TestImportHasherBackendUnavailableBackend(TestCase):
         importlib.invalidate_caches()
 
     def tearDown(self) -> None:
-        """
-        Remove the temporary module from the interpreter state.
+        """Remove the temporary module from the interpreter state.
 
         Guarantees that neither the import path nor the module cache leak
         into other tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         sys.modules.pop(_UNAVAILABLE_MODULE, None)
         if self._workspace.name in sys.path:
@@ -130,11 +159,15 @@ class TestImportHasherBackendUnavailableBackend(TestCase):
         self._workspace.cleanup()
 
     def testUnavailableBackendIsReportedAsAMissingDependency(self) -> None:
-        """
-        Translate an unavailable backend into a module level failure.
+        """Translate an unavailable backend into a module level failure.
 
         Validates the branch that catches the error raised by the backend
         library when its optional dependency is absent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MissingHashDependencyException) as captured:
             import_hasher_backend(

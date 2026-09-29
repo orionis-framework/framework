@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 from orionis.http.contracts.request import IRequest
 from orionis.http.enums.interfaces import Interface
+from orionis.http.payload.body import BodyStream
 from orionis.http.payload.estructures.cookies import Cookies
 from orionis.http.payload.estructures.query_params import QueryParams
 from orionis.http.payload.media_types import DEFAULT_MEDIA_TYPES, MediaTypeRegistry
@@ -67,18 +68,20 @@ class Request(IRequest):
         "__interface",
         "__json_parsed",
         "__path_params",
+        "__receive_or_protocol",
         "__registry",
         "__scope",
         "__state",
     )
 
-    def __init__(
+    def __init__(  # noqa: PLR0913 - Preserve injected streams and transport options.
         self,
         interface: Interface,
         adapter: TransportAdapter,
-        body_stream: IBodyStream,
+        body_stream: IBodyStream | None = None,
         *,
         registry: MediaTypeRegistry | None = None,
+        receive_or_protocol: object = None,
         params: Mapping[str, Any] | None = None,
     ) -> None:
         """
@@ -90,8 +93,10 @@ class Request(IRequest):
             Transport protocol type (ASGI or RSGI).
         adapter : TransportAdapter
             Provides the parsed scope dict and header accessor.
-        body_stream : IBodyStream
-            Pre-constructed body stream.  Inject a stub for unit testing.
+        body_stream : IBodyStream | None, optional
+            Pre-constructed stream, or None to create it on first body access.
+        receive_or_protocol : object, optional
+            ASGI receive callable or RSGI protocol used for lazy body creation.
         registry : MediaTypeRegistry | None, optional
             Content-type parser registry.  Defaults to ``DEFAULT_MEDIA_TYPES``.
         params : Mapping[str, Any] | None, optional
@@ -101,7 +106,7 @@ class Request(IRequest):
         -------
         None
         """
-        self.__scope = adapter.getScope()
+        self.__scope: dict[str, Any] | None = None
         self.__adapter = adapter
         # Reuse the enum member directly when the caller already passes one.
         self.__interface = (
@@ -109,7 +114,8 @@ class Request(IRequest):
             if isinstance(interface, Interface)
             else Interface(interface)
         )
-        self.__body_stream: IBodyStream = body_stream
+        self.__body_stream: IBodyStream | None = body_stream
+        self.__receive_or_protocol = receive_or_protocol
         self.__registry: MediaTypeRegistry = (
             registry if registry is not None else DEFAULT_MEDIA_TYPES
         )
@@ -135,6 +141,36 @@ class Request(IRequest):
         self.__path_params: dict[str, Any] | None = dict(params) if params else None
         self.__state: SimpleNamespace | None = None
 
+    def __getScope(self) -> dict[str, Any]:
+        """
+        Materialize the transport scope on its first access.
+
+        Returns
+        -------
+        dict[str, Any]
+            Request-local scope snapshot, retained for subsequent reads.
+        """
+        scope = self.__scope
+        if scope is None:
+            scope = self.__adapter.getScope()
+            self.__scope = scope
+        return scope
+
+    def __getBodyStream(self) -> IBodyStream:
+        """
+        Create the body reader when the request consumes its body.
+
+        Returns
+        -------
+        IBodyStream
+            Body reader shared by all payload parsing methods.
+        """
+        stream = self.__body_stream
+        if stream is None:
+            stream = BodyStream(self.__interface, self.__receive_or_protocol)
+            self.__body_stream = stream
+        return stream
+
     def __buildUrlRSGI(self) -> str:
         """
         Build the full URL from an RSGI scope.
@@ -147,7 +183,7 @@ class Request(IRequest):
         str
             The constructed request URL.
         """
-        scope = self.__scope
+        scope = self.__getScope()
 
         scheme: str = scope["scheme"]
         path: str = scope["path"]
@@ -172,7 +208,7 @@ class Request(IRequest):
         str
             The constructed request URL.
         """
-        scope = self.__scope
+        scope = self.__getScope()
 
         # Populate the scheme and path caches while building the URL.
         scheme: str = self.scheme
@@ -217,10 +253,10 @@ class Request(IRequest):
         str
             The base URL (scheme://host).
         """
-        scheme: str = self.__scope["scheme"]
+        scheme: str = self.__getScope()["scheme"]
 
         # The Host header carries the origin the client actually used.
-        host: str = self.headers.get("host") or self.__scope["server"]
+        host: str = self.headers.get("host") or self.__getScope()["server"]
 
         return f"{scheme}://{host}"
 
@@ -236,7 +272,7 @@ class Request(IRequest):
         str
             The base URL (scheme://host or scheme://host/root_path).
         """
-        scope: dict[str, Any] = self.__scope
+        scope: dict[str, Any] = self.__getScope()
 
         # Populate the scheme cache while building the base URL.
         scheme: str = self.scheme
@@ -312,7 +348,7 @@ class Request(IRequest):
         if self.__json_parsed:
             parsed = self.__cached_json
         else:
-            raw = await self.__body_stream.read()
+            raw = await self.__getBodyStream().read()
             if not raw:
                 error_msg = "Empty JSON body"
                 raise ValueError(error_msg)
@@ -338,7 +374,7 @@ class Request(IRequest):
             Parsed form mapping where repeated keys are preserved as lists.
         """
         # Parse raw bytes directly into a multi-value dictionary.
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         return parse_urlencoded_multi(raw)
 
     async def __parseDataMultipart(self) -> dict[str, Any]:
@@ -380,7 +416,7 @@ class Request(IRequest):
             If the decoded MessagePack payload is not a map.
         """
         # Decode MessagePack payload and validate expected mapping shape.
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         try:
             parsed = parse_msgpack(raw)
         except Exception as exc:
@@ -406,7 +442,7 @@ class Request(IRequest):
         if self.__cached_method is not None:
             return self.__cached_method
 
-        self.__cached_method = self.__scope["method"]
+        self.__cached_method = self.__getScope()["method"]
         return self.__cached_method
 
     @property
@@ -422,7 +458,7 @@ class Request(IRequest):
         if self.__cached_scheme is not None:
             return self.__cached_scheme
 
-        self.__cached_scheme = self.__scope.get("scheme", "http")
+        self.__cached_scheme = self.__getScope().get("scheme", "http")
         return self.__cached_scheme
 
     @property
@@ -436,7 +472,7 @@ class Request(IRequest):
             The path component of the request URL.
         """
         if self.__cached_path is None:
-            self.__cached_path = self.__scope.get("path", "/")
+            self.__cached_path = self.__getScope().get("path", "/")
         return self.__cached_path
 
     @property
@@ -452,7 +488,7 @@ class Request(IRequest):
         if self.__cached_http_version is not None:
             return self.__cached_http_version
 
-        self.__cached_http_version = self.__scope.get("http_version", "1.1")
+        self.__cached_http_version = self.__getScope().get("http_version", "1.1")
         return self.__cached_http_version
 
     @property
@@ -537,7 +573,7 @@ class Request(IRequest):
         if self.__cached_query_params is not None:
             return self.__cached_query_params
 
-        scope: Any = self.__scope
+        scope: Any = self.__getScope()
 
         # Determine query string based on interface type
         if self.__interface is Interface.RSGI:
@@ -586,7 +622,7 @@ class Request(IRequest):
         if self.__cached_ip is not None:
             return self.__cached_ip
 
-        raw = self.__scope.get("client")
+        raw = self.__getScope().get("client")
         if raw is None:
             return None
 
@@ -611,7 +647,7 @@ class Request(IRequest):
         if self.__cached_port is not None:
             return self.__cached_port
 
-        self.__cached_port = self.__scope.get("port")
+        self.__cached_port = self.__getScope().get("port")
         return self.__cached_port
 
     @property
@@ -626,7 +662,7 @@ class Request(IRequest):
         """
         if self.__cached_forwarded is not None:
             return self.__cached_forwarded
-        self.__cached_forwarded = self.__scope.get("forwarded", {})
+        self.__cached_forwarded = self.__getScope().get("forwarded", {})
         return self.__cached_forwarded
 
     # ---- Properties: User Agent & Authentication ----
@@ -733,7 +769,7 @@ class Request(IRequest):
         dict[str, Any]
             The raw scope dictionary provided by the transport layer.
         """
-        return self.__scope
+        return self.__getScope()
 
     # ---- Body Reading Methods ----
 
@@ -750,7 +786,7 @@ class Request(IRequest):
         AsyncGenerator[bytes]
             Yields chunks of the request body as bytes.
         """
-        async for chunk in self.__body_stream.stream():
+        async for chunk in self.__getBodyStream().stream():
             yield chunk
 
     async def body(self) -> bytes:
@@ -765,7 +801,7 @@ class Request(IRequest):
         bytes
             The complete request body as bytes.
         """
-        return await self.__body_stream.read()
+        return await self.__getBodyStream().read()
 
     async def raw(self) -> bytes:
         """
@@ -776,7 +812,7 @@ class Request(IRequest):
         bytes
             The raw request body.
         """
-        return await self.__body_stream.read()
+        return await self.__getBodyStream().read()
 
     async def text(self) -> str:
         """
@@ -787,7 +823,7 @@ class Request(IRequest):
         str
             The decoded request body.
         """
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         return raw.decode("utf-8")
 
     # ---- Structured Parsing Methods ----
@@ -822,7 +858,7 @@ class Request(IRequest):
             error_msg = "Content-Type must be application/json"
             raise UnsupportedMediaTypeException(error_msg)
 
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
 
         if not raw:
             error_msg = "Empty JSON body"
@@ -858,7 +894,7 @@ class Request(IRequest):
             If the document declares an internal or external entity. This is a
             subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
         """
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         return parse_xml(raw)
 
     async def msgpack(self) -> object:
@@ -876,7 +912,7 @@ class Request(IRequest):
         msgspec.DecodeError
             If the payload is not valid MessagePack.
         """
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         return parse_msgpack(raw)
 
     async def formUrlEncoded(self) -> dict[str, Any]:
@@ -901,7 +937,7 @@ class Request(IRequest):
             error_msg = "Content-Type must be application/x-www-form-urlencoded"
             raise UnsupportedMediaTypeException(error_msg)
 
-        raw = await self.__body_stream.read()
+        raw = await self.__getBodyStream().read()
         self.__cached_form = parse_urlencoded(raw)
         return self.__cached_form
 
@@ -942,7 +978,7 @@ class Request(IRequest):
             raise ValueError(error_msg)
 
         parser = MultipartStreamParser(
-            self.__body_stream.stream(),
+            self.__getBodyStream().stream(),
             boundary_str.encode(),
         )
 
@@ -967,7 +1003,7 @@ class Request(IRequest):
         # Resolve media type from the cached Content-Type header.
         media_type, _ = self.__contentType()
         if not media_type:
-            return await self.__body_stream.read()
+            return await self.__getBodyStream().read()
 
         # Multipart needs the live stream — delegate to the dedicated method.
         if media_type == _MIME_MULTIPART:
@@ -975,9 +1011,9 @@ class Request(IRequest):
 
         parser = self.__registry.get(media_type)
         if parser is None:
-            return await self.__body_stream.read()
+            return await self.__getBodyStream().read()
 
-        return parser(await self.__body_stream.read())
+        return parser(await self.__getBodyStream().read())
 
     async def data(self) -> dict[str, Any]:
         """

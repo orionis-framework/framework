@@ -9,6 +9,13 @@ class _StubBucket:
     __slots__ = ("key",)
 
     def __init__(self, key: str) -> None:
+        """Store the cache key exposed by the bucket double.
+
+        Parameters
+        ----------
+        key : str
+            Cache key associated with the bucket.
+        """
         self.key: str = key
 
 class TestOrionisBytecodeCache(TestCase):

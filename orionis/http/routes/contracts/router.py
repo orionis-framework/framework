@@ -255,6 +255,7 @@ class IRouter(ABC):
         middleware: MiddlewareInput | None = None,
         without_middleware: MiddlewareInput | None = None,
         routes: Sequence[FluentRoute | RouteGroup] | None = None,
+        public: bool | None = None,
     ) -> RouteGroup:
         """
         Register a group of routes with a shared prefix and middleware.
@@ -271,6 +272,8 @@ class IRouter(ABC):
             Accepts a single class or a container of classes.
         routes : Sequence[FluentRoute | RouteGroup] | None, optional
             Routes or nested groups to include.
+        public : bool | None, optional
+            Stateless profile inherited by descendants without an explicit choice.
 
         Returns
         -------

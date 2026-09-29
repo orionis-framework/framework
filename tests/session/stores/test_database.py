@@ -65,12 +65,16 @@ class TestDatabaseSessionStore(TestCase):
     """Unit tests for the database-backed DatabaseSessionStore."""
 
     async def asyncSetUp(self) -> None:
-        """
-        Create an in-memory SQLite connection and a fresh store per test.
+        """Create an in-memory SQLite connection and a fresh store per test.
 
         Provides an isolated, writable database so every test operates
         on its own state without side effects. Tables are created lazily
         by the store on first access.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._connection = Connection(
             "sqlite",
@@ -82,10 +86,14 @@ class TestDatabaseSessionStore(TestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """
-        Dispose the in-memory engine after each test.
+        """Dispose the in-memory engine after each test.
 
         Releases the pooled in-memory database.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         await self._connection.disconnect()
 
@@ -143,21 +151,29 @@ class TestDatabaseSessionStore(TestCase):
     # ── read ─────────────────────────────────────────────────────────────────
 
     async def testReadAbsentKeyReturnsNone(self) -> None:
-        """
-        Return None for a session identifier that was never written.
+        """Return None for a session identifier that was never written.
 
         Validates that reading from an empty table does not raise and
         correctly signals a miss.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = await self._store.read("nonexistent")
         self.assertIsNone(result)
 
     async def testReadReturnsStoredRecord(self) -> None:
-        """
-        Return the record previously written under the given identifier.
+        """Return the record previously written under the given identifier.
 
         Validates the basic write/read round-trip for a live, non-expired
         session record.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         record = _make_record("abc")
         await self._store.write(record)
@@ -167,11 +183,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(result.data, {"k": "v"})  # type: ignore[union-attr]
 
     async def testReadPreservesDataPayload(self) -> None:
-        """
-        Return the exact data payload stored with the session record.
+        """Return the exact data payload stored with the session record.
 
         Validates that arbitrary key-value pairs inside the data field
         survive a write/read cycle without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         record = SessionRecord(
             id="data-test",
@@ -184,11 +204,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(result.data, {"user_id": 42, "role": "admin"})  # type: ignore[union-attr]
 
     async def testReadRestoresExpiryAsUtcDatetime(self) -> None:
-        """
-        Rebuild the expiry column as a timezone-aware datetime.
+        """Rebuild the expiry column as a timezone-aware datetime.
 
         Validates that the epoch seconds stored in the table are decoded
         back into UTC, truncated to the whole second the column holds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         record = _make_record("tz")
         await self._store.write(record)
@@ -201,11 +225,15 @@ class TestDatabaseSessionStore(TestCase):
         )
 
     async def testExpiryIsStoredAsWholeSeconds(self) -> None:
-        """
-        Persist the expiry as an integer, as the column declares.
+        """Persist the expiry as an integer, as the column declares.
 
         Validates that no fractional epoch value reaches the database,
         since a strict driver rejects a float bound to a BIGINT column.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         record = _make_record("int-expiry")
         await self._store.write(record)
@@ -220,11 +248,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(stored, int(record.expires_at.timestamp()))
 
     async def testReadDeletesExpiredRow(self) -> None:
-        """
-        Evict the row when an expired record is read.
+        """Evict the row when an expired record is read.
 
         Validates the lazy eviction that keeps the table from growing
         without bound.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("gone"))
         await self._store._connection.execute(
@@ -239,11 +271,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(rows, [])
 
     async def testReadReturnsNoneForCorruptPayload(self) -> None:
-        """
-        Treat an undecodable payload as a miss.
+        """Treat an undecodable payload as a miss.
 
         Validates that malformed JSON never escapes the store as a
         decode error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("corrupt"))
         await self._store._connection.execute(
@@ -253,11 +289,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertIsNone(await self._store.read("corrupt"))
 
     async def testReadReturnsNoneWhenExpiryIsNull(self) -> None:
-        """
-        Treat a row without expiry as expired.
+        """Treat a row without expiry as expired.
 
         Validates the defensive guard protecting the store from a
         pre-existing table whose expiry column accepts NULL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         table = "relaxed_sessions"
         store = await self._relaxedStore(table)
@@ -272,11 +312,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(rows, [])
 
     async def testReadReturnsNoneWhenPayloadIsNull(self) -> None:
-        """
-        Treat a row without payload as a miss.
+        """Treat a row without payload as a miss.
 
         Validates the defensive guard protecting the store from a row
         whose JSON column was never populated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         table = "relaxed_payload_sessions"
         store = await self._relaxedStore(table)
@@ -288,11 +332,15 @@ class TestDatabaseSessionStore(TestCase):
     # ── write ────────────────────────────────────────────────────────────────
 
     async def testWriteOfExpiredRecordDeletesInsteadOfStoring(self) -> None:
-        """
-        Delete rather than store an already-expired record.
+        """Delete rather than store an already-expired record.
 
         Validates that write() never persists a record whose expiry is
         in the past.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("stale"))
         expired = _make_record("stale", offset_seconds=-5)
@@ -301,11 +349,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testWriteOverwritesExistingEntry(self) -> None:
-        """
-        Replace an existing record when the same identifier is written again.
+        """Replace an existing record when the same identifier is written again.
 
         Validates that a second write for the same session ID replaces
         the previous record without leaving a duplicate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         record_v1 = SessionRecord(
             id="dup",
@@ -324,11 +376,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(result.data, {"v": 2})  # type: ignore[union-attr]
 
     async def testWriteMultipleDistinctKeys(self) -> None:
-        """
-        Store several records without cross-contamination.
+        """Store several records without cross-contamination.
 
         Validates that writing multiple session records with different
         identifiers keeps each record independently retrievable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("s1"))
         await self._store.write(_make_record("s2"))
@@ -340,11 +396,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(r2.id, "s2")  # type: ignore[union-attr]
 
     async def testInsertFallsBackToUpdateOnConflict(self) -> None:
-        """
-        Recover from a concurrent insert by retrying as an update.
+        """Recover from a concurrent insert by retrying as an update.
 
         Validates the portable upsert strategy used instead of a
         dialect-specific ``ON CONFLICT`` clause.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("conflict"))
         expiration = (datetime.now(UTC) + timedelta(hours=2)).timestamp()
@@ -362,11 +422,15 @@ class TestDatabaseSessionStore(TestCase):
     # ── schema bootstrap ─────────────────────────────────────────────────────
 
     async def testSchemaIsCreatedOnFirstUseOnly(self) -> None:
-        """
-        Create the table once and flag the store as ready.
+        """Create the table once and flag the store as ready.
 
         Validates that repeated calls short-circuit instead of issuing
         redundant DDL statements.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(self._store._ready)
         await self._store._ensureSchema()
@@ -375,11 +439,15 @@ class TestDatabaseSessionStore(TestCase):
         self.assertTrue(self._store._ready)
 
     async def testConcurrentBootstrapCreatesSchemaOnce(self) -> None:
-        """
-        Serialise concurrent bootstraps behind the readiness lock.
+        """Serialise concurrent bootstraps behind the readiness lock.
 
         Validates that the second waiter observes the flag set by the
         first one and skips the redundant DDL statement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await asyncio.gather(
             self._store._ensureSchema(),
@@ -392,11 +460,15 @@ class TestDatabaseSessionStore(TestCase):
     # ── delete ───────────────────────────────────────────────────────────────
 
     async def testDeleteRemovesExistingRecord(self) -> None:
-        """
-        Remove a previously written record from the table.
+        """Remove a previously written record from the table.
 
         Validates that delete() causes subsequent read() calls to
         return None for the deleted identifier.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("to-delete"))
         await self._store.delete("to-delete")
@@ -404,22 +476,30 @@ class TestDatabaseSessionStore(TestCase):
         self.assertIsNone(result)
 
     async def testDeleteAbsentKeyIsNoOp(self) -> None:
-        """
-        Silently ignore delete() calls for non-existent identifiers.
+        """Silently ignore delete() calls for non-existent identifiers.
 
         Validates that calling delete() on an unknown session ID does
         not raise any exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.delete("ghost")
 
     # ── gc ───────────────────────────────────────────────────────────────────
 
     async def testGcRemovesExpiredRecords(self) -> None:
-        """
-        Sweep away expired rows while keeping live ones.
+        """Sweep away expired rows while keeping live ones.
 
         Validates that gc() performs a bulk delete of every record whose
         expires_at is in the past, leaving unrelated live records intact.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._store.write(_make_record("alive"))
         await self._store._ensureSchema()
@@ -437,7 +517,13 @@ class TestDatabaseSessionStore(TestCase):
         self.assertEqual(rows, [])
 
     async def testPrefixedStorePreservesRevocationAcrossConnections(self) -> None:
-        """Use prefixed IR queries and let deletion win over concurrent updates."""
+        """Use prefixed IR queries and let deletion win over concurrent updates.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with tempfile.TemporaryDirectory() as directory:
             config = {
                 "driver": "sqlite",

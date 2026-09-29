@@ -13,29 +13,49 @@ from orionis.test import TestCase
 # Every first-party connection declared by the configuration entities.
 _EXPECTED_CONNECTIONS = ("sqlite", "mysql", "pgsql", "oracle", "sqlserver")
 
-
 def template_config() -> dict:
-    """Build the application database template with its documented defaults."""
+    """Build the application database template with its documented defaults.
+
+    Returns
+    -------
+    dict
+        Value produced by the helper.
+    """
     with patch("config.database.Env") as environment:
         environment.get.side_effect = lambda _key, default=None: default
         return BootstrapDatabase().toDict()
-
 
 class _EntityStubApp:
     """Application stub returning the Database entity (not a dict)."""
 
     def config(self, key: str) -> Database:  # noqa: ARG002
+        """Return the requested database configuration.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Database
+            Value produced by the helper.
+        """
         return Database()
 
 class TestConfigurationContract(TestCase):
 
     def testEveryDefaultConnectionSpeaksWithTheDialect(self) -> None:
-        """
-        Run every default connection entity through the dialect layer.
+        """Run every default connection entity through the dialect layer.
 
         Validates that each configuration produced by the entities is
         fully understood: driver resolution, URL building, and engine
         options never fail and target the expected dialect.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         config = Database().toDict()
         connections = config["connections"]
@@ -50,20 +70,28 @@ class TestConfigurationContract(TestCase):
             self.assertIn("future", options)
 
     def testDefaultConnectionNameIsDeclared(self) -> None:
-        """
-        Keep the default connection inside the declared connections.
+        """Keep the default connection inside the declared connections.
 
         Validates the default/connections coherence of the entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         config = Database().toDict()
         self.assertIn(config["default"], config["connections"])
 
     def testManagerConsumesEntityConfiguration(self) -> None:
-        """
-        Build the manager from the entity object instead of a dict.
+        """Build the manager from the entity object instead of a dict.
 
         Validates the entity normalization path used when the runtime
         configuration returns dataclass instances.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = ConnectionManager(_EntityStubApp())
         for name in _EXPECTED_CONNECTIONS:
@@ -74,11 +102,15 @@ class TestConfigurationContract(TestCase):
         )
 
     def testApplicationTemplateConfigSpeaksWithTheDialect(self) -> None:
-        """
-        Validate the application database template against every dialect.
+        """Validate the application database template against every dialect.
 
         Every connection declared by ``config/database.py`` must resolve
         its driver and build a valid engine URL with engine options.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         config = template_config()
 
@@ -94,11 +126,15 @@ class TestConfigurationContract(TestCase):
             engine_options(entry)
 
     def testApplicationSqliteUrlAndDatabaseAreCoherent(self) -> None:
-        """
-        Keep the sqlite informational URL aligned with the database path.
+        """Keep the sqlite informational URL aligned with the database path.
 
         Validates that the app template derives both values from the
         same source, avoiding split-brain configuration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         config = template_config()
         sqlite = config["connections"]["sqlite"]

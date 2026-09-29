@@ -1,4 +1,3 @@
-"""Validate Route.auth() through its pinned router, compiler and cache."""
 import json
 import subprocess
 import sys
@@ -47,12 +46,17 @@ _AUTH_ROUTES = (
     ),
 )
 
-
 class TestRouteAuth(TestCase):
     """Keep the web authentication helper consistent with normal route registration."""
 
     def testRegistersExactlyTheCurrentWebFlowOnThePinnedRouter(self) -> None:
-        """Check every method, handler, name and middleware on a facade subclass."""
+        """Check every method, handler, name and middleware on a facade subclass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         facade = type("AuthRoutes", (Route,), {"_pinned_instance": router})
         initial = len(router.export()["routes"])
@@ -72,7 +76,13 @@ class TestRouteAuth(TestCase):
         self.assertEqual(resolver.options("/logout"), ["OPTIONS", "POST"])
 
     def testRejectsApiRegistrationBeforeMutatingRoutes(self) -> None:
-        """A misplaced helper must never silently create a session-less API flow."""
+        """A misplaced helper must never silently create a session-less API flow.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         original = router.export()
@@ -83,7 +93,13 @@ class TestRouteAuth(TestCase):
         self.assertEqual(router.get("/api", route_handler).export()["kind"], "api")
 
     def testAuthRoutesSurviveThePersistentCacheRoundTrip(self) -> None:
-        """Restore auth handlers, names and middleware from persistent JSON."""
+        """Restore auth handlers, names and middleware from persistent JSON.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.auth()
         cache = RouteCache()
@@ -101,7 +117,13 @@ class TestRouteAuth(TestCase):
             self.assertEqual(route.compiled_middlewares, expected_middleware)
 
     def testRepeatedRegistrationUsesTheNormalConflictValidation(self) -> None:
-        """Repeated helpers must fail compilation instead of overwriting routes."""
+        """Repeated helpers must fail compilation instead of overwriting routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.auth()
         router.auth()
@@ -109,7 +131,13 @@ class TestRouteAuth(TestCase):
             compile_router(router)
 
     def testExistingHandlersAreNeverSilentlyReplaced(self) -> None:
-        """Manual auth routes and generated routes cannot shadow each other."""
+        """Manual auth routes and generated routes cannot shadow each other.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/login", route_handler)
         router.auth()
@@ -117,7 +145,13 @@ class TestRouteAuth(TestCase):
             compile_router(router)
 
     def testFacadeImportDoesNotLoadApplicationAuthCode(self) -> None:
-        """Applications that do not use auth must be able to import the route facade."""
+        """Applications that do not use auth must be able to import the route facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         result = subprocess.run(
             [
                 sys.executable, "-B", "-c",

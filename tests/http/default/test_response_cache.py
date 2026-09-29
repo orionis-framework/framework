@@ -101,28 +101,61 @@ class _Request:
         """
         return self.wants_json
 
-
 class _RecordingEngine:
     """Record awaited renders without using a second template implementation."""
 
     __slots__ = ("calls", "content")
 
     def __init__(self, content: str = "<main>Injected engine</main>") -> None:
-        """Store the response text and allocate an independent call history."""
+        """Store the response text and allocate an independent call history.
+
+        Parameters
+        ----------
+        content : str
+            Value supplied for ``content``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.content = content
         self.calls: list[tuple[str, dict[str, object]]] = []
 
     async def render(self, template: str, context: dict[str, object]) -> str:
-        """Record a render that was awaited and return its configured content."""
+        """Record a render that was awaited and return its configured content.
+
+        Parameters
+        ----------
+        template : str
+            Value supplied for ``template``.
+        context : dict[str, object]
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         self.calls.append((template, context))
         return self.content
-
 
 class _ErrorPage(HTMLParser):
     """Collect markup, description text and scripts from an error page."""
 
     def __init__(self, content: bytes) -> None:
-        """Parse the rendered UTF-8 page into observable browser contexts."""
+        """Parse the rendered UTF-8 page into observable browser contexts.
+
+        Parameters
+        ----------
+        content : bytes
+            Value supplied for ``content``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__(convert_charrefs=True)
         self.tags: list[str] = []
         self.description: list[str] = []
@@ -135,7 +168,20 @@ class _ErrorPage(HTMLParser):
     def handleStartTag(
         self, tag: str, attrs: list[tuple[str, str | None]],
     ) -> None:
-        """Record element structure and the active text context."""
+        """Record element structure and the active text context.
+
+        Parameters
+        ----------
+        tag : str
+            Value supplied for ``tag``.
+        attrs : list[tuple[str, str | None]]
+            Value supplied for ``attrs``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.tags.append(tag)
         if ("class", "error-description") in attrs:
             self._in_description = True
@@ -143,14 +189,36 @@ class _ErrorPage(HTMLParser):
             self._in_script = True
 
     def handleEndTag(self, tag: str) -> None:
-        """Leave the description or script context at its closing tag."""
+        """Leave the description or script context at its closing tag.
+
+        Parameters
+        ----------
+        tag : str
+            Value supplied for ``tag``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         if tag == "div":
             self._in_description = False
         if tag == "script":
             self._in_script = False
 
     def handleData(self, data: str) -> None:
-        """Collect text independently from HTML elements and script source."""
+        """Collect text independently from HTML elements and script source.
+
+        Parameters
+        ----------
+        data : str
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         if self._in_description:
             self.description.append(data)
         if self._in_script:
@@ -160,7 +228,6 @@ class _ErrorPage(HTMLParser):
     handle_starttag = handleStartTag
     handle_endtag = handleEndTag
     handle_data = handleData
-
 
 def _defaults(directory: Path) -> DefaultResponses:
     """
@@ -179,11 +246,16 @@ def _defaults(directory: Path) -> DefaultResponses:
     fixture = _DefaultFixture(directory)
     return DefaultResponses(fixture, fixture, Jinja2Engine(ViewEnvironment(fixture)))
 
-
 class TestDefaultResponseCache(TestCase):
 
     async def testHealthResponsesDoNotShareMutableState(self) -> None:
-        """Keep headers and flash data private to each health request."""
+        """Keep headers and flash data private to each health request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             for wants_json in (True, False):
@@ -198,7 +270,13 @@ class TestDefaultResponseCache(TestCase):
                 self.assertIsNone(second.getFlashData())
 
     async def testErrorDoesNotSerializeUnusedDetails(self) -> None:
-        """Render an explicit message without serializing other fields."""
+        """Render an explicit message without serializing other fields.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             result = await defaults.error(
@@ -207,7 +285,13 @@ class TestDefaultResponseCache(TestCase):
             self.assertIn(b"Readable", result.getBody())
 
     async def testErrorRendersUntrustedDescriptionsAsText(self) -> None:
-        """Keep payloads out of markup and scripts across cached renders."""
+        """Keep payloads out of markup and scripts across cached renders.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payload = (
             '</script><script>probe()</script><img src=x onerror="probe()">'
             " 'quoted' & \"double\" \\ newline\nEspañol \u2028 \u2029"
@@ -233,7 +317,13 @@ class TestDefaultResponseCache(TestCase):
                     self.assertEqual(parsed.scripts, baseline.scripts)
 
     async def testErrorJsonPreservesDescriptionValues(self) -> None:
-        """Keep JSON strings and structured fields independent of HTML escaping."""
+        """Keep JSON strings and structured fields independent of HTML escaping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payload = '<em title="quoted">A&B</em>\nEspañol'
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
@@ -247,7 +337,13 @@ class TestDefaultResponseCache(TestCase):
                     self.assertEqual(json.loads(result.getBody()), expected)
 
     async def testErrorAcceptsKnownAndUnlistedStatusCodesInBothFormats(self) -> None:
-        """Preserve custom status codes and existing labels on repeated renders."""
+        """Preserve custom status codes and existing labels on repeated renders.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             for status, label in (
@@ -265,7 +361,13 @@ class TestDefaultResponseCache(TestCase):
                             self.assertIn(title.encode(), result.getBody())
 
     async def testErrorRejectsInvalidStatusesBeforeRendering(self) -> None:
-        """Validate type and range before reading templates or converting content."""
+        """Validate type and range before reading templates or converting content.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             fixture = _DefaultFixture(Path(directory))
             engine = _RecordingEngine()
@@ -286,7 +388,13 @@ class TestDefaultResponseCache(TestCase):
             self.assertEqual(engine.calls, [])
 
     async def testErrorPreservesCallerHeaders(self) -> None:
-        """Apply cache defaults without mutating the supplied mapping."""
+        """Apply cache defaults without mutating the supplied mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             headers = {"x-test": "value"}
@@ -301,7 +409,13 @@ class TestDefaultResponseCache(TestCase):
             self.assertEqual(result.getHeader("cache-control"), ["custom"])
 
     async def testCachedAssetsRemainIndependentAcrossConcurrentRequests(self) -> None:
-        """Serve each cached asset through a fresh stream and header mapping."""
+        """Serve each cached asset through a fresh stream and header mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             public = Path(directory)
             defaults = _defaults(public)

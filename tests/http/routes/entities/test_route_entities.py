@@ -10,7 +10,24 @@ def _make_compiled_route(
     kind: str = "web",
     name: str | None = "users.index",
 ) -> CompiledRoute:
-    """Return a minimal CompiledRoute for testing purposes."""
+    """Return a minimal CompiledRoute for testing purposes.
+
+    Parameters
+    ----------
+    path : str
+        Value supplied for ``path``.
+    method : str
+        Value supplied for ``method``.
+    kind : str
+        Value supplied for ``kind``.
+    name : str | None
+        Value supplied for ``name``.
+
+    Returns
+    -------
+    CompiledRoute
+        Value produced by the helper.
+    """
     return CompiledRoute(
         path=path,
         method=method,
@@ -27,12 +44,16 @@ class TestCompiledRoute(TestCase):
     """Unit tests for the CompiledRoute frozen dataclass."""
 
     def testDefaultFieldValues(self) -> None:
-        """
-        Verify that optional fields default to their documented values.
+        """Verify that optional fields default to their documented values.
 
         Confirms priority_score defaults to 0, kind to 'web', converters
         to an empty dict, middleware to an empty list, without_middleware
         to an empty set, and compiled_middlewares to an empty tuple.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         route = CompiledRoute(
             path="/",
@@ -51,10 +72,14 @@ class TestCompiledRoute(TestCase):
         self.assertEqual(route.compiled_middlewares, ())
 
     def testFieldsAreImmutable(self) -> None:
-        """
-        Verify that CompiledRoute is frozen and rejects attribute mutation.
+        """Verify that CompiledRoute is frozen and rejects attribute mutation.
 
         Confirms that assigning to any field raises a FrozenInstanceError.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         from dataclasses import FrozenInstanceError
 
@@ -63,11 +88,15 @@ class TestCompiledRoute(TestCase):
             route.path = "/other"  # type: ignore[misc]
 
     def testFieldsStoredCorrectly(self) -> None:
-        """
-        Verify that constructor arguments are accessible on the instance.
+        """Verify that constructor arguments are accessible on the instance.
 
         Confirms that path, method, type, action, name, segment_count,
         priority_score, and kind are stored without mutation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         route = _make_compiled_route(
             path="/users",
@@ -82,19 +111,27 @@ class TestCompiledRoute(TestCase):
         self.assertEqual(route.name, "users.store")
 
     def testNoneNameAllowed(self) -> None:
-        """
-        Verify that name may be None for anonymous routes.
+        """Verify that name may be None for anonymous routes.
 
         Confirms that passing name=None does not raise an error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         route = _make_compiled_route(name=None)
         self.assertIsNone(route.name)
 
     def testNoneRegexForStaticRoute(self) -> None:
-        """
-        Verify that regex is None for a static route.
+        """Verify that regex is None for a static route.
 
         Confirms that static routes do not require a compiled pattern.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         route = _make_compiled_route()
         self.assertIsNone(route.regex)
@@ -103,42 +140,58 @@ class TestResolvedRoute(TestCase):
     """Unit tests for the ResolvedRoute frozen dataclass."""
 
     def testKindDelegatesToCompiledRoute(self) -> None:
-        """
-        Verify that the kind property delegates to the underlying route.
+        """Verify that the kind property delegates to the underlying route.
 
         Confirms that ResolvedRoute.kind returns the same value as
         the nested CompiledRoute.kind field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         compiled = _make_compiled_route(kind="api")
         resolved = ResolvedRoute(route=compiled, params={})
         self.assertEqual(resolved.kind, "api")
 
     def testEmptyParamsForStaticRoute(self) -> None:
-        """
-        Verify that static routes carry an empty params dict.
+        """Verify that static routes carry an empty params dict.
 
         Confirms that ResolvedRoute accepts and preserves an empty
         parameter mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         compiled = _make_compiled_route()
         resolved = ResolvedRoute(route=compiled, params={})
         self.assertEqual(resolved.params, {})
 
     def testParamsStoredForDynamicRoute(self) -> None:
-        """
-        Verify that path parameters are stored on the resolved route.
+        """Verify that path parameters are stored on the resolved route.
 
         Confirms that a non-empty params dict is preserved as-is.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         compiled = _make_compiled_route(path="/users/{id:int}")
         resolved = ResolvedRoute(route=compiled, params={"id": 42})
         self.assertEqual(resolved.params["id"], 42)
 
     def testIsFrozen(self) -> None:
-        """
-        Verify that ResolvedRoute is frozen and rejects attribute mutation.
+        """Verify that ResolvedRoute is frozen and rejects attribute mutation.
 
         Confirms that assigning to the route field raises FrozenInstanceError.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         from dataclasses import FrozenInstanceError
 
@@ -148,18 +201,28 @@ class TestResolvedRoute(TestCase):
             resolved.params = {"x": 1}  # type: ignore[misc]
 
     def testRouteFieldPointsToCompiledRoute(self) -> None:
-        """
-        Verify that the route field stores the exact CompiledRoute instance.
+        """Verify that the route field stores the exact CompiledRoute instance.
 
         Confirms object identity between the constructor argument and
         the stored attribute.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         compiled = _make_compiled_route()
         resolved = ResolvedRoute(route=compiled, params={})
         self.assertIs(resolved.route, compiled)
 
     def testConstructorCopiesMutableParameterSources(self) -> None:
-        """Isolate results from external dicts and live read-only mapping views."""
+        """Isolate results from external dicts and live read-only mapping views.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         compiled = _make_compiled_route(path="/users/{id:int}")
         for wrap in (dict, MappingProxyType):
             source = {"id": 42}
@@ -169,7 +232,13 @@ class TestResolvedRoute(TestCase):
             self.assertEqual(resolved.params, {"id": 42})
 
     def testConstructorDoesNotRetainAnEmptyMutableSource(self) -> None:
-        """Keep empty results isolated when their source mapping later changes."""
+        """Keep empty results isolated when their source mapping later changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         source = {}
         resolved = ResolvedRoute(route=_make_compiled_route(), params=source)
         source["id"] = 99

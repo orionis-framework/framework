@@ -128,30 +128,42 @@ class _DelegatingRule(Rule):
 class TestRuleContract(TestCase):
 
     def testRuleImplementsTheRuleInterface(self) -> None:
-        """
-        Confirm Rule implements the IRule contract.
+        """Confirm Rule implements the IRule contract.
 
         Validates that concrete rules satisfy the interface used by the
         rules executor when binding validators.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(_AlwaysValidRule(), IRule)
 
     def testRuleDeclaresSlots(self) -> None:
-        """
-        Confirm Rule stores its state in slots.
+        """Confirm Rule stores its state in slots.
 
         Validates that the base class avoids per-instance dictionaries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(Rule.__slots__, ("_code", "_message"))
 
 class TestRuleEnforce(TestCase):
 
     def testBaseEnforceRaisesNotImplementedError(self) -> None:
-        """
-        Raise NotImplementedError when the base enforce is reached.
+        """Raise NotImplementedError when the base enforce is reached.
 
         Validates that subclasses are required to provide their own
         implementation of the validation predicate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = _DelegatingRule()
         with self.assertRaises(NotImplementedError):
@@ -160,19 +172,27 @@ class TestRuleEnforce(TestCase):
 class TestRuleValidate(TestCase):
 
     def testValidateReturnsNoneOnSuccess(self) -> None:
-        """
-        Return None when the rule accepts the value.
+        """Return None when the rule accepts the value.
 
         Validates that a passing rule produces no failure entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = _AlwaysValidRule()
         self.assertIsNone(rule.validate("field", "any_value", object()))
 
     def testValidateReturnsFailureOnRejection(self) -> None:
-        """
-        Return a ValidationFailure when the rule rejects the value.
+        """Return a ValidationFailure when the rule rejects the value.
 
         Validates the failure field and rule code reported to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = _AlwaysInvalidRule().validate("age", 0, object())
         self.assertIsInstance(result, ValidationFailure)
@@ -180,38 +200,54 @@ class TestRuleValidate(TestCase):
         self.assertEqual(result.rule, "always_invalid")
 
     def testValidateUsesClassMessageByDefault(self) -> None:
-        """
-        Fall back to the class-level message when none is supplied.
+        """Fall back to the class-level message when none is supplied.
 
         Validates the message resolution performed at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = _AlwaysInvalidRule().validate("field", "value", object())
         self.assertEqual(result.message, "Value is always invalid.")
 
     def testValidateUsesConstructorMessageWhenProvided(self) -> None:
-        """
-        Prefer the constructor message over the class-level message.
+        """Prefer the constructor message over the class-level message.
 
         Validates that per-instance overrides reach the failure entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = _AlwaysInvalidRule(message="Custom error.")
         result = rule.validate("field", "value", object())
         self.assertEqual(result.message, "Custom error.")
 
     def testMessageDefaultsToNoneWithoutDeclaration(self) -> None:
-        """
-        Report a None message when the class declares no message.
+        """Report a None message when the class declares no message.
 
         Validates that missing class attributes do not break resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = _BareRule().validate("field", "value", object())
         self.assertIsNone(result.message)
 
     def testCodeDefaultsToLowercasedClassName(self) -> None:
-        """
-        Derive the rule code from the class name when undeclared.
+        """Derive the rule code from the class name when undeclared.
 
         Validates the fallback applied when ``__code__`` is missing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = _BareRule().validate("field", "value", object())
         self.assertEqual(result.rule, "_barerule")

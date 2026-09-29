@@ -259,7 +259,20 @@ class _IdentityMiddlewareDouble(BaseMiddleware):
     __slots__ = ()
 
     async def handle(self, _request: Request, call_next: object) -> Response:
-        """Continue without adding authentication dependencies to kernel tests."""
+        """Continue without adding authentication dependencies to kernel tests.
+
+        Parameters
+        ----------
+        _request : Request
+            Value supplied for ``_request``.
+        call_next : object
+            Value supplied for ``call_next``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         return await call_next()
 
 class _DoubleNextMiddleware(BaseMiddleware):
@@ -296,7 +309,13 @@ class _StubScope:
     __slots__ = ("entries", "tags")
 
     def __init__(self) -> None:
-        """Initialise the two recording dictionaries."""
+        """Initialise the two recording dictionaries.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.entries: dict[object, object] = {}
         self.tags: dict[str, object] = {}
 
@@ -312,8 +331,12 @@ class _StubScope:
         return self
 
     async def __aexit__(self, *_exc: object) -> bool:
-        """
-        Leave the scope without swallowing exceptions.
+        """Leave the scope without swallowing exceptions.
+
+        Parameters
+        ----------
+        *_exc : object
+            Arguments passed to the wrapped callable.
 
         Returns
         -------
@@ -323,8 +346,7 @@ class _StubScope:
         return False
 
     def set(self, key: str, value: object) -> None:
-        """
-        Tag the scope with a keyed value.
+        """Tag the scope with a keyed value.
 
         Parameters
         ----------
@@ -332,12 +354,16 @@ class _StubScope:
             Tag name.
         value : object
             Tag value.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.tags[key] = value
 
     def __setitem__(self, key: object, value: object) -> None:
-        """
-        Register a per-request instance.
+        """Register a per-request instance.
 
         Parameters
         ----------
@@ -345,6 +371,11 @@ class _StubScope:
             Contract used as the binding key.
         value : object
             Instance bound for this request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.entries[key] = value
 
@@ -354,18 +385,41 @@ class _StubDefaultResponses:
     __slots__ = ("asset_paths", "calls", "health_calls")
 
     def __init__(self) -> None:
-        """Initialise the call recorder."""
+        """Initialise the call recorder.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.asset_paths: list[str] = []
         self.calls: list[tuple[int, object, bool]] = []
         self.health_calls = 0
 
     def health(self) -> Response:
-        """Expose instance reuse through an ordinary routed default action."""
+        """Expose instance reuse through an ordinary routed default action.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         self.health_calls += 1
         return Response(content=f"health:{self.health_calls}")
 
     def asset(self, path: str) -> Response:
-        """Record the packaged asset path and return its placeholder body."""
+        """Record the packaged asset path and return its placeholder body.
+
+        Parameters
+        ----------
+        path : str
+            Value supplied for ``path``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         self.asset_paths.append(path)
         return Response(content=f"asset:{path}")
 
@@ -410,7 +464,13 @@ class _StubCatch:
     __slots__ = ("handled",)
 
     def __init__(self) -> None:
-        """Initialise the recorder of handled exceptions."""
+        """Initialise the recorder of handled exceptions.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.handled: list[BaseException] = []
 
     async def exception(self, exc: BaseException, _request: object) -> Response:
@@ -438,8 +498,7 @@ class _StubRouteLoader:
     __slots__ = ("_fallback", "_routes")
 
     def __init__(self, routes: dict[str, dict], fallback: tuple | None) -> None:
-        """
-        Store the compiled routes and the fallback descriptor.
+        """Store the compiled routes and the fallback descriptor.
 
         Parameters
         ----------
@@ -447,6 +506,11 @@ class _StubRouteLoader:
             Compiled route tables grouped by HTTP method.
         fallback : tuple | None
             Registered fallback handler.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._routes = routes
         self._fallback = fallback
@@ -480,29 +544,44 @@ class _StubRequestPrinter:
     __slots__ = ("enabled", "printed", "timers")
 
     def __init__(self) -> None:
-        """Initialise the activity recorders."""
+        """Initialise the activity recorders.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.enabled: bool = False
         self.printed: list[Response] = []
         self.timers: int = 0
 
     def setEnabled(self, *, enabled: bool) -> None:
-        """
-        Store the requested activation flag.
+        """Store the requested activation flag.
 
         Parameters
         ----------
         enabled : bool
             Whether the printer should log requests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.enabled = enabled
 
     def startTimer(self) -> None:
-        """Record the start of a request timer."""
+        """Record the start of a request timer.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.timers += 1
 
     def printRequest(self, _adapter: object, response: Response) -> None:
-        """
-        Record the response that would be logged.
+        """Record the response that would be logged.
 
         Parameters
         ----------
@@ -510,6 +589,11 @@ class _StubRequestPrinter:
             Transport adapter for the request.
         response : Response
             Response about to be sent.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.printed.append(response)
 
@@ -519,7 +603,13 @@ class _StubResponseAdapter:
     __slots__ = ("sent",)
 
     def __init__(self) -> None:
-        """Initialise the recorder of sent responses."""
+        """Initialise the recorder of sent responses.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.sent: list[Response] = []
 
     async def send(
@@ -563,8 +653,7 @@ class _StubApp:
         debug: bool = False,
         maintenance: bool = False,
     ) -> None:
-        """
-        Store the collaborators and configuration served to the kernel.
+        """Store the collaborators and configuration served to the kernel.
 
         Parameters
         ----------
@@ -576,6 +665,11 @@ class _StubApp:
             Whether the application runs in debug mode.
         maintenance : bool, optional
             Whether the application is under maintenance.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.builds = builds
         self.build_calls: list[type] = []
@@ -704,13 +798,17 @@ class _StubRsgiHeaders:
     __slots__ = ("_data", "get_all")
 
     def __init__(self, data: dict[str, list[str]]) -> None:
-        """
-        Store the header map.
+        """Store the header map.
 
         Parameters
         ----------
         data : dict[str, list[str]]
             Header names mapped to their values.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._data = data
         # Expose the third-party header protocol through the local accessor.
@@ -747,7 +845,13 @@ class _ViewFactoryDouble:
     """Record template rendering performed by a view route."""
 
     def __init__(self) -> None:
-        """Initialize the list of rendered templates."""
+        """Initialize the list of rendered templates.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.templates: list[str] = []
 
     async def make(self, name: str) -> Response:
@@ -770,7 +874,13 @@ class _MaintenancePassThrough:
     """Allow selected requests through the maintenance collaborator."""
 
     def __init__(self) -> None:
-        """Initialize the record of checked paths."""
+        """Initialize the record of checked paths.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.paths: list[str] = []
 
     async def handle(self, adapter: TransportAdapter) -> None:
@@ -780,6 +890,11 @@ class _MaintenancePassThrough:
         ----------
         adapter : TransportAdapter
             Incoming request adapter checked by the maintenance collaborator.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.paths.append(adapter.path())
 
@@ -801,8 +916,7 @@ class _StubRsgiScope:
     )
 
     def __init__(self, path: str, method: str = "GET") -> None:
-        """
-        Build a minimal but complete RSGI scope.
+        """Build a minimal but complete RSGI scope.
 
         Parameters
         ----------
@@ -810,6 +924,11 @@ class _StubRsgiScope:
             Requested path.
         method : str, optional
             HTTP method of the request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.proto = "http"
         self.http_version = "1.1"
@@ -1078,13 +1197,17 @@ async def receive_empty() -> dict[str, Any]:
     return {"type": "http.request", "body": b"", "more_body": False}
 
 async def send_noop(_message: object) -> None:
-    """
-    Discard an ASGI response message.
+    """Discard an ASGI response message.
 
     Parameters
     ----------
     _message : object
         Message produced by the response adapter.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
     """
     return
 
@@ -1149,10 +1272,14 @@ def make_request_double(path: str) -> Request:
 class TestMiddlewarePipeline(TestCase):
 
     async def testInvokesTheTerminalWithoutMiddleware(self) -> None:
-        """
-        Call the terminal handler when the stack is empty.
+        """Call the terminal handler when the stack is empty.
 
         Validates the fast path taken by routes without middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         expected = Response(content="terminal")
 
@@ -1170,10 +1297,14 @@ class TestMiddlewarePipeline(TestCase):
         self.assertIs(await pipeline(), expected)
 
     async def testRunsEveryLayerInOrder(self) -> None:
-        """
-        Walk every middleware layer before reaching the terminal.
+        """Walk every middleware layer before reaching the terminal.
 
         Validates the ordering guarantee route stacks rely on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _RecordingMiddleware.calls = [] # NOSONAR
         request = make_request_double("/x")
@@ -1198,11 +1329,15 @@ class TestMiddlewarePipeline(TestCase):
         self.assertEqual(response.getHeader("x-route-middleware"), ["1"])
 
     async def testRejectsADoubleAdvanceFromTheSameLayer(self) -> None:
-        """
-        Reject a middleware calling ``next()`` twice.
+        """Reject a middleware calling ``next()`` twice.
 
         Validates the guard that prevents a handler from running twice
         for a single request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
 
         async def terminal() -> Response:
@@ -1226,20 +1361,28 @@ class TestMiddlewarePipeline(TestCase):
 class TestKernelBoot(TestCase):
 
     async def testBootWiresEveryCollaborator(self) -> None:
-        """
-        Resolve every collaborator exactly once during boot.
+        """Resolve every collaborator exactly once during boot.
 
         Validates that the request hot path never touches the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertTrue(kernel._KernelHTTP__boot)
 
     async def testBootIsIdempotent(self) -> None:
-        """
-        Ignore a second boot request.
+        """Ignore a second boot request.
 
         Validates that re-entering ``boot()`` cannot duplicate the
         middleware stacks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel()
         printer = app.builds[HTTPRequestPrinter]
@@ -1248,10 +1391,14 @@ class TestKernelBoot(TestCase):
         self.assertEqual(printer.timers, 0)
 
     async def testBuildsTheOrderedWebPipeline(self) -> None:
-        """
-        Install the session middleware before the CSRF middleware.
+        """Install the session middleware before the CSRF middleware.
 
         Validates the ordering the flash bag depends on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel()
         stack = kernel._KernelHTTP__web_middleware
@@ -1260,10 +1407,14 @@ class TestKernelBoot(TestCase):
         self.assertIs(stack[2], app.builds[ResolveSessionIdentityMiddleware])
 
     async def testPreloadsFunctionAndControllerHandlers(self) -> None:
-        """
-        Resolve every handler into an identity-keyed dispatch table.
+        """Resolve every handler into an identity-keyed dispatch table.
 
         Validates that no module import happens while serving a request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertIn(web_handler, kernel._KernelHTTP__fn_dispatch.values())
@@ -1273,10 +1424,14 @@ class TestKernelBoot(TestCase):
         )
 
     async def testSharesMiddlewareInstancesAcrossIdenticalStacks(self) -> None:
-        """
-        Build one middleware tuple per distinct route stack.
+        """Build one middleware tuple per distinct route stack.
 
         Validates the cache that keeps boot time and memory bounded.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         cache = kernel._KernelHTTP__middleware_cache
@@ -1284,20 +1439,28 @@ class TestKernelBoot(TestCase):
         self.assertEqual(len(next(iter(cache.values()))), 1)
 
     async def testKeepsTheRegisteredFallback(self) -> None:
-        """
-        Cache the fallback handler resolved at boot time.
+        """Cache the fallback handler resolved at boot time.
 
         Validates that unmatched routes can be served without a lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         fallback = (_FallbackController, "handle")
         kernel, _app, _responses, _catch = await boot_kernel(fallback=fallback)
         self.assertEqual(kernel._KernelHTTP__fallback, fallback)
 
     async def testTreatsAnEmptyFallbackPairAsAbsent(self) -> None:
-        """
-        Ignore the placeholder fallback pair produced by the loader.
+        """Ignore the placeholder fallback pair produced by the loader.
 
         Validates that ``(None, None)`` never reaches the dispatcher.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             fallback=(None, None),
@@ -1305,29 +1468,41 @@ class TestKernelBoot(TestCase):
         self.assertIsNone(kernel._KernelHTTP__fallback)
 
     async def testReportsNoFallbackWhenNoneIsRegistered(self) -> None:
-        """
-        Leave the fallback unset when the loader registers none.
+        """Leave the fallback unset when the loader registers none.
 
         Validates the default configuration of a fresh application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertIsNone(kernel._KernelHTTP__fallback)
 
     async def testEnablesTheRequestPrinterInDebugMode(self) -> None:
-        """
-        Activate the debug request printer only in debug mode.
+        """Activate the debug request printer only in debug mode.
 
         Validates that production requests skip the timer and the log
         call entirely.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _kernel, app, _responses, _catch = await boot_kernel(debug=True)
         self.assertTrue(app.builds[HTTPRequestPrinter].enabled)
 
     async def testDoesNotExposeAnInstanceDictionary(self) -> None:
-        """
-        Keep the kernel free of a per-instance dictionary.
+        """Keep the kernel free of a per-instance dictionary.
 
         Validates the slot layout declared by the class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertFalse(hasattr(kernel, "__dict__"))
@@ -1335,7 +1510,13 @@ class TestKernelBoot(TestCase):
 class TestKernelDispatch(TestCase):
 
     async def testReusesDefaultsAndBuildsOtherControllersPerRequest(self) -> None:
-        """Retain the bootstrapped default factory without sharing user controllers."""
+        """Retain the bootstrapped default factory without sharing user controllers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         routes = make_routes()
         routes["GET"]["static"]["/health"] = replace(
             make_route("/health", controller="DefaultResponses"),
@@ -1356,7 +1537,13 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testRendersAPreloadedViewRoute(self) -> None:
-        """Render a view route through its preloaded template descriptor."""
+        """Render a view route through its preloaded template descriptor.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         route = replace(
             make_route("/page", function="api_handler"),
             type=RouteType.VIEW,
@@ -1373,21 +1560,29 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testServesAnApiRoute(self) -> None:
-        """
-        Dispatch an API route straight to its handler.
+        """Dispatch an API route straight to its handler.
 
         Validates the fast path taken by routes without middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/api")
         self.assertEqual(response.getBody(), b"api")
 
     async def testServesAWebRouteThroughTheWebPipeline(self) -> None:
-        """
-        Route a web request through the session and CSRF layers.
+        """Route a web request through the session and CSRF layers.
 
         Validates that the flash bag and CSRF token are always available
         to web handlers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _SessionMiddlewareDouble.calls = [] # NOSONAR
         kernel, _app, _responses, _catch = await boot_kernel()
@@ -1396,20 +1591,28 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(_SessionMiddlewareDouble.calls, ["/web"])
 
     async def testServesAControllerAction(self) -> None:
-        """
-        Dispatch a class-based route to its controller action.
+        """Dispatch a class-based route to its controller action.
 
         Validates the second dispatch table built at boot time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/controller")
         self.assertEqual(response.getBody(), b"controller")
 
     async def testCoercesAMappingIntoJson(self) -> None:
-        """
-        Serialise a mapping returned by a handler.
+        """Serialise a mapping returned by a handler.
 
         Validates the convenience relied upon by simple API endpoints.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/dict")
@@ -1417,30 +1620,42 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(response.getBody(), b'{"answer":42}')
 
     async def testCoercesAStructIntoJson(self) -> None:
-        """
-        Serialise a structured payload returned by a handler.
+        """Serialise a structured payload returned by a handler.
 
         Validates support for schema objects as handler return values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/struct")
         self.assertEqual(response.getBody(), b'{"name":"orionis"}')
 
     async def testRejectsAHandlerThatReturnsNothing(self) -> None:
-        """
-        Report a handler that does not return a response.
+        """Report a handler that does not return a response.
 
         Validates the diagnostic surfaced through the failure handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, catch = await boot_kernel()
         await dispatch(kernel, "/invalid")
         self.assertIsInstance(catch.handled[0], TypeError)
 
     async def testRunsRouteMiddleware(self) -> None:
-        """
-        Execute the middleware stack attached to a route.
+        """Execute the middleware stack attached to a route.
 
         Validates that the pre-built instances are actually used.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _RecordingMiddleware.calls = [] # NOSONAR
         kernel, _app, _responses, _catch = await boot_kernel()
@@ -1449,10 +1664,14 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(response.getHeader("x-route-middleware"), ["1"])
 
     async def testBuildsAMissingMiddlewareStackOnDemand(self) -> None:
-        """
-        Build a route middleware stack absent from the boot-time cache.
+        """Build a route middleware stack absent from the boot-time cache.
 
         Validates the recovery path for stacks registered after boot.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _RecordingMiddleware.calls = [] # NOSONAR
         kernel, _app, _responses, _catch = await boot_kernel()
@@ -1462,10 +1681,14 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(len(kernel._KernelHTTP__middleware_cache), 1)
 
     async def testRegistersTheRequestInTheScope(self) -> None:
-        """
-        Publish the request and the kernel context in the active scope.
+        """Publish the request and the kernel context in the active scope.
 
         Validates the per-request bindings resolved by the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel()
         await dispatch(kernel, "/api")
@@ -1476,7 +1699,13 @@ class TestKernelDispatch(TestCase):
 class TestKernelGlobalMiddleware(TestCase):
 
     async def testAssetsRemainAvailableDuringMaintenance(self) -> None:
-        """Serve default-page assets before maintenance or session middleware."""
+        """Serve default-page assets before maintenance or session middleware.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         _SessionMiddlewareDouble.calls = [] # NOSONAR
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         for method in ("GET", "HEAD"):
@@ -1491,7 +1720,13 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testAssetsRemainAvailableAfterRateLimitRejections(self) -> None:
-        """Keep page assets available without consuming the request quota."""
+        """Keep page assets available without consuming the request quota.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, responses, catch = await boot_kernel(
             rate_limit={
                 "rate_limit_enabled": True,
@@ -1513,7 +1748,13 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testAssetsRetainSecurityChecksDuringMaintenance(self) -> None:
-        """Reject malformed headers before accessing packaged assets."""
+        """Reject malformed headers before accessing packaged assets.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         for headers in (
             [(b"host", b"a.test"), (b"host", b"b.test")],
@@ -1528,7 +1769,13 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testAssetsEnforceAllowedHosts(self) -> None:
-        """Retain the configured host allowlist on the asset request path."""
+        """Retain the configured host allowlist on the asset request path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         security = kernel_module.SecurityMiddleware(
             {"allowed_hosts": ["orionis.test"]}, responses,
@@ -1543,7 +1790,13 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testAssetsRejectUnsupportedMethods(self) -> None:
-        """Only permit GET and HEAD for the packaged asset namespace."""
+        """Only permit GET and HEAD for the packaged asset namespace.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         for method in ("POST", "PUT", "DELETE", "OPTIONS"):
             with self.subTest(method=method):
@@ -1556,7 +1809,13 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testMaintenancePassThroughStillEnforcesSecurity(self) -> None:
-        """Honor a maintenance pass-through and retain later security checks."""
+        """Honor a maintenance pass-through and retain later security checks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, _responses, catch = await boot_kernel(maintenance=True)
         maintenance = _MaintenancePassThrough()
         with replace_attribute(
@@ -1573,10 +1832,14 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testRejectsEveryRequestUnderMaintenance(self) -> None:
-        """
-        Answer with ``503`` while the application is under maintenance.
+        """Answer with ``503`` while the application is under maintenance.
 
         Validates that no handler runs during a deployment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, responses, _catch = await boot_kernel(maintenance=True)
         response = await dispatch(kernel, "/api")
@@ -1584,10 +1847,14 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(responses.calls[0][0], 503)
 
     async def testRejectsDuplicateHostHeaders(self) -> None:
-        """
-        Answer with ``400`` when two host headers are supplied.
+        """Answer with ``400`` when two host headers are supplied.
 
         Validates the request-smuggling guard of the security layer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(
@@ -1598,11 +1865,15 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(response.getStatusCode(), 400)
 
     async def testAnswersCorsPreflightRequests(self) -> None:
-        """
-        Answer a CORS preflight before reaching the router.
+        """Answer a CORS preflight before reaching the router.
 
         Validates that browsers receive the negotiated headers without
         running a handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(
@@ -1621,10 +1892,14 @@ class TestKernelGlobalMiddleware(TestCase):
 class TestKernelOptionsRequests(TestCase):
 
     async def testAdvertisesTheAllowedMethods(self) -> None:
-        """
-        Answer an ``OPTIONS`` request with the allowed methods.
+        """Answer an ``OPTIONS`` request with the allowed methods.
 
         Validates the introspection endpoint offered for every path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/web", "OPTIONS")
@@ -1632,11 +1907,15 @@ class TestKernelOptionsRequests(TestCase):
         self.assertIn("GET", response.getHeader("Allow")[0])
 
     async def testAdvertisesTheQueryPayloadTypes(self) -> None:
-        """
-        Advertise the accepted payload types for ``QUERY`` routes.
+        """Advertise the accepted payload types for ``QUERY`` routes.
 
         Validates the extra header emitted only when the path also
         answers the ``QUERY`` method.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/api", "OPTIONS")
@@ -1645,21 +1924,29 @@ class TestKernelOptionsRequests(TestCase):
 class TestKernelValidationFailures(TestCase):
 
     async def testWebRoutesRedirectBackWithTheErrors(self) -> None:
-        """
-        Redirect a browser back when validation fails on a web route.
+        """Redirect a browser back when validation fails on a web route.
 
         Validates that the redirect is produced inside the session
         middleware so the flash bag survives.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/web-invalid")
         self.assertEqual(response.getStatusCode(), 302)
 
     async def testApiRoutesReportTheFieldErrors(self) -> None:
-        """
-        Answer with ``422`` when validation fails on an API route.
+        """Answer with ``422`` when validation fails on an API route.
 
         Validates the structured payload returned to JSON clients.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/api-invalid")
@@ -1669,7 +1956,13 @@ class TestKernelValidationFailures(TestCase):
 class TestKernelFailureHandling(TestCase):
 
     async def testRejectsANoncallableFallbackDescriptor(self) -> None:
-        """Reject a fallback descriptor containing neither handler form."""
+        """Reject a fallback descriptor containing neither handler form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _app, _responses, catch = await boot_kernel(
             fallback=(None, "not-a-callable"),
         )
@@ -1678,11 +1971,15 @@ class TestKernelFailureHandling(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testDelegatesUnhandledErrorsToTheFailureHandler(self) -> None:
-        """
-        Forward an unexpected exception to the failure handler.
+        """Forward an unexpected exception to the failure handler.
 
         Validates that a broken handler never leaks a traceback to the
         transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, catch = await boot_kernel()
         response = await dispatch(kernel, "/boom")
@@ -1690,20 +1987,28 @@ class TestKernelFailureHandling(TestCase):
         self.assertIsInstance(catch.handled[0], RuntimeError)
 
     async def testDelegatesUnmatchedRoutesToTheFailureHandler(self) -> None:
-        """
-        Forward an unmatched path to the failure handler.
+        """Forward an unmatched path to the failure handler.
 
         Validates the behaviour of an application without a fallback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, catch = await boot_kernel()
         await dispatch(kernel, "/nowhere")
         self.assertIsInstance(catch.handled[0], RouteNotFound)
 
     async def testServesTheControllerFallback(self) -> None:
-        """
-        Serve an unmatched path through the class-based fallback.
+        """Serve an unmatched path through the class-based fallback.
 
         Validates the custom 404 page registered by applications.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             fallback=(_FallbackController, "handle"),
@@ -1712,10 +2017,14 @@ class TestKernelFailureHandling(TestCase):
         self.assertEqual(response.getBody(), b"fallback-controller")
 
     async def testServesTheCallableFallback(self) -> None:
-        """
-        Serve an unmatched path through a callable fallback.
+        """Serve an unmatched path through a callable fallback.
 
         Validates the closure-based registration form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             fallback=(None, fallback_function),
@@ -1724,11 +2033,15 @@ class TestKernelFailureHandling(TestCase):
         self.assertEqual(response.getBody(), b"fallback-function")
 
     async def testRejectsAFallbackThatReturnsNothing(self) -> None:
-        """
-        Report a fallback that does not return a response.
+        """Report a fallback that does not return a response.
 
         Validates that the developer error surfaces instead of being
         answered with a malformed response.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             fallback=(_BrokenFallbackController, "handle"),
@@ -1739,11 +2052,15 @@ class TestKernelFailureHandling(TestCase):
 class TestKernelRequestLogging(TestCase):
 
     async def testLogsRequestsInDebugMode(self) -> None:
-        """
-        Log every request while the application runs in debug mode.
+        """Log every request while the application runs in debug mode.
 
         Validates the timer and the printer are both driven by the same
         cached flag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel(debug=True)
         response = await dispatch(kernel, "/api")
@@ -1752,10 +2069,14 @@ class TestKernelRequestLogging(TestCase):
         self.assertEqual(printer.printed, [response])
 
     async def testSkipsLoggingOutsideDebugMode(self) -> None:
-        """
-        Skip request logging when debug mode is disabled.
+        """Skip request logging when debug mode is disabled.
 
         Validates the optimisation applied to production traffic.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel()
         await dispatch(kernel, "/api")
@@ -1766,21 +2087,29 @@ class TestKernelRequestLogging(TestCase):
 class TestKernelRateLimiting(TestCase):
 
     async def testSkipsTheLimiterWhenDisabled(self) -> None:
-        """
-        Bypass the limiter entirely when it is turned off.
+        """Bypass the limiter entirely when it is turned off.
 
         Validates the cached flag that keeps the disabled configuration
         free of asynchronous overhead.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertFalse(kernel._KernelHTTP__rate_limit_enabled)
         self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 200)
 
     async def testAllowsRequestsWithinTheQuota(self) -> None:
-        """
-        Serve the request when the client is within its quota.
+        """Serve the request when the client is within its quota.
 
         Validates the branch where the limiter defers to the router.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             rate_limit={
@@ -1792,10 +2121,14 @@ class TestKernelRateLimiting(TestCase):
         self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 200)
 
     async def testRejectsRequestsOverTheQuota(self) -> None:
-        """
-        Answer with ``429`` once the quota is exhausted.
+        """Answer with ``429`` once the quota is exhausted.
 
         Validates that the limiter short-circuits the router.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, _app, _responses, _catch = await boot_kernel(
             rate_limit={
@@ -1810,7 +2143,13 @@ class TestKernelRateLimiting(TestCase):
 class TestKernelRsgiEntryPoint(TestCase):
 
     async def testServesPackagedAssetsDuringMaintenance(self) -> None:
-        """Serve assets through the shared path for the RSGI transport."""
+        """Serve assets through the shared path for the RSGI transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, app, responses, catch = await boot_kernel(maintenance=True)
         response = await kernel.handleRSGI(
             _StubRsgiScope("/_orionis/assets/css/default.css"),
@@ -1822,11 +2161,15 @@ class TestKernelRsgiEntryPoint(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testServesAnRsgiRequest(self) -> None:
-        """
-        Handle a Granian RSGI request end to end.
+        """Handle a Granian RSGI request end to end.
 
         Validates the transport-specific entry point and its response
         adapter.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel()
         response = await kernel.handleRSGI(
@@ -1837,10 +2180,14 @@ class TestKernelRsgiEntryPoint(TestCase):
         self.assertEqual(app.builds[RSGIResponseAdapter].sent, [response])
 
     async def testLogsRsgiRequestsInDebugMode(self) -> None:
-        """
-        Log RSGI requests while the application runs in debug mode.
+        """Log RSGI requests while the application runs in debug mode.
 
         Validates parity between the two transport entry points.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         kernel, app, _responses, _catch = await boot_kernel(debug=True)
         await kernel.handleRSGI(_StubRsgiScope("/api"), _StubRsgiProtocol())
@@ -1850,11 +2197,30 @@ class TestMiddlewareTerminalArguments(TestCase):
     """Verify argument forwarding through the middleware terminal."""
 
     async def testForwardsTerminalArgumentsAndConsumesOnce(self) -> None:
-        """Forward positional arguments and reject another terminal invocation."""
+        """Forward positional arguments and reject another terminal invocation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         expected = Response(content="terminal")
 
         async def terminal(first: object, second: object) -> Response:
-            """Assert terminal argument forwarding and return the response."""
+            """Assert terminal argument forwarding and return the response.
+
+            Parameters
+            ----------
+            first : object
+                Value supplied for ``first``.
+            second : object
+                Value supplied for ``second``.
+
+            Returns
+            -------
+            Response
+                Value produced by the helper.
+            """
             self.assertEqual((first, second), ("request", "route"))
             return expected
 

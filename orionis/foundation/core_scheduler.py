@@ -1,5 +1,4 @@
 from types import MappingProxyType
-from orionis.console.base.scheduler import BaseScheduler
 
 def get_core_scheduler_mapping() -> MappingProxyType:
     """
@@ -11,10 +10,8 @@ def get_core_scheduler_mapping() -> MappingProxyType:
         Immutable mapping containing the 'module' and 'class' keys, referencing
         the BaseScheduler's module and class name.
     """
-    # Build an immutable mapping for BaseScheduler's module and class info
-    return MappingProxyType({
-        "module": BaseScheduler.__module__,
-        "class": BaseScheduler.__name__,
-    })
+    return MappingProxyType(
+        {"module": "orionis.console.base.scheduler", "class": "BaseScheduler"},
+    )
 
 CORE_SCHEDULER: MappingProxyType = get_core_scheduler_mapping()

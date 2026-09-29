@@ -91,8 +91,10 @@ class _StubApp:
         """Return the configured value, or None when the key is unknown."""
         return self._config.get(key)
 
-    def path(self, _key: str) -> Path:
-        """Return the storage directory regardless of the requested key."""
+    def path(self, key: str) -> Path:
+        """Return the requested application path used by the engine."""
+        if key == "storage_framework":
+            return self._storage / "framework"
         return self._storage
 
 class _BareApp:
@@ -117,8 +119,10 @@ class _BareApp:
         """Return None for every key, as an application without the section."""
         return None
 
-    def path(self, _key: str) -> Path:
-        """Return the storage directory regardless of the requested key."""
+    def path(self, key: str) -> Path:
+        """Return the requested application path used by the engine."""
+        if key == "storage_framework":
+            return self._storage / "framework"
         return self._storage
 
 def _engine_state(engine: TestingEngine, name: str) -> object:

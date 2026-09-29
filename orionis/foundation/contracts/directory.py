@@ -6,201 +6,146 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 class IDirectory(ABC):
+    """Define access to the application directory paths."""
+
+    __slots__ = ()
 
     @abstractmethod
     def root(self) -> Path:
-        """
-        Get the root directory of the application.
-
-        Returns
-        -------
-        Path
-            Path object representing the root directory.
-        """
+        """Return the application root directory."""
 
     @abstractmethod
     def app(self) -> Path:
-        """
-        Get the main application directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the application directory.
-        """
+        """Return the application directory."""
 
     @abstractmethod
-    def console(self) -> Path:
-        """
-        Get the console directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the console directory.
-        """
+    def appConsole(self) -> Path:
+        """Return the application console directory."""
 
     @abstractmethod
-    def exceptions(self) -> Path:
-        """
-        Get the exceptions directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the exceptions directory.
-        """
+    def appConsoleCommands(self) -> Path:
+        """Return the application console commands directory."""
 
     @abstractmethod
-    def http(self) -> Path:
-        """
-        Get the HTTP directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the HTTP directory.
-        """
+    def appConsoleListeners(self) -> Path:
+        """Return the application console listeners directory."""
 
     @abstractmethod
-    def models(self) -> Path:
-        """
-        Get the models directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the models directory.
-        """
+    def appExceptions(self) -> Path:
+        """Return the application exceptions directory."""
 
     @abstractmethod
-    def providers(self) -> Path:
-        """
-        Get the providers directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the providers directory.
-        """
+    def appHttp(self) -> Path:
+        """Return the application HTTP directory."""
 
     @abstractmethod
-    def notifications(self) -> Path:
-        """
-        Get the notifications directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the notifications directory.
-        """
+    def appHttpControllers(self) -> Path:
+        """Return the application controllers directory."""
 
     @abstractmethod
-    def services(self) -> Path:
-        """
-        Get the services directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the services directory.
-        """
+    def appHttpMiddleware(self) -> Path:
+        """Return the application HTTP middleware directory."""
 
     @abstractmethod
-    def jobs(self) -> Path:
-        """
-        Get the jobs directory.
+    def appHttpSchemas(self) -> Path:
+        """Return the application HTTP schemas directory."""
 
-        Returns
-        -------
-        Path
-            Path object representing the jobs directory.
-        """
+    @abstractmethod
+    def appModels(self) -> Path:
+        """Return the application models directory."""
+
+    @abstractmethod
+    def appProviders(self) -> Path:
+        """Return the application providers directory."""
+
+    @abstractmethod
+    def appEmails(self) -> Path:
+        """Return the application emails directory."""
+
+    @abstractmethod
+    def appServices(self) -> Path:
+        """Return the application services directory."""
+
+    @abstractmethod
+    def appJobs(self) -> Path:
+        """Return the application jobs directory."""
 
     @abstractmethod
     def bootstrap(self) -> Path:
-        """
-        Get the bootstrap directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the bootstrap directory.
-        """
+        """Return the bootstrap directory."""
 
     @abstractmethod
     def config(self) -> Path:
-        """
-        Get the configuration directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the configuration directory.
-        """
+        """Return the configuration directory."""
 
     @abstractmethod
     def database(self) -> Path:
-        """
-        Get the database directory.
+        """Return the database directory."""
 
-        Returns
-        -------
-        Path
-            Path object representing the database directory.
-        """
+    @abstractmethod
+    def databaseFactories(self) -> Path:
+        """Return the database factories directory."""
+
+    @abstractmethod
+    def databaseMigrations(self) -> Path:
+        """Return the database migrations directory."""
+
+    @abstractmethod
+    def databaseSchemas(self) -> Path:
+        """Return the database schemas directory."""
+
+    @abstractmethod
+    def databaseSeeders(self) -> Path:
+        """Return the database seeders directory."""
 
     @abstractmethod
     def resources(self) -> Path:
-        """
-        Get the resources directory.
+        """Return the resources directory."""
 
-        Returns
-        -------
-        Path
-            Path object representing the resources directory.
-        """
+    @abstractmethod
+    def resourcesCss(self) -> Path:
+        """Return the resources CSS directory."""
+
+    @abstractmethod
+    def resourcesJs(self) -> Path:
+        """Return the resources JavaScript directory."""
+
+    @abstractmethod
+    def resourcesLang(self) -> Path:
+        """Return the resources language directory."""
+
+    @abstractmethod
+    def resourcesViews(self) -> Path:
+        """Return the resources views directory."""
 
     @abstractmethod
     def routes(self) -> Path:
-        """
-        Get the routes directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the routes directory.
-        """
+        """Return the routes directory."""
 
     @abstractmethod
     def storage(self) -> Path:
-        """
-        Get the storage directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the storage directory.
-        """
+        """Return the storage directory."""
 
     @abstractmethod
-    def storagePublic(self) -> Path:
-        """
-        Get the public storage directory.
+    def storageApp(self) -> Path:
+        """Return the storage application directory."""
 
-        Returns
-        -------
-        Path
-            Path object representing the public storage directory.
-        """
+    @abstractmethod
+    def storageAppPrivate(self) -> Path:
+        """Return the private storage application directory."""
+
+    @abstractmethod
+    def storageAppPublic(self) -> Path:
+        """Return the public storage application directory."""
+
+    @abstractmethod
+    def storageFramework(self) -> Path:
+        """Return the framework storage directory."""
+
+    @abstractmethod
+    def storageLogs(self) -> Path:
+        """Return the storage logs directory."""
 
     @abstractmethod
     def tests(self) -> Path:
-        """
-        Get the tests directory.
-
-        Returns
-        -------
-        Path
-            Path object representing the tests directory.
-        """
+        """Return the tests directory."""

@@ -15,35 +15,51 @@ from orionis.test import TestCase
 class TestDisk(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build a disk over a fresh memory driver before each test.
+        """Build a disk over a fresh memory driver before each test.
 
         Keeps every test isolated in its own in-memory store.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._driver = MemoryStorageDriver()
         self._disk = Disk(name="fake", driver=self._driver)
 
     def testImplementsTheDiskContract(self) -> None:
-        """
-        Expose the disk through its published contract.
+        """Expose the disk through its published contract.
 
         Validates that the manager can type its return values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._disk, IDisk)
 
     def testNameReturnsTheConfiguredName(self) -> None:
-        """
-        Return the configuration name assigned to the disk.
+        """Return the configuration name assigned to the disk.
 
         Validates the accessor used to identify resolved disks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._disk.name(), "fake")
 
     def testFileFactoryBindsTheDiskDriver(self) -> None:
-        """
-        Build File objects bound to the driver of the disk.
+        """Build File objects bound to the driver of the disk.
 
         Validates the factory and its path normalization.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         file = self._disk.file("avatars//user.png")
         self.assertIsInstance(file, File)
@@ -51,19 +67,27 @@ class TestDisk(TestCase):
         self.assertIs(file._driver, self._driver)
 
     def testFileFactoryRejectsTheDiskRoot(self) -> None:
-        """
-        Reject file paths resolving to the disk root.
+        """Reject file paths resolving to the disk root.
 
         Validates the failure contract of file().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             self._disk.file("")
 
     def testDirectoryFactoryBindsTheDiskDriver(self) -> None:
-        """
-        Build Directory objects bound to the driver of the disk.
+        """Build Directory objects bound to the driver of the disk.
 
         Validates the factory and its path normalization.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = self._disk.directory("photos//2026")
         self.assertIsInstance(directory, Directory)
@@ -71,27 +95,39 @@ class TestDisk(TestCase):
         self.assertIs(directory._driver, self._driver)
 
     def testDirectoryFactoryDefaultsToTheDiskRoot(self) -> None:
-        """
-        Default the directory factory to the disk root.
+        """Default the directory factory to the disk root.
 
         Validates the empty-string representation of the root.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._disk.directory().path(), "")
 
     def testDirectoryFactoryRejectsEscapingPaths(self) -> None:
-        """
-        Reject directory paths escaping the disk root.
+        """Reject directory paths escaping the disk root.
 
         Validates the failure contract of directory().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             self._disk.directory("../outside")
 
     async def testPutWritesContentsAndReturnsAFile(self) -> None:
-        """
-        Persist contents and return the resulting file object.
+        """Persist contents and return the resulting file object.
 
         Validates the delegation of put() to File.write().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._disk.put("docs/a.txt", b"data")
         self.assertIsInstance(stored, IFile)
@@ -99,10 +135,14 @@ class TestDisk(TestCase):
         self.assertEqual(await stored.read(), b"data")
 
     async def testPutForwardsTheRequestedVisibility(self) -> None:
-        """
-        Apply the visibility requested when writing contents.
+        """Apply the visibility requested when writing contents.
 
         Validates that the optional argument reaches the driver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._disk.put(
             "a.txt", "text", Visibility.PUBLIC.value,
@@ -110,30 +150,42 @@ class TestDisk(TestCase):
         self.assertEqual(await stored.visibility(), Visibility.PUBLIC.value)
 
     async def testExistsReflectsTheStoredState(self) -> None:
-        """
-        Report whether a file exists on the disk.
+        """Report whether a file exists on the disk.
 
         Validates the delegation of exists() to File.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(await self._disk.exists("a.txt"))
         await self._disk.put("a.txt", b"data")
         self.assertTrue(await self._disk.exists("a.txt"))
 
     async def testDeleteReportsWhetherTheFileExisted(self) -> None:
-        """
-        Remove a file and report whether it was present.
+        """Remove a file and report whether it was present.
 
         Validates the delegation of delete() to File.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("a.txt", b"data")
         self.assertTrue(await self._disk.delete("a.txt"))
         self.assertFalse(await self._disk.delete("a.txt"))
 
     async def testCopyDuplicatesTheSourceFile(self) -> None:
-        """
-        Copy a file and keep the source in place.
+        """Copy a file and keep the source in place.
 
         Validates the delegation of copy() to File.copyTo().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("a.txt", b"data")
         copied = await self._disk.copy("a.txt", "b.txt")
@@ -142,19 +194,27 @@ class TestDisk(TestCase):
         self.assertTrue(await self._disk.exists("a.txt"))
 
     async def testCopyMissingSourceRaises(self) -> None:
-        """
-        Reject copies whose source file does not exist.
+        """Reject copies whose source file does not exist.
 
         Validates the failure contract of copy().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._disk.copy("missing.txt", "b.txt")
 
     async def testMoveRelocatesTheSourceFile(self) -> None:
-        """
-        Move a file and drop the original location.
+        """Move a file and drop the original location.
 
         Validates the delegation of move() to File.moveTo().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("a.txt", b"data")
         moved = await self._disk.move("a.txt", "sub/b.txt")
@@ -163,19 +223,27 @@ class TestDisk(TestCase):
         self.assertFalse(await self._disk.exists("a.txt"))
 
     async def testMoveMissingSourceRaises(self) -> None:
-        """
-        Reject moves whose source file does not exist.
+        """Reject moves whose source file does not exist.
 
         Validates the failure contract of move().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._disk.move("missing.txt", "b.txt")
 
     async def testDirectoryObjectsSeeFilesWrittenThroughTheDisk(self) -> None:
-        """
-        Share the same medium between disk and directory objects.
+        """Share the same medium between disk and directory objects.
 
         Validates that both factories are bound to one driver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("photos/a.png", b"1")
         listing = await self._disk.directory("photos").files()
@@ -183,10 +251,14 @@ class TestDisk(TestCase):
         self.assertEqual([file.path() for file in listing], ["photos/a.png"])
 
     async def testDirectoryFactoryProducesTheDirectoryContract(self) -> None:
-        """
-        Expose built directories through their published contract.
+        """Expose built directories through their published contract.
 
         Validates the type advertised by directory().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = self._disk.directory("photos")
         self.assertIsInstance(directory, IDirectory)

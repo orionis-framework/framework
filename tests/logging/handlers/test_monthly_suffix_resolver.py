@@ -3,7 +3,18 @@ from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolv
 from orionis.test import TestCase
 
 def _make_resolver(at_time: time | None = None) -> MonthlySuffixResolver:
-    """Return a monthly resolver pinned to UTC."""
+    """Return a monthly resolver pinned to UTC.
+
+    Parameters
+    ----------
+    at_time : time | None
+        Value supplied for ``at_time``.
+
+    Returns
+    -------
+    MonthlySuffixResolver
+        Value produced by the helper.
+    """
     resolver = MonthlySuffixResolver(at_time=at_time)
     resolver.tz = UTC
     return resolver
@@ -11,38 +22,54 @@ def _make_resolver(at_time: time | None = None) -> MonthlySuffixResolver:
 class TestMonthlySuffixResolverSuffix(TestCase):
 
     def testSuffixUsesTheMonthlyPattern(self) -> None:
-        """
-        Build the suffix from the year and month of the given datetime.
+        """Build the suffix from the year and month of the given datetime.
 
         Validates the naming scheme applied to monthly log files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         moment = datetime(2025, 3, 15, 10, 0, 0, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2025-03")
 
     def testSuffixDefaultsToTheCurrentMonth(self) -> None:
-        """
-        Resolve the current month when no datetime is supplied.
+        """Resolve the current month when no datetime is supplied.
 
         Validates that the handler can request a suffix without tracking time
         by itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertRegex(_make_resolver().getSuffix(), r"^\d{4}-\d{2}$")
 
 class TestMonthlySuffixResolverRotation(TestCase):
 
     def testDefaultRotationTimeIsMidnight(self) -> None:
-        """
-        Rotate at midnight when no time is configured.
+        """Rotate at midnight when no time is configured.
 
         Validates the default applied to channels declaring no rotation time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_make_resolver().at_time, time(0, 0, 0))
 
     def testNextRotationIsTheFirstDayOfTheFollowingMonth(self) -> None:
-        """
-        Schedule the next rotation on the first day of the next month.
+        """Schedule the next rotation on the first day of the next month.
 
         Validates the monthly schedule computed from a mid month moment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         current = datetime(2025, 3, 15, 12, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -51,10 +78,14 @@ class TestMonthlySuffixResolverRotation(TestCase):
         )
 
     def testNextRotationWrapsDecemberToJanuary(self) -> None:
-        """
-        Schedule the next rotation on the first day of the following year.
+        """Schedule the next rotation on the first day of the following year.
 
         Validates the year boundary handled separately from the other months.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         current = datetime(2025, 12, 20, 8, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -63,10 +94,14 @@ class TestMonthlySuffixResolverRotation(TestCase):
         )
 
     def testNextRotationHonoursTheConfiguredTime(self) -> None:
-        """
-        Apply the configured rotation time to the first day of the month.
+        """Apply the configured rotation time to the first day of the month.
 
         Validates that a non midnight schedule is preserved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         current = datetime(2025, 5, 10, 0, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -75,10 +110,14 @@ class TestMonthlySuffixResolverRotation(TestCase):
         )
 
     def testNextRotationIsAlwaysInTheFuture(self) -> None:
-        """
-        Schedule the next rotation after the supplied moment.
+        """Schedule the next rotation after the supplied moment.
 
         Validates the invariant on the last instant of a long month.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         current = datetime(2025, 8, 31, 23, 59, 59, tzinfo=UTC)
         self.assertGreater(_make_resolver().getNextRotationTime(current), current)

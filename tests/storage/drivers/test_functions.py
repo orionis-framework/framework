@@ -26,11 +26,15 @@ _KEYS: list[str] = [
 class TestDriverFunctions(TestCase):
 
     def testImportDriverDependencyRaisesWithInstallHint(self) -> None:
-        """
-        Raise a descriptive error for a missing optional package.
+        """Raise a descriptive error for a missing optional package.
 
         Validates that the exception names the package and both
         installation commands.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MissingStorageDependencyException) as ctx:
             importDriverDependency(
@@ -41,28 +45,40 @@ class TestDriverFunctions(TestCase):
         self.assertIn("orionis[faker]", message)
 
     def testAssertBinaryModeAcceptsBinaryModes(self) -> None:
-        """
-        Accept every supported binary mode without raising.
+        """Accept every supported binary mode without raising.
 
         Validates the mode whitelist shared by cloud drivers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for mode in ("rb", "wb", "ab", "rb+", "wb+", "ab+"):
             assertBinaryMode(mode)
 
     def testAssertBinaryModeRejectsTextModes(self) -> None:
-        """
-        Reject text-oriented stream modes.
+        """Reject text-oriented stream modes.
 
         Validates the failure contract of the shared mode check.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             assertBinaryMode("r")
 
     def testFilterFilesExcludesMarkersAndScopes(self) -> None:
-        """
-        Select only file keys under the requested base prefix.
+        """Select only file keys under the requested base prefix.
 
         Validates marker exclusion and recursive scoping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             filterFiles(_KEYS, "docs", recursive=False),
@@ -78,10 +94,14 @@ class TestDriverFunctions(TestCase):
         )
 
     def testDeriveDirectoriesFromKeysAndMarkers(self) -> None:
-        """
-        Infer directory prefixes from keys and explicit markers.
+        """Infer directory prefixes from keys and explicit markers.
 
         Validates direct and recursive derivation at several bases.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             deriveDirectories(_KEYS, "docs", recursive=False),
@@ -97,11 +117,15 @@ class TestDriverFunctions(TestCase):
         )
 
     def testResolveDownloadTargetHandlesDirectories(self) -> None:
-        """
-        Keep the remote file name when the destination is a folder.
+        """Keep the remote file name when the destination is a folder.
 
         Validates directory targets and parent creation for file
         targets.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with tempfile.TemporaryDirectory() as tmp:
             into_dir = resolveDownloadTarget("docs/report.pdf", tmp)

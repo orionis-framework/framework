@@ -22,12 +22,22 @@ from tests.http.default.test_response_cache import (
 if TYPE_CHECKING:
     import os
 
-
 class _Page(HTMLParser):
     """Expose actual browser contexts in rendered pages for security checks."""
 
     def __init__(self, content: bytes) -> None:
-        """Parse the rendered document into text and real HTML attributes."""
+        """Parse the rendered document into text and real HTML attributes.
+
+        Parameters
+        ----------
+        content : bytes
+            Value supplied for ``content``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__(convert_charrefs=True)
         self.elements: list[tuple[str, dict[str, str | None]]] = []
         self.text: list[str] = []
@@ -41,18 +51,53 @@ class _Page(HTMLParser):
         tag: str,
         attrs: list[tuple[str, str | None]],
     ) -> None:
-        """Record parsed attributes so escaping cannot hide injected handlers."""
+        """Record parsed attributes so escaping cannot hide injected handlers.
+
+        Parameters
+        ----------
+        tag : str
+            Value supplied for ``tag``.
+        attrs : list[tuple[str, str | None]]
+            Value supplied for ``attrs``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.elements.append((tag, dict(attrs)))
         if tag == "script":
             self._in_script = True
 
     def handleEndTag(self, tag: str) -> None:
-        """Stop collecting script contents at the real closing element."""
+        """Stop collecting script contents at the real closing element.
+
+        Parameters
+        ----------
+        tag : str
+            Value supplied for ``tag``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         if tag == "script":
             self._in_script = False
 
     def handleData(self, data: str) -> None:
-        """Collect decoded text and executable script content separately."""
+        """Collect decoded text and executable script content separately.
+
+        Parameters
+        ----------
+        data : str
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.text.append(data)
         if self._in_script:
             self.script_content.append(data)
@@ -61,44 +106,86 @@ class _Page(HTMLParser):
     handle_endtag = handleEndTag
     handle_data = handleData
 
-
 class _SuspendedEngine:
     """Pause the first render while another request changes shared configuration."""
 
     __slots__ = ("calls", "engine", "release", "started")
 
     def __init__(self, engine: Jinja2Engine) -> None:
-        """Allocate per-test synchronization without sleeps or shared globals."""
+        """Allocate per-test synchronization without sleeps or shared globals.
+
+        Parameters
+        ----------
+        engine : Jinja2Engine
+            Value supplied for ``engine``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.engine = engine
         self.started = asyncio.Event()
         self.release = asyncio.Event()
         self.calls = 0
 
     async def render(self, template: str, context: dict[str, object]) -> str:
-        """Hold the first context until a later render has had time to finish."""
+        """Hold the first context until a later render has had time to finish.
+
+        Parameters
+        ----------
+        template : str
+            Value supplied for ``template``.
+        context : dict[str, object]
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         self.calls += 1
         if self.calls == 1:
             self.started.set()
             await self.release.wait()
         return await self.engine.render(template, context)
 
-
 def local_defaults(
     fixture: _DefaultFixture, engine: object, assets: Path,
 ) -> DefaultResponses:
-    """Create a slot-safe response fixture with an isolated asset directory."""
+    """Create a slot-safe response fixture with an isolated asset directory.
+
+    Parameters
+    ----------
+    fixture : _DefaultFixture
+        Value supplied for ``fixture``.
+    engine : object
+        Value supplied for ``engine``.
+    assets : Path
+        Value supplied for ``assets``.
+
+    Returns
+    -------
+    DefaultResponses
+        Value produced by the helper.
+    """
     class LocalDefaults(DefaultResponses):
         __slots__ = ()
         _ASSETS_DIR = assets
 
     return LocalDefaults(fixture, fixture, engine)
 
-
 class TestDefaultTemplates(TestCase):
     """Exercise default pages through the public framework rendering engine."""
 
     def setUp(self) -> None:
-        """Build a service with real Jinja templates and isolated application views."""
+        """Build a service with real Jinja templates and isolated application views.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
@@ -107,7 +194,13 @@ class TestDefaultTemplates(TestCase):
         self.defaults = DefaultResponses(self.fixture, self.fixture, self.engine)
 
     async def testHealthStatusAndJsonRemainConsistentWithMaintenance(self) -> None:
-        """Reflect maintenance transitions independently for HTML and JSON requests."""
+        """Reflect maintenance transitions independently for HTML and JSON requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for maintenance, status, label in (
             (False, 200, "Online Application"),
             (True, 503, "Application in Maintenance"),
@@ -130,7 +223,13 @@ class TestDefaultTemplates(TestCase):
                         )
 
     async def testRetainedHealthServiceRefreshesLabelsAndLocale(self) -> None:
-        """Invalidate cached health markup after live app configuration changes."""
+        """Invalidate cached health markup after live app configuration changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for name, locale, maintenance in (
             ("Original application", "en", False),
             ("Updated <application>", "es", False),
@@ -151,7 +250,13 @@ class TestDefaultTemplates(TestCase):
             self.assertNotIn(b"<application>", response.getBody())
 
     async def testSlowHealthRenderCannotReplaceNewConfigurationCache(self) -> None:
-        """Keep newer cached markup when an earlier asynchronous render finishes."""
+        """Keep newer cached markup when an earlier asynchronous render finishes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         engine = _SuspendedEngine(self.engine)
         defaults = DefaultResponses(self.fixture, self.fixture, engine)
         pending = asyncio.create_task(defaults.health(_Request(wants_json=False)))
@@ -171,7 +276,13 @@ class TestDefaultTemplates(TestCase):
         self.assertEqual(engine.calls, 2)
 
     async def testEveryHtmlPageUsesInjectedViewEngine(self) -> None:
-        """Delegate health, maintenance, error and exception markup to IViewEngine."""
+        """Delegate health, maintenance, error and exception markup to IViewEngine.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         engine = _RecordingEngine()
         defaults = DefaultResponses(self.fixture, self.fixture, engine)
         await defaults.health(_Request(wants_json=False))
@@ -191,7 +302,13 @@ class TestDefaultTemplates(TestCase):
         )
 
     async def testFrameworkNamespaceCannotBeShadowedByApplicationViews(self) -> None:
-        """Keep built-in pages available without trusting matching app filenames."""
+        """Keep built-in pages available without trusting matching app filenames.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         shadow = self.directory / "__orionis__" / "default"
         shadow.mkdir(parents=True)
         for filename in ("base.html", "up.html", "error.html"):
@@ -201,7 +318,13 @@ class TestDefaultTemplates(TestCase):
         self.assertIn(b"<!DOCTYPE html>", response.getBody())
 
     async def testBuiltinEscapingSurvivesDisabledApplicationAutoescape(self) -> None:
-        """Escape app labels and attributes even when application views opt out."""
+        """Escape app labels and attributes even when application views opt out.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payload = '"><script>probe()</script><img src=x onerror="probe()"> & Español'
         self.fixture.settings["app.name"] = payload
         self.fixture.settings["app.locale"] = payload
@@ -222,7 +345,13 @@ class TestDefaultTemplates(TestCase):
         self.assertEqual(await engine.render("app", {"value": payload}), payload)
 
     async def testExceptionDetailsAndSourceRenderAsText(self) -> None:
-        """Keep request data, exception messages and source snippets out of scripts."""
+        """Keep request data, exception messages and source snippets out of scripts.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payload = '</script><script>probe()</script><img src=x onerror="probe()">'
         source_payload = f"source = {payload!r}"
         traceback_data = {
@@ -249,7 +378,18 @@ class TestDefaultTemplates(TestCase):
             Jinja2Engine(ViewEnvironment(self.fixture)),
         )
         def parse_data(_parser: ExceptionParser) -> dict[str, object]:
-            """Supply hostile source and exception data to the actual renderer."""
+            """Supply hostile source and exception data to the actual renderer.
+
+            Parameters
+            ----------
+            _parser : ExceptionParser
+                Value supplied for ``_parser``.
+
+            Returns
+            -------
+            dict[str, object]
+                Value produced by the helper.
+            """
             return traceback_data
 
         with replace_attribute(ExceptionParser, "toDict", parse_data):
@@ -275,7 +415,13 @@ class TestDefaultTemplates(TestCase):
     async def testConcurrentErrorRendersKeepDescriptionsAndHeadersSeparate(
         self,
     ) -> None:
-        """Reuse compiled templates without leaking per-request values or headers."""
+        """Reuse compiled templates without leaking per-request values or headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         descriptions = [f"request-{index:02d}-<tag>" for index in range(12)]
         responses = await asyncio.gather(
             *[
@@ -294,7 +440,13 @@ class TestDefaultTemplates(TestCase):
                     self.assertNotIn(other, text)
 
     async def testSuspendedErrorsAndExceptionsKeepTheirOwnContext(self) -> None:
-        """Preserve each in-flight render's app labels and request-specific details."""
+        """Preserve each in-flight render's app labels and request-specific details.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for page in ("error", "exception"):
             with self.subTest(page=page):
                 self.fixture.settings.update({
@@ -308,7 +460,22 @@ class TestDefaultTemplates(TestCase):
                     service: DefaultResponses = defaults,
                     template_page: str = page,
                 ) -> Response:
-                    """Render either error path through the same retained service."""
+                    """Render either error path through the same retained service.
+
+                    Parameters
+                    ----------
+                    message : str
+                        Value supplied for ``message``.
+                    service : DefaultResponses
+                        Value supplied for ``service``.
+                    template_page : str
+                        Value supplied for ``template_page``.
+
+                    Returns
+                    -------
+                    Response
+                        Value produced by the helper.
+                    """
                     if template_page == "error":
                         return await service.error(404, message, expects_json=False)
                     return await service.exception(
@@ -342,7 +509,13 @@ class TestDefaultTemplates(TestCase):
                     self.assertNotIn(other, body)
 
     async def testAllPagesReferenceOneLocalStylesheetAndScript(self) -> None:
-        """Render every page with the shared local bundle and no inline code."""
+        """Render every page with the shared local bundle and no inline code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         responses = [await self.defaults.health(_Request(wants_json=False))]
         self.fixture.settings["app.maintenance"] = True
         responses.append(await self.defaults.health(_Request(wants_json=False)))
@@ -354,7 +527,18 @@ class TestDefaultTemplates(TestCase):
             self._assertLocalResources(_Page(response.getBody()))
 
     def _assertLocalResources(self, page: _Page) -> None:
-        """Check rendered dependency URLs and executable browser attributes."""
+        """Check rendered dependency URLs and executable browser attributes.
+
+        Parameters
+        ----------
+        page : _Page
+            Value supplied for ``page``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         stylesheets = []
         scripts = []
         for tag, attrs in page.elements:
@@ -379,7 +563,13 @@ class TestDefaultTemplates(TestCase):
         self.assertFalse("".join(page.script_content).strip())
 
     async def testPackagedAssetsServeContentTypesAndIndependentStreams(self) -> None:
-        """Make each locally referenced bundle or font available to browsers."""
+        """Make each locally referenced bundle or font available to browsers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for name, content_type in (
             ("default.css", "text/css"),
             ("default.js", "text/javascript"),
@@ -410,7 +600,13 @@ class TestDefaultTemplates(TestCase):
                 self.assertEqual(contents[0], contents[1])
 
     async def testMissingPublicFilesAwaitTheirErrorPage(self) -> None:
-        """Render all three missing-file fallbacks rather than returning coroutines."""
+        """Render all three missing-file fallbacks rather than returning coroutines.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         engine = _RecordingEngine("<main>Missing asset</main>")
         defaults = local_defaults(self.fixture, engine, self.directory / "absent")
         for method in (defaults.favicon, defaults.robotsTxt, defaults.sitemapXml):
@@ -422,7 +618,13 @@ class TestDefaultTemplates(TestCase):
             self.assertEqual(template, "__orionis__/default/error.html")
 
     async def testAssetCacheRechecksCreatedChangedAndRemovedFiles(self) -> None:
-        """Cache asset locations while observing filesystem changes on every request."""
+        """Cache asset locations while observing filesystem changes on every request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         assets = self.directory / "assets"
         assets.mkdir()
         defaults = local_defaults(self.fixture, self.engine, assets)
@@ -448,17 +650,49 @@ class TestDefaultTemplates(TestCase):
         self.assertEqual(await self._consume(restored), b"restored")
 
     def testKnownAssetTypeAvoidsMimeGuessingAndDuplicateStat(self) -> None:
-        """Validate each packaged asset once and use its already-known MIME type."""
+        """Validate each packaged asset once and use its already-known MIME type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original_stat = Path.stat
         inspected: list[Path] = []
 
         def record_stat(path: Path, *, follow_symlinks: bool = True) -> os.stat_result:
-            """Record filesystem validation while preserving actual file metadata."""
+            """Record filesystem validation while preserving actual file metadata.
+
+            Parameters
+            ----------
+            path : Path
+                Value supplied for ``path``.
+            follow_symlinks : bool
+                Value supplied for ``follow_symlinks``.
+
+            Returns
+            -------
+            os.stat_result
+                Value produced by the helper.
+            """
             inspected.append(path)
             return original_stat(path, follow_symlinks=follow_symlinks)
 
         def reject_guess(_path: object, *, strict: bool = True) -> tuple[str, None]:
-            """Fail if a response guesses metadata already known to the asset map."""
+            """Fail if a response guesses metadata already known to the asset map.
+
+            Parameters
+            ----------
+            _path : object
+                Value supplied for ``_path``.
+            strict : bool
+                Value supplied for ``strict``.
+
+            Returns
+            -------
+            tuple[str, None]
+                Value produced by the helper.
+            """
             self.fail(f"Unexpected MIME lookup with strict={strict}")
 
         with (
@@ -473,7 +707,13 @@ class TestDefaultTemplates(TestCase):
                     self.assertEqual(inspected, [response.getPath()])
 
     async def testCachedPublicFilesRecoverAfterTheirRemoval(self) -> None:
-        """Replace stale public paths with packaged fallbacks or a rendered 404."""
+        """Replace stale public paths with packaged fallbacks or a rendered 404.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         assets = self.directory / "fallbacks"
         assets.mkdir()
         (assets / "favicon.ico").write_bytes(b"fallback icon")
@@ -503,7 +743,13 @@ class TestDefaultTemplates(TestCase):
                 self.assertEqual(await self._consume(restored), b"restored public")
 
     def testAssetAllowlistRejectsTraversalAndUnrelatedFiles(self) -> None:
-        """Refuse paths that could expose package source or arbitrary local files."""
+        """Refuse paths that could expose package source or arbitrary local files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for name in (
             "../responses.py",
             "../../view/engine.py",
@@ -524,7 +770,13 @@ class TestDefaultTemplates(TestCase):
                 self.assertNotIsInstance(response, FileResponse)
 
     async def testCssFontUrlsResolveToPackagedAssets(self) -> None:
-        """Ensure fonts load locally without network imports or missing files."""
+        """Ensure fonts load locally without network imports or missing files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         css = (await self._consume(self.defaults.asset("default.css"))).decode("utf-8")
         self.assertNotIn("@import", css)
         urls = [
@@ -544,5 +796,16 @@ class TestDefaultTemplates(TestCase):
 
     @staticmethod
     async def _consume(response: FileResponse) -> bytes:
-        """Collect a file response through its asynchronous public stream API."""
+        """Collect a file response through its asynchronous public stream API.
+
+        Parameters
+        ----------
+        response : FileResponse
+            Value supplied for ``response``.
+
+        Returns
+        -------
+        bytes
+            Value produced by the helper.
+        """
         return b"".join([chunk async for chunk in response.getStream()])

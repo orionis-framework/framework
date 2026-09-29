@@ -94,9 +94,9 @@ instancia compartida entre clases `Singleton` que no estén relacionadas.
 
 | Miembro | Descripción |
 |---|---|
-| `__init__` | Se ejecuta una sola vez, en el momento de definir la clase. Inicializa `cls._singleton_instance` con un centinela interno de "aún no creado" y asigna un `threading.Lock` dedicado para la clase en un registro a nivel de módulo indexado por el objeto clase. |
+| `__init__` | Se ejecuta una sola vez, en el momento de definir la clase. Inicializa `cls._singleton_instance` con un centinela interno de "aún no creado" y almacena un `threading.Lock` dedicado en la clase. |
 | `__call__` | `MiClase(*args, **kwargs)` — constructor síncrono seguro para hilos. Devuelve la instancia existente si ya se creó una (camino rápido: una lectura de atributo + comprobación de identidad); si no, adquiere el lock dedicado de la clase y crea la instancia con double-checked locking. |
-| `__acall__` | `await MiClase.__acall__(*args, **kwargs)` — constructor seguro para `asyncio`, **invocado explícitamente** (Python no llama a `__acall__` automáticamente desde `MiClase(...)`). Crea de forma perezosa un `asyncio.Lock` por clase en el primer uso y crea la instancia bajo él con el mismo patrón de doble verificación que `__call__`. |
+| `__acall__` | `await MiClase.__acall__(*args, **kwargs)` — constructor seguro para `asyncio`, **invocado explícitamente** (Python no llama a `__acall__` automáticamente desde `MiClase(...)`). Usa el `threading.Lock` de la clase para coordinar la creación con las llamadas síncronas. |
 
 Tanto `__call__` como `__acall__` leen/escriben el mismo slot
 subyacente `cls._singleton_instance`, así que la vía que cree la
@@ -177,32 +177,14 @@ asyncio.run(main())
   cual evita un recorrido completo del MRO, ya que `__is_final__`
   siempre se establece directamente en el objeto clase que lo posee,
   nunca se hereda.
-- **Vía síncrona de `Singleton` (`__call__`)**: después de crear la
-  primera instancia, cada llamada posterior es `O(1)` — una lectura de
-  atributo (`cls._singleton_instance`) más una comprobación de identidad
-  `is not`, sin adquisición de lock. El `threading.Lock` dedicado por
-  clase (almacenado en un `dict[type, threading.Lock]` a nivel de
-  módulo, no como atributo de clase) hace que las clases `Singleton` no
-  relacionadas nunca compitan por el lock de la otra; solo lo hacen las
-  construcciones concurrentes de primera vez de la *misma* clase.
-- **Vía asíncrona de `Singleton` (`__acall__`)**: el `asyncio.Lock` por
-  clase se crea de forma perezosa, en la primera invocación de
-  `__acall__`, protegido por un único `threading.Lock` a nivel de módulo
-  (`_meta_lock`) usado solo para poblar de forma segura el registro de
-  locks — nunca se mantiene retenido mientras se ejecuta el propio
-  constructor del singleton. Las clases que nunca se usan desde código
-  async nunca pagan el costo de asignar un `asyncio.Lock`.
-- **Carrera mixta entre construcción síncrona y asíncrona**: `__call__`
-  (protegido por un `threading.Lock`) y `__acall__` (protegido por un
-  `asyncio.Lock` separado) son cada uno independientemente seguros
-  frente a llamadores concurrentes que usen el *mismo* estilo de
-  llamada. Como usan dos objetos de lock distintos, una carrera genuina
-  en la que un hilo llama a `MiClase(...)` y, al mismo tiempo, una
-  corrutina llama a `await MiClase.__acall__()` por primera vez no está
-  sincronizada de forma cruzada por un lock compartido — esto solo
-  importa durante la estrecha ventana antes de que se haya creado la
-  instancia del singleton por primera vez; una vez creada, ambas vías
-  simplemente leen la misma instancia cacheada.
+- **Vías de `Singleton` (`__call__` y `__acall__`)**: después de crear
+  la primera instancia, las llamadas leen el atributo cacheado y hacen
+  una comparación de identidad sin adquirir locks. La primera creación
+  comprueba de nuevo el valor cacheado mientras mantiene un lock guardado
+  en la clase. Ambas APIs comparten ese lock, por lo que las llamadas
+  síncronas y asíncronas concurrentes no crean instancias duplicadas.
+  Almacenar el lock en cada clase también permite recolectar clases
+  dinámicas cuando dejan de usarse.
 - Ninguna de las dos metaclases realiza E/S; ambas son operaciones
   puras, en memoria y limitadas por CPU.
 
@@ -217,11 +199,9 @@ asyncio.run(main())
   `base.__dict__` directamente (no `getattr`) específicamente para que
   la bandera nunca se "vea" accidentalmente por herencia — siempre se
   establece de nuevo en cada clase creada con la metaclase.
-- **Double-checked locking**: `Singleton.__call__`/`__acall__` siguen el
-  patrón clásico de doble verificación con bloqueo — una lectura rápida
-  sin lock, seguida de una nueva comprobación protegida por lock antes
-  de construir — para mantener el caso común (la instancia ya existe)
-  libre de cualquier costo de bloqueo.
+- **Double-checked locking**: `Singleton.__call__`/`__acall__` primero
+  leen la instancia cacheada y luego vuelven a comprobarla bajo el lock
+  compartido de la clase antes de construirla.
 - **Invocación explícita de `__acall__`**: el modelo de datos de Python
   no invoca `__acall__` automáticamente cuando se escribe `MiClase(...)`
   dentro de un contexto `async def`; debe esperarse explícitamente como
@@ -238,11 +218,11 @@ asyncio.run(main())
 
 - Requiere **Python 3.14+**, en línea con el resto del framework
   `orionis` (`requires-python = ">=3.14"` en `pyproject.toml`).
-- Sin dependencias de terceros; solo usa `threading` y `asyncio` de la
-  librería estándar.
+- Sin dependencias de terceros; solo usa `threading` de la librería
+  estándar.
 - Sin comportamiento específico de plataforma; ambas metaclases dependen
-  únicamente del protocolo estándar de creación de tipos de CPython, de
-  `threading.Lock` y de `asyncio.Lock`.
+  únicamente del protocolo estándar de creación de tipos de CPython y de
+  `threading.Lock`.
 - Se usan internamente en `orionis.http.payload.estructures` (`Cookies`,
   `Headers`, `QueryParams`, vía `Final`) y en
   `orionis.environment.core.dot_env.DotEnv` (vía `Singleton`), pero

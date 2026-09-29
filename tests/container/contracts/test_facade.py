@@ -14,21 +14,52 @@ class _StubFacade(IFacade):
 
     @classmethod
     def getFacadeAccessor(cls) -> str:
-        """Return a fixed accessor key."""
+        """Return a fixed accessor key.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "stub"
 
     @classmethod
     async def resolve(cls, *_args: object, **_kwargs: object) -> object:
-        """Return nothing, standing in for a real container lookup."""
+        """Return nothing, standing in for a real container lookup.
+
+        Parameters
+        ----------
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return None
 
     @classmethod
     async def pin(cls) -> None:
-        """Skip pinning; the stub keeps no state."""
+        """Skip pinning; the stub keeps no state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     @classmethod
     def unpin(cls) -> None:
-        """Skip unpinning; the stub keeps no state."""
+        """Skip unpinning; the stub keeps no state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class TestIFacade(TestCase):
 

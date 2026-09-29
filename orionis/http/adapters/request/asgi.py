@@ -134,10 +134,7 @@ class ASGITransportAdapter(TransportAdapter):
             Return decoded and indexed request headers.
         """
         # Decode raw byte pairs to latin-1 strings.
-        return Headers([
-            (k.decode("latin-1"), v.decode("latin-1"))
-            for k, v in self.__scope.get("headers", ())
-        ])
+        return Headers(self.__scope.get("headers", ()), decode=True)
 
     def client(self) -> str | None:
         """

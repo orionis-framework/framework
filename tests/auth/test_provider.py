@@ -29,17 +29,49 @@ class _RecordingApp:
     __slots__ = ("scopeds", "singletons")
 
     def __init__(self) -> None:
-        """Start with an empty registration journal."""
+        """Start with an empty registration journal.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.singletons: list[tuple[type, type]] = []
         self.scopeds: list[tuple[type, type]] = []
 
     def scoped(self, abstract: type, concrete: type) -> bool:
-        """Record a request-scoped registration."""
+        """Record a request-scoped registration.
+
+        Parameters
+        ----------
+        abstract : type
+            Value supplied for ``abstract``.
+        concrete : type
+            Value supplied for ``concrete``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.scopeds.append((abstract, concrete))
         return True
 
     def singleton(self, abstract: type, concrete: type) -> bool:
-        """Record a singleton registration."""
+        """Record a singleton registration.
+
+        Parameters
+        ----------
+        abstract : type
+            Value supplied for ``abstract``.
+        concrete : type
+            Value supplied for ``concrete``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.singletons.append((abstract, concrete))
         return True
 
@@ -49,11 +81,23 @@ class _StubFacade:
     __slots__ = ("pins",)
 
     def __init__(self) -> None:
-        """Start with an empty pin counter."""
+        """Start with an empty pin counter.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.pins = 0
 
     async def pin(self) -> None:
-        """Record that the facade was pinned."""
+        """Record that the facade was pinned.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.pins += 1
 
 class TestAuthProvider(TestCase):
@@ -63,6 +107,11 @@ class TestAuthProvider(TestCase):
         """Validates that the module ships enabled by default.
 
         Applications must not have to register it by hand.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(AuthProvider, CORE_PROVIDERS)
 
@@ -70,6 +119,11 @@ class TestAuthProvider(TestCase):
         """Validates the base class of the provider.
 
         The container only boots real service providers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(AuthProvider, ServiceProvider))
 
@@ -79,6 +133,11 @@ class TestAuthProvider(TestCase):
         ``Auth.user()`` is synchronous, so the facade must already be
         pinned when a template or a controller reads it. A deferred
         provider would hand out a dispatcher instead.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(issubclass(AuthProvider, DeferrableProvider))
 
@@ -87,6 +146,11 @@ class TestAuthProvider(TestCase):
 
         Every service is stateless, so a shared instance is both safe and
         cheaper than rebuilding one per request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _RecordingApp()
         AuthProvider(app).register()
@@ -109,6 +173,11 @@ class TestAuthProvider(TestCase):
         """Validates the consistency between provider and facade.
 
         A mismatch would make the facade unresolvable at boot time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(AuthFacade.getFacadeAccessor(), IAuthManager)
 
@@ -116,7 +185,13 @@ class TestAuthProviderBoot(TestCase):
     """Validate the boot phase of the provider."""
 
     def setUp(self) -> None:
-        """Install a facade double for the duration of the test."""
+        """Install a facade double for the duration of the test.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         from orionis.auth import provider as provider_module
 
         self._module = provider_module
@@ -125,7 +200,13 @@ class TestAuthProviderBoot(TestCase):
         provider_module.AuthFacade = self._facade
 
     def tearDown(self) -> None:
-        """Restore the real facade."""
+        """Restore the real facade.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         self._module.AuthFacade = self._original
 
     async def testBootPinsTheFacade(self) -> None:
@@ -133,6 +214,11 @@ class TestAuthProviderBoot(TestCase):
 
         Without pinning, every ``Auth`` attribute access would build a
         deferred dispatcher and break the synchronous API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await AuthProvider(_RecordingApp()).boot()
         self.assertEqual(self._facade.pins, 1)
@@ -145,6 +231,11 @@ class TestAuthFacadeInABootedApplication(TestCase):
 
         These assertions only hold inside a booted runtime, which is
         exactly the environment the test runner provides.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNotNone(AuthFacade._pinned_instance)
 
@@ -152,6 +243,11 @@ class TestAuthFacadeInABootedApplication(TestCase):
         """Validates the synchronous surface used by templates.
 
         ``Auth.check()`` must return a boolean, never a dispatcher.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(AuthFacade.check(), bool)
         self.assertIsInstance(AuthFacade.guest(), bool)
@@ -162,6 +258,11 @@ class TestAuthFacadeInABootedApplication(TestCase):
 
         Validates the scoped binding: one guest context per request, and
         never the same instance across two scopes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = Application()
         async with ScopeManager():

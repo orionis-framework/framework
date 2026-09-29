@@ -23,26 +23,38 @@ _EXPECTED_SURFACE = frozenset({
 class TestIMailManagerContract(TestCase):
 
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
-        """
-        Declare exactly the documented composition and delivery operations.
+        """Declare exactly the documented composition and delivery operations.
 
         Validates that no infrastructure method leaks into the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IMailManager.__abstractmethods__, _EXPECTED_SURFACE)
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates the memory contract shared by framework interfaces.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IMailManager.__slots__, ())
 
     def testTerminalOperationsAreCoroutines(self) -> None:
-        """
-        Declare only the terminal operations as coroutine methods.
+        """Declare only the terminal operations as coroutine methods.
 
         Validates that composition never requires an intermediate await.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in ("send", "raw", "html"):
             self.assertTrue(
@@ -56,10 +68,14 @@ class TestIMailManagerContract(TestCase):
             )
 
     def testImplementationMatchesEveryDeclaredSignature(self) -> None:
-        """
-        Keep the parameters of the manager aligned with the contract.
+        """Keep the parameters of the manager aligned with the contract.
 
         Validates names, order, and default values of each operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in sorted(_EXPECTED_SURFACE):
             declared = inspect.signature(
@@ -82,10 +98,14 @@ class TestIMailManagerContract(TestCase):
             )
 
     def testSendDeclaresThreeOverloads(self) -> None:
-        """
-        Expose the Mailable, view, and Content overloads of send.
+        """Expose the Mailable, view, and Content overloads of send.
 
         Validates the typed surface consumers rely on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         overloads = typing.get_overloads(IMailManager.send)
         self.assertEqual(len(overloads), 3)
@@ -95,10 +115,14 @@ class TestIMailManagerContract(TestCase):
         )
 
     def testManagerImplementsTheContract(self) -> None:
-        """
-        Register the concrete manager as an implementation of the contract.
+        """Register the concrete manager as an implementation of the contract.
 
         Validates that dependency injection can resolve it by contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(MailManager, IMailManager))
         self.assertEqual(MailManager.__abstractmethods__, frozenset())

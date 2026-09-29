@@ -3,12 +3,17 @@ from typing import get_args, get_origin, get_type_hints
 from orionis.http.payload.estructures.cookies import Cookies
 from orionis.test import TestCase
 
-
 class TestCookieViewAnnotations(TestCase):
     """Keep cookie view annotations resolvable and consistent with their results."""
 
     def testViewAnnotationsResolveToTheirRuntimeViewTypes(self) -> None:
-        """Resolve public annotations without supplying an external namespace."""
+        """Resolve public annotations without supplying an external namespace.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cookies = Cookies("color=blue; empty=")
         for method, view_type, arguments in (
             (Cookies.items, ItemsView, (str, str)),
@@ -21,7 +26,13 @@ class TestCookieViewAnnotations(TestCase):
             self.assertIsInstance(method(cookies), view_type)
 
     def testViewOperationsPreserveParsedCookieValues(self) -> None:
-        """Preserve ordered values, membership and set operations on cookie views."""
+        """Preserve ordered values, membership and set operations on cookie views.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cookies = Cookies("color=red; empty=; color=blue; name=A%20B")
         items = cookies.items()
         keys = cookies.keys()

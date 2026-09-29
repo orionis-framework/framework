@@ -1,8 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-class IWorkers(ABC):
 
+class IWorkers(ABC):
     @classmethod
     @abstractmethod
     def setRamPerWorker(cls, ram_per_worker: float) -> None:
@@ -23,6 +23,11 @@ class IWorkers(ABC):
         -----
         Changing the RAM allocation per worker affects every subsequent call
         to calculate(). No instantiation is required.
+
+        Raises
+        ------
+        ValueError
+            If the budget is not finite, positive, or at least one byte.
         """
 
     @classmethod

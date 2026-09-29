@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html lang="{{ locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link rel="icon" href="{{ asset_base }}/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="{{ asset_base }}/default.css">
+    <script src="{{ asset_base }}/default.js" defer></script>
+</head>
+<body class="page-{{ page }}">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="scanline-overlay" aria-hidden="true"></div>
+    {% if page != 'exception' %}
+    <div id="particles" aria-hidden="true">
+        {% for particle in range(12) %}<div class="particle"></div>{% endfor %}
+    </div>
+    {% endif %}
+    <header class="topbar">
+        <div class="topbar-status">
+            <div class="topbar-dot" aria-hidden="true"></div>
+            <span>{{ {'up': 'SYSTEM ONLINE', 'down': 'SYS.OFFLINE', 'error': 'SYS.ERROR', 'exception': 'SYS.EXCEPTION'}.get(page, 'ORIONIS') }}</span>
+            <span class="topbar-navigation">{{ 'NAV:ORBITAL' if page == 'up' else 'NAV:HALTED' }}</span>
+        </div>
+        <time class="topbar-time" id="systemTime"></time>
+    </header>
+    {% block content %}{% endblock %}
+</body>
+</html>
+{% endautoescape %}

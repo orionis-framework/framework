@@ -35,7 +35,6 @@ from tests.session import test_manager as session_fixtures
 
 # ruff: noqa: TC001
 
-
 class _CanView(RequirePermissionMiddleware):
     """Require the capability exercised by protected integration routes."""
 
@@ -55,7 +54,13 @@ class _Rendezvous:
     __slots__ = ("barrier",)
 
     def __init__(self) -> None:
-        """Create a two-party barrier for one concurrent request pair."""
+        """Create a two-party barrier for one concurrent request pair.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.barrier = asyncio.Barrier(2)
 
 
@@ -63,7 +68,20 @@ async def identity_handler(
     auth: IAuthManager,
     context: IAuthenticationContext,
 ) -> dict[str, object]:
-    """Return the identity and authorization injected into a real route handler."""
+    """Return the identity and authorization injected into a real route handler.
+
+    Parameters
+    ----------
+    auth : IAuthManager
+        Value supplied for ``auth``.
+    context : IAuthenticationContext
+        Value supplied for ``context``.
+
+    Returns
+    -------
+    dict[str, object]
+        Value produced by the helper.
+    """
     return {
         "identity": auth.identifier(),
         "injected": context.identifier(),
@@ -78,7 +96,22 @@ async def concurrent_handler(
     rendezvous: _Rendezvous,
     context: IAuthenticationContext,
 ) -> dict[str, object]:
-    """Observe Auth across a deterministic interleaving with another request."""
+    """Observe Auth across a deterministic interleaving with another request.
+
+    Parameters
+    ----------
+    auth : IAuthManager
+        Value supplied for ``auth``.
+    rendezvous : _Rendezvous
+        Value supplied for ``rendezvous``.
+    context : IAuthenticationContext
+        Value supplied for ``context``.
+
+    Returns
+    -------
+    dict[str, object]
+        Value produced by the helper.
+    """
     before = auth.identifier()
     await rendezvous.barrier.wait()
     payload = await identity_handler(auth, context)
@@ -89,7 +122,18 @@ async def concurrent_handler(
 
 
 async def logout_handler(auth: IAuthManager) -> Response:
-    """Invalidate the current web session from a kernel-dispatched handler."""
+    """Invalidate the current web session from a kernel-dispatched handler.
+
+    Parameters
+    ----------
+    auth : IAuthManager
+        Value supplied for ``auth``.
+
+    Returns
+    -------
+    Response
+        Value produced by the helper.
+    """
     await auth.logout()
     return Response(status_code=204)
 
@@ -100,7 +144,18 @@ class _HttpApp(auth_fixtures._StubApp):
     __slots__ = ("basePath", "builds", "container", "scopes")
 
     def __init__(self, directory: Path) -> None:
-        """Configure web middleware without external services."""
+        """Configure web middleware without external services.
+
+        Parameters
+        ----------
+        directory : Path
+            Value supplied for ``directory``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         super().__init__(str(directory / "unused.sqlite"))
         self.basePath = directory
         self._tree["http"] = http_fixtures.make_http_config(csrf_enabled=True)
@@ -110,31 +165,86 @@ class _HttpApp(auth_fixtures._StubApp):
         self.scopes: list[ScopeManager] = []
 
     async def build(self, target: type) -> object:
-        """Return prebuilt infrastructure or use actual constructor injection."""
+        """Return prebuilt infrastructure or use actual constructor injection.
+
+        Parameters
+        ----------
+        target : type
+            Value supplied for ``target``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         if target in self.builds:
             return self.builds[target]
         return await self.container.build(target)
 
     async def invoke(self, target: object, **kwargs: object) -> object:
-        """Invoke the handler with the real container and current Request binding."""
+        """Invoke the handler with the real container and current Request binding.
+
+        Parameters
+        ----------
+        target : object
+            Value supplied for ``target``.
+        **kwargs : object
+            Arguments forwarded to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return await self.container.invoke(target, **kwargs)
 
     def instance(self, abstract: type, instance: object) -> bool:
-        """Register Session in the active request scope using the real container."""
+        """Register Session in the active request scope using the real container.
+
+        Parameters
+        ----------
+        abstract : type
+            Value supplied for ``abstract``.
+        instance : object
+            Value supplied for ``instance``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return self.container.instance(abstract, instance)
 
     def beginScope(self) -> ScopeManager:
-        """Create and record a real scope for each HTTP request."""
+        """Create and record a real scope for each HTTP request.
+
+        Returns
+        -------
+        ScopeManager
+            Value produced by the helper.
+        """
         scope = self.container.beginScope()
         self.scopes.append(scope)
         return scope
 
     def isDebug(self) -> bool:
-        """Disable console request output in the isolated integration runtime."""
+        """Disable console request output in the isolated integration runtime.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return False
 
     def underMaintenance(self) -> bool:
-        """Allow requests through the normal kernel lifecycle."""
+        """Allow requests through the normal kernel lifecycle.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return False
 
 
@@ -144,11 +254,37 @@ class _HttpCatch:
     __slots__ = ("handler",)
 
     def __init__(self, responses: object, application: object) -> None:
-        """Build the standard exception handler."""
+        """Build the standard exception handler.
+
+        Parameters
+        ----------
+        responses : object
+            Value supplied for ``responses``.
+        application : object
+            Value supplied for ``application``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.handler = BaseExceptionHandler(responses, application)
 
     async def exception(self, exc: Exception, request: object) -> Response:
-        """Delegate error classification to Orionis."""
+        """Delegate error classification to Orionis.
+
+        Parameters
+        ----------
+        exc : Exception
+            Value supplied for ``exc``.
+        request : object
+            Value supplied for ``request``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         return await self.handler.handleHTTP(exc, request)
 
 
@@ -158,7 +294,13 @@ class _RsgiProtocol:
     __slots__ = ("body", "headers", "status")
 
     def __init__(self) -> None:
-        """Start without a response."""
+        """Start without a response.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.status = 0
         self.headers: list[tuple[str, str]] = []
         self.body = b""
@@ -166,12 +308,42 @@ class _RsgiProtocol:
     def response_bytes(
         self, status: int, headers: list[tuple[str, str]], body: bytes,
     ) -> None:
-        """Record the protocol response supplied by the adapter."""
+        """Record the protocol response supplied by the adapter.
+
+        Parameters
+        ----------
+        status : int
+            Value supplied for ``status``.
+        headers : list[tuple[str, str]]
+            Value supplied for ``headers``.
+        body : bytes
+            Value supplied for ``body``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.status, self.headers, self.body = status, headers, body
 
 
 def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
-    """Build a route descriptor using native middleware classes."""
+    """Build a route descriptor using native middleware classes.
+
+    Parameters
+    ----------
+    path : str
+        Value supplied for ``path``.
+    function : str
+        Value supplied for ``function``.
+    web : bool
+        Value supplied for ``web``.
+
+    Returns
+    -------
+    CompiledRoute
+        Value produced by the helper.
+    """
     guard = AuthenticateSessionMiddleware if web else AuthenticateTokenMiddleware
     middleware = (guard,) if path == "/logout" else (guard, _CanView)
     if path == "/public":
@@ -193,15 +365,33 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
     """Exercise request identity through the actual HTTP kernel and transports."""
 
     def setUp(self) -> None:
-        """Detach from the test runner's ambient container scope."""
+        """Detach from the test runner's ambient container scope.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self._scope_token = ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Restore the runner's context after the isolated HTTP runtime."""
+        """Restore the runner's context after the isolated HTTP runtime.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ScopedContext.reset(self._scope_token)
 
     async def asyncSetUp(self) -> None:
-        """Boot a real kernel over the existing temporary Auth database fixtures."""
+        """Boot a real kernel over the existing temporary Auth database fixtures.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         await super().asyncSetUp()
         self.http_app = _HttpApp(Path(self._tmp.name))
         self.http_app.instance(IAuthManager, self.auth)
@@ -240,7 +430,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         await self.kernel.boot()
 
     async def asyncTearDown(self) -> None:
-        """Dispose the test container and its database after every request scenario."""
+        """Dispose the test container and its database after every request scenario.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         Container._instances.pop(type(self.http_app.container), None)
         await super().asyncTearDown()
 
@@ -248,13 +444,47 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         self, path: str, headers: list[tuple[bytes, bytes]] | None = None,
         method: str = "GET",
     ) -> tuple[int, dict[str, object], list[tuple[bytes, bytes]]]:
-        """Send one ASGI request through the kernel and collect its real response."""
+        """Send one ASGI request through the kernel and collect its real response.
+
+        Parameters
+        ----------
+        path : str
+            Value supplied for ``path``.
+        headers : list[tuple[bytes, bytes]] | None
+            Value supplied for ``headers``.
+        method : str
+            Value supplied for ``method``.
+
+        Returns
+        -------
+        tuple[int, dict[str, object], list[tuple[bytes, bytes]]]
+            Value produced by the helper.
+        """
         messages: list[dict] = []
 
         async def receive() -> dict:
+            """Build an empty HTTP request message.
+
+            Returns
+            -------
+            dict
+                Value produced by the helper.
+            """
             return {"type": "http.request", "body": b"", "more_body": False}
 
         async def send(message: dict) -> None:
+            """Record an ASGI response message.
+
+            Parameters
+            ----------
+            message : dict
+                Value supplied for ``message``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             messages.append(message)
 
         scope = http_fixtures.make_asgi_scope(path, method, headers)
@@ -266,7 +496,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         return start["status"], payload, start["headers"]
 
     async def testAsgiDistinguishesUnauthorizedAndForbidden(self) -> None:
-        """Send guests to 401 and known identities without rights to 403."""
+        """Send guests to 401 and known identities without rights to 403.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         status, _, headers = await self.asgi("/api")
         self.assertEqual(status, 401)
         self.assertIn((b"www-authenticate", b"Bearer"), headers)
@@ -282,7 +518,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         self.assertTrue(self.auth.guest())
 
     async def testConcurrentAsgiRequestsKeepTheirInjectedIdentity(self) -> None:
-        """Interleave two real API requests through shared middleware and services."""
+        """Interleave two real API requests through shared middleware and services.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         await self.registrar.givePermissionTo(self.bob, "users.view")
         first = await self.tokens.create(self.ada, "first")
@@ -302,7 +544,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             )
 
     async def testWebSessionAndCsrfLogoutUseTheKernelLifecycle(self) -> None:
-        """Restore a session, authorize, validate CSRF, log out and reject replay."""
+        """Restore a session, authorize, validate CSRF, log out and reject replay.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         session = Session()
         session.put("_auth_identifier", str(self.ada.id))
@@ -328,7 +576,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             SessionFacade.get("_auth_identifier")
 
     async def testRsgiUsesTheSameAuthenticationAndAuthorization(self) -> None:
-        """Exercise the real RSGI adapters and the same token middleware pipeline."""
+        """Exercise the real RSGI adapters and the same token middleware pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         issued = await self.tokens.create(self.ada, "rsgi")
         scope = http_fixtures._StubRsgiScope("/api")
@@ -344,7 +598,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         self.assertTrue(all(not scope.isActive for scope in self.http_app.scopes))
 
     async def testCustomAuthExceptionsKeepTheirHttpSemantics(self) -> None:
-        """Classify application subclasses as 401 or 403 rather than generic 500."""
+        """Classify application subclasses as 401 or 403 rather than generic 500.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         request = SimpleNamespace(wantsJson=lambda: True)
         for exception, expected in (
             (_ExpiredIdentity("expired"), 401),
@@ -354,7 +614,13 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             self.assertEqual(response.getStatusCode(), expected)
 
     async def testBearerHeadersAreUnambiguousAndCaseInsensitive(self) -> None:
-        """Accept case-insensitive schemes and reject duplicate credentials."""
+        """Accept case-insensitive schemes and reject duplicate credentials.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         issued = await self.tokens.create(self.ada, "header-check")
         value = f"bEaReR {issued.plain_text}".encode()

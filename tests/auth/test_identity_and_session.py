@@ -1,0 +1,806 @@
+import inspect
+import threading
+from types import SimpleNamespace
+from typing import Any
+from orionis.auth.concerns.authenticatable import Authenticatable
+from orionis.auth.concerns.authorizable import Authorizable
+from orionis.auth.contracts.identity_provider import IIdentityProvider
+from orionis.auth.exceptions import AuthException, IdentityProviderException
+from orionis.auth.guards.session_guard import SessionGuard
+from orionis.auth.identity.provider import ModelIdentityProvider
+from orionis.database.connection_manager import ConnectionManager
+from orionis.hashing.hash_manager import HashManager
+from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
+from orionis.orm import BigInteger, Boolean, Model, String
+from orionis.orm.resolver import ConnectionResolver
+from orionis.orm.schema.table import TableDefinition
+from orionis.session.session import Session
+from orionis.test import TestCase
+
+# Cheap Argon2 parameters: these tests verify behaviour, not cost.
+_HASH_OPTIONS: dict[str, int] = {"memory": 32, "threads": 1, "time": 1}
+
+class Account(Model, Authenticatable, Authorizable):
+    """Identity model used by the tests in this module."""
+
+    table = "accounts"
+    timestamps = False
+
+    id = BigInteger().primary().autoIncrement()
+    email = String(255)
+    password = String(255)
+    active = Boolean().nullable()
+
+class _StubApp:
+    """Application stub exposing the database and auth configuration."""
+
+    def __init__(self, config: dict[str, Any]) -> None:
+        """Store the configuration tree the stub answers from.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            Value supplied for ``config``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
+        self._config = config
+
+    def config(self, key: str | None = None) -> Any:  # noqa: ANN401
+        """Resolve a dot-notated configuration key.
+
+        Parameters
+        ----------
+        key : str | None
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
+        if key is None:
+            return self._config
+        node: Any = self._config
+        for part in key.split("."):
+            if not isinstance(node, dict):
+                return None
+            node = node.get(part)
+            if node is None:
+                return None
+        return node
+
+def build_app(**auth: object) -> _StubApp:
+    """Build an application stub wired to an in-memory SQLite database.
+
+    Parameters
+    ----------
+    **auth : object
+        Arguments forwarded to the wrapped callable.
+
+    Returns
+    -------
+    _StubApp
+        Value produced by the helper.
+    """
+    identity = {
+        "model": f"{__name__}.Account",
+        "username": "email",
+        "password": "password",
+    }
+    identity.update(auth.pop("identity", {}))
+    return _StubApp({
+        "database": {
+            "default": "sqlite",
+            "connections": {
+                "sqlite": {
+                    "driver": "sqlite",
+                    "database": ":memory:",
+                    "prefix": "",
+                },
+            },
+        },
+        "hashing": {"driver": "argon2", "argon2": _HASH_OPTIONS},
+        "auth": {
+            "default": "session",
+            "identity": identity,
+            "session": {"key": "_auth_identifier", "redirect_to": None},
+            "tokens": {},
+            **auth,
+        },
+    })
+
+def accounts_table() -> TableDefinition:
+    """Build the physical ``accounts`` table.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
+    columns = {
+        "id": BigInteger().primary().autoIncrement(),
+        "email": String(255),
+        "password": String(255),
+        "active": Boolean().nullable(),
+    }
+    for name, column in columns.items():
+        column.name = name
+    return TableDefinition(name="accounts", columns=columns, primary_key="id")
+
+def fake_request(session: Session | None) -> SimpleNamespace:
+    """Build a request double exposing only ``state.session``.
+
+    Parameters
+    ----------
+    session : Session | None
+        Value supplied for ``session``.
+
+    Returns
+    -------
+    SimpleNamespace
+        Value produced by the helper.
+    """
+    state = SimpleNamespace()
+    if session is not None:
+        state.session = session
+    return SimpleNamespace(state=state)
+
+class _RecordingHasher:
+    """Hashing double recording every call made by the provider."""
+
+    __slots__ = ("checked", "hashed")
+
+    def __init__(self) -> None:
+        """Start with empty call journals.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
+        self.hashed: list[str] = []
+        self.checked: list[tuple[str, str]] = []
+
+    async def make(self, value: str, **_: object) -> str:
+        """Record the hashing of a value and return a marker.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+        **_ : object
+            Arguments forwarded to the wrapped callable.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
+        self.hashed.append(value)
+        return f"hashed:{value}"
+
+    async def check(self, value: str, hashed: str) -> bool:
+        """Record a verification and answer against the marker.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+        hashed : str
+            Value supplied for ``hashed``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
+        self.checked.append((value, hashed))
+        return hashed == f"hashed:{value}"
+
+class _ThreadRecordingArgon2(Argon2Hasher):
+    """Argon2 driver recording the thread that burns the hashing cost."""
+
+    __slots__ = ("thread_ids",)
+
+    def __init__(self) -> None:
+        """Start with an empty journal of worker threads.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
+        super().__init__(**_HASH_OPTIONS)
+        self.thread_ids: list[int] = []
+
+    def _check(self, value: str, hashed: str) -> bool:
+        """Record the executing thread before verifying.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+        hashed : str
+            Value supplied for ``hashed``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
+        self.thread_ids.append(threading.get_ident())
+        return super()._check(value, hashed)
+
+class _InputRejectingHasher(_RecordingHasher):
+    """Model a native password backend rejecting an invalid input value."""
+
+    __slots__ = ()
+
+    async def check(self, value: str, hashed: str) -> bool:  # noqa: ARG002
+        """Raise a backend input error that must not escape authentication.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+        hashed : str
+            Value supplied for ``hashed``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+
+        Raises
+        ------
+        ValueError
+            Raised when the helper reaches this failure path.
+        """
+        error_msg = "invalid password input"
+        raise ValueError(error_msg)
+
+class TestModelIdentityProvider(TestCase):
+    """Validate identity lookup and password verification."""
+
+    async def asyncSetUp(self) -> None:
+        """Create the schema and seed a single account.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
+        self.app = build_app()
+        self.manager = ConnectionManager(self.app)
+        self._previous_manager = ConnectionResolver._manager
+        ConnectionResolver.setManager(self.manager)
+        self.connection = self.manager.connection("sqlite")
+        await self.connection.createTable(accounts_table())
+
+        self.hasher = HashManager(self.app)
+        self.provider = ModelIdentityProvider(self.app, self.hasher)
+        self.hashed = await self.hasher.make("secret")
+        await Account.create({
+            "email": "ada@orionis.dev",
+            "password": self.hashed,
+            "active": True,
+        })
+
+    async def asyncTearDown(self) -> None:
+        """Release the SQLite connection.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
+        ConnectionResolver.setManager(self._previous_manager)
+        await self.connection.disconnect()
+
+    def testResolvesTheConfiguredModel(self) -> None:
+        """Validates that the dotted path in configuration is imported.
+
+        The framework never imports the application identity directly, so
+        the provider must resolve and memoise the class itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertIs(self.provider.model(), Account)
+        self.assertIs(self.provider.model(), Account)
+
+    def testRejectsAModelThatIsNotAuthenticatable(self) -> None:
+        """Validates that a model without the mixin is refused.
+
+        Accepting it would fail much later, when the guard asks for the
+        password hash of an object that cannot answer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        app = build_app(identity={"model": "orionis.orm.model.Model"})
+        provider = ModelIdentityProvider(app, self.hasher)
+        with self.assertRaises(IdentityProviderException):
+            provider.model()
+
+    def testRejectsAnUnimportableModel(self) -> None:
+        """Validates that a broken dotted path raises a module error.
+
+        The failure must be an authentication error, not a bare
+        ``ImportError`` leaking from the framework internals.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        app = build_app(identity={"model": "does.not.exist.Identity"})
+        provider = ModelIdentityProvider(app, self.hasher)
+        with self.assertRaises(IdentityProviderException):
+            provider.model()
+
+    async def testRetrievesAnIdentityByItsIdentifier(self) -> None:
+        """Validates the lookup used to restore a session.
+
+        The session only stores the primary key, so the provider must be
+        able to rebuild the identity from it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        self.assertIsNotNone(identity)
+        self.assertEqual(identity.email, "ada@orionis.dev")
+
+    async def testReturnsNoneForAnUnknownIdentifier(self) -> None:
+        """Validates that a stale identifier resolves to nothing.
+
+        A deleted account must not keep its session alive.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertIsNone(await self.provider.retrieveById(999))
+        self.assertIsNone(await self.provider.retrieveById(None))
+
+    async def testRetrievesAnIdentityByItsCredentials(self) -> None:
+        """Validates that lookup uses the configured username field.
+
+        Only the public credential participates in the lookup; the secret
+        is verified separately.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveByCredentials({
+            "email": "ada@orionis.dev",
+        })
+        self.assertIsNotNone(identity)
+        self.assertEqual(identity.getAuthIdentifier(), 1)
+
+    async def testReturnsNoneWhenTheUsernameIsMissing(self) -> None:
+        """Validates that an incomplete payload never hits the database.
+
+        A missing or non textual username cannot match anything.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertIsNone(await self.provider.retrieveByCredentials({}))
+        self.assertIsNone(
+            await self.provider.retrieveByCredentials({"email": 42}),
+        )
+
+    async def testValidatesTheCorrectPassword(self) -> None:
+        """Validates that verification delegates to the hashing module.
+
+        Authentication must never compare passwords by hand.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        granted = await self.provider.validateCredentials(
+            identity, {"password": "secret"},
+        )
+        self.assertTrue(granted)
+
+    def testCredentialVerificationIsASingleCoroutine(self) -> None:
+        """Validates that verification is one awaitable entry point.
+
+        A synchronous implementation would let a caller hand it to
+        ``asyncio.to_thread`` and read the unawaited coroutine as a truthy
+        answer, accepting every password.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertTrue(
+            inspect.iscoroutinefunction(IIdentityProvider.validateCredentials),
+        )
+        self.assertTrue(
+            inspect.iscoroutinefunction(
+                ModelIdentityProvider.validateCredentials,
+            ),
+        )
+
+    async def testRejectsAWrongPassword(self) -> None:
+        """Validates that a mismatching secret is refused.
+
+        The stored hash must remain the only source of truth.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        granted = await self.provider.validateCredentials(
+            identity, {"password": "wrong"},
+        )
+        self.assertFalse(granted)
+
+    async def testRejectsAnUnknownIdentityWithoutSkippingTheHashing(
+        self,
+    ) -> None:
+        """Validates that a missing identity still burns hashing work.
+
+        Returning early would let an attacker enumerate accounts by
+        measuring the response time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        hasher = _RecordingHasher()
+        provider = ModelIdentityProvider(self.app, hasher)
+
+        granted = await provider.validateCredentials(None, {"password": "secret"})
+
+        self.assertFalse(granted)
+        self.assertEqual(hasher.hashed, ["secret"])
+        self.assertEqual(hasher.checked, [])
+
+    async def testRejectsAnEmptyPassword(self) -> None:
+        """Validates that a blank secret never reaches the hasher.
+
+        An empty password is a malformed request, not a candidate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        self.assertFalse(await self.provider.validateCredentials(identity, {}))
+        self.assertFalse(
+            await self.provider.validateCredentials(identity, {"password": ""}),
+        )
+
+    async def testBackendInputErrorsAreInvalidCredentials(self) -> None:
+        """Deny native backend input errors without exposing password material.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        provider = ModelIdentityProvider(self.app, _InputRejectingHasher())
+        self.assertFalse(
+            await provider.validateCredentials(identity, {"password": "invalid"}),
+        )
+        self.assertFalse(
+            await provider.validateCredentials(None, {"password": "x" * 5000}),
+        )
+
+class TestSessionGuard(TestCase):
+    """Validate the web authentication lifecycle."""
+
+    async def asyncSetUp(self) -> None:
+        """Create the schema, seed an account and build the guard.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
+        self.app = build_app()
+        self.manager = ConnectionManager(self.app)
+        self._previous_manager = ConnectionResolver._manager
+        ConnectionResolver.setManager(self.manager)
+        self.connection = self.manager.connection("sqlite")
+        await self.connection.createTable(accounts_table())
+
+        self.hasher = HashManager(self.app)
+        self.provider = ModelIdentityProvider(self.app, self.hasher)
+        self.guard = SessionGuard(self.app, self.provider)
+        await Account.create({
+            "email": "ada@orionis.dev",
+            "password": await self.hasher.make("secret"),
+            "active": True,
+        })
+
+    async def asyncTearDown(self) -> None:
+        """Release the SQLite connection.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
+        ConnectionResolver.setManager(self._previous_manager)
+        await self.connection.disconnect()
+
+    def testExposesItsConfigurationName(self) -> None:
+        """Validates the name used to select the guard.
+
+        The manager resolves guards by this exact string.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertEqual(self.guard.name, "session")
+
+    async def testAttemptAuthenticatesValidCredentials(self) -> None:
+        """Validates the happy path of a web login.
+
+        The identity is returned and remembered in the session.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        request = fake_request(session)
+
+        identity = await self.guard.attempt(
+            request, {"email": "ada@orionis.dev", "password": "secret"},
+        )
+
+        self.assertIsNotNone(identity)
+        self.assertEqual(session.get("_auth_identifier"), "1")
+
+    async def testAttemptRotatesTheSessionIdentifier(self) -> None:
+        """Validates the protection against session fixation.
+
+        A value planted before the login must stop being valid.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        session.put("planted", "value")
+        self.assertFalse(session.wantsRegenerate)
+
+        await self.guard.attempt(
+            fake_request(session),
+            {"email": "ada@orionis.dev", "password": "secret"},
+        )
+
+        self.assertTrue(session.wantsRegenerate)
+
+    async def testAttemptRejectsAWrongPassword(self) -> None:
+        """Validates that a bad secret leaves the session anonymous.
+
+        Nothing must be written when the credentials do not match.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        identity = await self.guard.attempt(
+            fake_request(session),
+            {"email": "ada@orionis.dev", "password": "wrong"},
+        )
+
+        self.assertIsNone(identity)
+        self.assertIsNone(session.get("_auth_identifier"))
+
+    async def testAttemptRejectsAnUnknownIdentity(self) -> None:
+        """Validates that a missing account is refused like a bad secret.
+
+        The caller cannot tell the two failures apart.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        identity = await self.guard.attempt(
+            fake_request(session),
+            {"email": "ghost@orionis.dev", "password": "secret"},
+        )
+
+        self.assertIsNone(identity)
+        self.assertIsNone(session.get("_auth_identifier"))
+
+    async def testResolveRestoresTheIdentityFromTheSession(self) -> None:
+        """Validates the per request restoration of a logged in user.
+
+        The identifier and password fingerprint travel in the session.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        self.guard.login(fake_request(session), await self.provider.retrieveById(1))
+
+        result = await self.guard.resolve(fake_request(session))
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.guard, "session")
+        self.assertEqual(result.identity.getAuthIdentifier(), 1)
+        self.assertIsNone(result.abilities)
+
+    async def testResolveReturnsNoneWithoutSession(self) -> None:
+        """Validates that API routes without a session stay anonymous.
+
+        The guard must not explode outside the web pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertIsNone(await self.guard.resolve(fake_request(None)))
+
+    async def testResolveReturnsNoneForAnEmptySession(self) -> None:
+        """Validates that a fresh visitor is a guest.
+
+        No identifier means nothing to restore.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        self.assertIsNone(await self.guard.resolve(fake_request(Session())))
+
+    async def testResolveCleansUpAStaleIdentifier(self) -> None:
+        """Validates that a deleted account clears the session key.
+
+        Leaving the key would retry the same failing lookup forever.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        session.put("_auth_identifier", 999)
+
+        result = await self.guard.resolve(fake_request(session))
+
+        self.assertIsNone(result)
+        self.assertIsNone(session.get("_auth_identifier"))
+
+    async def testLoginRequiresASession(self) -> None:
+        """Validates that logging in without a session fails loudly.
+
+        Silently doing nothing would look like a successful login.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        with self.assertRaises(AuthException):
+            self.guard.login(fake_request(None), identity)
+
+    async def testLogoutInvalidatesTheSession(self) -> None:
+        """Validates that logging out destroys the session entirely.
+
+        Only forgetting the key would leave the rest of the payload alive.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        session = Session()
+        session.put("_auth_identifier", 1)
+        session.put("cart", ["book"])
+
+        await self.guard.logout(fake_request(session))
+
+        self.assertTrue(session.invalidated)
+        self.assertEqual(session.all(), {})
+
+    async def testLogoutWithoutSessionIsANoOperation(self) -> None:
+        """Validates that logging out is safe outside the web pipeline.
+
+        A request without a session is already anonymous.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await self.guard.logout(fake_request(None))
+
+    async def testPasswordVerificationRunsOutsideTheEventLoopThread(self) -> None:
+        """Verify a password and record the thread that ran the hasher.
+
+        Validates that the expensive comparison never blocks the event
+        loop serving the HTTP request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        driver = _ThreadRecordingArgon2()
+        hasher = HashManager(self.app)
+        hasher._drivers["argon2"] = driver
+        guard = SessionGuard(self.app, ModelIdentityProvider(self.app, hasher))
+
+        await guard.attempt(
+            fake_request(Session()),
+            {"email": "ada@orionis.dev", "password": "secret"},
+        )
+
+        self.assertEqual(len(driver.thread_ids), 1)
+        self.assertNotIn(threading.get_ident(), driver.thread_ids)
+
+    async def testLoginRotatesCsrfAndPreservesUnrelatedSessionData(self) -> None:
+        """Rotate security credentials without losing the visitor's payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identity = await self.provider.retrieveById(1)
+        session = Session()
+        previous = "previous-csrf-value"
+        session.put("_csrf_token", previous)
+        session.put("cart", ["book"])
+        request = fake_request(session)
+        self.guard.login(request, identity)
+        self.assertNotEqual(session.get("_csrf_token"), previous)
+        self.assertEqual(request.state.csrf_token, session.get("_csrf_token"))
+        self.assertEqual(session.get("cart"), ["book"])
+
+    def testLoginRejectsAnUnsavedIdentity(self) -> None:
+        """Never authenticate a model whose primary key has not been assigned.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        with self.assertRaises(AuthException):
+            self.guard.login(fake_request(Session()), Account())

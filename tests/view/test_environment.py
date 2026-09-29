@@ -13,6 +13,15 @@ class _StubApp:
     __slots__ = ("basePath", "requested", "view_config")
 
     def __init__(self, view_config: object, base_path: Path) -> None:
+        """Store view configuration and the application base path.
+
+        Parameters
+        ----------
+        view_config : object
+            Configuration returned for the view section.
+        base_path : Path
+            Base directory used to resolve relative paths.
+        """
         self.view_config: object = view_config
         self.basePath: Path = base_path
         self.requested: list[str] = []
@@ -206,6 +215,18 @@ class TestViewEnvironment(TestCase):
         jinja_env = env.getJinjaEnvironment()
 
         def is_positive(value: int) -> bool:
+            """Return whether the supplied value is positive.
+
+            Parameters
+            ----------
+            value : int
+                Number to evaluate.
+
+            Returns
+            -------
+            bool
+                Whether ``value`` is greater than zero.
+            """
             return value > 0
 
         env.addTest("positive", is_positive)

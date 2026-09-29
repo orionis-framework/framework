@@ -5,12 +5,17 @@ from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
 from tests.http.test_request import make_asgi_request
 
-
 class TestQuotedHeaderParameters(TestCase):
     """Preserve quoted delimiters across header and multipart parsing."""
 
     def testContentTypePreservesQuotedSemicolonsAndFollowingParameters(self) -> None:
-        """Keep values intact without changing duplicate or escape handling."""
+        """Keep values intact without changing duplicate or escape handling.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             (
                 'TEXT/PLAIN; note = "alpha;beta=gamma"; Charset=UTF-8; empty=""; flag',
@@ -37,7 +42,13 @@ class TestQuotedHeaderParameters(TestCase):
             self.assertEqual(parse_content_type(header), ("text/plain", expected))
 
     def testDispositionPreservesQuotedNamesAndFilenames(self) -> None:
-        """Keep delimiters and escaped quotes inside both supported quote styles."""
+        """Keep delimiters and escaped quotes inside both supported quote styles.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             ('form-data; name="alpha;beta"; filename="a;b.txt"', "alpha;beta"),
             ("form-data; name='alpha;beta'; filename='a;b.txt'", "alpha;beta"),
@@ -53,7 +64,13 @@ class TestQuotedHeaderParameters(TestCase):
                 self.assertEqual(upload.extension, ".txt")
 
     def testExtendedDispositionValuesRetainPriorityAndApostrophes(self) -> None:
-        """Preserve extended decoding, plain fallbacks and unquoted apostrophes."""
+        """Preserve extended decoding, plain fallbacks and unquoted apostrophes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             (
                 (
@@ -81,7 +98,13 @@ class TestQuotedHeaderParameters(TestCase):
                 self.assertEqual(part.name, expected_name)
 
     async def testRequestFormPreservesQuotedParametersAndUploadedBytes(self) -> None:
-        """Read quoted boundaries, field names and filenames through Request.form."""
+        """Read quoted boundaries, field names and filenames through Request.form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         body = (
             b'--orionis;boundary\r\n'
             b'Content-Disposition: form-data; name="alpha;beta"\r\n\r\n'

@@ -66,7 +66,7 @@ from orionis.support.performance import PerformanceCounter
 PerformanceCounter() -> None
 ```
 
-Un objeto basado en `__slots__` (`_start_time`, `_end_time`,
+Un objeto basado en `__slots__` (`_start_time`, `_diff_time`,
 `_diff_time`, `_is_async_mode`) sin argumentos de constructor. Todos los
 métodos de "inicio" y "parada" devuelven `self`, por lo que las llamadas
 se pueden encadenar; todos los métodos "get" leen el tiempo transcurrido
@@ -75,9 +75,9 @@ registrado por el último ciclo `start()`/`stop()` (o `astart()`/
 
 | Método | Firma | Descripción |
 |---|---|---|
-| `start` | `start() -> PerformanceCounter` | Registra la lectura actual de `time.perf_counter()` como el tiempo de inicio y marca la instancia en modo **síncrono**. Devuelve `self`. |
+| `start` | `start() -> PerformanceCounter` | Registra la lectura actual de `time.perf_counter()` como el tiempo de inicio, borra el resultado anterior y marca la instancia en modo **síncrono**. Devuelve `self`. |
 | `astart` | `astart() -> PerformanceCounter` *(async)* | Igual que `start()`, pero marca la instancia en modo **asíncrono**. Devuelve `self`. |
-| `stop` | `stop() -> PerformanceCounter` | Registra el tiempo final y calcula el tiempo transcurrido desde `start()`. Devuelve `self`. Lanza `RuntimeError` si el contador se inició con `astart()` (usar `astop()` en su lugar). |
+| `stop` | `stop() -> PerformanceCounter` | Lee el reloj y calcula el tiempo transcurrido desde `start()`. Devuelve `self`. Lanza `RuntimeError` si el contador se inició con `astart()` (usar `astop()` en su lugar) o `ValueError` si nunca se inició. |
 | `astop` | `astop() -> PerformanceCounter` *(async)* | Registra el tiempo final y calcula el tiempo transcurrido desde `astart()`. Devuelve `self`. Lanza `RuntimeError` si el contador se inició con `start()` (usar `stop()` en su lugar). |
 | `elapsedTime` | `elapsedTime() -> float` | Tiempo transcurrido en segundos desde el último ciclo `start()`/`stop()` completado. Lanza `ValueError` si el contador no se ha iniciado y detenido. |
 | `aelapsedTime` | `aelapsedTime() -> float` *(async)* | Equivalente asíncrono de `elapsedTime()`. Mismo comportamiento de `ValueError`. |
@@ -197,8 +197,8 @@ asyncio.run(main())
   — **no** es tiempo de calendario/reloj de pared y su valor absoluto no
   tiene significado fuera de calcular diferencias entre dos lecturas del
   mismo proceso.
-- La clase está basada en `__slots__` (`_start_time`, `_end_time`,
-  `_diff_time`, `_is_async_mode`), por lo que cada instancia tiene una
+- La clase está basada en `__slots__` (`_start_time`, `_diff_time`,
+  `_is_async_mode`), por lo que cada instancia tiene una
   huella de memoria pequeña y fija, sin el costo de un `__dict__` por
   instancia.
 - Los métodos con prefijo `a` (`astart`, `astop`, `aelapsedTime`,
@@ -215,12 +215,13 @@ asyncio.run(main())
   modo junto con el estado de tiempo.
 - Una instancia de `PerformanceCounter` **no es segura para hilos** y no
   está pensada para compartirse entre tareas/hilos concurrentes: guarda
-  un único estado mutable de inicio/fin/transcurrido, por lo que medir
+  un único estado mutable de inicio/transcurrido, por lo que medir
   varias operaciones superpuestas requiere una instancia por operación
   (o reutilizar una instancia secuencialmente vía `restart()`).
-- Todas las operaciones son `O(1)` — no hay asignación de memoria,
-  iteración ni E/S externa involucrada más allá de las dos lecturas de
-  reloj.
+- Todas las operaciones son `O(1)` y usan estado de tamaño fijo. Las
+  lecturas del reloj y las operaciones aritméticas crean objetos `float`,
+  y cada llamada `async def` esperada crea un objeto coroutine; no hay
+  iteración ni E/S externa.
 
 ## Notas de diseño
 
@@ -248,7 +249,7 @@ asyncio.run(main())
 - **`__slots__` para un objeto tipo valor**: al ser una utilidad de
   medición de tiempo pequeña e instanciada con frecuencia,
   `PerformanceCounter` evita el `__dict__` por instancia declarando
-  `__slots__` para sus cuatro atributos.
+  `__slots__` para sus tres atributos.
 
 ## Notas de compatibilidad
 

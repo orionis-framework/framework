@@ -3,15 +3,19 @@ import pkgutil
 from dataclasses import is_dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
-
 from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-
 def configuration_modules() -> list[ModuleType]:
-    """Load every configuration module, including public package reexports."""
+    """Load every configuration module, including public package reexports.
+
+    Returns
+    -------
+    list[ModuleType]
+        Value produced by the helper.
+    """
     package = importlib.import_module("orionis.foundation.config")
     modules = [package]
     modules.extend(
@@ -24,9 +28,19 @@ def configuration_modules() -> list[ModuleType]:
     )
     return modules
 
-
 def configuration_classes(modules: list[ModuleType]) -> list[type]:
-    """Collect concrete dataclasses once, excluding imported aliases."""
+    """Collect concrete dataclasses once, excluding imported aliases.
+
+    Parameters
+    ----------
+    modules : list[ModuleType]
+        Value supplied for ``modules``.
+
+    Returns
+    -------
+    list[type]
+        Value produced by the helper.
+    """
     return [
         value
         for module in modules
@@ -36,31 +50,67 @@ def configuration_classes(modules: list[ModuleType]) -> list[type]:
         and value.__module__ == module.__name__
     ]
 
-
 class EnvironmentDouble:
     """Provide deterministic environment values without writing to .env."""
 
     __slots__ = ("values", "writes")
 
     def __init__(self) -> None:
-        """Create independently controlled values for each test."""
+        """Create independently controlled values for each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.values: dict[str, object] = {}
         self.writes: list[tuple[str, object]] = []
 
     def get(self, key: str, default: object = None) -> object:
-        """Return configured values, including explicit falsy values."""
+        """Return configured values, including explicit falsy values.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        default : object
+            Value supplied for ``default``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return self.values.get(key, default)
 
     def set(self, key: str, value: object) -> None:
-        """Record a generated key without modifying process or disk state."""
-        self.writes.append((key, value))
+        """Record a generated key without modifying process or disk state.
 
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        value : object
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        self.writes.append((key, value))
 
 class ConfigurationTestCase(TestCase):
     """Isolate the environment consumed by all configuration factories."""
 
     def setUp(self) -> None:
-        """Replace module environment references before each test."""
+        """Replace module environment references before each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.modules = configuration_modules()
         self.environment = EnvironmentDouble()
         self.originals = []
@@ -70,6 +120,12 @@ class ConfigurationTestCase(TestCase):
                 module.Env = self.environment
 
     def tearDown(self) -> None:
-        """Restore all references even after failed configuration validation."""
+        """Restore all references even after failed configuration validation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         for module, original in self.originals:
             module.Env = original

@@ -101,6 +101,7 @@ class FluentRoute(IFluentRoute):
         self.__middleware: list[type[BaseMiddleware]] = []
         self.__without_middleware: set[type[BaseMiddleware]] = set()
         self.__kind: str = "web"
+        self.__public: bool | None = None
         self.__view: str | None = view
 
         # A view route is rendered by the kernel and has no Python handler.
@@ -186,6 +187,35 @@ class FluentRoute(IFluentRoute):
         self.__name = name.strip()
         return self
 
+    def public(self, *, enabled: bool = True) -> Self:
+        """Select a stateless route without automatic session or identity setup.
+
+        Global security, CORS, rate limits, and explicitly attached middleware
+        still run. Web session, CSRF, and automatic identity resolution do not.
+        Use this profile only for endpoints that do not use cookie credentials.
+
+        Parameters
+        ----------
+        enabled : bool, optional
+            Whether to opt out of the default web or API context middleware.
+            False explicitly retains that context inside a public group.
+
+        Returns
+        -------
+        Self
+            This route with the requested execution profile.
+
+        Raises
+        ------
+        TypeError
+            If enabled is not a boolean.
+        """
+        if not isinstance(enabled, bool):
+            error_msg = "The public route profile must be a boolean"
+            raise TypeError(error_msg)
+        self.__public = enabled
+        return self
+
     def middleware(
         self,
         *middleware: MiddlewareInput,
@@ -258,6 +288,8 @@ class FluentRoute(IFluentRoute):
         prefix: str,
         middleware: tuple[type[BaseMiddleware], ...],
         without_middleware: frozenset[type[BaseMiddleware]],
+        *,
+        public: bool | None = None,
     ) -> Self:
         """Apply validated group context during registration.
 
@@ -269,6 +301,8 @@ class FluentRoute(IFluentRoute):
             Parent middleware, in declaration order.
         without_middleware : frozenset[type[BaseMiddleware]]
             Exclusions inherited by the route.
+        public : bool | None, optional
+            Parent profile applied only when the route has no explicit profile.
 
         Returns
         -------
@@ -280,6 +314,8 @@ class FluentRoute(IFluentRoute):
         # The compiler removes duplicates after all parent layers are known.
         self.__middleware[:0] = middleware
         self.__without_middleware.update(without_middleware)
+        if self.__public is None and public is not None:
+            self.__public = public
         return self
 
     def _kind(self, kind: str) -> Self:
@@ -311,7 +347,7 @@ class FluentRoute(IFluentRoute):
         dict
             Dictionary with keys: id, method, path, class, handler,
             callable_handler, view, name, middleware, without_middleware,
-            and kind.
+            kind, and public.
 
         Raises
         ------
@@ -340,4 +376,5 @@ class FluentRoute(IFluentRoute):
             "middleware": self.__middleware,
             "without_middleware": self.__without_middleware,
             "kind": self.__kind,
+            "public": bool(self.__public),
         }

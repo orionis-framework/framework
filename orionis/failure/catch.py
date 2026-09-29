@@ -1,13 +1,14 @@
+import asyncio
 from typing import TYPE_CHECKING
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.foundation.contracts.application import IApplication
+from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.http.request import Request
 from orionis.http.responses import Response
 
 if TYPE_CHECKING:
     from orionis.failure.contracts.handler import IBaseExceptionHandler
-    from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class Catch(ICatch):
 
@@ -29,52 +30,11 @@ class Catch(ICatch):
         """
         self.__app: IApplication = app
         self.__exception_handler: IBaseExceptionHandler | None = None
-
-    async def __getContext(self) -> KernelContext:
-        """
-        Retrieve the current kernel context from the application scope.
-
-        Returns
-        -------
-        KernelContext
-            The kernel type representing the current execution context.
-
-        Raises
-        ------
-        RuntimeError
-            If no active scope or kernel is found.
-        """
-        # Get the current application scope
-        scope = self.__app.getCurrentScope()
-        if scope is None:
-            error_msg = "No active scope found for context retrieval."
-            raise RuntimeError(error_msg)
-
-        # Retrieve the kernel type from the scope
-        kernel = await scope.get("kernel")
-        if kernel is None:
-            error_msg = "No kernel found in the current scope for context retrieval."
-            raise RuntimeError(error_msg)
-
-        # Return the kernel type as a string for context identification
-        return kernel
-
-    async def __ensureHandler(self) -> IBaseExceptionHandler:
-        """
-        Resolve and cache the exception handler from the application container.
-
-        Returns
-        -------
-        IBaseExceptionHandler
-            The resolved exception handler instance.
-        """
-        if self.__exception_handler is None:
-            self.__exception_handler = await self.__app.getExceptionHandler()
-        return self.__exception_handler
+        self.__handler_lock = asyncio.Lock()
 
     async def exception(
         self,
-        exception: BaseException | Exception,
+        exception: BaseException,
         request: Request | TransportAdapter | None = None,
     ) -> Response | None:
         """
@@ -82,7 +42,7 @@ class Catch(ICatch):
 
         Parameters
         ----------
-        exception : BaseException | Exception
+        exception : BaseException
             The exception instance to handle.
         request : Request | TransportAdapter | None, optional
             The HTTP request or transport adapter associated with the exception.
@@ -92,28 +52,48 @@ class Catch(ICatch):
         None | Response
             This method performs side effects and may return a Response.
 
+        Raises
+        ------
+        RuntimeError
+            If the application has no active scope or kernel context.
+
         Notes
         -----
         Determines the context and delegates exception handling accordingly.
         """
-        # Resolve handler and context once per call
-        handler = await self.__ensureHandler()
-        context = await self.__getContext()
+        app = self.__app
+        handler = self.__exception_handler
+        if handler is None:
+            async with self.__handler_lock:
+                handler = self.__exception_handler
+                if handler is None:
+                    handler = await app.getExceptionHandler()
+                    self.__exception_handler = handler
+
+        scope = app.getCurrentScope()
+        if scope is None:
+            error_msg = "No active scope found for context retrieval."
+            raise RuntimeError(error_msg)
+
+        context = await scope.get("kernel")
+        if context is None:
+            error_msg = "No kernel found in the current scope for context retrieval."
+            raise RuntimeError(error_msg)
 
         # Report the exception using the registered handler
-        await self.__app.call(handler, "report", exception=exception)
+        await app.call(handler, "report", exception=exception)
 
         # Handle console exceptions without request context
-        if context == KernelContext.CONSOLE:
-            return await self.__app.call(
+        if context is KernelContext.CONSOLE:
+            return await app.call(
                 handler,
                 "handleCLI",
                 exception=exception,
             )
 
         # Handle HTTP exceptions with the request context
-        if context == KernelContext.HTTP:
-            return await self.__app.call(
+        if context is KernelContext.HTTP:
+            return await app.call(
                 handler,
                 "handleHTTP",
                 exception=exception,

@@ -31,19 +31,48 @@ class _Identity:
     __slots__ = ("identifier",)
 
     def __init__(self, identifier: int = 1) -> None:
-        """Store the identifier answered by the contract method."""
+        """Store the identifier answered by the contract method.
+
+        Parameters
+        ----------
+        identifier : int
+            Value supplied for ``identifier``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.identifier = identifier
 
     def getAuthIdentifierName(self) -> str:
-        """Return the attribute holding the identifier."""
+        """Return the attribute holding the identifier.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "identifier"
 
     def getAuthIdentifier(self) -> object:
-        """Return the identifier of this identity."""
+        """Return the identifier of this identity.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return self.identifier
 
     def getAuthPassword(self) -> str:
-        """Return an empty hash; credentials are irrelevant here."""
+        """Return an empty hash; credentials are irrelevant here.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return ""
 
 class _StaticGuard:
@@ -52,18 +81,48 @@ class _StaticGuard:
     __slots__ = ("_name", "_result", "calls")
 
     def __init__(self, name: str, result: GuardResult | None) -> None:
-        """Store the guard name and the result it always answers."""
+        """Store the guard name and the result it always answers.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+        result : GuardResult | None
+            Value supplied for ``result``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self._name = name
         self._result = result
         self.calls = 0
 
     @property
     def name(self) -> str:
-        """Return the configured guard name."""
+        """Return the configured guard name.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return self._name
 
     async def resolve(self, request: object) -> GuardResult | None:  # noqa: ARG002
-        """Return the configured result and count the call."""
+        """Return the configured result and count the call.
+
+        Parameters
+        ----------
+        request : object
+            Value supplied for ``request``.
+
+        Returns
+        -------
+        GuardResult | None
+            Value produced by the helper.
+        """
         self.calls += 1
         return self._result
 
@@ -73,12 +132,34 @@ class _StubManager:
     __slots__ = ("guards", "requested")
 
     def __init__(self, guards: dict[str | None, _StaticGuard]) -> None:
-        """Store the guards this manager can hand out."""
+        """Store the guards this manager can hand out.
+
+        Parameters
+        ----------
+        guards : dict[str | None, _StaticGuard]
+            Value supplied for ``guards``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.guards = guards
         self.requested: list[str | None] = []
 
     def guard(self, name: str | None = None) -> _StaticGuard:
-        """Return the guard registered under the requested name."""
+        """Return the guard registered under the requested name.
+
+        Parameters
+        ----------
+        name : str | None
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        _StaticGuard
+            Value produced by the helper.
+        """
         self.requested.append(name)
         return self.guards[name]
 
@@ -92,7 +173,20 @@ class _StaticRepository:
         permissions: tuple[str, ...] = (),
         roles: tuple[str, ...] = (),
     ) -> None:
-        """Store the authorization every identity resolves to."""
+        """Store the authorization every identity resolves to.
+
+        Parameters
+        ----------
+        permissions : tuple[str, ...]
+            Value supplied for ``permissions``.
+        roles : tuple[str, ...]
+            Value supplied for ``roles``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.permissions = permissions
         self.roles = roles
 
@@ -100,7 +194,18 @@ class _StaticRepository:
         self,
         authorizable: object,  # noqa: ARG002
     ) -> tuple[frozenset[str], frozenset[str]]:
-        """Return the configured permissions and roles."""
+        """Return the configured permissions and roles.
+
+        Parameters
+        ----------
+        authorizable : object
+            Value supplied for ``authorizable``.
+
+        Returns
+        -------
+        tuple[frozenset[str], frozenset[str]]
+            Value produced by the helper.
+        """
         return frozenset(self.permissions), frozenset(self.roles)
 
 class _StubApp:
@@ -113,12 +218,36 @@ class _StubApp:
         redirect_to: str | None = None,
         home: str | None = None,
     ) -> None:
-        """Store the configured redirect and home targets."""
+        """Store the configured redirect and home targets.
+
+        Parameters
+        ----------
+        redirect_to : str | None
+            Value supplied for ``redirect_to``.
+        home : str | None
+            Value supplied for ``home``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self._redirect_to = redirect_to
         self._home = home
 
     def config(self, key: str | None = None) -> Any:  # noqa: ANN401
-        """Answer the two keys the middleware reads."""
+        """Answer the two keys the middleware reads.
+
+        Parameters
+        ----------
+        key : str | None
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
         if key == "auth.session.redirect_to":
             return self._redirect_to
         if key == "auth.session.home":
@@ -131,27 +260,90 @@ class _RecordingAuthorizer:
     __slots__ = ("calls", "verdict")
 
     def __init__(self, verdict: bool) -> None:  # noqa: FBT001
-        """Store the verdict every check answers."""
+        """Store the verdict every check answers.
+
+        Parameters
+        ----------
+        verdict : bool
+            Value supplied for ``verdict``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.verdict = verdict
         self.calls: list[tuple[str, object]] = []
 
     async def can(self, context: object, permission: str) -> bool:  # noqa: ARG002
-        """Record and answer a single permission check."""
+        """Record and answer a single permission check.
+
+        Parameters
+        ----------
+        context : object
+            Value supplied for ``context``.
+        permission : str
+            Value supplied for ``permission``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.calls.append(("can", permission))
         return self.verdict
 
     async def canAny(self, context: object, permissions: object) -> bool:  # noqa: ARG002
-        """Record and answer an any-of permission check."""
+        """Record and answer an any-of permission check.
+
+        Parameters
+        ----------
+        context : object
+            Value supplied for ``context``.
+        permissions : object
+            Value supplied for ``permissions``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.calls.append(("canAny", tuple(permissions)))
         return self.verdict
 
     async def canAll(self, context: object, permissions: object) -> bool:  # noqa: ARG002
-        """Record and answer an all-of permission check."""
+        """Record and answer an all-of permission check.
+
+        Parameters
+        ----------
+        context : object
+            Value supplied for ``context``.
+        permissions : object
+            Value supplied for ``permissions``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.calls.append(("canAll", tuple(permissions)))
         return self.verdict
 
     async def hasRole(self, context: object, role: str) -> bool:  # noqa: ARG002
-        """Record and answer a role check."""
+        """Record and answer a role check.
+
+        Parameters
+        ----------
+        context : object
+            Value supplied for ``context``.
+        role : str
+            Value supplied for ``role``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.calls.append(("hasRole", role))
         return self.verdict
 
@@ -161,12 +353,40 @@ class _RecordingAuthorizer:
         ability: str,
         resource: object,
     ) -> bool:
-        """Record and answer a policy check."""
+        """Record and answer a policy check.
+
+        Parameters
+        ----------
+        context : object
+            Value supplied for ``context``.
+        ability : str
+            Value supplied for ``ability``.
+        resource : object
+            Value supplied for ``resource``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.calls.append(("allows", (ability, resource)))
         return self.verdict
 
     def registerPolicy(self, resource: type, policy: type) -> None:
-        """Record a policy registration."""
+        """Record a policy registration.
+
+        Parameters
+        ----------
+        resource : type
+            Value supplied for ``resource``.
+        policy : type
+            Value supplied for ``policy``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls.append(("registerPolicy", (resource, policy)))
 
 class _Post:
@@ -175,7 +395,20 @@ class _Post:
     __slots__ = ()
 
 def web_request(*, wants_json: bool = False, ajax: bool = False) -> SimpleNamespace:
-    """Build a request double with content negotiation answers."""
+    """Build a request double with content negotiation answers.
+
+    Parameters
+    ----------
+    wants_json : bool
+        Value supplied for ``wants_json``.
+    ajax : bool
+        Value supplied for ``ajax``.
+
+    Returns
+    -------
+    SimpleNamespace
+        Value produced by the helper.
+    """
     return SimpleNamespace(
         state=SimpleNamespace(),
         wantsJson=lambda: wants_json,
@@ -183,7 +416,13 @@ def web_request(*, wants_json: bool = False, ajax: bool = False) -> SimpleNamesp
     )
 
 async def call_next() -> str:
-    """Terminal of the pipeline used by every middleware test."""
+    """Terminal of the pipeline used by every middleware test.
+
+    Returns
+    -------
+    str
+        Value produced by the helper.
+    """
     return "handled"
 
 class _CacheableArea(AuthenticateMiddleware):
@@ -249,7 +488,13 @@ class TestResolveIdentityMiddleware(TestCase):
     """Validate the middleware that only establishes the context."""
 
     async def testReusesTheRequestGuardInsteadOfTheConfiguredDefault(self) -> None:
-        """An unpinned middleware respects the kernel's web or API context."""
+        """An unpinned middleware respects the kernel's web or API context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for identity in (None, _Identity(7)):
             manager = _StubManager({"token": _StaticGuard("token", None)})
             middleware = ResolveIdentityMiddleware(manager, _StaticRepository())
@@ -263,7 +508,13 @@ class TestResolveIdentityMiddleware(TestCase):
                 self.assertEqual(manager.guards["token"].calls, 0)
 
     async def testPinnedGuardCannotReplaceAnAuthenticatedRequest(self) -> None:
-        """Automatic identity resolution preserves the guard-switch protection."""
+        """Automatic identity resolution preserves the guard-switch protection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         from orionis.auth.middleware import ResolveSessionIdentityMiddleware
 
         manager = _StubManager({"session": _StaticGuard("session", None)})
@@ -280,6 +531,11 @@ class TestResolveIdentityMiddleware(TestCase):
         """Validates the normal path of identity resolution.
 
         Everything downstream reads the identity from the context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard(
             "session", GuardResult(identity=_Identity(7), guard="session"),
@@ -299,6 +555,11 @@ class TestResolveIdentityMiddleware(TestCase):
         """Validates that this middleware never rejects.
 
         Public pages must keep working for anonymous visitors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         middleware = ResolveIdentityMiddleware(
@@ -315,6 +576,11 @@ class TestResolveIdentityMiddleware(TestCase):
         """Validates how the guard is selected.
 
         The base class defers to the configured default guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         manager = _StubManager({None: guard})
@@ -329,6 +595,11 @@ class TestResolveIdentityMiddleware(TestCase):
         """Validates that a token restriction survives the middleware.
 
         Dropping the abilities would silently widen the credential.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard(
             "token",
@@ -358,6 +629,11 @@ class TestAuthenticateMiddleware(TestCase):
 
         A resolved identity reaches the controller, and the answer is
         marked as non-cacheable because it carries private data.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard(
             "session", GuardResult(identity=_Identity(1), guard="session"),
@@ -367,6 +643,13 @@ class TestAuthenticateMiddleware(TestCase):
         )
 
         async def handled() -> PlainTextResponse:
+            """Return the response expected by the middleware.
+
+            Returns
+            -------
+            PlainTextResponse
+                Value produced by the helper.
+            """
             return PlainTextResponse("handled")
 
         async with ScopeManager():
@@ -381,6 +664,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates the opt-out of the non-cacheable default.
 
         A subclass serving public data keeps the upstream headers intact.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard(
             "session", GuardResult(identity=_Identity(1), guard="session"),
@@ -390,6 +678,13 @@ class TestAuthenticateMiddleware(TestCase):
         )
 
         async def handled() -> PlainTextResponse:
+            """Return the response expected by the middleware.
+
+            Returns
+            -------
+            PlainTextResponse
+                Value produced by the helper.
+            """
             return PlainTextResponse("handled")
 
         async with ScopeManager():
@@ -401,6 +696,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates the ``401`` path without a redirect target.
 
         The exception handler turns it into an unauthenticated response.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -417,6 +717,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates the browser friendly rejection.
 
         A redirect keeps the flash data alive, unlike a raised exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -435,6 +740,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates the content negotiation of the rejection.
 
         An API client expects a status code, not a redirect.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -453,6 +763,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates that background requests are answered with a status.
 
         Following a redirect would replace the page fragment with HTML.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -471,6 +786,11 @@ class TestAuthenticateMiddleware(TestCase):
         """Validates the ready made session and token middlewares.
 
         Each one must always ask for its own guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session_guard = _StaticGuard("session", None)
         token_guard = _StaticGuard("token", None)
@@ -493,7 +813,13 @@ class TestAuthenticateMiddleware(TestCase):
         self.assertEqual(manager.requested, ["session", "token"])
 
     async def testTokenRoutesNeverRedirectToTheSessionLogin(self) -> None:
-        """Return an authentication failure for token clients without Accept."""
+        """Return an authentication failure for token clients without Accept.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = AuthenticateTokenMiddleware(
             _StubApp("/login"),
             _StubManager({"token": _StaticGuard("token", None)}),
@@ -510,6 +836,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates the happy path of a permission gate.
 
         The controller runs when the permission is granted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanViewUsers(authorizer)
@@ -528,6 +859,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates the ``403`` path.
 
         The identity is known but lacks the permission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _CanViewUsers(_RecordingAuthorizer(verdict=False))
 
@@ -542,6 +878,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates the ``401`` path of an authorization gate.
 
         A guest is not forbidden, it is simply unauthenticated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _CanViewUsers(_RecordingAuthorizer(verdict=True))
 
@@ -555,6 +896,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates the alternative combination mode.
 
         Holding one of the listed permissions is enough.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanManageUsers(authorizer)
@@ -571,6 +917,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates the guard against a misconfigured subclass.
 
         Silently allowing the request would be a security hole.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _MissingPermissions(_RecordingAuthorizer(verdict=True))
 
@@ -584,6 +935,11 @@ class TestRequirePermissionMiddleware(TestCase):
         """Validates that the gate plugs into the routing pipeline.
 
         Only ``BaseMiddleware`` subclasses may be attached to a route.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(_CanViewUsers, BaseMiddleware))
 
@@ -594,6 +950,11 @@ class TestRequireRoleMiddleware(TestCase):
         """Validates the happy path of a role gate.
 
         Roles are evaluated through the authorizer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _MustBeAdmin(authorizer)
@@ -612,6 +973,11 @@ class TestRequireRoleMiddleware(TestCase):
         """Validates the ``403`` path of a role gate.
 
         The controller must never run.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=False))
 
@@ -626,6 +992,11 @@ class TestRequireRoleMiddleware(TestCase):
         """Validates that anonymous requests are answered with ``401``.
 
         Roles cannot be evaluated without an identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=True))
 
@@ -639,6 +1010,11 @@ class TestRequireRoleMiddleware(TestCase):
         """Validates the guard against a misconfigured subclass.
 
         An empty requirement would let everything through.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _MissingRoles(_RecordingAuthorizer(verdict=True))
 
@@ -649,7 +1025,13 @@ class TestRequireRoleMiddleware(TestCase):
                 await middleware.handle(web_request(), call_next)
 
     async def testRoleMembershipCannotBypassTokenRestrictions(self) -> None:
-        """Require a capability gate for restricted token credentials."""
+        """Require a capability gate for restricted token credentials.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=True))
         async with ScopeManager():
             bind_auth_context(AuthenticationContext(
@@ -665,6 +1047,11 @@ class TestRequirePolicyMiddleware(TestCase):
         """Validates the happy path of a policy gate.
 
         The ability is evaluated against the resource class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanCreatePosts(authorizer)
@@ -683,6 +1070,11 @@ class TestRequirePolicyMiddleware(TestCase):
         """Validates the ``403`` path of a policy gate.
 
         A denial must stop the pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _CanCreatePosts(_RecordingAuthorizer(verdict=False))
 
@@ -697,6 +1089,11 @@ class TestRequirePolicyMiddleware(TestCase):
         """Validates that anonymous requests never reach a policy.
 
         Policies always receive a real identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _CanCreatePosts(_RecordingAuthorizer(verdict=True))
 
@@ -710,6 +1107,11 @@ class TestRequirePolicyMiddleware(TestCase):
         """Validates the guard against a misconfigured subclass.
 
         Both the ability and the resource are mandatory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         middleware = _MissingPolicy(_RecordingAuthorizer(verdict=True))
 
@@ -723,7 +1125,13 @@ class TestGuestMiddleware(TestCase):
     """Validate the guest-only routes used for login and registration."""
 
     async def testGuestsReachTheForm(self) -> None:
-        """Continue without inventing an authenticated identity."""
+        """Continue without inventing an authenticated identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = GuestMiddleware(
             _StubApp(),
             _StubManager({"session": _StaticGuard("session", None)}),
@@ -735,7 +1143,13 @@ class TestGuestMiddleware(TestCase):
             )
 
     async def testAuthenticatedBrowsersLeaveTheGuestRoute(self) -> None:
-        """Redirect an authenticated browser to the configured home page."""
+        """Redirect an authenticated browser to the configured home page.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(
             _StubApp(home="/dashboard"),
@@ -748,7 +1162,13 @@ class TestGuestMiddleware(TestCase):
             self.assertEqual(response.getHeader("location"), ["/dashboard"])
 
     async def testAnExplicitTargetOverridesTheConfiguredHome(self) -> None:
-        """Honour the destination pinned by a subclass."""
+        """Honour the destination pinned by a subclass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = _BackToRoot(
             _StubApp(home="/dashboard"),
@@ -760,7 +1180,13 @@ class TestGuestMiddleware(TestCase):
             self.assertEqual(response.getHeader("location"), ["/"])
 
     async def testAuthenticatedJsonClientsAreForbidden(self) -> None:
-        """Use 403 for a known identity denied access to a guest-only route."""
+        """Use 403 for a known identity denied access to a guest-only route.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(
             _StubApp(),

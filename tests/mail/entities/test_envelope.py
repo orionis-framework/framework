@@ -6,10 +6,14 @@ from orionis.test import TestCase
 class TestEnvelope(TestCase):
 
     def testNormalizesEveryDeclaredCollection(self) -> None:
-        """
-        Convert each recipient declaration into a tuple of addresses.
+        """Convert each recipient declaration into a tuple of addresses.
 
         Validates that mixed strings and Address values are accepted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         envelope = Envelope(
             subject="Welcome",
@@ -27,10 +31,14 @@ class TestEnvelope(TestCase):
         self.assertEqual(envelope.reply_to[0].address, "support@example.com")
 
     def testDefaultsToAnEmptyDeclaration(self) -> None:
-        """
-        Build an empty envelope without a sender or recipients.
+        """Build an empty envelope without a sender or recipients.
 
         Validates the starting point used when merging fluent options.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         envelope = Envelope()
         self.assertEqual(envelope.subject, "")
@@ -38,10 +46,14 @@ class TestEnvelope(TestCase):
         self.assertEqual(envelope.recipients(), ())
 
     def testCopiesSuppliedCollections(self) -> None:
-        """
-        Detach recipient collections from the caller's list.
+        """Detach recipient collections from the caller's list.
 
         Validates that mutating the original list never changes the envelope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         recipients = ["a@example.com"]
         envelope = Envelope(to=recipients)
@@ -49,10 +61,14 @@ class TestEnvelope(TestCase):
         self.assertEqual(envelope.recipients(), ("a@example.com",))
 
     def testTransportRecipientsExcludeReplyTo(self) -> None:
-        """
-        Build the transport union from To, Cc, and Bcc only.
+        """Build the transport union from To, Cc, and Bcc only.
 
         Validates that duplicates are removed while order is preserved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         envelope = Envelope(
             to=["a@example.com", "b@example.com"],
@@ -66,10 +82,14 @@ class TestEnvelope(TestCase):
         )
 
     def testRejectsHiddenAndVisibleConflicts(self) -> None:
-        """
-        Reject a mailbox declared as both a visible recipient and Bcc.
+        """Reject a mailbox declared as both a visible recipient and Bcc.
 
         Validates that the intended privacy of a message stays unambiguous.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             Envelope(to="a@example.com", bcc="a@example.com")
@@ -77,10 +97,14 @@ class TestEnvelope(TestCase):
             Envelope(cc="a@example.com", bcc="a@example.com")
 
     def testRejectsUnsafeSubjectsAndSenders(self) -> None:
-        """
-        Reject header injection in the subject and an invalid sender.
+        """Reject header injection in the subject and an invalid sender.
 
         Validates that envelopes never carry control characters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             Envelope(subject="Title\nBcc: x@y")

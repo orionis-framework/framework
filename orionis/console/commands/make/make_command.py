@@ -136,7 +136,7 @@ class MakeCommand(BaseCommand):
             stub = stub.replace("{{description}}", description)
 
             # Resolve the target directory and normalise the file name
-            commands_dir = app.path("console") / "commands"
+            commands_dir: Path  = app.path("app_console_commands")
 
             if not name.lower().endswith("command"):
                 name = name.rstrip("_") + "_command"

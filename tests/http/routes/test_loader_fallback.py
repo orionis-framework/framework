@@ -10,7 +10,6 @@ from orionis.test import TestCase
 from tests.http.routes.test_nested_routing import UserController, route_handler
 from tests.http.test_kernel import boot_kernel, dispatch
 
-
 class _LoaderApp:
     """Configure real route persistence and record route-import requests."""
 
@@ -21,13 +20,34 @@ class _LoaderApp:
 
     @property
     def routeHealthCheck(self) -> str:
-        """Return the default health route registered by the real router."""
+        """Return the default health route registered by the real router.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "/up"
 
     def __init__(
         self, path: Path, *, compiled: bool = True, cache_only: bool = False,
     ) -> None:
-        """Configure an isolated directory and optional cache-hit guards."""
+        """Configure an isolated directory and optional cache-hit guards.
+
+        Parameters
+        ----------
+        path : Path
+            Value supplied for ``path``.
+        compiled : bool
+            Value supplied for ``compiled``.
+        cache_only : bool
+            Value supplied for ``cache_only``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.compiled = compiled
         self.compiledPath = path
         self.compiledInvalidationPathsDirs: list[Path] = []
@@ -36,16 +56,37 @@ class _LoaderApp:
         self.cache_only = cache_only
 
     def getMiddleware(self) -> list[type]:
-        """Return an empty application middleware stack."""
+        """Return an empty application middleware stack.
+
+        Returns
+        -------
+        list[type]
+            Value produced by the helper.
+        """
         return []
 
     def routingPaths(self, kind: str) -> None:
-        """Record cold imports and fail if a warm load requests route files."""
+        """Record cold imports and fail if a warm load requests route files.
+
+        Parameters
+        ----------
+        kind : str
+            Value supplied for ``kind``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        AssertionError
+            Raised by this helper to exercise the failure path.
+        """
         if self.cache_only:
             error_msg = "A cache hit must not import route files"
             raise AssertionError(error_msg)
         self.imports.append(kind)
-
 
 class _CacheOnlyRouter(Router):
     """Use a real router while rejecting exports during a cache hit."""
@@ -53,10 +94,20 @@ class _CacheOnlyRouter(Router):
     __slots__ = ()
 
     def export(self) -> dict:
-        """Fail if cached routes are rebuilt from router registrations."""
+        """Fail if cached routes are rebuilt from router registrations.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+
+        Raises
+        ------
+        AssertionError
+            Raised by this helper to exercise the failure path.
+        """
         error_msg = "A cache hit must not export registered routes"
         raise AssertionError(error_msg)
-
 
 class _IdentityOnlyMeta(type):
     """Reject equality checks against controller classes."""
@@ -64,16 +115,30 @@ class _IdentityOnlyMeta(type):
     __hash__ = type.__hash__
 
     def __eq__(cls, _other: object) -> bool:
-        """Fail if fallback normalization invokes controller equality."""
+        """Fail if fallback normalization invokes controller equality.
+
+        Parameters
+        ----------
+        _other : object
+            Value supplied for ``_other``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+
+        Raises
+        ------
+        AssertionError
+            Raised by this helper to exercise the failure path.
+        """
         error_msg = "Fallback normalization must not compare controller classes"
         raise AssertionError(error_msg)
-
 
 class _IdentityOnlyController(UserController, metaclass=_IdentityOnlyMeta):
     """Provide a valid invokable action with guarded metaclass equality."""
 
     __slots__ = ()
-
 
 class TestLoaderFallbackPersistence(TestCase):
     """Keep fallback state consistent across real persistence boundaries."""
@@ -81,7 +146,13 @@ class TestLoaderFallbackPersistence(TestCase):
     async def testAbsentFallbackStaysNoneWithoutCacheAndAcrossColdWarmLoads(
         self,
     ) -> None:
-        """Normalize absence once and preserve missing-route handling on reload."""
+        """Normalize absence once and preserve missing-route handling on reload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for compiled in (False, True):
             with TemporaryDirectory() as directory:
                 path = Path(directory)
@@ -134,7 +205,13 @@ class TestLoaderFallbackPersistence(TestCase):
     async def testRegisteredFallbackFormsKeepDescriptorsAndDispatchAfterReload(
         self,
     ) -> None:
-        """Restore functions, invokable classes and controller pairs from disk."""
+        """Restore functions, invokable classes and controller pairs from disk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             (route_handler, (None, route_handler)),
             (UserController, (UserController, "__call__")),
@@ -169,7 +246,13 @@ class TestLoaderFallbackPersistence(TestCase):
                 self.assertEqual(warm_app.imports, [])
 
     def testStaleRouteCacheVersionRebuildsWithAnAbsentFallback(self) -> None:
-        """Replace an old route snapshot and read the repaired file on a hit."""
+        """Replace an old route snapshot and read the repaired file on a hit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with TemporaryDirectory() as directory:
             path = Path(directory)
             persistence = FileBasedCache(path, "routes")

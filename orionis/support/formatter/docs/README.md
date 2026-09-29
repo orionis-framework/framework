@@ -208,16 +208,12 @@ except ValueError as exc:
   the dictionary more than once, but each computation is deterministic
   and produces an equal result, so there is no data corruption, only a
   possible redundant computation.
-- `_getSourceCode` reads the surrounding source lines using a single
-  `linecache.getlines(filename)` call followed by list slicing, instead
-  of calling `linecache.getline()` once per line — this keeps the number
-  of `linecache` lookups to one per frame regardless of how many context
-  lines are extracted. `linecache` itself caches file contents across
-  calls within the process.
-- `_parseStack` iterates the traceback's `StackSummary` in reverse
-  (`reversed(stack_list)`) to produce the most-recent-frame-first
-  ordering directly, avoiding a separate `.reverse()` pass over the
-  list.
+- `_getSourceCode` reads the surrounding source lines with one
+  `linecache.getlines(filename)` call per frame. `linecache` caches file
+  contents across calls within the process.
+- `_parseStack` iterates the traceback's `StackSummary` directly in reverse
+  to produce the most-recent-frame-first ordering without copying the
+  stack into a second list. Frame IDs increase from 1 in that same order.
 - `ExceptionParser` is `__slots__`-based, keeping the per-instance
   memory footprint small and fixed (`_cache`, `_error_code`,
   `_exc_type`, `_tb`).

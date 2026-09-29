@@ -90,36 +90,52 @@ def ancestors_without_slots(klass: type) -> list[str]:
 class TestStoragePackage(TestCase):
 
     def testAllDeclaresTheFullPublicSurface(self) -> None:
-        """
-        Declare every public symbol of the package in __all__.
+        """Declare every public symbol of the package in __all__.
 
         Validates that the export list never drifts from the code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             sorted(storage.__all__), sorted(_EXPECTED_EXPORTS),
         )
 
     def testAllIsAlphabeticallySorted(self) -> None:
-        """
-        Keep the export list alphabetically sorted.
+        """Keep the export list alphabetically sorted.
 
         Validates the convention followed by the framework packages.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(list(storage.__all__), sorted(storage.__all__))
 
     def testAllNamesAreUnique(self) -> None:
-        """
-        List every exported name exactly once.
+        """List every exported name exactly once.
 
         Validates that __all__ contains no duplicated entry.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(len(set(storage.__all__)), len(storage.__all__))
 
     def testExportedSymbolsResolveToTheirImplementation(self) -> None:
-        """
-        Re-export the very objects defined by the submodules.
+        """Re-export the very objects defined by the submodules.
 
         Validates that shortcuts never shadow the real classes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name, expected in _EXPECTED_EXPORTS.items():
             self.assertIs(getattr(storage, name), expected)
@@ -127,21 +143,29 @@ class TestStoragePackage(TestCase):
 class TestStorageSlots(TestCase):
 
     def testContractsDeclareEmptySlots(self) -> None:
-        """
-        Declare an empty ``__slots__`` on every storage contract.
+        """Declare an empty ``__slots__`` on every storage contract.
 
         Validates that the ABCs never reintroduce ``__dict__`` in the
         concrete classes implementing them.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for contract in _CONTRACTS:
             self.assertEqual(contract.__slots__, (), contract.__name__)
 
     def testWholeHierarchyDeclaresSlots(self) -> None:
-        """
-        Declare ``__slots__`` at every level of each class hierarchy.
+        """Declare ``__slots__`` at every level of each class hierarchy.
 
         Validates the invariant for classes that cannot be built
         without external resources, such as the cloud drivers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for klass in _SLOTTED_CLASSES:
             self.assertEqual(
@@ -149,11 +173,15 @@ class TestStorageSlots(TestCase):
             )
 
     def testInstancesCarryNoAttributeDictionary(self) -> None:
-        """
-        Build domain objects without an instance dictionary.
+        """Build domain objects without an instance dictionary.
 
         Validates the memory footprint claimed by ``__slots__`` on the
         objects created on every listing or file operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = MemoryStorageDriver()
         instances = (

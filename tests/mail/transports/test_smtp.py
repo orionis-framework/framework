@@ -52,6 +52,13 @@ class SmtpBoundary:
     )
 
     def __init__(self) -> None:
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.clients: list[RecordingClient] = []
         self.close_error = False
         self.closed = threading.Event()
@@ -65,7 +72,18 @@ class SmtpBoundary:
         self.status = 220
 
     def plain(self, *, timeout: int | None) -> RecordingClient:
-        """Build one plaintext or STARTTLS-capable connection."""
+        """Build one plaintext or STARTTLS-capable connection.
+
+        Parameters
+        ----------
+        timeout : int | None
+            Value supplied for ``timeout``.
+
+        Returns
+        -------
+        RecordingClient
+            Value produced by the helper.
+        """
         return self._create(timeout, None)
 
     def encrypted(
@@ -74,7 +92,20 @@ class SmtpBoundary:
         timeout: int | None,
         context: ssl.SSLContext,
     ) -> RecordingClient:
-        """Build one implicit-TLS connection and keep its context."""
+        """Build one implicit-TLS connection and keep its context.
+
+        Parameters
+        ----------
+        timeout : int | None
+            Value supplied for ``timeout``.
+        context : ssl.SSLContext
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        RecordingClient
+            Value produced by the helper.
+        """
         return self._create(timeout, context)
 
     def _create(
@@ -82,7 +113,20 @@ class SmtpBoundary:
         timeout: int | None,
         context: ssl.SSLContext | None,
     ) -> RecordingClient:
-        """Register and return a new recording connection."""
+        """Register and return a new recording connection.
+
+        Parameters
+        ----------
+        timeout : int | None
+            Value supplied for ``timeout``.
+        context : ssl.SSLContext | None
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        RecordingClient
+            Value produced by the helper.
+        """
         connection = RecordingClient(self, timeout, context)
         self.clients.append(connection)
         return connection
@@ -98,6 +142,22 @@ class RecordingClient:
         timeout: int | None,
         context: ssl.SSLContext | None,
     ) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        boundary : SmtpBoundary
+            Value supplied for ``boundary``.
+        timeout : int | None
+            Value supplied for ``timeout``.
+        context : ssl.SSLContext | None
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.boundary = boundary
         self.timeout = timeout
         self.ssl_context = context
@@ -105,30 +165,102 @@ class RecordingClient:
         self.thread = threading.get_ident()
 
     def _record(self, action: str, *values: object) -> None:
-        """Record one protocol step and raise the configured failure."""
+        """Record one protocol step and raise the configured failure.
+
+        Parameters
+        ----------
+        action : str
+            Value supplied for ``action``.
+        *values : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        self.boundary.failure
+            Raised by this helper to exercise the failure path.
+        """
         self.events.append((action, *values))
         if self.boundary.failure_at == action:
             raise self.boundary.failure
 
     def connect(self, host: str, port: int) -> tuple[int, bytes]:
-        """Record endpoint selection or raise a connection error."""
+        """Record endpoint selection or raise a connection error.
+
+        Parameters
+        ----------
+        host : str
+            Value supplied for ``host``.
+        port : int
+            Value supplied for ``port``.
+
+        Returns
+        -------
+        tuple[int, bytes]
+            Value produced by the helper.
+        """
         self._record("connect", host, port)
         return self.boundary.status, b"welcome"
 
     def ehlo_or_helo_if_needed(self) -> None:
-        """Record capability negotiation using the standard method name."""
+        """Record capability negotiation using the standard method name.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._record("ehlo")
 
     def starttls(self, *, context: ssl.SSLContext) -> None:
-        """Record a mandatory STARTTLS upgrade or reject it."""
+        """Record a mandatory STARTTLS upgrade or reject it.
+
+        Parameters
+        ----------
+        context : ssl.SSLContext
+            Value supplied for ``context``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._record("starttls", context)
 
     def login(self, username: str, password: str) -> None:
-        """Record the effective authentication pair."""
+        """Record the effective authentication pair.
+
+        Parameters
+        ----------
+        username : str
+            Value supplied for ``username``.
+        password : str
+            Value supplied for ``password``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._record("login", username, password)
 
     def has_extn(self, name: str) -> bool:
-        """Expose the explicitly configured SMTP capabilities."""
+        """Expose the explicitly configured SMTP capabilities.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return name in self.boundary.extensions
 
     def sendmail(
@@ -139,7 +271,29 @@ class RecordingClient:
         *,
         mail_options: list[str],
     ) -> Mapping[str, tuple[int, bytes]]:
-        """Record a transaction and optionally block for cancellation."""
+        """Record a transaction and optionally block for cancellation.
+
+        Parameters
+        ----------
+        sender : str
+            Value supplied for ``sender``.
+        recipients : tuple[str, ...]
+            Value supplied for ``recipients``.
+        payload : bytes
+            Value supplied for ``payload``.
+        mail_options : list[str]
+            Value supplied for ``mail_options``.
+
+        Returns
+        -------
+        Mapping[str, tuple[int, bytes]]
+            Value produced by the helper.
+
+        Raises
+        ------
+        TimeoutError
+            Raised by this helper to exercise the failure path.
+        """
         self._record("sendmail", sender, recipients, payload, mail_options)
         self.boundary.started.set()
         if not self.boundary.release.wait(5):
@@ -148,7 +302,18 @@ class RecordingClient:
         return self.boundary.refused
 
     def close(self) -> None:
-        """Record closure even when closing itself fails."""
+        """Record closure even when closing itself fails.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        OSError
+            Raised by this helper to exercise the failure path.
+        """
         self.events.append(("close",))
         self.boundary.closed.set()
         if self.boundary.close_error:
@@ -158,7 +323,13 @@ class RecordingClient:
 class TestSmtpTransport(TestCase):
 
     def setUp(self) -> None:
-        """Replace only the SMTP boundary, keeping real protocol errors."""
+        """Replace only the SMTP boundary, keeping real protocol errors.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.original = smtp_module.smtplib
         self.boundary = SmtpBoundary()
         smtp_module.smtplib = SimpleNamespace(
@@ -169,12 +340,29 @@ class TestSmtpTransport(TestCase):
         )
 
     def tearDown(self) -> None:
-        """Release any waiting worker and restore the network boundary."""
+        """Release any waiting worker and restore the network boundary.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.boundary.release.set()
         smtp_module.smtplib = self.original
 
     def buildTransport(self, **options: object) -> SmtpTransport:
-        """Build a transport from explicit effective settings."""
+        """Build a transport from explicit effective settings.
+
+        Parameters
+        ----------
+        **options : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        SmtpTransport
+            Value produced by the helper.
+        """
         return SmtpTransport(
             SmtpSettings.fromConfig({
                 "host": "smtp.example.com",
@@ -184,10 +372,14 @@ class TestSmtpTransport(TestCase):
         )
 
     async def testStartTlsAndAuthenticationRunOffLoopWithVerifiedContext(self) -> None:
-        """
-        Upgrade, authenticate, and transmit on a worker thread.
+        """Upgrade, authenticate, and transmit on a worker thread.
 
         Validates certificate and hostname verification before DATA.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transport = self.buildTransport(
             username="user",
@@ -215,10 +407,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(result.mailer, "notifications")
 
     async def testImplicitTlsNeverUsesStartTls(self) -> None:
-        """
-        Negotiate implicit TLS for the SSL mode.
+        """Negotiate implicit TLS for the SSL mode.
 
         Validates that no STARTTLS upgrade is attempted afterwards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.buildTransport(encryption="ssl").send(
             _MESSAGE,
@@ -233,10 +429,14 @@ class TestSmtpTransport(TestCase):
         self.assertIsNone(client.timeout)
 
     async def testExplicitPlaintextAndEmptyCredentialsSkipTlsAndLogin(self) -> None:
-        """
-        Honour an explicit plaintext connection without authenticating.
+        """Honour an explicit plaintext connection without authenticating.
 
         Validates that empty credentials never trigger a login.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.buildTransport(encryption="none").send(
             _MESSAGE,
@@ -252,10 +452,14 @@ class TestSmtpTransport(TestCase):
         )
 
     async def testTlsFailureDoesNotFallbackAndStillCloses(self) -> None:
-        """
-        Abort the operation when the mandatory upgrade fails.
+        """Abort the operation when the mandatory upgrade fails.
 
         Validates that no plaintext fallback transmits the message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.failure_at = "starttls"
         self.boundary.failure = smtplib.SMTPNotSupportedError("unsupported")
@@ -269,10 +473,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(len(self.boundary.clients), 1)
 
     async def testPartialAcceptanceIsNotReportedAsTotalAcceptance(self) -> None:
-        """
-        Report only the recipients the server confirmed.
+        """Report only the recipients the server confirmed.
 
         Validates that rejection reasons are sanitized and redacted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.refused = {
             "hidden@example.com": (550, b"Rejected\r\nprivate-auth-value"),
@@ -291,10 +499,14 @@ class TestSmtpTransport(TestCase):
         )
 
     async def testTotalRejectionRaisesAndCloses(self) -> None:
-        """
-        Raise instead of returning a falsely successful result.
+        """Raise instead of returning a falsely successful result.
 
         Validates that the connection is still closed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.failure_at = "sendmail"
         self.boundary.failure = smtplib.SMTPRecipientsRefused(
@@ -306,10 +518,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(self.boundary.clients[0].events[-1], ("close",))
 
     async def testAReportedRejectionOfEveryRecipientAlsoRaises(self) -> None:
-        """
-        Raise when the transaction reports every recipient as refused.
+        """Raise when the transaction reports every recipient as refused.
 
         Validates that a returned mapping is judged like an exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.refused = dict.fromkeys(_MESSAGE.recipients, (550, b"no"))
 
@@ -320,10 +536,14 @@ class TestSmtpTransport(TestCase):
     async def testFailuresNeverExposeCredentialsAndCloseErrorsDoNotMaskThem(
         self,
     ) -> None:
-        """
-        Sanitize every failure stage and keep closing the connection.
+        """Sanitize every failure stage and keep closing the connection.
 
         Validates that no credential appears in the reported traceback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failures = (
             ("connect", ConnectionRefusedError(_CREDENTIAL)),
@@ -351,10 +571,14 @@ class TestSmtpTransport(TestCase):
             self.assertEqual(self.boundary.clients[-1].events[-1], ("close",))
 
     async def testCloseFailureDoesNotEraseConfirmedAcceptance(self) -> None:
-        """
-        Keep a confirmed acceptance despite a failing socket close.
+        """Keep a confirmed acceptance despite a failing socket close.
 
         Validates that cleanup never rewrites the transaction outcome.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.close_error = True
         result = await self.buildTransport().send(
@@ -365,10 +589,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(result.status, MailStatus.ACCEPTED)
 
     async def testSmtpUtf8IsNegotiatedOrRejectedExplicitly(self) -> None:
-        """
-        Require the advertised extensions for international mailboxes.
+        """Require the advertised extensions for international mailboxes.
 
         Validates that no character is dropped when they are missing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         international = PreparedMail(
             message_id=_MESSAGE.message_id,
@@ -399,10 +627,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(self.boundary.clients[-1].events[-1], ("close",))
 
     async def testConcurrentSendsNeverShareAConnection(self) -> None:
-        """
-        Open one independently closed connection per operation.
+        """Open one independently closed connection per operation.
 
         Validates that no mutable connection is reused concurrently.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transport = self.buildTransport(encryption="none")
         results = await asyncio.gather(
@@ -419,10 +651,14 @@ class TestSmtpTransport(TestCase):
         )
 
     async def testCancellationPropagatesWhileWorkerFinishesAndCloses(self) -> None:
-        """
-        Propagate cancellation without claiming the message was refused.
+        """Propagate cancellation without claiming the message was refused.
 
         Validates that the worker still closes its own connection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.release.clear()
         operation = asyncio.create_task(
@@ -443,10 +679,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(len(self.boundary.clients), 1)
 
     async def testInvalidGreetingClosesBeforeAnyTransaction(self) -> None:
-        """
-        Reject a greeting other than 220 before sending anything.
+        """Reject a greeting other than 220 before sending anything.
 
         Validates that the connection is closed immediately.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.status = 554
         with self.assertRaises(MailTransportException):
@@ -457,10 +697,14 @@ class TestSmtpTransport(TestCase):
         )
 
     async def testPublicManagerUsesTheSameMimeAndCompleteEnvelope(self) -> None:
-        """
-        Select SMTP centrally and transmit the composed message.
+        """Select SMTP centrally and transmit the composed message.
 
         Validates that hidden recipients stay out of the serialized headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = MailApplication(
             Path.cwd(),
@@ -504,10 +748,14 @@ class TestSmtpTransport(TestCase):
         self.assertEqual(result.accepted_recipients, transaction[2])
 
     def testRealSmtplibConstructorsAcceptNoneTimeoutWithoutConnecting(self) -> None:
-        """
-        Confirm the runtime contract behind the local type suppressions.
+        """Confirm the runtime contract behind the local type suppressions.
 
         Validates that both constructors accept an unbounded timeout.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         clients = (
             self.original.SMTP(timeout=None, local_hostname="test.example.com"),

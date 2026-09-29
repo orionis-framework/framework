@@ -19,8 +19,7 @@ from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.logging.contracts.logger import ILogger
 
-# Mapping of specific exception types to their corresponding
-# HTTP status codes and messages
+# Map handled exception types to their public HTTP status and message.
 _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
     AuthenticationException: (401, "Unauthenticated"),
     AuthorizationException: (403, "This action is unauthorized"),
@@ -64,14 +63,14 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
     def toThrowable(
         self,
-        exception: Exception,
+        exception: BaseException,
     ) -> Throwable:
         """
         Convert an exception to a structured Throwable object.
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             Exception instance to be converted.
 
         Returns
@@ -94,14 +93,14 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
     def isExceptionIgnored(
         self,
-        exception: Exception,
+        exception: BaseException,
     ) -> bool:
         """
         Determine whether the given exception should be ignored.
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance to check.
 
         Returns
@@ -116,12 +115,12 @@ class BaseExceptionHandler(IBaseExceptionHandler):
             )
             raise TypeError(error_msg)
 
-        # O(1) frozenset membership test
+        # Check whether the exact exception class is configured to be ignored.
         return type(exception) in self.dont_catch
 
     async def report(
         self,
-        exception: Exception,
+        exception: BaseException,
         log: ILogger,
     ) -> Throwable | None:
         """
@@ -129,7 +128,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         log : ILogger
             The logger instance for error reporting.
@@ -154,7 +153,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
     async def handleCLI(
         self,
-        exception: Exception,
+        exception: BaseException,
         console: Console,
     ) -> None:
         """
@@ -162,7 +161,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         console : IConsole
             The console instance for output.
@@ -181,7 +180,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
     async def handleHTTP(
         self,
-        exception: Exception,
+        exception: BaseException,
         request: Request | TransportAdapter,
     ) -> Response | None:
         """
@@ -189,7 +188,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         Parameters
         ----------
-        exception : Exception
+        exception : BaseException
             The exception instance that was caught.
         request : Request | TransportAdapter
             The HTTP request instance or transport adapter that was being processed.
@@ -234,7 +233,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
                 expects_json=wants_json,
             )
 
-        # Handle 500 server error — resolve adapter type once
+        # Build the debug response with the request details and exception.
         is_adapter: bool = isinstance(request, TransportAdapter)
         return await self.__default_responses.exception(
             request_path=request.path() if is_adapter else request.path,

@@ -1,0 +1,40 @@
+{% extends "__orionis__/default/base.html" %}
+
+{% block title %}{% autoescape true %}{{ error }} | {{ app_name }}{% endautoescape %}{% endblock %}
+
+{% block content %}{% autoescape true %}
+<main class="main-container">
+    <div class="hud-card">
+        <div class="hud-card-inner">
+            <div class="card-header-label">
+                <span class="system-label">SYS.FAILURE &mdash; {{ app_name }}</span>
+                <div class="status-badge">
+                    <div class="status-badge-dot" aria-hidden="true"></div>
+                    <span>CRITICAL</span>
+                </div>
+            </div>
+            <div class="error-code-container">
+                <div class="error-code">
+                    {% for digit in digits %}<span class="digit">{{ digit }}</span>{% endfor %}
+                </div>
+            </div>
+            <h1 class="error-title">{{ message }}</h1>
+            <div class="glow-line"></div>
+            <div class="error-description">{{ description }}</div>
+            <div class="retrying-bar">
+                <div class="retrying-bar-fill"></div>
+            </div>
+            <div class="diagnostic-line">
+                <div class="diagnostic-icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="diagnostic-warning">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                </div>
+                <div class="diagnostic-text">
+                    CAUTION: Response header returned status code <span>{{ error }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endautoescape %}{% endblock %}

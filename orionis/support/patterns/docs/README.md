@@ -93,9 +93,9 @@ instance across unrelated `Singleton` classes.
 
 | Member | Description |
 |---|---|
-| `__init__` | Runs once at class-definition time. Initializes `cls._singleton_instance` to an internal "not yet created" sentinel and allocates a dedicated `threading.Lock` for the class in a module-level registry keyed by the class object. |
+| `__init__` | Runs once at class-definition time. Initializes `cls._singleton_instance` to an internal "not yet created" sentinel and stores a dedicated `threading.Lock` on the class. |
 | `__call__` | `MyClass(*args, **kwargs)` — thread-safe synchronous constructor. Returns the existing instance if one was already created (fast path: one attribute read + identity check); otherwise acquires the class's dedicated lock and creates the instance under double-checked locking. |
-| `__acall__` | `await MyClass.__acall__(*args, **kwargs)` — async-safe constructor, **invoked explicitly** (Python does not call `__acall__` automatically from `MyClass(...)`). Lazily creates a per-class `asyncio.Lock` on first use and creates the instance under it with the same double-checked pattern as `__call__`. |
+| `__acall__` | `await MyClass.__acall__(*args, **kwargs)` — async-safe constructor, **invoked explicitly** (Python does not call `__acall__` automatically from `MyClass(...)`). Uses the class's `threading.Lock` to coordinate creation with synchronous calls. |
 
 Both `__call__` and `__acall__` read/write the same underlying
 `cls._singleton_instance` slot, so whichever path creates the instance
@@ -173,30 +173,13 @@ asyncio.run(main())
   `base.__dict__.get("__is_final__", False)` instead of `getattr`,
   which avoids a full MRO traversal since `__is_final__` is always set
   directly on the class object that owns it, never inherited.
-- **`Singleton` synchronous path (`__call__`)**: after the first
-  instance is created, every subsequent call is `O(1)` — one attribute
-  read (`cls._singleton_instance`) plus an `is not` identity check, with
-  no lock acquisition. The dedicated `threading.Lock` per class (stored
-  in a module-level `dict[type, threading.Lock]`, not as a class
-  attribute) means unrelated `Singleton` classes never contend with each
-  other's lock, only concurrent first-time constructions of the *same*
-  class do.
-- **`Singleton` asynchronous path (`__acall__`)**: the per-class
-  `asyncio.Lock` is created lazily, on the first `__acall__` invocation,
-  guarded by a single module-level `threading.Lock` (`_meta_lock`) used
-  only to safely populate the lock registry — it is never held while
-  the singleton constructor itself runs. Classes that are never used
-  from async code never pay the cost of allocating an `asyncio.Lock`.
-- **Mixed sync/async construction race**: `__call__` (guarded by a
-  `threading.Lock`) and `__acall__` (guarded by a separate
-  `asyncio.Lock`) are each independently safe against concurrent callers
-  using the *same* calling style. Because they use two different lock
-  objects, a genuine race where a thread calls `MyClass(...)` and, at
-  the same time, a coroutine calls `await MyClass.__acall__()` for the
-  very first time is not cross-synchronized by a shared lock — this
-  only matters during the narrow window before the singleton instance
-  has been created for the first time; once created, both paths simply
-  read the same cached instance.
+- **`Singleton` paths (`__call__` and `__acall__`)**: after the first
+  instance is created, calls use one attribute read and an identity
+  check, without acquiring a lock. First-time construction rechecks the
+  cached value while holding a lock stored on the class. Both APIs use
+  that same lock, so concurrent sync and async callers cannot construct
+  duplicate instances. Keeping lock state on each class also allows
+  dynamically created singleton classes to be reclaimed when unused.
 - Neither metaclass performs any I/O; both are pure, in-memory,
   CPU-bound operations.
 
@@ -210,10 +193,9 @@ asyncio.run(main())
   `base.__dict__` directly (not `getattr`) specifically so the flag is
   never accidentally "seen" through inheritance — it is always set
   fresh on every class created with the metaclass.
-- **Double-checked locking**: `Singleton.__call__`/`__acall__` follow the
-  classic double-checked locking pattern — an unlocked fast-path read,
-  then a lock-protected re-check before construction — to keep the
-  common case (instance already exists) free of any locking overhead.
+- **Double-checked locking**: `Singleton.__call__`/`__acall__` first read
+  the cached instance, then recheck it under the shared class lock before
+  construction.
 - **Explicit `__acall__` invocation**: Python's data model does not
   invoke `__acall__` automatically when you write `MyClass(...)` in an
   `async def` context; it must be awaited explicitly as
@@ -229,11 +211,10 @@ asyncio.run(main())
 
 - Requires **Python 3.14+**, consistent with the rest of the `orionis`
   framework (`requires-python = ">=3.14"` in `pyproject.toml`).
-- No third-party dependencies; only uses `threading` and `asyncio` from
-  the standard library.
+- No third-party dependencies; only uses `threading` from the standard
+  library.
 - No platform-specific behavior; both metaclasses rely only on the
-  standard CPython type-creation protocol, `threading.Lock`, and
-  `asyncio.Lock`.
+  standard CPython type-creation protocol and `threading.Lock`.
 - Used internally by `orionis.http.payload.estructures` (`Cookies`,
   `Headers`, `QueryParams`, via `Final`) and
   `orionis.environment.core.dot_env.DotEnv` (via `Singleton`), but

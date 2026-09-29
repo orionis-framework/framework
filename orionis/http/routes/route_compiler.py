@@ -252,6 +252,7 @@ class RouteCompiler(IRouteCompiler):
             segment_count=segment_count,
             priority_score=priority_score,
             kind=route.get("kind", "web"),
+            public=route.get("public", False),
             converters=converters,
             middleware=middleware,
             without_middleware=without_middleware,

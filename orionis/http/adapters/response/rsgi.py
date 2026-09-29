@@ -1,12 +1,10 @@
 from typing import TYPE_CHECKING
-
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
 from orionis.http.adapters.response.ranges import parse_range
 from orionis.http.responses import FileResponse, Response
 
 if TYPE_CHECKING:
     from granian.rsgi import HTTPProtocol
-
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class RSGIResponseAdapter(ResponseAdapter):
@@ -45,51 +43,14 @@ class RSGIResponseAdapter(ResponseAdapter):
         # Read response headers as name/value string tuples.
         headers: list[tuple[str, str]] = response.getStringHeaders()
 
-        # HEAD requests must receive an empty body.
+        # Send the selected response representation.
         if adapter.method() == "HEAD":
             self.__ensureContentLength(headers, response)
             protocol.response_empty(status, headers)
-            await response.runBackground()
-            return
-
-        # Handle FileResponse with optional byte-range support.
-        if isinstance(response, FileResponse):
-            file_path: str = str(response.getPath())
-            file_size: int = response.getFileSize()
-            range_values: tuple[int, int] | None = parse_range(
-                adapter.headers().get("range"), file_size,
-            )
-
-            if range_values is not None:
-                start, end = range_values
-                headers = [
-                    pair for pair in headers
-                    if pair[0] not in {
-                        "content-length", "content-range", "accept-ranges",
-                    }
-                ]
-                headers.append(("content-length", str(end - start)))
-                headers.append(
-                    ("content-range", f"bytes {start}-{end-1}/{file_size}"),
-                )
-                headers.append(("accept-ranges", "bytes"))
-                protocol.response_file_range(
-                    206,
-                    headers,
-                    file_path,
-                    start,
-                    end,
-                )
-            else:
-                protocol.response_file(status, headers, file_path)
-
-            await response.runBackground()
-            return
-
-        # Stream the response body chunk by chunk when available.
-        if response.hasStream():
+        elif isinstance(response, FileResponse):
+            self.__sendFile(adapter, response, protocol, status, headers)
+        elif response.hasStream():
             transport = protocol.response_stream(status, headers)
-
             iterator = aiter(response.getStream())
             try:
                 async for chunk in iterator:
@@ -98,22 +59,64 @@ class RSGIResponseAdapter(ResponseAdapter):
                 close = getattr(iterator, "aclose", None)
                 if close is not None:
                     await close()
+        else:
+            body = response.getBody() or b""
+            if body:
+                protocol.response_bytes(status, headers, body)
+            else:
+                protocol.response_empty(status, headers)
 
+        if (
+            response.background is not None
+            or type(response).runBackground is not Response.runBackground
+        ):
             await response.runBackground()
+
+    def __sendFile(
+        self,
+        adapter: TransportAdapter,
+        response: FileResponse,
+        protocol: HTTPProtocol,
+        status: int,
+        headers: list[tuple[str, str]],
+    ) -> None:
+        """Send a file or the byte interval selected by the request.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Request headers used to select the file range.
+        response : FileResponse
+            File metadata and source path.
+        protocol : HTTPProtocol
+            RSGI response writer.
+        status : int
+            HTTP status for a complete file.
+        headers : list[tuple[str, str]]
+            Response headers for this request.
+
+        Returns
+        -------
+        None
+            The file response is handed to the protocol.
+        """
+        path = str(response.getPath())
+        file_size = response.getFileSize()
+        interval = parse_range(adapter.headers().get("range"), file_size)
+        if interval is None:
+            protocol.response_file(status, headers, path)
             return
-
-        # Fall back to a regular buffered body response.
-        body: bytes = response.getBody() or b""
-
-        if not body:
-            protocol.response_empty(status, headers)
-            await response.runBackground()
-            return
-
-        # The body is already encoded; hand the bytes straight to the protocol.
-        protocol.response_bytes(status, headers, body)
-
-        await response.runBackground()
+        start, end = interval
+        headers = [
+            pair for pair in headers
+            if pair[0] not in {"content-length", "content-range", "accept-ranges"}
+        ]
+        headers.extend((
+            ("content-length", str(end - start)),
+            ("content-range", f"bytes {start}-{end - 1}/{file_size}"),
+            ("accept-ranges", "bytes"),
+        ))
+        protocol.response_file_range(206, headers, path, start, end)
 
     def __ensureContentLength(
         self,

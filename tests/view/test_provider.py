@@ -53,6 +53,7 @@ class _StubEnvironment:
     __slots__ = ("extensions", "filters", "globals")
 
     def __init__(self) -> None:
+        """Initialize empty template registration collections."""
         self.globals: dict[str, object] = {}
         self.filters: dict[str, object] = {}
         self.extensions: list[object] = []
@@ -75,6 +76,13 @@ class _StubApp:
     __slots__ = ("environment", "resolved", "singletons")
 
     def __init__(self, environment: _StubEnvironment | None = None) -> None:
+        """Configure the environment returned by the application double.
+
+        Parameters
+        ----------
+        environment : _StubEnvironment | None, optional
+            Environment returned from dependency resolution.
+        """
         self.environment: _StubEnvironment | None = environment
         self.singletons: list[tuple[object, object]] = []
         self.resolved: list[object] = []
@@ -98,6 +106,7 @@ class _StubViewFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
+        """Initialize the facade pin counter."""
         self.pinned: int = 0
 
     async def pin(self) -> None:

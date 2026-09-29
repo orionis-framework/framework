@@ -8,27 +8,46 @@ from orionis.orm.attributes import serialize_for_storage
 from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.schema.table import TableDefinition
 
-
 class _Record(Model):
     id = Integer().primary()
     name = String()
     timestamps = False
 
-
 class _ComparisonGuard:
     """Reject comparisons to an attribute outside the requested selection."""
 
     def __ne__(self, other: object) -> bool:
-        """Raise if the caller evaluates this attribute."""
+        """Raise if the caller evaluates this attribute.
+
+        Parameters
+        ----------
+        other : object
+            Value supplied for ``other``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+
+        Raises
+        ------
+        AssertionError
+            Raised by this helper to exercise the failure path.
+        """
         error_msg = f"Unexpected comparison with {type(other).__name__}."
         raise AssertionError(error_msg)
-
 
 class TestModelHotPaths(TestCase):
     """Exercise attribute state and serialization without database access."""
 
     def testSelectedDirtyCheckDoesNotCompareUnrequestedAttributes(self) -> None:
-        """Inspect only the requested attributes, including missing keys."""
+        """Inspect only the requested attributes, including missing keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         record = _Record._newFromDatabase({"id": 1, "name": "before"})
         record.setAttribute("unrelated", _ComparisonGuard())
         self.assertFalse(record.isDirty("name", "missing"))
@@ -36,13 +55,25 @@ class TestModelHotPaths(TestCase):
         self.assertTrue(record.isDirty("missing", "name"))
 
     def testDirtyCheckStopsAtFirstChange(self) -> None:
-        """Return after the first changed attribute without comparing the rest."""
+        """Return after the first changed attribute without comparing the rest.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         record = _Record({"name": "changed"})
         record.setAttribute("unrelated", _ComparisonGuard())
         self.assertTrue(record.isDirty())
 
     def testMissingAndNoneRemainDistinct(self) -> None:
-        """Track newly assigned null values and ignore absent attributes."""
+        """Track newly assigned null values and ignore absent attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         record = _Record()
         self.assertFalse(record.isDirty("name"))
         record.name = None
@@ -51,7 +82,13 @@ class TestModelHotPaths(TestCase):
         self.assertTrue(record.isClean())
 
     def testSerializationReturnsIndependentMapping(self) -> None:
-        """Keep serialization result edits outside the attribute store."""
+        """Keep serialization result edits outside the attribute store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         record = _Record({"name": "original"})
         result = record.toDict()
         result["name"] = "changed"
@@ -62,7 +99,13 @@ class TestModelHotPaths(TestCase):
         self.assertIsNot(stored, values)
 
     def testSharedSchemaRetainsItsTableAndConstraints(self) -> None:
-        """Adopt the same versioned table used by schema migrations."""
+        """Adopt the same versioned table used by schema migrations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         definition = TableDefinition(
             name="shared_records", schema="example",
             columns={"key": Integer().primary(), "name": String()},
@@ -81,7 +124,13 @@ class TestModelHotPaths(TestCase):
         self.assertEqual(_Shared({"name": "valid"}).name, "valid")
 
     def testSharedSchemaRejectsConflictingDeclarations(self) -> None:
-        """Reject duplicate columns, table names and primary keys."""
+        """Reject duplicate columns, table names and primary keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         definition = TableDefinition(
             name="records", columns={"id": Integer().primary()},
         )
@@ -95,7 +144,13 @@ class TestModelHotPaths(TestCase):
                 type("Invalid", (Model,), {"table_definition": definition, **overrides})
 
     def testSoftDeleteInheritanceDoesNotModifyParentSchema(self) -> None:
-        """Keep a child nullable delete column isolated from its parent."""
+        """Keep a child nullable delete column isolated from its parent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         class _Parent(Model):
             id = Integer().primary()
             deleted_at = DateTime()
@@ -107,7 +162,13 @@ class TestModelHotPaths(TestCase):
         self.assertTrue(_SoftChild.__meta__.columns["deleted_at"].is_nullable)
 
     def testSharedSoftDeleteSchemaRequiresNullableColumn(self) -> None:
-        """Reject invalid shared schemas without modifying historical definitions."""
+        """Reject invalid shared schemas without modifying historical definitions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         definition = TableDefinition(
             name="records",
             columns={"id": Integer().primary(), "deleted_at": DateTime()},
@@ -118,12 +179,17 @@ class TestModelHotPaths(TestCase):
             })
         self.assertFalse(definition.columns["deleted_at"].is_nullable)
 
-
 class TestModelPersistenceRouting(IsolatedAsyncioTestCase):
     """Exercise instance persistence using an overridable connection resolver."""
 
     async def testWritesUseDeclaredConnectionHookAndOneTimestamp(self) -> None:
-        """Route all writes through the hook and share creation timestamps."""
+        """Route all writes through the hook and share creation timestamps.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         connection = AsyncMock()
         connection.insert.return_value = InsertResult(row_count=1, last_insert_id=7)
         connection.update.return_value = 1
@@ -138,7 +204,13 @@ class TestModelPersistenceRouting(IsolatedAsyncioTestCase):
 
             @classmethod
             def getConnection(cls) -> AsyncMock:
-                """Return the connection assigned to this model."""
+                """Return the connection assigned to this model.
+
+                Returns
+                -------
+                AsyncMock
+                    Value produced by the helper.
+                """
                 cls.calls += 1
                 return connection
 
@@ -152,7 +224,13 @@ class TestModelPersistenceRouting(IsolatedAsyncioTestCase):
         self.assertEqual(_Routed.calls, 3)
 
     async def testInheritedListenersRunOncePerRegistration(self) -> None:
-        """Preserve explicit duplicates without multiplying inherited listeners."""
+        """Preserve explicit duplicates without multiplying inherited listeners.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         class _Ancestor(_Record):
             pass
 
@@ -178,7 +256,13 @@ class TestModelPersistenceRouting(IsolatedAsyncioTestCase):
         self.assertEqual(seen, [record, record])
 
     async def testFlushedListenersStayAbsentFromDescendants(self) -> None:
-        """Keep cleared inherited listeners out of newly declared descendants."""
+        """Keep cleared inherited listeners out of newly declared descendants.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         class _Ancestor(_Record):
             pass
 
@@ -196,14 +280,31 @@ class TestModelPersistenceRouting(IsolatedAsyncioTestCase):
         self.assertFalse(await _Ancestor().fireEvent("saving"))
 
     async def testListenersRegisteredDuringDispatchWaitUntilNextEvent(self) -> None:
-        """Dispatch an immutable listener snapshot while registration changes."""
+        """Dispatch an immutable listener snapshot while registration changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         class _Observed(_Record):
             pass
 
         seen = []
 
         def register_during_dispatch(record: Model) -> None:
-            """Append the next listener during an existing dispatch."""
+            """Append the next listener during an existing dispatch.
+
+            Parameters
+            ----------
+            record : Model
+                Value supplied for ``record``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             seen.append("first")
             type(record).registerEvent("saved", lambda _model: seen.append("next"))
 

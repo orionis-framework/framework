@@ -15,12 +15,29 @@ class _DummyAsyncContext:
     """Minimal async context manager returned by a proxied method."""
 
     def __init__(self, value: str) -> None:
-        """Store the value yielded when the context is entered."""
+        """Store the value yielded when the context is entered.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.value = value
         self.exited = False
 
     async def __aenter__(self) -> str:
-        """Return the fixed value carried by this context."""
+        """Return the fixed value carried by this context.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return self.value
 
     async def __aexit__(
@@ -29,7 +46,22 @@ class _DummyAsyncContext:
         exc: object,
         tb: object,
     ) -> bool:
-        """Record that the context was exited and never suppress errors."""
+        """Record that the context was exited and never suppress errors.
+
+        Parameters
+        ----------
+        exc_type : object
+            Value supplied for ``exc_type``.
+        exc : object
+            Value supplied for ``exc``.
+        tb : object
+            Value supplied for ``tb``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.exited = True
         return False
 
@@ -39,19 +71,50 @@ class _DummyService:
     version: str = _SERVICE_VERSION
 
     def greet(self) -> str:
-        """Return a greeting string."""
+        """Return a greeting string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "hello"
 
     def add(self, a: int, b: int) -> int:
-        """Return the sum of two integers."""
+        """Return the sum of two integers.
+
+        Parameters
+        ----------
+        a : int
+            Value supplied for ``a``.
+        b : int
+            Value supplied for ``b``.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return a + b
 
     async def fetch(self) -> str:
-        """Return a value from an asynchronous service method."""
+        """Return a value from an asynchronous service method.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "awaited"
 
     def openContext(self) -> _DummyAsyncContext:
-        """Return an async context manager carrying a fixed value."""
+        """Return an async context manager carrying a fixed value.
+
+        Returns
+        -------
+        _DummyAsyncContext
+            Value produced by the helper.
+        """
         return _DummyAsyncContext(_CONTEXT_VALUE)
 
 class _MetaFacade(Facade):
@@ -59,7 +122,13 @@ class _MetaFacade(Facade):
 
     @classmethod
     def getFacadeAccessor(cls) -> str:
-        """Return the service key for this facade."""
+        """Return the service key for this facade.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "dummy_service"
 
 class _BootedApp:
@@ -73,7 +142,22 @@ class _BootedApp:
         *_args: object,
         **_kwargs: object,
     ) -> _DummyService:
-        """Return a fresh _DummyService regardless of the requested key."""
+        """Return a fresh _DummyService regardless of the requested key.
+
+        Parameters
+        ----------
+        _key : object
+            Value supplied for ``_key``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        _DummyService
+            Value produced by the helper.
+        """
         return _DummyService()
 
 class _FacadeStateTestCase(TestCase):
@@ -88,7 +172,13 @@ class _FacadeStateTestCase(TestCase):
     pin_service: bool = False
 
     def setUp(self) -> None:
-        """Install the declared facade class state before each test."""
+        """Install the declared facade class state before each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         double = self.application_double
         _MetaFacade._application = None if double is None else double()
         _MetaFacade._pinned_instance = (
@@ -96,7 +186,13 @@ class _FacadeStateTestCase(TestCase):
         )
 
     def tearDown(self) -> None:
-        """Clear the facade class state after each test."""
+        """Clear the facade class state after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _MetaFacade._application = None
         _MetaFacade._pinned_instance = None
 

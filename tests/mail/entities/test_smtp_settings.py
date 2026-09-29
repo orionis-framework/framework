@@ -10,10 +10,14 @@ _CREDENTIAL = "p@ss:word"
 class TestSmtpSettings(TestCase):
 
     def testEmptyUrlUsesFieldsAndDoesNotMutateConfig(self) -> None:
-        """
-        Resolve the standalone fields when no URL was configured.
+        """Resolve the standalone fields when no URL was configured.
 
         Validates that the supplied configuration is left untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         original = {
             "url": "",
@@ -32,10 +36,14 @@ class TestSmtpSettings(TestCase):
         self.assertEqual(original["encryption"], "tLs")
 
     def testDefaultsToTlsOnThePortUsedForSubmission(self) -> None:
-        """
-        Apply the submission defaults when only a host is configured.
+        """Apply the submission defaults when only a host is configured.
 
         Validates that mandatory STARTTLS is the default mode.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         settings = SmtpSettings.fromConfig({"host": "smtp.example.com"})
         self.assertEqual(settings.port, 587)
@@ -44,10 +52,14 @@ class TestSmtpSettings(TestCase):
         self.assertIsNone(settings.timeout)
 
     def testSmtpUrlOverridesHostAndCredentialsAsAUnit(self) -> None:
-        """
-        Let the URL replace the host and both credentials together.
+        """Let the URL replace the host and both credentials together.
 
         Validates that percent-encoded credentials are decoded.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         settings = SmtpSettings.fromConfig(
             {
@@ -69,10 +81,14 @@ class TestSmtpSettings(TestCase):
         self.assertNotIn(_CREDENTIAL, repr(settings))
 
     def testUrlCredentialsReplaceUnsetIndividualFields(self) -> None:
-        """
-        Ignore unused field credentials once the URL supplies a pair.
+        """Ignore unused field credentials once the URL supplies a pair.
 
         Validates that the replaced fields are no longer validated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         settings = SmtpSettings.fromConfig({
             "url": "smtp://user:encoded%40value@smtp.example.com",
@@ -83,10 +99,14 @@ class TestSmtpSettings(TestCase):
         self.assertEqual(settings.password, "encoded@value")
 
     def testSmtpsForcesImplicitTlsAndItsDefaultPort(self) -> None:
-        """
-        Force implicit TLS and port 465 for an smtps URL.
+        """Force implicit TLS and port 465 for an smtps URL.
 
         Validates that an explicit URL port still wins.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         config = {
             "url": "smtps://mail.example.com",
@@ -106,10 +126,14 @@ class TestSmtpSettings(TestCase):
         self.assertEqual(custom.port, 8465)
 
     def testSmtpUrlKeepsConfiguredPortAndEncryption(self) -> None:
-        """
-        Keep the configured port and mode for a plain smtp URL.
+        """Keep the configured port and mode for a plain smtp URL.
 
         Validates both spellings of an explicit plaintext connection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for encryption in ("", "NoNe"):
             settings = SmtpSettings.fromConfig(
@@ -123,10 +147,14 @@ class TestSmtpSettings(TestCase):
             self.assertIs(settings.encryption, MailEncryption.NONE)
 
     def testSensitiveValuesCoverEveryCredentialSpelling(self) -> None:
-        """
-        Collect the credentials that a server response could echo.
+        """Collect the credentials that a server response could echo.
 
         Validates the redaction material used by transport diagnostics.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         settings = SmtpSettings.fromConfig({
             "url": "smtp://user:url%40secret@smtp.example.com",
@@ -138,10 +166,14 @@ class TestSmtpSettings(TestCase):
         self.assertNotIn(None, settings.sensitive)
 
     def testRejectsUnsupportedAndMalformedUrls(self) -> None:
-        """
-        Reject unsupported schemes, extra components, and invalid ports.
+        """Reject unsupported schemes, extra components, and invalid ports.
 
         Validates that no unknown URL option is silently interpreted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for url in (
             "https://mail.example.com",
@@ -158,10 +190,14 @@ class TestSmtpSettings(TestCase):
                 SmtpSettings.fromConfig({"url": url})
 
     def testRejectsIncompleteAuthAndInvalidEffectiveSettings(self) -> None:
-        """
-        Reject invalid effective options without leaking credentials.
+        """Reject invalid effective options without leaking credentials.
 
         Validates ranges, types, and incomplete authentication pairs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cases = (
             {"username": "user"},
@@ -187,10 +223,14 @@ class TestSmtpSettings(TestCase):
             self.assertNotIn(_CREDENTIAL, str(failure.exception))
 
     def testEntityDefersOperationalRangesUntilTransportSelection(self) -> None:
-        """
-        Keep an unused SMTP entity inert until the transport is selected.
+        """Keep an unused SMTP entity inert until the transport is selected.
 
         Validates that only the effective options are range checked.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         settings = Smtp(host="smtp.example.com", port=-1, timeout=-1)
         with self.assertRaises(MailConfigurationException):

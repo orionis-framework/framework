@@ -1,9 +1,12 @@
 from __future__ import annotations
+import asyncio
 import inspect
 from unittest.mock import AsyncMock, MagicMock
+from typing import get_args
 from orionis.failure.catch import Catch
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
+from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.test import TestCase
 
 # Minimum number of positional args expected in app.call(handler, method, ...)
@@ -44,31 +47,54 @@ def _make_catch(
 class TestCatchIsICatch(TestCase):
 
     def testIsSubclassOfICatch(self) -> None:
-        """
-        Confirm that Catch is a subclass of ICatch.
+        """Confirm that Catch is a subclass of ICatch.
 
         Validates the interface contract so that the dependency injection
         container can resolve ICatch to Catch transparently.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(Catch, ICatch))
 
     def testExceptionMethodIsCoroutine(self) -> None:
-        """
-        Confirm that the exception method is a coroutine function.
+        """Confirm that the exception method is a coroutine function.
 
         Validates that callers can safely await Catch.exception without
         any additional async wrapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(Catch.exception))
+
+    def testRequestAnnotationIncludesTransportAdapter(self) -> None:
+        """Keep the transport request type available to runtime inspection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        annotation = inspect.signature(Catch.exception).parameters["request"].annotation
+        self.assertIn(TransportAdapter, get_args(annotation))
 
 class TestCatchNoScope(TestCase):
 
     async def testRaisesRuntimeErrorWhenNoScope(self) -> None:
-        """
-        Raise RuntimeError when no active application scope is found.
+        """Raise RuntimeError when no active application scope is found.
 
         Validates the guard that prevents exception handling from
         continuing without a valid scope, signalling a misconfiguration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_app = MagicMock()
         mock_app.getCurrentScope.return_value = None
@@ -82,11 +108,15 @@ class TestCatchNoScope(TestCase):
 class TestCatchNoKernel(TestCase):
 
     async def testRaisesRuntimeErrorWhenNoKernel(self) -> None:
-        """
-        Raise RuntimeError when the scope contains no kernel entry.
+        """Raise RuntimeError when the scope contains no kernel entry.
 
         Validates the guard that prevents exception handling from
         continuing without an identified kernel context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=None)
@@ -103,11 +133,15 @@ class TestCatchNoKernel(TestCase):
 class TestCatchConsoleContext(TestCase):
 
     async def testDelegatesHandleCLIInConsoleContext(self) -> None:
-        """
-        Invoke the handler's handleCLI path in a CONSOLE kernel context.
+        """Invoke the handler's handleCLI path in a CONSOLE kernel context.
 
         Validates that when the current scope identifies the CONSOLE kernel
         the app.call dispatcher is directed to handleCLI.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
@@ -131,11 +165,15 @@ class TestCatchConsoleContext(TestCase):
         self.assertIn("handleCLI", method_names)
 
     async def testCallsReportBeforeHandleCLI(self) -> None:
-        """
-        Invoke report before handleCLI in the CONSOLE context.
+        """Invoke report before handleCLI in the CONSOLE context.
 
         Validates the expected call ordering so that exceptions are always
         logged prior to being rendered in the CLI.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
@@ -146,6 +184,22 @@ class TestCatchConsoleContext(TestCase):
         async def _track_call(
             _obj: object, method: str, **_kwargs: object,
         ) -> None:
+            """Record the dispatched handler method.
+
+            Parameters
+            ----------
+            _obj : object
+                Value supplied for ``_obj``.
+            method : str
+                Value supplied for ``method``.
+            **_kwargs : object
+                Arguments passed to the wrapped callable.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             call_order.append(method)
 
         mock_app = MagicMock()
@@ -162,11 +216,15 @@ class TestCatchConsoleContext(TestCase):
 class TestCatchHTTPContext(TestCase):
 
     async def testDelegatesHandleHTTPInHTTPContext(self) -> None:
-        """
-        Invoke the handler's handleHTTP path in an HTTP kernel context.
+        """Invoke the handler's handleHTTP path in an HTTP kernel context.
 
         Validates that when the current scope identifies the HTTP kernel
         the app.call dispatcher is directed to handleHTTP.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
@@ -191,11 +249,15 @@ class TestCatchHTTPContext(TestCase):
         self.assertIn("handleHTTP", method_names)
 
     async def testCallsReportBeforeHandleHTTP(self) -> None:
-        """
-        Invoke report before handleHTTP in the HTTP context.
+        """Invoke report before handleHTTP in the HTTP context.
 
         Validates the expected call ordering so that exceptions are always
         logged prior to being rendered as HTTP error responses.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
@@ -206,6 +268,22 @@ class TestCatchHTTPContext(TestCase):
         async def _track_call(
             _obj: object, method: str, **_kwargs: object,
         ) -> None:
+            """Record the dispatched handler method.
+
+            Parameters
+            ----------
+            _obj : object
+                Value supplied for ``_obj``.
+            method : str
+                Value supplied for ``method``.
+            **_kwargs : object
+                Arguments passed to the wrapped callable.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             call_order.append(method)
 
         mock_app = MagicMock()
@@ -220,11 +298,15 @@ class TestCatchHTTPContext(TestCase):
         self.assertEqual(call_order[1], "handleHTTP")
 
     async def testPassesRequestToHandleHTTP(self) -> None:
-        """
-        Forward the request argument when dispatching handleHTTP.
+        """Forward the request argument when dispatching handleHTTP.
 
         Validates that the request object supplied to exception() is
         propagated through app.call to the handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
@@ -249,11 +331,15 @@ class TestCatchHTTPContext(TestCase):
 class TestCatchUnknownContext(TestCase):
 
     async def testReturnsNoneForUnknownContext(self) -> None:
-        """
-        Return None when the kernel context is not CONSOLE or HTTP.
+        """Return None when the kernel context is not CONSOLE or HTTP.
 
         Validates the fallback path so that unrecognised kernel types do
         not raise an unhandled exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value="UNKNOWN_CONTEXT")
@@ -269,11 +355,15 @@ class TestCatchUnknownContext(TestCase):
         self.assertIsNone(result)
 
     async def testHandlerCachedAcrossCalls(self) -> None:
-        """
-        Resolve the exception handler only once across multiple calls.
+        """Resolve the exception handler only once across multiple calls.
 
         Validates that the handler is cached so that getExceptionHandler
         is not invoked on every exception dispatch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_scope = AsyncMock()
         mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
@@ -289,3 +379,40 @@ class TestCatchUnknownContext(TestCase):
         await catch.exception(RuntimeError("second"))
 
         self.assertEqual(mock_app.getExceptionHandler.call_count, 1)
+
+    async def testHandlerResolutionIsSharedAcrossConcurrentCalls(self) -> None:
+        """Resolve the shared handler once when first use overlaps.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        mock_scope = AsyncMock()
+        mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
+
+        handler = MagicMock()
+
+        async def resolve_handler():
+            """Wait for overlapping calls before returning the handler.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
+            await asyncio.sleep(0)
+            return handler
+
+        mock_app = MagicMock()
+        mock_app.getCurrentScope.return_value = mock_scope
+        mock_app.getExceptionHandler = AsyncMock(side_effect=resolve_handler)
+        mock_app.call = AsyncMock(return_value=None)
+
+        catch = Catch(app=mock_app)
+        await asyncio.gather(*(
+            catch.exception(RuntimeError("concurrent"))
+            for _ in range(8)
+        ))
+
+        mock_app.getExceptionHandler.assert_awaited_once()

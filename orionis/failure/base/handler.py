@@ -1,0 +1,243 @@
+from typing import ClassVar
+from orionis.auth.context.functions import current_auth_context
+from orionis.auth.exceptions import (
+    AuthenticationException,
+    AuthorizationException,
+)
+from orionis.console.output.console import Console
+from orionis.foundation.contracts.application import IApplication
+from orionis.failure.contracts.handler import IBaseExceptionHandler
+from orionis.failure.entities.throwable import Throwable
+from orionis.http.adapters.request.contracts.transport import TransportAdapter
+from orionis.http.default.responses import DefaultResponses
+from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
+from orionis.http.payload.body import PayloadTooLargeException
+from orionis.http.request import Request
+from orionis.http.request import UnsupportedMediaTypeException
+from orionis.http.responses import Response
+from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
+from orionis.http.routes.exceptions.route_not_found import RouteNotFound
+from orionis.logging.contracts.logger import ILogger
+
+# Map handled exception types to their public HTTP status and message.
+_HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
+    AuthenticationException: (401, "Unauthenticated"),
+    AuthorizationException: (403, "This action is unauthorized"),
+    RouteNotFound: (404, "Route not found"),
+    MethodNotAllowed: (405, "Method not allowed"),
+    PayloadTooLargeException: (413, "Payload too large"),
+    UnsupportedMediaTypeException: (415, "Unsupported media type"),
+    CSRFTokenMismatchException: (419, "CSRF token mismatch"),
+}
+
+class BaseExceptionHandler(IBaseExceptionHandler):
+
+    # ruff: noqa: G004, TC001
+
+    # Exceptions that should not be caught by the handler
+    dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()
+
+    def __init__(
+        self,
+        default_responses: DefaultResponses,
+        application: IApplication,
+    ) -> None:
+        """
+        Initialize the BaseExceptionHandler instance.
+
+        Parameters
+        ----------
+        default_responses : DefaultResponses
+            Default responses for HTTP error handling.
+        application : IApplication
+            The application instance containing configuration and context.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        # Default responses for HTTP error handling
+        self.__default_responses = default_responses
+        self.__application = application
+
+    def toThrowable(
+        self,
+        exception: BaseException,
+    ) -> Throwable:
+        """
+        Convert an exception to a structured Throwable object.
+
+        Parameters
+        ----------
+        exception : BaseException
+            Exception instance to be converted.
+
+        Returns
+        -------
+        Throwable
+            Structured Throwable object containing class, message, arguments,
+            and traceback.
+        """
+        # Extract and stringify exception arguments
+        args = exception.args or ("",)
+        str_args = tuple(map(str, args))
+
+        # Create and return the Throwable object
+        return Throwable(
+            classtype=type(exception),
+            message=str_args[0],
+            args=str_args,
+            traceback=exception.__traceback__,
+        )
+
+    def isExceptionIgnored(
+        self,
+        exception: BaseException,
+    ) -> bool:
+        """
+        Determine whether the given exception should be ignored.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance to check.
+
+        Returns
+        -------
+        bool
+            True if the exception should be ignored, otherwise False.
+        """
+        # Ensure the input is an exception instance
+        if not isinstance(exception, BaseException):
+            error_msg = (
+                f"Expected BaseException, got {type(exception).__name__}"
+            )
+            raise TypeError(error_msg)
+
+        # Check whether the exact exception class is configured to be ignored.
+        return type(exception) in self.dont_catch
+
+    async def report(
+        self,
+        exception: BaseException,
+        log: ILogger,
+    ) -> Throwable | None:
+        """
+        Report or log an exception.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        log : ILogger
+            The logger instance for error reporting.
+
+        Returns
+        -------
+        Throwable or None
+            The structured Throwable object if reported, otherwise None.
+        """
+        # Skip reporting if the exception should be ignored
+        if self.isExceptionIgnored(exception):
+            return None
+
+        # Convert the exception into a structured Throwable object
+        throwable = self.toThrowable(exception)
+
+        # Log the exception details
+        log.error(f"[{throwable.classtype.__name__}] {throwable.message}")
+
+        # Return the structured exception
+        return throwable
+
+    async def handleCLI(
+        self,
+        exception: BaseException,
+        console: Console,
+    ) -> None:
+        """
+        Render the exception message for CLI output.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        console : IConsole
+            The console instance for output.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+        """
+        # Skip reporting if the exception should be ignored
+        if self.isExceptionIgnored(exception):
+            return
+
+        # Output the exception details to the console
+        console.exception(exception)
+
+    async def handleHTTP(
+        self,
+        exception: BaseException,
+        request: Request | TransportAdapter,
+    ) -> Response | None:
+        """
+        Handle the exception for HTTP responses.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        request : Request | TransportAdapter
+            The HTTP request instance or transport adapter that was being processed.
+
+        Returns
+        -------
+        Response | None
+            The HTTP response if handled, otherwise None.
+        """
+        # Skip reporting if the exception should be ignored
+        if self.isExceptionIgnored(exception):
+            return None
+
+        # Determine if the client expects a JSON response
+        wants_json: bool = request.wantsJson()
+
+        # Preserve defined HTTP statuses in both debug and production modes.
+        exc_type = type(exception)
+
+        for ancestor in exc_type.__mro__:
+            mapped = _HTTP_STATUS_MAP.get(ancestor)
+            if mapped is None:
+                continue
+            status_code, content = mapped
+            response = await self.__default_responses.error(
+                status_code=status_code,
+                content=content,
+                expects_json=wants_json,
+            )
+            if (
+                isinstance(exception, AuthenticationException)
+                and current_auth_context().guard == "token"
+            ):
+                response.setHeader("WWW-Authenticate", "Bearer")
+            return response
+
+        # Hide unhandled exception details when the application is not in debug mode.
+        if not self.__application.config("app.debug"):
+            return await self.__default_responses.error(
+                status_code=500,
+                content="Internal Server Error",
+                expects_json=wants_json,
+            )
+
+        # Build the debug response with the request details and exception.
+        is_adapter: bool = isinstance(request, TransportAdapter)
+        return await self.__default_responses.exception(
+            request_path=request.path() if is_adapter else request.path,
+            request_method=request.method() if is_adapter else request.method,
+            exception=exception,
+            status_code=500,
+        )

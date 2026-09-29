@@ -9,7 +9,6 @@ from orionis.test import TestCase
 # Members the manager adds on top of the plain hashing contract.
 _MANAGER_METHODS: frozenset[str] = frozenset({"driver", "getDefaultDriver"})
 
-
 def abstract_body_statements(method: object) -> list[ast.stmt]:
     """
     Return the statements declared inside the body of a method.
@@ -28,41 +27,56 @@ def abstract_body_statements(method: object) -> list[ast.stmt]:
     node = ast.parse(textwrap.dedent(inspect.getsource(method))).body[0]
     return node.body if isinstance(node, ast.FunctionDef) else []
 
-
 class TestIHashManagerDefinition(TestCase):
 
     def testExtendsTheHasherContract(self) -> None:
-        """
-        Extend the plain hashing contract instead of duplicating it.
+        """Extend the plain hashing contract instead of duplicating it.
 
         Validates that the manager can stand in for a single driver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(IHashManager, IHasher))
 
     def testCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Refuse instantiation while abstract methods remain unimplemented.
+        """Refuse instantiation while abstract methods remain unimplemented.
 
         Validates that the contract is enforced at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IHashManager()  # type: ignore[abstract]
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates the requirement that makes the slots of HashManager
         effective instead of decorative.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IHashManager.__dict__.get("__slots__"), ())
 
     def testAddsOnlyTheDriverResolutionMembers(self) -> None:
-        """
-        Publish driver resolution as the only additional surface.
+        """Publish driver resolution as the only additional surface.
 
         Validates that the manager contract inherits every hashing
         operation and adds nothing else.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             IHashManager.__abstractmethods__,
@@ -70,42 +84,57 @@ class TestIHashManagerDefinition(TestCase):
         )
 
     def testAbstractMethodsCarryNoImplementation(self) -> None:
-        """
-        Keep the added abstract methods free of executable bodies.
+        """Keep the added abstract methods free of executable bodies.
 
         Validates that no dead code hides behind the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in _MANAGER_METHODS:
             statements = abstract_body_statements(getattr(IHashManager, name))
             self.assertEqual(len(statements), 1, msg=name)
             self.assertIsInstance(statements[0], ast.Expr, msg=name)
 
-
 class TestIHashManagerImplementation(TestCase):
 
     def testManagerImplementsTheContract(self) -> None:
-        """
-        Register HashManager as the implementation of the contract.
+        """Register HashManager as the implementation of the contract.
 
         Validates the binding published by the service provider.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(HashManager, IHashManager))
 
     def testManagerLeavesTheAbstractSetEmpty(self) -> None:
-        """
-        Implement every abstract member in the manager.
+        """Implement every abstract member in the manager.
 
         Validates that the manager is instantiable by design and not by
         accident.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(HashManager.__abstractmethods__, frozenset())
 
     def testManagerMatchesTheContractSignatures(self) -> None:
-        """
-        Keep the parameters of the manager aligned with the contract.
+        """Keep the parameters of the manager aligned with the contract.
 
         Validates that callers relying on the contract can invoke the
         manager unchanged.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in IHashManager.__abstractmethods__:
             expected = inspect.signature(getattr(IHashManager, name))

@@ -11,7 +11,7 @@ class ScopeManager:
 
     # ruff: noqa: ANN401
 
-    __slots__ = ("__active", "__closed", "_instances", "_token")
+    __slots__ = ("__active", "__closed", "__creation_locks", "_instances", "_token")
 
     def __init__(self) -> None:
         """
@@ -28,10 +28,42 @@ class ScopeManager:
         self._instances: dict[object, object] = {}
         self.__active = False
         self.__closed = False
+        self.__creation_locks: dict[object, asyncio.Lock] | None = None
+
+    def creationLock(self, key: object) -> asyncio.Lock:
+        """
+        Return the construction lock owned by this scope and service key.
+
+        Parameters
+        ----------
+        key : object
+            Contract identifying a scoped service.
+
+        Returns
+        -------
+        asyncio.Lock
+            Lock shared by tasks resolving that service within this scope.
+
+        Raises
+        ------
+        RuntimeError
+            If the scope has already closed.
+        """
+        if self.__closed:
+            message = "Cannot resolve a service in a closed container scope."
+            raise RuntimeError(message)
+        locks = self.__creation_locks
+        if locks is None:
+            locks = self.__creation_locks = {}
+        lock = locks.get(key)
+        if lock is None:
+            lock = locks[key] = asyncio.Lock()
+        return lock
 
     @property
     def isActive(self) -> bool:
-        """Report whether the owning scope is still open.
+        """
+        Report whether the owning scope is still open.
 
         Returns
         -------
@@ -165,6 +197,7 @@ class ScopeManager:
         self.__active = False
         self.__closed = True
         self.clear()
+        self.__creation_locks = None
         ScopedContext.reset(self._token)
 
     async def get(self, key: object) -> Any | None:

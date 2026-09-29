@@ -4,12 +4,17 @@ from tempfile import TemporaryDirectory
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
 
-
 class TestUploadedFileAppend(TestCase):
     """Preserve uploaded content when writes follow partial reads."""
 
     def testWriteAppendsAfterPartialReadsAcrossSpoolStates(self) -> None:
-        """Append in memory, during rollover and after spilling to disk."""
+        """Append in memory, during rollover and after spilling to disk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for threshold in (0, 1024, 6, 1):
             for chunk in (b"XYZ", bytearray(b"XYZ"), memoryview(b"XYZ")):
                 with closing(UploadedFile(
@@ -29,7 +34,13 @@ class TestUploadedFileAppend(TestCase):
                     self.assertEqual(b"".join(upload.chunks(2)), b"abcdefXYZ")
 
     def testWriteAppendsAfterReplacingAndSavingContent(self) -> None:
-        """Keep replacement size and saved bytes consistent after partial reads."""
+        """Keep replacement size and saved bytes consistent after partial reads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for threshold in (0, 1):
             with TemporaryDirectory() as directory, closing(UploadedFile(
                 "sample.txt", "text/plain", memory_threshold=threshold,

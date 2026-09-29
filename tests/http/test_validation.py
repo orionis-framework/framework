@@ -17,7 +17,13 @@ class _FakeDefaultResponses:
     __slots__ = ("expects_json",)
 
     def __init__(self) -> None:
-        """Initialise the recorder of the negotiated payload format."""
+        """Initialise the recorder of the negotiated payload format.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.expects_json: bool = False
 
     async def error(
@@ -93,7 +99,13 @@ def _make_request(
     }
 
     async def receive() -> dict[str, Any]:
-        """Deliver the supplied request body as a single transport message."""
+        """Deliver the supplied request body as a single transport message.
+
+        Returns
+        -------
+        dict[str, Any]
+            Value produced by the helper.
+        """
         return {"type": "http.request", "body": body, "more_body": False}
 
     return Request(
@@ -127,11 +139,15 @@ def _make_exception() -> ValidationException:
 class TestValidationResponseForJson(TestCase):
 
     async def testJsonClientGets422(self) -> None:
-        """
-        Return a 422 response when the client accepts JSON.
+        """Return a 422 response when the client accepts JSON.
 
         Validates that API-style clients receive the structured payload
         instead of a redirect.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"accept", b"application/json")],
@@ -143,11 +159,15 @@ class TestValidationResponseForJson(TestCase):
         self.assertEqual(response.getStatusCode(), 422)
 
     async def testAjaxClientGets422(self) -> None:
-        """
-        Return a 422 response for XMLHttpRequest submissions.
+        """Return a 422 response for XMLHttpRequest submissions.
 
         Validates that AJAX form posts are answered with JSON even when the
         Accept header prefers HTML.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[
@@ -161,11 +181,15 @@ class TestValidationResponseForJson(TestCase):
         self.assertIsInstance(response, JSONResponse)
 
     async def testJsonPayloadCarriesFieldErrors(self) -> None:
-        """
-        Expose every field error in the JSON payload.
+        """Expose every field error in the JSON payload.
 
         Validates the ``message`` plus ``errors`` contract consumed by
         front-end clients.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"accept", b"application/json")],
@@ -177,11 +201,15 @@ class TestValidationResponseForJson(TestCase):
 class TestValidationResponseForWeb(TestCase):
 
     async def testBrowserIsRedirectedBack(self) -> None:
-        """
-        Redirect the browser back to the submitted form.
+        """Redirect the browser back to the submitted form.
 
         Validates that an HTML client receives a 302 pointing at the
         referring page.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[
@@ -200,11 +228,15 @@ class TestValidationResponseForWeb(TestCase):
         )
 
     async def testErrorsAreFlashed(self) -> None:
-        """
-        Queue every field error in the response flash bag.
+        """Queue every field error in the response flash bag.
 
         Validates that the errors bag reaches the session middleware with
         one entry per offending field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(extra_headers=[(b"accept", b"text/html")])
         response = await validation_response(
@@ -220,11 +252,15 @@ class TestValidationResponseForWeb(TestCase):
         )
 
     async def testSubmittedInputIsFlashedWithoutCredentials(self) -> None:
-        """
-        Repopulate the form without leaking credential fields.
+        """Repopulate the form without leaking credential fields.
 
         Validates that the submitted payload is flashed as old input and
         that the password is stripped from it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             body=b"email=user%40mail.test&password=secret",
@@ -237,11 +273,15 @@ class TestValidationResponseForWeb(TestCase):
         self.assertEqual(old_input, {"email": "user@mail.test"})
 
     async def testUnparsableBodyStillRedirects(self) -> None:
-        """
-        Redirect even when the submitted body cannot be parsed.
+        """Redirect even when the submitted body cannot be parsed.
 
         Validates that an unsupported media type degrades to a redirect
         carrying the errors, without old input.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             body=b"<xml/>",
@@ -259,11 +299,15 @@ class TestValidationResponseForWeb(TestCase):
 class TestPreviousUrl(TestCase):
 
     def testSessionPreviousUrlWins(self) -> None:
-        """
-        Prefer the page recorded by the session middleware.
+        """Prefer the page recorded by the session middleware.
 
         Validates that the last visited page takes precedence over the
         referrer, which browsers may omit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"referer", b"http://orionis.test/login")],
@@ -274,10 +318,14 @@ class TestPreviousUrl(TestCase):
         self.assertEqual(previous_url(request), "http://orionis.test/users/create")
 
     def testRefererIsUsedWhenSessionHasNoPreviousUrl(self) -> None:
-        """
-        Fall back to the referrer for a session without a recorded page.
+        """Fall back to the referrer for a session without a recorded page.
 
         Validates the second step of the resolution chain.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"referer", b"http://orionis.test/register")],
@@ -286,10 +334,14 @@ class TestPreviousUrl(TestCase):
         self.assertEqual(previous_url(request), "http://orionis.test/register")
 
     def testSameOriginRefererIsUsed(self) -> None:
-        """
-        Redirect back to a referrer belonging to this application.
+        """Redirect back to a referrer belonging to this application.
 
         Validates that an absolute same-origin URL is preserved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"referer", b"http://orionis.test/register")],
@@ -297,20 +349,28 @@ class TestPreviousUrl(TestCase):
         self.assertEqual(previous_url(request), "http://orionis.test/register")
 
     def testRelativeRefererIsUsed(self) -> None:
-        """
-        Accept a relative referrer path.
+        """Accept a relative referrer path.
 
         Validates that a path-only referrer is treated as same-origin.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(extra_headers=[(b"referer", b"/register")])
         self.assertEqual(previous_url(request), "/register")
 
     def testExternalRefererFallsBackToCurrentUrl(self) -> None:
-        """
-        Ignore a referrer pointing to another origin.
+        """Ignore a referrer pointing to another origin.
 
         Validates that the redirect target cannot be controlled by an
         external site, preventing open redirects.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"referer", b"http://evil.test/phish")],
@@ -318,10 +378,14 @@ class TestPreviousUrl(TestCase):
         self.assertEqual(previous_url(request), "http://orionis.test/login")
 
     def testProtocolRelativeRefererFallsBackToCurrentUrl(self) -> None:
-        """
-        Ignore a protocol-relative referrer.
+        """Ignore a protocol-relative referrer.
 
         Validates that ``//evil.test`` is not mistaken for a local path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         request = _make_request(
             extra_headers=[(b"referer", b"//evil.test/phish")],
@@ -329,20 +393,28 @@ class TestPreviousUrl(TestCase):
         self.assertEqual(previous_url(request), "http://orionis.test/login")
 
     def testMissingRefererFallsBackToCurrentUrl(self) -> None:
-        """
-        Redirect back to the submitted URL without a referrer.
+        """Redirect back to the submitted URL without a referrer.
 
         Validates that the form endpoint is used as the last resort instead
         of sending the user to the application root.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(previous_url(_make_request()), "http://orionis.test/login")
 
     def testRejectsHostPrefixSpoofingAndCredentials(self) -> None:
-        """
-        Reject lookalike origins and authorities containing user credentials.
+        """Reject lookalike origins and authorities containing user credentials.
 
         Validates that string prefixes and user information cannot authorize
         an external redirect destination.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         references = (
             b"http://orionis.test.evil/path",
@@ -361,11 +433,15 @@ class TestPreviousUrl(TestCase):
                 self.assertEqual(previous_url(request), request.url)
 
     def testRejectsMalformedAuthoritiesAndControlCharacters(self) -> None:
-        """
-        Fall back safely for malformed authorities and ambiguous separators.
+        """Fall back safely for malformed authorities and ambiguous separators.
 
         Validates that URL parsing failures do not escape and that browser
         normalization cannot reinterpret a local-looking reference as external.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         references = (
             b"http://[invalid/path", b"http://orionis.test:invalid/path",
@@ -379,10 +455,14 @@ class TestPreviousUrl(TestCase):
                 self.assertEqual(previous_url(request), request.url)
 
     def testNormalizesHostnameCaseAndDefaultPorts(self) -> None:
-        """
-        Accept equivalent origins with explicit defaults and hostname casing.
+        """Accept equivalent origins with explicit defaults and hostname casing.
 
         Validates origin comparison while preserving the caller's target URL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for reference in (
             b"HTTP://ORIONIS.TEST/register", b"http://orionis.test:80/register",
@@ -392,10 +472,14 @@ class TestPreviousUrl(TestCase):
                 self.assertEqual(previous_url(request), reference.decode())
 
     def testAcceptsMatchingExplicitPortsAndIpv6Authorities(self) -> None:
-        """
-        Match explicit ports and IPv6 hosts without confusing authority fields.
+        """Match explicit ports and IPv6 hosts without confusing authority fields.
 
         Validates that same-origin checks support non-default server addresses.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for host, reference in (
             (b"orionis.test:8080", b"http://ORIONIS.TEST:8080/register"),
@@ -408,10 +492,14 @@ class TestPreviousUrl(TestCase):
                 self.assertEqual(previous_url(request), reference.decode())
 
     def testNormalizesTheHttpsDefaultPort(self) -> None:
-        """
-        Match HTTPS origins with implicit and explicit default ports.
+        """Match HTTPS origins with implicit and explicit default ports.
 
         Validates that HTTPS never inherits the default port of plain HTTP.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for reference, accepted in (
             (b"https://orionis.test:443/register", True),

@@ -14,12 +14,30 @@ class _AbstractFixture(abc.ABC):
 
     @abc.abstractmethod
     def run(self) -> None:
-        """Run the abstract operation."""
+        """Run the abstract operation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class _ConcreteFixture:
     """Concrete user-defined class fixture."""
 
     def __init__(self, value: int = 0) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        value : int
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.value = value
 
 class _ABCDirectBase(abc.ABC):  # noqa: B024
@@ -29,7 +47,13 @@ class _ProtocolFixture(typing.Protocol):
     """Protocol fixture for isProtocol checks."""
 
     def greet(self) -> str:
-        """Return a greeting."""
+        """Return a greeting.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         ...
 
 class _SlottedFixture:
@@ -58,19 +82,43 @@ class _OriginFixture:
     __origin__ = list
 
 def _sync_gen():
-    """Yield integers as a synchronous generator fixture."""
+    """Yield integers as a synchronous generator fixture.
+
+    Yields
+    ------
+    object
+        Value produced by the helper.
+    """
     yield 1
 
 async def _async_gen():
-    """Yield integers as an asynchronous generator fixture."""
+    """Yield integers as an asynchronous generator fixture.
+
+    Yields
+    ------
+    object
+        Value produced by the helper.
+    """
     yield 1
 
 async def _coroutine_fn() -> int: # NOSONAR
-    """Return 1 as an async coroutine fixture."""
+    """Return 1 as an async coroutine fixture.
+
+    Returns
+    -------
+    int
+        Value produced by the helper.
+    """
     return 1
 
 def _plain_fn() -> int:
-    """Return 1 as a plain function fixture."""
+    """Return 1 as a plain function fixture.
+
+    Returns
+    -------
+    int
+        Value produced by the helper.
+    """
     return 1
 
 # ---------------------------------------------------------------------------
@@ -1417,13 +1465,17 @@ class TestIsTypingConstruct(TestCase):
 class TestIsTraceback(TestCase):
 
     def testRealTracebackReturnsTrue(self) -> None:
-        """
-        Assert that isTraceback returns True for a live traceback object.
+        """Assert that isTraceback returns True for a live traceback object.
 
         Returns
         -------
         None
             Raises AssertionError on failure.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         try:
             _err_msg = "fixture"

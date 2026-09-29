@@ -8,10 +8,22 @@ class _ConcreteProvider(IServiceProvider):
     """Minimal IServiceProvider implementation for structural tests."""
 
     def register(self) -> None:
-        """Skip registration; the stub binds nothing."""
+        """Skip registration; the stub binds nothing.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     async def boot(self) -> None:
-        """Skip booting; the stub initialises nothing."""
+        """Skip booting; the stub initialises nothing.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class TestIServiceProvider(TestCase):
 

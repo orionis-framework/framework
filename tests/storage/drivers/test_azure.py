@@ -11,10 +11,14 @@ from orionis.test import TestCase
 class TestAzureStorageDriver(TestCase):
 
     async def testUrlComposedFromAccountAndContainer(self) -> None:
-        """
-        Compose the canonical Azure Blob URL for the container.
+        """Compose the canonical Azure Blob URL for the container.
 
         Validates URL building and quoting without any SDK.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = AzureStorageDriver(
             Azure(account_name="acct", container="media"),
@@ -25,10 +29,14 @@ class TestAzureStorageDriver(TestCase):
         )
 
     async def testCredentialsParsedFromConnectionString(self) -> None:
-        """
-        Derive the account name and key from the connection string.
+        """Derive the account name and key from the connection string.
 
         Validates the pure parsing performed at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = (
             "DefaultEndpointsProtocol=https;AccountName=demo;"
@@ -43,20 +51,28 @@ class TestAzureStorageDriver(TestCase):
         )
 
     async def testSetVisibilityIsUnsupported(self) -> None:
-        """
-        Reject per-blob visibility changes.
+        """Reject per-blob visibility changes.
 
         Validates the documented Azure limitation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = AzureStorageDriver(Azure(container="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
             await driver.setVisibility("f.txt", "public")
 
     async def testTemporaryUrlRequiresAccountKey(self) -> None:
-        """
-        Reject SAS generation without an account key.
+        """Reject SAS generation without an account key.
 
         Validates the failure contract of temporaryUrl().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = AzureStorageDriver(
             Azure(account_name="acct", container="media"),
@@ -65,11 +81,15 @@ class TestAzureStorageDriver(TestCase):
             await driver.temporaryUrl("f.txt", 60)
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """
-        Surface the missing Azure SDK with install instructions.
+        """Surface the missing Azure SDK with install instructions.
 
         Only asserted when azure-storage-blob is absent from the
         environment, so the test remains valid anywhere.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         if importlib.util.find_spec("azure") is not None:
             return

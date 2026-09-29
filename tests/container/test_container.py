@@ -35,28 +35,72 @@ class _NeedsPlain:
     """Service with a single positional _Plain dependency."""
 
     def __init__(self, dep: _Plain) -> None:
-        """Store the injected dependency."""
+        """Store the injected dependency.
+
+        Parameters
+        ----------
+        dep : _Plain
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
 
 class _NeedsKeywordPlain:
     """Service with a single keyword-only _Plain dependency."""
 
     def __init__(self, *, dep: _Plain) -> None:
-        """Store the injected dependency."""
+        """Store the injected dependency.
+
+        Parameters
+        ----------
+        dep : _Plain
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
 
 class _NeedsBuiltin:
     """Service annotated with a builtin type and no default value."""
 
     def __init__(self, count: int) -> None:
-        """Store the builtin argument that the container cannot resolve."""
+        """Store the builtin argument that the container cannot resolve.
+
+        Parameters
+        ----------
+        count : int
+            Value supplied for ``count``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.count = count
 
 class _NeedsDefault:
     """Service whose only argument carries a default value."""
 
     def __init__(self, flag: str = "fallback") -> None:
-        """Store the argument resolved from its own default."""
+        """Store the argument resolved from its own default.
+
+        Parameters
+        ----------
+        flag : str
+            Value supplied for ``flag``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.flag = flag
 
 # Circular dependency pair — patched after both classes are defined so that
@@ -69,11 +113,33 @@ class _CircB:
     """Circular dep node B — depends on _CircA."""
 
     def __init__(self, a: _CircA) -> None:
-        """Store the injected node A."""
+        """Store the injected node A.
+
+        Parameters
+        ----------
+        a : _CircA
+            Value supplied for ``a``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.a = a
 
 def _circa_init(self, b: _CircB) -> None:
-    """Patch the constructor that closes the A to B to A cycle."""
+    """Patch the constructor that closes the A to B to A cycle.
+
+    Parameters
+    ----------
+    b : _CircB
+        Value supplied for ``b``.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     self.b = b
 
 _CircA.__init__ = _circa_init  # type: ignore[method-assign]
@@ -84,27 +150,78 @@ class _Host:
     non_callable: str = "string_value"
 
     def greet(self) -> str:
-        """Return a fixed greeting."""
+        """Return a fixed greeting.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "hello"
 
     def echo(self, dep: _Plain) -> _Plain:
-        """Return the injected dependency."""
+        """Return the injected dependency.
+
+        Parameters
+        ----------
+        dep : _Plain
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        _Plain
+            Value produced by the helper.
+        """
         return dep
 
 def _fn_no_dep() -> str:
-    """Return a constant from a dependency-free function."""
+    """Return a constant from a dependency-free function.
+
+    Returns
+    -------
+    str
+        Value produced by the helper.
+    """
     return "ok"
 
 def _fn_with_dep(dep: _Plain) -> _Plain:
-    """Return the dependency injected into a synchronous function."""
+    """Return the dependency injected into a synchronous function.
+
+    Parameters
+    ----------
+    dep : _Plain
+        Value supplied for ``dep``.
+
+    Returns
+    -------
+    _Plain
+        Value produced by the helper.
+    """
     return dep
 
 async def _afn_no_dep() -> str:
-    """Return a constant from a dependency-free coroutine function."""
+    """Return a constant from a dependency-free coroutine function.
+
+    Returns
+    -------
+    str
+        Value produced by the helper.
+    """
     return "async_ok"
 
 async def _afn_with_dep(dep: _Plain) -> _Plain:
-    """Return the dependency injected into a coroutine function."""
+    """Return the dependency injected into a coroutine function.
+
+    Parameters
+    ----------
+    dep : _Plain
+        Value supplied for ``dep``.
+
+    Returns
+    -------
+    _Plain
+        Value produced by the helper.
+    """
     return dep
 
 # ---------------------------------------------------------------------------
@@ -117,10 +234,22 @@ class _StubRequest(Request):
     """Request double returning a fixed body payload."""
 
     def __init__(self) -> None:
-        """Skip the transport wiring required by the real request."""
+        """Skip the transport wiring required by the real request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     async def data(self) -> dict[str, object]:
-        """Return the canned request payload."""
+        """Return the canned request payload.
+
+        Returns
+        -------
+        dict[str, object]
+            Value produced by the helper.
+        """
         return {"name": _SCHEMA_NAME}
 
 class _PayloadSchema(Schema):
@@ -132,14 +261,36 @@ class _NeedsSchema:
     """Service receiving a schema as a positional constructor argument."""
 
     def __init__(self, payload: _PayloadSchema) -> None:
-        """Store the validated schema payload."""
+        """Store the validated schema payload.
+
+        Parameters
+        ----------
+        payload : _PayloadSchema
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.payload = payload
 
 class _NeedsKeywordSchema:
     """Service receiving a schema as a keyword-only constructor argument."""
 
     def __init__(self, *, payload: _PayloadSchema) -> None:
-        """Store the validated schema payload."""
+        """Store the validated schema payload.
+
+        Parameters
+        ----------
+        payload : _PayloadSchema
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.payload = payload
 
 # ---------------------------------------------------------------------------
@@ -154,10 +305,22 @@ class _SlowRequest(Request):
     """Request double that yields control before answering."""
 
     def __init__(self) -> None:
-        """Skip the transport wiring required by the real request."""
+        """Skip the transport wiring required by the real request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     async def data(self) -> dict[str, object]:
-        """Suspend once, then return the canned request payload."""
+        """Suspend once, then return the canned request payload.
+
+        Returns
+        -------
+        dict[str, object]
+            Value produced by the helper.
+        """
         await asyncio.sleep(0)
         return {"name": _SCHEMA_NAME}
 
@@ -167,7 +330,18 @@ class _SuspendingSingleton:
     constructions = 0
 
     def __init__(self, payload: _PayloadSchema) -> None:
-        """Count the construction and store the validated payload."""
+        """Count the construction and store the validated payload.
+
+        Parameters
+        ----------
+        payload : _PayloadSchema
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _SuspendingSingleton.constructions += 1
         self.payload = payload
 
@@ -177,7 +351,18 @@ class _SuspendingScoped:
     constructions = 0
 
     def __init__(self, payload: _PayloadSchema) -> None:
-        """Count the construction and store the validated payload."""
+        """Count the construction and store the validated payload.
+
+        Parameters
+        ----------
+        payload : _PayloadSchema
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _SuspendingScoped.constructions += 1
         self.payload = payload
 
@@ -197,9 +382,23 @@ def _locks_from_two_loops(container: Container) -> tuple[object, object]:
         independent loop.
     """
     async def take() -> object:
+        """Acquire the creation lock in a new event loop.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return container._Container__creationLock(_Plain)
 
     def capture() -> tuple[object, object]:
+        """Collect the locks returned by two event loops.
+
+        Returns
+        -------
+        tuple[object, object]
+            Value produced by the helper.
+        """
         return asyncio.run(take()), asyncio.run(take())
 
     with ThreadPoolExecutor(max_workers=1) as pool:
@@ -245,7 +444,13 @@ class _AsyncDeferredProvider:
         cls.boot_calls = 0
 
     def register(self) -> None:
-        """Publish the deferred alias into the attached container."""
+        """Publish the deferred alias into the attached container.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _AsyncDeferredProvider.register_calls += 1
         if _AsyncDeferredProvider.container is not None:
             _AsyncDeferredProvider.container.transient(
@@ -253,7 +458,13 @@ class _AsyncDeferredProvider:
             )
 
     async def boot(self) -> None:
-        """Record that the asynchronous boot hook ran."""
+        """Record that the asynchronous boot hook ran.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _AsyncDeferredProvider.boot_calls += 1
 
 class _SyncDeferredProvider:
@@ -281,14 +492,26 @@ class _SyncDeferredProvider:
         cls.boot_calls = 0
 
     def register(self) -> None:
-        """Publish the deferred alias into the attached container."""
+        """Publish the deferred alias into the attached container.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         if _SyncDeferredProvider.container is not None:
             _SyncDeferredProvider.container.transient(
                 None, _DeferredService, alias=_SYNC_ALIAS,
             )
 
     def boot(self) -> None:
-        """Record that the synchronous boot hook ran."""
+        """Record that the synchronous boot hook ran.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _SyncDeferredProvider.boot_calls += 1
 
 class _DependencyProvider:
@@ -316,20 +539,43 @@ class _DependencyProvider:
         cls.register_calls = 0
 
     def register(self) -> None:
-        """Publish the deferred dependency into the attached container."""
+        """Publish the deferred dependency into the attached container.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _DependencyProvider.register_calls += 1
         if _DependencyProvider.container is not None:
             _DependencyProvider.container.transient(None, _DeferredKwService)
 
     async def boot(self) -> None:
-        """Suspend once so concurrent resolutions can interleave."""
+        """Suspend once so concurrent resolutions can interleave.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await asyncio.sleep(0)
 
 class _NeedsDeferredDep:
     """Service depending on a type published by a deferred provider."""
 
     def __init__(self, dep: _DeferredKwService) -> None:
-        """Store the deferred dependency."""
+        """Store the deferred dependency.
+
+        Parameters
+        ----------
+        dep : _DeferredKwService
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
 
 _TEST_MODULE = __name__
@@ -355,7 +601,13 @@ class _RaceLock:
     __slots__ = ("entries", "owner")
 
     def __init__(self) -> None:
-        """Start the lock double unbound and never entered."""
+        """Start the lock double unbound and never entered.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.entries: int = 0
         self.owner: type | None = None
 
@@ -425,7 +677,13 @@ class _UnknownLifetimeBinding:
     __slots__ = ("concrete", "contract", "lifetime")
 
     def __init__(self) -> None:
-        """Build a binding double with an unrecognised lifetime."""
+        """Build a binding double with an unrecognised lifetime.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.contract: type = _Plain
         self.concrete: type = _Plain
         self.lifetime: str = "unsupported"
@@ -462,11 +720,23 @@ class _ScopelessTestCase(TestCase):
     """
 
     def setUp(self) -> None:
-        """Detach the ambient scope so registrations land globally."""
+        """Detach the ambient scope so registrations land globally.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._scope_token = ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Restore the ambient scope captured before the test."""
+        """Restore the ambient scope captured before the test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.reset(self._scope_token)
 
 # ===========================================================================
@@ -538,12 +808,24 @@ class TestContainerSingleton(_ScopelessTestCase):
 class TestContainerSingletonRace(_ScopelessTestCase):
 
     def setUp(self) -> None:
-        """Arm the lock double so the probe observes a competing instance."""
+        """Arm the lock double so the probe observes a competing instance.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().setUp()
         _RACE_LOCK.bindTo(_SingletonRaceProbe)
 
     def tearDown(self) -> None:
-        """Disarm the lock double and drop the probe singleton."""
+        """Disarm the lock double and drop the probe singleton.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _RACE_LOCK.bindTo(None)
         Container._instances.pop(_SingletonRaceProbe, None)
         super().tearDown()
@@ -1403,7 +1685,22 @@ class TestContainerSignatureResolution(_ScopelessTestCase):
                 *args: object,
                 **kwargs: object,
             ) -> None:
-                """Record the variadic arguments received."""
+                """Record the variadic arguments received.
+
+                Parameters
+                ----------
+                dep : _Plain
+                    Value supplied for ``dep``.
+                *args : object
+                    Arguments passed to the wrapped callable.
+                **kwargs : object
+                    Arguments passed to the wrapped callable.
+
+                Returns
+                -------
+                None
+                    Completes the operation described above.
+                """
                 captured["dep"] = dep
                 captured["args"] = args
                 captured["kwargs"] = kwargs
@@ -1495,7 +1792,13 @@ class TestContainerSignatureResolution(_ScopelessTestCase):
 class TestContainerSchemaArguments(_ScopelessTestCase):
 
     def setUp(self) -> None:
-        """Bind a request double so schema arguments can be validated."""
+        """Bind a request double so schema arguments can be validated.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().setUp()
         self._container = _fresh()
         self._container.instance(Request, _StubRequest())
@@ -1539,7 +1842,13 @@ class TestContainerSchemaArguments(_ScopelessTestCase):
 class TestContainerDeferredProviders(_ScopelessTestCase):
 
     def setUp(self) -> None:
-        """Attach a fresh container to every deferred provider double."""
+        """Attach a fresh container to every deferred provider double.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().setUp()
         self._container = _fresh()
         self._container._deferred_providers = dict(_DEFERRED_REGISTRY)
@@ -1548,7 +1857,13 @@ class TestContainerDeferredProviders(_ScopelessTestCase):
         _DependencyProvider.reset(self._container)
 
     def tearDown(self) -> None:
-        """Detach the container from every deferred provider double."""
+        """Detach the container from every deferred provider double.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _AsyncDeferredProvider.reset(None)
         _SyncDeferredProvider.reset(None)
         _DependencyProvider.reset(None)
@@ -1665,7 +1980,13 @@ class TestContainerDeferredProviders(_ScopelessTestCase):
 class TestContainerConcurrentResolution(_ScopelessTestCase):
 
     def setUp(self) -> None:
-        """Bind a suspending request double and reset the build counters."""
+        """Bind a suspending request double and reset the build counters.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().setUp()
         self._container = _fresh()
         self._container.instance(Request, _SlowRequest())
@@ -1726,6 +2047,13 @@ class TestContainerConcurrentResolution(_ScopelessTestCase):
         self._container.scoped(None, _SuspendingScoped)
 
         async def resolve() -> object:
+            """Run the resolve helper.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             async with self._container.beginScope():
                 return await self._container.make(_SuspendingScoped)
 
@@ -1843,6 +2171,13 @@ class TestContainerThreadSafety(_ScopelessTestCase):
         guard = threading.Lock()
 
         def build() -> None:
+            """Build a service through the container test double.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             barrier.wait()
             instance = _Threaded()
             with guard:

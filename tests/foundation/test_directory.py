@@ -6,11 +6,34 @@ from orionis.foundation.contracts.directory import IDirectory
 from orionis.test import TestCase
 
 def _make_directory(path_map: dict | None = None) -> Directory:
-    """Create a Directory instance backed by a mock IApplication."""
+    """Create a Directory instance backed by a mock IApplication.
+
+    Parameters
+    ----------
+    path_map : dict | None
+        Value supplied for ``path_map``.
+
+    Returns
+    -------
+    Directory
+        Value produced by the helper.
+    """
     mock_app = MagicMock()
     default_path = Path("/fake/root")
 
     def path_side_effect(key: str) -> Path:
+        """Resolve the requested path using the configured map.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Path
+            Value produced by the helper.
+        """
         if path_map:
             return path_map.get(key, default_path / key)
         return default_path / key

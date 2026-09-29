@@ -8,14 +8,35 @@ class _DefaultResponses:
 
     @staticmethod
     async def error(*, status_code: int, content: str, **_kwargs: object) -> Response:
-        """Return the requested error status and body."""
+        """Return the requested error status and body.
+
+        Parameters
+        ----------
+        status_code : int
+            Value supplied for ``status_code``.
+        content : str
+            Value supplied for ``content``.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         return Response(status_code=status_code, content=content)
 
 class TestSecurityHeaderChecks(TestCase):
     """Preserve host and header policies across middleware changes."""
 
     async def testRejectsDuplicateHostHeadersRegardlessOfCase(self) -> None:
-        """Reject two Host fields even when their casing differs."""
+        """Reject two Host fields even when their casing differs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = SecurityMiddleware({}, _DefaultResponses())
         response = await middleware.handle(make_adapter([
             (b"Host", b"example.com"), (b"host", b"other.example.com"),
@@ -23,7 +44,13 @@ class TestSecurityHeaderChecks(TestCase):
         self.assertEqual(response.getStatusCode(), 400)
 
     async def testMatchesExactAndWildcardHosts(self) -> None:
-        """Match wildcard suffixes at a domain boundary and retain exact hosts."""
+        """Match wildcard suffixes at a domain boundary and retain exact hosts.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = SecurityMiddleware(
             {"allowed_hosts": ["*.example.com", "internal.local"]},
             _DefaultResponses(),
@@ -42,7 +69,13 @@ class TestSecurityHeaderChecks(TestCase):
                 self.assertEqual(response.getStatusCode(), 400)
 
     async def testRetainsHeaderInjectionValidation(self) -> None:
-        """Reject carriage returns and line feeds before accepting the request."""
+        """Reject carriage returns and line feeds before accepting the request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         middleware = SecurityMiddleware({}, _DefaultResponses())
         for headers in (
             [(b"x-value", b"text\r\ninvalid")], [(b"x-invalid\n", b"text")],

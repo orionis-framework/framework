@@ -17,31 +17,43 @@ class TestLocalizationContractsPackage(TestCase):
     """Validate the public surface of the contracts package."""
 
     def testAllDeclaresEveryContract(self) -> None:
-        """
-        Publish exactly the four localization contracts.
+        """Publish exactly the four localization contracts.
 
         Validates that the package aggregates every interface consumers
         may depend on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(tuple(contracts.__all__), _EXPECTED_EXPORTS)
 
     def testAllIsSortedAndFreeOfDuplicates(self) -> None:
-        """
-        Keep the export list sorted and unique.
+        """Keep the export list sorted and unique.
 
         Validates that the contract catalogue stays readable and free
         of repeated names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exported = list(contracts.__all__)
         self.assertEqual(exported, sorted(exported))
         self.assertEqual(len(exported), len(set(exported)))
 
     def testExportsReuseTheDefiningModules(self) -> None:
-        """
-        Re-export the very interfaces declared by each module.
+        """Re-export the very interfaces declared by each module.
 
         Validates that isinstance checks behave identically regardless
         of the import path used.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(contracts.ITranslationLoader, ITranslationLoader)
         self.assertIs(contracts.ITranslationRepository, ITranslationRepository)

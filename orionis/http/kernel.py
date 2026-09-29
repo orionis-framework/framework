@@ -7,6 +7,7 @@ from orionis.auth.middleware.resolve_identity import (
     ResolveTokenIdentityMiddleware,
 )
 from orionis.console.output.http_request import HTTPRequestPrinter
+from orionis.container.entities.invocation import callable_plan, warm_controller_plan
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.foundation.contracts.application import IApplication
@@ -24,7 +25,6 @@ from orionis.http.layer.shared.rate_limit import RateLimitMiddleware
 from orionis.http.layer.shared.security import SecurityMiddleware
 from orionis.http.layer.web.csrf_token import CSRFTokenMiddleware
 from orionis.http.layer.web.start_session import StartSessionMiddleware
-from orionis.http.payload.body import BodyStream
 from orionis.http.request import Request
 from orionis.http.responses import JSONResponse, Response
 from orionis.http.routes.enums.route_types import RouteType
@@ -49,19 +49,62 @@ _JSON_RESPONSE_TYPES: tuple[type, ...] = (dict, msgspec.Struct)
 # Kernel context identifier reused across all request scopes.
 _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
 
+class _MiddlewareNext:
+    """Hold one request-local continuation that can be consumed only once."""
+
+    __slots__ = ("_args", "_called", "_terminal")
+
+    def __init__(self, terminal: Callable, args: tuple) -> None:
+        """
+        Bind a continuation to its fixed arguments.
+
+        Parameters
+        ----------
+        terminal : Callable
+            Asynchronous next middleware or handler.
+        args : tuple
+            Arguments supplied when advancing the pipeline.
+
+        Returns
+        -------
+        None
+            The continuation is ready for one invocation.
+        """
+        self._terminal = terminal
+        self._args = args
+        self._called = False
+
+    async def __call__(self) -> Response:
+        """
+        Advance once, including when concurrent tasks call the continuation.
+
+        Returns
+        -------
+        Response
+            Response returned by the next middleware or handler.
+
+        Raises
+        ------
+        RuntimeError
+            If the middleware already consumed this continuation.
+        """
+        if self._called:
+            error_msg = "next() has already been called in this middleware layer."
+            raise RuntimeError(error_msg)
+        self._called = True
+        return await self._terminal(*self._args)
+
 class _MiddlewarePipeline:
     """
     Middleware pipeline with request-local execution state.
 
     A single instance encapsulates the execution state for one middleware stack
-    invocation.  Its ``__call__`` method acts as the ``next()`` callable passed
-    to each layer, advancing the pipeline without allocating closures or cells
-    per request.
+    invocation. Each layer receives a fixed continuation so concurrent
+    invocations cannot change the depth observed by another middleware.
     """
 
     __slots__ = (
         "_called_mask",
-        "_depth",
         "_instances",
         "_n",
         "_request",
@@ -99,7 +142,6 @@ class _MiddlewarePipeline:
         self._terminal = terminal
         self._terminal_args = terminal_args
         self._n = len(instances)
-        self._depth = 0
         self._called_mask = 0
 
     async def __call__(self) -> Response:
@@ -116,7 +158,22 @@ class _MiddlewarePipeline:
         RuntimeError
             When ``next()`` is invoked more than once in the same layer.
         """
-        depth = self._depth
+        return await self.__advance(0)
+
+    async def __advance(self, depth: int) -> Response:
+        """
+        Invoke the layer at a fixed depth with its own continuation.
+
+        Parameters
+        ----------
+        depth : int
+            Position of the middleware or terminal to execute.
+
+        Returns
+        -------
+        Response
+            Response returned by this middleware and its descendants.
+        """
         bit = 1 << depth
         # Guard against double invocation of next() from the same layer.
         if self._called_mask & bit:
@@ -126,11 +183,8 @@ class _MiddlewarePipeline:
         # The terminal also consumes its continuation exactly once.
         if depth >= self._n:
             return await self._terminal(*self._terminal_args)
-        self._depth = depth + 1
-        try:
-            return await self._instances[depth].handle(self._request, self)
-        finally:
-            self._depth = depth
+        continuation = _MiddlewareNext(self.__advance, (depth + 1,))
+        return await self._instances[depth].handle(self._request, continuation)
 
 class KernelHTTP(IKernelHTTP):
 
@@ -281,12 +335,14 @@ class KernelHTTP(IKernelHTTP):
 
     async def __preloadHandlers(self) -> None:
         """
-        Eagerly import all route modules and resolve callables at boot time.
+        Import route handlers and prepare their dependency metadata at boot time.
 
         Populates two int-keyed dispatch tables using route object identity,
         eliminating per-request module imports, attribute lookups, and tuple
         key construction from the handler invocation hot path. View routes are
-        stored in a third table holding only their template name.
+        stored in a third table holding only their template name. Ordinary
+        constructor and action plans are prepared without resolving services
+        or creating controller instances. Custom descriptors remain lazy.
 
         Returns
         -------
@@ -314,12 +370,14 @@ class KernelHTTP(IKernelHTTP):
                 module_cache[module_name] = module
 
             if route.type is RouteType.FUNCTION:
-                fn_dispatch[route_id] = attrgetter(action["function"])(module)
+                function = attrgetter(action["function"])(module)
+                callable_plan(function)
+                fn_dispatch[route_id] = function
             else:
-                cls_dispatch[route_id] = (
-                    attrgetter(action["class"])(module),
-                    action["method"],
-                )
+                controller = attrgetter(action["class"])(module)
+                method = action["method"]
+                warm_controller_plan(controller, method)
+                cls_dispatch[route_id] = (controller, method)
 
         self.__fn_dispatch: dict[int, object] = fn_dispatch
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
@@ -526,12 +584,21 @@ class KernelHTTP(IKernelHTTP):
         Response
             HTTP response produced by the middleware pipeline.
         """
+        if resolved_route.route.public:
+            return await self.__requestLayer(request, resolved_route)
         if resolved_route.kind == "web":
             instances = self.__web_middleware
             terminal = self.__webTerminal
         else:
             instances = self.__api_middleware
             terminal = self.__requestLayer
+
+        if not instances:
+            return await terminal(request, resolved_route)
+        if len(instances) == 1:
+            return await instances[0].handle(
+                request, _MiddlewareNext(terminal, (request, resolved_route)),
+            )
 
         # Keep continuation state local to this request.
         pipeline = _MiddlewarePipeline(
@@ -600,6 +667,12 @@ class KernelHTTP(IKernelHTTP):
             built = [await self.__app.build(mw_class) for mw_class in stack]
             instances = tuple(built)
             self.__middleware_cache[stack] = instances
+
+        if len(instances) == 1:
+            return await instances[0].handle(
+                request,
+                _MiddlewareNext(self.__callHandler, (resolved_route, request)),
+            )
 
         # Keep continuation state local to this request.
         pipeline = _MiddlewarePipeline(
@@ -811,14 +884,10 @@ class KernelHTTP(IKernelHTTP):
 
             # Resolve the route and construct the fully typed request object.
             resolved_route = self.__routes.resolve(method=method, path=path)
-            body_stream = BodyStream(
-                interface=interface,
-                receive_or_protocol=receive_or_protocol,
-            )
             request = Request(
                 interface=interface,
                 adapter=adapter,
-                body_stream=body_stream,
+                receive_or_protocol=receive_or_protocol,
                 params=resolved_route.params,
             )
             request_context[Request] = request  # type: ignore[index]

@@ -15,17 +15,40 @@ class _FullProvider(ServiceProvider):
     """Subclass recording both register() and boot() invocations."""
 
     def __init__(self, app: _FakeApp) -> None:
-        """Store the application and initialise the call recorders."""
+        """Store the application and initialise the call recorders.
+
+        Parameters
+        ----------
+        app : _FakeApp
+            Value supplied for ``app``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__(app)
         self.register_calls: int = 0
         self.boot_calls: int = 0
 
     def register(self) -> None:
-        """Record a synchronous registration call."""
+        """Record a synchronous registration call.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.register_calls += 1
 
     async def boot(self) -> None:
-        """Record an asynchronous boot call."""
+        """Record an asynchronous boot call.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.boot_calls += 1
 
 # ===========================================================================

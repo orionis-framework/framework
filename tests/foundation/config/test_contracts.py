@@ -4,7 +4,6 @@ import tempfile
 from dataclasses import asdict, fields
 from pathlib import Path
 from typing import get_args, get_type_hints
-
 from orionis.foundation.config.app import App
 from orionis.foundation.config.startup import Configuration
 from orionis.foundation.core_config import CORE_CONFIG
@@ -13,17 +12,28 @@ from tests.foundation.config.support import (
     configuration_classes,
 )
 
-
 class TestConfigurationContracts(ConfigurationTestCase):
     def testAllDefaultsAndSerializedConfigurationsConstruct(self) -> None:
-        """Construct and round-trip every entity and application subclass."""
+        """Construct and round-trip every entity and application subclass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in configuration_classes(self.modules):
             with self.subTest(entity=cls.__module__):
                 original = cls()
                 self.assertEqual(asdict(cls(**asdict(original))), asdict(original))
 
     def testEveryFieldRejectsAnUnsupportedObject(self) -> None:
-        """Exercise the initialization guards of every declared field."""
+        """Exercise the initialization guards of every declared field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in configuration_classes(self.modules):
             for field in fields(cls):
                 with (
@@ -33,7 +43,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
                     cls(**{field.name: object()})
 
     def testNullabilityMatchesDeclaredTypes(self) -> None:
-        """Distinguish nullable options from required configuration values."""
+        """Distinguish nullable options from required configuration values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in configuration_classes(self.modules):
             annotations = get_type_hints(cls)
             for field in fields(cls):
@@ -45,7 +61,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
                             cls(**{field.name: None})
 
     def testBootstrapDefaultsPreserveExplicitApplicationChoices(self) -> None:
-        """Compare the application templates with their framework bases."""
+        """Compare the application templates with their framework bases.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         overrides = {
             "BootstrapAppAuth": ("session", "redirect_to", "/login"),
             "BootstrapCache": ("prefix", None, ""),
@@ -65,7 +87,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
                 self.assertEqual(asdict(cls()), expected)
 
     def testStartupContainsEveryCoreConfigurationSection(self) -> None:
-        """Include hashing, scheduler and view in nested startup validation."""
+        """Include hashing, scheduler and view in nested startup validation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(set(Configuration().toDict()), set(CORE_CONFIG))
         configured = Configuration(
             hashing={"bcrypt": {"rounds": 4}},
@@ -79,14 +107,26 @@ class TestConfigurationContracts(ConfigurationTestCase):
             Configuration(hashing={"bcrypt": {"rounds": 32}})
 
     def testPublicExportsRemainImportable(self) -> None:
-        """Import the whole configuration tree and verify its declared exports."""
+        """Import the whole configuration tree and verify its declared exports.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for module in self.modules:
             for name in getattr(module, "__all__", ()):
                 with self.subTest(module=module.__name__, export=name):
                     self.assertTrue(hasattr(module, name))
 
     def testConfigurationMethodsFollowProjectConventions(self) -> None:
-        """Protect camelCase methods and Python protocol method names."""
+        """Protect camelCase methods and Python protocol method names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for root in (Path("config"), Path("orionis/foundation/config")):
             for path in root.rglob("*.py"):
                 tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -108,7 +148,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
                             self.assertTrue(special or camel)
 
     def testNoConfigurationUsesRuntimeAssertions(self) -> None:
-        """Keep validation active when Python runs with optimization enabled."""
+        """Keep validation active when Python runs with optimization enabled.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for module in self.modules:
             if module.__file__ is None:
                 continue
@@ -118,7 +164,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
             )
 
     def testInvalidAppDoesNotGenerateOrPersistAKey(self) -> None:
-        """Validate all application fields before generating a missing key."""
+        """Validate all application fields before generating a missing key.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for options in ({"maintenance": 1}, {"timezone": "Missing/Zone"}):
             with (
                 self.subTest(options=options),
@@ -128,7 +180,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
         self.assertEqual(self.environment.writes, [])
 
     def testEmptyRoutingFileDoesNotBlockConfigurationBoot(self) -> None:
-        """Allow empty optional route files while rejecting non-routing code."""
+        """Allow empty optional route files while rejecting non-routing code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         from orionis.foundation.application import Application
 
         with tempfile.TemporaryDirectory() as directory:

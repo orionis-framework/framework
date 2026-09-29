@@ -4,7 +4,18 @@ from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.test import TestCase
 
 def _make_argument(**overrides: object) -> Argument:
-    """Create a valid Argument instance with sensible defaults."""
+    """Create a valid Argument instance with sensible defaults.
+
+    Parameters
+    ----------
+    **overrides : object
+        Arguments passed to the wrapped callable.
+
+    Returns
+    -------
+    Argument
+        Value produced by the helper.
+    """
     defaults = {
         "name": "my_service",
         "resolved": True,

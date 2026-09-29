@@ -9,12 +9,16 @@ from orionis.test import TestCase
 class TestValidateKeyNameAcceptedNames(TestCase):
 
     def testAcceptsEveryValidNamingShape(self) -> None:
-        """
-        Accept every documented shape of a valid variable name.
+        """Accept every documented shape of a valid variable name.
 
         Validates the single uppercase letter, plain word, underscored,
         digit-suffixed, mixed and consecutive-underscore forms allowed by
         the pattern.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for key in (
             "A",
@@ -28,21 +32,29 @@ class TestValidateKeyNameAcceptedNames(TestCase):
             self.assertEqual(ValidateKeyName(key), key)
 
     def testReturnsTheValidatedNameUnchanged(self) -> None:
-        """
-        Return the very same string object that was validated.
+        """Return the very same string object that was validated.
 
         Validates that no normalisation or copying happens, so callers can
         rely on identity when caching keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         key = "MY_KEY"
         self.assertIs(ValidateKeyName(key), key)
 
     def testIsReExportedByThePackage(self) -> None:
-        """
-        Re-export the validator from the validators package root.
+        """Re-export the validator from the validators package root.
 
         Validates that both documented import paths resolve to the very
         same callable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(ValidateKeyName, PackageValidateKeyName)
 
@@ -53,22 +65,30 @@ class TestValidateKeyNameAcceptedNames(TestCase):
 class TestValidateKeyNameRejectedTypes(TestCase):
 
     def testRejectsEveryNonStringInput(self) -> None:
-        """
-        Raise TypeError for every non-string input.
+        """Raise TypeError for every non-string input.
 
         Validates that the type guard runs before the pattern check for
         integers, floats, booleans, ``None`` and containers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for key in (42, 3.14, True, None, ["KEY"], {"KEY": 1}, ("KEY",)):
             with self.assertRaises(TypeError):
                 ValidateKeyName(key)
 
     def testReportsTheReceivedTypeInTheMessage(self) -> None:
-        """
-        Report the offending type inside the error message.
+        """Report the offending type inside the error message.
 
         Validates that the failure is actionable without inspecting a
         traceback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError) as ctx:
             ValidateKeyName(42)
@@ -81,12 +101,16 @@ class TestValidateKeyNameRejectedTypes(TestCase):
 class TestValidateKeyNameRejectedNames(TestCase):
 
     def testRejectsEveryNameOutsideThePattern(self) -> None:
-        """
-        Raise ValueError for every name outside the allowed pattern.
+        """Raise ValueError for every name outside the allowed pattern.
 
         Validates rejection of empty names, lowercase letters, a leading
         digit or underscore, whitespace, hyphens, dots and any character
         that is not an uppercase letter, digit or underscore.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for key in (
             "",
@@ -104,11 +128,15 @@ class TestValidateKeyNameRejectedNames(TestCase):
                 ValidateKeyName(key)
 
     def testReportsTheOffendingNameInTheMessage(self) -> None:
-        """
-        Report the offending name inside the error message.
+        """Report the offending name inside the error message.
 
         Validates that the failure names the rejected key and documents
         the expected convention.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError) as ctx:
             ValidateKeyName("lower")
@@ -123,11 +151,15 @@ class TestValidateKeyNameRejectedNames(TestCase):
 class TestValidateKeyNameCaching(TestCase):
 
     def testReusesTheCachedResultForRepeatedNames(self) -> None:
-        """
-        Serve repeated validations from the memoisation cache.
+        """Serve repeated validations from the memoisation cache.
 
         Validates that the ``lru_cache`` wrapper is active, which keeps
         the hot configuration path free of regex matching.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         info_before = ValidateKeyName.cache_info()
         ValidateKeyName("CACHED_KEY")

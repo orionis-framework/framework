@@ -2,23 +2,30 @@ from orionis import encrypter as package
 from orionis.encrypter.encrypter import Encrypter
 from orionis.test import TestCase
 
-
 class TestEncrypterPackage(TestCase):
 
     def testPublishesOnlyTheEncrypterClass(self) -> None:
-        """
-        Export a single public name from the package root.
+        """Export a single public name from the package root.
 
         Validates the surface consumers may import from
         ``orionis.encrypter``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(package.__all__, ["Encrypter"])
 
     def testExportedNameResolvesToTheImplementation(self) -> None:
-        """
-        Bind the exported name to the concrete implementation.
+        """Bind the exported name to the concrete implementation.
 
         Validates that the re-export points at the real class instead of
         a shadowing alias.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(package.Encrypter, Encrypter)

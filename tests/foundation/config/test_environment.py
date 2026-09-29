@@ -7,10 +7,15 @@ from orionis.foundation.config.logging import Logging
 from orionis.foundation.config.view import View
 from tests.foundation.config.support import ConfigurationTestCase
 
-
 class TestConfigurationEnvironment(ConfigurationTestCase):
     def testSelectedDatabaseCharsetDoesNotInvalidateOtherConnections(self) -> None:
-        """Keep backend-specific encodings out of inactive connection defaults."""
+        """Keep backend-specific encodings out of inactive connection defaults.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(DB_CONNECTION="mysql", DB_CHARSET="utf8mb4")
         for cls in (Database, BootstrapDatabase):
             with self.subTest(entity=cls.__name__):
@@ -27,7 +32,13 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertEqual(cls().connections.mysql.charset, "utf8mb4")
 
     def testSelectedStackPathDoesNotInvalidateRotatingChannels(self) -> None:
-        """Use a plain stack filename while keeping valid rotation templates."""
+        """Use a plain stack filename while keeping valid rotation templates.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(
             LOG_CHANNEL="stack",
             LOG_PATH="storage/custom.log",
@@ -39,7 +50,13 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertIn("{suffix}", config.channels.daily.path)
 
     def testSelectedRetentionIsValidatedForItsOwnTimeUnit(self) -> None:
-        """Allow hourly retention above the unrelated monthly maximum."""
+        """Allow hourly retention above the unrelated monthly maximum.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(LOG_CHANNEL="hourly", LOG_RETENTION=168)
         for cls in (Logging, BootstrapLogging):
             with self.subTest(entity=cls.__name__):
@@ -51,7 +68,13 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 cls()
 
     def testEnvironmentListsDoNotBecomeSharedInstanceDefaults(self) -> None:
-        """Own collections even when the environment returns the same list."""
+        """Own collections even when the environment returns the same list.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         values = ["https://example.com"]
         self.environment.values["CORS_ALLOW_ORIGINS"] = values
         first = Cors()
@@ -61,7 +84,13 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
         self.assertIsNot(second.allow_origins, values)
 
     def testEnvironmentFalsyValuesAreNotReplacedByDefaults(self) -> None:
-        """Keep explicitly disabled template and bytecode caches."""
+        """Keep explicitly disabled template and bytecode caches.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(
             VIEW_CACHE_SIZE=0,
             VIEW_AUTOESCAPE=False,

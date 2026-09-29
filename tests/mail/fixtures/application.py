@@ -34,22 +34,45 @@ if TYPE_CHECKING:
 
 _PDF = b"%PDF-1.4\nMail integration fixture\n%%EOF\n"
 
-
 class WelcomeMail(Mailable):
     __slots__ = ("name",)
 
     def __init__(self, name: str) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.name = name
 
     def envelope(self) -> Envelope:
-        """Declare the example sender and subject."""
+        """Declare the example sender and subject.
+
+        Returns
+        -------
+        Envelope
+            Value produced by the helper.
+        """
         return Envelope(
             from_address=Address("no-reply@example.com", "Example App"),
             subject="Welcome",
         )
 
     def content(self) -> Content:
-        """Declare the example view and plain-text alternative."""
+        """Declare the example view and plain-text alternative.
+
+        Returns
+        -------
+        Content
+            Value produced by the helper.
+        """
         return Content(
             view="emails.welcome",
             data={"name": self.name},
@@ -57,7 +80,13 @@ class WelcomeMail(Mailable):
         )
 
     def attachments(self) -> list[Attachment]:
-        """Declare a guide resolved from the actual configured storage disk."""
+        """Declare a guide resolved from the actual configured storage disk.
+
+        Returns
+        -------
+        list[Attachment]
+            Value produced by the helper.
+        """
         return [
             Attachment.fromStorage(
                 "documents/guide.pdf",
@@ -67,21 +96,31 @@ class WelcomeMail(Mailable):
             ),
         ]
 
-
 class CompleteWelcomeMail(WelcomeMail):
     __slots__ = ()
 
     def envelope(self) -> Envelope:
-        """Declare a self-contained envelope accepted by Mail.send(mailable)."""
+        """Declare a self-contained envelope accepted by Mail.send(mailable).
+
+        Returns
+        -------
+        Envelope
+            Value produced by the helper.
+        """
         return Envelope(
             from_address="no-reply@example.com",
             subject="Complete",
             to="ana@example.com",
         )
 
-
 async def send_welcome() -> MailResult:
-    """Execute the reusable Mailable acceptance example."""
+    """Execute the reusable Mailable acceptance example.
+
+    Returns
+    -------
+    MailResult
+        Value produced by the helper.
+    """
     return (
         await Mail.mailer("file")
         .to(Address("ana@example.com", "Ana"))
@@ -90,9 +129,19 @@ async def send_welcome() -> MailResult:
         )
     )
 
-
 def configure_welcome(message: Message) -> None:
-    """Configure the direct controller example with every envelope field."""
+    """Configure the direct controller example with every envelope field.
+
+    Parameters
+    ----------
+    message : Message
+        Value supplied for ``message``.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     message.fromAddress("no-reply@example.com", "Example App")
     message.to("ana@example.com", "Ana")
     message.cc("operations@example.com")
@@ -108,15 +157,19 @@ def configure_welcome(message: Message) -> None:
         ),
     )
 
-
 class WelcomeController(BaseController):
     __slots__ = ()
 
     async def sendWelcome(self) -> HttpResponse:
-        """Return a real JSON response after awaiting the direct view send."""
+        """Return a real JSON response after awaiting the direct view send.
+
+        Returns
+        -------
+        HttpResponse
+            Value produced by the helper.
+        """
         result = await Mail.send("emails.welcome", {"name": "Ana"}, configure_welcome)
         return response.json({"message_id": result.message_id, "status": result.status})
-
 
 class InvoiceDeliveryService:
     __slots__ = ()
@@ -127,7 +180,22 @@ class InvoiceDeliveryService:
         invoice_number: str,
         attachment_path: str,
     ) -> MailResult:
-        """Execute the fluent Content-and-attachment acceptance example."""
+        """Execute the fluent Content-and-attachment acceptance example.
+
+        Parameters
+        ----------
+        recipient : str
+            Value supplied for ``recipient``.
+        invoice_number : str
+            Value supplied for ``invoice_number``.
+        attachment_path : str
+            Value supplied for ``attachment_path``.
+
+        Returns
+        -------
+        MailResult
+            Value produced by the helper.
+        """
         return await (
             Mail.mailer("file")
             .fromAddress("billing@example.com", "Example Billing")
@@ -150,9 +218,14 @@ class InvoiceDeliveryService:
             )
         )
 
-
 async def send_notifications() -> None:
-    """Execute both literal-body examples without a callback or Mailable."""
+    """Execute both literal-body examples without a callback or Mailable.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     await (
         Mail.fromAddress("notifications@example.com", "Example App")
         .to("ana@example.com")
@@ -166,26 +239,47 @@ async def send_notifications() -> None:
         .html("<h1>Your report is ready.</h1>")
     )
 
-
 class NotificationService:
     __slots__ = ()
 
     async def configureMessage(self, message: Message) -> None:
-        """Configure values through the required asynchronous bound callback."""
+        """Configure values through the required asynchronous bound callback.
+
+        Parameters
+        ----------
+        message : Message
+            Value supplied for ``message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         message.fromAddress("notifications@example.com", "Example App")
         message.to("ana@example.com")
         message.subject("Notification")
 
     async def sendNotification(self) -> MailResult:
-        """Await the asynchronous callback before sending literal text."""
+        """Await the asynchronous callback before sending literal text.
+
+        Returns
+        -------
+        MailResult
+            Value produced by the helper.
+        """
         return await Mail.mailer("file").raw(
             "Your notification is ready.",
             self.configureMessage,
         )
 
-
 async def send_independent_messages() -> None:
-    """Execute concurrent derivations of the same immutable fluent chain."""
+    """Execute concurrent derivations of the same immutable fluent chain.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     base = (
         Mail.mailer("file")
         .fromAddress("notifications@example.com", "Example App")
@@ -195,15 +289,37 @@ async def send_independent_messages() -> None:
     second = base.to("luis@example.com")
     await asyncio.gather(first.raw("Hello, Ana."), second.raw("Hello, Luis."))
 
-
 class AlertService:
     __slots__ = ("__mail",)
 
     def __init__(self, mail: IMailManager) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        mail : IMailManager
+            Value supplied for ``mail``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.__mail = mail
 
     async def sendAlert(self, recipient: str) -> MailResult:
-        """Send using the contract injected by the real framework container."""
+        """Send using the contract injected by the real framework container.
+
+        Parameters
+        ----------
+        recipient : str
+            Value supplied for ``recipient``.
+
+        Returns
+        -------
+        MailResult
+            Value produced by the helper.
+        """
         return await (
             self.__mail.fromAddress("alerts@example.com", "Example App")
             .to(recipient)
@@ -211,18 +327,35 @@ class AlertService:
             .raw("A service alert requires your attention.")
         )
 
-
 class RecordingSink:
     __slots__ = ("messages",)
 
     def __init__(self) -> None:
-        self.messages: list[PreparedMail] = []
+        """Initialize the test helper.
 
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        self.messages: list[PreparedMail] = []
 
 class RecordingTransport(IMailTransport):
     __slots__ = ("sink",)
 
     def __init__(self, sink: RecordingSink) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        sink : RecordingSink
+            Value supplied for ``sink``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.sink = sink
 
     async def send(
@@ -232,7 +365,22 @@ class RecordingTransport(IMailTransport):
         mailer: str,
         driver: str,
     ) -> MailResult:
-        """Record one prepared operation without bypassing public driver resolution."""
+        """Record one prepared operation without bypassing public driver resolution.
+
+        Parameters
+        ----------
+        message : PreparedMail
+            Value supplied for ``message``.
+        mailer : str
+            Value supplied for ``mailer``.
+        driver : str
+            Value supplied for ``driver``.
+
+        Returns
+        -------
+        MailResult
+            Value produced by the helper.
+        """
         self.sink.messages.append(message)
         return MailResult(
             message_id=message.message_id,
@@ -242,40 +390,95 @@ class RecordingTransport(IMailTransport):
             recipients=message.recipients,
         )
 
-
 async def recording_factory(
     app: IApplication,
     config: Mapping[str, object],
 ) -> IMailTransport:
-    """Resolve a driver dependency using the documented factory signature."""
+    """Resolve a driver dependency using the documented factory signature.
+
+    Parameters
+    ----------
+    app : IApplication
+        Value supplied for ``app``.
+    config : Mapping[str, object]
+        Value supplied for ``config``.
+
+    Returns
+    -------
+    IMailTransport
+        Value produced by the helper.
+
+    Raises
+    ------
+    AssertionError
+        Raised by this helper to exercise the failure path.
+    """
     if config["label"] != "provider-extension":
         error_msg = "The factory did not receive its normalized central config."
         raise AssertionError(error_msg)
     return await app.make(RecordingTransport)
 
-
 class RecordingProvider(ServiceProvider):
     __slots__ = ()
 
     def register(self) -> None:
-        """Register test-only transport dependencies during normal startup."""
+        """Register test-only transport dependencies during normal startup.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.app.singleton(RecordingSink, RecordingSink)
         self.app.singleton(RecordingTransport, RecordingTransport)
 
     async def boot(self) -> None:
-        """Extend the already registered manager before the driver's first use."""
+        """Extend the already registered manager before the driver's first use.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         manager = await self.app.make(IMailManager)
         manager.extend("recording", recording_factory)
 
-
 def forbid_smtp(*_args: object, **_kwargs: object) -> None:
-    """Fail if a file-only example attempts any SMTP connection."""
+    """Fail if a file-only example attempts any SMTP connection.
+
+    Parameters
+    ----------
+    *_args : object
+        Arguments passed to the wrapped callable.
+    **_kwargs : object
+        Arguments passed to the wrapped callable.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+
+    Raises
+    ------
+    AssertionError
+        Raised by this helper to exercise the failure path.
+    """
     error_msg = "File-only examples must not construct an SMTP connection."
     raise AssertionError(error_msg)
 
-
 def semantic_content(path: Path) -> list[tuple[object, ...]]:
-    """Compare MIME structure and payloads without operation-specific boundaries."""
+    """Compare MIME structure and payloads without operation-specific boundaries.
+
+    Parameters
+    ----------
+    path : Path
+        Value supplied for ``path``.
+
+    Returns
+    -------
+    list[tuple[object, ...]]
+        Value produced by the helper.
+    """
     parsed = BytesParser(policy=policy.default).parsebytes(path.read_bytes())
     return [
         (
@@ -287,15 +490,42 @@ def semantic_content(path: Path) -> list[tuple[object, ...]]:
         for part in parsed.walk()
     ]
 
-
 def require(condition: object, detail: str) -> None:
-    """Fail an isolated acceptance check even when Python optimization is enabled."""
+    """Fail an isolated acceptance check even when Python optimization is enabled.
+
+    Parameters
+    ----------
+    condition : object
+        Value supplied for ``condition``.
+    detail : str
+        Value supplied for ``detail``.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+
+    Raises
+    ------
+    AssertionError
+        Raised by this helper to exercise the failure path.
+    """
     if not condition:
         raise AssertionError(detail)
 
-
 async def run_examples(app: Application) -> dict[str, object]:
-    """Execute all required styles against the real facade, engine, and local disk."""
+    """Execute all required styles against the real facade, engine, and local disk.
+
+    Parameters
+    ----------
+    app : Application
+        Value supplied for ``app``.
+
+    Returns
+    -------
+    dict[str, object]
+        Value produced by the helper.
+    """
     require(
         isinstance(Mail.fromAddress("check@example.com"), PendingMail),
         "The fluent facade is not pinned.",
@@ -398,9 +628,19 @@ async def run_examples(app: Application) -> dict[str, object]:
         "facade_pinned": isinstance(Mail.fromAddress("a@b"), PendingMail),
     }
 
-
 async def main(runtime: str) -> None:
-    """Boot a real isolated application through its public HTTP or CLI entry point."""
+    """Boot a real isolated application through its public HTTP or CLI entry point.
+
+    Parameters
+    ----------
+    runtime : str
+        Value supplied for ``runtime``.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     smtplib.SMTP = forbid_smtp
     smtplib.SMTP_SSL = forbid_smtp
     routes = Path.cwd() / "routes"
@@ -447,9 +687,33 @@ async def main(runtime: str) -> None:
         result = {}
 
         async def receive() -> dict[str, str]:
+            """Return the next queued ASGI event.
+
+            Returns
+            -------
+            dict[str, str]
+                Value produced by the helper.
+            """
             return next(events)
 
         async def send(event: dict[str, str]) -> None:
+            """Record the ASGI response event.
+
+            Parameters
+            ----------
+            event : dict[str, str]
+                Value supplied for ``event``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+
+            Raises
+            ------
+            RuntimeError
+                Raised by this helper to exercise the failure path.
+            """
             acknowledgements.append(event["type"])
             if event["type"] == "lifespan.startup.complete":
                 result.update(await run_examples(app))
@@ -467,7 +731,6 @@ async def main(runtime: str) -> None:
             "HTTP lifespan failed.",
         )
     sys.stdout.write(json.dumps({"runtime": runtime, **result}) + "\n")
-
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1]))

@@ -13,7 +13,13 @@ class TestDatabaseNamingConventions(TestCase):
     """Check public and internal Python names across the database and ORM."""
 
     def testMethodsAndModuleFunctionsFollowConventions(self) -> None:
-        """Keep methods camelCase and module functions snake_case."""
+        """Keep methods camelCase and module functions snake_case.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         failures = []
         for package in ("database", "orm"):
             root = _ROOT / "orionis" / package

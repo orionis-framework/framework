@@ -9,11 +9,28 @@ class _Clock:
     """Expose an explicitly controlled monotonic time to the rate-limit store."""
 
     def __init__(self, now: float = 0.0) -> None:
-        """Store the initial timestamp reported by the clock."""
+        """Store the initial timestamp reported by the clock.
+
+        Parameters
+        ----------
+        now : float
+            Value supplied for ``now``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.now = now
 
     def __call__(self) -> float:
-        """Return the current controlled timestamp."""
+        """Return the current controlled timestamp.
+
+        Returns
+        -------
+        float
+            Value produced by the helper.
+        """
         return self.now
 
 
@@ -21,12 +38,24 @@ class TestMemoryRateLimitStore(TestCase):
     """Exercise quotas and incremental reclamation of inactive clients."""
 
     async def testExpiresAtTheSlidingWindowBoundary(self) -> None:
-        """Allow a new attempt as soon as the oldest accepted attempt expires."""
+        """Allow a new attempt as soon as the oldest accepted attempt expires.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         timestamps = iter((0.0, 1.0, 9.0, 10.0, 10.5, 11.0))
 
         def next_timestamp() -> float:
-            """Return the timestamp assigned to the next quota attempt."""
+            """Return the timestamp assigned to the next quota attempt.
+
+            Returns
+            -------
+            float
+                Value produced by the helper.
+            """
             return next(timestamps)
 
         with replace_attribute(memory_rate_limit, "monotonic", next_timestamp):
@@ -34,7 +63,13 @@ class TestMemoryRateLimitStore(TestCase):
         self.assertEqual(results, [True, True, False, True, False, True])
 
     async def testReclaimsClientsThatNeverReturn(self) -> None:
-        """Remove expired buckets while unrelated requests continue arriving."""
+        """Remove expired buckets while unrelated requests continue arriving.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         clock = _Clock()
         with replace_attribute(memory_rate_limit, "monotonic", clock):
@@ -47,7 +82,13 @@ class TestMemoryRateLimitStore(TestCase):
         self.assertEqual(list(store._MemoryRateLimitStore__keys), ["active"])
 
     async def testRejectedTrafficStillReclaimsExpiredClients(self) -> None:
-        """Continue collecting short-lived clients when a busy client is denied."""
+        """Continue collecting short-lived clients when a busy client is denied.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         clock = _Clock()
         with replace_attribute(memory_rate_limit, "monotonic", clock):
@@ -60,7 +101,13 @@ class TestMemoryRateLimitStore(TestCase):
         self.assertEqual(set(store._MemoryRateLimitStore__storage), {"busy"})
 
     async def testBoundsEachCollectionBatch(self) -> None:
-        """Limit the number of keys inspected by one collection pass."""
+        """Limit the number of keys inspected by one collection pass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         with replace_attribute(memory_rate_limit, "monotonic", _Clock()):
             for index in range(1024):
@@ -72,7 +119,13 @@ class TestMemoryRateLimitStore(TestCase):
         )
 
     async def testConcurrentAttemptsRespectTheQuota(self) -> None:
-        """Apply one shared quota to tasks running on the same event loop."""
+        """Apply one shared quota to tasks running on the same event loop.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         with replace_attribute(memory_rate_limit, "monotonic", _Clock()):
             results = await asyncio.gather(*(
@@ -81,7 +134,13 @@ class TestMemoryRateLimitStore(TestCase):
         self.assertEqual(sum(results), 10)
 
     async def testZeroQuotaDoesNotRetainClients(self) -> None:
-        """Reject a zero quota without retaining empty client buckets."""
+        """Reject a zero quota without retaining empty client buckets.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         store = MemoryRateLimitStore()
         self.assertFalse(await store.hit("client", 0, 60))
         self.assertFalse(store._MemoryRateLimitStore__storage)

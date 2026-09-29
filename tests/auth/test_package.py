@@ -53,7 +53,6 @@ _HEAVY_SERVICES = (
     "AccessTokenRepository",
 )
 
-
 class TestPackageSurface(TestCase):
     """Validate the public surface of the authentication package."""
 
@@ -62,6 +61,11 @@ class TestPackageSurface(TestCase):
 
         Validates that no name is silently added or dropped from the
         package entry point.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(set(auth_exports), set(_EXPECTED_EXPORTS))
 
@@ -70,6 +74,11 @@ class TestPackageSurface(TestCase):
 
         Validates that the re-exports point at the very objects their
         defining modules expose, never at a copy or an alias.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name, expected in _EXPECTED_EXPORTS.items():
             self.assertIs(getattr(package, name), expected, name)
@@ -79,6 +88,11 @@ class TestPackageSurface(TestCase):
 
         Validates that the list keeps a deterministic order, which makes
         review diffs readable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(list(auth_exports), sorted(auth_exports))
 
@@ -87,6 +101,11 @@ class TestPackageSurface(TestCase):
 
         Validates the package never hides one of its own submodules,
         which would make it unreachable through attribute access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in auth_exports:
             self.assertNotIsInstance(getattr(package, name), types.ModuleType)
@@ -97,6 +116,11 @@ class TestPackageSurface(TestCase):
         Validates the guard against a circular import: the facades
         package imports this one very early, so the manager, the provider
         and the guards must stay in their own modules.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in _HEAVY_SERVICES:
             self.assertNotIn(name, auth_exports)

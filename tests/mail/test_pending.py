@@ -21,10 +21,28 @@ class WelcomeMail(Mailable):
     __slots__ = ("name",)
 
     def __init__(self, name: str) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.name = name
 
     def envelope(self) -> Envelope:
-        """Declare reusable initial headers."""
+        """Declare reusable initial headers.
+
+        Returns
+        -------
+        Envelope
+            Value produced by the helper.
+        """
         return Envelope(
             subject="Welcome",
             from_address="original@example.com",
@@ -32,7 +50,13 @@ class WelcomeMail(Mailable):
         )
 
     def content(self) -> Content:
-        """Declare reusable view and text alternatives."""
+        """Declare reusable view and text alternatives.
+
+        Returns
+        -------
+        Content
+            Value produced by the helper.
+        """
         return Content(
             view="emails.welcome",
             text=f"Hello, {self.name}",
@@ -40,7 +64,13 @@ class WelcomeMail(Mailable):
         )
 
     def attachments(self) -> list[Attachment]:
-        """Declare a deferred guide attachment."""
+        """Declare a deferred guide attachment.
+
+        Returns
+        -------
+        list[Attachment]
+            Value produced by the helper.
+        """
         return [Attachment.fromStorage("documents/guide.pdf")]
 
 class PlainMail(Mailable):
@@ -49,11 +79,23 @@ class PlainMail(Mailable):
     __slots__ = ()
 
     def envelope(self) -> Envelope:
-        """Provide a complete envelope without fluent configuration."""
+        """Provide a complete envelope without fluent configuration.
+
+        Returns
+        -------
+        Envelope
+            Value produced by the helper.
+        """
         return Envelope(from_address="a@example.com", to="b@example.com")
 
     def content(self) -> Content:
-        """Provide literal text without any I/O."""
+        """Provide literal text without any I/O.
+
+        Returns
+        -------
+        Content
+            Value produced by the helper.
+        """
         return Content(text="plain")
 
 class InvalidMail(PlainMail):
@@ -62,23 +104,53 @@ class InvalidMail(PlainMail):
     __slots__ = ("content_value", "envelope_value", "failure", "items")
 
     def __init__(self) -> None:
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.envelope_value: object = super().envelope()
         self.content_value: object = super().content()
         self.failure: Exception | None = None
         self.items: object = ()
 
     def envelope(self) -> Envelope:
-        """Return the deliberately supplied declaration value."""
+        """Return the deliberately supplied declaration value.
+
+        Returns
+        -------
+        Envelope
+            Value produced by the helper.
+
+        Raises
+        ------
+        self.failure
+            Raised by this helper to exercise the failure path.
+        """
         if self.failure is not None:
             raise self.failure
         return self.envelope_value
 
     def content(self) -> Content:
-        """Return the deliberately supplied content value."""
+        """Return the deliberately supplied content value.
+
+        Returns
+        -------
+        Content
+            Value produced by the helper.
+        """
         return self.content_value
 
     def attachments(self) -> Sequence[Attachment]:
-        """Return the deliberately supplied attachment declaration."""
+        """Return the deliberately supplied attachment declaration.
+
+        Returns
+        -------
+        Sequence[Attachment]
+            Value produced by the helper.
+        """
         return self.items
 
 class Callback:
@@ -87,13 +159,36 @@ class Callback:
     __slots__ = ("calls", "failure", "received", "result")
 
     def __init__(self) -> None:
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls = 0
         self.received: list[Message] = []
         self.result: object = None
         self.failure: Exception | None = None
 
     def __call__(self, message: Message) -> object:
-        """Configure headers once and return the requested outcome."""
+        """Configure headers once and return the requested outcome.
+
+        Parameters
+        ----------
+        message : Message
+            Value supplied for ``message``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+
+        Raises
+        ------
+        self.failure
+            Raised by this helper to exercise the failure path.
+        """
         self.calls += 1
         self.received.append(message)
         message.subject("Callback").to("callback@example.com")
@@ -102,22 +197,43 @@ class Callback:
         return message if self.result == "self" else self.result
 
     async def configure(self, message: Message) -> object:
-        """Expose the same behavior through an awaitable bound method."""
+        """Expose the same behavior through an awaitable bound method.
+
+        Parameters
+        ----------
+        message : Message
+            Value supplied for ``message``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         await asyncio.sleep(0)
         return self(message)
 
 class TestPendingMail(TestCase):
 
     def setUp(self) -> None:
-        """Create an isolated recorder and an empty pending chain."""
+        """Create an isolated recorder and an empty pending chain.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.delivery = RecordingDelivery()
         self.base = PendingMail(self.delivery).mailer("archive")
 
     def testEveryFluentEntryReturnsANewIndependentChain(self) -> None:
-        """
-        Return a new chain from every composition method.
+        """Return a new chain from every composition method.
 
         Validates that chains are values instead of mutable builders.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entries = (
             self.base.mailer("file"),
@@ -134,10 +250,14 @@ class TestPendingMail(TestCase):
             self.assertIsNot(chain, self.base)
 
     async def testDerivationsAreIndependentAndConcurrent(self) -> None:
-        """
-        Keep a reusable chain free of recipients added by its children.
+        """Keep a reusable chain free of recipients added by its children.
 
         Validates that concurrent branches never mix recipients.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = self.base.fromAddress("sender@example.com").subject("Notice")
         first = base.to("ana@example.com")
@@ -152,10 +272,14 @@ class TestPendingMail(TestCase):
         )
 
     async def testMailableMergeReplacesScalarsAndAppendsCollections(self) -> None:
-        """
-        Overlay explicit scalars and append recipients and attachments.
+        """Overlay explicit scalars and append recipients and attachments.
 
         Validates that sending never mutates the reusable declaration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mailable = WelcomeMail("Ana")
         await (
@@ -186,10 +310,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(mailable.envelope().subject, "Welcome")
 
     async def testStringContentAndLiteralTerminals(self) -> None:
-        """
-        Keep views, Content, and literal bodies unambiguous.
+        """Keep views, Content, and literal bodies unambiguous.
 
         Validates that a literal is never interpreted as a template.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.base.send("emails.welcome", {"name": "Ana"})
         await self.base.send(Content(html="{{ literal }}", text="{{ literal }}"))
@@ -204,10 +332,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(contents[3].html, "{{ literal }}")
 
     async def testSelectedMailerTravelsWithTheOperation(self) -> None:
-        """
-        Forward the selected mailer to the delivery pipeline.
+        """Forward the selected mailer to the delivery pipeline.
 
         Validates that no mailer is resolved before a terminal call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.base.fromAddress("a@example.com").to("b@example.com").raw("text")
         await PendingMail(self.delivery).fromAddress("a@example.com").to(
@@ -220,10 +352,14 @@ class TestPendingMail(TestCase):
         )
 
     async def testDefaultAttachmentsAndSuccessiveScalarReplacement(self) -> None:
-        """
-        Use the last fluent scalar and the default empty attachments.
+        """Use the last fluent scalar and the default empty attachments.
 
         Validates the merge rules for repeated composition calls.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await (
             self.base.fromAddress("first@example.com")
@@ -239,10 +375,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(attachments, ())
 
     async def testCallbacksAreCalledOnceAndTheirAwaitablesAreAwaited(self) -> None:
-        """
-        Invoke callable objects and async methods exactly once.
+        """Invoke callable objects and async methods exactly once.
 
         Validates that a captured message cannot change a sent operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         callback = Callback()
         await self.base.subject("base").to("base@example.com").raw("one", callback)
@@ -261,12 +401,28 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages[0][1].subject, "Callback")
 
     async def testCallbackScalarsOverrideAndForeignMessageReturnFails(self) -> None:
-        """
-        Let callback scalars win and reject a foreign Message return.
+        """Let callback scalars win and reject a foreign Message return.
 
         Validates that only None or the received message are accepted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         def configure(message: Message) -> Message:
+            """Configure the callback message with test values.
+
+            Parameters
+            ----------
+            message : Message
+                Value supplied for ``message``.
+
+            Returns
+            -------
+            Message
+                Value produced by the helper.
+            """
             return (
                 message.fromAddress("callback@example.com")
                 .subject("")
@@ -291,10 +447,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(len(self.delivery.messages), 1)
 
     async def testCallbackFailureOrInvalidReturnNeverDelivers(self) -> None:
-        """
-        Reject a false return value and a failing callback.
+        """Reject a false return value and a failing callback.
 
         Validates that neither reaches the delivery pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         callback = Callback()
         callback.result = False
@@ -309,10 +469,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     async def testCompositionFailuresRaisedByACallbackKeepTheirIdentity(self) -> None:
-        """
-        Propagate a composition failure raised inside a callback unchanged.
+        """Propagate a composition failure raised inside a callback unchanged.
 
         Validates that a precise message is not replaced by a generic one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         callback = Callback()
         callback.failure = MailCompositionException("explicit callback rejection")
@@ -324,10 +488,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     async def testRejectsInvalidTerminalArgumentCombinations(self) -> None:
-        """
-        Reject ignored arguments even when they are explicitly None.
+        """Reject ignored arguments even when they are explicitly None.
 
         Validates that an invalid combination fails instead of being dropped.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid_calls = (
             self.base.send(WelcomeMail("Ana"), None),
@@ -342,10 +510,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     def testRejectsInvalidMailerAndAttachmentDeclarations(self) -> None:
-        """
-        Fail immediately on invalid fluent declarations.
+        """Fail immediately on invalid fluent declarations.
 
         Validates that composition performs no deferred validation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for value in (None, 1, ""):
             with self.assertRaises(MailConfigurationException):
@@ -354,10 +526,14 @@ class TestPendingMail(TestCase):
             self.base.attach("file.pdf")
 
     async def testInvalidDeclarationsCannotReachDelivery(self) -> None:
-        """
-        Reject declarations that violate their synchronous contract.
+        """Reject declarations that violate their synchronous contract.
 
         Validates that the Mailable itself is never mutated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for field, value in (
             ("envelope_value", None),
@@ -372,12 +548,23 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     async def testAsyncDeclarationIsRejectedAndItsCoroutineClosed(self) -> None:
-        """
-        Reject an asynchronous declaration without leaking a coroutine.
+        """Reject an asynchronous declaration without leaking a coroutine.
 
         Validates that no "never awaited" warning can be produced.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async def declaration() -> Envelope:
+            """Return the envelope requested by the callback.
+
+            Returns
+            -------
+            Envelope
+                Value produced by the helper.
+            """
             return Envelope()
 
         value = declaration()
@@ -390,10 +577,14 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     async def testDeclarationExceptionsKeepTheirCauseAndPreventDelivery(self) -> None:
-        """
-        Translate a failing declaration into a composition failure.
+        """Translate a failing declaration into a composition failure.
 
         Validates that the original cause is preserved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mailable = InvalidMail()
         mailable.failure = ValueError("declaration failure")
@@ -404,12 +595,33 @@ class TestPendingMail(TestCase):
         self.assertEqual(self.delivery.messages, [])
 
     async def testCallbackCancellationNeverContinuesToDelivery(self) -> None:
-        """
-        Propagate cancellation instead of translating it.
+        """Propagate cancellation instead of translating it.
 
         Validates that a cancelled operation never delivers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async def cancel(_message: Message) -> None:
+            """Cancel delivery before it reaches the transport.
+
+            Parameters
+            ----------
+            _message : Message
+                Value supplied for ``_message``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+
+            Raises
+            ------
+            asyncio.CancelledError
+                Raised by this helper to exercise the failure path.
+            """
             raise asyncio.CancelledError
 
         with self.assertRaises(asyncio.CancelledError):

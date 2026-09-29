@@ -27,48 +27,156 @@ class _CompleteLogger(ILogger):
 
     @property
     def name(self) -> str:
-        """Return the logger name."""
+        """Return the logger name.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "complete"
 
     def info(self, _message: str) -> None:
-        """Discard an informational message."""
+        """Discard an informational message.
+
+        Parameters
+        ----------
+        _message : str
+            Value supplied for ``_message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def error(self, _message: str) -> None:
-        """Discard an error message."""
+        """Discard an error message.
+
+        Parameters
+        ----------
+        _message : str
+            Value supplied for ``_message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def warning(self, _message: str) -> None:
-        """Discard a warning message."""
+        """Discard a warning message.
+
+        Parameters
+        ----------
+        _message : str
+            Value supplied for ``_message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def debug(self, _message: str) -> None:
-        """Discard a debug message."""
+        """Discard a debug message.
+
+        Parameters
+        ----------
+        _message : str
+            Value supplied for ``_message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def critical(self, _message: str) -> None:
-        """Discard a critical message."""
+        """Discard a critical message.
+
+        Parameters
+        ----------
+        _message : str
+            Value supplied for ``_message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def getLogger(self) -> logging.Logger:
-        """Return a standard library logger."""
+        """Return a standard library logger.
+
+        Returns
+        -------
+        logging.Logger
+            Value produced by the helper.
+        """
         return logging.getLogger("orionis-contract-probe")
 
     def reloadConfiguration(self) -> None:
-        """Ignore the configuration reload request."""
+        """Ignore the configuration reload request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def switchChannel(self, _channel_name: str) -> bool:
-        """Report a successful channel switch."""
+        """Report a successful channel switch.
+
+        Parameters
+        ----------
+        _channel_name : str
+            Value supplied for ``_channel_name``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     def close(self) -> None:
-        """Ignore the shutdown request."""
+        """Ignore the shutdown request.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def getAvailableChannels(self) -> list[str]:
-        """Return no configured channel."""
+        """Return no configured channel.
+
+        Returns
+        -------
+        list[str]
+            Value produced by the helper.
+        """
         return []
 
     def getActiveChannel(self) -> str | None:
-        """Return no active channel."""
+        """Return no active channel.
+
+        Returns
+        -------
+        str | None
+            Value produced by the helper.
+        """
         return None
 
     def getActiveChannels(self) -> list[str]:
-        """Return no active channel."""
+        """Return no active channel.
+
+        Returns
+        -------
+        list[str]
+            Value produced by the helper.
+        """
         return []
 
 class _IncompleteLogger(ILogger):
@@ -76,17 +184,27 @@ class _IncompleteLogger(ILogger):
 
     @property
     def name(self) -> str:
-        """Return the logger name."""
+        """Return the logger name.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "incomplete"
 
 class TestILoggerContract(TestCase):
 
     def testIsAnAbstractContract(self) -> None:
-        """
-        Expose the logger contract as a non instantiable abstraction.
+        """Expose the logger contract as a non instantiable abstraction.
 
         Validates that consumers can only depend on implementations bound in
         the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(ILogger, ABC))
         self.assertTrue(inspect.isabstract(ILogger))
@@ -94,57 +212,81 @@ class TestILoggerContract(TestCase):
             ILogger()
 
     def testDeclaresTheCompleteAbstractSurface(self) -> None:
-        """
-        Declare every member required from a logging implementation.
+        """Declare every member required from a logging implementation.
 
         Validates the public contract so that adding or removing a member is
         an explicit decision.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ILogger.__abstractmethods__, _ABSTRACT_MEMBERS)
 
     def testNameIsDeclaredAsAProperty(self) -> None:
-        """
-        Expose the service name as a read only property.
+        """Expose the service name as a read only property.
 
         Validates that implementations may shadow it with a plain class
         attribute without breaking the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(ILogger.__dict__["name"], property)
 
     def testEveryAbstractMemberIsDocumented(self) -> None:
-        """
-        Document every member of the contract.
+        """Document every member of the contract.
 
         Validates that implementers always find the expected behaviour
         described in the abstraction itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for member in sorted(_ABSTRACT_MEMBERS):
             self.assertTrue(inspect.getdoc(getattr(ILogger, member)))
 
     def testIncompleteImplementationCannotBeInstantiated(self) -> None:
-        """
-        Reject an implementation missing part of the contract.
+        """Reject an implementation missing part of the contract.
 
         Validates that the abstraction is enforced at instantiation time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             _IncompleteLogger()
 
     def testCompleteImplementationCanBeInstantiated(self) -> None:
-        """
-        Accept an implementation covering the whole contract.
+        """Accept an implementation covering the whole contract.
 
         Validates that the declared surface is sufficient to build a usable
         logging service.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(_CompleteLogger(), ILogger)
 
     def testFrameworkLoggerMatchesTheContractSignatures(self) -> None:
-        """
-        Keep the framework logger aligned with the contract signatures.
+        """Keep the framework logger aligned with the contract signatures.
 
         Validates that every implemented member accepts exactly the parameters
         declared by the abstraction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for member in sorted(_ABSTRACT_MEMBERS - {"name"}):
             expected = inspect.signature(getattr(ILogger, member))

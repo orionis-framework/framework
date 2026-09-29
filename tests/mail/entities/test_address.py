@@ -5,11 +5,15 @@ from orionis.test import TestCase
 class TestAddress(TestCase):
 
     def testPreservesLocalCaseAndNormalizesDomains(self) -> None:
-        """
-        Deduplicate mailboxes by their normalized addr-spec.
+        """Deduplicate mailboxes by their normalized addr-spec.
 
         Validates that the domain is lowercased while the potentially
         significant local part keeps its original case.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = addresses(["Ana@EXAMPLE.com", "Ana@example.com", "ana@example.com"])
         self.assertEqual(
@@ -18,10 +22,14 @@ class TestAddress(TestCase):
         )
 
     def testInternationalMailboxAndDisplayName(self) -> None:
-        """
-        Preserve SMTPUTF8 local parts and Unicode display names.
+        """Preserve SMTPUTF8 local parts and Unicode display names.
 
         Validates that an internationalized domain is encoded with IDNA.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         address = Address("jos\u00e9@example.com", "Jos\u00e9")
         self.assertEqual(address.asHeader().username, "jos\u00e9")
@@ -32,10 +40,14 @@ class TestAddress(TestCase):
         )
 
     def testHeaderKeepsTheOptionalDisplayName(self) -> None:
-        """
-        Build a header value that carries the mailbox and its name.
+        """Build a header value that carries the mailbox and its name.
 
         Validates the structure the composer writes into address headers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         header = Address("ana@example.com", "Ana").asHeader()
         self.assertEqual(header.addr_spec, "ana@example.com")
@@ -43,10 +55,14 @@ class TestAddress(TestCase):
         self.assertEqual(Address("ana@example.com").asHeader().display_name, "")
 
     def testSingleMailboxAcceptsStringsAndAddresses(self) -> None:
-        """
-        Normalize one mailbox supplied as a string or as an Address.
+        """Normalize one mailbox supplied as a string or as an Address.
 
         Validates that an existing Address is reused without copying.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         existing = Address("ana@example.com", "Ana")
         self.assertIs(one_address(existing), existing)
@@ -54,10 +70,14 @@ class TestAddress(TestCase):
         self.assertEqual(one_address("ana@example.com", "Ana").name, "Ana")
 
     def testCollectionsAreNormalizedIntoTuples(self) -> None:
-        """
-        Accept a single mailbox or a list/tuple of mailboxes.
+        """Accept a single mailbox or a list/tuple of mailboxes.
 
         Validates that every declaration produces a tuple of addresses.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(len(addresses("ana@example.com")), 1)
         self.assertEqual(len(addresses(Address("ana@example.com"))), 1)
@@ -69,10 +89,14 @@ class TestAddress(TestCase):
         self.assertEqual(addresses(()), ())
 
     def testRejectsInvalidMailboxes(self) -> None:
-        """
-        Reject malformed mailboxes, lists encoded as strings, and injection.
+        """Reject malformed mailboxes, lists encoded as strings, and injection.
 
         Validates that a display-name form and a header break never parse.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for value in (
             "",
@@ -87,10 +111,14 @@ class TestAddress(TestCase):
                 Address(value)
 
     def testRejectsAmbiguousOrInvalidNames(self) -> None:
-        """
-        Reject a display name that duplicates or contradicts a declaration.
+        """Reject a display name that duplicates or contradicts a declaration.
 
         Validates that names are only accepted beside a single string mailbox.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             addresses(["a@example.com"], "Name")
@@ -100,10 +128,14 @@ class TestAddress(TestCase):
             Address("a@example.com", "Name\x00")
 
     def testRejectsUnsupportedRecipientContainers(self) -> None:
-        """
-        Reject containers that are not a list or a tuple of mailboxes.
+        """Reject containers that are not a list or a tuple of mailboxes.
 
         Validates that a set or a generator never reaches the parser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for value in ({"a@example.com"}, 7, None):
             with self.assertRaises(MailCompositionException):

@@ -25,11 +25,15 @@ _CONSUMED_OPTIONS: frozenset[str] = frozenset({
 class TestS3StorageDriver(TestCase):
 
     def testEntityDeclaresOnlyConsumedOptions(self) -> None:
-        """
-        Declare exactly the options the S3 driver consumes.
+        """Declare exactly the options the S3 driver consumes.
 
         Validates that the configuration entity never grows fields
         that no driver ever reads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             {field.name for field in dataclasses.fields(S3)},
@@ -37,10 +41,14 @@ class TestS3StorageDriver(TestCase):
         )
 
     async def testUrlUsesVirtualHostAddress(self) -> None:
-        """
-        Compose the canonical virtual-host URL for the bucket.
+        """Compose the canonical virtual-host URL for the bucket.
 
         Validates URL building and quoting without any SDK.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = S3StorageDriver(S3(bucket="media", region="us-east-1"))
         self.assertEqual(
@@ -49,10 +57,14 @@ class TestS3StorageDriver(TestCase):
         )
 
     async def testUrlPrefersConfiguredBaseUrl(self) -> None:
-        """
-        Prefer the configured base URL over computed addresses.
+        """Prefer the configured base URL over computed addresses.
 
         Validates the url override option of the disk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = S3StorageDriver(
             S3(bucket="media", url="https://cdn.example.com/"),
@@ -63,10 +75,14 @@ class TestS3StorageDriver(TestCase):
         )
 
     async def testUrlUsesCustomEndpointWhenConfigured(self) -> None:
-        """
-        Compose path-style URLs against custom endpoints.
+        """Compose path-style URLs against custom endpoints.
 
         Validates URL building for S3-compatible services.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = S3StorageDriver(
             S3(bucket="media", endpoint="http://localhost:9000"),
@@ -77,31 +93,43 @@ class TestS3StorageDriver(TestCase):
         )
 
     async def testPathTraversalRejectedBeforeSdkBootstrap(self) -> None:
-        """
-        Reject invalid paths before touching the SDK.
+        """Reject invalid paths before touching the SDK.
 
         Validates that path safety never depends on boto3.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = S3StorageDriver(S3(bucket="media"))
         with self.assertRaises(StoragePathException):
             await driver.read("../escape")
 
     def testOpenRejectsTextModesWithoutSdk(self) -> None:
-        """
-        Reject text stream modes before touching the SDK.
+        """Reject text stream modes before touching the SDK.
 
         Validates the shared mode whitelist in the S3 driver.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         driver = S3StorageDriver(S3(bucket="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
             driver.open("f.txt", "w")
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """
-        Surface the missing boto3 package with install instructions.
+        """Surface the missing boto3 package with install instructions.
 
         Only asserted when boto3 is absent from the environment, so
         the test remains valid on machines that have it installed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         if importlib.util.find_spec("boto3") is not None:
             return

@@ -17,11 +17,28 @@ class _CompleteCaster(IEnvironmentCaster):
     __slots__ = ()
 
     def get(self) -> object:
-        """Return a canned value."""
+        """Return a canned value.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return "value"
 
     def to(self, type_hint: str) -> str:
-        """Return a canned serialised representation."""
+        """Return a canned serialised representation.
+
+        Parameters
+        ----------
+        type_hint : str
+            Value supplied for ``type_hint``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return f"{type_hint}:value"
 
 class _IncompleteCaster(IEnvironmentCaster):
@@ -30,7 +47,13 @@ class _IncompleteCaster(IEnvironmentCaster):
     __slots__ = ()
 
     def get(self) -> object:
-        """Return a canned value."""
+        """Return a canned value.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return "value"
 
 # ---------------------------------------------------------------------------
@@ -40,21 +63,29 @@ class _IncompleteCaster(IEnvironmentCaster):
 class TestEnvironmentCasterContract(TestCase):
 
     def testIsAnAbstractBaseClass(self) -> None:
-        """
-        Expose the caster contract as an abstract base class.
+        """Expose the caster contract as an abstract base class.
 
         Validates that the contract cannot be used as a concrete service
         and participates in the ABC registration machinery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(IEnvironmentCaster, ABC))
         self.assertTrue(isabstract(IEnvironmentCaster))
 
     def testPublishesExactlyTheDocumentedAbstractSurface(self) -> None:
-        """
-        Publish exactly the documented abstract method surface.
+        """Publish exactly the documented abstract method surface.
 
         Validates that no method is silently added to or removed from the
         contract without updating its implementations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             IEnvironmentCaster.__abstractmethods__,
@@ -62,51 +93,71 @@ class TestEnvironmentCasterContract(TestCase):
         )
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates that concrete casters declaring ``__slots__`` do not
         inherit an unwanted instance dictionary from the contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IEnvironmentCaster.__dict__.get("__slots__"), ())
 
     def testCannotBeInstantiatedDirectly(self) -> None:
-        """
-        Reject direct instantiation of the contract.
+        """Reject direct instantiation of the contract.
 
         Validates that callers are forced to depend on a concrete caster
         implementation instead of the interface itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IEnvironmentCaster()
 
     def testRejectsPartialImplementations(self) -> None:
-        """
-        Reject subclasses that leave an abstract method unimplemented.
+        """Reject subclasses that leave an abstract method unimplemented.
 
         Validates that a half-finished caster fails at construction time
         rather than at the first call site.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             _IncompleteCaster()
 
     def testAcceptsCompleteImplementations(self) -> None:
-        """
-        Accept subclasses that implement the whole contract.
+        """Accept subclasses that implement the whole contract.
 
         Validates that the abstract surface is satisfiable without any
         additional hook or attribute.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         caster = _CompleteCaster()
         self.assertEqual(caster.get(), "value")
         self.assertEqual(caster.to("int"), "int:value")
 
     def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
-        """
-        Match the parameter names published by the shipped caster.
+        """Match the parameter names published by the shipped caster.
 
         Validates that ``EnvironmentCaster`` can be substituted wherever
         the contract is expected without changing call sites.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in sorted(_EXPECTED_ABSTRACTS):
             expected = list(signature(getattr(IEnvironmentCaster, name)).parameters)
@@ -114,10 +165,14 @@ class TestEnvironmentCasterContract(TestCase):
             self.assertEqual(actual, expected)
 
     def testIsImplementedByTheShippedCaster(self) -> None:
-        """
-        Recognise the shipped caster as a valid implementation.
+        """Recognise the shipped caster as a valid implementation.
 
         Validates that the concrete class actually derives from the
         contract used across the framework.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(EnvironmentCaster, IEnvironmentCaster))

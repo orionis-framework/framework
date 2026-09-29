@@ -16,6 +16,20 @@ class _FakeUpload:
     __slots__ = ("closed", "content_type", "extension", "filename", "payload")
 
     def __init__(self, filename: str, data: bytes) -> None:
+        """Initialize the storage test double.
+
+        Parameters
+        ----------
+        filename : str
+            Value supplied for ``filename``.
+        data : bytes
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.filename = filename
         self.content_type = "image/png"
         self.closed = False
@@ -64,7 +78,13 @@ class _FakeUpload:
             yield self.payload[start:start + size]
 
     def close(self) -> None:
-        """Mark the buffered payload as released."""
+        """Mark the buffered payload as released.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.closed = True
 
 class _RecordingManager:
@@ -73,6 +93,18 @@ class _RecordingManager:
     __slots__ = ("disk_names", "target")
 
     def __init__(self, target: Disk) -> None:
+        """Initialize the storage test double.
+
+        Parameters
+        ----------
+        target : Disk
+            Value supplied for ``target``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.target = target
         self.disk_names: list[str | None] = []
 
@@ -96,11 +128,15 @@ class _RecordingManager:
 class TestUploadedFileMetadata(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build an uploaded file over a memory-backed disk.
+        """Build an uploaded file over a memory-backed disk.
 
         Provides a fake payload and a recording manager so tests run
         without a booted application.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
         self._source = _FakeUpload("Profile Photo.png", b"png-payload")
@@ -111,18 +147,26 @@ class TestUploadedFileMetadata(TestCase):
         )
 
     def testImplementsTheUploadedFileContract(self) -> None:
-        """
-        Expose the upload through its published contract.
+        """Expose the upload through its published contract.
 
         Validates that the manager can type its return values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._upload, IUploadedFile)
 
     def testExposesTheClientSuppliedMetadata(self) -> None:
-        """
-        Expose the payload metadata through camelCase accessors.
+        """Expose the payload metadata through camelCase accessors.
 
         Validates originalName, extension, size, and mimeType.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._upload.originalName(), "Profile Photo.png")
         self.assertEqual(self._upload.extension(), ".png")
@@ -130,26 +174,38 @@ class TestUploadedFileMetadata(TestCase):
         self.assertEqual(self._upload.mimeType(), "image/png")
 
     def testHashNameKeepsTheOriginalExtension(self) -> None:
-        """
-        Append the original extension to the generated name.
+        """Append the original extension to the generated name.
 
         Validates the format of hashName().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(self._upload.hashName().endswith(".png"))
 
     def testHashNameIsGeneratedOnlyOnce(self) -> None:
-        """
-        Cache the generated name for the lifetime of the object.
+        """Cache the generated name for the lifetime of the object.
 
         Validates the memoization of hashName().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._upload.hashName(), self._upload.hashName())
 
     def testHashNameHandlesExtensionlessUploads(self) -> None:
-        """
-        Generate a bare name when the upload has no extension.
+        """Generate a bare name when the upload has no extension.
 
         Validates the empty-extension branch of hashName().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = UploadedFile(
             source=_FakeUpload("archive", b"data"),  # type: ignore[arg-type]
@@ -158,21 +214,29 @@ class TestUploadedFileMetadata(TestCase):
         self.assertNotIn(".", upload.hashName())
 
     async def testReadReturnsTheFullPayload(self) -> None:
-        """
-        Return the complete buffered payload.
+        """Return the complete buffered payload.
 
         Validates the delegation of read() to the source.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await self._upload.read(), b"png-payload")
 
 class TestUploadedFilePersistence(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build an uploaded file over a memory-backed disk.
+        """Build an uploaded file over a memory-backed disk.
 
         Provides a fake payload and a recording manager so tests run
         without a booted application.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
         self._source = _FakeUpload("photo.png", b"png-payload")
@@ -183,29 +247,41 @@ class TestUploadedFilePersistence(TestCase):
         )
 
     async def testStorePersistsUnderTheGeneratedName(self) -> None:
-        """
-        Persist the payload under the generated hash name.
+        """Persist the payload under the generated hash name.
 
         Validates the delegation of store() to storeAs().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.store("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
         self.assertEqual(await stored.read(), b"png-payload")
 
     async def testStoreDefaultsToTheDiskRoot(self) -> None:
-        """
-        Persist at the disk root when no directory is supplied.
+        """Persist at the disk root when no directory is supplied.
 
         Validates the default directory of store().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.store()
         self.assertEqual(stored.path(), self._upload.hashName())
 
     async def testStoreForwardsDiskAndVisibility(self) -> None:
-        """
-        Forward the disk name and visibility down the write path.
+        """Forward the disk name and visibility down the write path.
 
         Validates the optional arguments of store().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.store(
             "avatars", "public", Visibility.PUBLIC.value,
@@ -214,38 +290,54 @@ class TestUploadedFilePersistence(TestCase):
         self.assertEqual(await stored.visibility(), Visibility.PUBLIC.value)
 
     async def testStoreAsPersistsUnderAnExplicitName(self) -> None:
-        """
-        Persist the payload under the requested file name.
+        """Persist the payload under the requested file name.
 
         Validates storeAs() and the streamed content.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.storeAs("avatars", "user.png")
         self.assertEqual(stored.path(), "avatars/user.png")
         self.assertEqual(await stored.read(), b"png-payload")
 
     async def testStoreAsWithoutDirectoryWritesAtTheRoot(self) -> None:
-        """
-        Persist at the disk root when the directory is empty.
+        """Persist at the disk root when the directory is empty.
 
         Validates the target-path composition of storeAs().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.storeAs("", "user.png")
         self.assertEqual(stored.path(), "user.png")
 
     async def testStoreAsRejectsEmptyNames(self) -> None:
-        """
-        Reject empty file names on explicit persistence.
+        """Reject empty file names on explicit persistence.
 
         Validates the failure contract of storeAs().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             await self._upload.storeAs("avatars", "")
 
     async def testStoreAsRejectsDirectorySeparators(self) -> None:
-        """
-        Reject file names carrying a directory separator.
+        """Reject file names carrying a directory separator.
 
         Validates that the name is always a single path segment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             await self._upload.storeAs("avatars", "../user.png")
@@ -253,48 +345,68 @@ class TestUploadedFilePersistence(TestCase):
             await self._upload.storeAs("avatars", "sub\\user.png")
 
     async def testMoveReleasesTheUploadBuffer(self) -> None:
-        """
-        Release the temporary buffer after persisting the payload.
+        """Release the temporary buffer after persisting the payload.
 
         Validates the buffer lifecycle of move().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.move("avatars", "moved.png")
         self.assertEqual(stored.path(), "avatars/moved.png")
         self.assertTrue(self._source.closed)
 
     async def testMoveDefaultsToTheGeneratedName(self) -> None:
-        """
-        Fall back to the generated name when none is supplied.
+        """Fall back to the generated name when none is supplied.
 
         Validates the optional name argument of move().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.move("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
 
     async def testCopyKeepsTheUploadBufferUsable(self) -> None:
-        """
-        Keep the temporary buffer open after persisting.
+        """Keep the temporary buffer open after persisting.
 
         Validates the lifecycle difference between copy() and move().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.copy("avatars", "kept.png")
         self.assertEqual(stored.path(), "avatars/kept.png")
         self.assertFalse(self._source.closed)
 
     async def testCopyDefaultsToTheGeneratedName(self) -> None:
-        """
-        Fall back to the generated name when none is supplied.
+        """Fall back to the generated name when none is supplied.
 
         Validates the optional name argument of copy().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         stored = await self._upload.copy("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
 
     async def testPayloadIsStreamedInChunks(self) -> None:
-        """
-        Persist multi-chunk payloads without loading them at once.
+        """Persist multi-chunk payloads without loading them at once.
 
         Validates the internal chunked stream used on every write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = UploadedFile(
             source=_FakeUpload("big.bin", b"0123456789"),  # type: ignore[arg-type]
@@ -304,10 +416,14 @@ class TestUploadedFilePersistence(TestCase):
         self.assertEqual(await stored.read(), b"0123456789")
 
     async def testEmptyPayloadIsPersisted(self) -> None:
-        """
-        Persist uploads whose buffer produces no chunk at all.
+        """Persist uploads whose buffer produces no chunk at all.
 
         Validates the immediate termination of the chunk loop.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = UploadedFile(
             source=_FakeUpload("empty.bin", b""),  # type: ignore[arg-type]

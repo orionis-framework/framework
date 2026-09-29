@@ -30,7 +30,13 @@ if TYPE_CHECKING:
 class TestMailComposer(TestCase):
 
     def setUp(self) -> None:
-        """Build real Jinja and storage engines with isolated fixtures."""
+        """Build real Jinja and storage engines with isolated fixtures.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.app = ViewApplication(Path(temporary.name))
@@ -43,10 +49,14 @@ class TestMailComposer(TestCase):
         )
 
     async def testRealViewsRenderWithoutRequestAndWithIsolatedContext(self) -> None:
-        """
-        Render both alternatives through the configured Jinja engine.
+        """Render both alternatives through the configured Jinja engine.
 
         Validates that a template works without an active HTTP request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         content = Content(
             view="emails.welcome",
@@ -63,10 +73,14 @@ class TestMailComposer(TestCase):
         self.assertIsNotNone(parsed["Date"])
 
     async def testMimeAlternativesAndAttachmentsKeepCorrectNesting(self) -> None:
-        """
-        Nest alternatives inside multipart/mixed with binary attachments.
+        """Nest alternatives inside multipart/mixed with binary attachments.
 
         Validates that literal bodies are never rendered as templates.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.storage.disk("remote").file("private/empty.bin").write(b"")
         await self.storage.disk("local").file("documents/guide.pdf").write(b"%PDF-test")
@@ -95,10 +109,14 @@ class TestMailComposer(TestCase):
         self.assertIn("{{ literal }}", parsed.get_body(("plain",)).get_content())
 
     async def testBccOnlyIsPresentOnlyInTransportEnvelope(self) -> None:
-        """
-        Keep hidden recipients out of every serialized header.
+        """Keep hidden recipients out of every serialized header.
 
         Validates that a message may have Bcc recipients only.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         envelope = Envelope(from_address="sender@example.com", bcc="hidden@example.com")
         prepared = await self.composer.prepare(envelope, Content(text="private"), ())
@@ -111,10 +129,14 @@ class TestMailComposer(TestCase):
         self.assertNotIn(b"hidden@example.com", prepared.mime)
 
     async def testMissingSenderRecipientViewOrFileFailsPreparation(self) -> None:
-        """
-        Fail before transport when a required preparation step is invalid.
+        """Fail before transport when a required preparation step is invalid.
 
         Validates that no partial message is ever produced.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for envelope in (Envelope(to="a@b"), Envelope(from_address="a@b")):
             with self.assertRaises(MailCompositionException):
@@ -131,10 +153,14 @@ class TestMailComposer(TestCase):
             )
 
     async def testUtf8MailboxesArePreservedAndFlagged(self) -> None:
-        """
-        Require SMTPUTF8 for international mailboxes only.
+        """Require SMTPUTF8 for international mailboxes only.
 
         Validates that Unicode bodies alone do not change the transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         prepared = await self.composer.prepare(
             Envelope(from_address="jos\u00e9@example.com", to="ana@example.com"),
@@ -148,10 +174,14 @@ class TestMailComposer(TestCase):
         self.assertFalse(regular.smtp_utf8)
 
     async def testReadsARealLocalStorageDisk(self) -> None:
-        """
-        Read local files through the same API used for remote backends.
+        """Read local files through the same API used for remote backends.
 
         Validates that the composer never rebuilds a filesystem path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         disk = Disk("local", LocalStorageDriver(self.app.basePath / "storage"))
         self.storage.disks["local"] = disk
@@ -171,7 +201,13 @@ class TestMailComposer(TestCase):
 class TestMailComposerStorageAttachments(TestCase):
 
     def setUp(self) -> None:
-        """Build the composer with an explicit pathless storage boundary."""
+        """Build the composer with an explicit pathless storage boundary.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.storage = RemoteStorage()
         self.composer = MailComposer(
             cast("IViewEngine", object()),
@@ -183,7 +219,18 @@ class TestMailComposerStorageAttachments(TestCase):
         )
 
     async def prepareAttachment(self, **options: object) -> PreparedMail:
-        """Prepare one message carrying a single declared attachment."""
+        """Prepare one message carrying a single declared attachment.
+
+        Parameters
+        ----------
+        **options : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        PreparedMail
+            Value produced by the helper.
+        """
         return await self.composer.prepare(
             self.envelope,
             Content(text="hello"),
@@ -191,10 +238,14 @@ class TestMailComposerStorageAttachments(TestCase):
         )
 
     async def testResolutionIsDeferredAndStreamsAreClosed(self) -> None:
-        """
-        Read attachment bytes only while preparing the message.
+        """Read attachment bytes only while preparing the message.
 
         Validates that declaring an attachment touches no backend.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         attachment = Attachment.fromStorage("private/document.pdf", disk="remote")
         self.assertEqual(self.storage.selected, [])
@@ -213,10 +264,14 @@ class TestMailComposerStorageAttachments(TestCase):
         self.assertEqual(self.storage.stream.closed, 1)
 
     async def testZeroBytesAndDefaultDiskAreValid(self) -> None:
-        """
-        Treat an empty payload as a valid attachment.
+        """Treat an empty payload as a valid attachment.
 
         Validates that the default disk is used when none was declared.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.stream.payload = b""
         prepared = await self.prepareAttachment()
@@ -227,10 +282,14 @@ class TestMailComposerStorageAttachments(TestCase):
         self.assertEqual(self.storage.stream.closed, 1)
 
     async def testExplicitMetadataOverridesBackendAndPath(self) -> None:
-        """
-        Prefer explicit metadata over backend metadata and inference.
+        """Prefer explicit metadata over backend metadata and inference.
 
         Validates that the backend is not even asked for a MIME type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.mime_type = "invalid metadata"
         prepared = await self.prepareAttachment(
@@ -245,10 +304,14 @@ class TestMailComposerStorageAttachments(TestCase):
         self.assertEqual(self.storage.metadata_calls, 0)
 
     async def testMetadataThenNameThenBinaryFallback(self) -> None:
-        """
-        Fall back from backend metadata to inference and octet-stream.
+        """Fall back from backend metadata to inference and octet-stream.
 
         Validates the documented MIME resolution order.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.mime_type = "image/png"
         prepared = await self.prepareAttachment()
@@ -267,20 +330,28 @@ class TestMailComposerStorageAttachments(TestCase):
         )
 
     async def testRejectsUnsafeBackendMetadata(self) -> None:
-        """
-        Reject a backend MIME type carrying header parameters.
+        """Reject a backend MIME type carrying header parameters.
 
         Validates that storage metadata is validated like explicit metadata.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.mime_type = "text/plain; charset=utf-8"
         with self.assertRaises(MailAttachmentException):
             await self.prepareAttachment()
 
     async def testDriverFailureValuesAreNotSilentlyEmptyAttachments(self) -> None:
-        """
-        Reject non-binary read results after closing the stream.
+        """Reject non-binary read results after closing the stream.
 
         Validates that a failure value never becomes an empty attachment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for payload in (None, False, "not bytes"):
             self.storage.stream.payload = payload
@@ -290,10 +361,14 @@ class TestMailComposerStorageAttachments(TestCase):
             self.assertEqual(self.storage.stream.closed, before + 1)
 
     async def testReadFailureClosesAndKeepsOriginalCause(self) -> None:
-        """
-        Keep a read failure visible even when cleanup also fails.
+        """Keep a read failure visible even when cleanup also fails.
 
         Validates that the original cause survives the translation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.stream.read_error = True
         self.storage.stream.close_error = True
@@ -304,10 +379,14 @@ class TestMailComposerStorageAttachments(TestCase):
         self.assertEqual(self.storage.stream.closed, 1)
 
     async def testOpenAndCloseFailuresAbortPreparation(self) -> None:
-        """
-        Abort preparation when a stream cannot be opened or closed.
+        """Abort preparation when a stream cannot be opened or closed.
 
         Validates that neither failure reaches the transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.stream.open_error = True
         with self.assertRaises(MailAttachmentException):
@@ -321,10 +400,14 @@ class TestMailComposerStorageAttachments(TestCase):
         self.assertEqual(self.storage.stream.closed, 2)
 
     async def testCancellationDuringOpenWaitsForClosureThenPropagates(self) -> None:
-        """
-        Retain ownership of an opening stream until cleanup finishes.
+        """Retain ownership of an opening stream until cleanup finishes.
 
         Validates that cancellation is preserved after the stream closes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.storage.stream.release.clear()
         operation = asyncio.create_task(self.prepareAttachment())
@@ -343,7 +426,13 @@ class TestMailComposerStorageAttachments(TestCase):
 class TestMailComposerGuards(TestCase):
 
     def setUp(self) -> None:
-        """Build a composer over a view engine controlled by the test."""
+        """Build a composer over a view engine controlled by the test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.view = RenderingEngine()
         self.composer = MailComposer(
             cast("IViewEngine", self.view),
@@ -351,10 +440,14 @@ class TestMailComposerGuards(TestCase):
         )
 
     async def testRejectsAnEnvelopeWithoutSender(self) -> None:
-        """
-        Refuse to compose a message that declares no sender.
+        """Refuse to compose a message that declares no sender.
 
         Validates the final guard reached through direct composer use.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             await self.composer.prepare(
@@ -364,10 +457,14 @@ class TestMailComposerGuards(TestCase):
             )
 
     async def testRejectsNonTextRenderResults(self) -> None:
-        """
-        Refuse a view engine result that is not rendered text.
+        """Refuse a view engine result that is not rendered text.
 
         Validates that a misbehaving engine never produces a MIME body.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.view.rendered = b"bytes"
         with self.assertRaises(MailCompositionException):
@@ -378,10 +475,14 @@ class TestMailComposerGuards(TestCase):
             )
 
     async def testTranslatesViewEngineFailures(self) -> None:
-        """
-        Translate any engine failure into a composition failure.
+        """Translate any engine failure into a composition failure.
 
         Validates that the original cause is preserved for debugging.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.view.failure = RuntimeError("template exploded")
         with self.assertRaises(MailCompositionException) as raised:

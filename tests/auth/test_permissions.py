@@ -44,11 +44,33 @@ class _StubApp:
     __slots__ = ("_database",)
 
     def __init__(self, database: str) -> None:
-        """Store the SQLite database the connection points at."""
+        """Store the SQLite database the connection points at.
+
+        Parameters
+        ----------
+        database : str
+            Value supplied for ``database``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self._database = database
 
     def config(self, key: str | None = None) -> Any:  # noqa: ANN401, ARG002
-        """Return the database configuration tree."""
+        """Return the database configuration tree.
+
+        Parameters
+        ----------
+        key : str | None
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -66,16 +88,41 @@ class _Identity:
     __slots__ = ("identifier", "kind")
 
     def __init__(self, identifier: object, kind: str = "tests.Account") -> None:
-        """Store the polymorphic type and the identifier."""
+        """Store the polymorphic type and the identifier.
+
+        Parameters
+        ----------
+        identifier : object
+            Value supplied for ``identifier``.
+        kind : str
+            Value supplied for ``kind``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.identifier = identifier
         self.kind = kind
 
     def getAuthorizableType(self) -> str:
-        """Return the polymorphic type of this identity."""
+        """Return the polymorphic type of this identity.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return self.kind
 
     def getAuthorizableId(self) -> object:
-        """Return the identifier of this identity."""
+        """Return the identifier of this identity.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return self.identifier
 
 class _CountingConnection(Connection):
@@ -84,19 +131,54 @@ class _CountingConnection(Connection):
     __slots__ = ("selects",)
 
     def __init__(self, config: dict) -> None:
-        """Start an isolated SQL connection with an empty read counter."""
+        """Start an isolated SQL connection with an empty read counter.
+
+        Parameters
+        ----------
+        config : dict
+            Value supplied for ``config``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         super().__init__("sqlite", config)
         self.selects = 0
 
     async def select(
         self, query: object, bindings: dict | None = None,
     ) -> list[dict]:
-        """Count a statement before delegating to SQLAlchemy Core."""
+        """Count a statement before delegating to SQLAlchemy Core.
+
+        Parameters
+        ----------
+        query : object
+            Value supplied for ``query``.
+        bindings : dict | None
+            Value supplied for ``bindings``.
+
+        Returns
+        -------
+        list[dict]
+            Value produced by the helper.
+        """
         self.selects += 1
         return await super().select(query, bindings)
 
 def named_table(name: str) -> TableDefinition:
-    """Build a ``permissions`` or ``roles`` shaped table."""
+    """Build a ``permissions`` or ``roles`` shaped table.
+
+    Parameters
+    ----------
+    name : str
+        Value supplied for ``name``.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": BigInteger().primary().autoIncrement(),
         "name": String(255),
@@ -113,7 +195,20 @@ def named_table(name: str) -> TableDefinition:
     )
 
 def morph_table(name: str, owner: str) -> TableDefinition:
-    """Build a polymorphic pivot table keyed by owner and model."""
+    """Build a polymorphic pivot table keyed by owner and model.
+
+    Parameters
+    ----------
+    name : str
+        Value supplied for ``name``.
+    owner : str
+        Value supplied for ``owner``.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         owner: BigInteger(),
         "model_type": String(255),
@@ -128,7 +223,13 @@ def morph_table(name: str, owner: str) -> TableDefinition:
     )
 
 def role_permissions_table() -> TableDefinition:
-    """Build the pivot table linking roles with permissions."""
+    """Build the pivot table linking roles with permissions.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "permission_id": BigInteger(),
         "role_id": BigInteger(),
@@ -145,7 +246,13 @@ class _AuthorizationCase(TestCase):
     """Base case creating the authorization schema on SQLite."""
 
     async def asyncSetUp(self) -> None:
-        """Create every authorization table on a temporary database."""
+        """Create every authorization table on a temporary database.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self._tmp = tempfile.TemporaryDirectory()
         database = str(Path(self._tmp.name) / "auth.sqlite")
 
@@ -170,7 +277,13 @@ class _AuthorizationCase(TestCase):
         self.repository = DatabasePermissionRepository(self.db)
 
     async def asyncTearDown(self) -> None:
-        """Release the connection and remove the temporary database."""
+        """Release the connection and remove the temporary database.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ConnectionResolver.setManager(self._previous_manager)
         await self.connection.disconnect()
         self._tmp.cleanup()
@@ -182,6 +295,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates that creation is idempotent.
 
         Seeders run repeatedly, so a second call must reuse the row.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = await self.registrar.createPermission("users.view")
         second = await self.registrar.createPermission("users.view")
@@ -195,6 +313,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates that role creation is idempotent too.
 
         Roles are stored in a table with the same unique constraint.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = await self.registrar.createRole("admin")
         second = await self.registrar.createRole("admin")
@@ -206,6 +329,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates that the composite key absorbs duplicates.
 
         Granting the same permission twice must not fail.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.givePermissionTo(identity, "users.view")
@@ -218,6 +346,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates that a granted permission can be taken back.
 
         Only the pivot row is removed, never the permission itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.givePermissionTo(identity, "users.view")
@@ -230,6 +363,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates the no-op path of a revocation.
 
         Removing something that was never granted is not an error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.revokePermissionFrom(_Identity(1), "ghost")
 
@@ -237,6 +375,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates the role attachment lifecycle.
 
         Roles use the very same polymorphic pivot shape.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.assignRole(identity, "admin", "editor")
@@ -250,6 +393,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates the role to permission pivot.
 
         This is what makes a role a grouping of permissions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.grantToRole("admin", "users.view", "users.delete")
         self.assertEqual(
@@ -265,6 +413,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates the no-op path when the role does not exist.
 
         A missing role cannot hold any permission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.registrar.revokeFromRole("ghost", "users.view")
 
@@ -272,6 +425,11 @@ class TestPermissionRegistrar(_AuthorizationCase):
         """Validates that creation is race free.
 
         The unique key decides the winner instead of a read-then-write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         results = await asyncio.gather(
             *(self.registrar.createPermission("users.view") for _ in range(6)),
@@ -281,13 +439,30 @@ class TestPermissionRegistrar(_AuthorizationCase):
         self.assertEqual(len(await self.db.table("permissions").get()), 1)
 
     async def testUnexpectedInsertFailuresAreNeverReportedAsSuccess(self) -> None:
-        """Propagate broken pivot storage instead of swallowing every SQL error."""
+        """Propagate broken pivot storage instead of swallowing every SQL error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.dropTable("model_has_permissions")
         with self.assertRaises(QueryException):
             await self.registrar.givePermissionTo(_Identity(1), "users.view")
 
     async def testDuplicateAttachmentsPreserveTheOuterTransaction(self) -> None:
-        """Keep duplicate recovery local to its own savepoint."""
+        """Keep duplicate recovery local to its own savepoint.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        ValueError
+            Raised when the helper reaches this failure path.
+        """
         identity = _Identity(1)
         await self.registrar.givePermissionTo(identity, "users.view")
         with self.assertRaises(ValueError):
@@ -300,13 +475,25 @@ class TestPermissionRegistrar(_AuthorizationCase):
         self.assertEqual(await self.db.table("model_has_permissions").count(), 1)
 
     async def testRejectsInvalidAuthorizationNames(self) -> None:
-        """Reject names that would be ambiguous or exceed the schema."""
+        """Reject names that would be ambiguous or exceed the schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for name in ("", " users.view", "roles." * 50):
             with self.assertRaises(AuthException):
                 await self.registrar.createPermission(name)
 
     async def testGrantsWorkWithAColdSchemaCache(self) -> None:
-        """Resolve generated IDs when the process did not execute the migrations."""
+        """Resolve generated IDs when the process did not execute the migrations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.connection._compiler = SQLCompiler()
         identity = _Identity(1)
         await self.registrar.assignRole(identity, "editor")
@@ -322,6 +509,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates the baseline for a brand new identity.
 
         Authorization defaults to deny.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         permissions, roles = await self.repository.loadFor(_Identity(1))
         self.assertEqual(permissions, frozenset())
@@ -331,6 +523,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates permissions attached straight to the identity.
 
         Direct permissions do not require any role.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.givePermissionTo(
@@ -346,6 +543,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates that a role hands its permissions to its holders.
 
         This is the whole point of grouping permissions in roles.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.grantToRole("admin", "users.view", "users.delete")
@@ -360,6 +562,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates that both sources are combined.
 
         An identity may hold many roles plus its own permissions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.grantToRole("admin", "users.view")
@@ -379,6 +586,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates that a permission granted twice appears once.
 
         Direct and inherited grants must not multiply.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = _Identity(1)
         await self.registrar.grantToRole("admin", "users.view")
@@ -393,6 +605,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates the polymorphic filtering of the pivot tables.
 
         Two identities of the same type must stay independent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = _Identity(1)
         second = _Identity(2)
@@ -406,6 +623,11 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         """Validates that the ``model_type`` column is honoured.
 
         Two different models may share an identifier value.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         account = _Identity(1, "tests.Account")
         team = _Identity(1, "tests.Team")
@@ -416,7 +638,13 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         self.assertEqual(permissions, frozenset())
 
     async def testDirectOnlyIdentitiesHaveNoRoles(self) -> None:
-        """Resolve direct grants without inventing a role for their owner."""
+        """Resolve direct grants without inventing a role for their owner.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         identity = _Identity(1)
         await self.registrar.givePermissionTo(identity, "users.view")
 
@@ -426,7 +654,13 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         self.assertEqual(permissions, frozenset({"users.view"}))
 
     async def testUuidIdentitiesOwnRolesAndDirectPermissions(self) -> None:
-        """Store UUID owner keys without coupling RBAC to integer models."""
+        """Store UUID owner keys without coupling RBAC to integer models.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         identity = _Identity(uuid4())
         await self.registrar.assignRole(identity, "editor")
         await self.registrar.grantToRole("editor", "posts.update")
@@ -436,7 +670,13 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         self.assertEqual(roles, frozenset({"editor"}))
 
     async def testAnIdentityWithoutRbacSupportHasNoPermissions(self) -> None:
-        """Keep authentication-only identities usable with resource policies."""
+        """Keep authentication-only identities usable with resource policies.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(
             await self.repository.loadFor(object()), (frozenset(), frozenset()),
         )
@@ -445,7 +685,13 @@ class TestAuthMigrations(TestCase):
     """Run the shipped authorization and token migrations on an isolated database."""
 
     async def asyncSetUp(self) -> None:
-        """Bind migration schema access to a temporary database, never the app DB."""
+        """Bind migration schema access to a temporary database, never the app DB.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self._tmp = tempfile.TemporaryDirectory()
         self.app = auth_fixtures._StubApp(str(Path(self._tmp.name) / "schema.sqlite"))
         self.app._tree["database"]["connections"]["sqlite"][
@@ -470,7 +716,13 @@ class TestAuthMigrations(TestCase):
         self.migrator._Migrator__discovered_cache = migrations
 
     async def asyncTearDown(self) -> None:
-        """Restore migration globals and the original database resolver."""
+        """Restore migration globals and the original database resolver.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         for module, schema in self._modules:
             module.Schema = schema
         ConnectionResolver.setManager(self._previous_manager)
@@ -478,7 +730,13 @@ class TestAuthMigrations(TestCase):
         self._tmp.cleanup()
 
     async def testRealMigrationsSupportUuidOwnersAndRollback(self) -> None:
-        """Apply real DDL, issue grants and tokens, then roll back all six tables."""
+        """Apply real DDL, issue grants and tokens, then roll back all six tables.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         applied = await self.migrator.migrate()
         self.assertEqual(len(applied), 6)
         self.assertEqual(await self.migrator.migrate(), [])
@@ -498,7 +756,13 @@ class TestAuthMigrations(TestCase):
         self.assertEqual(await self.migrator.rollback(), list(reversed(applied)))
 
     async def testForeignKeysDoNotPermitOrphanedRoleGrants(self) -> None:
-        """Keep role and permission deletion explicit while references exist."""
+        """Keep role and permission deletion explicit while references exist.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.migrator.migrate()
         role_id = await self.registrar.createRole("editor")
         await self.registrar.assignRole(_Identity(1), "editor")
@@ -511,14 +775,26 @@ class TestAuthorizationQueryBudget(_AuthorizationCase):
     """Measure the query budget for repeated and concurrent permission checks."""
 
     async def asyncSetUp(self) -> None:
-        """Replace the temporary connection with a counting implementation."""
+        """Replace the temporary connection with a counting implementation.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         await super().asyncSetUp()
         await self.connection.disconnect()
         self.connection = _CountingConnection(self.manager.configFor("sqlite"))
         self.manager._cached_connections["sqlite"] = self.connection
 
     async def testConcurrentSnapshotsIssueExactlyOneSelect(self) -> None:
-        """Load roles and effective permissions in one statement per context."""
+        """Load roles and effective permissions in one statement per context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         identity = _Identity(1)
         await self.registrar.assignRole(identity, "editor")
         await self.registrar.grantToRole("editor", "posts.update")

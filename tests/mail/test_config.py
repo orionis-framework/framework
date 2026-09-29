@@ -7,10 +7,15 @@ from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
 from orionis.test import TestCase
 
-
 class TestMailConfiguration(TestCase):
     def testNamedMailerSurvivesSerialization(self) -> None:
-        """Preserve named mailers through the central configuration entity."""
+        """Preserve named mailers through the central configuration entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = {
             "archive": {"driver": "file", "path": "storage/mail/archive"},
         }
@@ -19,7 +24,13 @@ class TestMailConfiguration(TestCase):
         self.assertIsNot(config.mailers, original)
 
     def testBootstrapKeepsFrozenDataclassContract(self) -> None:
-        """Keep the existing bootstrap and conventional entities usable."""
+        """Keep the existing bootstrap and conventional entities usable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         config = BootstrapMail(
             default="file",
             mailers=Mailers(
@@ -32,7 +43,13 @@ class TestMailConfiguration(TestCase):
             config.default = "smtp"
 
     def testGlobalSenderAcceptsEntitiesAndDictionariesOnly(self) -> None:
-        """Expose a serializable global sender and reject other shapes."""
+        """Expose a serializable global sender and reject other shapes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         config = Mail(
             from_address=FromAddress(address="no-reply@example.com", name="App"),
         )

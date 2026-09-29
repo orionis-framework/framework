@@ -13,6 +13,18 @@ class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     def config(self, key: str) -> dict:  # noqa: ARG002
+        """Run the config helper.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -25,7 +37,13 @@ class _StubApp:
         }
 
 def _users_table() -> TableDefinition:
-    """Build the physical "users" table used by every test."""
+    """Build the physical "users" table used by every test.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": Integer().primary().autoIncrement(),
         "name": String(),
@@ -35,9 +53,14 @@ def _users_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="users", columns=columns, primary_key="id")
 
-
 def _posts_table() -> TableDefinition:
-    """Build the physical "posts" table used by the join test."""
+    """Build the physical "posts" table used by the join test.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": Integer().primary().autoIncrement(),
         "user_id": Integer(),
@@ -46,7 +69,6 @@ def _posts_table() -> TableDefinition:
     for key, column in columns.items():
         column.name = key
     return TableDefinition(name="posts", columns=columns, primary_key="id")
-
 
 class TestRawQueryBuilder(TestCase):
     """
@@ -57,7 +79,13 @@ class TestRawQueryBuilder(TestCase):
     """
 
     async def asyncSetUp(self) -> None:
-        """Wire an isolated in-memory manager and create both tables."""
+        """Wire an isolated in-memory manager and create both tables.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
         facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
@@ -68,15 +96,25 @@ class TestRawQueryBuilder(TestCase):
         await connection.createTable(_posts_table())
 
     async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test."""
+        """Dispose the manager and clear the resolver after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self._manager.disconnect()
         ConnectionResolver.clear()
 
     async def testInsertAndGetReturnPlainDictionaries(self) -> None:
-        """
-        Insert a row and read it back as a plain dictionary.
+        """Insert a row and read it back as a plain dictionary.
 
         Validates the model-less insert/get round trip.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         rows = await DB.table("users").get()
@@ -84,10 +122,14 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual(rows[0]["name"], "John")
 
     async def testWhereFiltersRows(self) -> None:
-        """
-        Filter rows by an equality condition.
+        """Filter rows by an equality condition.
 
         Validates that ``where()`` narrows the result set.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert(
             [
@@ -100,19 +142,27 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual(rows[0]["name"], "John")
 
     async def testFirstReturnsNoneWithoutMatches(self) -> None:
-        """
-        Return ``None`` from ``first()`` when nothing matches.
+        """Return ``None`` from ``first()`` when nothing matches.
 
         Validates the empty-result path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         row = await DB.table("users").where("name", "Ghost").first()
         self.assertIsNone(row)
 
     async def testCountReturnsMatchingRows(self) -> None:
-        """
-        Count rows matching a condition without fetching them.
+        """Count rows matching a condition without fetching them.
 
         Validates the aggregate terminal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert(
             [
@@ -125,10 +175,14 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual(count, 2)
 
     async def testUpdateAndDeleteAffectMatchingRows(self) -> None:
-        """
-        Update then delete a row through the raw builder.
+        """Update then delete a row through the raw builder.
 
         Validates both mutation terminals end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         affected = (
@@ -139,11 +193,15 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual(deleted, 1)
 
     async def testJoinAcrossTwoRawTables(self) -> None:
-        """
-        Join two model-less tables using qualified projected columns.
+        """Join two model-less tables using qualified projected columns.
 
         Validates that ``join()`` reuses the JoinExpression compiler
         support without either side declaring a schema upfront.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         await DB.table("posts").insert({"user_id": 1, "title": "Hello"})
@@ -158,10 +216,14 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual(rows[0]["title"], "Hello")
 
     async def testAliasAndOrderByWork(self) -> None:
-        """
-        Order rows through an aliased table reference.
+        """Order rows through an aliased table reference.
 
         Validates that ``alias=`` on ``DB.table()`` reaches the compiler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("users").insert(
             [
@@ -173,10 +235,14 @@ class TestRawQueryBuilder(TestCase):
         self.assertEqual([row["name"] for row in rows], ["A", "B"])
 
     async def testInsertWithoutValuesRaises(self) -> None:
-        """
-        Reject an insert call carrying no rows.
+        """Reject an insert call carrying no rows.
 
         Validates the same guard used by ``ModelQueryBuilder``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidQueryException):
             await DB.table("users").insert([])

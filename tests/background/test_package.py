@@ -1,5 +1,4 @@
 from types import ModuleType
-
 import orionis.background as package
 from orionis.background import BackgroundTask, BackgroundTasks
 from orionis.background.task import BackgroundTask as TaskImplementation
@@ -13,29 +12,41 @@ class TestBackgroundPackageExports(TestCase):
     """Validate the public surface exposed by ``orionis.background``."""
 
     def testDeclaresTheExpectedPublicNames(self) -> None:
-        """
-        Declare exactly the documented exports.
+        """Declare exactly the documented exports.
 
         Validates that ``__all__`` lists the two classes that make up the
         supported package surface.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(frozenset(package.__all__), _EXPORTED_NAMES)
 
     def testExportsAreSortedAndUnique(self) -> None:
-        """
-        Keep the export list sorted and free of duplicates.
+        """Keep the export list sorted and free of duplicates.
 
         Validates that ``__all__`` is a stable, canonical listing instead
         of an accidental accumulation of names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(package.__all__, sorted(_EXPORTED_NAMES))
 
     def testDoesNotLeakAdditionalPublicNames(self) -> None:
-        """
-        Hide implementation modules from the package namespace.
+        """Hide implementation modules from the package namespace.
 
         Validates that no public attribute beyond the declared exports is
         reachable from the package root.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         public_names = {
             name
@@ -45,11 +56,15 @@ class TestBackgroundPackageExports(TestCase):
         self.assertEqual(public_names, _EXPORTED_NAMES)
 
     def testReExportsTheImplementationClasses(self) -> None:
-        """
-        Re-export the very classes defined by the implementation modules.
+        """Re-export the very classes defined by the implementation modules.
 
         Validates that the package root and the concrete modules resolve
         to the same objects, so both import paths are interchangeable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(BackgroundTask, TaskImplementation)
         self.assertIs(BackgroundTasks, TasksImplementation)

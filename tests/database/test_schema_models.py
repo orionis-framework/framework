@@ -26,7 +26,13 @@ class TestModelSchemaSelection(TestCase):
     """Select table metadata and connections without database reflection."""
 
     def setUp(self) -> None:
-        """Capture the table definition passed to each schema operation."""
+        """Capture the table definition passed to each schema operation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.connection = Mock()
         self.connection.createTable = AsyncMock(return_value=True)
         self.connection.dropTable = AsyncMock(return_value=True)
@@ -35,14 +41,26 @@ class TestModelSchemaSelection(TestCase):
         self.schema = Schema(self.manager)
 
     async def testCreateFromDefinitionPassesTheOriginalMetadata(self) -> None:
-        """Reuse the versioned schema object for DDL compilation."""
+        """Reuse the versioned schema object for DDL compilation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         definition = _CurrentModel.__meta__.table
         self.assertTrue(await self.schema.createFromDefinition(definition))
         self.connection.createTable.assert_awaited_once_with(definition)
         self.manager.connection.assert_called_once_with(None)
 
     async def testCreateFromModelUsesItsDeclaredConnection(self) -> None:
-        """Resolve the model connection when the schema has no override."""
+        """Resolve the model connection when the schema has no override.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertTrue(await self.schema.createFromModel(_CurrentModel))
         self.connection.createTable.assert_awaited_once_with(
             _CurrentModel.__meta__.table,
@@ -50,26 +68,50 @@ class TestModelSchemaSelection(TestCase):
         self.manager.connection.assert_called_once_with("model_connection")
 
     async def testExplicitConnectionOverridesTheModelConnection(self) -> None:
-        """Honor an explicitly selected schema connection."""
+        """Honor an explicitly selected schema connection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.schema.connection("override").createFromModel(_CurrentModel)
         self.manager.connection.assert_called_once_with("override")
 
     async def testExplicitDefaultOverridesTheModelConnection(self) -> None:
-        """Select the manager default even when the model names a connection."""
+        """Select the manager default even when the model names a connection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.schema.connection(None).createFromModel(_CurrentModel)
         self.manager.connection.assert_called_once_with(None)
         with self.assertRaises(ValueError):
             self.schema.connection("override")
 
     async def testCreateFromModelRejectsAbstractAndNonModelClasses(self) -> None:
-        """Report invalid model arguments before accessing a connection."""
+        """Report invalid model arguments before accessing a connection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for invalid in (Model, object, _CurrentModel()):
             with self.subTest(invalid=invalid), self.assertRaises(TypeError):
                 await self.schema.createFromModel(invalid)
         self.manager.connection.assert_not_called()
 
     async def testMigrationScopeBindsUnqualifiedSchemaCalls(self) -> None:
-        """Create and drop tables on the connection owned by a migration."""
+        """Create and drop tables on the connection owned by a migration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         target = Mock()
         target.createTable = AsyncMock(return_value=True)
         target.dropTable = AsyncMock(return_value=True)
@@ -84,27 +126,51 @@ class TestModelSchemaSelection(TestCase):
         self.manager.connection.assert_not_called()
 
     async def testExplicitSchemaSelectionOverridesTheMigrationScope(self) -> None:
-        """Keep explicitly selected schema connections authoritative."""
+        """Keep explicitly selected schema connections authoritative.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with migration_connection_scope(Mock()):
             await self.schema.connection(None).createFromModel(_DefaultModel)
         self.manager.connection.assert_called_once_with(None)
 
     async def testQualifiedTableNameRetainsBothParts(self) -> None:
-        """Pass the database schema separately from the table name."""
+        """Pass the database schema separately from the table name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.schema.drop("reporting.entries")
         self.connection.dropTable.assert_awaited_once_with(
             name="entries", schema="reporting",
         )
 
     async def testMalformedTableNamesNeverReachTheConnection(self) -> None:
-        """Reject names that would otherwise drop a truncated table name."""
+        """Reject names that would otherwise drop a truncated table name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for name in ("", ".table", "schema.", "one.two.three"):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 await self.schema.drop(name)
         self.connection.dropTable.assert_not_awaited()
 
     async def testFluentCreationStillCollectsColumnsAndConstraints(self) -> None:
-        """Keep the existing context-manager declaration API functional."""
+        """Keep the existing context-manager declaration API functional.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         async with self.schema.create("users") as table:
             table.integer("id").primary()
             table.string("name", 80).unique()
@@ -120,7 +186,18 @@ class _SchemaApp:
     """Provide a private in-memory SQLite database for schema integration."""
 
     def config(self, key: str) -> dict:  # noqa: ARG002
-        """Return the connection configuration requested by the manager."""
+        """Return the connection configuration requested by the manager.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -132,7 +209,13 @@ class TestVersionedSchemaIntegration(TestCase):
     """Replay a historical schema after the active model adopts a new one."""
 
     async def testModelAndMigrationShareOneVersionedDefinition(self) -> None:
-        """Create the historical table independently from current model changes."""
+        """Create the historical table independently from current model changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         initial = TableDefinition(
             name="versioned_users",
             columns={

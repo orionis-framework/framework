@@ -17,7 +17,6 @@ from tests.http.test_kernel import boot_kernel, dispatch
 
 _VERBS = ("get", "post", "put", "patch", "delete", "query")
 
-
 class _AbstractActionController(ABC):
     """Expose a concrete handler on a controller that cannot be instantiated."""
 
@@ -25,7 +24,13 @@ class _AbstractActionController(ABC):
 
     @abstractmethod
     def required(self) -> None:
-        """Require a concrete implementation before constructing the controller."""
+        """Require a concrete implementation before constructing the controller.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def index(self) -> Response:
         """Return the response shared with routing integration fixtures.
@@ -47,21 +52,31 @@ class _AbstractActionController(ABC):
         """
         return self.index()
 
-
 class _ConcreteActionController(_AbstractActionController):
     """Complete the abstract controller while retaining its inherited handler."""
 
     __slots__ = ()
 
     def required(self) -> None:
-        """Complete the controller contract without changing the inherited action."""
+        """Complete the controller contract without changing the inherited action.
 
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class TestAbstractRouteActions(TestCase):
     """Reject abstract action owners before registration and compilation."""
 
     def testAbstractActionsFailBeforeRouteOrFallbackRegistration(self) -> None:
-        """Reject abstract list, tuple and bare actions without consuming routes."""
+        """Reject abstract list, tuple and bare actions without consuming routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         actions = (
             [_AbstractActionController, "index"],
             (_AbstractActionController, "index"),
@@ -87,7 +102,13 @@ class TestAbstractRouteActions(TestCase):
             self.assertEqual(router.export()["fallback"], (None, route_handler))
 
     def testRejectedActionAssignmentsPreservePendingHandlerAndViewState(self) -> None:
-        """Keep each fluent state intact when the replacement owner is abstract."""
+        """Keep each fluent state intact when the replacement owner is abstract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         pending = FluentRoute("GET", "/pending")
         with self.assertRaises(TypeError):
             pending.action(_AbstractActionController, "index")
@@ -107,7 +128,13 @@ class TestAbstractRouteActions(TestCase):
             self.assertEqual(route.export(), original)
 
     def testCompilerRejectsAnAbstractOwnerInRawRouteData(self) -> None:
-        """Reject an abstract owner even when raw data bypasses fluent validation."""
+        """Reject an abstract owner even when raw data bypasses fluent validation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         raw = FluentRoute(
             "GET", "/raw", [_ConcreteActionController, "index"],
         ).export()
@@ -118,7 +145,13 @@ class TestAbstractRouteActions(TestCase):
     async def testConcreteInheritedActionsSurviveCompilationCacheAndResolution(
         self,
     ) -> None:
-        """Accept inherited handlers once every abstract method is implemented."""
+        """Accept inherited handlers once every abstract method is implemented.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         for label, action in (

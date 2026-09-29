@@ -75,16 +75,22 @@ class TestHTTPConventions(TestCase):
     """Enforce HTTP naming, documentation, annotations, and test dependencies."""
 
     def testFunctionAndMethodNamesFollowTheirConventions(self) -> None:
-        """
-        Require camelCase methods and snake_case standalone functions.
+        """Require camelCase methods and snake_case standalone functions.
 
         Validates custom names while retaining the protocol hooks that Python
         invokes through its language-defined dunder names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid = []
         for path, function, is_method in function_definitions():
             name = function.name
-            if is_method and name.startswith("__") and name.endswith("__"):
+            if (is_method and name.startswith("__") and name.endswith("__")) or (
+                not is_method and name in {"__getattr__", "__dir__"}
+            ):
                 continue
             pattern = _METHOD_NAME if is_method else _FUNCTION_NAME
             if is_method and name.startswith("test"):
@@ -94,10 +100,14 @@ class TestHTTPConventions(TestCase):
         self.assertEqual(invalid, [])
 
     def testEveryTestHelperHasAnnotatedArgumentsAndReturnType(self) -> None:
-        """
-        Require explicit annotations on test methods and their helper functions.
+        """Require explicit annotations on test methods and their helper functions.
 
         Validates signatures independently of repository-wide lint exemptions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid = []
         for path, function, _is_method in function_definitions():
@@ -113,10 +123,14 @@ class TestHTTPConventions(TestCase):
         self.assertEqual(invalid, [])
 
     def testEveryTestHelperHasADocstringWithoutExamplesSection(self) -> None:
-        """
-        Require documentation for every test function and helper.
+        """Require documentation for every test function and helper.
 
         Validates that documentation does not introduce an Examples section.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid = []
         for path, function, _is_method in function_definitions():
@@ -128,10 +142,14 @@ class TestHTTPConventions(TestCase):
         self.assertEqual(invalid, [])
 
     def testTestsDoNotImportUnittestDirectly(self) -> None:
-        """
-        Keep all test imports independent of the unittest package.
+        """Keep all test imports independent of the unittest package.
 
         Validates the framework TestCase contract and explicit test doubles.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid = []
         for path, tree in source_trees():
@@ -149,10 +167,14 @@ class TestHTTPConventions(TestCase):
         self.assertEqual(invalid, [])
 
     def testAsyncTestsExerciseAnAsyncOperation(self) -> None:
-        """
-        Require asynchronous test methods to await asynchronous behavior.
+        """Require asynchronous test methods to await asynchronous behavior.
 
         Validates that synchronous functionality uses ordinary test methods.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         invalid = []
         for path, function, is_method in function_definitions():

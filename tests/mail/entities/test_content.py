@@ -5,10 +5,14 @@ from orionis.test import TestCase
 class TestContent(TestCase):
 
     def testDeclaresViewsAndLiteralsSeparately(self) -> None:
-        """
-        Keep view identifiers and literal bodies in their own fields.
+        """Keep view identifiers and literal bodies in their own fields.
 
         Validates that a literal is never confused with a template name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         content = Content(
             view="emails.welcome",
@@ -21,19 +25,27 @@ class TestContent(TestCase):
         self.assertIsNone(content.text)
 
     def testEmptyLiteralIsADeclaredBody(self) -> None:
-        """
-        Treat an empty string as an intentionally declared body.
+        """Treat an empty string as an intentionally declared body.
 
         Validates the difference between an empty body and no body at all.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(Content(text="").text, "")
         self.assertEqual(Content(html="").html, "")
 
     def testSnapshotsContainersButNotOpaqueObjects(self) -> None:
-        """
-        Copy owned context containers without deep-copying user objects.
+        """Copy owned context containers without deep-copying user objects.
 
         Validates that later mutations of the caller's data never leak in.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         service = object()
         data = {"names": ["Ana"], "options": {"enabled": True}, "service": service}
@@ -48,10 +60,14 @@ class TestContent(TestCase):
             content.data["new"] = True
 
     def testCopiesSetsAndRejectsCyclicContainers(self) -> None:
-        """
-        Protect set context values and reject container cycles.
+        """Protect set context values and reject container cycles.
 
         Validates that an immutable snapshot is always achievable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         values = {"first"}
         content = Content(text="text", data={"values": values})
@@ -64,19 +80,27 @@ class TestContent(TestCase):
             Content(text="text", data=cyclic)
 
     def testMissingDataBecomesAnEmptyMapping(self) -> None:
-        """
-        Normalize an absent context into an empty read-only mapping.
+        """Normalize an absent context into an empty read-only mapping.
 
         Validates that rendering always receives a mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         content = Content(view="emails.welcome")
         self.assertEqual(dict(content.data), {})
 
     def testRejectsAbsentConflictingAndInvalidBodies(self) -> None:
-        """
-        Reject undeclared, conflicting, or wrongly typed bodies.
+        """Reject undeclared, conflicting, or wrongly typed bodies.
 
         Validates that every operation carries exactly one body per format.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for options in (
             {},

@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 from unittest.mock import patch
-
 from orionis.database.connection_manager import ConnectionManager
 from orionis.orm import Integer, Model, String
 from orionis.orm.query_builder import QueryBuilder
@@ -17,11 +16,22 @@ if TYPE_CHECKING:
         HasManyRelation,
     )
 
-
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     def config(self, key: str) -> dict:  # noqa: ARG002
+        """Return the requested database configuration.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -33,14 +43,27 @@ class _StubApp:
             },
         }
 
-
 def _pivot_table(name: str, first: str, second: str) -> TableDefinition:
-    """Build a bare pivot table with two integer columns."""
+    """Build a bare pivot table with two integer columns.
+
+    Parameters
+    ----------
+    name : str
+        Value supplied for ``name``.
+    first : str
+        Value supplied for ``first``.
+    second : str
+        Value supplied for ``second``.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {first: Integer(), second: Integer()}
     for key, column in columns.items():
         column.name = key
     return TableDefinition(name=name, columns=columns)
-
 
 class Team(Model):
     id = Integer().primary().autoIncrement()
@@ -48,13 +71,24 @@ class Team(Model):
     timestamps = False
 
     def players(self) -> HasManyRelation[Player]:
-        """Every player on this team."""
+        """Every player on this team.
+
+        Returns
+        -------
+        HasManyRelation[Player]
+            Value produced by the helper.
+        """
         return self.hasMany(Player)
 
     def members(self) -> BelongsToManyRelation[Member]:
-        """Every member linked to this team through the pivot table."""
-        return self.belongsToMany(Member)
+        """Every member linked to this team through the pivot table.
 
+        Returns
+        -------
+        BelongsToManyRelation[Member]
+            Value produced by the helper.
+        """
+        return self.belongsToMany(Member)
 
 class Player(Model):
     id = Integer().primary().autoIncrement()
@@ -65,9 +99,14 @@ class Player(Model):
     fillable: ClassVar[list[str]] = ["name", "team_id"]
 
     def team(self) -> BelongsToRelation[Team]:
-        """Return the team owning this player."""
-        return self.belongsTo(Team)
+        """Return the team owning this player.
 
+        Returns
+        -------
+        BelongsToRelation[Team]
+            Value produced by the helper.
+        """
+        return self.belongsTo(Team)
 
 class Member(Model):
     id = Integer().primary().autoIncrement()
@@ -75,9 +114,14 @@ class Member(Model):
     timestamps = False
 
     def teams(self) -> BelongsToManyRelation[Team]:
-        """Every team this member is linked to through the pivot table."""
-        return self.belongsToMany(Team)
+        """Every team this member is linked to through the pivot table.
 
+        Returns
+        -------
+        BelongsToManyRelation[Team]
+            Value produced by the helper.
+        """
+        return self.belongsToMany(Team)
 
 class TestRelationsWithTransactions(TestCase):
     """
@@ -90,7 +134,13 @@ class TestRelationsWithTransactions(TestCase):
     """
 
     async def asyncSetUp(self) -> None:
-        """Wire an isolated in-memory manager and create every table."""
+        """Wire an isolated in-memory manager and create every table.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
         facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
@@ -105,16 +155,31 @@ class TestRelationsWithTransactions(TestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test."""
+        """Dispose the manager and clear the resolver after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self._manager.disconnect()
         ConnectionResolver.clear()
 
     async def testHasManyCreateRollsBackWithTransaction(self) -> None:
-        """
-        Roll back a related row created inside a failed transaction.
+        """Roll back a related row created inside a failed transaction.
 
         Validates that ``HasManyRelation.create()`` participates in the
         surrounding transaction like any other write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         team = await Team.create({"name": "Reds"})
 
@@ -128,10 +193,14 @@ class TestRelationsWithTransactions(TestCase):
         self.assertEqual(len(players), 0)
 
     async def testHasManyCreateCommitsWithTransaction(self) -> None:
-        """
-        Persist a related row created inside a successful transaction.
+        """Persist a related row created inside a successful transaction.
 
         Validates the happy path alongside the rollback test above.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         team = await Team.create({"name": "Blues"})
 
@@ -142,11 +211,20 @@ class TestRelationsWithTransactions(TestCase):
         self.assertEqual([p.name for p in players], ["Bob"])
 
     async def testBelongsToManyAttachRollsBackWithTransaction(self) -> None:
-        """
-        Roll back pivot rows inserted through ``attach()`` on failure.
+        """Roll back pivot rows inserted through ``attach()`` on failure.
 
         Validates that pivot-table mutations honor the same transaction
         boundaries as any other write.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -161,10 +239,14 @@ class TestRelationsWithTransactions(TestCase):
         self.assertEqual(len(teams), 0)
 
     async def testBelongsToManyAttachCommitsWithTransaction(self) -> None:
-        """
-        Persist pivot rows inserted through ``attach()`` on success.
+        """Persist pivot rows inserted through ``attach()`` on success.
 
         Validates the happy path alongside the rollback test above.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         member = await Member.create({"name": "Bob"})
         team = await Team.create({"name": "Blues"})
@@ -176,11 +258,20 @@ class TestRelationsWithTransactions(TestCase):
         self.assertEqual([t.name for t in teams], ["Blues"])
 
     async def testNestedTransactionSavepointRollsBackRelationWrite(self) -> None:
-        """
-        Roll back only the inner savepoint, keeping the outer commit.
+        """Roll back only the inner savepoint, keeping the outer commit.
 
         Validates relations compose with nested transactions the same
         way plain model writes already do.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         team = await Team.create({"name": "Reds"})
 
@@ -195,7 +286,6 @@ class TestRelationsWithTransactions(TestCase):
         players = await team.players().get()
         self.assertEqual([p.name for p in players], ["Kept"])
 
-
 class TestRelationsWithDbTable(TestCase):
     """
     Integration tests validating relations compose with ``DB.table()``.
@@ -207,7 +297,13 @@ class TestRelationsWithDbTable(TestCase):
     """
 
     async def asyncSetUp(self) -> None:
-        """Wire an isolated in-memory manager and create every table."""
+        """Wire an isolated in-memory manager and create every table.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
         connection = self._manager.connection()
@@ -222,16 +318,26 @@ class TestRelationsWithDbTable(TestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test."""
+        """Dispose the manager and clear the resolver after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self._manager.disconnect()
         ConnectionResolver.clear()
 
     async def testAttachIsVisibleThroughDbTable(self) -> None:
-        """
-        Read pivot rows inserted by ``attach()`` directly with ``DB.table()``.
+        """Read pivot rows inserted by ``attach()`` directly with ``DB.table()``.
 
         Validates that the pivot table used by the relationship is a
         regular table indistinguishable from any other raw query target.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -244,11 +350,15 @@ class TestRelationsWithDbTable(TestCase):
         self.assertEqual(rows[0]["team_id"], team.id)
 
     async def testDbTableInsertIsVisibleThroughRelation(self) -> None:
-        """
-        Read a pivot row inserted directly with ``DB.table()``.
+        """Read a pivot row inserted directly with ``DB.table()``.
 
         Validates the inverse direction: the relationship is just a
         query, not a separate storage mechanism.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         member = await Member.create({"name": "Bob"})
         team = await Team.create({"name": "Blues"})
@@ -261,10 +371,14 @@ class TestRelationsWithDbTable(TestCase):
         self.assertEqual([t.name for t in teams], ["Blues"])
 
     async def testDetachRemovesRowVisibleToDbTable(self) -> None:
-        """
-        Confirm ``detach()`` also removes the row from ``DB.table()``.
+        """Confirm ``detach()`` also removes the row from ``DB.table()``.
 
         Validates both entry points observe the same underlying table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -276,11 +390,15 @@ class TestRelationsWithDbTable(TestCase):
         self.assertEqual(len(rows), 0)
 
     async def testBelongsToJoinsAgreeWithDbTableJoin(self) -> None:
-        """
-        Cross-check ``belongsTo`` against a manual ``DB.table()`` join.
+        """Cross-check ``belongsTo`` against a manual ``DB.table()`` join.
 
         Validates the relationship's inferred foreign key matches what a
         hand-written join over the physical tables would use.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         team = await Team.create({"name": "Reds"})
         await Player.create({"name": "Ana", "team_id": team.id})

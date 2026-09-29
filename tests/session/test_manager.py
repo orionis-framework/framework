@@ -28,25 +28,91 @@ class _FakeCacheRepository:
     """Minimal in-memory stand-in for ICacheRepository."""
 
     def __init__(self) -> None:
+        """Initialize the test double with its configured state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.data: dict[str, Any] = {}
 
     async def get(self, key: str) -> Any:
+        """Return a cached value by key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
         return self.data.get(key)
 
     async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:  # noqa: ARG002
+        """Store a cache value under its key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        value : Any
+            Value supplied for ``value``.
+        ttl : float | None
+            Value supplied for ``ttl``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.data[key] = value
         return True
 
     async def delete(self, key: str) -> bool:
+        """Remove a cached value and report whether it existed.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return self.data.pop(key, None) is not None
 
 class _FakeCacheManager:
     """Fake ICacheManager exposing only the store() factory method."""
 
     def __init__(self) -> None:
+        """Initialize the test double with its configured state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.repository = _FakeCacheRepository()
 
     def store(self, name: str | None = None) -> _FakeCacheRepository:
+        """Record the requested cache store.
+
+        Parameters
+        ----------
+        name : str | None
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        _FakeCacheRepository
+            Value produced by the helper.
+        """
         self.requested_store = name
         return self.repository
 
@@ -54,6 +120,18 @@ class _StubDatabaseApp:
     """Application stub exposing an in-memory SQLite configuration."""
 
     def config(self, key: str) -> dict[str, Any]:  # noqa: ARG002
+        """Return session configuration for the requested key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict[str, Any]
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -103,6 +181,18 @@ class _FakeRequest:
     """Request stub exposing only the cookie jar the manager reads."""
 
     def __init__(self, cookies: dict[str, str] | None = None) -> None:
+        """Initialize the test double with its configured state.
+
+        Parameters
+        ----------
+        cookies : dict[str, str] | None
+            Value supplied for ``cookies``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.cookies: dict[str, str] = cookies if cookies is not None else {}
         self.state = SimpleNamespace()
         self.method = "POST"
@@ -113,34 +203,128 @@ class _RecordingCatch:
     __slots__ = ()
 
     async def exception(self, error: Exception, request: object) -> JSONResponse:  # noqa: ARG002
-        """Return an error response for the middleware lifecycle probe."""
+        """Return an error response for the middleware lifecycle probe.
+
+        Parameters
+        ----------
+        error : Exception
+            Value supplied for ``error``.
+        request : object
+            Value supplied for ``request``.
+
+        Returns
+        -------
+        JSONResponse
+            Value produced by the helper.
+        """
         return JSONResponse(content={"message": "Request failed"}, status_code=500)
 
 class _FakeResponse:
     """Response stub recording cookie mutations issued by the manager."""
 
     def __init__(self) -> None:
+        """Initialize the test double with its configured state.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.set_calls: list[tuple[str, str, dict[str, Any]]] = []
         self.delete_calls: list[tuple[str, dict[str, Any]]] = []
 
     def setCookie(self, name: str, value: str, **options: Any) -> None:
+        """Record a cookie written by the response double.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+        value : str
+            Value supplied for ``value``.
+        **options : Any
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.set_calls.append((name, value, options))
 
     def deleteCookie(self, name: str, **options: Any) -> None:
+        """Record a cookie removed by the response double.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+        **options : Any
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.delete_calls.append((name, options))
 
 class _FakeApplication:
     """Application stub providing config, base path and instance binding."""
 
     def __init__(self, config: dict[str, Any], base_path: Path) -> None:
+        """Initialize the test double with its configured state.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            Value supplied for ``config``.
+        base_path : Path
+            Value supplied for ``base_path``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._config = config
         self.basePath = base_path
         self.bindings: list[tuple[Any, Any]] = []
 
     def config(self, key: str, default: Any = None) -> Any:
+        """Return session configuration for the requested key.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        default : Any
+            Value supplied for ``default``.
+
+        Returns
+        -------
+        Any
+            Value produced by the helper.
+        """
         return self._config if key == "session" else default
 
     def instance(self, abstract: Any, instance: Any, **_options: Any) -> bool:
+        """Record the object bound to the application.
+
+        Parameters
+        ----------
+        abstract : Any
+            Value supplied for ``abstract``.
+        instance : Any
+            Value supplied for ``instance``.
+        **_options : Any
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.bindings.append((abstract, instance))
         return True
 
@@ -148,27 +332,94 @@ class _RecordingStore:
     """Store stub tracking every call made by the manager."""
 
     def __init__(self, record: SessionRecord | None = None) -> None:
+        """Initialize the test double with its configured state.
+
+        Parameters
+        ----------
+        record : SessionRecord | None
+            Value supplied for ``record``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.record = record
         self.written: list[SessionRecord] = []
         self.deleted: list[str] = []
         self.read_ids: list[str] = []
 
     async def read(self, session_id: str) -> SessionRecord | None:
+        """Return the stored session record.
+
+        Parameters
+        ----------
+        session_id : str
+            Value supplied for ``session_id``.
+
+        Returns
+        -------
+        SessionRecord | None
+            Value produced by the helper.
+        """
         self.read_ids.append(session_id)
         return self.record
 
     async def write(self, record: SessionRecord) -> None:
+        """Record the session record written by the manager.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Value supplied for ``record``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.written.append(record)
 
     async def update(self, record: SessionRecord) -> bool:
+        """Record the updated session record.
+
+        Parameters
+        ----------
+        record : SessionRecord
+            Value supplied for ``record``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.written.append(record)
         return True
 
     async def delete(self, session_id: str) -> bool:
+        """Remove a cached value and report whether it existed.
+
+        Parameters
+        ----------
+        session_id : str
+            Value supplied for ``session_id``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.deleted.append(session_id)
         return True
 
     async def gc(self) -> None:
+        """Leave garbage collection unimplemented in this store double.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         return
 
 class TestSessionManager(TestCase):
@@ -223,31 +474,43 @@ class TestSessionManager(TestCase):
     # ── Store resolution ─────────────────────────────────────────────────────
 
     def testMemoryDriverResolvesToMemoryStore(self) -> None:
-        """
-        Select the in-memory store for the memory driver.
+        """Select the in-memory store for the memory driver.
 
         Validates the default driver never touches disk or the database.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         self.assertIsInstance(manager._store, MemorySessionStore)
 
     def testFileDriverResolvesToFileStore(self) -> None:
-        """
-        Select the filesystem store for the file driver.
+        """Select the filesystem store for the file driver.
 
         Validates that the configured directory is resolved relative to
         the application base path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({"driver": "file", "files": "sessions"})
         self.assertIsInstance(manager._store, FileSessionStore)
         self.assertTrue((self._base_path / "sessions").is_dir())
 
     def testCacheDriverResolvesToCacheStore(self) -> None:
-        """
-        Select the cache-backed store for the cache driver.
+        """Select the cache-backed store for the cache driver.
 
         Validates that the configured store name is forwarded to the
         cache manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cache = _FakeCacheManager()
         manager, _ = self._makeManager({"driver": "cache", "cache": "redis"}, cache)
@@ -257,29 +520,41 @@ class TestSessionManager(TestCase):
     # ── Cookie configuration ─────────────────────────────────────────────────
 
     def testCookieMaxAgeDerivesFromLifetime(self) -> None:
-        """
-        Convert the configured lifetime into cookie seconds.
+        """Convert the configured lifetime into cookie seconds.
 
         Validates that a 120-minute lifetime yields a 7200-second cookie.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({"lifetime": 120})
         self.assertEqual(manager._cookie_max_age, 7200)
 
     def testExpireOnCloseOmitsMaxAge(self) -> None:
-        """
-        Produce a browser-session cookie when expire_on_close is set.
+        """Produce a browser-session cookie when expire_on_close is set.
 
         Validates that no Max-Age is emitted so the cookie dies with the
         browser session.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({"expire_on_close": True})
         self.assertIsNone(manager._cookie_max_age)
 
     def testSameSitePolicyIsStoredAsPlainValue(self) -> None:
-        """
-        Unwrap the SameSite enum into its header value.
+        """Unwrap the SameSite enum into its header value.
 
         Validates that the cookie writer receives a plain string.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({"same_site": "strict"})
         self.assertEqual(manager._cookie_same_site, "strict")
@@ -287,10 +562,14 @@ class TestSessionManager(TestCase):
     # ── start ────────────────────────────────────────────────────────────────
 
     async def testStartWithoutCookieReturnsLazySession(self) -> None:
-        """
-        Return a blank lazy session when no cookie is present.
+        """Return a blank lazy session when no cookie is present.
 
         Validates that anonymous traffic never hits the backing store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -303,10 +582,14 @@ class TestSessionManager(TestCase):
         self.assertEqual(store.read_ids, [])
 
     async def testStartRestoresRecordFromStore(self) -> None:
-        """
-        Rebuild the session from the stored record.
+        """Rebuild the session from the stored record.
 
         Validates that the identifier and payload survive a round trip.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         manager._store = _RecordingStore(
@@ -325,10 +608,14 @@ class TestSessionManager(TestCase):
         self.assertFalse(session.isNew)
 
     async def testStartWithUnknownCookieReturnsLazySession(self) -> None:
-        """
-        Fall back to a blank session when the record is gone.
+        """Fall back to a blank session when the record is gone.
 
         Validates that an expired or forged cookie cannot resurrect data.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -341,11 +628,15 @@ class TestSessionManager(TestCase):
         self.assertFalse(session.started)
 
     async def testStartAgesFlashData(self) -> None:
-        """
-        Advance the flash lifecycle on restore.
+        """Advance the flash lifecycle on restore.
 
         Validates that values flashed in the previous request are still
         readable exactly once.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         manager._store = _RecordingStore(
@@ -362,11 +653,15 @@ class TestSessionManager(TestCase):
         self.assertIn("_flash_old", session.all())
 
     async def testStartRegistersSessionUnderItsContract(self) -> None:
-        """
-        Bind the active session into the container.
+        """Bind the active session into the container.
 
         Validates that a single binding is issued, keyed by ISession, so
         globals and facades can resolve it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, app = self._makeManager()
         manager._store = _RecordingStore()
@@ -378,10 +673,14 @@ class TestSessionManager(TestCase):
     # ── save ─────────────────────────────────────────────────────────────────
 
     async def testSaveIsNoOpForUnusedSession(self) -> None:
-        """
-        Skip persistence and cookies for untouched sessions.
+        """Skip persistence and cookies for untouched sessions.
 
         Validates that read-only traffic issues no Set-Cookie header.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -394,11 +693,15 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls, [])
 
     async def testSavePersistsDirtySessionAndSetsCookie(self) -> None:
-        """
-        Write the record and emit the cookie for a used session.
+        """Write the record and emit the cookie for a used session.
 
         Validates that the persisted payload matches the session data
         and the dirty flag is cleared afterwards.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -416,10 +719,14 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls[0][1], session.id)
 
     async def testCleanSessionsRenewServerAndCookieExpiryTogether(self) -> None:
-        """
-        Renew the server-side expiry before refreshing the cookie.
+        """Renew the server-side expiry before refreshing the cookie.
 
         Validate that a clean request cannot extend only the browser's deadline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -433,10 +740,14 @@ class TestSessionManager(TestCase):
         self.assertEqual(len(response.set_calls), 1)
 
     async def testSavePersistsExpiryFromConfiguredLifetime(self) -> None:
-        """
-        Stamp the record with the configured lifetime.
+        """Stamp the record with the configured lifetime.
 
         Validates that expires_at lands within the expected window.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({"lifetime": 10})
         store = _RecordingStore()
@@ -451,11 +762,15 @@ class TestSessionManager(TestCase):
         self.assertLessEqual(delta.total_seconds(), 10 * 60)
 
     async def testSaveRotatesIdentifierAndDropsOldRecord(self) -> None:
-        """
-        Swap the identifier when a regeneration was requested.
+        """Swap the identifier when a regeneration was requested.
 
         Validates that the previous record is deleted and the cookie
         carries the new identifier.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -471,10 +786,14 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls[0][1], session.id)
 
     async def testSaveInvalidatedSessionDeletesRecordAndCookie(self) -> None:
-        """
-        Purge the record and expire the cookie on invalidation.
+        """Purge the record and expire the cookie on invalidation.
 
         Validates that logout leaves no server-side or client-side trace.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -491,11 +810,15 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls, [])
 
     async def testSaveInvalidatedSessionWithoutIdentifierSkipsStore(self) -> None:
-        """
-        Expire the cookie without touching the store when no ID exists.
+        """Expire the cookie without touching the store when no ID exists.
 
         Validates that a session invalidated before it ever received an
         identifier issues no delete against the backing store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -510,11 +833,15 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.delete_calls[0][0], "sessionid")
 
     async def testSaveRotationWithoutPreviousIdentifierSkipsDelete(self) -> None:
-        """
-        Rotate without deleting when no previous record existed.
+        """Rotate without deleting when no previous record existed.
 
         Validates that the manager only removes a stale record when the
         session actually had an identifier.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -530,10 +857,14 @@ class TestSessionManager(TestCase):
         self.assertEqual(response.set_calls[0][1], session.id)
 
     async def testSaveForwardsCookieAttributes(self) -> None:
-        """
-        Propagate every configured cookie attribute.
+        """Propagate every configured cookie attribute.
 
         Validates that security flags reach the outgoing response.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager({
             "cookie": "orionis_session",
@@ -561,10 +892,14 @@ class TestSessionManager(TestCase):
         self.assertTrue(options["partitioned"])
 
     async def testFullCycleRoundTripsThroughMemoryStore(self) -> None:
-        """
-        Persist and restore a session through the real memory store.
+        """Persist and restore a session through the real memory store.
 
         Validates that start() and save() interoperate end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
@@ -577,7 +912,13 @@ class TestSessionManager(TestCase):
         self.assertFalse(restored.isNew)
 
     async def testSlowRequestsCannotRestoreAnInvalidatedSession(self) -> None:
-        """Let logout win over later writes and rotations from stale requests."""
+        """Let logout win over later writes and rotations from stale requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for driver in ("memory", "file"):
             manager, _ = self._makeManager({"driver": driver, "files": "sessions"})
             session = await manager.start(_FakeRequest())
@@ -601,7 +942,13 @@ class TestSessionManager(TestCase):
             self.assertEqual(rotating_response.set_calls, [])
 
     async def testMemoryRequestsNeverShareNestedPayloads(self) -> None:
-        """Keep unsaved nested mutations private to the owning request."""
+        """Keep unsaved nested mutations private to the owning request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
         session.put("cart", ["book"])
@@ -613,7 +960,13 @@ class TestSessionManager(TestCase):
         self.assertEqual(second.get("cart"), ["book"])
 
     async def testMalformedCookieNeverReachesTheStore(self) -> None:
-        """Reject path traversal and invalid IDs before storage lookup."""
+        """Reject path traversal and invalid IDs before storage lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         manager, _ = self._makeManager()
         store = _RecordingStore()
         manager._store = store
@@ -623,7 +976,13 @@ class TestSessionManager(TestCase):
         self.assertEqual(store.read_ids, [])
 
     async def testCacheSessionsRoundTripAndCannotResurrect(self) -> None:
-        """Exercise actual cache serialization and conditional replacement."""
+        """Exercise actual cache serialization and conditional replacement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for backend in (
             SimpleMemoryCache(serializer=MsgspecSerializer()),
             FileCacheBackend(self._base_path / "cache"),
@@ -645,7 +1004,13 @@ class TestSessionManager(TestCase):
             self.assertIsNone(await store.read(record.id))
 
     async def testLogoutSurvivesAControllerException(self) -> None:
-        """Persist logout before returning the framework's error response."""
+        """Persist logout before returning the framework's error response.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
         session.put("_auth_identifier", 42)
@@ -654,6 +1019,18 @@ class TestSessionManager(TestCase):
         middleware = StartSessionMiddleware(manager, _RecordingCatch())
 
         async def controller() -> None:
+            """Invalidate the active session before returning.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+
+            Raises
+            ------
+            ValueError
+                Raised by this helper to exercise the failure path.
+            """
             request.state.session.invalidate()
             error_msg = "controller failed after logout"
             raise ValueError(error_msg)
@@ -663,7 +1040,13 @@ class TestSessionManager(TestCase):
         self.assertIsNone(await manager._store.read(session.id))
 
     async def testCancelledLogoutStillRevokesTheSession(self) -> None:
-        """Remove an invalidated record even when the request task is cancelled."""
+        """Remove an invalidated record even when the request task is cancelled.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
         session.put("_auth_identifier", 42)
@@ -674,6 +1057,13 @@ class TestSessionManager(TestCase):
         hold = asyncio.Event()
 
         async def controller() -> None:
+            """Invalidate the active session before returning.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             request.state.session.invalidate()
             entered.set()
             await hold.wait()
@@ -732,11 +1122,15 @@ class TestSessionManagerDatabaseDriver(TestCase):
         return SessionManager(app, _FakeCacheManager())
 
     def testDatabaseDriverResolvesToDatabaseStore(self) -> None:
-        """
-        Select the database store for the database driver.
+        """Select the database store for the database driver.
 
         Validates that the connection is resolved through the ORM
         resolver and that the configured table name is honoured.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({
             "driver": "database",
@@ -747,10 +1141,14 @@ class TestSessionManagerDatabaseDriver(TestCase):
         self.assertEqual(manager._store._table, "user_sessions")
 
     def testDatabaseDriverFallsBackToDefaultTable(self) -> None:
-        """
-        Use the built-in table name when the configuration omits one.
+        """Use the built-in table name when the configuration omits one.
 
         Validates the ``sessions`` default applied by the manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({
             "driver": "database",

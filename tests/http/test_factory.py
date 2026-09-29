@@ -22,13 +22,17 @@ class _Money:
     __slots__ = ("amount",)
 
     def __init__(self, amount: str) -> None:
-        """
-        Store the raw amount as text.
+        """Store the raw amount as text.
 
         Parameters
         ----------
         amount : str
             Amount rendered by the custom encoder.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.amount = amount
 
@@ -38,8 +42,7 @@ class _StubPendingView:
     __slots__ = ("context", "template")
 
     def __init__(self, template: str, context: dict[str, object]) -> None:
-        """
-        Record the rendering intent without touching the engine.
+        """Record the rendering intent without touching the engine.
 
         Parameters
         ----------
@@ -47,6 +50,11 @@ class _StubPendingView:
             Template name requested by the factory.
         context : dict[str, object]
             Template variables forwarded by the factory.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self.template = template
         self.context = context
@@ -79,41 +87,57 @@ class _StubViewFacade:
 class TestResponseFactoryView(TestCase):
 
     def setUp(self) -> None:
-        """
-        Install a view facade double for the duration of the test.
+        """Install a view facade double for the duration of the test.
 
         Validates the factory delegation without booting the template
         engine or touching the filesystem.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         _StubViewFacade.calls = []
         self._original_facade = factory_module.View
         factory_module.View = _StubViewFacade
 
     def tearDown(self) -> None:
-        """
-        Restore the real view facade after the test.
+        """Restore the real view facade after the test.
 
         Validates that the swap never leaks into other test cases.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         factory_module.View = self._original_facade
 
     def testViewDelegatesToTheFacade(self) -> None:
-        """
-        Forward the template name and context to the view facade.
+        """Forward the template name and context to the view facade.
 
         Validates that controllers can render a template through the
         shared response factory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.view("users.index", total=2)
         self.assertIsInstance(result, _StubPendingView)
         self.assertEqual(_StubViewFacade.calls, [("users.index", {"total": 2})])
 
     def testViewIsNotAwaitedByTheFactory(self) -> None:
-        """
-        Return the pending view untouched so it stays chainable.
+        """Return the pending view untouched so it stays chainable.
 
         Validates that mutators such as ``withErrors()`` can be chained on
         the value returned by ``view()``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.view("auth.login")
         self.assertEqual(result.template, "auth.login")
@@ -122,11 +146,15 @@ class TestResponseFactoryView(TestCase):
 class TestResponseFactoryHtml(TestCase):
 
     def testHtmlUsesSaneDefaults(self) -> None:
-        """
-        Build an empty ``200`` HTML response by default.
+        """Build an empty ``200`` HTML response by default.
 
         Validates the shortest call form used by controllers that render
         markup built elsewhere.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.html()
         self.assertIsInstance(result, HTMLResponse)
@@ -134,11 +162,15 @@ class TestResponseFactoryHtml(TestCase):
         self.assertEqual(result.getBody(), b"")
 
     def testHtmlForwardsEveryArgument(self) -> None:
-        """
-        Forward content, status code and headers to the response.
+        """Forward content, status code and headers to the response.
 
         Validates that the factory adds no behaviour of its own beyond
         constructing the right response class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.html(
             "<p>hi</p>",
@@ -152,10 +184,14 @@ class TestResponseFactoryHtml(TestCase):
 class TestResponseFactoryJson(TestCase):
 
     def testJsonSerialisesTheContent(self) -> None:
-        """
-        Serialise the payload and advertise the JSON content type.
+        """Serialise the payload and advertise the JSON content type.
 
         Validates the default path used by API controllers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.json({"ok": True})
         self.assertIsInstance(result, JSONResponse)
@@ -166,21 +202,29 @@ class TestResponseFactoryJson(TestCase):
         )
 
     def testJsonForwardsFormattingOptions(self) -> None:
-        """
-        Forward the pretty-printing options to the response.
+        """Forward the pretty-printing options to the response.
 
         Validates that indentation requested at the call site reaches the
         serializer instead of being silently dropped.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.json({"a": 1}, indent=2)
         self.assertEqual(result.getBody(), b'{\n  "a": 1\n}')
 
     def testJsonForwardsTheCustomEncoder(self) -> None:
-        """
-        Use the caller-supplied encoder for unsupported types.
+        """Use the caller-supplied encoder for unsupported types.
 
         Validates that domain objects can be serialised without changing
         the framework encoder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.json(
             {"money": _Money("12.50")},
@@ -189,11 +233,15 @@ class TestResponseFactoryJson(TestCase):
         self.assertEqual(result.getBody(), b'{"money":"custom:12.50"}')
 
     def testJsonForwardsStatusAndHeaders(self) -> None:
-        """
-        Forward the status code and extra headers untouched.
+        """Forward the status code and extra headers untouched.
 
         Validates that error payloads can be produced through the same
         helper as successful ones.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.json({"error": "nope"}, 422, {"x-trace": "abc"})
         self.assertEqual(result.getStatusCode(), 422)
@@ -202,10 +250,14 @@ class TestResponseFactoryJson(TestCase):
 class TestResponseFactoryText(TestCase):
 
     def testTextUsesSaneDefaults(self) -> None:
-        """
-        Build an empty ``200`` plain-text response by default.
+        """Build an empty ``200`` plain-text response by default.
 
         Validates the shortest call form used for health-check endpoints.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.text()
         self.assertIsInstance(result, PlainTextResponse)
@@ -216,10 +268,14 @@ class TestResponseFactoryText(TestCase):
         )
 
     def testTextForwardsEveryArgument(self) -> None:
-        """
-        Forward content, status code and headers to the response.
+        """Forward content, status code and headers to the response.
 
         Validates that plain-text errors keep their status code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.text("gone", 410, {"x-reason": "expired"})
         self.assertEqual(result.getBody(), b"gone")
@@ -229,10 +285,14 @@ class TestResponseFactoryText(TestCase):
 class TestResponseFactoryRedirect(TestCase):
 
     def testRedirectDefaultsToFound(self) -> None:
-        """
-        Redirect with ``302`` and the target in the location header.
+        """Redirect with ``302`` and the target in the location header.
 
         Validates the default used after a successful form submission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.redirect("/login")
         self.assertIsInstance(result, RedirectResponse)
@@ -240,11 +300,15 @@ class TestResponseFactoryRedirect(TestCase):
         self.assertEqual(result.getHeader("location"), ["/login"])
 
     def testRedirectForwardsStatusAndHeaders(self) -> None:
-        """
-        Forward a permanent status code and extra headers.
+        """Forward a permanent status code and extra headers.
 
         Validates that ``301`` redirects can be produced through the same
         helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.redirect("/new", 301, {"x-legacy": "yes"})
         self.assertEqual(result.getStatusCode(), 301)
@@ -253,11 +317,15 @@ class TestResponseFactoryRedirect(TestCase):
 class TestResponseFactoryStream(TestCase):
 
     async def testStreamAcceptsASynchronousIterable(self) -> None:
-        """
-        Adapt a synchronous byte iterable into a streaming response.
+        """Adapt a synchronous byte iterable into a streaming response.
 
         Validates that generators producing chunks can be returned
         directly by a controller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.stream([b"a", b"b"], media_type="text/csv")
         self.assertIsInstance(result, StreamingResponse)
@@ -265,11 +333,15 @@ class TestResponseFactoryStream(TestCase):
         self.assertEqual(chunks, [b"a", b"b"])
 
     def testStreamForwardsStatusAndHeaders(self) -> None:
-        """
-        Forward the status code, headers and media type.
+        """Forward the status code, headers and media type.
 
         Validates that a streamed export can advertise its own content
         type and disposition.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.stream(
             [b"chunk"],
@@ -285,32 +357,44 @@ class _FileFactoryTestCase(TestCase):
     """Base case providing a temporary file on disk."""
 
     def setUp(self) -> None:
-        """
-        Create a temporary file served by the file helpers.
+        """Create a temporary file served by the file helpers.
 
         Validates the file responses against real filesystem metadata
         instead of stubbed sizes.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmp = TemporaryDirectory()
         self._file = Path(self._tmp.name) / "report.txt"
         self._file.write_bytes(b"payload")
 
     def tearDown(self) -> None:
-        """
-        Remove the temporary directory after the test.
+        """Remove the temporary directory after the test.
 
         Validates that the suite leaves no artefacts behind.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._tmp.cleanup()
 
 class TestResponseFactoryFile(_FileFactoryTestCase):
 
     def testFileGuessesTheMediaType(self) -> None:
-        """
-        Serve a file and infer its media type from the extension.
+        """Serve a file and infer its media type from the extension.
 
         Validates that controllers do not need to repeat the MIME type
         for well-known extensions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.file(self._file)
         self.assertIsInstance(result, FileResponse)
@@ -318,11 +402,15 @@ class TestResponseFactoryFile(_FileFactoryTestCase):
         self.assertEqual(result.getFileSize(), len(b"payload"))
 
     def testFileForwardsEveryArgument(self) -> None:
-        """
-        Forward status, headers, media type, filename and chunk size.
+        """Forward status, headers, media type, filename and chunk size.
 
         Validates that a download can be tuned without bypassing the
         factory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.file(
             str(self._file),
@@ -343,11 +431,15 @@ class TestResponseFactoryFile(_FileFactoryTestCase):
 class TestResponseFactoryDownload(_FileFactoryTestCase):
 
     def testDownloadFallsBackToTheFileName(self) -> None:
-        """
-        Advertise the file name when no override is supplied.
+        """Advertise the file name when no override is supplied.
 
         Validates that the browser saves the attachment under its
         original name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.download(self._file)
         self.assertEqual(
@@ -356,10 +448,14 @@ class TestResponseFactoryDownload(_FileFactoryTestCase):
         )
 
     def testDownloadHonoursTheRequestedName(self) -> None:
-        """
-        Advertise the caller-supplied attachment name.
+        """Advertise the caller-supplied attachment name.
 
         Validates that a generated export can be renamed for the user.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.download(
             self._file,
@@ -377,10 +473,14 @@ class TestResponseFactoryDownload(_FileFactoryTestCase):
 class TestResponseFactoryBareResponses(TestCase):
 
     def testNoContentDefaultsToStatus204(self) -> None:
-        """
-        Build an empty ``204`` response by default.
+        """Build an empty ``204`` response by default.
 
         Validates the canonical answer of a successful delete endpoint.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.noContent()
         self.assertIsInstance(result, Response)
@@ -388,20 +488,28 @@ class TestResponseFactoryBareResponses(TestCase):
         self.assertEqual(result.getBody(), b"")
 
     def testNoContentForwardsStatusAndHeaders(self) -> None:
-        """
-        Forward an alternative empty status code and headers.
+        """Forward an alternative empty status code and headers.
 
         Validates that ``304`` style responses reuse the same helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.noContent(304, {"etag": "abc"})
         self.assertEqual(result.getStatusCode(), 304)
         self.assertEqual(result.getHeader("etag"), ["abc"])
 
     def testMakeBuildsABareResponse(self) -> None:
-        """
-        Build a response with full control over content and media type.
+        """Build a response with full control over content and media type.
 
         Validates the escape hatch used when no specialised helper fits.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.make("raw", 201, {"x-kind": "bare"}, "text/csv")
         self.assertEqual(result.getBody(), b"raw")
@@ -410,10 +518,14 @@ class TestResponseFactoryBareResponses(TestCase):
         self.assertEqual(result.getMediaType(), "text/csv")
 
     def testMakeDefaultsToAnEmptyOkResponse(self) -> None:
-        """
-        Build an empty ``200`` response when nothing is supplied.
+        """Build an empty ``200`` response when nothing is supplied.
 
         Validates that the helper is safe to call without arguments.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = response.make()
         self.assertEqual(result.getBody(), b"")
@@ -423,29 +535,41 @@ class TestResponseFactoryBareResponses(TestCase):
 class TestResponseFactoryInstance(TestCase):
 
     def testFactoryIsStateless(self) -> None:
-        """
-        Keep the shared factory free of per-instance state.
+        """Keep the shared factory free of per-instance state.
 
         Validates that importing the module-level instance is safe from
         concurrently handled requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(ResponseFactory.__slots__, ())
         self.assertFalse(hasattr(response, "__dict__"))
 
     def testModuleLevelInstanceIsAFactory(self) -> None:
-        """
-        Expose a ready-to-use factory instance at module level.
+        """Expose a ready-to-use factory instance at module level.
 
         Validates the import shape used by every controller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(response, ResponseFactory)
 
     def testEveryHelperReturnsAResponseSubclass(self) -> None:
-        """
-        Return a response object from every non-view helper.
+        """Return a response object from every non-view helper.
 
         Validates that handlers annotated with ``HttpResponse`` accept the
         output of any factory helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         built: list[Response] = [
             response.html(),

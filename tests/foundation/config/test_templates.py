@@ -1,7 +1,6 @@
 import ast
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-
 from config.database import BootstrapDatabase
 from config.logging import BootstrapLogging
 from tests.foundation.config.support import (
@@ -9,10 +8,15 @@ from tests.foundation.config.support import (
     configuration_classes,
 )
 
-
 class TestConfigurationTemplates(ConfigurationTestCase):
     def testEveryApplicationOptionIsDeclaredInItsTemplate(self) -> None:
-        """Keep every framework option visible in the editable application layer."""
+        """Keep every framework option visible in the editable application layer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls in configuration_classes(self.modules):
             if not cls.__module__.startswith("config."):
                 continue
@@ -23,7 +27,13 @@ class TestConfigurationTemplates(ConfigurationTestCase):
                 )
 
     def testNestedTemplatesExposeAllConstructorOptions(self) -> None:
-        """Reject hidden entity factories and incomplete nested configuration trees."""
+        """Reject hidden entity factories and incomplete nested configuration trees.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for module in self.modules:
             if not module.__name__.startswith("config."):
                 continue
@@ -56,7 +66,13 @@ class TestConfigurationTemplates(ConfigurationTestCase):
                         )
 
     def testDatabaseTemplateReadsNestedEnvironmentOptions(self) -> None:
-        """Apply application choices across all five explicitly configured drivers."""
+        """Apply application choices across all five explicitly configured drivers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(
             DB_HOST="database.example.com",
             DB_PREFIX="tenant_",
@@ -83,7 +99,13 @@ class TestConfigurationTemplates(ConfigurationTestCase):
         self.assertFalse(connections.sqlserver.trust_server_certificate)
 
     def testLoggingTemplateReadsEachChannelOptions(self) -> None:
-        """Apply paths and retention independently to each logging channel."""
+        """Apply paths and retention independently to each logging channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         retentions = {
             "hourly": "retention_hours",
             "daily": "retention_days",

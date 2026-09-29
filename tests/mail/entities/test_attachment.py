@@ -6,10 +6,14 @@ from orionis.test import TestCase
 class TestAttachment(TestCase):
 
     def testDeclarationNormalizesPathAndMimeType(self) -> None:
-        """
-        Normalize the logical path and lowercase an explicit MIME type.
+        """Normalize the logical path and lowercase an explicit MIME type.
 
         Validates that declaring an attachment performs no storage access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         attachment = Attachment.fromStorage(
             "./private/../documents/guide.pdf",
@@ -23,10 +27,14 @@ class TestAttachment(TestCase):
         self.assertEqual(attachment.name, "guide.pdf")
 
     def testMissingFilesRemainValidDeclarations(self) -> None:
-        """
-        Accept a path that does not exist yet.
+        """Accept a path that does not exist yet.
 
         Validates that resolution is deferred to the sending pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         attachment = Attachment.fromStorage("private/missing.pdf")
         self.assertEqual(attachment.path, "private/missing.pdf")
@@ -35,20 +43,28 @@ class TestAttachment(TestCase):
         self.assertIsNone(attachment.mime_type)
 
     def testDeclarationIsFrozen(self) -> None:
-        """
-        Reject mutation of an already declared attachment.
+        """Reject mutation of an already declared attachment.
 
         Validates that a shared declaration cannot be rewritten in place.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         attachment = Attachment.fromStorage("guide.pdf")
         with self.assertRaises(FrozenInstanceError):
             attachment.path = "other.pdf"
 
     def testRejectsUnsafePathsAndDisks(self) -> None:
-        """
-        Reject traversal, control characters, and empty disk names.
+        """Reject traversal, control characters, and empty disk names.
 
         Validates that unsafe declarations fail before any disk resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for path in ("../private.pdf", "guide\r\n.pdf", "", "a\x00b"):
             with self.assertRaises(MailAttachmentException):
@@ -57,10 +73,14 @@ class TestAttachment(TestCase):
             Attachment.fromStorage("guide.pdf", disk="   ")
 
     def testRejectsUnsafeVisibleNamesAndMediaTypes(self) -> None:
-        """
-        Reject visible names holding paths and MIME types with parameters.
+        """Reject visible names holding paths and MIME types with parameters.
 
         Validates that Content-Disposition and Content-Type stay safe.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for options in (
             {"name": "../secret"},

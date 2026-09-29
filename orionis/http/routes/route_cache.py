@@ -115,6 +115,7 @@ class RouteCache(IRouteCache):
             "segment_count": cr.segment_count,
             "priority_score": cr.priority_score,
             "kind": cr.kind,
+            "public": cr.public,
             "middleware": [
                 f"{m.__module__}.{m.__qualname__}"
                 for m in cr.middleware
@@ -163,6 +164,7 @@ class RouteCache(IRouteCache):
             segment_count=route_data["segment_count"],
             priority_score=route_data["priority_score"],
             kind=route_data.get("kind", "web"),
+            public=route_data.get("public", False),
             converters=converters,
             middleware=[
                 RouteCache.__resolveClass(s, resolved_classes)

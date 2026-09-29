@@ -3,7 +3,6 @@ from orionis.http.layer.shared.proxies import ProxiesMiddleware
 from orionis.test import TestCase
 from tests.http.test_kernel import _StubRsgiHeaders, _StubRsgiScope
 
-
 def _make_scope(
     client: str | None,
     headers: dict[str, list[str]] | None = None,
@@ -28,11 +27,16 @@ def _make_scope(
         scope.headers = _StubRsgiHeaders(headers)
     return scope
 
-
 class TestRsgiClient(TestCase):
 
     def testClientNormalizesIpv6AndPreservesCacheAndOverrides(self) -> None:
-        """Normalize socket hosts while retaining port and cached overrides."""
+        """Normalize socket hosts while retaining port and cached overrides.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             ("[::1]:1234", "::1"),
             ("[2001:db8::7]:1234", "2001:db8::7"),
@@ -58,7 +62,13 @@ class TestRsgiClient(TestCase):
             self.assertEqual(adapter.getScope()["port"], 1234)
 
     def testUnavailableClientAndEarlyOverrideRemainLazy(self) -> None:
-        """Cache absent peers and honor an override before parsing the scope."""
+        """Cache absent peers and honor an override before parsing the scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for raw in (None, ""):
             scope = _make_scope(raw)
             adapter = RSGITransportAdapter(scope)
@@ -76,7 +86,13 @@ class TestRsgiClient(TestCase):
         self.assertNotIn("port", adapter)
 
     def testTrustedIpv6AndIpv4PeersApplyForwarding(self) -> None:
-        """Trust normalized peers and apply the validated forwarding chain."""
+        """Trust normalized peers and apply the validated forwarding chain.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             ("[::1]:1234", "::1/128", "::1"),
             ("[2001:db8:123::7]:1234", "2001:db8:123::/48", "2001:db8:123::7"),
@@ -101,7 +117,13 @@ class TestRsgiClient(TestCase):
             })
 
     def testUntrustedIpv6AndIpv4PeersIgnoreForwarding(self) -> None:
-        """Preserve the direct peer and scheme when proxy trust does not match."""
+        """Preserve the direct peer and scheme when proxy trust does not match.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             ("[::1]:1234", "2001:db8:123::/48", "::1"),
             ("[2001:db8:456::7]:1234", "2001:db8:123::/48", "2001:db8:456::7"),

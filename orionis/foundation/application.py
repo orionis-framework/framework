@@ -7,6 +7,7 @@ from collections import OrderedDict, deque
 from contextlib import suppress
 from copy import deepcopy
 from dataclasses import asdict
+from importlib import import_module
 from pathlib import Path
 import sys
 import time
@@ -18,16 +19,14 @@ from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.failure.contracts.handler import IBaseExceptionHandler
 from orionis.foundation.contracts.application import IApplication
-from orionis.foundation.core_config import CORE_CONFIG
+from orionis.foundation.core_config import get_core_config_mapping
 from orionis.foundation.core_exception_handler import CORE_EXCEPTION_HANDLER
 from orionis.foundation.core_kernels import CORE_KERNELS
 from orionis.foundation.core_paths import CORE_APP_PATHS
-from orionis.foundation.core_providers import CORE_PROVIDERS
+from orionis.foundation.core_providers import get_core_providers_mapping
 from orionis.foundation.core_scheduler import CORE_SCHEDULER
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
-from orionis.foundation.lifespan.shutdown import shutdown_orionis_generator
-from orionis.foundation.lifespan.startup import startup_orionis_generator
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.layer.contracts.middleware import IBaseMiddleware
 from orionis.metadata.framework import PYTHON_REQUIRES
@@ -40,6 +39,8 @@ from orionis.console.contracts.kernel import IKernelCLI
 if TYPE_CHECKING:
     from collections.abc import Awaitable
     from collections.abc import Callable
+    from collections.abc import Coroutine
+    from collections.abc import Mapping
     from granian.rsgi import (
         Scope,
         HTTPProtocol,
@@ -51,24 +52,50 @@ if TYPE_CHECKING:
     from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 
 _SENTINEL = object()
+_ASGI_BODY_QUEUE_SIZE = 8
 _CWD = Path.cwd()
+_CONFIG_KEY_CACHE_SIZE = 256
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
 
+def _create_http_handler_task(
+    loop: asyncio.AbstractEventLoop,
+    coroutine: Coroutine,
+) -> asyncio.Task:
+    """Start a monitored handler through the event loop's task factory.
+
+    Parameters
+    ----------
+    loop : asyncio.AbstractEventLoop
+        Running request event loop.
+    coroutine : Coroutine
+        Kernel handler coroutine to schedule.
+
+    Returns
+    -------
+    asyncio.Task
+        Handler task. The native loop without a custom factory starts it eagerly;
+        other loops and factories receive their standard task-creation arguments.
+    """
+    if (
+        type(loop).create_task is asyncio.BaseEventLoop.create_task
+        and loop.get_task_factory() is None
+    ):
+        return loop.create_task(coroutine, eager_start=True)
+    return loop.create_task(coroutine)
 
 async def _asgi_receive_dispatcher(
     receive: Callable[[], Awaitable[dict[str, Any]]],
     request_queue: asyncio.Queue,
-    disconnect_future: asyncio.Future[bool],
-) -> None:
+    handler_task: asyncio.Task,
+) -> bool:
     """
     Consume ASGI receive messages and dispatch them concurrently.
 
-    Routes ``http.request`` body chunks into *request_queue* so the
-    kernel handler reads them normally, and resolves *disconnect_future*
-    immediately upon ``http.disconnect`` without requiring the handler
-    to call ``receive`` itself.
+    Forward body chunks through a bounded queue and cancel the handler when
+    the receive channel reports a disconnect or fails. A full queue pauses
+    receive calls until the handler consumes a buffered message.
 
     Parameters
     ----------
@@ -76,33 +103,113 @@ async def _asgi_receive_dispatcher(
         ASGI receive callable provided by the server.
     request_queue : asyncio.Queue
         Queue that buffers body messages for the handler.
-    disconnect_future : asyncio.Future[bool]
-        Future resolved to ``True`` when the client disconnects.
+    handler_task : asyncio.Task
+        Kernel task to cancel when the receive channel closes.
 
     Returns
     -------
-    None
-        Returns when a disconnect is detected or the task is cancelled.
+    bool
+        Whether the disconnect requested cancellation of the handler.
     """
+    if handler_task.done():
+        return False
     try:
         while True:
-            message: dict[str, Any] = await receive()
-            msg_type: str | None = message.get("type")
-            if msg_type == "http.disconnect":
-                # Signal disconnect before forwarding so the callback fires
-                if not disconnect_future.done():
-                    disconnect_future.set_result(True)
-                # Unblock any handler awaiting queue.get()
-                await request_queue.put(message)
-                return
-            # Buffer body chunks for the handler
+            message = await receive()
             await request_queue.put(message)
-    except asyncio.CancelledError:  # NOSONAR
-        pass
+            if message.get("type") == "http.disconnect":
+                return handler_task.cancel("client_disconnect")
+    except BaseException:
+        # Stop the handler when the server receive channel fails.
+        handler_task.cancel()
+        raise
 
+async def _rsgi_disconnect_watcher(
+    protocol: HTTPProtocol,
+    handler_task: asyncio.Task,
+) -> bool:
+    """
+    Cancel the kernel task when the RSGI disconnect awaitable completes.
+
+    Parameters
+    ----------
+    protocol : HTTPProtocol
+        Protocol providing the client disconnect awaitable.
+    handler_task : asyncio.Task
+        Kernel task associated with the connection.
+
+    Returns
+    -------
+    bool
+        Whether the disconnect requested cancellation of the handler.
+    """
+    if handler_task.done():
+        return False
+    try:
+        await protocol.client_disconnect()
+    except BaseException:
+        # Stop the handler when the disconnect channel fails.
+        handler_task.cancel()
+        raise
+    return handler_task.cancel("client_disconnect")
+
+async def _await_http_tasks(
+    handler_task: asyncio.Task,
+    disconnect_task: asyncio.Task[bool],
+) -> Any:
+    """
+    Await the kernel and finish its disconnect monitor before returning.
+
+    Parameters
+    ----------
+    handler_task : asyncio.Task
+        Kernel task handling the request.
+    disconnect_task : asyncio.Task[bool]
+        Monitor returning whether it cancelled the kernel on disconnect.
+
+    Returns
+    -------
+    Any
+        Kernel result, or None after a client disconnect.
+
+    Raises
+    ------
+    asyncio.CancelledError
+        If the caller or kernel is cancelled independently of a disconnect.
+    Exception
+        If the kernel or disconnect monitor fails.
+    """
+    parent_task = asyncio.current_task()
+    try:
+        return await handler_task
+    except asyncio.CancelledError: # NOSONAR
+        if parent_task.cancelling() or not disconnect_task.done():
+            raise
+        if not disconnect_task.result():
+            raise
+        return None
+    finally:
+        if not disconnect_task.done():
+            disconnect_task.cancel()
+        try:
+            await disconnect_task
+        except asyncio.CancelledError:
+            # Preserve cancellation of the request during monitor cleanup.
+            if parent_task.cancelling():
+                raise
 
 class Application(Container, IApplication):
-    # ruff: noqa: SLF001, ANN401, FBT001
+    """
+    Configure the container and serve requests within one worker event loop.
+
+    Notes
+    -----
+    Concurrent tasks share kernel initialization and provider startup locks.
+    Mutable application state is not synchronized across threads or event loops.
+    Python and RSGI special methods retain their protocol-defined names.
+    """
+
+    # ruff: noqa: SLF001, ANN401
 
     # --- ASGI Application Handling ---
 
@@ -134,16 +241,16 @@ class Application(Container, IApplication):
 
         # Route lifespan events to the dedicated handler
         if scope_type == "lifespan":
-            return await self.__asgi_lifespan__(receive, send)
+            return await self.__asgiLifespan(receive, send)
 
-        # Route HTTP requests to the optimized handler
+        # Route HTTP requests to the kernel handler.
         if scope_type == "http":
-            return await self.__handle_http_asgi__(scope, receive, send)
+            return await self.__handleHttpAsgi(scope, receive, send)
 
         # Ignore unsupported scopes per ASGI specification
         return None
 
-    async def __asgi_lifespan__(
+    async def __asgiLifespan(
         self,
         receive: Callable[[], Awaitable[dict]],
         send: Callable[[dict], Awaitable[None]],
@@ -219,18 +326,21 @@ class Application(Container, IApplication):
                 )
                 return
 
-    async def __handle_http_asgi__(
+    async def __handleHttpAsgi(
         self,
         scope: dict,
         receive: Callable[[], Awaitable[dict[str, Any]]],
         send: Callable[[dict[str, Any]], Awaitable[None]],
     ) -> Any | None:
         """
-        Handle an HTTP request over ASGI with concurrent disconnect detection.
+        Handle an HTTP request using the configured disconnect policy.
 
-        Runs the kernel handler and a receive dispatcher as separate tasks.
-        The dispatcher signals *disconnect_future* the instant the client
-        disconnects, which immediately cancels the handler task.
+        Direct dispatch uses the server task and receive callable. When
+        ``http.monitor_disconnects`` is enabled, a receive dispatcher cancels
+        the kernel on disconnect and buffers incoming body messages.
+        At most nine body messages are retained outside the kernel: eight
+        in the queue and one waiting to enter it. Disconnect detection
+        pauses while the queue is full.
 
         Parameters
         ----------
@@ -247,63 +357,25 @@ class Application(Container, IApplication):
             Result of the kernel handler, or ``None`` if the client
             disconnected before the response was sent.
         """
-        loop = asyncio.get_running_loop()
-
-        # Future resolved to True when an http.disconnect message arrives
-        disconnect_future: asyncio.Future[bool] = loop.create_future()
-
-        # Lazily initialise and cache the kernel handler on first request
-        if not self.__kernel_http_asgi:
-            self.config("app.interface", "asgi")
-            kernel_instance = await self.__loadHTTPKernel()
-            self.__kernel_http_asgi = kernel_instance.handleASGI
-
-        # Local reference avoids per-request attribute lookup
         handler = self.__kernel_http_asgi
+        if handler is None:
+            await self.__initializeHttpKernel("asgi")
+            handler = self.__kernel_http_asgi
 
-        # Queue that decouples the server receive channel from the handler;
-        # the dispatcher writes here, the handler reads via _receive_for_handler
-        request_queue: asyncio.Queue = asyncio.Queue()
+        if not self.__http_disconnect_monitoring:
+            return await handler(scope, receive, send)
 
-        async def _receive_for_handler() -> dict[str, Any]:
-            """Return the next message buffered by the dispatcher."""
-            return await request_queue.get()
-
-        # Concurrently consume the server channel and watch for disconnect
+        loop = asyncio.get_running_loop()
+        request_queue: asyncio.Queue = asyncio.Queue(maxsize=_ASGI_BODY_QUEUE_SIZE)
+        handler_task = _create_http_handler_task(
+            loop, handler(scope, request_queue.get, send),
+        )
+        if handler_task.done():
+            return handler_task.result()
         dispatcher_task = loop.create_task(
-            _asgi_receive_dispatcher(
-                receive,
-                request_queue,
-                disconnect_future,
-            ),
+            _asgi_receive_dispatcher(receive, request_queue, handler_task),
         )
-
-        # Run the kernel handler with the queue-backed receive shim
-        handler_task = loop.create_task(
-            handler(scope, _receive_for_handler, send),
-        )
-
-        # Cancel the handler immediately when disconnect is detected
-        def _on_disconnect(_: asyncio.Future) -> None:
-            if not handler_task.done():
-                handler_task.cancel(msg="client_disconnect")
-
-        disconnect_future.add_done_callback(_on_disconnect)
-
-        try:
-            return await handler_task
-
-        except asyncio.CancelledError:  # NOSONAR
-            # Client disconnected; exit silently
-            return None
-
-        finally:
-            # Stop the dispatcher if the handler finished first
-            if not dispatcher_task.done():
-                dispatcher_task.cancel()
-            # Resolve future to avoid a "never retrieved" warning
-            if not disconnect_future.done():
-                disconnect_future.set_result(False)
+        return await _await_http_tasks(handler_task, dispatcher_task)
 
     # --- RSGI Application Handling ---
 
@@ -329,7 +401,7 @@ class Application(Container, IApplication):
         """
         # Delegate to the appropriate kernel handler based on protocol type.
         if scope.proto == "http":
-            return await self.__handle_http_rsgi__(scope, protocol)
+            return await self.__handleHttpRsgi(scope, protocol)
 
         # Unsupported protocol; return None per RSGI specification.
         return None
@@ -353,7 +425,7 @@ class Application(Container, IApplication):
         """
         # Trigger application startup lifecycle and run all startup callbacks.
         loop.run_until_complete(
-            self.__onStartup(runtime=Runtime.HTTP),
+            self.__onStartup(runtime=Runtime.HTTP, http_interface="rsgi"),
         )
 
     def __rsgi_del__(
@@ -378,7 +450,7 @@ class Application(Container, IApplication):
             self.__onShutdown(runtime=Runtime.HTTP),
         )
 
-    async def __handle_http_rsgi__(
+    async def __handleHttpRsgi(
         self,
         scope: Scope,
         protocol: HTTPProtocol,
@@ -386,10 +458,9 @@ class Application(Container, IApplication):
         """
         Handle HTTP requests using the KernelHTTP in RSGI mode.
 
-        Runs the kernel handler and a ``protocol.client_disconnect()`` watcher
-        concurrently. The handler task is cancelled immediately when the client
-        disconnects. Per the RSGI specification, the application is responsible
-        for cancelling the disconnect watcher once the response has been sent.
+        Direct dispatch executes in the server task. When
+        ``http.monitor_disconnects`` is enabled, a watcher requests cancellation
+        when the client disconnects. The watcher is joined before returning.
 
         Parameters
         ----------
@@ -412,51 +483,48 @@ class Application(Container, IApplication):
         TypeError
             If the HTTP kernel does not have a handleRSGI method.
         """
-        # Initialize HTTP kernel if not already cached.
-        if not self.__kernel_http_rsgi:
-            # Set the application interface type for kernel resolution.
-            self.config("app.interface", "rsgi")
+        handler = self.__kernel_http_rsgi
+        if handler is None:
+            await self.__initializeHttpKernel("rsgi")
+            handler = self.__kernel_http_rsgi
 
-            # Import lazily to avoid overhead during application startup.
-            kernel_instance = await self.__loadHTTPKernel()
+        if not self.__http_disconnect_monitoring:
+            return await handler(scope, protocol)
 
-            # Cache the kernel's handleRSGI method for future calls.
-            self.__kernel_http_rsgi = kernel_instance.handleRSGI
-
-        loop: asyncio.AbstractEventLoop = asyncio.get_running_loop()
-
-        # Schedule the kernel handler as a cancellable task.
-        handler_task: asyncio.Task = loop.create_task(
-            self.__kernel_http_rsgi(scope, protocol),
+        loop = asyncio.get_running_loop()
+        handler_task = _create_http_handler_task(loop, handler(scope, protocol))
+        if handler_task.done():
+            return handler_task.result()
+        disconnect_task = loop.create_task(
+            _rsgi_disconnect_watcher(protocol, handler_task),
         )
-
-        # Schedule the client disconnect watcher as a concurrent task that
-        # cancels the handler immediately upon disconnect.
-        disconnect_task: asyncio.Future = asyncio.ensure_future(
-            protocol.client_disconnect(),
-        )
-
-        def _on_disconnect(_: asyncio.Future) -> None:
-            """Cancel the handler task when the client disconnects."""
-            if not handler_task.done():
-                handler_task.cancel()
-
-        # Cancel the handler as soon as the disconnect watcher resolves.
-        disconnect_task.add_done_callback(_on_disconnect)
-
-        try:
-            # Await the handler; propagates CancelledError on disconnect.
-            return await handler_task
-        except asyncio.CancelledError:  # NOSONAR
-            # Client disconnected before the response was sent.
-            return None
-        finally:
-            # Per RSGI spec: cancel the disconnect watcher after the response
-            # so that keep-alive connections are not incorrectly closed.
-            if not disconnect_task.done():
-                disconnect_task.cancel()
+        return await _await_http_tasks(handler_task, disconnect_task)
 
     # --- Kernel Handling Methods ---
+
+    async def __initializeHttpKernel(self, interface: str) -> None:
+        """
+        Build and boot the HTTP kernel once for concurrent first requests.
+
+        Parameters
+        ----------
+        interface : str
+            Server interface recorded before the kernel is built.
+
+        Returns
+        -------
+        None
+            Both protocol handlers are published after a successful boot.
+        """
+        async with self.__kernel_http_lock:
+            if self.__kernel_http_asgi is not None:
+                return
+            self.config("app.interface", interface)
+            kernel = await self.__loadHTTPKernel()
+            asgi_handler = kernel.handleASGI
+            rsgi_handler = kernel.handleRSGI
+            self.__kernel_http_asgi = asgi_handler
+            self.__kernel_http_rsgi = rsgi_handler
 
     async def __loadHTTPKernel(
         self,
@@ -477,7 +545,7 @@ class Application(Container, IApplication):
         # Retrieve HTTP kernel configuration from bootstrap
         kernel_metadata = self.__bootstrap["kernels"]["KernelHTTP"]
 
-        # Import lazily to avoid unnecessary overhead during application startup
+        # Load the configured HTTP kernel class.
         kernel_cls = ModuleInspector.loadClass(metadata=kernel_metadata)
         kernel_instance = await self.build(kernel_cls)
 
@@ -488,7 +556,7 @@ class Application(Container, IApplication):
             )
             raise TypeError(error_msg)
 
-        # Boot the kernel, supporting both sync and async boot methods
+        # Boot the HTTP kernel before publishing its handlers.
         await kernel_instance.boot()
 
         # Return the loaded HTTP kernel instance
@@ -519,7 +587,7 @@ class Application(Container, IApplication):
             error_msg = "CLI Kernel is not configured in the application."
             raise RuntimeError(error_msg) from None
 
-        # Import lazily to avoid unnecessary overhead during application startup
+        # Load the configured CLI kernel class.
         kernel_cls = ModuleInspector.loadClass(metadata=kernel_metadata)
         kernel_instance = await self.build(kernel_cls)
 
@@ -558,19 +626,9 @@ class Application(Container, IApplication):
         TypeError
             If the CLI kernel does not have a handle method.
         """
-        # Initialize CLI kernel if not already cached
-        if not self.__kernel_cli:
-            # Import lazily to avoid unnecessary overhead during application startup
-            kernel_instance = await self.__loadCLIKernel()
-
-            # Boot the kernel, supporting both sync and async boot methods
-            if inspect.iscoroutinefunction(kernel_instance.boot):
-                await kernel_instance.boot(self)
-            else:
-                kernel_instance.boot(self)
-
-            # Cache the kernel's handle method for future calls
-            self.__kernel_cli = kernel_instance.handle
+        # Initialize the CLI kernel before starting command lifecycle hooks.
+        if self.__kernel_cli is None:
+            await self.__initializeCliKernel()
 
         # Trigger startup lifecycle event before each command execution
         await self.__onStartup(runtime=Runtime.CLI)
@@ -585,18 +643,36 @@ class Application(Container, IApplication):
         # Return the response code from the CLI kernel
         return response
 
+    async def __initializeCliKernel(self) -> None:
+        """
+        Build and boot the CLI kernel once for concurrent commands.
+
+        Returns
+        -------
+        None
+            The command handler is published after the kernel boots.
+        """
+        async with self.__kernel_cli_lock:
+            if self.__kernel_cli is not None:
+                return
+            kernel = await self.__loadCLIKernel()
+            boot_result = kernel.boot(self)
+            if inspect.isawaitable(boot_result):
+                await boot_result
+            self.__kernel_cli = kernel.handle
+
     # --- Application Properties ---
 
     @property
     def isBooted(self) -> bool:
         """
-        Check if the application service providers have been booted.
+        Check whether configuration and provider registration have completed.
 
         Returns
         -------
         bool
-            True if all service providers have been booted and the application is
-            ready for use; otherwise, False.
+            True after create() finishes. Asynchronous provider startup and HTTP
+            kernel readiness are completed separately during lifespan startup.
         """
         return self.__booted
 
@@ -774,9 +850,9 @@ class Application(Container, IApplication):
                 None: {Lifespan.STARTUP: set(), Lifespan.SHUTDOWN: set()},
             }
 
-            # Initialize resolved service instances.
-            self.__scheduler_resolved: IBaseScheduler | None = None
-            self.__exception_handler_resolved: IBaseExceptionHandler | None = None
+            # Initialize references to resolved service classes.
+            self.__scheduler_resolved: type[IBaseScheduler] | None = None
+            self.__exception_handler_resolved: type[IBaseExceptionHandler] | None = None
 
             # Initialize application state flags.
             self.__booted: bool = False
@@ -788,15 +864,20 @@ class Application(Container, IApplication):
             # Initialize configuration dictionaries.
             self.__bootstrap: dict[str, Any] = {}
             self.__runtime_config: dict[str, Any] = {}
+            self.__config_key_parts: dict[str, tuple[str, ...]] = {}
 
             # Initialize kernel caches.
             self.__kernel_cli: Callable | None = None
             self.__kernel_http_rsgi: Callable | None = None
             self.__kernel_http_asgi: Callable | None = None
+            self.__http_disconnect_monitoring: bool = False
+            self.__kernel_http_lock = asyncio.Lock()
+            self.__kernel_cli_lock = asyncio.Lock()
 
             # Initialize deferred providers cache.
             self.__cache_resolved_providers: set[str] = set()
             self.__pending_boot_providers: deque[IServiceProvider] = deque()
+            self.__provider_boot_lock = asyncio.Lock()
 
             # Initialize providers registry sentinel.
             self.__providers_registry_initialized: bool = False
@@ -839,7 +920,6 @@ class Application(Container, IApplication):
             This method does not return a value.
         """
         self.__bootCompiledState(
-            compiled=True,
             compiled_path=path,
             compiled_invalidation_paths=invalidation_paths,
         )
@@ -889,8 +969,6 @@ class Application(Container, IApplication):
         ------
         TypeError
             If `path` is not a Path or str.
-        FileNotFoundError
-            If the resolved path does not exist.
         """
         # Convert string to Path. basePath may not be set yet (e.g. during __init__),
         # so fall back to the process working directory for relative strings.
@@ -975,6 +1053,7 @@ class Application(Container, IApplication):
     async def __onStartup(
         self,
         runtime: Runtime,
+        http_interface: str = "asgi",
     ) -> None:
         """
         Execute startup callbacks for the application lifecycle.
@@ -984,6 +1063,8 @@ class Application(Container, IApplication):
         runtime : Runtime
             The runtime environment (HTTP or CLI) for which to
             execute startup callbacks.
+        http_interface : str, optional
+            HTTP transport recorded when the kernel is warmed during startup.
 
         Returns
         -------
@@ -1002,12 +1083,17 @@ class Application(Container, IApplication):
         # Trigger startup lifecycle events and execute registered startup callbacks
         if runtime == Runtime.HTTP:
             # Start the Orionis startup generator.
-            startup_gen = startup_orionis_generator(self)
+            startup_gen = import_module(
+                "orionis.foundation.lifespan.startup",
+            ).startup_orionis_generator(self)
             next(startup_gen)
 
             # Execute all registered startup callbacks (sync or async).
             for func in callbacks:
                 await self.invoke(func)
+
+            # Publish both HTTP handlers before the server acknowledges readiness.
+            await self.__initializeHttpKernel(http_interface)
 
             # Finalize the startup generator.
             with suppress(StopIteration):
@@ -1045,7 +1131,9 @@ class Application(Container, IApplication):
         # Trigger shutdown lifecycle events and execute registered shutdown callbacks
         if runtime == Runtime.HTTP:
             # Start the Orionis shutdown generator.
-            shutdown_gen = shutdown_orionis_generator(self)
+            shutdown_gen = import_module(
+                "orionis.foundation.lifespan.shutdown",
+            ).shutdown_orionis_generator(self)
             next(shutdown_gen)
 
             # Execute all registered shutdown callbacks (sync or async).
@@ -1181,17 +1269,14 @@ class Application(Container, IApplication):
 
     def __bootCompiledState(
         self,
-        compiled: bool,
         compiled_path: str | None = None,
         compiled_invalidation_paths: list[str] | None = None,
-    ) -> Self:
+    ) -> None:
         """
         Initialize application compilation and configuration caching.
 
         Parameters
         ----------
-        compiled : bool
-            Indicates whether configuration caching is enabled.
         compiled_path : str | None, optional
             Path to the cache directory, or None.
         compiled_invalidation_paths : list[str] | None, optional
@@ -1199,18 +1284,14 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
-            The current Application instance for method chaining.
+        None
+            Configure the cache and load any valid stored bootstrap state.
 
         Notes
         -----
         This method sets up the cache driver and loads cached configuration
         if available. It also tracks directories and files for cache invalidation.
         """
-        # Return immediately if caching is not enabled.
-        if not compiled:
-            return self
-
         # Mark the application as compiled to activate caching logic.
         self.__compiled = True
 
@@ -1233,10 +1314,6 @@ class Application(Container, IApplication):
                 self.__basePath / "storage" / "framework" / "cache"
             ).resolve()
 
-        # Ensure the cache directory exists if caching is enabled and a path is set.
-        if not self.__compiled_path.exists():
-            self.__compiled_path.mkdir(parents=True, exist_ok=True)
-
         # Initialize the cache driver for configuration caching.
         self.__compiled_state_store = FileBasedCache(
             path=self.__compiled_path,
@@ -1253,9 +1330,6 @@ class Application(Container, IApplication):
             self.__bootstrap = bootstrapt_cache
             self.__is_compiled = True
             self.__commitConfig()
-
-        # Return self for method chaining.
-        return self
 
     def __persistCompiledState(self) -> None:
         """
@@ -1276,7 +1350,7 @@ class Application(Container, IApplication):
 
         # Save the current bootstrap configuration to cache if cache driver exists
         if self.__compiled_state_store is not None:
-            self.__compiled_state_store.save(deepcopy(self.__bootstrap))
+            self.__compiled_state_store.save(self.__bootstrap)
 
     # --- Service Provider Bootstrapping Logic ---
 
@@ -1307,8 +1381,7 @@ class Application(Container, IApplication):
         # Ensure configuration is not locked before modification
         self.__assertConfigMutable()
 
-        # Store middleware metadata in bootstrap (serialised to cache),
-        # avoiding duplicates while preserving registration order.
+        # Store unique middleware metadata in registration order.
         mw_list: list = self.__bootstrap["middleware"]
         for mw in middleware:
             if not isinstance(mw, type) or not issubclass(mw, IBaseMiddleware):
@@ -1398,7 +1471,7 @@ class Application(Container, IApplication):
             This method modifies the internal providers registry in place.
         """
         # Register each core provider in the providers registry
-        for provider in CORE_PROVIDERS:
+        for provider in get_core_providers_mapping():
             self.__storeProviderClass(provider)
 
     def __ensureProvidersRegistryStructure(self) -> None:
@@ -1491,9 +1564,6 @@ class Application(Container, IApplication):
         module: str = provider.__module__
         class_name: str = provider.__name__
         provider_full_path: str = f"{module}.{class_name}"
-
-        # Remove existing entry to prevent duplicates before re-inserting
-        eager.pop(provider_full_path, None)
 
         # Insert metadata and move to front to maintain priority ordering
         eager[provider_full_path] = {"module": module, "class": class_name}
@@ -1598,8 +1668,8 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        self : ProvidersLoader
-            Instance of ProvidersLoader.
+        modules : set[str]
+            Dotted module names containing service provider classes.
 
         Returns
         -------
@@ -1675,7 +1745,9 @@ class Application(Container, IApplication):
             # Resolve the provider class using the module engine and register it
             provider = ModuleInspector.loadClass(metadata=provider_metadata)
             instance: IServiceProvider = provider(self)
-            self.__registerEagerProviders(instance)
+            register = getattr(instance, "register", None)
+            if callable(register):
+                register()
 
             # Schedule boot for async providers, call directly for sync
             boot_fn = getattr(instance, "boot", None)
@@ -1688,49 +1760,28 @@ class Application(Container, IApplication):
             # Add to resolved providers cache to prevent duplicate resolution
             self.__cache_resolved_providers.add(full_path_provider)
 
-    def __registerEagerProviders(
-        self,
-        provider: IServiceProvider,
-    ) -> None:
-        """
-        Register a service provider instance.
-
-        Parameters
-        ----------
-        provider : IServiceProvider
-            The service provider instance to register.
-
-        Returns
-        -------
-        None
-            This method does not return a value. It calls the provider's
-            register method if it exists.
-        """
-        # Call the register method if it exists and is callable
-        if hasattr(provider, "register") and callable(provider.register):
-            provider.register()
-
     async def __bootEagerProviders(self) -> None:
         """
         Boot all pending eager service providers.
 
-        Schedule asynchronous boot methods for all pending eager service
-        providers using the current event loop.
+        Await providers in registration order and retain unfinished providers
+        so a later startup can retry them.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        # Return immediately if there are no pending eager providers.
+        # Skip startup coordination when every provider has finished booting.
         if not self.__pending_boot_providers:
             return
 
-        # Boot each pending eager provider instance asynchronously
-        # in registration order.
-        while self.__pending_boot_providers:
-            provider = self.__pending_boot_providers.popleft()
-            await provider.boot()
+        # Keep each provider pending until its boot method completes.
+        async with self.__provider_boot_lock:
+            pending = self.__pending_boot_providers
+            while pending:
+                await pending[0].boot()
+                pending.popleft()
 
     # --- Routing Configuration and Validation ---
 
@@ -1968,7 +2019,7 @@ class Application(Container, IApplication):
             )
             raise RuntimeError(error_msg)
 
-        # Resolve and cache the exception handler instance if not already done
+        # Resolve and cache the exception handler class.
         if self.__exception_handler_resolved is None:
             exception_handler = self.__bootstrap.get("exception_handler")
             concrete_handler = ModuleInspector.loadClass(metadata=exception_handler)
@@ -2052,7 +2103,7 @@ class Application(Container, IApplication):
             error_msg = "Cannot retrieve scheduler before application is booted."
             raise RuntimeError(error_msg)
 
-        # Resolve and cache the scheduler instance if not already done
+        # Resolve and cache the scheduler class.
         if self.__scheduler_resolved is None:
             scheduler = self.__bootstrap.get("scheduler")
             concrete_scheduler = ModuleInspector.loadClass(metadata=scheduler)
@@ -2065,14 +2116,14 @@ class Application(Container, IApplication):
 
     def withConfigApp(
         self,
-        **app_config: dict,
+        **app_config: object,
     ) -> Self:
         """
         Configure application settings using keyword arguments.
 
         Parameters
         ----------
-        **app_config : dict
+        **app_config : object
             Configuration parameters for the application. Keys must match the
             field names and types expected by the App dataclass from
             orionis.foundation.config.app.entities.app.App.
@@ -2097,14 +2148,14 @@ class Application(Container, IApplication):
 
     def withConfigAuth(
         self,
-        **auth_config: dict,
+        **auth_config: object,
     ) -> Self:
         """
         Configure authentication subsystem using keyword arguments.
 
         Parameters
         ----------
-        **auth_config : dict
+        **auth_config : object
             Keyword arguments for authentication configuration. Keys must match
             the fields of the `Auth` dataclass from
             `orionis.foundation.config.auth.entities.auth.Auth`.
@@ -2129,14 +2180,14 @@ class Application(Container, IApplication):
 
     def withConfigCache(
         self,
-        **cache_config: dict,
+        **cache_config: object,
     ) -> Self:
         """
         Configure the cache subsystem using keyword arguments.
 
         Parameters
         ----------
-        **cache_config : dict
+        **cache_config : object
             Keyword arguments representing cache configuration options. Keys must
             match the field names and types expected by the `Cache` dataclass from
             `orionis.foundation.config.cache.entities.cache.Cache`.
@@ -2161,14 +2212,14 @@ class Application(Container, IApplication):
 
     def withConfigHttp(
         self,
-        **http_config: dict,
+        **http_config: object,
     ) -> Self:
         """
         Configure the HTTP subsystem using keyword arguments.
 
         Parameters
         ----------
-        **http_config : dict
+        **http_config : object
             Keyword arguments for HTTP configuration. Keys must match the field
             names and types expected by the `HTTP` dataclass from
             `orionis.foundation.config.http.entitites.http.HTTP`.
@@ -2193,14 +2244,14 @@ class Application(Container, IApplication):
 
     def withConfigDatabase(
         self,
-        **database_config: dict,
+        **database_config: object,
     ) -> Self:
         """
         Configure the database subsystem using keyword arguments.
 
         Parameters
         ----------
-        **database_config : dict
+        **database_config : object
             Keyword arguments for database configuration. Keys must match the
             fields of the `Database` dataclass from
             `orionis.foundation.config.database.entities.database.Database`.
@@ -2225,14 +2276,14 @@ class Application(Container, IApplication):
 
     def withConfigFilesystems(
         self,
-        **filesystems_config: dict,
+        **filesystems_config: object,
     ) -> Self:
         """
         Configure the filesystems subsystem using keyword arguments.
 
         Parameters
         ----------
-        **filesystems_config : dict
+        **filesystems_config : object
             Keyword arguments for filesystems configuration. Keys must match the
             fields of the `Filesystems` dataclass from
             `orionis.foundation.config.filesystems.entitites.filesystems.Filesystems`.
@@ -2257,14 +2308,14 @@ class Application(Container, IApplication):
 
     def withConfigLogging(
         self,
-        **logging_config: dict,
+        **logging_config: object,
     ) -> Self:
         """
         Configure logging subsystem using keyword arguments.
 
         Parameters
         ----------
-        **logging_config : dict
+        **logging_config : object
             Keyword arguments for logging configuration. Keys must match the
             fields of the `Logging` dataclass from
             `orionis.foundation.config.logging.entities.logging.Logging`.
@@ -2289,14 +2340,14 @@ class Application(Container, IApplication):
 
     def withConfigMail(
         self,
-        **mail_config: dict,
+        **mail_config: object,
     ) -> Self:
         """
         Configure mail subsystem using keyword arguments.
 
         Parameters
         ----------
-        **mail_config : dict
+        **mail_config : object
             Keyword arguments for mail configuration. Keys must match the fields
             of the `Mail` dataclass from
             `orionis.foundation.config.mail.entities.mail.Mail`.
@@ -2321,14 +2372,14 @@ class Application(Container, IApplication):
 
     def withConfigQueue(
         self,
-        **queue_config: dict,
+        **queue_config: object,
     ) -> Self:
         """
         Configure the queue subsystem using keyword arguments.
 
         Parameters
         ----------
-        **queue_config : dict
+        **queue_config : object
             Keyword arguments representing queue configuration options. Keys must
             match the field names and types expected by the `Queue` dataclass from
             `orionis.foundation.config.queue.entities.queue.Queue`.
@@ -2353,14 +2404,14 @@ class Application(Container, IApplication):
 
     def withConfigSession(
         self,
-        **session_config: dict,
+        **session_config: object,
     ) -> Self:
         """
         Configure session subsystem using keyword arguments.
 
         Parameters
         ----------
-        session_config : dict
+        **session_config : object
             Keyword arguments for session configuration. Keys must match the
             fields of the `Session` dataclass from
             `orionis.foundation.config.session.entities.session.Session`.
@@ -2385,14 +2436,14 @@ class Application(Container, IApplication):
 
     def withConfigTesting(
         self,
-        **testing_config: dict,
+        **testing_config: object,
     ) -> Self:
         """
         Configure the testing subsystem using keyword arguments.
 
         Parameters
         ----------
-        **testing_config : dict
+        **testing_config : object
             Keyword arguments for testing configuration. Keys must match the
             fields of the `Testing` dataclass from
             `orionis.foundation.config.testing.entities.testing.Testing`.
@@ -2417,18 +2468,18 @@ class Application(Container, IApplication):
 
     def withConfigPaths(
         self,
-        **paths: dict[str, str | Path | None],
+        **paths: str | Path | None,
     ) -> Self:
         """
         Set and resolve application directory paths.
 
         Parameters
         ----------
-        **paths : dict[str, str | Path | None]
-            Optional directory paths to override defaults. Valid keys include
-            'root', 'app', 'console', 'exceptions', 'http', 'models',
-            'providers', 'notifications', 'services', 'jobs', 'bootstrap',
-            'config', 'database', 'resources', 'routes', 'storage', 'tests'.
+        **paths : str | Path | None
+            Optional directory path overrides. Valid keys are 'app', 'console',
+            'exceptions', 'http', 'models', 'providers', 'notifications',
+            'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
+            'routes', 'storage' and 'tests'. The root always comes from basePath.
 
         Returns
         -------
@@ -2442,45 +2493,21 @@ class Application(Container, IApplication):
         # Ensure configuration is not locked before modification
         self.__assertConfigMutable()
 
-        # Define default path mappings
-        default_paths: dict = FreezeThaw.thaw(CORE_APP_PATHS)
-
-        # List of valid path keys
-        keys = {
-            "app",
-            "console",
-            "exceptions",
-            "http",
-            "models",
-            "providers",
-            "notifications",
-            "services",
-            "jobs",
-            "bootstrap",
-            "config",
-            "database",
-            "resources",
-            "routes",
-            "storage",
-            "tests",
-        }
-
         # Initialize final paths with the root path
+        base_path = self.__basePath
         final_paths: dict = {
-            "root": self.__basePath.resolve(),
+            "root": base_path,
         }
 
         # Iterate over valid keys and resolve paths, using provided values or defaults
-        for key in keys:
-            # Use provided path if available, otherwise use default
-            if key in paths:
-                if isinstance(paths[key], Path):
-                    final_paths[key] = paths[key].resolve()
-                    continue
-                if isinstance(paths[key], str):
-                    final_paths[key] = (self.__basePath / paths[key]).resolve()
-                    continue
-            final_paths[key] = (self.__basePath / default_paths[key]).resolve()
+        for key, default in CORE_APP_PATHS.items():
+            path = paths.get(key)
+            if isinstance(path, Path):
+                final_paths[key] = path.resolve()
+            elif isinstance(path, str):
+                final_paths[key] = (base_path / path).resolve()
+            else:
+                final_paths[key] = (base_path / default).resolve()
 
         # Store the resolved paths in the application configuration
         self.__bootstrap["paths"] = final_paths
@@ -2520,9 +2547,27 @@ class Application(Container, IApplication):
             values: dict[str, Any],
             base: dict[str, Any],
         ) -> None:
+            """
+            Merge one configuration section into the destination mapping.
+
+            Parameters
+            ----------
+            section : str
+                Name of the configuration section.
+            values : dict[str, Any]
+                Values overriding existing keys within the section.
+            base : dict[str, Any]
+                Destination configuration modified in place.
+
+            Returns
+            -------
+            None
+                The destination mapping contains the merged section.
+            """
             # Merge values into the base config section
-            if section in base and isinstance(base[section], dict):
-                base[section].update(values)
+            current = base.get(section)
+            if isinstance(current, dict):
+                current.update(values)
             else:
                 base[section] = values
 
@@ -2557,7 +2602,7 @@ class Application(Container, IApplication):
             This method updates the internal bootstrap configuration in place.
         """
         # Use the core config as the default configuration
-        default_config: dict = FreezeThaw.thaw(CORE_CONFIG)
+        default_config: dict = dict(get_core_config_mapping())
 
         # Discover configuration modules in the config directory
         config_paths: dict = self.__bootstrap["paths"]
@@ -2701,8 +2746,10 @@ class Application(Container, IApplication):
         # Prevent duplicate initialization if already booted
         if not self.__booted:
             # Store the file path where the application was started.
-            # inspect.stack() is portable across all standard Python implementations.
-            self.__entry_point = inspect.stack()[1].filename
+            try:
+                self.__entry_point = sys._getframe(1).f_code.co_filename
+            except AttributeError:
+                self.__entry_point = inspect.stack(context=0)[1].filename
 
             # Register application instance in the container
             self.instance(IApplication, self, alias="x-orionis-IApplication")
@@ -2721,7 +2768,14 @@ class Application(Container, IApplication):
             self.__is_production_cache = "prod" in str(self.config("app.env") or "")
             self.__is_debug_cache = self.config("app.debug") is True
 
-            # Mark application as fully booted
+            # Store the HTTP policy used throughout this worker's lifetime.
+            monitoring = self.config("http.monitor_disconnects")
+            if monitoring is not None and not isinstance(monitoring, bool):
+                error_msg = "http.monitor_disconnects must be a bool."
+                raise TypeError(error_msg)
+            self.__http_disconnect_monitoring = monitoring is True
+
+            # Mark configuration and provider registration as complete.
             self.__booted = True
 
         # Return the application instance for method chaining
@@ -2775,8 +2829,14 @@ class Application(Container, IApplication):
             error_msg = "Configuration key must be a string."
             raise TypeError(error_msg)
 
-        # Split the key into parts for nested access
-        key_parts: list[str] = key.split(".")
+        # Store parsed paths for subsequent configuration lookups.
+        key_cache = self.__config_key_parts
+        key_parts = key_cache.get(key)
+        if key_parts is None:
+            key_parts = tuple(key.split("."))
+            if len(key_cache) >= _CONFIG_KEY_CACHE_SIZE:
+                key_cache.clear()
+            key_cache[key] = key_parts
 
         # If value is not provided, retrieve the configuration value
         if value is _SENTINEL:
@@ -2790,8 +2850,8 @@ class Application(Container, IApplication):
         Reset the runtime configuration to a mutable copy of the bootstrap config.
 
         Resets the application's runtime configuration to a mutable and isolated
-        copy of the bootstrap configuration. Marks the runtime config as fresh,
-        allowing re-initialization by calling `create()` again.
+        copy of the bootstrap configuration. The application remains booted
+        and subsequent accesses use the restored runtime values.
 
         Returns
         -------
@@ -2801,10 +2861,7 @@ class Application(Container, IApplication):
         # Obtain current bootstrap configuration for runtime use
         bootstrap_config: dict = self.__bootstrap.get("config", {})
 
-        # Thaw to a fully mutable, deep-copied structure.
-        # FreezeThaw.thaw already creates new container objects at every level,
-        # providing the same isolation as deepcopy without the MappingProxyType
-        # serialization restriction.
+        # Recreate mutable containers from the frozen bootstrap configuration.
         self.__runtime_config = FreezeThaw.thaw(bootstrap_config)
 
         # Mark runtime configuration as ready for access
@@ -2815,15 +2872,15 @@ class Application(Container, IApplication):
 
     def __getRuntimeConfigValue(
         self,
-        key_parts: list[str],
+        key_parts: tuple[str, ...],
     ) -> object:
         """
         Retrieve a value from a nested dictionary using dot notation.
 
         Parameters
         ----------
-        key_parts : list[str]
-            List of keys representing the path in the nested dictionary.
+        key_parts : tuple[str, ...]
+            Keys representing the path in the nested dictionary.
 
         Returns
         -------
@@ -2833,15 +2890,14 @@ class Application(Container, IApplication):
         cfg: object = self.__runtime_config
         for part in key_parts:
             # Traverse nested dictionaries using the provided key parts
-            if isinstance(cfg, dict) and part in cfg:
-                cfg = cfg[part]
-            else:
+            if not isinstance(cfg, dict):
                 return None
+            cfg = cfg.get(part)
         return cfg
 
     def __setRuntimeConfigValue(
         self,
-        key_parts: list[str],
+        key_parts: tuple[str, ...],
         value: object,
     ) -> object:
         """
@@ -2849,8 +2905,8 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        key_parts : list[str]
-            List of keys representing the path in the nested dictionary.
+        key_parts : tuple[str, ...]
+            Keys representing the path in the nested dictionary.
         value : object
             The value to set at the specified nested key path.
 
@@ -2862,11 +2918,16 @@ class Application(Container, IApplication):
         # Traverse the nested dictionary structure, creating intermediate
         # dictionaries as needed, and set the value at the specified path.
         current = self.__runtime_config
-        for part in key_parts[:-1]:
-            if part not in current or not isinstance(current[part], dict):
-                current[part] = {}
-            current = current[part]
-        current[key_parts[-1]] = value
+        parts = iter(key_parts)
+        part = next(parts)
+        for next_part in parts:
+            child = current.get(part)
+            if not isinstance(child, dict):
+                child = {}
+                current[part] = child
+            current = child
+            part = next_part
+        current[part] = value
         return value
 
     # --- Application Path Access Method ---
@@ -2874,7 +2935,7 @@ class Application(Container, IApplication):
     def path(
         self,
         key: str | None = None,
-    ) -> Path | dict | None:
+    ) -> Path | Mapping[str, Path] | None:
         """
         Retrieve an application path by key or return all paths.
 
@@ -2885,9 +2946,9 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Path | dict | None
-            The resolved path for the given key, all paths as a dictionary,
-            or None if the key does not exist.
+        Path | Mapping[str, Path] | None
+            The resolved path for the given key, all paths as a read-only
+            mapping, or None if the key does not exist.
 
         Raises
         ------
@@ -2971,8 +3032,7 @@ class Application(Container, IApplication):
             return FreezeThaw.thaw(routing)
 
         # Validate key exists in valid routing types
-        valid_keys = {"api", "web", "console"}
-        if key not in valid_keys:
+        if key not in {"api", "web", "console"}:
             return None
 
         # Thaw before returning: freeze converts lists→tuples; callers expect list[Path]

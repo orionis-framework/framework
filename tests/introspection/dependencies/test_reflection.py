@@ -14,30 +14,84 @@ class _NoArgs:
     """Class with a no-argument constructor (only self)."""
 
     def __init__(self) -> None:
-        pass
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class _AllResolved:
     """Class whose constructor uses only type-annotated, non-builtin params."""
 
     def __init__(self, dep: _AllResolved) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        dep : _AllResolved
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
 
 class _WithDefault:
     """Class whose constructor has a parameter with a default value."""
 
     def __init__(self, value: int = 10) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        value : int
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.value = value
 
 class _WithBuiltin:
     """Class whose constructor has a bare builtin-typed parameter."""
 
     def __init__(self, name: str) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.name = name
 
 class _Unannotated:
     """Class whose constructor has a completely unannotated parameter."""
 
     def __init__(self, x) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        x : object
+            Value supplied for ``x``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.x = x
 
 class _Mixed:
@@ -49,6 +103,22 @@ class _Mixed:
         name: str,
         count: int = 0,
     ) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        dep : _Mixed
+            Value supplied for ``dep``.
+        name : str
+            Value supplied for ``name``.
+        count : int
+            Value supplied for ``count``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
         self.name = name
         self.count = count
@@ -75,6 +145,20 @@ class _KeywordOnly:
     """Class whose constructor has keyword-only parameters."""
 
     def __init__(self, *, label: str, count: int = 0) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        label : str
+            Value supplied for ``label``.
+        count : int
+            Value supplied for ``count``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.label = label
         self.count = count
 
@@ -85,6 +169,18 @@ class _ForwardRef:
         self,
         dep: "UnknownDependency",  # type: ignore[name-defined]  # noqa: F821, UP037
     ) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        dep : 'UnknownDependency'
+            Value supplied for ``dep``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.dep = dep
 
 

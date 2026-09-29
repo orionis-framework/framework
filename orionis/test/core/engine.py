@@ -73,7 +73,7 @@ class TestingEngine(ITestingEngine):
         )
         self.__json_cache: bool = bool(app.config("testing.cache_results"))
         self.__cache_folder: Path = (
-            app.path("storage") / "framework" / "cache" / "testing"
+            app.path("storage_framework") / "cache" / "testing"
         )
         self.__with_panel: bool = True  # Default to showing the start panel
 

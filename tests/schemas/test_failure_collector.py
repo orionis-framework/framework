@@ -122,60 +122,88 @@ def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> 
 class TestNestedSchema(TestCase):
 
     def testBareSchemaIsReturned(self) -> None:
-        """
-        Return the schema declared directly by a field annotation.
+        """Return the schema declared directly by a field annotation.
 
         Validates the marker attribute lookup used to detect schemas.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(_nested_schema(_Address), _Address)
 
     def testAnnotatedWrapperIsUnwrapped(self) -> None:
-        """
-        Return the schema wrapped inside an Annotated alias.
+        """Return the schema wrapped inside an Annotated alias.
 
         Validates that metadata never hides the wrapped schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(_nested_schema(Annotated[_Address, Title("A")]), _Address)
 
     def testUnionMemberIsReturned(self) -> None:
-        """
-        Return the schema declared as a union member.
+        """Return the schema declared as a union member.
 
         Validates support for optional nested schemas.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(_nested_schema(_Address | None), _Address)
 
     def testUnionWithoutSchemaReturnsNone(self) -> None:
-        """
-        Return None when no union member declares a schema.
+        """Return None when no union member declares a schema.
 
         Validates that scalar unions are left untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(_nested_schema(int | str))
 
     def testScalarAnnotationReturnsNone(self) -> None:
-        """
-        Return None for annotations carrying no schema.
+        """Return None for annotations carrying no schema.
 
         Validates the fallback applied to plain field types.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(_nested_schema(str))
 
 class TestFieldPlan(TestCase):
 
     def testPlanIsCachedPerSchema(self) -> None:
-        """
-        Return the very same plan object on repeated calls.
+        """Return the very same plan object on repeated calls.
 
         Validates the per-schema cache used on the error path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(_field_plan(_Person), _field_plan(_Person))
 
     def testPlanDescribesEveryDeclaredField(self) -> None:
-        """
-        Describe name, requiredness and nesting for each declared field.
+        """Describe name, requiredness and nesting for each declared field.
 
         Validates the tuple layout consumed by the collector.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entries = {entry[0]: entry for entry in _field_plan(_PartialDefaults)}
         self.assertEqual(set(entries), {"age", "label"})
@@ -184,29 +212,41 @@ class TestFieldPlan(TestCase):
         self.assertIsNone(entries["age"][3])
 
     def testNestedSchemaIsRecordedInThePlan(self) -> None:
-        """
-        Record the nested schema declared by a field.
+        """Record the nested schema declared by a field.
 
         Validates that nested traversal metadata reaches the collector.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entries = {entry[0]: entry for entry in _field_plan(_OptionalNested)}
         self.assertIs(entries["address"][3], _Address)
 
     def testRulesAreBoundToTheirField(self) -> None:
-        """
-        Bind the custom rule validators declared for a field.
+        """Bind the custom rule validators declared for a field.
 
         Validates that rules are reused from the executor plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entries = {entry[0]: entry for entry in _field_plan(_RuledParent)}
         self.assertEqual(len(entries["code"][4]), 1)
         self.assertEqual(entries["count"][4], ())
 
     def testRulePlanIsBuiltWhenNotCached(self) -> None:
-        """
-        Build the rule plan when the schema has no cached entry.
+        """Build the rule plan when the schema has no cached entry.
 
         Validates the cache-miss branch of the plan builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_FieldPlanColdRules", {"code": [_RejectRule()]})
         entries = {entry[0]: entry for entry in _field_plan(klass)}
@@ -215,10 +255,14 @@ class TestFieldPlan(TestCase):
 class TestFailureCollectorCollect(TestCase):
 
     def testEveryMissingRequiredFieldIsReported(self) -> None:
-        """
-        Report each required field absent from the payload.
+        """Report each required field absent from the payload.
 
         Validates that reporting does not stop at the first missing field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _Person)
         failures = FailureCollector.collect({}, _Person, error)
@@ -226,10 +270,14 @@ class TestFailureCollectorCollect(TestCase):
         self.assertEqual({f.rule for f in failures}, {"missing"})
 
     def testOptionalMissingFieldIsIgnored(self) -> None:
-        """
-        Skip fields that are absent but carry a default value.
+        """Skip fields that are absent but carry a default value.
 
         Validates that defaults never produce a missing-field failure.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"age": "not-an-int"}
         error = _conversion_error(payload, _PartialDefaults)
@@ -237,10 +285,14 @@ class TestFailureCollectorCollect(TestCase):
         self.assertEqual([f.field for f in failures], ["age"])
 
     def testNonMappingPayloadKeepsTheOriginalError(self) -> None:
-        """
-        Keep the parsed original error when no field can be blamed.
+        """Keep the parsed original error when no field can be blamed.
 
         Validates the fallback used for payloads that are not mappings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = [1, 2]
         error = _conversion_error(payload, _Person)
@@ -249,19 +301,27 @@ class TestFailureCollectorCollect(TestCase):
         self.assertIsInstance(failures[0], ValidationFailure)
 
     def testCollectReturnsATuple(self) -> None:
-        """
-        Return the collected failures as an immutable tuple.
+        """Return the collected failures as an immutable tuple.
 
         Validates the contract consumed by the validation exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _Person)
         self.assertIsInstance(FailureCollector.collect({}, _Person, error), tuple)
 
     def testNestedMappingFailuresAreExpanded(self) -> None:
-        """
-        Expand a rejected nested mapping into its own field failures.
+        """Expand a rejected nested mapping into its own field failures.
 
         Validates the recursion applied to nested schema payloads.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"child": {"code": 123}, "count": 1}
         error = _conversion_error(payload, _NestedParent)
@@ -269,10 +329,14 @@ class TestFailureCollectorCollect(TestCase):
         self.assertEqual([f.field for f in failures], ["child.code"])
 
     def testNestedNonMappingValueIsParsedAsOneFailure(self) -> None:
-        """
-        Report a single failure when a nested value is not a mapping.
+        """Report a single failure when a nested value is not a mapping.
 
         Validates the fallback of the blame helper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"child": 5, "count": 1}
         error = _conversion_error(payload, _NestedParent)
@@ -280,10 +344,14 @@ class TestFailureCollectorCollect(TestCase):
         self.assertEqual([f.field for f in failures], ["child"])
 
     def testRulesRunForFieldsThatConverted(self) -> None:
-        """
-        Run custom rules on values that converted successfully.
+        """Run custom rules on values that converted successfully.
 
         Validates that type errors and rule errors are reported together.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"code": "abc", "count": "not-an-int"}
         error = _conversion_error(payload, _RuledParent)
@@ -292,10 +360,14 @@ class TestFailureCollectorCollect(TestCase):
         self.assertIn("reject", {f.rule for f in failures})
 
     def testNestedRulesRunWhenASiblingFieldFails(self) -> None:
-        """
-        Run the rules of a nested schema that converted cleanly.
+        """Run the rules of a nested schema that converted cleanly.
 
         Validates that nested rules are reached from the slow path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"child": {"code": "abc"}, "count": "not-an-int"}
         error = _conversion_error(payload, _NestedParent)
@@ -305,10 +377,14 @@ class TestFailureCollectorCollect(TestCase):
 class TestFailureCollectorEnforce(TestCase):
 
     def testUncachedNestedPlanIsBuiltOnDemand(self) -> None:
-        """
-        Build the nested rule plan when the value type is not cached.
+        """Build the nested rule plan when the value type is not cached.
 
         Validates the cache-miss branch of the rule enforcement pass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_EnforceColdChild", {"code": [_RejectRule()]})
         failures: list[ValidationFailure] = []
@@ -318,20 +394,28 @@ class TestFailureCollectorEnforce(TestCase):
         self.assertEqual([f.field for f in failures], ["child.code"])
 
     def testNoneNestedValueIsSkipped(self) -> None:
-        """
-        Skip nested enforcement when the converted value is None.
+        """Skip nested enforcement when the converted value is None.
 
         Validates that optional nested schemas never raise on absence.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
         FailureCollector._enforce([("address", None, (), _Address)], {}, failures)
         self.assertEqual(failures, [])
 
     def testEmptyNestedPlanProducesNoFailure(self) -> None:
-        """
-        Produce no failure when the nested schema declares no rule.
+        """Produce no failure when the nested schema declares no rule.
 
         Validates the guard applied before running a nested plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
         FailureCollector._enforce(
@@ -342,11 +426,15 @@ class TestFailureCollectorEnforce(TestCase):
 class TestFailureCollectorBlame(TestCase):
 
     def testCleanNestedMappingFallsBackToTheParsedError(self) -> None:
-        """
-        Report the parsed error when the nested mapping blames no field.
+        """Report the parsed error when the nested mapping blames no field.
 
         Validates the fallback used when the rejection comes from outside
         the declared fields of the nested schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = _conversion_error({"zip_code": 1}, _Address)
         failures = FailureCollector._blame(
@@ -357,9 +445,13 @@ class TestFailureCollectorBlame(TestCase):
 class TestFailureCollectorContract(TestCase):
 
     def testCollectorDeclaresSlots(self) -> None:
-        """
-        Confirm the collector stores no per-instance state.
+        """Confirm the collector stores no per-instance state.
 
         Validates that the class is purely static.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(FailureCollector.__slots__, ())

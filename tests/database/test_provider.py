@@ -12,33 +12,60 @@ from orionis.orm.resolver import ConnectionResolver
 from orionis.support.facades.db import DB
 from orionis.test import TestCase
 
-
 class _CaptureApp:
     """Application stub capturing singleton registrations."""
 
     def __init__(self) -> None:
+        """Initialize the test double.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.bindings: list[tuple[type, type]] = []
 
     def singleton(self, contract: type, implementation: type) -> None:
-        self.bindings.append((contract, implementation))
+        """Record a singleton service registration.
 
+        Parameters
+        ----------
+        contract : type
+            Value supplied for ``contract``.
+        implementation : type
+            Value supplied for ``implementation``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        self.bindings.append((contract, implementation))
 
 class TestConnectionManagerProvider(TestCase):
     """Registration and boot wiring of the connection manager provider."""
 
     def testProviderInheritsFrameworkBase(self) -> None:
-        """
-        Extend the framework ServiceProvider base.
+        """Extend the framework ServiceProvider base.
 
         Validates the provider class hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(ConnectionManagerProvider, ServiceProvider))
 
     def testRegisterBindsManagerAsSingleton(self) -> None:
-        """
-        Bind IConnectionManager as a singleton.
+        """Bind IConnectionManager as a singleton.
 
         Validates the container registration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _CaptureApp()
         provider = ConnectionManagerProvider(app)  # type: ignore[arg-type]
@@ -46,10 +73,14 @@ class TestConnectionManagerProvider(TestCase):
         self.assertEqual(app.bindings, [(IConnectionManager, ConnectionManager)])
 
     async def testBootInstallsManagerOnResolver(self) -> None:
-        """
-        Install the resolved manager on the ORM resolver.
+        """Install the resolved manager on the ORM resolver.
 
         Validates that models reach connections without the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         previous = ConnectionResolver._manager
         try:
@@ -65,17 +96,20 @@ class TestConnectionManagerProvider(TestCase):
             application.make.assert_awaited_once_with(IConnectionManager)
             self.assertIs(ConnectionResolver.manager(), manager)
         finally:
-            ConnectionResolver._manager = previous
-
+            ConnectionResolver._manager = previous # NOSONAR
 
 class TestQueryBuilderProvider(TestCase):
     """Registration and boot wiring of the query builder gateway."""
 
     def testRegisterBindsGatewayAsSingleton(self) -> None:
-        """
-        Bind IQueryBuilder as a singleton.
+        """Bind IQueryBuilder as a singleton.
 
         Validates the container registration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _CaptureApp()
         provider = QueryBuilderProvider(app)  # type: ignore[arg-type]
@@ -83,10 +117,14 @@ class TestQueryBuilderProvider(TestCase):
         self.assertEqual(app.bindings, [(IQueryBuilder, QueryBuilder)])
 
     async def testBootPinsTheFacade(self) -> None:
-        """
-        Pin the DB facade so it resolves without awaiting a dispatcher.
+        """Pin the DB facade so it resolves without awaiting a dispatcher.
 
         Validates the boot wiring against the booted application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         gateway = QueryBuilder(db_manager=None)
         application = Mock(isBooted=True)
@@ -100,31 +138,43 @@ class TestQueryBuilderProvider(TestCase):
             self.assertIs(DB._pinned_instance, gateway)
             self.assertIsInstance(DB.table("users"), IRawQueryBuilder)
 
-
 class TestDBFacade(TestCase):
     """Contract exposed by the DB facade."""
 
     def testFacadeAccessorIsGatewayContract(self) -> None:
-        """
-        Expose IQueryBuilder as the facade accessor.
+        """Expose IQueryBuilder as the facade accessor.
 
         Validates the facade to container binding.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(DB.getFacadeAccessor(), IQueryBuilder)
-
 
 class TestQueryBuilderGateway(TestCase):
     """Statelessness guarantees of the singleton gateway."""
 
     def setUp(self) -> None:
-        """Build a gateway over a stub manager."""
+        """Build a gateway over a stub manager.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._gateway = QueryBuilder(db_manager=None)  # type: ignore[arg-type]
 
     def testTableReturnsIndependentBuilders(self) -> None:
-        """
-        Build a fresh builder on every table() call.
+        """Build a fresh builder on every table() call.
 
         Validates that concurrent callers never share query state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = self._gateway.table("users")
         second = self._gateway.table("posts")
@@ -132,11 +182,15 @@ class TestQueryBuilderGateway(TestCase):
         self.assertIsNot(first.toPlan(), second.toPlan())
 
     def testConnectionReturnsScopedGatewayWithoutMutating(self) -> None:
-        """
-        Scope a gateway to a connection without mutating the singleton.
+        """Scope a gateway to a connection without mutating the singleton.
 
         Validates that ``DB.connection(...)`` cannot retarget the shared
         instance every other caller resolves.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         scoped = self._gateway.connection("reporting")
         self.assertIsNot(scoped, self._gateway)
@@ -144,10 +198,14 @@ class TestQueryBuilderGateway(TestCase):
         self.assertEqual(scoped.table("users")._connection_name, "reporting")
 
     def testTableConnectionOverridesGatewayScope(self) -> None:
-        """
-        Honor the per-call connection argument declared by the contract.
+        """Honor the per-call connection argument declared by the contract.
 
         Validates that the explicit argument wins over the gateway scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         scoped = self._gateway.connection("reporting")
         builder = scoped.table("users", connection="analytics")

@@ -13,20 +13,28 @@ _KEY_PREFIX: str = "base64:"
 class TestSecureKeyGeneratorCatalogue(TestCase):
 
     def testCoversEveryDeclaredCipher(self) -> None:
-        """
-        Map every declared cipher to a key size.
+        """Map every declared cipher to a key size.
 
         Validates that no supported cipher is left without an entry, which
         would make key generation fail at runtime.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(set(SecureKeyGenerator.KEY_SIZES), set(Cipher))
 
     def testDeclaresTheKeySizeRequiredByEachCipher(self) -> None:
-        """
-        Declare the byte length required by each cipher variant.
+        """Declare the byte length required by each cipher variant.
 
         Validates that 128-bit modes map to 16 bytes and 256-bit modes to
         32 bytes, as expected by the encrypter.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             SecureKeyGenerator.KEY_SIZES,
@@ -45,22 +53,30 @@ class TestSecureKeyGeneratorCatalogue(TestCase):
 class TestSecureKeyGeneratorOutput(TestCase):
 
     def testDefaultsToTheAes256CbcCipher(self) -> None:
-        """
-        Generate a 32 byte key when no cipher is supplied.
+        """Generate a 32 byte key when no cipher is supplied.
 
         Validates the documented default, which must stay aligned with the
         cipher configured by a freshly scaffolded application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         generated = SecureKeyGenerator.generate()
         payload = base64.b64decode(generated.removeprefix(_KEY_PREFIX))
         self.assertEqual(len(payload), 32)
 
     def testProducesADecodableKeyForEveryCipher(self) -> None:
-        """
-        Produce a prefixed, decodable key for every supported cipher.
+        """Produce a prefixed, decodable key for every supported cipher.
 
         Validates the Laravel compatible ``base64:`` envelope and that the
         decoded payload matches the declared key size.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
             generated = SecureKeyGenerator.generate(cipher)
@@ -72,11 +88,15 @@ class TestSecureKeyGeneratorOutput(TestCase):
             self.assertEqual(len(payload), size)
 
     def testAcceptsTheCipherAsAPlainString(self) -> None:
-        """
-        Accept the cipher expressed as its canonical string value.
+        """Accept the cipher expressed as its canonical string value.
 
         Validates the branch used when the cipher arrives straight from an
         environment variable instead of the enumeration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
             generated = SecureKeyGenerator.generate(cipher.value)
@@ -84,11 +104,15 @@ class TestSecureKeyGeneratorOutput(TestCase):
             self.assertEqual(len(payload), size)
 
     def testProducesADifferentKeyOnEveryCall(self) -> None:
-        """
-        Produce cryptographically distinct keys across invocations.
+        """Produce cryptographically distinct keys across invocations.
 
         Validates that the generator draws fresh randomness instead of
         reusing a cached or seeded value.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         generated = {SecureKeyGenerator.generate() for _ in range(25)}
         self.assertEqual(len(generated), 25)
@@ -100,11 +124,15 @@ class TestSecureKeyGeneratorOutput(TestCase):
 class TestSecureKeyGeneratorRejections(TestCase):
 
     def testRejectsAnUnknownCipherName(self) -> None:
-        """
-        Raise ValueError when the cipher name is not recognised.
+        """Raise ValueError when the cipher name is not recognised.
 
         Validates that the message lists the supported options so the
         misconfiguration can be corrected immediately.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate("AES-512-CBC")
@@ -113,21 +141,29 @@ class TestSecureKeyGeneratorRejections(TestCase):
         self.assertIn("AES-256-CBC", message)
 
     def testRejectsAnEmptyCipherName(self) -> None:
-        """
-        Raise ValueError when the cipher name is an empty string.
+        """Raise ValueError when the cipher name is an empty string.
 
         Validates that a blank environment variable cannot silently fall
         back to the default cipher.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             SecureKeyGenerator.generate("")
 
     def testRejectsACipherOutsideTheSizeCatalogue(self) -> None:
-        """
-        Raise ValueError when a non-string cipher has no declared size.
+        """Raise ValueError when a non-string cipher has no declared size.
 
         Validates the guard protecting the key size lookup from arbitrary
         objects that bypass the string conversion branch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate(object())
@@ -140,19 +176,27 @@ class TestSecureKeyGeneratorRejections(TestCase):
 class TestSecureKeyGeneratorLayout(TestCase):
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots for a generator that holds no state.
+        """Declare empty slots for a generator that holds no state.
 
         Validates that the utility keeps its whole catalogue at class
         level instead of per instance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(SecureKeyGenerator.__slots__, ())
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
-        """
-        Keep instances free of a dictionary.
+        """Keep instances free of a dictionary.
 
         Validates that an accidental instantiation cannot be used to
         shadow the declared key sizes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(SecureKeyGenerator(), "__dict__"))

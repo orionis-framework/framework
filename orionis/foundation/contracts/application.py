@@ -5,6 +5,7 @@ from orionis.container.contracts.container import IContainer
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
+    from collections.abc import Mapping
     from pathlib import Path
     from orionis.console.base.contracts.scheduler import IBaseScheduler
     from orionis.container.contracts.service_provider import IServiceProvider
@@ -21,13 +22,13 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def isBooted(self) -> bool:
         """
-        Check if the application service providers have been booted.
+        Check whether configuration and provider registration have completed.
 
         Returns
         -------
         bool
-            True if all service providers have been booted and the application is
-            ready for use; otherwise, False.
+            True after create() completes. Asynchronous provider startup and
+            HTTP kernel readiness complete during the server lifespan startup.
         """
 
     @property
@@ -128,6 +129,28 @@ class IApplication(IContainer, ABC):
         -------
         list of Path
             List of file paths monitored for cache invalidation.
+        """
+
+    @abstractmethod
+    def compile(
+        self,
+        path: str | None = None,
+        invalidation_paths: list[str] | None = None,
+    ) -> None:
+        """
+        Configure the directory and source paths for compiled application state.
+
+        Parameters
+        ----------
+        path : str or None, optional
+            Directory used to store the compiled application cache.
+        invalidation_paths : list of str or None, optional
+            Paths monitored for changes that invalidate the cache.
+
+        Returns
+        -------
+        None
+            Configure compiled application state in place.
         """
 
     @abstractmethod
@@ -368,14 +391,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigApp(
         self,
-        **app_config: dict,
+        **app_config: object,
     ) -> Self:
         """
         Configure application settings using keyword arguments.
 
         Parameters
         ----------
-        **app_config : dict
+        **app_config : object
             Configuration parameters for the application. Keys must match the
             field names and types expected by the App dataclass from
             orionis.foundation.config.app.entities.app.App.
@@ -389,14 +412,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigAuth(
         self,
-        **auth_config: dict,
+        **auth_config: object,
     ) -> Self:
         """
         Configure authentication subsystem using keyword arguments.
 
         Parameters
         ----------
-        **auth_config : dict
+        **auth_config : object
             Keyword arguments for authentication configuration. Keys must match
             the fields of the `Auth` dataclass from
             `orionis.foundation.config.auth.entities.auth.Auth`.
@@ -410,14 +433,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigCache(
         self,
-        **cache_config: dict,
+        **cache_config: object,
     ) -> Self:
         """
         Configure the cache subsystem using keyword arguments.
 
         Parameters
         ----------
-        **cache_config : dict
+        **cache_config : object
             Keyword arguments representing cache configuration options. Keys must
             match the field names and types expected by the `Cache` dataclass from
             `orionis.foundation.config.cache.entities.cache.Cache`.
@@ -431,14 +454,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigHttp(
         self,
-        **http_config: dict,
+        **http_config: object,
     ) -> Self:
         """
         Configure the HTTP subsystem using keyword arguments.
 
         Parameters
         ----------
-        **http_config : dict
+        **http_config : object
             Keyword arguments for HTTP configuration. Keys must match the field
             names and types expected by the `HTTP` dataclass from
             `orionis.foundation.config.http.entitites.http.HTTP`.
@@ -452,14 +475,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigDatabase(
         self,
-        **database_config: dict,
+        **database_config: object,
     ) -> Self:
         """
         Configure the database subsystem using keyword arguments.
 
         Parameters
         ----------
-        **database_config : dict
+        **database_config : object
             Keyword arguments for database configuration. Keys must match the
             fields of the `Database` dataclass from
             `orionis.foundation.config.database.entities.database.Database`.
@@ -473,14 +496,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigFilesystems(
         self,
-        **filesystems_config: dict,
+        **filesystems_config: object,
     ) -> Self:
         """
         Configure the filesystems subsystem using keyword arguments.
 
         Parameters
         ----------
-        **filesystems_config : dict
+        **filesystems_config : object
             Keyword arguments for filesystems configuration. Keys must match the
             fields of the `Filesystems` dataclass from
             `orionis.foundation.config.filesystems.entitites.filesystems.Filesystems`.
@@ -494,14 +517,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigLogging(
         self,
-        **logging_config: dict,
+        **logging_config: object,
     ) -> Self:
         """
         Configure logging subsystem using keyword arguments.
 
         Parameters
         ----------
-        **logging_config : dict
+        **logging_config : object
             Keyword arguments for logging configuration. Keys must match the
             fields of the `Logging` dataclass from
             `orionis.foundation.config.logging.entities.logging.Logging`.
@@ -515,14 +538,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigMail(
         self,
-        **mail_config: dict,
+        **mail_config: object,
     ) -> Self:
         """
         Configure mail subsystem using keyword arguments.
 
         Parameters
         ----------
-        **mail_config : dict
+        **mail_config : object
             Keyword arguments for mail configuration. Keys must match the fields
             of the `Mail` dataclass from
             `orionis.foundation.config.mail.entities.mail.Mail`.
@@ -536,14 +559,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigQueue(
         self,
-        **queue_config: dict,
+        **queue_config: object,
     ) -> Self:
         """
         Configure the queue subsystem using keyword arguments.
 
         Parameters
         ----------
-        **queue_config : dict
+        **queue_config : object
             Keyword arguments representing queue configuration options. Keys must
             match the field names and types expected by the `Queue` dataclass from
             `orionis.foundation.config.queue.entities.queue.Queue`.
@@ -557,14 +580,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigSession(
         self,
-        **session_config: dict,
+        **session_config: object,
     ) -> Self:
         """
         Configure session subsystem using keyword arguments.
 
         Parameters
         ----------
-        **session_config : dict
+        **session_config : object
             Keyword arguments for session configuration. Keys must match the
             fields of the `Session` dataclass from
             `orionis.foundation.config.session.entities.session.Session`.
@@ -578,14 +601,14 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigTesting(
         self,
-        **testing_config: dict,
+        **testing_config: object,
     ) -> Self:
         """
         Configure the testing subsystem using keyword arguments.
 
         Parameters
         ----------
-        **testing_config : dict
+        **testing_config : object
             Keyword arguments for testing configuration. Keys must match the
             fields of the `Testing` dataclass from
             `orionis.foundation.config.testing.entities.testing.Testing`.
@@ -599,18 +622,18 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigPaths(
         self,
-        **paths: dict[str, str | Path | None],
+        **paths: str | Path | None,
     ) -> Self:
         """
         Set and resolve application directory paths.
 
         Parameters
         ----------
-        **paths : dict[str, str | Path | None]
-            Optional directory paths to override defaults. Valid keys include
-            'root', 'app', 'console', 'exceptions', 'http', 'models',
-            'providers', 'notifications', 'services', 'jobs', 'bootstrap',
-            'config', 'database', 'resources', 'routes', 'storage', 'tests'.
+        **paths : str | Path | None
+            Optional directory path overrides. Valid keys are 'app', 'console',
+            'exceptions', 'http', 'models', 'providers', 'notifications',
+            'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
+            'routes', 'storage' and 'tests'. The root always comes from basePath.
 
         Returns
         -------
@@ -630,6 +653,32 @@ class IApplication(IContainer, ABC):
         -------
         Self
             The current Application instance for method chaining.
+        """
+
+    @abstractmethod
+    async def handleCommand(
+        self,
+        args: list[str] | None = None,
+    ) -> int:
+        """
+        Run a CLI command through the configured command kernel.
+
+        Parameters
+        ----------
+        args : list of str or None, optional
+            Command-line arguments passed to the CLI kernel.
+
+        Returns
+        -------
+        int
+            Exit code returned by the command kernel.
+
+        Raises
+        ------
+        RuntimeError
+            If the CLI kernel is not configured.
+        TypeError
+            If the configured kernel does not implement the CLI interface.
         """
 
     @abstractmethod
@@ -669,8 +718,8 @@ class IApplication(IContainer, ABC):
         Reset the runtime configuration to a mutable copy of the bootstrap config.
 
         Resets the application's runtime configuration to a mutable and isolated
-        copy of the bootstrap configuration. Marks the runtime config as fresh,
-        allowing re-initialization by calling `create()` again.
+        copy of the bootstrap configuration. The application remains booted and
+        subsequent accesses use the restored runtime values.
 
         Returns
         -------
@@ -682,7 +731,7 @@ class IApplication(IContainer, ABC):
     def path(
         self,
         key: str | None = None,
-    ) -> Path | dict | None:
+    ) -> Path | Mapping[str, Path] | None:
         """
         Retrieve an application path by key or return all paths.
 
@@ -693,9 +742,9 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Path | dict | None
-            The resolved path for the given key, all paths as a dictionary,
-            or None if the key does not exist.
+        Path | Mapping[str, Path] | None
+            The resolved path for the given key, all paths as a read-only
+            mapping, or None if the key does not exist.
 
         Raises
         ------

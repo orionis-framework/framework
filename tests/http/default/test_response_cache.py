@@ -59,7 +59,7 @@ class _DefaultFixture:
         """
         return self.settings[key]
 
-    def storagePublic(self) -> Path:
+    def storageAppPublic(self) -> Path:
         """
         Return the public asset directory.
 

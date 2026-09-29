@@ -1,19 +1,35 @@
 from __future__ import annotations
+import math
 import os
 import psutil
 from orionis.support.system.contracts.workers import IWorkers
 
-# Constants evaluated once at import time to cache system information.
-_CPU_COUNT: int = os.cpu_count() or 1
+# Helper function to determine the logical CPU count available to this process.
+def _get_cpu_count() -> int:
+    """
+    Return the logical CPU count available to this process.
+
+    Returns
+    -------
+    int
+        Logical CPU count available to this process.
+    """
+    return os.process_cpu_count() or os.cpu_count() or 1
+
+# Store the process resource limits for the lifetime of this process.
+_CPU_COUNT: int = _get_cpu_count()
 _RAM_TOTAL_BYTES: int = psutil.virtual_memory().total
+_BYTES_PER_GB: int = 1 << 30
+_DEFAULT_RAM_PER_WORKER_BYTES: int = 1 << 29
+_ERR_INVALID_RAM_PER_WORKER: str = "RAM per worker must be a finite positive value."
+_ERR_RAM_PER_WORKER_TOO_SMALL: str = "RAM per worker must be at least one byte."
 
 class Workers(IWorkers):
-
-    # Using __slots__ to prevent instance attribute creation and reduce memory overhead
+    # Keep instances without per-object state.
     __slots__ = ()
 
-    # Class-level variable to store RAM allocation per worker, defaulting to 0.5 GB.
-    _ram_per_worker: float = 0.5
+    # Store the configured RAM budget in bytes.
+    _ram_per_worker_bytes: int = _DEFAULT_RAM_PER_WORKER_BYTES
 
     @classmethod
     def setRamPerWorker(cls, ram_per_worker: float) -> None:
@@ -34,8 +50,20 @@ class Workers(IWorkers):
         -----
         Changing the RAM allocation per worker affects every subsequent call
         to calculate(). The update is reflected immediately.
+
+        Raises
+        ------
+        ValueError
+            If the budget is not finite, positive, or at least one byte.
         """
-        cls._ram_per_worker = ram_per_worker
+        if not math.isfinite(ram_per_worker) or ram_per_worker <= 0:
+            raise ValueError(_ERR_INVALID_RAM_PER_WORKER)
+
+        ram_per_worker_bytes = int(ram_per_worker * _BYTES_PER_GB)
+        if ram_per_worker_bytes == 0:
+            raise ValueError(_ERR_RAM_PER_WORKER_TOO_SMALL)
+
+        cls._ram_per_worker_bytes = ram_per_worker_bytes
 
     @classmethod
     def calculate(cls) -> int:
@@ -55,13 +83,13 @@ class Workers(IWorkers):
 
         Notes
         -----
-        Uses module-level constants for CPU count and total RAM (evaluated
-        once at import time) to avoid repeated OS calls on every invocation.
-
-        Integer floor-division (//) on raw byte counts is used instead of
-        math.floor() to eliminate the module attribute lookup, the float
-        intermediate object, and the Python-level function call overhead.
+        Uses cached CPU and RAM values and a precomputed RAM budget so each
+        invocation only needs integer arithmetic.
         """
-        # Convert RAM per worker from GB to bytes for the calculation.
-        ram_per_worker_bytes: int = int(cls._ram_per_worker * (1 << 30))
-        return min(_CPU_COUNT, _RAM_TOTAL_BYTES // ram_per_worker_bytes) or 1
+        return (
+            min(
+                _CPU_COUNT,
+                _RAM_TOTAL_BYTES // cls._ram_per_worker_bytes,
+            )
+            or 1
+        )

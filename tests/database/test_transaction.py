@@ -25,27 +25,54 @@ class _FakeConnection:
         self._fail_begin = fail_begin
 
     async def begin(self) -> None:
-        """Record the call and optionally simulate a failure to start."""
+        """Record the call and optionally simulate a failure to start.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        TransactionException
+            Raised by this helper to exercise the failure path.
+        """
         self.calls.append("begin")
         if self._fail_begin:
             error_msg = "Unable to begin transaction."
             raise TransactionException(error_msg)
 
     async def commit(self) -> None:
-        """Record the commit call."""
+        """Record the commit call.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls.append("commit")
 
     async def rollback(self) -> None:
-        """Record the rollback call."""
+        """Record the rollback call.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls.append("rollback")
 
 class TestTransaction(TestCase):
 
     async def testEnterBeginsTransactionAndReturnsItself(self) -> None:
-        """
-        Begin the transaction and yield the transaction itself.
+        """Begin the transaction and yield the transaction itself.
 
         Validates the entry point of the async context manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = _FakeConnection()
         transaction = Transaction(connection)
@@ -54,10 +81,14 @@ class TestTransaction(TestCase):
         self.assertEqual(connection.calls, ["begin"])
 
     async def testCleanExitCommitsTransaction(self) -> None:
-        """
-        Commit the transaction when the block exits without error.
+        """Commit the transaction when the block exits without error.
 
         Validates the successful path of the async context manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = _FakeConnection()
         async with Transaction(connection):
@@ -65,10 +96,19 @@ class TestTransaction(TestCase):
         self.assertEqual(connection.calls, ["begin", "commit"])
 
     async def testExceptionExitRollsBackTransaction(self) -> None:
-        """
-        Roll back the transaction when an exception escapes the block.
+        """Roll back the transaction when an exception escapes the block.
 
         Validates the failure path of the async context manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         connection = _FakeConnection()
         error_msg = "boom"
@@ -78,11 +118,15 @@ class TestTransaction(TestCase):
         self.assertEqual(connection.calls, ["begin", "rollback"])
 
     async def testAexitReturnsFalseOnCleanExit(self) -> None:
-        """
-        Return False from __aexit__ on a clean exit.
+        """Return False from __aexit__ on a clean exit.
 
         Validates that the context manager never swallows exceptions,
         even when there is none to propagate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = _FakeConnection()
         transaction = Transaction(connection)
@@ -91,11 +135,15 @@ class TestTransaction(TestCase):
         self.assertFalse(result)
 
     async def testAexitReturnsFalseOnException(self) -> None:
-        """
-        Return False from __aexit__ so exceptions keep propagating.
+        """Return False from __aexit__ so exceptions keep propagating.
 
         Validates the direct contract of __aexit__ regardless of the
         surrounding ``async with`` statement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = _FakeConnection()
         transaction = Transaction(connection)
@@ -106,11 +154,15 @@ class TestTransaction(TestCase):
         self.assertEqual(connection.calls, ["begin", "rollback"])
 
     async def testBeginFailurePreventsCommitOrRollback(self) -> None:
-        """
-        Propagate a failure to start without attempting to finalize it.
+        """Propagate a failure to start without attempting to finalize it.
 
         Validates that a broken ``begin`` never triggers a spurious
         commit or rollback call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         connection = _FakeConnection(fail_begin=True)
         with self.assertRaises(TransactionException):
@@ -119,11 +171,15 @@ class TestTransaction(TestCase):
         self.assertEqual(connection.calls, ["begin"])
 
     async def testTransactionSatisfiesItsContract(self) -> None:
-        """
-        Implement the ITransaction contract.
+        """Implement the ITransaction contract.
 
         Validates that Transaction is usable wherever ITransaction is
         expected, such as the Connection.transaction() factory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transaction = Transaction(_FakeConnection())
         self.assertIsInstance(transaction, ITransaction)

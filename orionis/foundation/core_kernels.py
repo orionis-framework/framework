@@ -1,6 +1,4 @@
 from types import MappingProxyType
-from orionis.console.kernel import KernelCLI
-from orionis.http.kernel import KernelHTTP
 
 def get_core_kernels_mapping() -> MappingProxyType:
     """
@@ -16,24 +14,11 @@ def get_core_kernels_mapping() -> MappingProxyType:
         Immutable mapping with kernel type as key and a dictionary containing
         'module' and 'class' as values.
     """
-    # Initialize empty dictionary to store kernel metadata
-    kernels = {}
-
-    # Define core kernel classes mapping
-    kernel_mapping = {
-        "KernelCLI": KernelCLI,
-        "KernelHTTP": KernelHTTP,
-    }
-
-    # Extract metadata for each core kernel class
-    for class_kernel, instance in kernel_mapping.items():
-        # Store module and class name for each kernel
-        kernels[class_kernel] = {
-            "module": instance.__module__,
-            "class": instance.__name__,
-        }
-
-    # Return an immutable mapping of the kernel metadata
-    return MappingProxyType(kernels)
+    return MappingProxyType(
+        {
+            "KernelCLI": {"module": "orionis.console.kernel", "class": "KernelCLI"},
+            "KernelHTTP": {"module": "orionis.http.kernel", "class": "KernelHTTP"},
+        },
+    )
 
 CORE_KERNELS: MappingProxyType = get_core_kernels_mapping()

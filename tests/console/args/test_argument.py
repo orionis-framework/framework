@@ -852,6 +852,20 @@ class TestArgument(TestCase):
         captured_kwargs: dict[str, Any] = {}
 
         def mock_add_argument(*args: object, **kwargs: object) -> object:
+            """Record arguments supplied to parser registration.
+
+            Parameters
+            ----------
+            *args : object
+                Arguments passed to the wrapped callable.
+            **kwargs : object
+                Arguments passed to the wrapped callable.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             captured_kwargs.update(kwargs)
             return original_add_argument(*args, **kwargs)
 
@@ -889,6 +903,20 @@ class TestArgument(TestCase):
         captured_kwargs: dict[str, Any] = {}
 
         def mock_add_argument(*args: object, **kwargs: object) -> object:
+            """Record arguments supplied to parser registration.
+
+            Parameters
+            ----------
+            *args : object
+                Arguments passed to the wrapped callable.
+            **kwargs : object
+                Arguments passed to the wrapped callable.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             captured_kwargs.update(kwargs)
             return original_add_argument(*args, **kwargs)
 
@@ -924,6 +952,20 @@ class TestArgument(TestCase):
         captured_kwargs: dict[str, Any] = {}
 
         def mock_add_argument(*args: object, **kwargs: object) -> object:
+            """Record arguments supplied to parser registration.
+
+            Parameters
+            ----------
+            *args : object
+                Arguments passed to the wrapped callable.
+            **kwargs : object
+                Arguments passed to the wrapped callable.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             captured_kwargs.update(kwargs)
             return original_add_argument(*args, **kwargs)
 

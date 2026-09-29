@@ -3,7 +3,20 @@ from pathlib import Path
 from orionis.test import TestCase
 
 def public_signatures(path: Path, class_name: str) -> dict:
-    """Read public method signatures without importing stub-only definitions."""
+    """Read public method signatures without importing stub-only definitions.
+
+    Parameters
+    ----------
+    path : Path
+        Value supplied for ``path``.
+    class_name : str
+        Value supplied for ``class_name``.
+
+    Returns
+    -------
+    dict
+        Value produced by the helper.
+    """
     tree = ast.parse(path.read_text(encoding="utf-8"))
     definition = next(
         node
@@ -26,7 +39,13 @@ class TestRouterTyping(TestCase):
     """Check shared API structure in addition to behavioral integration tests."""
 
     def testFacadeStubMatchesRuntimeSignatures(self) -> None:
-        """Keep argument kinds, defaults, annotations and group return aligned."""
+        """Keep argument kinds, defaults, annotations and group return aligned.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         root = Path(__file__).resolve().parents[3]
         runtime = public_signatures(root / "orionis/http/routes/router.py", "Router")
         stub = public_signatures(root / "orionis/support/facades/router.pyi", "Route")
@@ -35,7 +54,13 @@ class TestRouterTyping(TestCase):
                 self.assertEqual(stub[name], signature)
 
     def testContractMatchesRuntimeSignatures(self) -> None:
-        """Keep the router contract consistent with both runtime and facade."""
+        """Keep the router contract consistent with both runtime and facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         root = Path(__file__).resolve().parents[3]
         runtime = public_signatures(root / "orionis/http/routes/router.py", "Router")
         contract = public_signatures(

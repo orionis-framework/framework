@@ -28,7 +28,6 @@ from orionis.session.session import Session
 from orionis.test import TestCase
 from tests.auth.test_identity_and_session import build_app
 
-
 class RememberAccount(Model, Authenticatable):
     """Use the same persistent credential column declared in the app migration."""
 
@@ -42,7 +41,20 @@ class RememberAccount(Model, Authenticatable):
 
 
 def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamespace:
-    """Create an independent browser session with an optional remembered login."""
+    """Create an independent browser session with an optional remembered login.
+
+    Parameters
+    ----------
+    cookie : str | None
+        Value supplied for ``cookie``.
+    scheme : str
+        Value supplied for ``scheme``.
+
+    Returns
+    -------
+    SimpleNamespace
+        Value produced by the helper.
+    """
     return SimpleNamespace(
         scheme=scheme,
         state=SimpleNamespace(session=Session()),
@@ -51,7 +63,18 @@ def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamesp
 
 
 def queued_cookie(incoming: SimpleNamespace) -> str:
-    """Read the raw cookie only inside a test, never in application logs."""
+    """Read the raw cookie only inside a test, never in application logs.
+
+    Parameters
+    ----------
+    incoming : SimpleNamespace
+        Value supplied for ``incoming``.
+
+    Returns
+    -------
+    str
+        Value produced by the helper.
+    """
     return incoming.state._auth_remember_cookie["value"]
 
 
@@ -59,7 +82,13 @@ class TestRememberMe(TestCase):
     """Exercise real database updates and token races without live browser data."""
 
     async def asyncSetUp(self) -> None:
-        """Create a temporary database and an account with a real password hash."""
+        """Create a temporary database and an account with a real password hash.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self.temp = tempfile.TemporaryDirectory()
         self.app = build_app(identity={"model": f"{__name__}.RememberAccount"})
         self.app._config["database"]["connections"]["sqlite"]["database"] = str(
@@ -83,13 +112,30 @@ class TestRememberMe(TestCase):
         )
 
     async def asyncTearDown(self) -> None:
-        """Release the temporary connection and restore the test resolver."""
+        """Release the temporary connection and restore the test resolver.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ConnectionResolver.setManager(self.previous_manager)
         await self.connection.disconnect()
         self.temp.cleanup()
 
     async def login(self, *, remember: bool = True) -> SimpleNamespace:
-        """Submit verified credentials through the real session guard."""
+        """Submit verified credentials through the real session guard.
+
+        Parameters
+        ----------
+        remember : bool
+            Value supplied for ``remember``.
+
+        Returns
+        -------
+        SimpleNamespace
+            Value produced by the helper.
+        """
         incoming = request()
         result = await self.guard.attempt(
             incoming,
@@ -103,7 +149,13 @@ class TestRememberMe(TestCase):
         return incoming
 
     async def testOptInStoresOnlyDigestAndUsesSecureCookie(self) -> None:
-        """Issue a bounded, HttpOnly credential only after password verification."""
+        """Issue a bounded, HttpOnly credential only after password verification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         incoming = await self.login()
         cookie = queued_cookie(incoming)
         stored = (await RememberAccount.find(self.user.id)).remember_token
@@ -122,7 +174,13 @@ class TestRememberMe(TestCase):
         self.assertEqual(outgoing.getHeader("cache-control"), ["no-store"])
 
     async def testRestoreRotatesCredentialAndCreatesFreshSession(self) -> None:
-        """Persistent login renews both the bearer token and session CSRF token."""
+        """Persistent login renews both the bearer token and session CSRF token.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         incoming = request(original)
         incoming.state.session.put("_csrf_token", "old-csrf")
@@ -137,7 +195,13 @@ class TestRememberMe(TestCase):
         self.assertIsNotNone(await self.guard.resolve(request(replacement)))
 
     async def testWebMiddlewareRestoresEncodedCookieAndReturnsReplacement(self) -> None:
-        """Exercise the response hook and the browser's percent-encoded cookie."""
+        """Exercise the response hook and the browser's percent-encoded cookie.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         logged_in = await self.login()
         response = Response()
         apply_remember_cookie(logged_in, response)
@@ -149,6 +213,13 @@ class TestRememberMe(TestCase):
         )
 
         async def endpoint():
+            """Verify the identity associated with the remembered login.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             self.assertEqual(
                 incoming.state.session.get("_auth_identifier"), str(self.user.id),
             )
@@ -161,7 +232,13 @@ class TestRememberMe(TestCase):
         self.assertNotEqual(queued_cookie(incoming), queued_cookie(logged_in))
 
     async def testWrongPasswordNeverIssuesPersistentCredential(self) -> None:
-        """A submitted opt-in flag cannot bypass password verification."""
+        """A submitted opt-in flag cannot bypass password verification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         incoming = request()
         self.assertIsNone(
             await self.guard.attempt(
@@ -177,7 +254,13 @@ class TestRememberMe(TestCase):
         self.assertIsNone((await RememberAccount.find(self.user.id)).remember_token)
 
     async def testOptOutRevokesExistingRememberedLogin(self) -> None:
-        """A subsequent login without opt-in removes the previous credential."""
+        """A subsequent login without opt-in removes the previous credential.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         incoming = await self.login(remember=False)
         self.assertEqual(queued_cookie(incoming), "")
@@ -185,7 +268,13 @@ class TestRememberMe(TestCase):
         self.assertIsNone(await self.guard.resolve(request(original)))
 
     async def testLogoutRevokesCookieAndServerToken(self) -> None:
-        """A stolen pre-logout cookie cannot silently create another session."""
+        """A stolen pre-logout cookie cannot silently create another session.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         incoming = await self.login()
         original = queued_cookie(incoming)
         await self.guard.logout(incoming)
@@ -195,7 +284,13 @@ class TestRememberMe(TestCase):
         self.assertIsNone(await self.guard.resolve(request(original)))
 
     async def testLogoutAfterRestoreRevokesRotatedToken(self) -> None:
-        """Logout reads the fresh database token after restoration has rotated it."""
+        """Logout reads the fresh database token after restoration has rotated it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         incoming = request(queued_cookie(await self.login()))
         await self.guard.resolve(incoming)
         rotated = queued_cookie(incoming)
@@ -203,14 +298,26 @@ class TestRememberMe(TestCase):
         self.assertIsNone(await self.guard.resolve(request(rotated)))
 
     async def testNewOptInReplacesPreviousDevice(self) -> None:
-        """The single database column deliberately keeps only the newest grant."""
+        """The single database column deliberately keeps only the newest grant.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         newest = queued_cookie(await self.login())
         self.assertIsNone(await self.guard.resolve(request(original)))
         self.assertIsNotNone(await self.guard.resolve(request(newest)))
 
     async def testTamperedCookieCannotSelectAnotherUserOrExtendExpiry(self) -> None:
-        """Public selectors and timestamps are bound to the stored digest."""
+        """Public selectors and timestamps are bound to the stored digest.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         identifier, expiry, secret = original.split("|")
         for value in (
@@ -224,7 +331,13 @@ class TestRememberMe(TestCase):
                 self.assertIsNone(await self.guard.resolve(request(value)))
 
     async def testExpiredCookieIsRejectedAtServerEvenIfBrowserKeepsIt(self) -> None:
-        """Expiration is enforced independently of the client's Max-Age handling."""
+        """Expiration is enforced independently of the client's Max-Age handling.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         expiry = int(original.split("|")[1])
         with patch("orionis.auth.remember.time.time", return_value=expiry):
@@ -233,7 +346,13 @@ class TestRememberMe(TestCase):
         self.assertEqual(queued_cookie(incoming), "")
 
     async def testInactiveDeletedAndPasswordChangedAccountsCannotRestore(self) -> None:
-        """A valid cookie does not override current account state or credentials."""
+        """A valid cookie does not override current account state or credentials.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         await (
             RememberAccount.query().where("id", self.user.id).update({"active": False})
@@ -254,7 +373,13 @@ class TestRememberMe(TestCase):
         self.assertIsNone(await self.guard.resolve(request(original)))
 
     async def testConcurrentRestorationHasOneWinner(self) -> None:
-        """Only one request can exchange a token, without erasing its replacement."""
+        """Only one request can exchange a token, without erasing its replacement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         incoming = [request(original) for _ in range(5)]
         results = await asyncio.gather(*(self.guard.resolve(item) for item in incoming))
@@ -265,7 +390,13 @@ class TestRememberMe(TestCase):
         )
 
     async def testSecureModeRejectsHttpWithoutAuthenticating(self) -> None:
-        """A misconfigured HTTP deployment cannot accidentally issue a bearer cookie."""
+        """A misconfigured HTTP deployment cannot accidentally issue a bearer cookie.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         incoming = request(scheme="http")
         with self.assertRaises(AuthException):
             await self.guard.attempt(
@@ -281,7 +412,13 @@ class TestRememberMe(TestCase):
         self.assertIsNone(await self.guard.resolve(request(original, scheme="http")))
 
     async def testPasswordResetClearsRememberToken(self) -> None:
-        """The reset broker revokes persistent login in its password transaction."""
+        """The reset broker revokes persistent login in its password transaction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         original = queued_cookie(await self.login())
         with patch.object(reset_migration, "Schema", DatabaseSchema(self.manager)):
             await reset_migration.CreatePasswordResetTokensTable().up()
@@ -298,7 +435,13 @@ class TestRememberConfigurationAndController(TestCase):
     """Verify opt-in wiring and the configuration's safety checks."""
 
     def testSettingsRejectInvalidValues(self) -> None:
-        """Invalid TTLs, names and insecure prefixed cookies fail at boot."""
+        """Invalid TTLs, names and insecure prefixed cookies fail at boot.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for values in (
             {"lifetime": 0},
             {"lifetime": True},
@@ -311,7 +454,13 @@ class TestRememberConfigurationAndController(TestCase):
             RememberAuth(secure="false")
 
     async def testControllerPassesExplicitOptInAndRetiresUsernameCookie(self) -> None:
-        """The login checkbox requests authentication persistence, not autofill."""
+        """The login checkbox requests authentication persistence, not autofill.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         controller = LoginController(build_app())
         for value, expected in (("on", True), (None, False), ("false", False)):
             auth = SimpleNamespace(attempt=AsyncMock(return_value=True))

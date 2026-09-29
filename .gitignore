@@ -1,0 +1,69 @@
+# ========================
+# Orionis runtime data
+# ========================
+storage/app/private/*
+storage/framework/*
+storage/logs/*
+storage/mail/*
+database/*.sqlite
+/docs
+
+# ========================
+# Orionis utilities
+# ========================
+*.ps1
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+!*.pyi
+.venv/
+venv/
+env/
+.env
+
+# ========================
+# Testing and coverage
+# ========================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# ========================
+# Distribution and packaging
+# ========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ========================
+# IDEs
+# ========================
+.vscode/
+.idea/
+.ruff_cache/
+
+# ========================
+# Local GitHub configuration
+# ========================
+.github/*.md
+
+# ========================
+# Logs and caches
+# ========================
+*.log
+*.cache
+.uv-cache-task
+
+# ========================
+# Operating system
+# ========================
+.DS_Store
+Thumbs.db

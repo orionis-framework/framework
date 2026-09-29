@@ -15,6 +15,11 @@ class TestGuardsEnum(TestCase):
         """Validates the closed set of guards of this version.
 
         JWT, OAuth and the rest are deliberately out of scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             {member.value for member in Guards}, {"session", "token"},
@@ -27,6 +32,11 @@ class TestIdentityConfiguration(TestCase):
         """Validates the out of the box configuration.
 
         A fresh application authenticates by email and password.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         identity = Identity()
         self.assertEqual(identity.username, "email")
@@ -37,6 +47,11 @@ class TestIdentityConfiguration(TestCase):
         """Validates the type guards of the section.
 
         Every option names an attribute or a class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             Identity(username=42)
@@ -45,6 +60,11 @@ class TestIdentityConfiguration(TestCase):
         """Validates that no option may be blank.
 
         A blank attribute name would silently break every lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Identity(username="   ")
@@ -53,6 +73,11 @@ class TestIdentityConfiguration(TestCase):
         """Validates the shape of the identity model path.
 
         The module and the class name must be separable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Identity(model="User")
@@ -64,6 +89,11 @@ class TestSessionAuthConfiguration(TestCase):
         """Validates the default session key and redirect behaviour.
 
         Without an explicit target, guests get the standard error page.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = SessionAuth()
         self.assertEqual(session.key, "_auth_identifier")
@@ -74,6 +104,11 @@ class TestSessionAuthConfiguration(TestCase):
         """Validates the browser friendly rejection setting.
 
         Applications with a login page point at it here.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(SessionAuth(redirect_to="/login").redirect_to, "/login")
 
@@ -81,6 +116,11 @@ class TestSessionAuthConfiguration(TestCase):
         """Validates the destination used once the login succeeds.
 
         Applications landing somewhere other than ``/home`` point at it here.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(SessionAuth(home="/dashboard").home, "/dashboard")
 
@@ -88,6 +128,11 @@ class TestSessionAuthConfiguration(TestCase):
         """Validates the type and value guards of the section.
 
         Misconfiguration must fail at boot, not on the first request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             SessionAuth(key=1)
@@ -107,6 +152,11 @@ class TestTokensConfiguration(TestCase):
         """Validates the default token settings.
 
         Tokens never expire on their own unless configured to.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         tokens = Tokens()
         self.assertEqual(tokens.table, "personal_access_tokens")
@@ -117,6 +167,11 @@ class TestTokensConfiguration(TestCase):
         """Validates that the token table must be named.
 
         An empty name would produce invalid SQL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Tokens(table="  ")
@@ -125,6 +180,11 @@ class TestTokensConfiguration(TestCase):
         """Validates the lifetime guard.
 
         A zero or negative lifetime would issue dead tokens.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Tokens(expiration=0)
@@ -135,6 +195,11 @@ class TestTokensConfiguration(TestCase):
         """Validates the entropy guard of generated secrets.
 
         Too little entropy would make tokens guessable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Tokens(secret_bytes=8)
@@ -148,6 +213,11 @@ class TestAuthConfiguration(TestCase):
         """Validates the shape of a default configuration.
 
         Every section resolves to its typed entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         auth = Auth()
         self.assertEqual(auth.default, "session")
@@ -159,6 +229,11 @@ class TestAuthConfiguration(TestCase):
         """Validates that guards may be named in several ways.
 
         Both the enum member and a case insensitive string are accepted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(Auth(default=Guards.TOKEN).default, "token")
         self.assertEqual(Auth(default="TOKEN").default, "token")
@@ -168,6 +243,11 @@ class TestAuthConfiguration(TestCase):
         """Validates the guard whitelist.
 
         Naming a guard that does not exist must fail at boot.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Auth(default="jwt")
@@ -178,6 +258,11 @@ class TestAuthConfiguration(TestCase):
         """Validates that plain dictionaries become typed entities.
 
         Configuration files are free to use dictionaries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         auth = Auth(
             identity={"username": "login"},
@@ -192,6 +277,11 @@ class TestAuthConfiguration(TestCase):
         """Validates the type guard of every section.
 
         A misplaced value must not reach the services.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             Auth(identity="app.models.user.User")
@@ -200,6 +290,11 @@ class TestAuthConfiguration(TestCase):
         """Validates that the entity can be flattened for the container.
 
         The application stores configuration as plain dictionaries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = Auth().toDict()
         self.assertEqual(
@@ -212,6 +307,11 @@ class TestAuthConfiguration(TestCase):
         """Validates that the section is available to every application.
 
         Services read their options through ``app.config('auth.*')``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn("auth", CORE_CONFIG)
         self.assertIn("identity", CORE_CONFIG["auth"])

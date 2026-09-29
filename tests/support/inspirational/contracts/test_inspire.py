@@ -6,6 +6,13 @@ class _ConcreteInspire(IInspire):
     """Minimal concrete implementation of IInspire for contract testing."""
 
     def random(self) -> dict:
+        """Return the fixed quote used by the contract test.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {"quote": "Stub quote.", "author": "Stub Author"}
 
 class _NonImplementingSubclass(IInspire):

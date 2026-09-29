@@ -50,6 +50,13 @@ class TestCsrfExtension(TestCase):
         awaited before its markup is written to the output.
         """
         async def csrf_field() -> Markup:
+            """Return the hidden CSRF field used by the template.
+
+            Returns
+            -------
+            Markup
+                Markup rendered for the CSRF field.
+            """
             return _FIELD
 
         env = _makeEnvironment(csrf_field)

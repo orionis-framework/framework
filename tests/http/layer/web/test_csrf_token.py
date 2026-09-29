@@ -10,7 +10,20 @@ class _Request:
     """Expose request metadata and count body access during CSRF checks."""
 
     def __init__(self, method: str, headers: list[tuple[str, str]]) -> None:
-        """Create a request with a concrete session and an existing CSRF token."""
+        """Create a request with a concrete session and an existing CSRF token.
+
+        Parameters
+        ----------
+        method : str
+            Value supplied for ``method``.
+        headers : list[tuple[str, str]]
+            Value supplied for ``headers``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.method = method
         self.scheme = "https"
         self.headers = Headers(headers)
@@ -18,7 +31,13 @@ class _Request:
         self.bodyReads = 0
 
     async def data(self) -> dict[str, object]:
-        """Count an asynchronous body access and return an empty form."""
+        """Count an asynchronous body access and return an empty form.
+
+        Returns
+        -------
+        dict[str, object]
+            Value produced by the helper.
+        """
         self.bodyReads += 1
         return {}
 
@@ -26,12 +45,24 @@ class _Terminal:
     """Count middleware continuation calls and return a concrete response."""
 
     def __init__(self) -> None:
-        """Initialize the awaited-call counter and outgoing response."""
+        """Initialize the awaited-call counter and outgoing response.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls = 0
         self.response = Response()
 
     async def __call__(self) -> Response:
-        """Record the awaited continuation and return its response."""
+        """Record the awaited continuation and return its response.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         self.calls += 1
         return self.response
 
@@ -39,7 +70,13 @@ class TestCSRFLifecycle(TestCase):
     """Keep token generation and validation consistent for every request method."""
 
     async def testSafeRequestPublishesTokenAndCookieWithoutReadingBody(self) -> None:
-        """Expose the existing session token and issue the HTTPS XSRF cookie."""
+        """Expose the existing session token and issue the HTTPS XSRF cookie.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         request = _Request("GET", [])
         terminal = _Terminal()
         response = await CSRFTokenMiddleware({"xsrf_cookie": True}).handle(
@@ -53,7 +90,13 @@ class TestCSRFLifecycle(TestCase):
         self.assertIn("Secure", response.getHeader("set-cookie")[0])
 
     async def testUnsafeRequestUsesHeaderTokenBeforeReadingBody(self) -> None:
-        """Accept matching headers and reject mismatches before calling the handler."""
+        """Accept matching headers and reject mismatches before calling the handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         request = _Request("POST", [("x-csrf-token", "token")])
         terminal = _Terminal()
         middleware = CSRFTokenMiddleware({})

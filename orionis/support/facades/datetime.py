@@ -71,7 +71,7 @@ class DateTime:
             If the timezone is invalid.
         """
         try:
-            # Validate timezone without creating a datetime object
+            # Check that the timezone name is recognized.
             pendulum.timezone(timezone_name)
             cls._timezone = timezone_name
             cls._zoneinfo_cache.clear()
@@ -702,7 +702,7 @@ class DateTime:
         str
             The formatted date string.
         """
-        # Short-circuit for the most common case: format the current time directly
+        # Format the current time when no datetime is provided.
         if dt is None:
             return cls.now().format(format_string)
         # Ensure dt is a pendulum.DateTime in the local timezone
@@ -935,7 +935,7 @@ class DateTime:
         int
             The difference in days between the two dates.
         """
-        # Timestamp arithmetic avoids constructing a transient Duration object
+        # Return the number of complete elapsed days.
         return abs(int((dt2.timestamp() - dt1.timestamp()) / 86400))
 
     @classmethod
@@ -957,7 +957,7 @@ class DateTime:
         int
             The difference in hours between the two dates.
         """
-        # Timestamp arithmetic avoids constructing a transient Duration object
+        # Return the number of complete elapsed hours.
         return abs(int((dt2.timestamp() - dt1.timestamp()) / 3600))
 
     @classmethod
@@ -997,10 +997,13 @@ class DateTime:
         bool
             True if the date is today, False otherwise.
         """
-        # Both sides must be datetime.date for equality to work correctly.
-        # pendulum.today() returns pendulum.DateTime (datetime.datetime subclass),
-        # so comparing datetime.date with pendulum.DateTime always yields False.
-        return dt.date() == pendulum.today(cls._timezone).date()
+        # Read the current date in the configured timezone.
+        today = pendulum.today(cls._timezone)
+        return (
+            dt.year == today.year
+            and dt.month == today.month
+            and dt.day == today.day
+        )
 
     @classmethod
     def isFuture(cls, dt: pendulum.DateTime) -> bool:

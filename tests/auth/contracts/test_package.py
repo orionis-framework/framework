@@ -10,6 +10,11 @@ class TestContractsPackage(TestCase):
 
         Validates that no contract silently gives an instance dictionary
         to its implementations, which would defeat their own slots.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in contracts.__all__:
             contract = getattr(contracts, name)
@@ -21,6 +26,11 @@ class TestContractsPackage(TestCase):
 
         Validates that the entry point stays usable and that its order
         keeps review diffs readable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(list(contracts.__all__), sorted(contracts.__all__))
         for name in contracts.__all__:

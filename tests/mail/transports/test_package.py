@@ -7,10 +7,14 @@ from orionis.test import TestCase
 class TestTransportsPackage(TestCase):
 
     def testExportsEveryBuiltInTransportAndFactory(self) -> None:
-        """
-        Publish each built-in transport next to its factory.
+        """Publish each built-in transport next to its factory.
 
         Validates the shortcut import used by the manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             sorted(transports_package.__all__),
@@ -33,10 +37,14 @@ class TestTransportsPackage(TestCase):
             )
 
     def testEveryTransportImplementsTheSharedContract(self) -> None:
-        """
-        Keep both transports behind the single delivery contract.
+        """Keep both transports behind the single delivery contract.
 
         Validates that the manager can use them interchangeably.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for transport in (FileTransport, SmtpTransport):
             self.assertTrue(issubclass(transport, IMailTransport))

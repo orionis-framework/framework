@@ -37,6 +37,18 @@ class AlertService:
     __slots__ = ("mail",)
 
     def __init__(self, mail: IMailManager) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        mail : IMailManager
+            Value supplied for ``mail``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.mail = mail
 
 def stub_methods() -> list[ast.FunctionDef | ast.AsyncFunctionDef]:
@@ -62,20 +74,28 @@ def stub_methods() -> list[ast.FunctionDef | ast.AsyncFunctionDef]:
 class TestMailProvider(TestCase):
 
     def testIsAnEagerCoreProvider(self) -> None:
-        """
-        Ship as an eager core provider instead of a deferred one.
+        """Ship as an eager core provider instead of a deferred one.
 
         Validates that the facade is pinned during normal startup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(MailProvider, CORE_PROVIDERS)
         self.assertFalse(issubclass(MailProvider, DeferrableProvider))
         self.assertTrue(inspect.iscoroutinefunction(MailProvider.boot))
 
     def testRegistersTheComposerAndTheManagerContract(self) -> None:
-        """
-        Bind the shared composer and the manager contract as singletons.
+        """Bind the shared composer and the manager contract as singletons.
 
         Validates the wiring used by dependency injection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         recorded: list[tuple[object, object]] = []
 
@@ -83,7 +103,20 @@ class TestMailProvider(TestCase):
             __slots__ = ()
 
             def singleton(self, abstract: object, concrete: object) -> None:
-                """Record one binding without touching a real container."""
+                """Record one binding without touching a real container.
+
+                Parameters
+                ----------
+                abstract : object
+                    Value supplied for ``abstract``.
+                concrete : object
+                    Value supplied for ``concrete``.
+
+                Returns
+                -------
+                None
+                    Completes the operation described above.
+                """
                 recorded.append((abstract, concrete))
 
         MailProvider(RecordingApp()).register()
@@ -95,18 +128,34 @@ class TestMailProvider(TestCase):
 class TestMailFacade(TestCase):
 
     def setUp(self) -> None:
-        """Keep test-time resolutions out of the ambient runner scope."""
+        """Keep test-time resolutions out of the ambient runner scope.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.scope_token = ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Restore the runner scope after each resolution."""
+        """Restore the runner scope after each resolution.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.reset(self.scope_token)
 
     async def testFacadeAndConstructorInjectionUseTheSameSingleton(self) -> None:
-        """
-        Resolve one manager for the facade and for injected consumers.
+        """Resolve one manager for the facade and for injected consumers.
 
         Validates the wiring of the booted application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = Application()
         manager = await app.make(IMailManager)
@@ -118,19 +167,27 @@ class TestMailFacade(TestCase):
         self.assertIs(Mail._pinned_instance, manager)
 
     def testIsExportedByTheFacadesPackage(self) -> None:
-        """
-        Expose the facade from the shared facades package.
+        """Expose the facade from the shared facades package.
 
         Validates that consumers can import it like every other facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn("Mail", facades_package.__all__)
         self.assertIs(facades_package.Mail, Mail)
 
     def testEveryFacadeEntryImmediatelyReturnsPendingMail(self) -> None:
-        """
-        Return a usable chain without an intermediate await.
+        """Return a usable chain without an intermediate await.
 
         Validates that no deferred dispatcher reaches application code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         calls = (
             Mail.mailer("file"),
@@ -147,10 +204,14 @@ class TestMailFacade(TestCase):
             self.assertFalse(inspect.isawaitable(pending))
 
     def testRuntimeFacadeOnlyDeclaresItsAccessor(self) -> None:
-        """
-        Keep the runtime facade free of method stubs.
+        """Keep the runtime facade free of method stubs.
 
         Validates that the metaclass dispatch is never shadowed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(Mail.getFacadeAccessor(), IMailManager)
         own_methods = {
@@ -163,10 +224,14 @@ class TestMailFacade(TestCase):
 class TestMailFacadeStub(TestCase):
 
     def testDeclaresOnlyTheConsumerSurface(self) -> None:
-        """
-        Publish composition and delivery operations only.
+        """Publish composition and delivery operations only.
 
         Validates that registration and facade internals stay out.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         declared = {method.name for method in stub_methods()}
         self.assertEqual(declared, _CONSUMER_SURFACE)
@@ -174,10 +239,14 @@ class TestMailFacadeStub(TestCase):
         self.assertNotIn("getFacadeAccessor", declared)
 
     def testDeclaresEveryEntryAsAStaticMethod(self) -> None:
-        """
-        Declare each entry as a static method on the facade class.
+        """Declare each entry as a static method on the facade class.
 
         Validates that class-level calls type check for consumers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for method in stub_methods():
             decorators = {
@@ -186,10 +255,14 @@ class TestMailFacadeStub(TestCase):
             self.assertIn("staticmethod", decorators, msg=method.name)
 
     def testTerminalOperationsAreDeclaredAsynchronous(self) -> None:
-        """
-        Mark only the terminal operations as coroutines in the stub.
+        """Mark only the terminal operations as coroutines in the stub.
 
         Validates that composition stays synchronous for consumers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for method in stub_methods():
             self.assertEqual(
@@ -199,10 +272,14 @@ class TestMailFacadeStub(TestCase):
             )
 
     def testSendDeclaresItsThreeOverloads(self) -> None:
-        """
-        Publish the Mailable, view, and Content overloads of send.
+        """Publish the Mailable, view, and Content overloads of send.
 
         Validates the typed surface used by application code.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         sends = [method for method in stub_methods() if method.name == "send"]
         self.assertEqual(len(sends), 3)
@@ -212,10 +289,14 @@ class TestMailFacadeStub(TestCase):
         )
 
     def testSignaturesMatchTheImplementation(self) -> None:
-        """
-        Keep stub parameters, defaults, and returns aligned with the manager.
+        """Keep stub parameters, defaults, and returns aligned with the manager.
 
         Validates that autocompletion never advertises a wrong signature.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for method in stub_methods():
             if method.name == "send":

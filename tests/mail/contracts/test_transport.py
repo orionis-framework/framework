@@ -7,27 +7,39 @@ from orionis.test import TestCase
 class TestIMailTransportContract(TestCase):
 
     def testDeclaresOnlyTheSendOperation(self) -> None:
-        """
-        Declare a single asynchronous operation for prepared messages.
+        """Declare a single asynchronous operation for prepared messages.
 
         Validates that transports never expose composition concerns.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IMailTransport.__abstractmethods__, frozenset({"send"}))
         self.assertTrue(inspect.iscoroutinefunction(IMailTransport.send))
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots so implementations stay dictionary free.
+        """Declare empty slots so implementations stay dictionary free.
 
         Validates the memory contract shared by framework interfaces.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(IMailTransport.__slots__, ())
 
     def testMailerAndDriverAreKeywordOnly(self) -> None:
-        """
-        Require the mailer and driver names as keyword arguments.
+        """Require the mailer and driver names as keyword arguments.
 
         Validates the call shape used by the manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         parameters = inspect.signature(
             IMailTransport.send,
@@ -42,10 +54,14 @@ class TestIMailTransportContract(TestCase):
             self.assertIs(parameters[name].kind, inspect.Parameter.KEYWORD_ONLY)
 
     def testBuiltInTransportsImplementTheContract(self) -> None:
-        """
-        Implement the contract in both production transports.
+        """Implement the contract in both production transports.
 
         Validates that each one can be resolved through a factory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for transport in (FileTransport, SmtpTransport):
             self.assertTrue(issubclass(transport, IMailTransport))

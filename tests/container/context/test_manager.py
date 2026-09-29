@@ -7,11 +7,23 @@ from orionis.container.context.scope import ScopedContext
 class TestScopeManager(TestCase):
 
     def setUp(self) -> None:
-        """Reset the active scope before each test to guarantee isolation."""
+        """Reset the active scope before each test to guarantee isolation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Reset the active scope after each test to avoid state leakage."""
+        """Reset the active scope after each test to avoid state leakage.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.setCurrentScope(None)
 
     # ------------------------------------------------------------------
@@ -383,8 +395,7 @@ class TestScopeManager(TestCase):
         self.assertIsNone(ScopedContext.getCurrentScope())
 
     async def testAsyncContextManagerCleansUpOnException(self) -> None:
-        """
-        Clean up correctly even when an exception is raised inside async context.
+        """Clean up correctly even when an exception is raised inside async context.
 
         Confirms that instances and the active scope are cleared regardless of
         whether an exception propagates out of the 'async with' block.
@@ -393,6 +404,11 @@ class TestScopeManager(TestCase):
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         sm = ScopeManager()
         raised: bool = False
@@ -454,6 +470,13 @@ class TestScopeManager(TestCase):
             This method does not return a value.
         """
         async def _make_value() -> str: # NOSONAR
+            """Return the marker used by asynchronous resolution.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "coroutine_result"
 
         sm = ScopeManager()
@@ -479,6 +502,13 @@ class TestScopeManager(TestCase):
             This method does not return a value.
         """
         async def _worker() -> int: # NOSONAR
+            """Return the marker produced by the worker.
+
+            Returns
+            -------
+            int
+                Value produced by the helper.
+            """
             return 42
 
         sm = ScopeManager()
@@ -553,6 +583,13 @@ class TestScopeManager(TestCase):
             This method does not return a value.
         """
         async def _produce() -> str: # NOSONAR
+            """Produce the value delivered by asynchronous resolution.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
             return "produced"
 
         sm = ScopeManager()
@@ -562,7 +599,13 @@ class TestScopeManager(TestCase):
         self.assertEqual(result, "produced")
 
     async def testClosedScopeCannotBeReenteredOrRepopulated(self) -> None:
-        """Keep inherited references from reviving a completed request scope."""
+        """Keep inherited references from reviving a completed request scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         async with ScopeManager() as scope:
             self.assertTrue(scope.isActive)
         self.assertFalse(scope.isActive)
@@ -572,11 +615,24 @@ class TestScopeManager(TestCase):
             await scope.__aenter__()
 
     async def testInFlightResolutionCannotPublishAfterScopeExit(self) -> None:
-        """Reject a late service result even when its task inherited the scope."""
+        """Reject a late service result even when its task inherited the scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         entered = asyncio.Event()
         finished = asyncio.Event()
 
         async def build_late() -> object:
+            """Publish the service after its owning scope closes.
+
+            Returns
+            -------
+            object
+                Value produced by the helper.
+            """
             entered.set()
             await finished.wait()
             return object()

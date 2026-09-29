@@ -212,17 +212,12 @@ except ValueError as exc:
   vez, pero cada cálculo es determinista y produce un resultado igual,
   por lo que no hay corrupción de datos, solo un posible cómputo
   redundante.
-- `_getSourceCode` lee las líneas de código fuente circundantes usando
-  una sola llamada a `linecache.getlines(filename)` seguida de slicing
-  de lista, en lugar de llamar a `linecache.getline()` una vez por
-  línea — esto mantiene el número de búsquedas en `linecache` en una
-  por frame sin importar cuántas líneas de contexto se extraigan.
-  `linecache` en sí cachea el contenido de los archivos entre llamadas
-  dentro del proceso.
-- `_parseStack` itera el `StackSummary` de la traza en reversa
-  (`reversed(stack_list)`) para producir directamente el orden
-  "más reciente primero", evitando una pasada `.reverse()` separada
-  sobre la lista.
+- `_getSourceCode` lee las líneas de código fuente circundantes con una
+  llamada a `linecache.getlines(filename)` por frame. `linecache` cachea
+  el contenido de los archivos entre llamadas dentro del proceso.
+- `_parseStack` itera el `StackSummary` directamente en reversa para
+  producir el orden "más reciente primero" sin copiar la pila a otra
+  lista. Los IDs aumentan desde 1 en ese mismo orden.
 - `ExceptionParser` está basado en `__slots__`, manteniendo la huella de
   memoria por instancia pequeña y fija (`_cache`, `_error_code`,
   `_exc_type`, `_tb`).

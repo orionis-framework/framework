@@ -1,7 +1,11 @@
-from orionis.console.args.argument import Argument
-from orionis.console.debug.dumper import Dumper
-from orionis.console.dynamic.progress_bar import ProgressBar
-from orionis.console.output.console import Console
+from typing import TYPE_CHECKING as _TYPE_CHECKING
+from orionis._exports import resolve_export as _resolve_export
+
+if _TYPE_CHECKING:
+    from orionis.console.args.argument import Argument
+    from orionis.console.debug.dumper import Dumper
+    from orionis.console.dynamic.progress_bar import ProgressBar
+    from orionis.console.output.console import Console
 
 __all__ = [
     "Argument",
@@ -9,3 +13,42 @@ __all__ = [
     "Dumper",
     "ProgressBar",
 ]
+
+_EXPORTS = {
+    "Argument": ("orionis.console.args.argument", "Argument"),
+    "Console": ("orionis.console.output.console", "Console"),
+    "Dumper": ("orionis.console.debug.dumper", "Dumper"),
+    "ProgressBar": ("orionis.console.dynamic.progress_bar", "ProgressBar"),
+}
+
+def __getattr__(name: str) -> object:
+    """
+    Resolve and cache a public package export.
+
+    Parameters
+    ----------
+    name : str
+        Public attribute requested from this package.
+
+    Returns
+    -------
+    object
+        Exported object from its defining module.
+
+    Raises
+    ------
+    AttributeError
+        If the requested attribute is not exported.
+    """
+    return _resolve_export(globals(), _EXPORTS, name)
+
+def __dir__() -> list[str]:
+    """
+    List loaded attributes and declared public exports.
+
+    Returns
+    -------
+    list[str]
+        Sorted attribute names available on this package.
+    """
+    return sorted(globals().keys() | _EXPORTS.keys())

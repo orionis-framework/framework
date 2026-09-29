@@ -12,7 +12,7 @@ class ICatch(ABC):
     @abstractmethod
     async def exception(
         self,
-        exception: BaseException | Exception,
+        exception: BaseException,
         request: Request | TransportAdapter | None = None,
     ) -> Response | None:
         """
@@ -20,7 +20,7 @@ class ICatch(ABC):
 
         Parameters
         ----------
-        exception : BaseException | Exception
+        exception : BaseException
             The exception instance to handle.
         request : Request | TransportAdapter | None, optional
             The HTTP request or transport adapter associated with the exception.

@@ -16,7 +16,13 @@ class SampleABC(ABC):
 
     @abstractmethod
     def abstractMethod(self) -> str:
-        """Return an unimplemented abstract result."""
+        """Return an unimplemented abstract result.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
 
     def concreteMethod(self) -> int:
         """
@@ -266,7 +272,16 @@ class _NoDocABC(ABC):
     """Provide an ABC intentionally without a runtime class docstring."""
 
     @abstractmethod
-    def method(self) -> None: ...
+    def method(self) -> None:
+        """Implement the ``method`` contract stub.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        ...
+
 
 class _ConcreteClass:
     """Represent an ordinary non-abstract class fixture."""
@@ -289,7 +304,16 @@ def _make_mutable_abc() -> type:
         mutable_attr: int = 99
 
         @abstractmethod
-        def abstractMethod(self) -> str: ...
+        def abstractMethod(self) -> str:
+            """Run the abstract method helper.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
+            ...
+
 
         def deletableMethod(self) -> int:
             """
@@ -316,7 +340,16 @@ def _make_private_method_abc() -> type:
     class _PrivateMethodABC(ABC):
 
         @abstractmethod
-        def abstractMethod(self) -> str: ...
+        def abstractMethod(self) -> str:
+            """Run the abstract method helper.
+
+            Returns
+            -------
+            str
+                Value produced by the helper.
+            """
+            ...
+
 
         def __hiddenMethod(self) -> int: # NOSONAR
             """
@@ -341,7 +374,13 @@ def _make_sourceless_abc() -> type:
         A new abstract class whose source lines cannot be located.
     """
     def _method(self) -> None:
-        """Do nothing."""
+        """Do nothing.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     return ABCMeta(
         "_SourcelessABC",
@@ -359,7 +398,13 @@ def _make_moduleless_abc() -> type:
         A new abstract class pointing at a module missing from sys.modules.
     """
     def _method(self) -> None:
-        """Do nothing."""
+        """Do nothing.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     return ABCMeta(
         "_ModulelessABC",
@@ -456,7 +501,13 @@ class TestReflectionAbstractInit(TestCase):
 class TestReflectionAbstractCacheProtocol(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract instance for cache tests."""
+        """Initialise a shared ReflectionAbstract instance for cache tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testSetAndGetItem(self) -> None:
@@ -536,7 +587,13 @@ class TestReflectionAbstractCacheProtocol(TestCase):
 class TestReflectionAbstractIdentity(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract instance for identity tests."""
+        """Initialise a shared ReflectionAbstract instance for identity tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetClassReturnsSampleABC(self) -> None:
@@ -616,7 +673,13 @@ class TestReflectionAbstractIdentity(TestCase):
 class TestReflectionAbstractMetadata(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract instance for metadata tests."""
+        """Initialise a shared ReflectionAbstract instance for metadata tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetDocstringReturnsStr(self) -> None:
@@ -642,7 +705,16 @@ class TestReflectionAbstractMetadata(TestCase):
         """
         class _Bare(ABC):
             @abstractmethod
-            def m(self): ...
+            def m(self):
+                """Run the m helper.
+
+                Returns
+                -------
+                None
+                    Completes the operation described above.
+                """
+                ...
+
 
         # Force __doc__ to None to simulate a class with no docstring
         _Bare.__doc__ = None
@@ -727,7 +799,13 @@ class TestReflectionAbstractMetadata(TestCase):
 class TestReflectionAbstractPublicAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for public attribute tests."""
+        """Initialise a shared ReflectionAbstract for public attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPublicAttributesReturnsDict(self) -> None:
@@ -821,7 +899,13 @@ class TestReflectionAbstractPublicAttributes(TestCase):
 class TestReflectionAbstractProtectedAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for protected attribute tests."""
+        """Initialise a shared ReflectionAbstract for protected attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetProtectedAttributesReturnsDict(self) -> None:
@@ -860,7 +944,13 @@ class TestReflectionAbstractProtectedAttributes(TestCase):
 class TestReflectionAbstractPrivateAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for private attribute tests."""
+        """Initialise a shared ReflectionAbstract for private attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPrivateAttributesReturnsDict(self) -> None:
@@ -894,7 +984,13 @@ class TestReflectionAbstractPrivateAttributes(TestCase):
 class TestReflectionAbstractDunderAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for dunder attribute tests."""
+        """Initialise a shared ReflectionAbstract for dunder attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetDunderAttributesReturnsDict(self) -> None:
@@ -1027,7 +1123,13 @@ class TestReflectionAbstractRemoveAttribute(TestCase):
 class TestReflectionAbstractPublicMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for public method tests."""
+        """Initialise a shared ReflectionAbstract for public method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPublicMethodsReturnsList(self) -> None:
@@ -1126,7 +1228,13 @@ class TestReflectionAbstractPublicMethods(TestCase):
 class TestReflectionAbstractProtectedMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for protected method tests."""
+        """Initialise a shared ReflectionAbstract for protected method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetProtectedMethodsReturnsList(self) -> None:
@@ -1192,7 +1300,13 @@ class TestReflectionAbstractProtectedMethods(TestCase):
 class TestReflectionAbstractPrivateMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for private method tests."""
+        """Initialise a shared ReflectionAbstract for private method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPrivateMethodsReturnsList(self) -> None:
@@ -1225,7 +1339,13 @@ class TestReflectionAbstractPrivateMethods(TestCase):
 class TestReflectionAbstractClassMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for class method tests."""
+        """Initialise a shared ReflectionAbstract for class method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPublicClassMethodsReturnsList(self) -> None:
@@ -1291,7 +1411,13 @@ class TestReflectionAbstractClassMethods(TestCase):
 class TestReflectionAbstractStaticMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for static method tests."""
+        """Initialise a shared ReflectionAbstract for static method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPublicStaticMethodsReturnsList(self) -> None:
@@ -1357,7 +1483,13 @@ class TestReflectionAbstractStaticMethods(TestCase):
 class TestReflectionAbstractDunderMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for dunder method tests."""
+        """Initialise a shared ReflectionAbstract for dunder method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetDunderMethodsReturnsList(self) -> None:
@@ -1389,7 +1521,13 @@ class TestReflectionAbstractDunderMethods(TestCase):
 class TestReflectionAbstractMethodOperations(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for method operation tests."""
+        """Initialise a shared ReflectionAbstract for method operation tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testHasMethodReturnsTrueForExisting(self) -> None:
@@ -1478,7 +1616,13 @@ class TestReflectionAbstractMethodOperations(TestCase):
 class TestReflectionAbstractProperties(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for property tests."""
+        """Initialise a shared ReflectionAbstract for property tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPropertiesReturnsList(self) -> None:
@@ -1599,7 +1743,13 @@ class TestReflectionAbstractProperties(TestCase):
 class TestReflectionAbstractDependencies(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for dependency tests."""
+        """Initialise a shared ReflectionAbstract for dependency tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testConstructorSignatureReturnsSignatureObject(self) -> None:
@@ -1646,7 +1796,13 @@ class TestReflectionAbstractDependencies(TestCase):
 class TestReflectionAbstractClearCache(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for clearCache tests."""
+        """Initialise a shared ReflectionAbstract for clearCache tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testClearCacheResetsStoredValues(self) -> None:
@@ -1696,7 +1852,13 @@ class TestReflectionAbstractClearCache(TestCase):
 class TestReflectionAbstractAsyncMembers(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for async member tests."""
+        """Initialise a shared ReflectionAbstract for async member tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testPrivateSyncMethodsExcludeCoroutines(self) -> None:
@@ -1875,7 +2037,13 @@ class TestReflectionAbstractAsyncMembers(TestCase):
 class TestReflectionAbstractPrivateAccess(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for private access tests."""
+        """Initialise a shared ReflectionAbstract for private access tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testGetPropertySignatureResolvesPrivateNames(self) -> None:
@@ -2052,7 +2220,13 @@ class TestReflectionAbstractErrorBranches(TestCase):
 class TestReflectionAbstractMemoization(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionAbstract for memoization tests."""
+        """Initialise a shared ReflectionAbstract for memoization tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.r = ReflectionAbstract(SampleABC)
 
     def testBaseClassesAreMemoized(self) -> None:

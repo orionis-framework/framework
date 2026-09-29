@@ -12,11 +12,36 @@ class _RecordingEnv:
     __slots__ = ("calls", "value")
 
     def __init__(self, value: object = None) -> None:
+        """Store the environment value returned by the stub.
+
+        Parameters
+        ----------
+        value : object
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.value: object = value
         self.calls: list[tuple[str, object]] = []
 
     def get(self, key: str, default: object | None = None) -> object:
-        """Record the lookup and return the canned value."""
+        """Record the lookup and return the canned value.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+        default : object | None
+            Value supplied for ``default``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         self.calls.append((key, default))
         return self.value
 
@@ -27,81 +52,113 @@ class _RecordingEnv:
 class TestEnvHelperDelegation(TestCase):
 
     def setUp(self) -> None:
-        """
-        Replace the Env facade with a controllable double.
+        """Replace the Env facade with a controllable double.
 
         Keeps the helper isolated from the real ``.env`` file so the
         delegation contract can be asserted deterministically.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._original_facade = functions_module.Env
         self._facade = _RecordingEnv("recorded")
         functions_module.Env = self._facade
 
     def tearDown(self) -> None:
-        """
-        Restore the original Env facade after each test.
+        """Restore the original Env facade after each test.
 
         Guarantees that module-level state is never leaked to other test
         cases running in the same process.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         functions_module.Env = self._original_facade
 
     def testForwardsTheRequestedKey(self) -> None:
-        """
-        Forward the requested key to the facade unchanged.
+        """Forward the requested key to the facade unchanged.
 
         Validates that the helper performs no normalisation of its own
         before delegating the lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         env("APP_NAME")
         self.assertEqual(self._facade.calls, [("APP_NAME", None)])
 
     def testForwardsNoneAsTheImplicitDefault(self) -> None:
-        """
-        Forward ``None`` when the caller omits a default.
+        """Forward ``None`` when the caller omits a default.
 
         Validates that the helper always supplies the second positional
         argument expected by the facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         env("MISSING_KEY")
         self.assertIsNone(self._facade.calls[0][1])
 
     def testForwardsTheExplicitDefault(self) -> None:
-        """
-        Forward the caller-supplied default to the facade.
+        """Forward the caller-supplied default to the facade.
 
         Validates that fallback values reach ``Env.get`` untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         env("MISSING_KEY", "fallback")
         self.assertEqual(self._facade.calls, [("MISSING_KEY", "fallback")])
 
     def testReturnsTheFacadeResultUnchanged(self) -> None:
-        """
-        Return the exact object produced by the facade.
+        """Return the exact object produced by the facade.
 
         Validates that the helper never copies or coerces the resolved
         value before handing it back to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         expected = [1, 2, 3]
         self._facade.value = expected
         self.assertIs(env("LIST_KEY"), expected)
 
     def testReturnsNoneWhenTheFacadeResolvesNothing(self) -> None:
-        """
-        Return ``None`` when the facade resolves nothing.
+        """Return ``None`` when the facade resolves nothing.
 
         Validates that a missing variable without a default surfaces as a
         plain ``None`` instead of an exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._facade.value = None
         self.assertIsNone(env("MISSING_KEY"))
 
     def testDelegatesExactlyOncePerCall(self) -> None:
-        """
-        Delegate exactly one lookup per helper invocation.
+        """Delegate exactly one lookup per helper invocation.
 
         Validates that the helper does not retry or pre-warm the facade,
         which would double the cost of every configuration read.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         env("FIRST_KEY")
         env("SECOND_KEY")

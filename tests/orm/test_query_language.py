@@ -15,11 +15,22 @@ from orionis.orm.schema.types import Boolean, Integer, String
 from orionis.support.facades.db import DB
 from orionis.test import TestCase
 
-
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     def config(self, key: str) -> dict:  # noqa: ARG002
+        """Run the config helper.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -30,7 +41,6 @@ class _StubApp:
                 },
             },
         }
-
 
 def _table(name: str, columns: dict) -> TableDefinition:
     """
@@ -51,7 +61,6 @@ def _table(name: str, columns: dict) -> TableDefinition:
     for key, column in columns.items():
         column.name = key
     return TableDefinition(name=name, columns=columns, primary_key="id")
-
 
 def _users_table() -> TableDefinition:
     """
@@ -74,7 +83,6 @@ def _users_table() -> TableDefinition:
         },
     )
 
-
 def _posts_table() -> TableDefinition:
     """
     Build the physical "posts" table used by the join tests.
@@ -94,12 +102,17 @@ def _posts_table() -> TableDefinition:
         },
     )
 
-
 class _QueryLanguageTestCase(TestCase):
     """Shared fixture creating the users/posts schema on sqlite."""
 
     async def asyncSetUp(self) -> None:
-        """Wire an isolated in-memory manager and create both tables."""
+        """Wire an isolated in-memory manager and create both tables.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(self._manager)
         facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
@@ -110,12 +123,24 @@ class _QueryLanguageTestCase(TestCase):
         await connection.createTable(_posts_table())
 
     async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test."""
+        """Dispose the manager and clear the resolver after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self._manager.disconnect()
         ConnectionResolver.clear()
 
     async def seedUsers(self) -> None:
-        """Insert the reference user rows shared by several tests."""
+        """Insert the reference user rows shared by several tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await DB.table("users").insert(
             [
                 {
@@ -153,16 +178,19 @@ class _QueryLanguageTestCase(TestCase):
         """
         return sorted(row["name"] for row in rows)
 
-
 class TestNestedConditions(_QueryLanguageTestCase):
     """Condition grouping through callbacks, at any nesting depth."""
 
     async def testGroupIsAndCombinedWithOuterCondition(self) -> None:
-        """
-        Wrap a callback group in parentheses joined by AND.
+        """Wrap a callback group in parentheses joined by AND.
 
         Validates ``where(a).where(fn: b OR c)`` keeps ``a AND (b OR c)``
         instead of degrading into ``a AND b OR c``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -178,10 +206,14 @@ class TestNestedConditions(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben"])
 
     async def testTwoGroupsAreCombinedIndependently(self) -> None:
-        """
-        Combine two sibling groups with AND.
+        """Combine two sibling groups with AND.
 
         Validates ``(a OR b) AND (c AND d)`` evaluation order.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -201,10 +233,14 @@ class TestNestedConditions(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben"])
 
     async def testOrGroupIsCombinedWithOuterCondition(self) -> None:
-        """
-        Attach a group through OR.
+        """Attach a group through OR.
 
         Validates ``a OR (b AND c)`` keeps the group atomic.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -220,10 +256,14 @@ class TestNestedConditions(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Dot"])
 
     async def testGroupsNestArbitrarily(self) -> None:
-        """
-        Nest groups several levels deep.
+        """Nest groups several levels deep.
 
         Validates that nesting is recursive rather than one level deep.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -247,10 +287,14 @@ class TestNestedConditions(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben"])
 
     def testGroupRendersParentheses(self) -> None:
-        """
-        Render explicit parentheses around a group.
+        """Render explicit parentheses around a group.
 
         Validates the generated SQL, not only the returned rows.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         builder = (
             RawQueryBuilder()
@@ -267,24 +311,31 @@ class TestNestedConditions(_QueryLanguageTestCase):
         self.assertIn(" OR ", sql)
 
     async def testEmptyGroupDoesNotFilterAnything(self) -> None:
-        """
-        Ignore a group whose callback declares no condition.
+        """Ignore a group whose callback declares no condition.
 
         Validates the neutral element of an empty parenthesis group.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await DB.table("users").where(lambda _query: None).get()
         self.assertEqual(len(rows), 4)
 
-
 class TestConditionSurface(_QueryLanguageTestCase):
     """Conditions beyond plain comparisons."""
 
     async def testWhereColumnComparesTwoColumns(self) -> None:
-        """
-        Compare two columns of the same row.
+        """Compare two columns of the same row.
 
         Validates ``whereColumn``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await DB.table("posts").insert(
             [
@@ -296,20 +347,28 @@ class TestConditionSurface(_QueryLanguageTestCase):
         self.assertEqual([row["title"] for row in rows], ["b"])
 
     async def testWhereNotBetweenExcludesTheRange(self) -> None:
-        """
-        Exclude an inclusive range.
+        """Exclude an inclusive range.
 
         Validates ``whereNotBetween``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await DB.table("users").whereNotBetween("age", (18, 60)).get()
         self.assertEqual(self.names(rows), ["Cid", "Dot"])
 
     async def testWhereRawBindsItsParameters(self) -> None:
-        """
-        Bind every value of a raw fragment.
+        """Bind every value of a raw fragment.
 
         Validates that raw conditions never inline literals.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -320,10 +379,14 @@ class TestConditionSurface(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ben", "Dot"])
 
     async def testOrWhereVariantsCombineWithOr(self) -> None:
-        """
-        Combine the ``or`` variants of the typed conditions.
+        """Combine the ``or`` variants of the typed conditions.
 
         Validates ``orWhereIn`` and ``orWhereNull``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -335,24 +398,31 @@ class TestConditionSurface(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben"])
 
     async def testUnsupportedOperatorIsRejected(self) -> None:
-        """
-        Reject an operator outside the supported set.
+        """Reject an operator outside the supported set.
 
         Validates that the builder never forwards arbitrary text into
         the generated SQL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidQueryException):
             DB.table("users").where("name", "; DROP TABLE users; --", "x")
-
 
 class TestSubqueries(_QueryLanguageTestCase):
     """Subquery support across projections, conditions, and joins."""
 
     async def testWhereInAcceptsASubquery(self) -> None:
-        """
-        Filter rows against the result of another query.
+        """Filter rows against the result of another query.
 
         Validates ``whereIn`` with a callable subquery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -369,10 +439,14 @@ class TestSubqueries(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada"])
 
     async def testWhereExistsCorrelatesWithTheOuterQuery(self) -> None:
-        """
-        Keep rows having at least one related row.
+        """Keep rows having at least one related row.
 
         Validates that a correlated ``EXISTS`` resolves outer columns.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -391,10 +465,14 @@ class TestSubqueries(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ben"])
 
     async def testWhereNotExistsIsTheComplement(self) -> None:
-        """
-        Keep rows without any related row.
+        """Keep rows without any related row.
 
         Validates ``whereNotExists``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -413,10 +491,14 @@ class TestSubqueries(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Cid", "Dot"])
 
     async def testSelectSubProjectsAScalarSubquery(self) -> None:
-        """
-        Project an aggregate of a related table as a column.
+        """Project an aggregate of a related table as a column.
 
         Validates ``selectSub``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -441,10 +523,14 @@ class TestSubqueries(_QueryLanguageTestCase):
         self.assertEqual(rows[0]["posts_count"], 2)
 
     async def testJoinSubJoinsADerivedTable(self) -> None:
-        """
-        Join an aggregated subquery as a derived table.
+        """Join an aggregated subquery as a derived table.
 
         Validates ``joinSub`` and its mandatory alias.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -472,10 +558,14 @@ class TestSubqueries(_QueryLanguageTestCase):
         self.assertEqual(rows[0]["total"], 7)
 
     def testSubqueryJoinWithoutAliasIsRejected(self) -> None:
-        """
-        Reject a derived table that cannot be referenced.
+        """Reject a derived table that cannot be referenced.
 
         Validates the alias guard of subquery joins.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         builder = (
             RawQueryBuilder()
@@ -491,12 +581,17 @@ class TestSubqueries(_QueryLanguageTestCase):
         with self.assertRaises(QueryException):
             SQLCompiler().compileSelect(builder.toPlan())
 
-
 class TestJoins(_QueryLanguageTestCase):
     """Every join flavour exposed by the shared engine."""
 
     async def seedJoinable(self) -> None:
-        """Insert users and posts linked by ``user_id``."""
+        """Insert users and posts linked by ``user_id``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self.seedUsers()
         await DB.table("posts").insert(
             [
@@ -506,10 +601,14 @@ class TestJoins(_QueryLanguageTestCase):
         )
 
     async def testInnerJoinKeepsOnlyMatchingRows(self) -> None:
-        """
-        Join two tables keeping only linked rows.
+        """Join two tables keeping only linked rows.
 
         Validates the INNER JOIN path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedJoinable()
         rows = await (
@@ -522,10 +621,14 @@ class TestJoins(_QueryLanguageTestCase):
         self.assertEqual([row["title"] for row in rows], ["first", "second"])
 
     async def testLeftJoinKeepsUnmatchedRows(self) -> None:
-        """
-        Keep rows of the main table without a match.
+        """Keep rows of the main table without a match.
 
         Validates the LEFT OUTER JOIN path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedJoinable()
         rows = await (
@@ -537,10 +640,14 @@ class TestJoins(_QueryLanguageTestCase):
         self.assertEqual(len(rows), 4)
 
     async def testJoinAcceptsSeveralConditionsThroughACallback(self) -> None:
-        """
-        Declare a multi-condition ON clause through a callback.
+        """Declare a multi-condition ON clause through a callback.
 
         Validates the ``JoinClause`` calling convention.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedJoinable()
         rows = await (
@@ -557,10 +664,14 @@ class TestJoins(_QueryLanguageTestCase):
         self.assertEqual([row["title"] for row in rows], ["first", "second"])
 
     async def testJoinSupportsAliases(self) -> None:
-        """
-        Join a table under an alias.
+        """Join a table under an alias.
 
         Validates alias-qualified column resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedJoinable()
         rows = await (
@@ -573,10 +684,14 @@ class TestJoins(_QueryLanguageTestCase):
         self.assertEqual([row["name"] for row in rows], ["Ada", "Ben"])
 
     async def testCrossJoinProducesTheCartesianProduct(self) -> None:
-        """
-        Combine every row of both tables.
+        """Combine every row of both tables.
 
         Validates the CROSS JOIN path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedJoinable()
         rows = await (
@@ -585,23 +700,30 @@ class TestJoins(_QueryLanguageTestCase):
         self.assertEqual(len(rows), 8)
 
     def testJoinWithoutConditionIsRejected(self) -> None:
-        """
-        Reject an incomplete ON clause.
+        """Reject an incomplete ON clause.
 
         Validates the guard preventing accidental cartesian products.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidQueryException):
             RawQueryBuilder().table("users").join("posts", "posts.user_id")
-
 
 class TestCompoundsAndLocks(_QueryLanguageTestCase):
     """Unions, locking, and builder reuse."""
 
     async def testUnionAllAppendsBothResultSets(self) -> None:
-        """
-        Append the rows of another query keeping duplicates.
+        """Append the rows of another query keeping duplicates.
 
         Validates ``unionAll``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         rows = await (
@@ -619,7 +741,13 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben", "Cid"])
 
     async def testThreeUnionBranchesCompileWithoutNestedParentheses(self) -> None:
-        """Execute three UNION arms using the shared query engine."""
+        """Execute three UNION arms using the shared query engine.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.seedUsers()
         base = DB.table("users").select("name").where("country", "CO")
         middle = DB.table("users").select("name").where("country", "MX")
@@ -628,7 +756,13 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ben", "Cid", "Dot"])
 
     async def testMixedUnionOperatorsPreserveLeftToRightSemantics(self) -> None:
-        """Preserve duplicates appended after a distinct compound result."""
+        """Preserve duplicates appended after a distinct compound result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.seedUsers()
         first = DB.table("users").select("name").where("name", "Ada")
         second = first.clone()
@@ -637,20 +771,28 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         self.assertEqual(self.names(rows), ["Ada", "Ada"])
 
     def testLockForUpdateRendersRowLocking(self) -> None:
-        """
-        Request row locking on the selected rows.
+        """Request row locking on the selected rows.
 
         Validates the generated SQL, since sqlite ignores row locks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         builder = RawQueryBuilder().table("users").lockForUpdate()
         sql = str(SQLCompiler().compileSelect(builder.toPlan()))
         self.assertIn("FOR UPDATE", sql)
 
     def testCloneDetachesThePlan(self) -> None:
-        """
-        Branch a builder without mutating the original.
+        """Branch a builder without mutating the original.
 
         Validates builder reuse and composition.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = RawQueryBuilder().table("users").where("active", True)
         branch = base.clone().where("role", "admin")
@@ -658,10 +800,14 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         self.assertEqual(len(branch.toPlan().wheres), 2)
 
     async def testAggregatesShareTheSameEngine(self) -> None:
-        """
-        Run every aggregate terminal over a model-less query.
+        """Run every aggregate terminal over a model-less query.
 
         Validates that aggregates are available outside models too.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         query = DB.table("users")
@@ -675,14 +821,17 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         )
 
     async def testRunningWithoutATableIsRejected(self) -> None:
-        """
-        Reject a query that never selected a table.
+        """Reject a query that never selected a table.
 
         Validates the target guard of the model-less builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidQueryException):
             await RawQueryBuilder().get()
-
 
 class _User(Model):
     """Model mapped onto the shared ``users`` fixture table."""
@@ -697,15 +846,18 @@ class _User(Model):
     age = Integer()
     active = Boolean()
 
-
 class TestModelSharesTheEngine(_QueryLanguageTestCase):
     """The model builder and the model-less builder are one engine."""
 
     async def testModelSupportsNestedGroups(self) -> None:
-        """
-        Group conditions from a model query.
+        """Group conditions from a model query.
 
         Validates that grouping is not exclusive to ``DB.table()``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         models = await (
@@ -720,10 +872,14 @@ class TestModelSharesTheEngine(_QueryLanguageTestCase):
         self.assertEqual(sorted(model.name for model in models), ["Ada", "Ben"])
 
     async def testModelSupportsJoins(self) -> None:
-        """
-        Join a related table from a model query.
+        """Join a related table from a model query.
 
         Validates that joins reached the model builder too.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -735,10 +891,14 @@ class TestModelSharesTheEngine(_QueryLanguageTestCase):
         self.assertEqual([model.name for model in models], ["Ada"])
 
     async def testModelSupportsSubqueryConditions(self) -> None:
-        """
-        Filter a model query with a correlated subquery.
+        """Filter a model query with a correlated subquery.
 
         Validates the shared ``EXISTS`` machinery.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -753,11 +913,15 @@ class TestModelSharesTheEngine(_QueryLanguageTestCase):
         self.assertEqual([model.name for model in models], ["Ben"])
 
     def testBothBuildersProduceTheSameSql(self) -> None:
-        """
-        Compile the same query identically from both entry points.
+        """Compile the same query identically from both entry points.
 
         Validates that models are a thin layer over the shared engine,
         with no duplicated query logic underneath.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         model_plan = (
             _User.query()
@@ -790,10 +954,14 @@ class TestModelSharesTheEngine(_QueryLanguageTestCase):
         )
 
     def testModelBuilderDerivesFromTheSharedEngine(self) -> None:
-        """
-        Share the very same base class between both builders.
+        """Share the very same base class between both builders.
 
         Validates the structural guarantee behind the previous test.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(ModelQueryBuilder, QueryBuilderBase))
         self.assertTrue(issubclass(RawQueryBuilder, QueryBuilderBase))

@@ -5,10 +5,14 @@ from orionis.test import TestCase
 class TestPreparedMail(TestCase):
 
     def testCarriesMimeAndTransportEnvelopeSeparately(self) -> None:
-        """
-        Expose serialized bytes beside the transport recipient union.
+        """Expose serialized bytes beside the transport recipient union.
 
         Validates the only data a transport receives.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         prepared = PreparedMail(
             message_id="<id@example.com>",
@@ -24,10 +28,14 @@ class TestPreparedMail(TestCase):
         self.assertFalse(prepared.smtp_utf8)
 
     def testIsFrozenAndSlotted(self) -> None:
-        """
-        Reject mutation and keep instances free of attribute dictionaries.
+        """Reject mutation and keep instances free of attribute dictionaries.
 
         Validates that a prepared message cannot be altered by a transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         prepared = PreparedMail(
             message_id="<id@example.com>",

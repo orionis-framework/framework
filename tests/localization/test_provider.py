@@ -18,6 +18,18 @@ class _StubManager:
     __slots__ = ("calls", "shared")
 
     def __init__(self, shared: object) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        shared : object
+            Value supplied for ``shared``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.shared = shared
         self.calls = 0
 
@@ -39,6 +51,18 @@ class _StubApp:
     __slots__ = ("bound", "manager", "resolved", "singletons")
 
     def __init__(self, manager: object | None = None) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        manager : object | None
+            Value supplied for ``manager``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.manager = manager
         self.singletons: list[tuple[object, object]] = []
         self.bound: list[tuple[object, object]] = []
@@ -101,6 +125,13 @@ class _StubLangFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.pinned = 0
 
     async def pin(self) -> None:
@@ -117,30 +148,42 @@ class TestLocalizationProviderDefinition(TestCase):
     """Validate the structural contract of the provider."""
 
     def testInheritsTheBaseServiceProvider(self) -> None:
-        """
-        Extend the base service provider.
+        """Extend the base service provider.
 
         Validates that the provider participates in the standard
         register and boot lifecycle.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(LocalizationProvider, ServiceProvider))
 
     def testStoresTheApplicationReference(self) -> None:
-        """
-        Keep the container received by the constructor.
+        """Keep the container received by the constructor.
 
         Validates that both phases bind services into the very same
         container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         self.assertIs(LocalizationProvider(app).app, app)
 
     def testBootIsACoroutineFunction(self) -> None:
-        """
-        Declare the boot phase as asynchronous.
+        """Declare the boot phase as asynchronous.
 
         Validates that boot can await container resolutions and facade
         pinning.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(LocalizationProvider.boot))
 
@@ -148,10 +191,14 @@ class TestLocalizationProviderRegistration(TestCase):
     """Validate the bindings declared during registration."""
 
     def testRegistersTheManagerAsASingleton(self) -> None:
-        """
-        Bind the manager contract to its concrete implementation.
+        """Bind the manager contract to its concrete implementation.
 
         Validates that a single manager serves the whole application.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         LocalizationProvider(app).register()
@@ -161,11 +208,15 @@ class TestLocalizationProviderRegistration(TestCase):
         )
 
     def testRegistrationBindsNothingElse(self) -> None:
-        """
-        Avoid binding instances during registration.
+        """Avoid binding instances during registration.
 
         Validates that the translator is only built in the boot phase,
         once the configuration is available.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         LocalizationProvider(app).register()
@@ -206,40 +257,56 @@ class TestLocalizationProviderBoot(TestCase):
         provider_module.LangFacade = self._original_facade
 
     async def testBootResolvesTheManagerContract(self) -> None:
-        """
-        Resolve the manager contract exactly once.
+        """Resolve the manager contract exactly once.
 
         Validates that the provider depends on the contract instead of
         the concrete implementation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._app.resolved, [ILocalizationManager])
 
     async def testBootBindsTheSharedTranslatorInstance(self) -> None:
-        """
-        Bind the translator built by the manager.
+        """Bind the translator built by the manager.
 
         Validates that consumers resolving the translator contract
         receive the very instance owned by the manager.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._app.bound, [(ITranslator, self._translator)])
 
     async def testBootBuildsTheTranslatorOnlyOnce(self) -> None:
-        """
-        Ask the manager for the translator a single time.
+        """Ask the manager for the translator a single time.
 
         Validates that booting never duplicates the translation cache.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._manager.calls, 1)
 
     async def testBootPinsTheLanguageFacade(self) -> None:
-        """
-        Pin the language facade after wiring the translator.
+        """Pin the language facade after wiring the translator.
 
         Validates that template globals and controllers reach the
         translator without container resolution overhead.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._facade.pinned, 1)

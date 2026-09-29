@@ -63,6 +63,17 @@ class _StubApp:
         storage: Path,
         config: dict[str, object] | None = None,
     ) -> None:
+        """Store project paths and prepare the default test configuration.
+
+        Parameters
+        ----------
+        base_path : Path
+            Root directory for the generated test suite.
+        storage : Path
+            Directory returned by the application path lookup.
+        config : dict[str, object] | None, optional
+            Values that override the default test options.
+        """
         self.basePath: Path = base_path
         self._storage: Path = storage
         self._config: dict[str, object] = {
@@ -90,6 +101,15 @@ class _BareApp:
     __slots__ = ("_storage", "basePath")
 
     def __init__(self, base_path: Path, storage: Path) -> None:
+        """Store project paths for an app without testing configuration.
+
+        Parameters
+        ----------
+        base_path : Path
+            Root directory for the generated test suite.
+        storage : Path
+            Directory returned by the application path lookup.
+        """
         self.basePath: Path = base_path
         self._storage: Path = storage
 

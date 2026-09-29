@@ -11,7 +11,6 @@ from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.support.facades.schedule import Schedule as ScheduleFacade
 from orionis.test import TestCase
 
-
 class _StubApp:
     """Application double capturing every binding it receives."""
 
@@ -44,7 +43,6 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete))
 
-
 class _StubScheduleFacade:
     """Facade double counting how many times it was pinned."""
 
@@ -70,62 +68,84 @@ class _StubScheduleFacade:
         """
         self.pinned += 1
 
-
 class TestScheduleProviderDefinition(TestCase):
 
     def testInheritsTheServiceProviderBase(self) -> None:
-        """
-        Extend the base ServiceProvider class.
+        """Extend the base ServiceProvider class.
 
         Validates the provider class hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(ScheduleProvider, ServiceProvider))
 
     def testIsNotDeferred(self) -> None:
-        """
-        Stay out of the deferred provider mechanism.
+        """Stay out of the deferred provider mechanism.
 
         Validates that the schedule facade is pinned during the regular
         boot phase instead of on first resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(issubclass(ScheduleProvider, DeferrableProvider))
 
     def testIsRegisteredAsACoreProvider(self) -> None:
-        """
-        Ship with the core providers booted by the framework.
+        """Ship with the core providers booted by the framework.
 
         Validates that ISchedule is bound without the application having to
         register anything by hand.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(ScheduleProvider, CORE_PROVIDERS)
 
     def testStoresTheApplicationReference(self) -> None:
-        """
-        Keep the container passed to the constructor.
+        """Keep the container passed to the constructor.
 
         Validates the container the provider binds services into.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         self.assertIs(ScheduleProvider(app).app, app)  # type: ignore[arg-type]
 
     def testBootIsDeclaredAsynchronous(self) -> None:
-        """
-        Declare the boot phase as an asynchronous method.
+        """Declare the boot phase as an asynchronous method.
 
         Validates that boot can await the facade pinning.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(ScheduleProvider.boot))
-
 
 class TestScheduleProviderRegister(TestCase):
 
     def testBindsTheStoreBeforeTheScheduleContract(self) -> None:
-        """
-        Bind both contracts, the store first.
+        """Bind both contracts, the store first.
 
         Validates the order required by the container: Schedule declares
         IScheduleStore as a constructor dependency, and an interface can
         only be auto resolved once it owns an explicit binding.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
 
@@ -137,23 +157,30 @@ class TestScheduleProviderRegister(TestCase):
         )
 
     def testFacadeAccessorIsTheScheduleContract(self) -> None:
-        """
-        Resolve the schedule contract from the container.
+        """Resolve the schedule contract from the container.
 
         Validates that the facade reads the very contract the provider
         registers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(ScheduleFacade.getFacadeAccessor(), ISchedule)
-
 
 class TestScheduleProviderBoot(TestCase):
 
     def setUp(self) -> None:
-        """
-        Replace the Schedule facade with a double before each test.
+        """Replace the Schedule facade with a double before each test.
 
         Prevents the boot phase from pinning the real facade, which would
         require a fully booted application.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._original_facade = provider_module.ScheduleFacade
         self._facade = _StubScheduleFacade()
@@ -161,28 +188,40 @@ class TestScheduleProviderBoot(TestCase):
         self._app = _StubApp()
 
     def tearDown(self) -> None:
-        """
-        Restore the original Schedule facade after each test.
+        """Restore the original Schedule facade after each test.
 
         Guarantees that module level state never leaks between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         provider_module.ScheduleFacade = self._original_facade
 
     async def testBootPinsTheScheduleFacade(self) -> None:
-        """
-        Pin the Schedule facade once the services are registered.
+        """Pin the Schedule facade once the services are registered.
 
         Validates that facade access skips container resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await ScheduleProvider(self._app).boot()  # type: ignore[arg-type]
 
         self.assertEqual(self._facade.pinned, 1)
 
     async def testBootRegistersNoAdditionalBinding(self) -> None:
-        """
-        Keep the boot phase free of container registrations.
+        """Keep the boot phase free of container registrations.
 
         Validates the separation between register() and boot().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await ScheduleProvider(self._app).boot()  # type: ignore[arg-type]
 

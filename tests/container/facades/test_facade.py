@@ -14,7 +14,13 @@ class _DummyService:
     """Lightweight service used as a stand-in for facade tests."""
 
     def greet(self) -> str:
-        """Return a greeting string."""
+        """Return a greeting string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "hello"
 
 class _ConcreteFacade(Facade):
@@ -22,7 +28,13 @@ class _ConcreteFacade(Facade):
 
     @classmethod
     def getFacadeAccessor(cls) -> str:
-        """Return the service key for this facade."""
+        """Return the service key for this facade.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return _ACCESSOR
 
 class _NoAccessorFacade(Facade):
@@ -44,7 +56,22 @@ class _BootedApp:
         *_args: object,
         **_kwargs: object,
     ) -> _DummyService:
-        """Return a fresh _DummyService regardless of the requested key."""
+        """Return a fresh _DummyService regardless of the requested key.
+
+        Parameters
+        ----------
+        _key : object
+            Value supplied for ``_key``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        _DummyService
+            Value produced by the helper.
+        """
         return _DummyService()
 
 class _CapturingApp:
@@ -61,7 +88,22 @@ class _CapturingApp:
         *args: object,
         **kwargs: object,
     ) -> _DummyService:
-        """Record the forwarded arguments and return a fresh service."""
+        """Record the forwarded arguments and return a fresh service.
+
+        Parameters
+        ----------
+        key : object
+            Value supplied for ``key``.
+        *args : object
+            Arguments passed to the wrapped callable.
+        **kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        _DummyService
+            Value produced by the helper.
+        """
         _CapturingApp.captured_key = key
         _CapturingApp.captured_args = args
         _CapturingApp.captured_kwargs = kwargs
@@ -78,13 +120,25 @@ class _FacadeStateTestCase(TestCase):
     application_double: type | None = None
 
     def setUp(self) -> None:
-        """Install the declared application double before each test."""
+        """Install the declared application double before each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         double = self.application_double
         _ConcreteFacade._application = None if double is None else double()
         _ConcreteFacade._pinned_instance = None
 
     def tearDown(self) -> None:
-        """Clear the facade class state after each test."""
+        """Clear the facade class state after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         _ConcreteFacade._application = None
         _ConcreteFacade._pinned_instance = None
 

@@ -6,14 +6,36 @@ if TYPE_CHECKING:
     from orionis.mail import Mailable
     from orionis.mail.contracts.manager import IMailManager
 
-
 def configure(message: Message) -> Message:
-    """Provide a typed fluent callback accepted by all direct-send entry points."""
+    """Provide a typed fluent callback accepted by all direct-send entry points.
+
+    Parameters
+    ----------
+    message : Message
+        Value supplied for ``message``.
+
+    Returns
+    -------
+    Message
+        Value produced by the helper.
+    """
     return message.fromAddress("a@example.com").to("b@example.com").subject("Typed")
 
-
 async def check_public_types(mail: IMailManager, mailable: Mailable) -> None:
-    """Check positive consumer signatures without sending anything at import time."""
+    """Check positive consumer signatures without sending anything at import time.
+
+    Parameters
+    ----------
+    mail : IMailManager
+        Value supplied for ``mail``.
+    mailable : Mailable
+        Value supplied for ``mailable``.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
     pending = assert_type(Mail.to(Address("b@example.com")), PendingMail)
     assert_type(pending.fromAddress("a@example.com"), PendingMail)
     assert_type(mail.subject("Typed"), PendingMail)

@@ -5,7 +5,6 @@ from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.concerns.must_verify_email import MustVerifyEmail
 from orionis.test import TestCase
 
-
 class TestConcernsPackage(TestCase):
     """Validate the public surface of the concerns package."""
 
@@ -14,6 +13,11 @@ class TestConcernsPackage(TestCase):
 
         Validates the entry point applications import their identity
         mixins from.
+
+        Returns
+        -------
+        None
+            Asserts that every advertised name resolves to its public object.
         """
         self.assertIs(concerns.Authenticatable, Authenticatable)
         self.assertIs(concerns.Authorizable, Authorizable)
@@ -24,5 +28,10 @@ class TestConcernsPackage(TestCase):
         """Compare the export list against its sorted counterpart.
 
         Validates that the package keeps a deterministic order.
+
+        Returns
+        -------
+        None
+            Asserts that the exported names are sorted.
         """
         self.assertEqual(list(concerns.__all__), sorted(concerns.__all__))

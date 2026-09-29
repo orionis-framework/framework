@@ -19,11 +19,23 @@ class _ScopelessTestCase(TestCase):
     """
 
     def setUp(self) -> None:
-        """Detach the current context from any ambient scope."""
+        """Detach the current context from any ambient scope.
+
+        Returns
+        -------
+        None
+            Prepares isolated state for the test.
+        """
         self._scope_token = ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Restore the ambient scope of the runner."""
+        """Restore the ambient scope of the runner.
+
+        Returns
+        -------
+        None
+            Restores shared state and releases test resources.
+        """
         ScopedContext.reset(self._scope_token)
 
 class _Identity:
@@ -32,19 +44,48 @@ class _Identity:
     __slots__ = ("identifier",)
 
     def __init__(self, identifier: int) -> None:
-        """Store the identifier answered by the contract method."""
+        """Store the identifier answered by the contract method.
+
+        Parameters
+        ----------
+        identifier : int
+            Value supplied for ``identifier``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.identifier = identifier
 
     def getAuthIdentifierName(self) -> str:
-        """Return the attribute holding the identifier."""
+        """Return the attribute holding the identifier.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "identifier"
 
     def getAuthIdentifier(self) -> object:
-        """Return the identifier of this identity."""
+        """Return the identifier of this identity.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return self.identifier
 
     def getAuthPassword(self) -> str:
-        """Return an empty hash; credentials are irrelevant here."""
+        """Return an empty hash; credentials are irrelevant here.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return ""
 
 class _CountingRepository:
@@ -58,7 +99,22 @@ class _CountingRepository:
         roles: tuple[str, ...] = (),
         delay: float = 0.0,
     ) -> None:
-        """Configure the answer and the number of suspension points."""
+        """Configure the answer and the number of suspension points.
+
+        Parameters
+        ----------
+        permissions : tuple[str, ...]
+            Value supplied for ``permissions``.
+        roles : tuple[str, ...]
+            Value supplied for ``roles``.
+        delay : float
+            Value supplied for ``delay``.
+
+        Returns
+        -------
+        None
+            Initializes the test object.
+        """
         self.permissions = permissions
         self.roles = roles
         self.delay = delay
@@ -68,7 +124,18 @@ class _CountingRepository:
         self,
         authorizable: object,  # noqa: ARG002
     ) -> tuple[frozenset[str], frozenset[str]]:
-        """Return the configured authorization after an optional delay."""
+        """Return the configured authorization after an optional delay.
+
+        Parameters
+        ----------
+        authorizable : object
+            Value supplied for ``authorizable``.
+
+        Returns
+        -------
+        tuple[frozenset[str], frozenset[str]]
+            Value produced by the helper.
+        """
         self.calls += 1
         if self.delay:
             await asyncio.sleep(self.delay)
@@ -81,6 +148,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates the declared contract of the context.
 
         Consumers depend on the interface, never on the concrete class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(AuthenticationContext(), IAuthenticationContext)
 
@@ -88,6 +160,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates that the context stays dictionary free.
 
         One context is built per request, so it must stay small.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(AuthenticationContext(), "__dict__"))
 
@@ -95,6 +172,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates the anonymous state.
 
         Every accessor must answer consistently for a guest.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         context = AuthenticationContext()
         self.assertTrue(context.isGuest)
@@ -109,6 +191,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates the authenticated state.
 
         The guard name and the credential identifier travel with it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         context = AuthenticationContext(
             identity=_Identity(7),
@@ -127,6 +214,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates that guests never hit the database.
 
         Resolving permissions for nobody would be pure overhead.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         repository = _CountingRepository(permissions=("users.view",))
         context = AuthenticationContext(repository=repository)
@@ -140,6 +232,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates the per request caching of the authorization.
 
         Repeated ``can()`` calls must not repeat the queries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         repository = _CountingRepository(
             permissions=("users.view",), roles=("admin",),
@@ -160,6 +257,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates that the token restriction reaches the snapshot.
 
         Otherwise abilities would silently be ignored.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         repository = _CountingRepository(
             permissions=("users.view", "users.delete"),
@@ -181,6 +283,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
 
         Several coroutines of the same request may ask at once; only one
         of them may reach the database.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         repository = _CountingRepository(
             permissions=("users.view",), delay=0.01,
@@ -202,6 +309,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates the defensive path when no source is wired.
 
         The context must degrade to "no permissions" instead of failing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
 
@@ -213,6 +325,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
         """Validates that debugging output is safe to log.
 
         Only the guard and the identifier are exposed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         guest = AuthenticationContext()
         self.assertEqual(repr(guest), "AuthenticationContext(guest)")
@@ -232,6 +349,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         """Validates the answer outside an HTTP request.
 
         Console commands and background tasks are anonymous by default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(current_auth_context(), GUEST_CONTEXT)
 
@@ -239,6 +361,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         """Validates that a context cannot be bound out of a request.
 
         Storing it globally would leak between concurrent requests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         with self.assertRaises(AuthException):
@@ -248,6 +375,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         """Validates the normal binding path.
 
         Everything running inside the scope must observe the identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
 
@@ -261,6 +393,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         """Validates the state before the middleware runs.
 
         A scope without a bound context is not authenticated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with ScopeManager():
             self.assertIs(current_auth_context(), GUEST_CONTEXT)
@@ -270,10 +407,29 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
 
         Two tasks binding different identities must keep seeing their
         own one across every suspension point.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         observed: dict[str, list[object]] = {}
 
         async def handle(name: str, identifier: int) -> None:
+            """Handle a request in the isolated test scope.
+
+            Parameters
+            ----------
+            name : str
+                Value supplied for ``name``.
+            identifier : int
+                Value supplied for ``identifier``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager():
                 bind_auth_context(
                     AuthenticationContext(
@@ -292,10 +448,23 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         self.assertEqual(observed["b"], [2, 2, 2, 2, 2])
 
     async def testAnInheritedClosedScopeCannotAuthenticateAgain(self) -> None:
-        """Reject identity publication after the owning request has ended."""
+        """Reject identity publication after the owning request has ended.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         finished = asyncio.Event()
 
         async def authenticate_late() -> None:
+            """Attempt authentication after the scope closes.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             await finished.wait()
             self.assertIs(current_auth_context(), GUEST_CONTEXT)
             with self.assertRaises(AuthException):
@@ -310,10 +479,28 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         await pending
 
     async def testSessionFacadeIsIsolatedAcrossConcurrentRequests(self) -> None:
-        """Read and mutate only the session of the active request."""
+        """Read and mutate only the session of the active request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         barrier = asyncio.Barrier(2)
 
         async def handle(identifier: int) -> None:
+            """Handle a request in the isolated test scope.
+
+            Parameters
+            ----------
+            identifier : int
+                Value supplied for ``identifier``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             async with ScopeManager() as scope:
                 session = Session()
                 session.put("owner", identifier)
@@ -333,10 +520,28 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             SessionFacade.get("owner")
 
     async def testSessionFacadeCannotEscapeAnExceptionalRequest(self) -> None:
-        """Deny inherited session access once an exceptional scope has exited."""
+        """Deny inherited session access once an exceptional scope has exited.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        ValueError
+            Raised when the helper reaches this failure path.
+        """
         finished = asyncio.Event()
 
         async def read_late() -> None:
+            """Read the session facade after the scope closes.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             await finished.wait()
             with self.assertRaises(RuntimeError):
                 await SessionFacade.resolve()
@@ -352,7 +557,13 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         await pending
 
     async def testRetainedContextStopsAuthorizingAfterReplacementAndExit(self) -> None:
-        """Invalidate retained context references when the owner changes or exits."""
+        """Invalidate retained context references when the owner changes or exits.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         context = AuthenticationContext(
             identity=_Identity(1), guard="session",
             repository=_CountingRepository(permissions=("users.view",)),
@@ -366,7 +577,13 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         self.assertIsNone(context.identity)
 
     async def testContextCannotBeReusedAcrossRequests(self) -> None:
-        """Reject binding the same identity context to a different scope."""
+        """Reject binding the same identity context to a different scope.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         async with ScopeManager():
             bind_auth_context(context)
@@ -375,7 +592,13 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
                 bind_auth_context(context)
 
     async def testContextReferenceDoesNotAuthorizeAnotherActiveScope(self) -> None:
-        """Deny a reference used from a different request even while its owner lives."""
+        """Deny a reference used from a different request even while its owner lives.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         async with ScopeManager():
             bind_auth_context(context)

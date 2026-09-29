@@ -103,7 +103,7 @@ class MakeProvider(BaseCommand):
             stub = stub.replace("{{class_name}}", class_name)
 
             # Resolve the target directory and normalise the file name
-            providers_dir: Path = app.path("providers")
+            providers_dir: Path = app.path("app_providers")
 
             if not name.lower().endswith("provider"):
                 name = name.rstrip("_") + "_provider"

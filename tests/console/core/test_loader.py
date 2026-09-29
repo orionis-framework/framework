@@ -54,10 +54,14 @@ class MockCommand(BaseCommand):
 class TestLoader(TestCase):
 
     def setUp(self) -> None:
-        """
-        Set up test fixtures.
+        """Set up test fixtures.
 
         Creates a Loader instance and mock objects needed for testing.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         # FileBasedCache creates this directory on disk, so it must point at a
         # writable temporary location instead of the filesystem root.
@@ -74,33 +78,45 @@ class TestLoader(TestCase):
         self.mock_app.compiledInvalidationPathsFiles = []
 
     def testInheritsFromILoader(self) -> None:
-        """
-        Verify that Loader inherits from ILoader.
+        """Verify that Loader inherits from ILoader.
 
         Ensures that the implementation properly implements the
         abstract interface and follows the inheritance hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         self.assertTrue(issubclass(Loader, ILoader))
         self.assertIsInstance(loader, ILoader)
 
     def testCanBeInstantiated(self) -> None:
-        """
-        Verify that Loader can be instantiated.
+        """Verify that Loader can be instantiated.
 
         Tests that the loader implementation can be created
         without raising any exceptions, unlike the abstract interface.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         self.assertIsInstance(loader, Loader)
         self.assertIsInstance(loader, ILoader)
 
     def testInitialization(self) -> None:
-        """
-        Verify that Loader initializes correctly.
+        """Verify that Loader initializes correctly.
 
         Tests that internal state is properly set up during
         construction with proper default values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         self.assertTrue(hasattr(loader, "_Loader__fluent_commands"))
@@ -112,20 +128,28 @@ class TestLoader(TestCase):
         self.assertTrue(hasattr(loader, "_Loader__persistence"))
 
     def testInitializationWithCache(self) -> None:
-        """
-        Verify that Loader initializes correctly with cache enabled.
+        """Verify that Loader initializes correctly with cache enabled.
 
         Tests that cache is properly set up when app.compiled is True.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.mock_app.compiled = True
         loader = Loader(self.mock_app)
         self.assertTrue(loader._Loader__use_cache)
 
     def testInitializationWithoutCache(self) -> None:
-        """
-        Verify that Loader initializes correctly without cache.
+        """Verify that Loader initializes correctly without cache.
 
         Tests that cache is disabled when app.compiled is False.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.mock_app.compiled = False
         loader = Loader(self.mock_app)
@@ -135,11 +159,15 @@ class TestLoader(TestCase):
         self.assertIsNone(loader._Loader__persistence)
 
     def testHasAllRequiredMethods(self) -> None:
-        """
-        Verify that Loader implements all required methods.
+        """Verify that Loader implements all required methods.
 
         Checks that all abstract methods from ILoader are implemented
         in the Loader class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
 
@@ -149,11 +177,15 @@ class TestLoader(TestCase):
         self.assertTrue(hasattr(loader, "addFluentCommand"))
 
     def testAllMethodsAreCallable(self) -> None:
-        """
-        Verify that all implemented methods are callable.
+        """Verify that all implemented methods are callable.
 
         Ensures that the Loader properly implements all methods
         as callable functions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         self.assertTrue(callable(loader.get))
@@ -161,11 +193,15 @@ class TestLoader(TestCase):
         self.assertTrue(callable(loader.addFluentCommand))
 
     def testAsyncMethods(self) -> None:
-        """
-        Verify that async methods are correctly implemented.
+        """Verify that async methods are correctly implemented.
 
         Checks that get and all methods are coroutine functions,
         matching the interface requirements.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         self.assertTrue(inspect.iscoroutinefunction(loader.get))
@@ -173,22 +209,30 @@ class TestLoader(TestCase):
         self.assertFalse(inspect.iscoroutinefunction(loader.addFluentCommand))
 
     async def testGetMethodReturnsNoneForNonExistentCommand(self) -> None:
-        """
-        Verify that get method returns None for non-existent commands.
+        """Verify that get method returns None for non-existent commands.
 
         Tests that the get method properly handles requests for
         commands that don't exist.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         result = await loader.get("nonexistent:command")
         self.assertIsNone(result)
 
     async def testAllMethodReturnsDict(self) -> None:
-        """
-        Verify that all method returns a dictionary.
+        """Verify that all method returns a dictionary.
 
         Tests that the all method returns the proper data structure
         for containing command mappings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         with patch.object(loader, "_Loader__loadMetadata", new_callable=AsyncMock):
@@ -196,11 +240,15 @@ class TestLoader(TestCase):
             self.assertIsInstance(result, dict)
 
     def testAddFluentCommandValidInput(self) -> None:
-        """
-        Verify that addFluentCommand works with valid input.
+        """Verify that addFluentCommand works with valid input.
 
         Tests that fluent commands can be properly added with
         valid signature and handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
 
@@ -211,11 +259,15 @@ class TestLoader(TestCase):
         self.assertIsNotNone(result)
 
     def testAddFluentCommandInvalidHandlerEmpty(self) -> None:
-        """
-        Verify that addFluentCommand raises error with empty handler.
+        """Verify that addFluentCommand raises error with empty handler.
 
         Tests that proper validation is performed on handler input
         and empty handlers are rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         with self.assertRaises(ValueError) as context:
@@ -224,20 +276,28 @@ class TestLoader(TestCase):
         self.assertIn("Handler must be a list with at least one element", error_message)
 
     def testAddFluentCommandInvalidHandlerNotList(self) -> None:
-        """
-        Verify that addFluentCommand raises error with non-list handler.
+        """Verify that addFluentCommand raises error with non-list handler.
 
         Tests that handler validation properly rejects non-list inputs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         with self.assertRaises(ValueError):
             loader.addFluentCommand("test:command", "not_a_list")
 
     def testAddFluentCommandInvalidHandlerNotCallable(self) -> None:
-        """
-        Verify that addFluentCommand raises error with non-callable handler.
+        """Verify that addFluentCommand raises error with non-callable handler.
 
         Tests that the first element of handler must be a callable class.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
 
@@ -248,10 +308,14 @@ class TestLoader(TestCase):
         self.assertIn("The first element of handler must be a class", error_message)
 
     def testGetSignatureValidation(self) -> None:
-        """
-        Verify that signature validation works correctly.
+        """Verify that signature validation works correctly.
 
         Tests the private __getSignature method with valid and invalid inputs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = Loader(self.mock_app)
         signature = loader._Loader__getSignature(MockCommand)
@@ -275,6 +339,13 @@ class TestLoader(TestCase):
             timestamps = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         with self.assertRaises(ValueError) as context:
@@ -301,6 +372,13 @@ class TestLoader(TestCase):
             timestamps = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         with self.assertRaises(TypeError) as context:
@@ -328,6 +406,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify that empty signature raises ValueError
@@ -357,6 +442,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify that invalid pattern raises ValueError
@@ -386,6 +478,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify default description is returned for missing attribute
@@ -413,6 +512,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify TypeError is raised for non-string description
@@ -441,6 +547,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify that empty description raises ValueError
@@ -468,6 +581,13 @@ class TestLoader(TestCase):
             description: str = "Test command"
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify default timestamps value is returned
@@ -494,6 +614,13 @@ class TestLoader(TestCase):
             timestamps: str = "not_boolean"  # Invalid type
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify TypeError is raised for non-boolean timestamps
@@ -522,6 +649,13 @@ class TestLoader(TestCase):
             timestamps: bool = False
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify empty list is returned for missing arguments
@@ -558,6 +692,13 @@ class TestLoader(TestCase):
             arguments: ClassVar[list[Argument]] = [arg]
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Retrieve and validate arguments list
@@ -587,6 +728,13 @@ class TestLoader(TestCase):
             arguments: str = "not_a_list"  # Invalid type
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify TypeError is raised for non-list arguments
@@ -617,6 +765,13 @@ class TestLoader(TestCase):
             arguments: ClassVar[list[str]] = ["not_an_argument"]
 
             def handle(self) -> str:
+                """Return a completed command result.
+
+                Returns
+                -------
+                str
+                    Value produced by the helper.
+                """
                 return "handled"
 
         # Verify TypeError is raised for non-Argument elements

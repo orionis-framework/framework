@@ -51,7 +51,10 @@ class SessionManager:
         "_cookie_same_site",
         "_cookie_secure",
         "_lifetime_delta",
+        "_renewal_delta",
+        "_renewal_window",
         "_store",
+        "_track_previous_url",
     )
 
     def __init__(
@@ -85,6 +88,15 @@ class SessionManager:
             cache=cache,
         )
         self._lifetime_delta: timedelta = timedelta(minutes=config.lifetime)
+        self._renewal_delta = (
+            timedelta(seconds=config.renewal_interval)
+            if config.renewal_interval else None
+        )
+        self._renewal_window = (
+            self._lifetime_delta - self._renewal_delta
+            if self._renewal_delta is not None else None
+        )
+        self._track_previous_url = config.track_previous_url
         self._cookie_name: str = config.cookie
         self._cookie_path: str = config.path
         self._cookie_domain: str | None = config.domain
@@ -99,6 +111,18 @@ class SessionManager:
         self._cookie_partitioned: bool = config.partitioned
 
     # ── Public API ──────────────────────────────────────────────────────────────
+
+    @property
+    def tracksPreviousUrl(self) -> bool:
+        """
+        Return whether session middleware remembers successful navigation URLs.
+
+        Returns
+        -------
+        bool
+            Whether previous-page tracking is enabled for this manager.
+        """
+        return self._track_previous_url
 
     async def start(self, request: Request) -> Session:
         """
@@ -133,7 +157,10 @@ class SessionManager:
         """
         Persist the session and set the cookie on *response*.
 
-        No-op when the session was never activated.
+        No-op when the session was never activated. With a renewal interval,
+        unchanged scalar payloads retain their existing store and cookie expiry
+        until the deadline; mutable payloads are always persisted. Browser
+        session cookies still omit Max-Age when expire_on_close is enabled.
 
         Parameters
         ----------
@@ -151,6 +178,12 @@ class SessionManager:
             return
 
         if not session.started:
+            return
+
+        if (
+            self._renewal_delta is not None
+            and not session._needsPersistence(datetime.now(UTC))  # noqa: SLF001
+        ):
             return
 
         if session.wantsRegenerate and not await self.__rotateId(session):
@@ -261,7 +294,12 @@ class SessionManager:
             or record.expires_at <= datetime.now(UTC)
         ):
             return Session()
-        return Session(id=record.id, data=record.data, started=True, is_new=False)
+        session = Session(id=record.id, data=record.data, started=True, is_new=False)
+        if self._renewal_window is not None:
+            session._setRenewalDeadline(  # noqa: SLF001
+                record.expires_at - self._renewal_window,
+            )
+        return session
 
     async def __persist(self, session: Session) -> bool:
         """
@@ -277,10 +315,11 @@ class SessionManager:
         bool
             False if a restored session has already been revoked or expired.
         """
+        now = datetime.now(UTC)
         record = SessionRecord(
             id=session.id,  # type: ignore[arg-type]
             data=session.all(),
-            expires_at=datetime.now(UTC) + self._lifetime_delta,
+            expires_at=now + self._lifetime_delta,
         )
         if session.isNew:
             await self._store.write(record)
@@ -288,6 +327,8 @@ class SessionManager:
             session.invalidate()
             return False
         session._markClean()  # noqa: SLF001
+        if self._renewal_delta is not None:
+            session._setRenewalDeadline(now + self._renewal_delta)  # noqa: SLF001
         return True
 
     async def __rotateId(self, session: Session) -> bool:

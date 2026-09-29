@@ -222,10 +222,14 @@ def _upload(
 class TestImageProbe(TestCase):
 
     def testEverySupportedFormatIsIdentified(self) -> None:
-        """
-        Read the format and dimensions of every supported raster header.
+        """Read the format and dimensions of every supported raster header.
 
         Validates the PNG, JPEG, GIF, BMP and WebP probes at once.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cases = (
             ("png", _png(60, 40)),
@@ -248,56 +252,80 @@ class TestImageProbe(TestCase):
             self.assertEqual(probed[1:], expected[name])
 
     def testWebpVariantsAreIdentified(self) -> None:
-        """
-        Read the dimensions of the three WebP bitstream variants.
+        """Read the dimensions of the three WebP bitstream variants.
 
         Validates the lossy, lossless and extended layouts.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(probe_image(_webp_lossy(320, 240)), ("webp", 320, 240))
         self.assertEqual(probe_image(_webp_lossless(320, 240)), ("webp", 320, 240))
         self.assertEqual(probe_image(_webp_extended(320, 240)), ("webp", 320, 240))
 
     def testUnknownContentReturnsNone(self) -> None:
-        """
-        Return None when the content matches no supported signature.
+        """Return None when the content matches no supported signature.
 
         Validates that plain text and truncated headers are rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(probe_image(b"just plain text"))
         self.assertIsNone(probe_image(b""))
         self.assertIsNone(probe_image(b"\x89PNG\r\n\x1a\n"))
 
     def testUnknownWebpChunkReturnsNone(self) -> None:
-        """
-        Return None when the WebP chunk identifier is not supported.
+        """Return None when the WebP chunk identifier is not supported.
 
         Validates that an unexpected bitstream is not misread.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(probe_image(_webp(b"XXXX" + b"\x00" * 14)))
 
 class TestFile(TestCase):
 
     def testUploadedFilePasses(self) -> None:
-        """
-        Return True when the value is a non-empty uploaded file.
+        """Return True when the value is a non-empty uploaded file.
 
         Validates the ordinary success path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(File().enforce("doc", _upload(b"content"), _OWNER))
 
     def testEmptyUploadFails(self) -> None:
-        """
-        Return False when the upload carries no content.
+        """Return False when the upload carries no content.
 
         Validates that an interrupted transfer is rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(File().enforce("doc", _upload(b""), _OWNER))
 
     def testForeignValuesFail(self) -> None:
-        """
-        Return False when the value does not implement the upload protocol.
+        """Return False when the value does not implement the upload protocol.
 
         Validates that plain data is never mistaken for a file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = File()
         for value in ("text", b"bytes", None, 1, object()):
@@ -306,49 +334,69 @@ class TestFile(TestCase):
 class TestMimeTypes(TestCase):
 
     def testExactTypeMatches(self) -> None:
-        """
-        Return True when the declared type is listed verbatim.
+        """Return True when the declared type is listed verbatim.
 
         Validates the exact matching path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = MimeTypes("text/plain", "application/pdf")
         upload = _upload(b"a", "a.txt", "text/plain")
         self.assertTrue(rule.enforce("doc", upload, _OWNER))
 
     def testWildcardSubtypeMatches(self) -> None:
-        """
-        Return True when a wildcard covers the declared subtype.
+        """Return True when a wildcard covers the declared subtype.
 
         Validates that ``image/*`` accepts any image subtype.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = MimeTypes("image/*")
         self.assertTrue(rule.enforce("photo", _upload(b"a"), _OWNER))
 
     def testParametersAreIgnoredOnBothSides(self) -> None:
-        """
-        Compare MIME types after dropping any trailing parameter.
+        """Compare MIME types after dropping any trailing parameter.
 
         Validates that charset parameters never break the comparison.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = MimeTypes("text/plain; charset=utf-8")
         upload = _upload(b"a", "a.txt", "text/plain; charset=iso-8859-1")
         self.assertTrue(rule.enforce("doc", upload, _OWNER))
 
     def testUnlistedTypeFails(self) -> None:
-        """
-        Return False when the declared type is not accepted.
+        """Return False when the declared type is not accepted.
 
         Validates that unrelated types and wildcards are rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = MimeTypes("image/*")
         upload = _upload(b"a", "a.txt", "text/plain")
         self.assertFalse(rule.enforce("doc", upload, _OWNER))
 
     def testMissingContentTypeFails(self) -> None:
-        """
-        Return False when the upload declares no MIME type.
+        """Return False when the upload declares no MIME type.
 
         Validates that an absent header is never accepted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = MimeTypes("text/plain")
         upload = UploadedFile("a.txt", None)
@@ -356,18 +404,26 @@ class TestMimeTypes(TestCase):
         self.assertFalse(rule.enforce("doc", upload, _OWNER))
 
     def testForeignValueFails(self) -> None:
-        """
-        Return False when the value is not an uploaded file.
+        """Return False when the value is not an uploaded file.
 
         Validates that plain data is never mistaken for a file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(MimeTypes("text/plain").enforce("doc", "text", _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
-        """
-        Raise ValueError when no MIME type is supplied.
+        """Raise ValueError when no MIME type is supplied.
 
         Validates that the rule refuses a configuration with no effect.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             MimeTypes()
@@ -375,20 +431,28 @@ class TestMimeTypes(TestCase):
 class TestSize(TestCase):
 
     def testFileSizeIsComparedInKilobytes(self) -> None:
-        """
-        Return True when the upload weighs exactly the required kilobytes.
+        """Return True when the upload weighs exactly the required kilobytes.
 
         Validates the file size semantics.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Size(1)
         self.assertTrue(rule.enforce("doc", _upload(b"x" * 1024), _OWNER))
         self.assertFalse(rule.enforce("doc", _upload(b"x" * 2048), _OWNER))
 
     def testStringAndNumberSemantics(self) -> None:
-        """
-        Compare strings by length and numbers by magnitude.
+        """Compare strings by length and numbers by magnitude.
 
         Validates that the rule stays generic across value types.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Size(3)
         self.assertTrue(rule.enforce("tag", "abc", _OWNER))
@@ -397,18 +461,26 @@ class TestSize(TestCase):
         self.assertFalse(rule.enforce("tag", "ab", _OWNER))
 
     def testUnmeasurableValuePasses(self) -> None:
-        """
-        Return True when the value carries no comparable size.
+        """Return True when the value carries no comparable size.
 
         Validates that type reporting is delegated to the type layer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(Size(3).enforce("tag", None, _OWNER))
 
     def testNegativeSizeRaises(self) -> None:
-        """
-        Raise ValueError when the required size is negative.
+        """Raise ValueError when the required size is negative.
 
         Validates the configuration check performed at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Size(-1)
@@ -416,49 +488,69 @@ class TestSize(TestCase):
 class TestImage(TestCase):
 
     def testEverySupportedFormatPasses(self) -> None:
-        """
-        Return True for uploads holding any supported raster format.
+        """Return True for uploads holding any supported raster format.
 
         Validates that detection relies on the header, not the extension.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Image()
         for blob in (_png(2, 2), _jpeg(2, 2), _gif(2, 2), _bmp(2, 2)):
             self.assertTrue(rule.enforce("photo", _upload(blob), _OWNER))
 
     def testMislabelledUploadFails(self) -> None:
-        """
-        Return False when the content is not a raster image.
+        """Return False when the content is not a raster image.
 
         Validates that a matching name and MIME type do not fool the rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload(b"plain text", "photo.png", "image/png")
         self.assertFalse(Image().enforce("photo", upload, _OWNER))
 
     def testForeignValueFails(self) -> None:
-        """
-        Return False when the value is not an uploaded file.
+        """Return False when the value is not an uploaded file.
 
         Validates that plain data is never mistaken for a file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(Image().enforce("photo", "text", _OWNER))
 
 class TestDimensions(TestCase):
 
     def testExactDimensionsPass(self) -> None:
-        """
-        Return True when width and height match the required values.
+        """Return True when width and height match the required values.
 
         Validates the exact-size configuration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Dimensions(width=60, height=40)
         self.assertTrue(rule.enforce("photo", _upload(_png(60, 40)), _OWNER))
         self.assertFalse(rule.enforce("photo", _upload(_png(61, 40)), _OWNER))
 
     def testBoundsAreInclusive(self) -> None:
-        """
-        Return True when the dimensions sit on the configured bounds.
+        """Return True when the dimensions sit on the configured bounds.
 
         Validates the minimum and maximum width and height checks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Dimensions(min_width=60, max_width=80, min_height=40, max_height=60)
         self.assertTrue(rule.enforce("photo", _upload(_png(60, 40)), _OWNER))
@@ -467,30 +559,42 @@ class TestDimensions(TestCase):
         self.assertFalse(rule.enforce("photo", _upload(_png(60, 61)), _OWNER))
 
     def testFractionRatioIsParsed(self) -> None:
-        """
-        Return True when the aspect ratio matches the given fraction.
+        """Return True when the aspect ratio matches the given fraction.
 
         Validates the ``"width/height"`` textual form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Dimensions(ratio="3/2")
         self.assertTrue(rule.enforce("photo", _upload(_png(60, 40)), _OWNER))
         self.assertFalse(rule.enforce("photo", _upload(_png(60, 60)), _OWNER))
 
     def testNumericRatioIsAccepted(self) -> None:
-        """
-        Return True when the aspect ratio matches the given number.
+        """Return True when the aspect ratio matches the given number.
 
         Validates that floats and numeric strings are supported.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload(_png(60, 40))
         self.assertTrue(Dimensions(ratio=1.5).enforce("p", upload, _OWNER))
         self.assertTrue(Dimensions(ratio="1.5").enforce("p", upload, _OWNER))
 
     def testRatioBoundsAreApplied(self) -> None:
-        """
-        Return True when the aspect ratio sits inside the ratio bounds.
+        """Return True when the aspect ratio sits inside the ratio bounds.
 
         Validates the minimum and maximum ratio checks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload(_png(60, 40))
         bounded = Dimensions(min_ratio=1.0, max_ratio=2.0)
@@ -499,21 +603,29 @@ class TestDimensions(TestCase):
         self.assertFalse(Dimensions(max_ratio=1.0).enforce("p", upload, _OWNER))
 
     def testNonImageValueFails(self) -> None:
-        """
-        Return False when the value is not a readable raster image.
+        """Return False when the value is not a readable raster image.
 
         Validates that plain data and foreign values are rejected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rule = Dimensions(width=60)
         self.assertFalse(rule.enforce("photo", _upload(b"plain"), _OWNER))
         self.assertFalse(rule.enforce("photo", "text", _OWNER))
 
     def testInvalidRatioRaises(self) -> None:
-        """
-        Raise ValueError when a ratio constraint cannot be parsed.
+        """Raise ValueError when a ratio constraint cannot be parsed.
 
         Validates that free text, zero denominators and foreign types are
         rejected at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Dimensions(ratio="abc")
@@ -525,61 +637,89 @@ class TestDimensions(TestCase):
 class TestEncoding(TestCase):
 
     def testEncodableStringPasses(self) -> None:
-        """
-        Return True when the string can be encoded with the codec.
+        """Return True when the string can be encoded with the codec.
 
         Validates the textual success path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(Encoding("ascii").enforce("tag", "plain", _OWNER))
 
     def testUnencodableStringFails(self) -> None:
-        """
-        Return False when the string cannot be encoded with the codec.
+        """Return False when the string cannot be encoded with the codec.
 
         Validates that accented text is rejected under ASCII.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(Encoding("ascii").enforce("tag", "ñandú", _OWNER))
 
     def testDecodableUploadPasses(self) -> None:
-        """
-        Return True when the upload content decodes with the codec.
+        """Return True when the upload content decodes with the codec.
 
         Validates the file success path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload(b"plain", "a.txt", "text/plain")
         self.assertTrue(Encoding("ascii").enforce("doc", upload, _OWNER))
 
     def testUndecodableUploadFails(self) -> None:
-        """
-        Return False when the upload content does not decode.
+        """Return False when the upload content does not decode.
 
         Validates that binary content is rejected under ASCII.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload("ñandú".encode(), "a.txt", "text/plain")
         self.assertFalse(Encoding("ascii").enforce("doc", upload, _OWNER))
 
     def testDefaultCodecIsUtf8(self) -> None:
-        """
-        Accept UTF-8 content under the default configuration.
+        """Accept UTF-8 content under the default configuration.
 
         Validates that the codec defaults to ``utf-8``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         upload = _upload("ñandú".encode(), "a.txt", "text/plain")
         self.assertTrue(Encoding().enforce("doc", upload, _OWNER))
 
     def testForeignValuePasses(self) -> None:
-        """
-        Return True when the value is neither a string nor a file.
+        """Return True when the value is neither a string nor a file.
 
         Validates that type reporting is delegated to the type layer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(Encoding("ascii").enforce("tag", 123, _OWNER))
 
     def testUnknownCodecRaises(self) -> None:
-        """
-        Raise ValueError when the configured codec does not exist.
+        """Raise ValueError when the configured codec does not exist.
 
         Validates the configuration check performed at construction time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             Encoding("not-a-codec")

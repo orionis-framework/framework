@@ -12,30 +12,42 @@ class TestDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testInheritsFromIDumper(self) -> None:
-        """
-        Verify that Dumper inherits from IDumper.
+        """Verify that Dumper inherits from IDumper.
 
         Ensures the implementation follows the expected class hierarchy
         and satisfies the abstract interface contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(Dumper, IDumper))
 
     def testDumperIsNotAbstract(self) -> None:
-        """
-        Verify that Dumper can be instantiated without errors.
+        """Verify that Dumper can be instantiated without errors.
 
         Ensures that all abstract methods from IDumper have been
         implemented, allowing direct instantiation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = Dumper()
         self.assertIsInstance(instance, Dumper)
 
     def testDdAndDumpAreStaticMethods(self) -> None:
-        """
-        Verify that dd and dump are defined as static methods.
+        """Verify that dd and dump are defined as static methods.
 
         Ensures they can be called directly on the class without
         requiring an instance, matching the interface contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(
             inspect.getattr_static(Dumper, "dd"),
@@ -47,11 +59,15 @@ class TestDumper(TestCase):
         )
 
     def testDdAndDumpAreNotCoroutines(self) -> None:
-        """
-        Verify that dd and dump are synchronous functions.
+        """Verify that dd and dump are synchronous functions.
 
         Ensures neither static method is a coroutine function,
         since variable dumping is a synchronous operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(inspect.iscoroutinefunction(Dumper.dd))
         self.assertFalse(inspect.iscoroutinefunction(Dumper.dump))
@@ -61,11 +77,15 @@ class TestDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testDumpDoesNotRaiseForSimpleValue(self) -> None:
-        """
-        Verify that dump() does not raise for a simple scalar value.
+        """Verify that dump() does not raise for a simple scalar value.
 
         Ensures that dumping a plain integer completes without error
         and does not terminate the process.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -84,11 +104,15 @@ class TestDumper(TestCase):
             mock_vd.print.assert_called_once_with(insert_line=False)
 
     def testDumpPassesShowTypesFlag(self) -> None:
-        """
-        Verify that dump() forwards show_types to VarDumper.showTypes().
+        """Verify that dump() forwards show_types to VarDumper.showTypes().
 
         Ensures the boolean flag is passed unchanged to the underlying
         VarDumper fluent builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -107,10 +131,14 @@ class TestDumper(TestCase):
             mock_vd.showTypes.assert_called_once_with(show=True)
 
     def testDumpPassesShowIndexFlag(self) -> None:
-        """
-        Verify that dump() forwards show_index to VarDumper.showIndex().
+        """Verify that dump() forwards show_index to VarDumper.showIndex().
 
         Ensures the flag value is passed without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -129,10 +157,14 @@ class TestDumper(TestCase):
             mock_vd.showIndex.assert_called_once_with(show=True)
 
     def testDumpPassesExpandAllFlag(self) -> None:
-        """
-        Verify that dump() forwards expand_all to VarDumper.expandAll().
+        """Verify that dump() forwards expand_all to VarDumper.expandAll().
 
         Ensures the flag controls whether nested structures are expanded.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -151,10 +183,14 @@ class TestDumper(TestCase):
             mock_vd.expandAll.assert_called_once_with(expand=False)
 
     def testDumpPassesMaxDepth(self) -> None:
-        """
-        Verify that dump() forwards max_depth to VarDumper.maxDepth().
+        """Verify that dump() forwards max_depth to VarDumper.maxDepth().
 
         Ensures the integer depth limit is passed to the builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -173,11 +209,15 @@ class TestDumper(TestCase):
             mock_vd.maxDepth.assert_called_once_with(3)
 
     def testDumpPassesModulePathAndLineNumber(self) -> None:
-        """
-        Verify that dump() forwards module_path and line_number to VarDumper.
+        """Verify that dump() forwards module_path and line_number to VarDumper.
 
         Ensures custom caller information is propagated to the builder
         instead of being auto-resolved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -197,11 +237,15 @@ class TestDumper(TestCase):
             mock_vd.lineNumber.assert_called_once_with(99)
 
     def testDumpPassesInsertLineFlag(self) -> None:
-        """
-        Verify that dump() forwards insert_line to VarDumper.print().
+        """Verify that dump() forwards insert_line to VarDumper.print().
 
         Ensures the flag that controls blank-line insertion is passed
         through to the final print call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -220,11 +264,15 @@ class TestDumper(TestCase):
             mock_vd.print.assert_called_once_with(insert_line=True)
 
     def testDumpSetsForceExitFalse(self) -> None:
-        """
-        Verify that dump() calls forceExit(force=False) on VarDumper.
+        """Verify that dump() calls forceExit(force=False) on VarDumper.
 
         Ensures that dump never terminates execution, distinguishing it
         from the dd variant.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -243,10 +291,14 @@ class TestDumper(TestCase):
             mock_vd.forceExit.assert_called_once_with(force=False)
 
     def testDumpPassesMultipleArgs(self) -> None:
-        """
-        Verify that dump() forwards all positional arguments to VarDumper.values().
+        """Verify that dump() forwards all positional arguments to VarDumper.values().
 
         Ensures the variadic *args are passed as a tuple to the values() call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -269,11 +321,15 @@ class TestDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testDdSetsForceExitTrue(self) -> None:
-        """
-        Verify that dd() calls forceExit(force=True) on VarDumper.
+        """Verify that dd() calls forceExit(force=True) on VarDumper.
 
         Ensures that dd is configured to terminate execution after
         dumping, distinguishing it from dump.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -292,11 +348,15 @@ class TestDumper(TestCase):
             mock_vd.forceExit.assert_called_once_with(force=True)
 
     def testDdPassesAllConfigurationFlags(self) -> None:
-        """
-        Verify that dd() forwards all keyword flags to VarDumper.
+        """Verify that dd() forwards all keyword flags to VarDumper.
 
         Ensures that each configuration option is passed correctly
         through the fluent builder when calling dd.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -333,10 +393,14 @@ class TestDumper(TestCase):
             mock_vd.print.assert_called_once_with(insert_line=True)
 
     def testDdPassesMultipleArgs(self) -> None:
-        """
-        Verify that dd() forwards all positional arguments to VarDumper.values().
+        """Verify that dd() forwards all positional arguments to VarDumper.values().
 
         Ensures the variadic *args are transmitted without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -359,11 +423,15 @@ class TestDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testDumpWithNoArgs(self) -> None:
-        """
-        Verify that dump() handles being called with no positional arguments.
+        """Verify that dump() handles being called with no positional arguments.
 
         Ensures VarDumper.values() is called with an empty argument list
         without raising any exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -382,11 +450,15 @@ class TestDumper(TestCase):
             mock_vd.values.assert_called_once_with()
 
     def testDdWithNoArgs(self) -> None:
-        """
-        Verify that dd() handles being called with no positional arguments.
+        """Verify that dd() handles being called with no positional arguments.
 
         Ensures VarDumper.values() is called with an empty argument list
         and forceExit is still set to True.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -406,11 +478,15 @@ class TestDumper(TestCase):
             mock_vd.forceExit.assert_called_once_with(force=True)
 
     def testDumpWithNoneMaxDepth(self) -> None:
-        """
-        Verify that dump() correctly passes max_depth=None to VarDumper.
+        """Verify that dump() correctly passes max_depth=None to VarDumper.
 
         Ensures the None value for unlimited depth is transmitted
         without being converted or replaced.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -429,11 +505,15 @@ class TestDumper(TestCase):
             mock_vd.maxDepth.assert_called_once_with(None)
 
     def testDumpWithComplexNestedValue(self) -> None:
-        """
-        Verify that dump() handles a complex nested data structure without raising.
+        """Verify that dump() handles a complex nested data structure without raising.
 
         Ensures that deeply nested dicts and lists are forwarded to
         VarDumper.values() without modification or error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -454,11 +534,15 @@ class TestDumper(TestCase):
             mock_vd.values.assert_called_once_with(nested)
 
     def testDumpDefaultsMatchInterface(self) -> None:
-        """
-        Verify that Dumper.dump uses the same defaults as defined in IDumper.
+        """Verify that Dumper.dump uses the same defaults as defined in IDumper.
 
         Ensures that calling dump with no keyword arguments invokes VarDumper
         with the exact default values specified in the interface.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd
@@ -485,11 +569,15 @@ class TestDumper(TestCase):
             mock_vd.print.assert_called_once_with(insert_line=False)
 
     def testDdDefaultsMatchInterface(self) -> None:
-        """
-        Verify that Dumper.dd uses the same defaults as defined in IDumper.
+        """Verify that Dumper.dd uses the same defaults as defined in IDumper.
 
         Ensures that calling dd with no keyword arguments invokes VarDumper
         with the exact default values, except forceExit which must be True.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_vd = MagicMock()
         mock_vd.showTypes.return_value = mock_vd

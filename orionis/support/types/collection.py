@@ -105,20 +105,14 @@ class Collection(ICollection):
         object
             The first item in the filtered collection, or None if empty.
         """
-        # Initialize filtered collection
-        filtered = self
+        if callback is None:
+            return self._items[0] if self._items else None
 
-        # Filter the collection using the provided callback
-        if callback:
-            filtered = self.filter(callback)
-        response = None
-
-        # Return the first item if the collection is not empty
-        if filtered:
-            response = filtered[0]
-
-        # Return None if collection is empty
-        return response
+        self.__checkIsCallable(callback)
+        for item in self._items:
+            if callback(item):
+                return item
+        return None
 
     def last(
         self,
@@ -137,17 +131,15 @@ class Collection(ICollection):
         object
             The last item in the filtered collection, or None if empty.
         """
-        # Filter the collection using the provided callback
-        filtered = self
-        if callback:
-            filtered = self.filter(callback)
+        if callback is None:
+            return self._items[-1] if self._items else None
 
-        # Return None if collection is empty
-        if not filtered:
-            return None
-
-        # Return the last item in the filtered collection
-        return filtered[-1]
+        self.__checkIsCallable(callback)
+        result = None
+        for item in self._items:
+            if callback(item):
+                result = item
+        return result
 
     def all(self) -> list[Any]:
         """
@@ -184,7 +176,7 @@ class Collection(ICollection):
         # Get values using the key or use all items if key is None
         items = self.__getValue(key) or self._items
 
-        # Prevenir división por cero
+        # Return zero when there are no values to average.
         if not items:
             return 0
 
@@ -426,7 +418,7 @@ class Collection(ICollection):
         """
         # Ensure the callback is callable before filtering
         self.__checkIsCallable(callback)
-        return self.__class__(list(filter(callback, self._items)))
+        return self.__class__([item for item in self._items if callback(item)])
 
     def flatten(self) -> Collection:
         """
@@ -626,15 +618,16 @@ class Collection(ICollection):
             error_msg = "cls must be a type"
             raise TypeError(error_msg)
 
+        mapper = getattr(cls, method, None) if method else None
+        if method and mapper is None:
+            return self.__class__([None] * len(self._items))
+
         results = []
         # Iterate through each item and map into the class or its method
         for item in self:
             try:
                 if method:
-                    if not hasattr(cls, method):
-                        error_msg = f"Class {cls.__name__} has no method '{method}'"
-                        raise AttributeError(error_msg)
-                    results.append(getattr(cls, method)(item, **kwargs))
+                    results.append(mapper(item, **kwargs))
                 else:
                     results.append(cls(item))
             except (TypeError, AttributeError, ValueError):
@@ -932,14 +925,18 @@ class Collection(ICollection):
         """
         def _serialize(item: object) -> object:
             # Set appends if present for each item
-            if self.__appends__ and hasattr(item, "set_appends"):
-                with contextlib.suppress(AttributeError):
-                    item.set_appends(self.__appends__)
+            if self.__appends__:
+                set_appends = getattr(item, "set_appends", _MISSING)
+                if set_appends is not _MISSING:
+                    with contextlib.suppress(AttributeError):
+                        set_appends(self.__appends__)
             # Prefer serialize method, then to_dict, else return as is
-            if hasattr(item, "serialize"):
-                return item.serialize()
-            if hasattr(item, "to_dict"):
-                return item.to_dict()
+            serializer = getattr(item, "serialize", _MISSING)
+            if serializer is not _MISSING:
+                return serializer()
+            serializer = getattr(item, "to_dict", _MISSING)
+            if serializer is not _MISSING:
+                return serializer()
             return item
 
         return list(map(_serialize, self._items))
@@ -1255,15 +1252,27 @@ class Collection(ICollection):
         """
         # Extract values from Collection if necessary
         values = self.__getItems(values)
-        # Pre-build str set once: avoids rebuilding O(M) list on every iteration
-        # of the N-item loop, reducing complexity from O(N*M) to O(N+M).
+        try:
+            value_set = set(values)
+            unhashable_values: list[Any] = []
+        except TypeError:
+            value_set = set()
+            unhashable_values = values
         str_values: set[str] = {str(v) for v in values}
         attributes: list[Any] = []
 
         # Iterate and collect items where the key's value is in the provided values
         for item in self._items:
             comparison = self.__dataGet(item, key)
-            if comparison in values or str(comparison) in str_values:
+            try:
+                matches_value = comparison in value_set
+            except TypeError:
+                matches_value = comparison in values
+            if (
+                matches_value
+                or comparison in unhashable_values
+                or str(comparison) in str_values
+            ):
                 attributes.append(item)
 
         return self.__class__(attributes)
@@ -1290,15 +1299,27 @@ class Collection(ICollection):
         """
         # Extract values from Collection if necessary
         values = self.__getItems(values)
-        # Pre-build str set once: avoids rebuilding O(M) list on every iteration
-        # of the N-item loop, reducing complexity from O(N*M) to O(N+M).
+        try:
+            value_set = set(values)
+            unhashable_values: list[Any] = []
+        except TypeError:
+            value_set = set()
+            unhashable_values = values
         str_values: set[str] = {str(v) for v in values}
         attributes: list[Any] = []
 
         # Iterate and collect items where the key's value is not in the provided values
         for item in self._items:
             comparison = self.__dataGet(item, key)
-            if comparison not in values and str(comparison) not in str_values:
+            try:
+                matches_value = comparison in value_set
+            except TypeError:
+                matches_value = comparison in values
+            if (
+                not matches_value
+                and comparison not in unhashable_values
+                and str(comparison) not in str_values
+            ):
                 attributes.append(item)
 
         return self.__class__(attributes)

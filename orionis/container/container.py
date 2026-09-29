@@ -4,18 +4,16 @@ import contextvars
 import importlib
 import inspect
 import threading
-from collections import deque
 from typing import TYPE_CHECKING, Any, ClassVar, Self
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import get_current_scope
 from orionis.container.contracts.container import IContainer
 from orionis.container.entities.binding import Binding
+from orionis.container.entities.invocation import callable_plan, constructor_plan
 from orionis.container.enums.lifetimes import Lifetime
 from orionis.container.exceptions import CircularDependencyException
 from orionis.http.request import Request
 from orionis.schemas.validator import Schema
-from orionis.introspection.callables.reflection import ReflectionCallable
-from orionis.introspection.concretes.reflection import ReflectionConcrete
 
 if TYPE_CHECKING:
     import msgspec
@@ -23,11 +21,13 @@ if TYPE_CHECKING:
     from orionis.container.contracts.service_provider import IServiceProvider
     from orionis.http.contracts.request import IRequest
     from orionis.introspection.dependencies.entities.argument import Argument
-    from orionis.introspection.dependencies.entities.signature import Signature
 
 # Context variable to track the resolution stack for circular dependency detection.
-_resolution_stack: contextvars.ContextVar[frozenset[str]] = contextvars.ContextVar(
+_resolution_stack: contextvars.ContextVar[frozenset[type]] = contextvars.ContextVar(
     "x-orionis-resolution-stack", default=frozenset(),
+)
+_provider_stack: contextvars.ContextVar[frozenset[tuple[int, tuple[str, str]]]] = (
+    contextvars.ContextVar("x-orionis-provider-stack", default=frozenset())
 )
 
 # Sentinel value for empty parameters in inspect signatures,
@@ -74,7 +74,7 @@ class Container(IContainer):
         Self
             The singleton instance of the calling class.
         """
-        # Fast path: check if instance already exists for the class
+        # Return the instance already registered for this class.
         instance = cls._instances.get(cls)
         if instance is not None:
             return instance
@@ -125,6 +125,8 @@ class Container(IContainer):
 
             # Tracks resolved deferred providers
             self.__cache_resolve_deferred_providers: set[Any] = set()
+            self.__registered_deferred: dict[tuple[str, str], IServiceProvider] = {}
+            self.__pending_deferred: dict[str, tuple[str, str]] = {}
 
             # Per-key locks serialising one-shot construction, paired with the
             # loop they were created on so a second loop never awaits a foreign lock.
@@ -180,10 +182,7 @@ class Container(IContainer):
             True when the type is already on the current resolution stack,
             which means the caller must skip the creation lock it already owns.
         """
-        return (
-            f"{concrete.__module__}.{concrete.__name__}"
-            in _resolution_stack.get()
-        )
+        return concrete in _resolution_stack.get()
 
     def __aliasService(
         self,
@@ -450,6 +449,7 @@ class Container(IContainer):
             alias=alias,
         )
         self.__bindings[abstract] = binding
+        self.__singleton_cache.pop(abstract, None)
         if alias is not None:
             self.__aliases[alias] = abstract
 
@@ -754,44 +754,100 @@ class Container(IContainer):
         if isinstance(key, type):
             key = f"{key.__module__}.{key.__name__}"
 
-        # Check existence in the provider registry BEFORE the resolved-cache.
-        # Most types are not deferred providers, so this exits in one lookup
-        # without ever touching __cache_resolve_deferred_providers.
-        if key not in self._deferred_providers:
+        # Find the provider identity shared by all of its service contracts.
+        provider_metadata = self._deferred_providers.get(key)
+        if provider_metadata is None:
+            return
+        provider_key = (provider_metadata["module"], provider_metadata["class"])
+        if provider_key in self.__cache_resolve_deferred_providers:
+            return
+        stack_key = (id(self), provider_key)
+        stack = _provider_stack.get()
+        if stack_key in stack:
             return
 
-        # Already resolved — no work needed
-        if key in self.__cache_resolve_deferred_providers:
-            return
-
-        # Serialise the bootstrap: registering and booting a provider spans
-        # several await points, so without this lock concurrent tasks would run
-        # the same provider twice and its register() would raise on the second.
-        async with self.__creationLock(key):
+        # Register and boot each provider once, including multicontract providers.
+        async with self.__creationLock(provider_key):
 
             # Another task may have completed the bootstrap while waiting
-            if key in self.__cache_resolve_deferred_providers:
+            if provider_key in self.__cache_resolve_deferred_providers:
                 return
+            token = _provider_stack.set(stack | {stack_key})
+            try:
+                await self.__bootDeferredProvider(provider_key)
+            finally:
+                _provider_stack.reset(token)
 
-            # Retrieve provider metadata for the given key
-            provider_metadata = self._deferred_providers.get(key)
+    async def __bootDeferredProvider(self, provider_key: tuple[str, str]) -> None:
+        """
+        Register a deferred provider once and complete its boot hook.
 
-            # Import the module declaring the provider class
-            module = importlib.import_module(provider_metadata["module"])
-            provider_class = getattr(module, provider_metadata["class"], None)
+        Parameters
+        ----------
+        provider_key : tuple[str, str]
+            Module and class identifying a provider whose lock is held.
 
-            # Build and register the provider instance
-            instance: IServiceProvider = await self.build(provider_class)
+        Returns
+        -------
+        None
+            The provider is marked ready after its boot hook succeeds.
+        """
+        # Keep registered instances available when boot needs retrying.
+        instance = self.__registered_deferred.get(provider_key)
+        if instance is None:
+            module = importlib.import_module(provider_key[0])
+            provider_class = getattr(module, provider_key[1], None)
+            instance = await self.build(provider_class)
             instance.register()
+            self.__registered_deferred[provider_key] = instance
+            for service, metadata in self._deferred_providers.items():
+                if (metadata["module"], metadata["class"]) == provider_key:
+                    self.__pending_deferred[service] = provider_key
 
-            # Boot the provider instance, supporting async and sync methods
-            if inspect.iscoroutinefunction(instance.boot):
-                await instance.boot()
-            else:
-                instance.boot()
+        # Allow provider boot to resolve its own registered services.
+        if inspect.iscoroutinefunction(instance.boot):
+            await instance.boot()
+        else:
+            instance.boot()
 
-            # Cache the resolved service to prevent redundant resolution
-            self.__cache_resolve_deferred_providers.add(key)
+        self.__cache_resolve_deferred_providers.add(provider_key)
+        self.__registered_deferred.pop(provider_key)
+        for service in tuple(self.__pending_deferred):
+            if self.__pending_deferred[service] == provider_key:
+                del self.__pending_deferred[service]
+
+    async def __awaitPendingProvider(self, key: type[Any] | str) -> None:
+        """
+        Wait for a provider that has registered services but is still booting.
+
+        Parameters
+        ----------
+        key : type[Any] | str
+            Service type or alias requested by a resolver.
+
+        Returns
+        -------
+        None
+            The provider is ready, or the caller is its own bootstrap task.
+        """
+        original = key
+        if isinstance(key, type):
+            key = f"{key.__module__}.{key.__name__}"
+        if key in self.__pending_deferred:
+            await self.__resolveDeferredProvider(key)
+            return
+
+        # Match aliases to declared contracts and types to declared aliases.
+        if isinstance(original, str):
+            abstract = self.__aliases.get(original)
+            if abstract is not None:
+                key = f"{abstract.__module__}.{abstract.__name__}"
+        else:
+            binding = self.__bindings.get(original)
+            if binding is not None:
+                key = binding.alias
+        if key in self.__pending_deferred:
+            await self.__resolveDeferredProvider(key)
 
     async def __resolveKey(
         self,
@@ -834,7 +890,7 @@ class Container(IContainer):
             # the way aliases are registered.
             return abstract
 
-        # If the key is already a type, return it directly (fast path).
+        # Return class keys without resolving an alias.
         return key
 
     async def __resolveOrBuild(
@@ -913,6 +969,10 @@ class Container(IContainer):
         ValueError
             If the service is not registered and cannot be auto-resolved.
         """
+        # Wait until a registered deferred service has completed provider boot.
+        if self.__pending_deferred:
+            await self.__awaitPendingProvider(key)
+
         # If key is a type and already has a singleton instance, return it immediately.
         if not isinstance(key, str):
             _cached = self.__singleton_cache.get(key)
@@ -1041,7 +1101,7 @@ class Container(IContainer):
     async def __createScoped(
         self,
         binding: Binding,
-        scope: dict[Any, Any],
+        scope: ScopeManager,
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
@@ -1052,7 +1112,7 @@ class Container(IContainer):
         ----------
         binding : Binding
             The scoped binding to materialize.
-        scope : dict[Any, Any]
+        scope : ScopeManager
             The active scope that owns the resulting instance.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.
@@ -1072,7 +1132,7 @@ class Container(IContainer):
         if self.__isBeingResolved(concrete):
             return await self.__autoResolveClass(concrete, *args, **kwargs)
 
-        async with self.__creationLock(binding.contract):
+        async with scope.creationLock(binding.contract):
 
             # Another task may have finished the construction while waiting
             if binding.contract in scope:
@@ -1112,32 +1172,28 @@ class Container(IContainer):
         Exception
             If the type cannot be auto-resolved.
         """
-        # Build a unique key for this type to track within the current task's stack
-        type_key = f"{type_.__module__}.{type_.__name__}"
+        # Resolve constructor metadata using the current constructor descriptor.
+        plan = constructor_plan(type_, type_.__init__)
+        if not plan.arguments:
+            return type_(*args, **kwargs)
 
         # Detect circular dependencies using the per-task ContextVar stack.
         # This is safe under async concurrency: each asyncio Task has its own
         # context, so concurrent resolutions of the same type never collide.
         stack = _resolution_stack.get()
-        if type_key in stack:
+        if type_ in stack:
+            type_key = f"{type_.__module__}.{type_.__name__}"
             error_msg = (
                 f"Circular dependency detected while resolving argument '{type_key}'."
             )
             raise CircularDependencyException(error_msg)
 
         # Push type onto the per-task stack; token allows precise rollback
-        token = _resolution_stack.set(stack | {type_key})
+        token = _resolution_stack.set(stack | {type_})
         try:
-            # Get constructor dependencies using reflection
-            signature = ReflectionConcrete(type_).constructorSignature()
-
-            # If no dependencies, instantiate directly
-            if not signature.hasParameters():
-                return type_(*args, **kwargs)
-
             # Resolve dependencies recursively
             final_args, final_kwargs = await self.__resolveSignature(
-                signature, *args, **kwargs,
+                plan.arguments, *args, **kwargs,
             )
 
             # Instantiate with resolved arguments
@@ -1179,6 +1235,10 @@ class Container(IContainer):
         -----
         Resolves deferred providers before attempting instantiation.
         """
+        # Wait for a provider that has published bindings but is still booting.
+        if self.__pending_deferred:
+            await self.__awaitPendingProvider(type_)
+
         # Resolve deferred providers for the given type if not already bound
         if not self.bound(type_):
             await self.__resolveDeferredProvider(type_)
@@ -1312,28 +1372,28 @@ class Container(IContainer):
         Exception
             If the callable cannot be auto-resolved.
         """
-        # Get callable dependencies using reflection
-        signature = ReflectionCallable(type_).getDependencies()
+        # Retrieve callable metadata shared by instances of the same class.
+        plan = callable_plan(type_)
 
         # If no dependencies, invoke directly
-        if not signature.hasParameters():
-            if inspect.iscoroutinefunction(type_):
+        if not plan.arguments:
+            if plan.is_async:
                 return await type_(*args, **kwargs)
             return type_(*args, **kwargs)
 
         # Resolve dependencies recursively
         final_args, final_kwargs = await self.__resolveSignature(
-            signature, *args, **kwargs,
+            plan.arguments, *args, **kwargs,
         )
 
         # Invoke the callable with resolved arguments
-        if inspect.iscoroutinefunction(type_):
+        if plan.is_async:
             return await type_(*final_args, **final_kwargs)
         return type_(*final_args, **final_kwargs)
 
     async def __resolveSignature( # NOSONAR
         self,
-        signature: Signature,
+        arguments: tuple[Argument, ...],
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> tuple[list[Any], dict[str, Any]]:
@@ -1342,8 +1402,8 @@ class Container(IContainer):
 
         Parameters
         ----------
-        signature : Signature
-            The signature object containing argument metadata.
+        arguments : tuple[Argument, ...]
+            Parameter metadata in declaration order.
         *args : tuple[Any, ...]
             Positional arguments to pass to the callable.
         **kwargs : dict[str, Any]
@@ -1354,45 +1414,39 @@ class Container(IContainer):
         tuple[list[Any], dict[str, Any]]
             A tuple containing the resolved positional and keyword arguments.
         """
-        # Copy kwargs to avoid mutating the original dictionary
-        remaining_kwargs: dict[str, Any] = dict(kwargs) if kwargs else {}
-
-        # Use a deque for efficient popping of positional arguments from the left
-        positional: deque[Any] = deque(args) if args else deque()
+        # Consume the local keyword mapping and positional tuple.
+        remaining_kwargs = kwargs
+        position = 0
+        positional_count = len(args)
 
         # Prepare containers for resolved arguments
         final_args: list[Any] = []
         final_kwargs: dict[str, Any] = {}
 
-        # Pre-check if there are any deferred providers to resolve,
-        # to optimize the loop.
+        # Track deferred registration for the current argument sequence.
         _has_deferred = bool(self._deferred_providers)
 
-        # Cache references to container bindings and singletons for
-        # faster access within the loop.
+        # Read current bindings so overrides apply to previously compiled plans.
         _bindings       = self.__bindings
         _singleton      = self.__singleton_cache
 
         # Iterate over arguments in definition order
-        for name, argument in signature.arguments():
+        for argument in arguments:
+            name = argument.name
 
             # Resolve deferred provider for this argument's type if applicable.
             if _has_deferred and argument.full_class_path in self._deferred_providers:
                 await self.__resolveDeferredProvider(argument.full_class_path)
 
-            # Determine if the argument is keyword-only
-            is_keyword_only = argument.is_keyword_only
-
             # Handle positional or positional-or-keyword arguments
-            if not is_keyword_only:
+            if not argument.is_keyword_only:
 
                 # Special handling for msgspec.Struct subclasses with default value
                 if argument.is_schema:
                     final_args.append(await self.__resolveSchemaArgument(argument))
                     continue
 
-                # Optimize resolution for arguments that are bound in
-                # the container by type.
+                # Resolve arguments registered by type in the container.
                 arg_type = argument.type
                 is_bound = arg_type in _bindings or arg_type in _singleton
                 if is_bound and name not in remaining_kwargs:
@@ -1401,9 +1455,9 @@ class Container(IContainer):
                     continue
 
                 # Use next positional argument if available
-                if positional:
-                    value = positional.popleft()
-                    final_args.append(value)
+                if position < positional_count:
+                    final_args.append(args[position])
+                    position += 1
                     continue
 
                 # Use provided keyword argument if available
@@ -1429,8 +1483,7 @@ class Container(IContainer):
                     del remaining_kwargs[name]
                     continue
 
-                # Optimize resolution for keyword-only arguments that are bound in
-                # the container by type.
+                # Resolve keyword-only arguments registered by type.
                 arg_type = argument.type
                 if arg_type in _bindings or arg_type in _singleton:
                     resolved = await self.make(arg_type)
@@ -1442,7 +1495,8 @@ class Container(IContainer):
                 final_kwargs[name] = resolved
 
         # Append any remaining positional arguments
-        final_args.extend(positional)
+        if position < positional_count:
+            final_args.extend(args[position:])
 
         # Add any remaining unused keyword arguments
         final_kwargs.update(remaining_kwargs)

@@ -3,10 +3,10 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.session.enums import SameSitePolicy
 from orionis.foundation.config.session.enums.drivers import SessionDriver
-from orionis.foundation.config.validation import validate_cookie_name
+from orionis.foundation.config.validation import validate_cookie_name, validate_integer
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozensets enable O(1) membership tests at validation time.
+# Enumerate accepted session drivers and cookie policies.
 _SAME_SITE_VALUES: frozenset[str] = frozenset(p.value for p in SameSitePolicy)
 _DRIVER_VALUES: frozenset[str] = frozenset(d.value for d in SessionDriver)
 
@@ -23,6 +23,13 @@ class Session(BaseEntity):
         Session lifetime in minutes. Defaults to 120.
     expire_on_close : bool
         Expire session on browser close (omits Max-Age). Defaults to False.
+    track_previous_url : bool
+        Remember successful navigation URLs in the session. Defaults to True.
+    renewal_interval : int
+        Minimum seconds between renewal writes for unchanged scalar payloads.
+        Zero renews every request. Must be strictly below the lifetime in
+        seconds so renewal can occur while the session is still valid.
+        Mutable payloads and dirty sessions are always persisted.
     files : str | None
         Path to session files (file driver). Defaults to 'storage/framework/sessions'.
     connection : str | None
@@ -73,6 +80,22 @@ class Session(BaseEntity):
         metadata={
             "description": "Expire session on browser close (omits Max-Age).",
             "default": False,
+        },
+    )
+
+    track_previous_url: bool = field(
+        default_factory=lambda: Env.get("SESSION_TRACK_PREVIOUS_URL", True),
+        metadata={
+            "description": "Remember successful navigation URLs in the session.",
+            "default": True,
+        },
+    )
+
+    renewal_interval: int = field(
+        default_factory=lambda: Env.get("SESSION_RENEWAL_INTERVAL", 0),
+        metadata={
+            "description": "Minimum seconds between unchanged session renewals.",
+            "default": 0,
         },
     )
 
@@ -290,6 +313,7 @@ class Session(BaseEntity):
         # Centralise bool checks to avoid repetitive isinstance calls.
         _bool_fields = (
             "expire_on_close",
+            "track_previous_url",
             "secure",
             "http_only",
             "partitioned",
@@ -560,6 +584,11 @@ class Session(BaseEntity):
         self.__validateDriver()
         self.__validateCookie()
         self.__validateLifetime()
+        validate_integer(
+            self.renewal_interval,
+            "renewal_interval",
+            maximum=self.lifetime * 60 - 1,
+        )
         self.__validateBooleans()
         self.__validateSameSite()
         if self.same_site == "none" and not self.secure:

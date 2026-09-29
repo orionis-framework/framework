@@ -30,15 +30,9 @@ class Final(type):
         TypeError
             If attempting to inherit from a final class.
 
-        Performance note
-        ----------------
-        ``base.__dict__.get`` is used instead of ``getattr`` to avoid the full
-        MRO traversal that ``getattr`` triggers.  ``__is_final__`` is always set
-        directly on the class object (never inherited), so checking ``__dict__``
-        is both correct and faster.
         """
         # Prevent inheritance from any class marked as final.
-        # ``__dict__.get`` avoids the MRO traversal cost of ``getattr``.
+        # The class namespace records whether the base itself is final.
         for base in bases:
             if base.__dict__.get("__is_final__", False):
                 error_msg = f"Cannot inherit from orionis final class '{base.__name__}'"

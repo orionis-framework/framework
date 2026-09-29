@@ -11,6 +11,20 @@ class _StubApp:
     __slots__ = ("_base_path", "_config", "requested")
 
     def __init__(self, base_path: Path, config: dict[str, object]) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        base_path : Path
+            Value supplied for ``base_path``.
+        config : dict[str, object]
+            Value supplied for ``config``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._base_path = base_path
         self._config = config
         self.requested: list[str] = []
@@ -120,21 +134,29 @@ class TestLocalizationManagerDefinition(_ManagerFixture):
     """Validate the structural contract of the manager."""
 
     def testImplementsTheManagerContract(self) -> None:
-        """
-        Implement the declared manager contract.
+        """Implement the declared manager contract.
 
         Validates that the manager can be resolved through its contract
         by the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({})
         self.assertIsInstance(manager, ILocalizationManager)
 
     def testInstancesDoNotCarryAnInstanceDictionary(self) -> None:
-        """
-        Keep manager instances free of an instance dictionary.
+        """Keep manager instances free of an instance dictionary.
 
         Validates that the declared slots are effective, which requires
         the contract to declare empty slots as well.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(self._makeManager({}), "__dict__"))
 
@@ -142,11 +164,15 @@ class TestLocalizationManagerWiring(_ManagerFixture):
     """Validate translator construction from the configuration."""
 
     def testBuildsATranslatorFromTheConfiguredSettings(self) -> None:
-        """
-        Build a translator honouring the configured settings.
+        """Build a translator honouring the configured settings.
 
         Validates that locale, fallback locale, and language path are
         read from the application configuration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({
             "app.locale": "es",
@@ -159,11 +185,15 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         self.assertEqual(translator.availableLocales(), ("en", "es"))
 
     def testTranslatorIsBuiltOnceAndShared(self) -> None:
-        """
-        Reuse a single translator across the application.
+        """Reuse a single translator across the application.
 
         Validates that the configuration is read once and that the
         translation cache is shared by every consumer.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({"app.locale": "es"})
         translator = manager.translator()
@@ -171,11 +201,15 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         self.assertEqual(self._app.requested.count("app.locale"), 1)
 
     def testFallbackLocaleResolvesTranslationsFromAnotherLocale(self) -> None:
-        """
-        Wire the configured fallback locale into the translator.
+        """Wire the configured fallback locale into the translator.
 
         Validates that missing lines are resolved from the fallback
         declared in the configuration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({
             "app.locale": "es",
@@ -186,11 +220,15 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         self.assertEqual(translator.get("Welcome"), "Welcome")
 
     def testRejectsAMalformedConfiguredLocale(self) -> None:
-        """
-        Reject a malformed locale declared in the configuration.
+        """Reject a malformed locale declared in the configuration.
 
         Validates that invalid settings fail fast instead of reaching
         the file system.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({"app.locale": "../etc"})
         with self.assertRaises(InvalidLocaleException):
@@ -200,21 +238,29 @@ class TestLocalizationManagerDefaults(_ManagerFixture):
     """Validate the fallback values applied to missing settings."""
 
     def testDefaultsToEnglishWhenNoLocaleIsConfigured(self) -> None:
-        """
-        Default the active locale to English.
+        """Default the active locale to English.
 
         Validates the documented default applied when ``app.locale`` is
         absent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({})
         self.assertEqual(manager.translator().getLocale(), "en")
 
     def testDefaultsTheFallbackToTheActiveLocale(self) -> None:
-        """
-        Default the fallback locale to the active locale.
+        """Default the fallback locale to the active locale.
 
         Validates that an incomplete configuration never falls back to
         an unrelated language.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({"app.locale": "es"})
         translator = manager.translator()
@@ -222,11 +268,15 @@ class TestLocalizationManagerDefaults(_ManagerFixture):
         self.assertEqual(translator.get("Welcome"), "Bienvenido")
 
     def testDefaultsTheLanguagePathToTheResourcesDirectory(self) -> None:
-        """
-        Default the language path to ``resources/lang``.
+        """Default the language path to ``resources/lang``.
 
         Validates the convention applied when ``app.language_path`` is
         absent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         manager = self._makeManager({"app.locale": "es"})
         self.assertEqual(manager.translator().get("Welcome"), "Bienvenido")
@@ -235,11 +285,15 @@ class TestLocalizationManagerPaths(_ManagerFixture):
     """Validate resolution of the configured language directory."""
 
     def testResolvesRelativePathsAgainstTheApplicationRoot(self) -> None:
-        """
-        Anchor a relative language path to the application root.
+        """Anchor a relative language path to the application root.
 
         Validates that the manager never depends on the current working
         directory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._writeSource(self._base / "custom" / "lang", "es", "Relativo")
         manager = self._makeManager({
@@ -249,11 +303,15 @@ class TestLocalizationManagerPaths(_ManagerFixture):
         self.assertEqual(manager.translator().get("Welcome"), "Relativo")
 
     def testHonoursAnAbsoluteLanguagePath(self) -> None:
-        """
-        Use an absolute language path verbatim.
+        """Use an absolute language path verbatim.
 
         Validates that deployments pointing outside the project tree
         are supported.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         absolute = self._base / "absolute" / "lang"
         self._writeSource(absolute, "es", "Absoluto")

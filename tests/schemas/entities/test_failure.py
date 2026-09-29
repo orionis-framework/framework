@@ -4,11 +4,15 @@ from orionis.test import TestCase
 class TestValidationFailure(TestCase):
 
     def testInstantiationStoresFields(self) -> None:
-        """
-        Instantiate ValidationFailure and verify stored attributes.
+        """Instantiate ValidationFailure and verify stored attributes.
 
         Validates that the constructor correctly persists all three
         required fields as immutable attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(
             field="username",
@@ -20,11 +24,15 @@ class TestValidationFailure(TestCase):
         self.assertEqual(failure.message, "This field is required.")
 
     def testToDictReturnsCorrectMapping(self) -> None:
-        """
-        Convert a ValidationFailure to a dictionary.
+        """Convert a ValidationFailure to a dictionary.
 
         Validates that toDict returns a plain dict with the expected
         keys and values matching the instance attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(
             field="email",
@@ -38,11 +46,15 @@ class TestValidationFailure(TestCase):
         self.assertEqual(result["message"], "Invalid email format.")
 
     def testToDictContainsExactlyThreeKeys(self) -> None:
-        """
-        Ensure toDict output contains exactly the three expected keys.
+        """Ensure toDict output contains exactly the three expected keys.
 
         Validates that no extra or missing keys appear in the returned
         dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(
             field="age",
@@ -53,11 +65,15 @@ class TestValidationFailure(TestCase):
         self.assertEqual(set(result.keys()), {"field", "rule", "message"})
 
     def testImmutabilityPreventsFieldMutation(self) -> None:
-        """
-        Confirm that ValidationFailure is immutable (frozen dataclass).
+        """Confirm that ValidationFailure is immutable (frozen dataclass).
 
         Validates that attempting to modify an attribute raises an
         AttributeError or FrozenInstanceError.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(
             field="name",
@@ -68,11 +84,15 @@ class TestValidationFailure(TestCase):
             failure.field = "other"  # type: ignore[misc]
 
     def testEmptyStringFieldsAreAccepted(self) -> None:
-        """
-        Accept empty strings for all three fields of ValidationFailure.
+        """Accept empty strings for all three fields of ValidationFailure.
 
         Validates that no error is raised when empty strings are supplied
         and that the values are preserved faithfully.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(field="", rule="", message="")
         self.assertEqual(failure.field, "")
@@ -80,11 +100,15 @@ class TestValidationFailure(TestCase):
         self.assertEqual(failure.message, "")
 
     def testToDictValuesMatchInstanceAttributes(self) -> None:
-        """
-        Verify that toDict values are identical to instance attributes.
+        """Verify that toDict values are identical to instance attributes.
 
         Validates that the dictionary is not a deep copy but reflects
         the same string objects for each field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failure = ValidationFailure(
             field="score",

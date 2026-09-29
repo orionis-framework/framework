@@ -9,6 +9,18 @@ class _RecordingHandle:
     __slots__ = ("buffer", "closed")
 
     def __init__(self, data: bytes = b"") -> None:
+        """Initialize the storage test double.
+
+        Parameters
+        ----------
+        data : bytes
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.buffer = io.BytesIO(data)
         self.closed = False
 
@@ -63,7 +75,13 @@ class _RecordingHandle:
         return self.buffer.seek(offset, whence)
 
     def close(self) -> None:
-        """Mark the handle as closed."""
+        """Mark the handle as closed.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.closed = True
 
 class _CountingOpener:
@@ -72,6 +90,18 @@ class _CountingOpener:
     __slots__ = ("calls", "handle")
 
     def __init__(self, handle: _RecordingHandle) -> None:
+        """Initialize the storage test double.
+
+        Parameters
+        ----------
+        handle : _RecordingHandle
+            Value supplied for ``handle``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.handle = handle
         self.calls = 0
 
@@ -93,6 +123,13 @@ class _CloseRecorder:
     __slots__ = ("calls", "states")
 
     def __init__(self) -> None:
+        """Initialize the storage test double.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls = 0
         self.states: list[bool] = []
 
@@ -115,10 +152,14 @@ class _CloseRecorder:
 class TestAsyncStream(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build a stream over a recording handle before each test.
+        """Build a stream over a recording handle before each test.
 
         Keeps every test isolated with its own buffer and counters.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._handle = _RecordingHandle(b"payload")
         self._opener = _CountingOpener(self._handle)
@@ -126,71 +167,103 @@ class TestAsyncStream(TestCase):
         self._stream = AsyncStream(self._opener, self._on_close)
 
     def testImplementsTheStreamContract(self) -> None:
-        """
-        Expose the stream through its published contract.
+        """Expose the stream through its published contract.
 
         Validates that drivers can type their return values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._stream, IStorageStream)
 
     def testConstructionNeverOpensTheHandle(self) -> None:
-        """
-        Keep construction free of side effects.
+        """Keep construction free of side effects.
 
         Validates that the opener runs lazily on first use.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._opener.calls, 0)
 
     async def testHandleIsOpenedOnlyOnce(self) -> None:
-        """
-        Reuse the handle opened on the first operation.
+        """Reuse the handle opened on the first operation.
 
         Validates the lazy-open cache shared by every operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.read(1)
         await self._stream.read(1)
         self.assertEqual(self._opener.calls, 1)
 
     async def testReadReturnsRequestedBytes(self) -> None:
-        """
-        Read the requested number of bytes from the handle.
+        """Read the requested number of bytes from the handle.
 
         Validates the size argument forwarded to the handle.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await self._stream.read(3), b"pay")
 
     async def testReadWithoutSizeConsumesEverything(self) -> None:
-        """
-        Read until the end of the stream by default.
+        """Read until the end of the stream by default.
 
         Validates the default ``-1`` size argument.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await self._stream.read(), b"payload")
 
     async def testWriteReturnsTheWrittenByteCount(self) -> None:
-        """
-        Write bytes at the current position of the handle.
+        """Write bytes at the current position of the handle.
 
         Validates the value returned by the underlying handle.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.seek(0, io.SEEK_END)
         self.assertEqual(await self._stream.write(b"-more"), 5)
         self.assertEqual(self._handle.buffer.getvalue(), b"payload-more")
 
     async def testSeekReturnsTheNewPosition(self) -> None:
-        """
-        Move the stream position and report the new offset.
+        """Move the stream position and report the new offset.
 
         Validates both the offset and the whence arguments.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(await self._stream.seek(3), 3)
         self.assertEqual(await self._stream.seek(0, io.SEEK_END), 7)
 
     async def testCloseRunsTheCallbackBeforeReleasing(self) -> None:
-        """
-        Invoke the close callback while the handle is still open.
+        """Invoke the close callback while the handle is still open.
 
         Validates that drivers can flush buffered data on close.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.read(1)
         await self._stream.close()
@@ -199,20 +272,28 @@ class TestAsyncStream(TestCase):
         self.assertTrue(self._handle.closed)
 
     async def testCloseDetachesTheHandle(self) -> None:
-        """
-        Detach the handle once the stream has been closed.
+        """Detach the handle once the stream has been closed.
 
         Validates the internal state after a successful close.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.read(1)
         await self._stream.close()
         self.assertIsNone(self._stream._handle)
 
     async def testCloseIsIdempotent(self) -> None:
-        """
-        Turn repeated close calls into harmless no-ops.
+        """Turn repeated close calls into harmless no-ops.
 
         Validates that the callback never runs twice.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.read(1)
         await self._stream.close()
@@ -220,10 +301,14 @@ class TestAsyncStream(TestCase):
         self.assertEqual(self._on_close.calls, 1)
 
     async def testCloseWithoutOpeningIsNoOp(self) -> None:
-        """
-        Skip every action when the handle was never opened.
+        """Skip every action when the handle was never opened.
 
         Validates the early return of close().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._stream.close()
         self.assertEqual(self._opener.calls, 0)
@@ -231,10 +316,14 @@ class TestAsyncStream(TestCase):
         self.assertFalse(self._handle.closed)
 
     async def testCloseWithoutCallbackReleasesTheHandle(self) -> None:
-        """
-        Release the handle when no close callback is configured.
+        """Release the handle when no close callback is configured.
 
         Validates the optional nature of the callback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         handle = _RecordingHandle(b"x")
         stream = AsyncStream(_CountingOpener(handle))
@@ -243,10 +332,14 @@ class TestAsyncStream(TestCase):
         self.assertTrue(handle.closed)
 
     async def testAsyncContextManagerOpensAndReturnsItself(self) -> None:
-        """
-        Open the handle on entry and yield the stream itself.
+        """Open the handle on entry and yield the stream itself.
 
         Validates the async context-manager protocol.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         async with self._stream as entered:
             self.assertIs(entered, self._stream)
@@ -254,10 +347,19 @@ class TestAsyncStream(TestCase):
         self.assertTrue(self._handle.closed)
 
     async def testAsyncContextManagerClosesOnFailure(self) -> None:
-        """
-        Close the stream when the guarded block raises.
+        """Close the stream when the guarded block raises.
 
         Validates the cleanup guarantees of __aexit__.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
         """
         error_msg = "boom"
         with self.assertRaises(RuntimeError):

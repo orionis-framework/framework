@@ -6,29 +6,37 @@ if TYPE_CHECKING:
 
 class Headers(metaclass=Final):
 
-    __slots__ = ("_index", "_items")
+    __slots__ = ("_has_invalid_format", "_index", "_items")
 
-    def __init__(self, raw: Iterable[tuple[str, str]]) -> None:
+    def __init__(
+        self,
+        raw: Iterable[tuple[str, str]] | Iterable[tuple[bytes, bytes]],
+        *,
+        decode: bool = False,
+    ) -> None:
         """
         Initialize Headers from an iterable of key-value pairs.
 
         Parameters
         ----------
-        raw : Iterable[tuple[str, str]]
+        raw : Iterable[tuple[str, str]] | Iterable[tuple[bytes, bytes]]
             Iterable of ``(header_name, header_value)`` pairs.
+        decode : bool, optional
+            Decode transport byte pairs using Latin-1 before indexing.
 
         Returns
         -------
         None
         """
-        # Adopt list inputs as-is; transports already hand over a fresh list.
-        items: list[tuple[str, str]] = (
-            raw if type(raw) is list else list(raw)
-        )
-        self._items: list[tuple[str, str]] = items
-        # Store a single value until a header name occurs more than once.
+        # Copy incoming pairs while indexing names and checking their format.
+        items: list[tuple[str, str]] = []
         index: dict[str, str | list[str]] = {}
-        for k, v in items:
+        invalid = False
+        for raw_key, raw_value in raw:
+            k = raw_key.decode("latin-1") if decode else raw_key
+            v = raw_value.decode("latin-1") if decode else raw_value
+            items.append((k, v))
+            invalid |= "\r" in k or "\n" in k or "\r" in v or "\n" in v
             key = k.lower()
             bucket = index.get(key)
             if bucket is None:
@@ -38,6 +46,18 @@ class Headers(metaclass=Final):
             else:
                 index[key] = [bucket, v]
         self._index = index
+        self._items = items
+        self._has_invalid_format = invalid
+
+    def hasInvalidFormat(self) -> bool:
+        """Report whether any header contains a carriage return or newline.
+
+        Returns
+        -------
+        bool
+            Whether the immutable input contains a CRLF injection marker.
+        """
+        return self._has_invalid_format
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """
@@ -59,7 +79,18 @@ class Headers(metaclass=Final):
         return value[-1] if isinstance(value, list) else value
 
     def count(self, key: str) -> int:
-        """Return the number of occurrences of a case-insensitive header name."""
+        """Return the number of occurrences of a header name.
+
+        Parameters
+        ----------
+        key : str
+            Case-insensitive header name.
+
+        Returns
+        -------
+        int
+            Number of entries for the name.
+        """
         value = self._index.get(key.lower())
         if value is None:
             return 0

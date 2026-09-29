@@ -22,18 +22,53 @@ from orionis.test import TestCase
 # stray file in the working directory.
 _DATABASE_FILE: str = "migrator.sqlite"
 
-
 class _StubApp:
     """Application stub exposing the paths and configuration used."""
 
     def __init__(self, database: str) -> None:
+        """Initialize the test double.
+
+        Parameters
+        ----------
+        database : str
+            Value supplied for ``database``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.basePath = Path.cwd()
         self._database = database
 
     def path(self, key: str) -> Path:  # noqa: ARG002
+        """Resolve the requested application path.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        Path
+            Value produced by the helper.
+        """
         return Path.cwd() / "database"
 
     def config(self, key: str) -> dict:  # noqa: ARG002
+        """Return the requested database configuration.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
         return {
             "default": "sqlite",
             "connections": {
@@ -49,7 +84,6 @@ class _StubApp:
                 },
             },
         }
-
 
 def _definition(name: str) -> TableDefinition:
     """
@@ -75,43 +109,91 @@ def _definition(name: str) -> TableDefinition:
         primary_key="id",
     )
 
-
 class _CreateAlpha(Migration):
     """Migration creating and dropping the ``alpha`` table."""
 
     async def up(self) -> None:
+        """Apply the test migration.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await ConnectionResolver.connection().createTable(_definition("alpha"))
 
     async def down(self) -> None:
-        await ConnectionResolver.connection().dropTable("alpha")
+        """Revert the test migration.
 
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        await ConnectionResolver.connection().dropTable("alpha")
 
 class _CreateBeta(Migration):
     """Migration creating and dropping the ``beta`` table."""
 
     async def up(self) -> None:
+        """Apply the test migration.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await ConnectionResolver.connection().createTable(_definition("beta"))
 
     async def down(self) -> None:
-        await ConnectionResolver.connection().dropTable("beta")
+        """Revert the test migration.
 
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        await ConnectionResolver.connection().dropTable("beta")
 
 class _Broken(Migration):
     """Migration whose ``up`` always fails."""
 
     async def up(self) -> None:
+        """Apply the test migration.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        RuntimeError
+            Raised by this helper to exercise the failure path.
+        """
         error_msg = "boom"
         raise RuntimeError(error_msg)
 
     async def down(self) -> None:
-        """Do nothing; this migration never applies."""
+        """Do nothing; this migration never applies.
 
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 class TestMigrator(TestCase):
     """Behaviour of the migration runner against a real sqlite database."""
 
     async def asyncSetUp(self) -> None:
-        """Wire an isolated manager and a migrator with fixed migrations."""
+        """Wire an isolated manager and a migrator with fixed migrations.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._workspace = tempfile.TemporaryDirectory()
         app = _StubApp(str(Path(self._workspace.name) / _DATABASE_FILE))
         self._manager = ConnectionManager(app)
@@ -120,7 +202,13 @@ class TestMigrator(TestCase):
         self.useMigrations({"m01_alpha": _CreateAlpha, "m02_beta": _CreateBeta})
 
     async def asyncTearDown(self) -> None:
-        """Release the manager and drop the temporary database."""
+        """Release the manager and drop the temporary database.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         await self._manager.disconnect()
         ConnectionResolver.clear()
         self._workspace.cleanup()
@@ -164,10 +252,14 @@ class TestMigrator(TestCase):
         return bool(rows)
 
     async def testMigrateAppliesEveryPendingMigration(self) -> None:
-        """
-        Apply pending migrations in chronological order.
+        """Apply pending migrations in chronological order.
 
         Validates the happy path of the runner.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         applied = await self._migrator.migrate()
         self.assertEqual(applied, ["m01_alpha", "m02_beta"])
@@ -175,29 +267,41 @@ class TestMigrator(TestCase):
         self.assertTrue(await self.tableExists("beta"))
 
     async def testMigrateIsIdempotent(self) -> None:
-        """
-        Skip migrations that already ran.
+        """Skip migrations that already ran.
 
         Validates that a second run is a no-op.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         self.assertEqual(await self._migrator.migrate(), [])
 
     async def testMigrationsShareASingleBatch(self) -> None:
-        """
-        Record every migration of one run under the same batch.
+        """Record every migration of one run under the same batch.
 
         Validates the batch numbering used by rollbacks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         rows = await self._migrator.status()
         self.assertEqual([row["batch"] for row in rows], [1, 1])
 
     async def testStatusReportsPendingMigrations(self) -> None:
-        """
-        Report applied and pending migrations separately.
+        """Report applied and pending migrations separately.
 
         Validates the status projection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rows = await self._migrator.status()
         self.assertEqual([row["ran"] for row in rows], [False, False])
@@ -206,10 +310,14 @@ class TestMigrator(TestCase):
         self.assertEqual([row["ran"] for row in rows], [True, True])
 
     async def testRollbackRevertsTheLastBatchOnly(self) -> None:
-        """
-        Revert only the most recent batch.
+        """Revert only the most recent batch.
 
         Validates batch-scoped rollbacks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         self.useMigrations({
@@ -224,10 +332,14 @@ class TestMigrator(TestCase):
         self.assertTrue(await self.tableExists("beta"))
 
     async def testRollbackRevertsInReverseOrder(self) -> None:
-        """
-        Revert the migrations of a batch newest first.
+        """Revert the migrations of a batch newest first.
 
         Validates the ordering guarantee of a rollback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         self.assertEqual(
@@ -237,19 +349,27 @@ class TestMigrator(TestCase):
         self.assertFalse(await self.tableExists("alpha"))
 
     async def testRollbackRejectsNonPositiveSteps(self) -> None:
-        """
-        Reject a non-positive step count.
+        """Reject a non-positive step count.
 
         Validates the argument guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValueError):
             await self._migrator.rollback(0)
 
     async def testResetRevertsEverything(self) -> None:
-        """
-        Revert every recorded migration regardless of batches.
+        """Revert every recorded migration regardless of batches.
 
         Validates ``reset``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         reverted = await self._migrator.reset()
@@ -260,10 +380,14 @@ class TestMigrator(TestCase):
         ])
 
     async def testRefreshRollsBackAndMigratesAgain(self) -> None:
-        """
-        Rebuild the schema in a single operation.
+        """Rebuild the schema in a single operation.
 
         Validates ``refresh``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         applied = await self._migrator.refresh()
@@ -271,10 +395,14 @@ class TestMigrator(TestCase):
         self.assertTrue(await self.tableExists("alpha"))
 
     async def testFreshRestartsTheHistory(self) -> None:
-        """
-        Drop the tracking table and rebuild from the first batch.
+        """Drop the tracking table and rebuild from the first batch.
 
         Validates ``fresh``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         await self._migrator.rollback()
@@ -284,10 +412,14 @@ class TestMigrator(TestCase):
         self.assertEqual([row["batch"] for row in rows], [1, 1])
 
     async def testFailedMigrationIsNotRecorded(self) -> None:
-        """
-        Leave no tracking record behind when a migration fails.
+        """Leave no tracking record behind when a migration fails.
 
         Validates the atomicity of each migration step.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.useMigrations({"m01_alpha": _CreateAlpha, "m02_broken": _Broken})
         with self.assertRaises(RuntimeError):
@@ -296,10 +428,14 @@ class TestMigrator(TestCase):
         self.assertEqual([row["ran"] for row in rows], [True, False])
 
     async def testMissingMigrationFileIsReported(self) -> None:
-        """
-        Report a recorded migration whose file disappeared.
+        """Report a recorded migration whose file disappeared.
 
         Validates the rollback guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._migrator.migrate()
         self.useMigrations({"m01_alpha": _CreateAlpha})
@@ -307,10 +443,14 @@ class TestMigrator(TestCase):
             await self._migrator.reset()
 
     async def testProgressEventsAreReported(self) -> None:
-        """
-        Report progress for every migration through the callbacks.
+        """Report progress for every migration through the callbacks.
 
         Validates the console-agnostic reporting hooks.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         started: list[str] = []
         finished: list[str] = []
@@ -324,16 +464,26 @@ class TestMigrator(TestCase):
         self.assertEqual(finished, ["m01_alpha", "m02_beta"])
 
     async def testUnknownConnectionIsRejected(self) -> None:
-        """
-        Reject a connection name that is not configured.
+        """Reject a connection name that is not configured.
 
         Validates the multi-connection entry point.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ConnectionNotFoundException):
             await self._migrator.migrate(connection="ghost")
 
     async def testNamedMigrationUsesItsTrackingConnection(self) -> None:
-        """Apply and revert unqualified migration operations on the target."""
+        """Apply and revert unqualified migration operations on the target.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self._migrator.migrate(connection="secondary")
         self.assertFalse(await self.tableExists("alpha"))
         target = self._manager.connection("secondary")
@@ -353,7 +503,13 @@ class TestMigrator(TestCase):
         self.assertEqual(rows, [])
 
     async def testConcurrentMigrationsKeepTheirConnectionsSeparate(self) -> None:
-        """Isolate selected connections while two migration runs overlap."""
+        """Isolate selected connections while two migration runs overlap.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         results = await gather(
             self._migrator.migrate(),
             self._migrator.migrate(connection="secondary"),
@@ -370,7 +526,13 @@ class TestMigrator(TestCase):
         self.assertIsNone(current_migration_connection())
 
     async def testFailedMigrationRestoresTheConnectionScope(self) -> None:
-        """Restore the caller's connection after a named migration raises."""
+        """Restore the caller's connection after a named migration raises.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.useMigrations({"m01_broken": _Broken})
         with self.assertRaises(RuntimeError):
             await self._migrator.migrate(connection="secondary")

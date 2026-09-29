@@ -1,4 +1,3 @@
-"""Exercise automatic authentication with real guards and request scopes."""
 import asyncio
 from typing import TYPE_CHECKING, ClassVar
 import msgspec
@@ -58,7 +57,13 @@ _CREDENTIAL = "test-api-credential"
 _CSRF = "test-csrf-value"
 
 def identity_handler() -> JSONResponse:
-    """Expose the identity visible to a controller in the current request."""
+    """Expose the identity visible to a controller in the current request.
+
+    Returns
+    -------
+    JSONResponse
+        Value produced by the helper.
+    """
     context = current_auth_context()
     request = ScopedContext.getCurrentScope()[Request]
     return JSONResponse({
@@ -74,18 +79,51 @@ class _Session:
     __slots__ = ("data",)
 
     def __init__(self, identifier: str | None) -> None:
-        """Keep the optional identifier and the configured CSRF token."""
+        """Keep the optional identifier and the configured CSRF token.
+
+        Parameters
+        ----------
+        identifier : str | None
+            Value supplied for ``identifier``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.data: dict[str, object] = {"_csrf_token": _CSRF}
         if identifier:
             self.data["_auth_identifier"] = identifier
             self.data["_auth_identifier_password"] = hash_token_secret("")
 
     def get(self, key: str) -> object:
-        """Read a value as the session guard does in production."""
+        """Read a value as the session guard does in production.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return self.data.get(key)
 
     def forget(self, key: str) -> None:
-        """Remove a stale identity reference."""
+        """Remove a stale identity reference.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.data.pop(key, None)
 
 class _RestoreSession(BaseMiddleware):
@@ -94,7 +132,20 @@ class _RestoreSession(BaseMiddleware):
     __slots__ = ()
 
     async def handle(self, request: Request, call_next: NextCallable) -> Response:
-        """Attach a distinct session before CSRF and session authentication."""
+        """Attach a distinct session before CSRF and session authentication.
+
+        Parameters
+        ----------
+        request : Request
+            Value supplied for ``request``.
+        call_next : NextCallable
+            Value supplied for ``call_next``.
+
+        Returns
+        -------
+        Response
+            Value produced by the helper.
+        """
         request.state.session = _Session(request.headers.get("x-session-identity"))
         return await call_next()
 
@@ -104,7 +155,20 @@ class _Identity(Authenticatable, Authorizable):
     __slots__ = ("id", "password")
 
     def __init__(self, identifier: int, password: str) -> None:
-        """Store the identifier and the stored password hash."""
+        """Store the identifier and the stored password hash.
+
+        Parameters
+        ----------
+        identifier : int
+            Value supplied for ``identifier``.
+        password : str
+            Value supplied for ``password``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.id = identifier
         self.password = password
 
@@ -114,11 +178,28 @@ class _Identities:
     __slots__ = ("calls",)
 
     def __init__(self) -> None:
-        """Start with no repository calls."""
+        """Start with no repository calls.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.calls: list[object] = []
 
     async def retrieveById(self, identifier: object) -> _Identity | None:
-        """Return two persisted identities and reject stale identifiers."""
+        """Return two persisted identities and reject stale identifiers.
+
+        Parameters
+        ----------
+        identifier : object
+            Value supplied for ``identifier``.
+
+        Returns
+        -------
+        _Identity | None
+            Value produced by the helper.
+        """
         self.calls.append(identifier)
         await asyncio.sleep(0)
         if str(identifier) in {"7", "8"}:
@@ -131,12 +212,29 @@ class _Tokens:
     __slots__ = ("lookups", "touches")
 
     def __init__(self) -> None:
-        """Start with no credential reads or writes."""
+        """Start with no credential reads or writes.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.lookups: list[str] = []
         self.touches: list[object] = []
 
     async def findByPlainText(self, value: str) -> AccessToken | None:
-        """Accept one credential with a restricted permission set."""
+        """Accept one credential with a restricted permission set.
+
+        Parameters
+        ----------
+        value : str
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        AccessToken | None
+            Value produced by the helper.
+        """
         self.lookups.append(value)
         if value != _CREDENTIAL:
             return None
@@ -146,7 +244,18 @@ class _Tokens:
         )
 
     async def touch(self, identifier: object) -> bool:
-        """Record the usage update performed by the real token guard."""
+        """Record the usage update performed by the real token guard.
+
+        Parameters
+        ----------
+        identifier : object
+            Value supplied for ``identifier``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         self.touches.append(identifier)
         return True
 
@@ -156,7 +265,13 @@ class _AuthApp(_StubApp):
     __slots__ = ()
 
     def beginScope(self) -> ScopeManager:
-        """Let the kernel own identity isolation and scope cleanup."""
+        """Let the kernel own identity isolation and scope cleanup.
+
+        Returns
+        -------
+        ScopeManager
+            Value produced by the helper.
+        """
         return ScopeManager()
 
 class _CanViewUsers(RequirePermissionMiddleware):
@@ -169,7 +284,20 @@ class _CanViewUsers(RequirePermissionMiddleware):
 async def boot_auth_kernel(
     *, csrf_enabled: bool = False, default_guard: str = "session",
 ) -> tuple[KernelHTTP, _Identities, _Tokens, _StubCatch]:
-    """Boot real routing, guards and middleware with in-memory collaborators."""
+    """Boot real routing, guards and middleware with in-memory collaborators.
+
+    Parameters
+    ----------
+    csrf_enabled : bool
+        Value supplied for ``csrf_enabled``.
+    default_guard : str
+        Value supplied for ``default_guard``.
+
+    Returns
+    -------
+    object
+        Value produced by the helper.
+    """
     router = make_router()
     router.get("/public", identity_handler)
     router.post("/public", identity_handler)
@@ -226,7 +354,13 @@ class TestAutomaticAuthentication(TestCase):
     """Validate optional identity resolution before application middleware."""
 
     async def testPublicRoutesAllowGuestsWithoutRepositoryCalls(self) -> None:
-        """Anonymous requests stay public and never query authentication storage."""
+        """Anonymous requests stay public and never query authentication storage.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         for path, guard in (("/public", "session"), ("/api/public", "token")):
             response = await dispatch(kernel, path)
@@ -240,7 +374,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testWebRestoresIdentityBeforePublicAndProtectedHandlers(self) -> None:
-        """Session resolution precedes handlers, guest checks and authorization."""
+        """Session resolution precedes handlers, guest checks and authorization.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel(
             default_guard="token",
         )
@@ -259,7 +399,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testApiResolvesBearerOnceAndRetainsAbilities(self) -> None:
-        """Both explicit and generic authentication reuse the resolved token."""
+        """Both explicit and generic authentication reuse the resolved token.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         for path in ("/api/public", "/api/private", "/api/generic"):
             response = await dispatch(kernel, path, headers=[
@@ -276,7 +422,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testWebIgnoresBearerAndApiIgnoresSessionCredentials(self) -> None:
-        """Route kind determines the credential source even with both present."""
+        """Route kind determines the credential source even with both present.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         headers = [
             (b"x-session-identity", b"8"),
@@ -293,7 +445,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testInvalidCredentialsStayAnonymousOnPublicRoutes(self) -> None:
-        """Stale sessions and rejected tokens preserve optional authentication."""
+        """Stale sessions and rejected tokens preserve optional authentication.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         for path, headers in (
             ("/public", [(b"x-session-identity", b"404")]),
@@ -308,7 +466,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testCredentialsFromTheOtherPipelineNeverAuthenticate(self) -> None:
-        """A session alone cannot authenticate an API and a Bearer cannot log in web."""
+        """A session alone cannot authenticate an API and a Bearer cannot log in web.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         for path, headers in (
             ("/api/public", [(b"x-session-identity", b"7")]),
@@ -321,7 +485,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testRsgiUsesTheSameAuthenticationPipeline(self) -> None:
-        """Both transport entry points establish the same token context."""
+        """Both transport entry points establish the same token context.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         scope = _StubRsgiScope("/api/public")
         scope.headers = _StubRsgiHeaders({
@@ -337,7 +507,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     async def testOptionsDoesNotResolveAnIdentity(self) -> None:
-        """Protocol introspection returns before any authentication storage access."""
+        """Protocol introspection returns before any authentication storage access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         response = await dispatch(kernel, "/api/public", "OPTIONS", [
             (b"authorization", f"Bearer {_CREDENTIAL}".encode()),
@@ -348,14 +524,26 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(catch.handled, [])
 
     def testViewRegistrationDoesNotSpecialCaseRootAuthentication(self) -> None:
-        """View paths rely on the same kernel policy as controller routes."""
+        """View paths rely on the same kernel policy as controller routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for path in ("/", "/about"):
             route = router.view(path, "welcome")
             self.assertEqual(route.export()["middleware"], [])
 
     async def testProtectedRoutesStillRejectGuests(self) -> None:
-        """Authentication and guest-only rules remain explicit route decisions."""
+        """Authentication and guest-only rules remain explicit route decisions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         response = await dispatch(kernel, "/private")
         self.assertEqual(response.status_code, 302)
@@ -370,7 +558,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(tokens.lookups, [])
 
     async def testCsrfRejectsBeforeIdentityLookup(self) -> None:
-        """Reject an unsafe web request before querying its identity provider."""
+        """Reject an unsafe web request before querying its identity provider.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, identities, _tokens, catch = await boot_auth_kernel(csrf_enabled=True)
         headers = [(b"x-session-identity", b"7")]
         await dispatch(kernel, "/public", "POST", headers)
@@ -382,7 +576,13 @@ class TestAutomaticAuthentication(TestCase):
         self.assertEqual(identities.calls, ["7"])
 
     async def testConcurrentRequestsNeverShareIdentity(self) -> None:
-        """Shared middleware instances keep identity state in kernel-owned scopes."""
+        """Shared middleware instances keep identity state in kernel-owned scopes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         kernel, _identities, _tokens, catch = await boot_auth_kernel()
         original = current_auth_context()
         responses = await asyncio.gather(*(

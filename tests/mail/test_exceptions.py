@@ -10,10 +10,14 @@ from orionis.test import TestCase
 class TestMailExceptions(TestCase):
 
     def testEveryFailureSharesOneBaseClass(self) -> None:
-        """
-        Derive every mail failure from a single catchable base.
+        """Derive every mail failure from a single catchable base.
 
         Validates that one handler can cover the whole module.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for exception in (
             MailConfigurationException,
@@ -24,18 +28,31 @@ class TestMailExceptions(TestCase):
         self.assertTrue(issubclass(MailException, Exception))
 
     def testAttachmentFailuresAreCompositionFailures(self) -> None:
-        """
-        Treat an unreadable attachment as a composition failure.
+        """Treat an unreadable attachment as a composition failure.
 
         Validates that both can be caught with one clause before transport.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(MailAttachmentException, MailCompositionException))
 
     def testCarriesTheSuppliedMessageAndCause(self) -> None:
-        """
-        Preserve the reported message and its original cause.
+        """Preserve the reported message and its original cause.
 
         Validates the diagnostics produced by the pipeline.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        MailTransportException
+            Raised by this helper to exercise the failure path.
         """
         cause = ValueError("origin")
         error_msg = "transport failed"
@@ -46,10 +63,14 @@ class TestMailExceptions(TestCase):
             self.assertIs(exception.__cause__, cause)
 
     def testDeclaresEmptySlots(self) -> None:
-        """
-        Declare empty slots in every exception of the hierarchy.
+        """Declare empty slots in every exception of the hierarchy.
 
         Validates that raising one allocates no attribute dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for exception in (
             MailException,

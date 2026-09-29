@@ -138,6 +138,13 @@ class TestTestCaseMethodPattern(TestCase):
         overwrite the discovery pattern of each other.
         """
         async def _configure() -> str:
+            """Set this task's pattern and return its compiled form.
+
+            Returns
+            -------
+            str
+                Pattern string observed by the running task.
+            """
             CoreTestCase.setMethodPattern("check*")
             return _METHOD_PATTERN.get().pattern
 

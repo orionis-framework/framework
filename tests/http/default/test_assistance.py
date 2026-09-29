@@ -15,9 +15,21 @@ from tests.http._support import replace_attribute
 from tests.http.default.test_response_cache import _DefaultFixture
 from tests.http.default.test_templates import _Page
 
-
 def make_trace(count: int = 3, source: str = "return missing_account") -> dict:
-    """Build a captured traceback ordered from the failing frame to its callers."""
+    """Build a captured traceback ordered from the failing frame to its callers.
+
+    Parameters
+    ----------
+    count : int
+        Value supplied for ``count``.
+    source : str
+        Value supplied for ``source``.
+
+    Returns
+    -------
+    dict
+        Value produced by the helper.
+    """
     return {
         "error_type": "LookupError",
         "error_message": "Missing account & region? #42",
@@ -37,12 +49,22 @@ def make_trace(count: int = 3, source: str = "return missing_account") -> dict:
         ],
     }
 
-
 class TestChatGPTHelp(TestCase):
     """Verify useful, bounded trace context and safe rendered assistance links."""
 
     def _prompt(self, url: str) -> str:
-        """Read the single prompt parameter and enforce the full encoded URL limit."""
+        """Read the single prompt parameter and enforce the full encoded URL limit.
+
+        Parameters
+        ----------
+        url : str
+            Value supplied for ``url``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         self.assertTrue(url.isascii())
         self.assertLessEqual(len(url), CHATGPT_URL_MAX_LENGTH)
         parts = urlsplit(url)
@@ -56,7 +78,13 @@ class TestChatGPTHelp(TestCase):
         return query["prompt"][0]
 
     def testCompleteTraceIncludesEveryFrameAndSourceInCapturedOrder(self) -> None:
-        """Keep the full compact trace, request and reply language when they fit."""
+        """Keep the full compact trace, request and reply language when they fit.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace()
         url, truncated = build_chatgpt_url(data, "es-CO", "GET", "/accounts/42")
         prompt = self._prompt(url)
@@ -75,7 +103,13 @@ class TestChatGPTHelp(TestCase):
         self.assertEqual(positions, sorted(positions))
 
     def testQueryEncodingPreservesUnicodeAndSeparators(self) -> None:
-        """Round-trip UTF-8, quotes and query delimiters without extra parameters."""
+        """Round-trip UTF-8, quotes and query delimiters without extra parameters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(1, 'raise ValueError("sí & también 東京 🔥")')
         data["error_message"] = 'España 東京 🔥 & next=evil? #fragment "quoted"'
         url, truncated = build_chatgpt_url(
@@ -89,7 +123,13 @@ class TestChatGPTHelp(TestCase):
         self.assertIn(data["stack_trace"][0]["line_code"], prompt)
 
     def testOverflowDropsSourceBeforeFrameLocations(self) -> None:
-        """Retain the entire call chain before spending space on long source lines."""
+        """Retain the entire call chain before spending space on long source lines.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(12, "source_detail_" * 70)
         url, truncated = build_chatgpt_url(data, "en", "GET", "/accounts")
         prompt = self._prompt(url)
@@ -101,7 +141,13 @@ class TestChatGPTHelp(TestCase):
         self.assertRegex(prompt.lower(), r"omitted|truncated|shortened")
 
     def testDeepTraceKeepsFailureAndReportsOmittedCallers(self) -> None:
-        """Bound deep traces while retaining the failing frame and error identity."""
+        """Bound deep traces while retaining the failing frame and error identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(2000)
         url, truncated = build_chatgpt_url(data, "pt-BR", "PUT", "/accounts/42")
         prompt = self._prompt(url)
@@ -112,7 +158,13 @@ class TestChatGPTHelp(TestCase):
         self.assertRegex(prompt.lower(), r"\d+.*(?:omitted|truncated|shortened)")
 
     def testOversizedUnicodeFieldsLeaveRoomForFailureLocation(self) -> None:
-        """Keep usable context when message, request and source fields are oversized."""
+        """Keep usable context when message, request and source fields are oversized.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(2, "界🔥" * 10000)
         data["error_message"] = "missing account: " + "界🔥" * 10000
         data["stack_trace"][0]["filename"] = "long/" * 10000 + "failure.py"
@@ -126,7 +178,13 @@ class TestChatGPTHelp(TestCase):
         self.assertNotIn("\ufffd", prompt)
 
     def testNoTraceStillExplainsTheException(self) -> None:
-        """Produce a helpful request when an exception has no captured frames."""
+        """Produce a helpful request when an exception has no captured frames.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(0)
         url, truncated = build_chatgpt_url(data, "fr", "GET", "/example")
         prompt = self._prompt(url)
@@ -136,7 +194,13 @@ class TestChatGPTHelp(TestCase):
         self.assertIn("fr", prompt)
 
     def testLongFailurePathLeavesRoomForAllShortCallers(self) -> None:
-        """Use spare encoded capacity to retain callers after shortening a long path."""
+        """Use spare encoded capacity to retain callers after shortening a long path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(100, "")
         data["error_message"] = "missing"
         for frame in data["stack_trace"]:
@@ -150,11 +214,28 @@ class TestChatGPTHelp(TestCase):
         self.assertIn("0 older frames omitted", prompt)
 
     async def testRenderedLinksHaveIconsAndPreparedTraceWithoutJavaScript(self) -> None:
-        """Render accessible help links near the error heading with an encoded trace."""
+        """Render accessible help links near the error heading with an encoded trace.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         data = make_trace(2, 'raise LookupError("</script><script>probe()</script>")')
 
         def parse_data(_parser: ExceptionParser) -> dict:
-            """Supply the captured trace without accessing external services."""
+            """Supply the captured trace without accessing external services.
+
+            Parameters
+            ----------
+            _parser : ExceptionParser
+                Value supplied for ``_parser``.
+
+            Returns
+            -------
+            dict
+                Value produced by the helper.
+            """
             return data
 
         with TemporaryDirectory() as directory:

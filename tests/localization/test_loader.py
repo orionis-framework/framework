@@ -61,20 +61,28 @@ class TestTranslationLoaderDefinition(_LoaderFixture):
     """Validate the structural contract of the loader."""
 
     def testImplementsTheLoaderContract(self) -> None:
-        """
-        Implement the declared loader contract.
+        """Implement the declared loader contract.
 
         Validates that the concrete loader can be injected wherever the
         contract is required.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._loader, ITranslationLoader)
 
     def testInstancesDoNotCarryAnInstanceDictionary(self) -> None:
-        """
-        Keep loader instances free of an instance dictionary.
+        """Keep loader instances free of an instance dictionary.
 
         Validates that the declared slots are effective, which requires
         the contract to declare empty slots as well.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(self._loader, "__dict__"))
 
@@ -82,21 +90,29 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
     """Validate decoding of the root JSON file of a locale."""
 
     def testLoadsLiteralSourceTextEntries(self) -> None:
-        """
-        Expose root JSON keys as literal source texts.
+        """Expose root JSON keys as literal source texts.
 
         Validates the Laravel-style convention where the key is the
         untranslated line itself.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", '{"Welcome": "Bienvenido"}')
         self.assertEqual(self._loader.load("es")["Welcome"], "Bienvenido")
 
     def testFlattensNestedObjectsDeclaredInTheRootFile(self) -> None:
-        """
-        Flatten nested root objects with dot notation.
+        """Flatten nested root objects with dot notation.
 
         Validates that a grouped structure declared inline behaves like
         a grouped file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(
             self._root / "es.json",
@@ -107,11 +123,15 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         self.assertEqual(loaded["messages.deep.bye"], "Adios")
 
     def testCoercesNonStringRootValuesToText(self) -> None:
-        """
-        Coerce non-string root values into text.
+        """Coerce non-string root values into text.
 
         Validates that numeric or boolean payloads never leak a
         non-string value into the translation map.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", '{"Total": 5, "Ready": true}')
         loaded = self._loader.load("es")
@@ -119,11 +139,15 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         self.assertEqual(loaded["Ready"], "True")
 
     def testDecodesUtf8EncodedSources(self) -> None:
-        """
-        Decode translation sources as UTF-8 text.
+        """Decode translation sources as UTF-8 text.
 
         Validates that accented and non-Latin characters survive the
         decoding step untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(
             self._root / "es.json",
@@ -137,11 +161,15 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
     """Validate decoding of the grouped files of a locale."""
 
     def testFlattensGroupedFilesWithDotNotation(self) -> None:
-        """
-        Prefix grouped entries with the file stem.
+        """Prefix grouped entries with the file stem.
 
         Validates the ``group.key`` convention used by grouped
         translation files.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(
             self._root / "es" / "validation.json",
@@ -151,11 +179,15 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         self.assertEqual(loaded["validation.required"], "El campo es obligatorio")
 
     def testFlattensNestedGroupedObjects(self) -> None:
-        """
-        Flatten nested grouped objects recursively.
+        """Flatten nested grouped objects recursively.
 
         Validates that arbitrarily deep structures collapse into a
         single flat mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(
             self._root / "es" / "validation.json",
@@ -167,21 +199,29 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         )
 
     def testCoercesNonStringGroupedValuesToText(self) -> None:
-        """
-        Coerce non-string grouped values into text.
+        """Coerce non-string grouped values into text.
 
         Validates that the flattening routine normalizes every leaf to
         a string.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es" / "limits.json", '{"max": 10}')
         self.assertEqual(self._loader.load("es")["limits.max"], "10")
 
     def testMergesEveryGroupedFileOfTheLocale(self) -> None:
-        """
-        Merge all grouped files belonging to the locale.
+        """Merge all grouped files belonging to the locale.
 
         Validates that translations are not restricted to a single
         group per locale.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es" / "auth.json", '{"failed": "Fallo"}')
         write_source(self._root / "es" / "passwords.json", '{"reset": "Listo"}')
@@ -190,11 +230,15 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         self.assertEqual(loaded["passwords.reset"], "Listo")
 
     def testRootEntriesOverrideGroupedEntries(self) -> None:
-        """
-        Give precedence to the root file on key collision.
+        """Give precedence to the root file on key collision.
 
         Validates the documented merge order where literal-text entries
         win over grouped entries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es" / "auth.json", '{"failed": "Grouped"}')
         write_source(self._root / "es.json", '{"auth.failed": "Root"}')
@@ -204,20 +248,28 @@ class TestTranslationLoaderMissingSources(_LoaderFixture):
     """Validate the behaviour when translation sources are absent."""
 
     def testUnknownLocaleYieldsAnEmptyMap(self) -> None:
-        """
-        Return an empty map for a locale without sources.
+        """Return an empty map for a locale without sources.
 
         Validates that a missing locale is not an error but an empty
         translation map.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._loader.load("fr"), {})
 
     def testGroupedDirectoryWithoutJsonFilesIsIgnored(self) -> None:
-        """
-        Ignore a grouped directory holding no JSON file.
+        """Ignore a grouped directory holding no JSON file.
 
         Validates that unrelated directories never break the load
         sequence.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         (self._root / "es").mkdir()
         write_source(self._root / "es" / "notes.txt", "ignored")
@@ -227,44 +279,60 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
     """Validate the errors raised for unusable translation files."""
 
     def testMalformedJsonRaisesSyntaxException(self) -> None:
-        """
-        Reject a translation file holding malformed JSON.
+        """Reject a translation file holding malformed JSON.
 
         Validates that decoding failures surface as a localization
         error instead of a msgspec error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", "{broken")
         with self.assertRaises(TranslationSyntaxException):
             self._loader.load("es")
 
     def testNonObjectRootFileRaisesSyntaxException(self) -> None:
-        """
-        Reject a root file whose payload is not an object.
+        """Reject a root file whose payload is not an object.
 
         Validates that only JSON objects are accepted as translation
         sources.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", '["Bienvenido"]')
         with self.assertRaises(TranslationSyntaxException):
             self._loader.load("es")
 
     def testNonObjectGroupedFileRaisesSyntaxException(self) -> None:
-        """
-        Reject a grouped file whose payload is not an object.
+        """Reject a grouped file whose payload is not an object.
 
         Validates that the object requirement applies to grouped files
         as well.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es" / "auth.json", '"Fallo"')
         with self.assertRaises(TranslationSyntaxException):
             self._loader.load("es")
 
     def testNonUtf8FileRaisesSyntaxException(self) -> None:
-        """
-        Reject a translation file stored in another encoding.
+        """Reject a translation file stored in another encoding.
 
         Validates that a decoding failure surfaces as a localization
         error instead of a bare UnicodeDecodeError.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         (self._root / "es.json").write_bytes(
             '{"Goodbye": "Adi\u00f3s"}'.encode("latin-1"),
@@ -273,11 +341,15 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
             self._loader.load("es")
 
     def testFileRemovedAfterDiscoveryRaisesNotFoundException(self) -> None:
-        """
-        Reject reading a file that vanished after discovery.
+        """Reject reading a file that vanished after discovery.
 
         Validates the race guard protecting the loader when a source is
         deleted between listing and reading.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TranslationFileNotFoundException):
             self._loader._TranslationLoader__readFile(self._root / "ghost.json")
@@ -286,11 +358,15 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
     """Validate discovery of the locales available on disk."""
 
     def testDiscoversLocalesFromRootFilesAndDirectories(self) -> None:
-        """
-        Discover locales from root files and grouped directories.
+        """Discover locales from root files and grouped directories.
 
         Validates that both source layouts contribute to the sorted
         list of available locales.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", "{}")
         write_source(self._root / "en.json", "{}")
@@ -298,33 +374,45 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
         self.assertEqual(self._loader.availableLocales(), ("en", "es", "fr"))
 
     def testIgnoresDirectoriesWithoutTranslationFiles(self) -> None:
-        """
-        Ignore directories that hold no JSON file.
+        """Ignore directories that hold no JSON file.
 
         Validates that unrelated folders are never reported as
         available locales.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", "{}")
         (self._root / "cache").mkdir()
         self.assertEqual(self._loader.availableLocales(), ("es",))
 
     def testIgnoresFilesThatAreNotJson(self) -> None:
-        """
-        Ignore files whose extension is not JSON.
+        """Ignore files whose extension is not JSON.
 
         Validates that documentation or backup files never become
         available locales.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         write_source(self._root / "es.json", "{}")
         write_source(self._root / "readme.txt", "ignored")
         self.assertEqual(self._loader.availableLocales(), ("es",))
 
     def testReturnsNoLocalesWhenThePathIsMissing(self) -> None:
-        """
-        Report no locales when the language path does not exist.
+        """Report no locales when the language path does not exist.
 
         Validates that a missing directory degrades gracefully instead
         of raising an operating system error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         loader = TranslationLoader(self._root / "missing")
         self.assertEqual(loader.availableLocales(), ())

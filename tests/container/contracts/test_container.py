@@ -15,37 +15,201 @@ class _ConcreteContainer(IContainer):
     """Minimal IContainer implementation used for structural tests."""
 
     def instance(self, _abstract, _instance, *, _alias=None, _override=False):
+        """Register an instance in the container test double.
+
+        Parameters
+        ----------
+        _abstract : object
+            Value supplied for ``_abstract``.
+        _instance : object
+            Value supplied for ``_instance``.
+        _alias : object
+            Value supplied for ``_alias``.
+        _override : object
+            Value supplied for ``_override``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def transient(self, _abstract, _concrete, *, _alias=None, _override=False):
+        """Register a transient service in the container test double.
+
+        Parameters
+        ----------
+        _abstract : object
+            Value supplied for ``_abstract``.
+        _concrete : object
+            Value supplied for ``_concrete``.
+        _alias : object
+            Value supplied for ``_alias``.
+        _override : object
+            Value supplied for ``_override``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def singleton(self, _abstract, _concrete, *, _alias=None, _override=False):
+        """Register a singleton in the container test double.
+
+        Parameters
+        ----------
+        _abstract : object
+            Value supplied for ``_abstract``.
+        _concrete : object
+            Value supplied for ``_concrete``.
+        _alias : object
+            Value supplied for ``_alias``.
+        _override : object
+            Value supplied for ``_override``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def scoped(self, _abstract, _concrete, *, _alias=None, _override=False):
+        """Register a scoped service in the container test double.
+
+        Parameters
+        ----------
+        _abstract : object
+            Value supplied for ``_abstract``.
+        _concrete : object
+            Value supplied for ``_concrete``.
+        _alias : object
+            Value supplied for ``_alias``.
+        _override : object
+            Value supplied for ``_override``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return True
 
     def bound(self, _key):
+        """Check whether a service key is bound.
+
+        Parameters
+        ----------
+        _key : object
+            Value supplied for ``_key``.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
         return False
 
     def beginScope(self):
-        return None
+        """Start a scope in the container test double.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def getCurrentScope(self):
-        return None
+        """Return the active scope from the container test double.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     async def make(self, _key, *_args: object, **_kwargs: object):
-        return None
+        """Resolve a service through the container test double.
+
+        Parameters
+        ----------
+        _key : object
+            Value supplied for ``_key``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     async def build(self, _target, *_args: object, **_kwargs: object):
-        return None
+        """Build a service through the container test double.
+
+        Parameters
+        ----------
+        _target : object
+            Value supplied for ``_target``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     async def invoke(self, _fn, *_args: object, **_kwargs: object):
-        return None
+        """Invoke a callable through the container test double.
+
+        Parameters
+        ----------
+        _fn : object
+            Value supplied for ``_fn``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     async def call(self, _instance, _name, *_args: object, **_kwargs: object):
-        return None
+        """Call a named method through the container test double.
+
+        Parameters
+        ----------
+        _instance : object
+            Value supplied for ``_instance``.
+        _name : object
+            Value supplied for ``_name``.
+        *_args : object
+            Arguments passed to the wrapped callable.
+        **_kwargs : object
+            Arguments passed to the wrapped callable.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
 class TestIContainer(TestCase):
 

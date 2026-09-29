@@ -13,10 +13,14 @@ from orionis.test import TestCase
 class TestMailEntitiesPackage(TestCase):
 
     def testDeclaresEveryEntityAsAPublicExport(self) -> None:
-        """
-        Expose the eight mail entities from the package root.
+        """Expose the eight mail entities from the package root.
 
         Validates the public surface consumers may import.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             entities_package.__all__,
@@ -33,10 +37,14 @@ class TestMailEntitiesPackage(TestCase):
         )
 
     def testReExportsBindEachEntityClass(self) -> None:
-        """
-        Bind every exported name to its real entity class.
+        """Bind every exported name to its real entity class.
 
         Validates that no export shadows a sibling submodule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exported = {
             "Address": Address,
@@ -53,10 +61,14 @@ class TestMailEntitiesPackage(TestCase):
             self.assertNotIsInstance(getattr(entities_package, name), ModuleType)
 
     def testEveryEntityUsesSlots(self) -> None:
-        """
-        Keep entity instances free of attribute dictionaries.
+        """Keep entity instances free of attribute dictionaries.
 
         Validates the memory contract shared by framework entities.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instances = (
             Address("ana@example.com"),

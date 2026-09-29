@@ -148,16 +148,12 @@ class SecurityMiddleware:
         headers = adapter.headers()
 
         # 1. Reject headers that contain bare CR or LF (CRLF injection).
-        for name, value in headers:
-            if (
-                "\r" in name or "\n" in name
-                or "\r" in value or "\n" in value
-            ):
-                return await self.__default_responses.error(
-                    status_code=400,
-                    content="Invalid header format.",
-                    expects_json=adapter.wantsJson(),
-                )
+        if headers.hasInvalidFormat():
+            return await self.__default_responses.error(
+                status_code=400,
+                content="Invalid header format.",
+                expects_json=adapter.wantsJson(),
+            )
 
         # 2. Reject requests that carry more than one Host header.
         if headers.count("host") > 1:

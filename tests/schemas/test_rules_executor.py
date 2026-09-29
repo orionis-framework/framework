@@ -119,34 +119,50 @@ def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> 
 class TestTypeContainsNested(TestCase):
 
     def testDirectSchemaIsDetected(self) -> None:
-        """
-        Detect a bare schema annotation as nested.
+        """Detect a bare schema annotation as nested.
 
         Validates the marker attribute lookup used by the plan builder.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(_type_contains_nested(_RejectingChild))
 
     def testUnionMemberIsDetected(self) -> None:
-        """
-        Detect a schema declared inside a union annotation.
+        """Detect a schema declared inside a union annotation.
 
         Validates that optional nested schemas are still traversed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(_type_contains_nested(_RejectingChild | None))
 
     def testAnnotatedWrapperIsUnwrapped(self) -> None:
-        """
-        Detect a schema wrapped in an Annotated alias.
+        """Detect a schema wrapped in an Annotated alias.
 
         Validates that metadata never hides the wrapped schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(_type_contains_nested(Annotated[_RejectingChild, Title("C")]))
 
     def testPlainAnnotationsAreNotNested(self) -> None:
-        """
-        Reject annotations carrying no schema at all.
+        """Reject annotations carrying no schema at all.
 
         Validates that scalar and scalar-union fields are skipped.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(_type_contains_nested(str))
         self.assertFalse(_type_contains_nested(int | str))
@@ -154,10 +170,14 @@ class TestTypeContainsNested(TestCase):
 class TestWarmChildPlan(TestCase):
 
     def testDirectSchemaPlanIsBuilt(self) -> None:
-        """
-        Build the plan of a nested schema declared directly.
+        """Build the plan of a nested schema declared directly.
 
         Validates the eager warm-up performed while building a parent plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_WarmDirect")
         self.assertNotIn(klass, _PLAN_CACHE)
@@ -165,10 +185,14 @@ class TestWarmChildPlan(TestCase):
         self.assertIn(klass, _PLAN_CACHE)
 
     def testUnionMemberPlanIsBuilt(self) -> None:
-        """
-        Build the plan of a nested schema declared inside a union.
+        """Build the plan of a nested schema declared inside a union.
 
         Validates that optional nested schemas are warmed up as well.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_WarmUnion")
         self.assertNotIn(klass, _PLAN_CACHE)
@@ -176,20 +200,28 @@ class TestWarmChildPlan(TestCase):
         self.assertIn(klass, _PLAN_CACHE)
 
     def testCachedPlanIsReused(self) -> None:
-        """
-        Keep the cached plan when the schema was already warmed up.
+        """Keep the cached plan when the schema was already warmed up.
 
         Validates that warming twice never rebuilds the plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cached = _PLAN_CACHE[_RejectingChild]
         _warm_child_plan(_RejectingChild)
         self.assertIs(_PLAN_CACHE[_RejectingChild], cached)
 
     def testUnrelatedAnnotationIsIgnored(self) -> None:
-        """
-        Skip annotations that declare no schema.
+        """Skip annotations that declare no schema.
 
         Validates that scalar annotations never reach the cache.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         _warm_child_plan(str)
         self.assertNotIn(str, _PLAN_CACHE)
@@ -197,18 +229,26 @@ class TestWarmChildPlan(TestCase):
 class TestBuildPlan(TestCase):
 
     def testPlanIsCachedAtClassCreation(self) -> None:
-        """
-        Cache the validation plan when the schema class is created.
+        """Cache the validation plan when the schema class is created.
 
         Validates the pre-build performed by the schema metaclass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(_RejectingChild, _PLAN_CACHE)
 
     def testPlanEntryDescribesTheRuledField(self) -> None:
-        """
-        Describe name, dotted prefix and validators of a ruled field.
+        """Describe name, dotted prefix and validators of a ruled field.
 
         Validates the shape of the tuple consumed by the hot loop.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         name, dotted, getter, validators, is_nested = _PLAN_CACHE[_RejectingChild][0]
         self.assertEqual(name, "code")
@@ -218,18 +258,26 @@ class TestBuildPlan(TestCase):
         self.assertFalse(is_nested)
 
     def testFieldsWithoutRulesOrNestingAreSkipped(self) -> None:
-        """
-        Produce an empty plan for a schema declaring no rules.
+        """Produce an empty plan for a schema declaring no rules.
 
         Validates that plain schemas cost nothing at validation time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(_PLAN_CACHE[_PlainSchema], ())
 
     def testNestedFieldIsFlaggedWithoutValidators(self) -> None:
-        """
-        Flag a nested field for traversal without binding validators.
+        """Flag a nested field for traversal without binding validators.
 
         Validates that nesting alone keeps the field in the plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entries = {entry[0]: entry for entry in _PLAN_CACHE[_ParentSchema]}
         self.assertIn("child", entries)
@@ -238,19 +286,27 @@ class TestBuildPlan(TestCase):
         self.assertNotIn("label", entries)
 
     def testValidationMetadataIsNotExecutable(self) -> None:
-        """
-        Ignore validation metadata while collecting executable rules.
+        """Ignore validation metadata while collecting executable rules.
 
         Validates that only Rule instances become bound validators.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         entry = _PLAN_CACHE[_MessageWithRuleSchema][0]
         self.assertEqual(len(entry[3]), 1)
 
     def testUnsupportedMetadataRaisesTypeError(self) -> None:
-        """
-        Reject metadata that is neither a rule nor validation metadata.
+        """Reject metadata that is neither a rule nor validation metadata.
 
         Validates the fail-fast guard applied while building a plan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_BadMeta", {"code": [object()]})
         with self.assertRaises(TypeError):
@@ -259,10 +315,14 @@ class TestBuildPlan(TestCase):
 class TestCollectNested(TestCase):
 
     def testUncachedChildPlanIsBuiltOnDemand(self) -> None:
-        """
-        Build the child plan when the nested type is not cached yet.
+        """Build the child plan when the nested type is not cached yet.
 
         Validates the cache-miss branch of the nested traversal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         klass = _uncached_struct("_NestedColdPlan")
         failures: list[ValidationFailure] = []
@@ -271,10 +331,14 @@ class TestCollectNested(TestCase):
         self.assertEqual(failures, [])
 
     def testChildFailuresAreQualifiedWithThePrefix(self) -> None:
-        """
-        Prefix nested failures with the dotted path of the parent field.
+        """Prefix nested failures with the dotted path of the parent field.
 
         Validates the path composition applied to child failures.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
         _collect_nested(_RejectingChild(code="abc"), "child.", failures)
@@ -285,10 +349,14 @@ class TestCollectNested(TestCase):
 class TestCollectWithPlan(TestCase):
 
     def testNestedFailuresAreAccumulated(self) -> None:
-        """
-        Accumulate failures found inside a nested schema.
+        """Accumulate failures found inside a nested schema.
 
         Validates that the parent plan drives the nested traversal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = _ParentSchema(child=_RejectingChild(code="abc"), label="ok")
         failures: list[ValidationFailure] = []
@@ -296,10 +364,14 @@ class TestCollectWithPlan(TestCase):
         self.assertEqual([f.field for f in failures], ["child.code"])
 
     def testNoneNestedValueIsSkipped(self) -> None:
-        """
-        Skip traversal when the nested value is None.
+        """Skip traversal when the nested value is None.
 
         Validates that optional nested schemas never raise on absence.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = _OptionalParentSchema(child=None)
         failures: list[ValidationFailure] = []
@@ -307,10 +379,14 @@ class TestCollectWithPlan(TestCase):
         self.assertEqual(failures, [])
 
     def testEveryFailingRuleIsReported(self) -> None:
-        """
-        Report every rule failure instead of stopping at the first one.
+        """Report every rule failure instead of stopping at the first one.
 
         Validates the accumulating behaviour of the inner loop.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = _RejectingChild(code="abc")
         failures: list[ValidationFailure] = []

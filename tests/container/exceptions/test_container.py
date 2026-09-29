@@ -44,26 +44,36 @@ class TestCircularDependencyException(TestCase):
         self.assertEqual(str(exc), _MESSAGE)
 
     def testRaisedInstanceKeepsItsMessage(self) -> None:
-        """
-        Keep the message intact once the exception has been raised.
+        """Keep the message intact once the exception has been raised.
 
         Returns
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        CircularDependencyException
+            Raised by this helper to exercise the failure path.
         """
         with self.assertRaises(CircularDependencyException) as ctx:
             raise CircularDependencyException(_MESSAGE)
         self.assertEqual(str(ctx.exception), _MESSAGE)
 
     def testSupportsExceptionChaining(self) -> None:
-        """
-        Keep the original error reachable through ``__cause__``.
+        """Keep the original error reachable through ``__cause__``.
 
         Returns
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        original
+            Raised by this helper to exercise the failure path.
+        CircularDependencyException
+            Raised by this helper to exercise the failure path.
         """
         original = ValueError("root cause")
         with self.assertRaises(CircularDependencyException) as ctx:

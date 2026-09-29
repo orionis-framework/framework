@@ -19,6 +19,15 @@ class _StubEngine:
         html: str = "<html></html>",
         error: Exception | None = None,
     ) -> None:
+        """Configure the engine output or rendering failure.
+
+        Parameters
+        ----------
+        html : str, optional
+            HTML returned by ``render``.
+        error : Exception | None, optional
+            Exception raised by ``render`` when provided.
+        """
         self.html: str = html
         self.error: Exception | None = error
         self.calls: list[tuple[str, dict[str, Any]]] = []

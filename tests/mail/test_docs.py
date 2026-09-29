@@ -10,10 +10,15 @@ from orionis.test import TestCase
 _DOCS = Path(__file__).resolve().parents[2] / "orionis/mail/docs"
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)\n```", re.DOTALL)
 
-
 class TestMailDocumentation(TestCase):
     def testBothManualsShareTheSameCompilableExamples(self) -> None:
-        """Keep bilingual code examples identical and valid for the selected Python."""
+        """Keep bilingual code examples identical and valid for the selected Python.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         english = _PYTHON_BLOCK.findall(
             (_DOCS / "README.md").read_text(encoding="utf-8"),
         )
@@ -26,7 +31,13 @@ class TestMailDocumentation(TestCase):
             compile(source, f"mail-documentation-{index}", "exec")
 
     async def testDocumentedExtensionFactoryUsesTheRealContainer(self) -> None:
-        """Execute the documented factory verbatim and store its prepared message."""
+        """Execute the documented factory verbatim and store its prepared message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         source = (_DOCS / "README.md").read_text(encoding="utf-8")
         example = next(block for block in _PYTHON_BLOCK.findall(source)
                        if "async def archive_factory(" in block)

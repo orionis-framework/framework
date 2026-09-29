@@ -6,10 +6,14 @@ from orionis.test import TestCase
 class TestMailResult(TestCase):
 
     def testOwnsItsRecipientCollectionsAndRejections(self) -> None:
-        """
-        Detach every collection supplied by a transport.
+        """Detach every collection supplied by a transport.
 
         Validates that mutating the caller's data never changes the result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         rejected = {"a@example.com": [550, "No\r\nmail\x00"]}
         recipients = ["a@example.com", "c@example.com"]
@@ -37,10 +41,14 @@ class TestMailResult(TestCase):
             result.rejected_recipients["new@example.com"] = (500, "no")
 
     def testStoredResultsCarryAPathAndNoSmtpAcceptance(self) -> None:
-        """
-        Keep acceptance collections empty for a stored message.
+        """Keep acceptance collections empty for a stored message.
 
         Validates that file publication never claims SMTP acceptance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = MailResult(
             message_id="<id@example.com>",
@@ -56,10 +64,14 @@ class TestMailResult(TestCase):
         self.assertEqual(result.file_path.name, "message.eml")
 
     def testAcceptedResultsHaveNoFilePath(self) -> None:
-        """
-        Report a fully accepted SMTP transaction without a file path.
+        """Report a fully accepted SMTP transaction without a file path.
 
         Validates the shape of a successful transport result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = MailResult(
             message_id="<id@example.com>",

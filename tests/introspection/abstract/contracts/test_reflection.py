@@ -84,7 +84,14 @@ class TestIReflectionAbstractBaseType(TestCase):
         # Subclass that only overrides one of many required abstract methods
         class _PartialImpl(IReflectionAbstract):
             def getClass(self):
-                return None
+                """Implement the ``getClass`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return
 
         with self.assertRaises(TypeError):
             _PartialImpl()

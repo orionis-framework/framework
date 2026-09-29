@@ -54,6 +54,30 @@ class IFluentRoute(ABC):
         """
 
     @abstractmethod
+    def public(self, *, enabled: bool = True) -> Self:
+        """Select a stateless route without automatic session or identity setup.
+
+        Global security, CORS, rate limits, and explicitly attached middleware
+        still run. Web session, CSRF, and automatic identity resolution do not.
+        Use this profile only for endpoints that do not use cookie credentials.
+
+        Parameters
+        ----------
+        enabled : bool, optional
+            Whether to opt out of the default web or API context middleware.
+            False explicitly retains that context inside a public group.
+
+        Returns
+        -------
+        Self
+            This route with the requested execution profile.
+
+        Raises
+        ------
+        TypeError
+            If enabled is not a boolean.
+        """
+    @abstractmethod
     def middleware(
         self,
         *middleware: MiddlewareInput,
@@ -121,7 +145,7 @@ class IFluentRoute(ABC):
         dict
             Dictionary with keys: id, method, path, class, handler,
             callable_handler, view, name, middleware, without_middleware,
-            and kind.
+            kind, and public.
 
         Raises
         ------

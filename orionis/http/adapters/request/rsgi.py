@@ -137,11 +137,11 @@ class RSGITransportAdapter(TransportAdapter):
         # Read the scope header collection.
         scope_headers = self.__scope.headers
         # Flatten multi-value headers into lowercase name/value tuples.
-        raw: list[tuple[str, str]] = [
+        raw = (
             (str(key).lower(), value)
             for key in scope_headers
             for value in scope_headers.get_all(key)
-        ]
+        )
         return Headers(raw)
 
     def client(self) -> str | None:

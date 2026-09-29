@@ -6,11 +6,23 @@ from orionis.container.context.scope import ScopedContext
 class TestScopedContext(TestCase):
 
     def setUp(self) -> None:
-        """Reset scope to None before each test to guarantee isolation."""
+        """Reset scope to None before each test to guarantee isolation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.setCurrentScope(None)
 
     def tearDown(self) -> None:
-        """Reset scope to None after each test to avoid state leakage."""
+        """Reset scope to None after each test to avoid state leakage.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         ScopedContext.setCurrentScope(None)
 
     # ------------------------------------------------------------------
@@ -211,6 +223,13 @@ class TestScopedContext(TestCase):
         child_scope_seen: list[object] = []
 
         def run_in_child() -> None:
+            """Run the copied context and record its active scope.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
             child_scope_seen.append(ScopedContext.getCurrentScope())
             ScopedContext.setCurrentScope({"ctx": "child"})
 

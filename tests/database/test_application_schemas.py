@@ -1,11 +1,9 @@
 from __future__ import annotations
-
 import unittest
 from dataclasses import replace
 from datetime import datetime
 from importlib import import_module
 from unittest.mock import Mock, patch
-
 from app.models.user import User
 from database.schemas.users_v1 import USERS_V1
 from orionis.database.connection import Connection
@@ -17,7 +15,6 @@ from orionis.orm.exceptions import MassAssignmentException
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import String
 from orionis.support.facades.schema import Schema as SchemaFacade
-
 
 _TABLE_COLUMNS = {
     "scheduler_tasks": ("id", "next_run_time", "job_state"),
@@ -42,12 +39,17 @@ _TABLE_COLUMNS = {
     ),
 }
 
-
 class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
     """Exercise application migrations against a private physical database."""
 
     async def asyncSetUp(self) -> None:
-        """Bind the real migrations and model to an isolated SQLite connection."""
+        """Bind the real migrations and model to an isolated SQLite connection.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.connection = Connection("application_schemas", {
             "driver": "sqlite",
             "database": ":memory:",
@@ -75,13 +77,25 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
         await self._migrateUp()
 
     async def _migrateUp(self) -> None:
-        """Apply every application migration using its connection context."""
+        """Apply every application migration using its connection context.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         with migration_connection_scope(self.connection):
             for migration in self.migrations:
                 await migration.up()
 
     async def _tableNames(self) -> set[str]:
-        """Read application table names from the SQLite catalog."""
+        """Read application table names from the SQLite catalog.
+
+        Returns
+        -------
+        set[str]
+            Value produced by the helper.
+        """
         rows = await self.connection.select(
             "SELECT name FROM sqlite_master "
             "WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
@@ -89,7 +103,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
         return {row["name"] for row in rows}
 
     async def testMigrationsRollbackAndReplay(self) -> None:
-        """Create, remove, and recreate the complete application schema."""
+        """Create, remove, and recreate the complete application schema.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(await self._tableNames(), set(_TABLE_COLUMNS))
         self.assertEqual(
             await self.connection.select("PRAGMA foreign_keys"),
@@ -106,7 +126,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
     async def testPhysicalColumnsAndPrimaryKeysPreserveTheOriginalSchema(
         self,
     ) -> None:
-        """Keep column order, storage types, nullability, and primary keys."""
+        """Keep column order, storage types, nullability, and primary keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         primary_keys = {
             "cache": ("cache_key",),
             "cache_locks": ("cache_key",),
@@ -147,7 +173,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
         })
 
     async def testIndexesCoverStorageAndAuthorizationLookups(self) -> None:
-        """Retain actual indexes used for expiration and authorization queries."""
+        """Retain actual indexes used for expiration and authorization queries.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         expected = {
             "scheduler_tasks": {(False, ("next_run_time",))},
             "users": {(True, ("email",))},
@@ -187,7 +219,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
     async def testAuthorizationForeignKeysAndCompositeKeysAreEnforced(
         self,
     ) -> None:
-        """Reject orphan and duplicate bindings while allowing distinct owners."""
+        """Reject orphan and duplicate bindings while allowing distinct owners.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         await self.connection.execute(
             "INSERT INTO permissions (id, name) VALUES (1, 'edit')",
         )
@@ -232,7 +270,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
                 )
 
     async def testUserCrudCastsDefaultsAndHiddenAttributes(self) -> None:
-        """Persist the real User model with its existing attribute policies."""
+        """Persist the real User model with its existing attribute policies.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         user = await User.create({
             "name": "Ada", "email": "ada@example.test", "password": "digest",
         })
@@ -265,7 +309,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(await User.find(user.id))
 
     async def testUserMassAssignmentStillProtectsSensitiveColumns(self) -> None:
-        """Reject every column outside the model's explicit fillable list."""
+        """Reject every column outside the model's explicit fillable list.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for attribute in (
             "id", "active", "email_verified_at", "remember_token",
             "created_at", "updated_at", "unknown_column",
@@ -280,7 +330,13 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
     async def testHistoricalMigrationKeepsItsVersionWhenUserSchemaChanges(
         self,
     ) -> None:
-        """Replay users V1 after the active model points at newer metadata."""
+        """Replay users V1 after the active model points at newer metadata.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertIs(User.__meta__.table, USERS_V1)
         migration = self.migrations[4]
         module = import_module(type(migration).__module__)

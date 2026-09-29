@@ -17,7 +17,13 @@ class TestRouteResolverBehavior(TestCase):
     """Cover dynamic indexes, precedence, failure paths and cache isolation."""
 
     def testParameterizedGroupPrefixes(self) -> None:
-        """Compile inherited path parameters along with local parameters."""
+        """Compile inherited path parameters along with local parameters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.group(
             prefix="org/{org:int}",
@@ -40,7 +46,13 @@ class TestRouteResolverBehavior(TestCase):
         )
 
     def testSupportedConverters(self) -> None:
-        """Convert every built-in placeholder type using the real matcher."""
+        """Convert every built-in placeholder type using the real matcher.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for kind in ("str", "int", "slug", "uuid"):
             router.get(f"/{kind}/{{value:{kind}}}", route_handler)
@@ -61,7 +73,13 @@ class TestRouteResolverBehavior(TestCase):
                 )
 
     def testPartitionedLookupMatchesAnOrderedReference(self) -> None:
-        """Compare partitioned resolution against a simple ordered regex scan."""
+        """Compare partitioned resolution against a simple ordered regex scan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for index in range(40):
             router.get(f"/r{index}/{{id:int}}", route_handler)
@@ -92,7 +110,13 @@ class TestRouteResolverBehavior(TestCase):
             resolver.resolve("DELETE", "/r39/42")
 
     def testWildcardFirstSegmentsPreservePriorityAndRegistrationOrder(self) -> None:
-        """Use the ordered matcher whenever a leading parameter can overlap."""
+        """Use the ordered matcher whenever a leading parameter can overlap.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for index in range(20):
             router.get(f"/r{index}/{{id:int}}", route_handler)
@@ -106,7 +130,13 @@ class TestRouteResolverBehavior(TestCase):
         self.assertEqual(resolver.resolve("GET", "/r19/42").params, {"id": 42})
 
     def testSamePrefixBucketAndMultipleDepths(self) -> None:
-        """Retain route selection and extraction in large shared-prefix buckets."""
+        """Retain route selection and extraction in large shared-prefix buckets.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for index in range(20):
             router.get(f"/api/r{index}/{{id:int}}", route_handler)
@@ -118,7 +148,13 @@ class TestRouteResolverBehavior(TestCase):
             resolver.resolve("GET", "/api/r19/12/extra")
 
     def testRecursiveLiteralBranchesPreserveRouteSelection(self) -> None:
-        """Resolve nested branches whose literal prefixes have different lengths."""
+        """Resolve nested branches whose literal prefixes have different lengths.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for prefix in ("v1", "version-two"):
             for index in range(24):
@@ -140,7 +176,13 @@ class TestRouteResolverBehavior(TestCase):
             resolver.resolve("GET", "/api/v1/missing/42")
 
     def testMixedBranchesPreserveEqualPriorityRegistrationOrder(self) -> None:
-        """Compare overlapping literal and wildcard routes with an ordered scan."""
+        """Compare overlapping literal and wildcard routes with an ordered scan.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for position in (0, 16, 32):
             router = make_router()
             for index in range(33):
@@ -167,7 +209,13 @@ class TestRouteResolverBehavior(TestCase):
                 resolver.resolve("GET", "/unknown/absent")
 
     def testMixedPartialSegmentsAndSharedPrefixes(self) -> None:
-        """Match wildcard fragments after shared prefixes and literal branches."""
+        """Match wildcard fragments after shared prefixes and literal branches.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/api/{stem}-tail/end", route_handler).name("partial")
         for index in range(32):
@@ -184,7 +232,13 @@ class TestRouteResolverBehavior(TestCase):
             resolver.resolve("GET", "/api/unknown/end")
 
     def testManyWildcardAlternativesPreserveOrder(self) -> None:
-        """Resolve dense wildcard populations against the same ordered reference."""
+        """Resolve dense wildcard populations against the same ordered reference.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for index in range(12):
             router.get(f"/{{group}}/w{index}-{{value}}", route_handler)
@@ -201,7 +255,13 @@ class TestRouteResolverBehavior(TestCase):
                 self.assertIs(resolver.resolve("GET", path).route, expected)
 
     def testWrongMethodsUnknownPathsAndCanonicalRequests(self) -> None:
-        """Distinguish 404 from 405 and keep implicit HEAD and path handling."""
+        """Distinguish 404 from 405 and keep implicit HEAD and path handling.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/fixed", route_handler)
         router.post("/items/{id:int}", route_handler)
@@ -223,7 +283,13 @@ class TestRouteResolverBehavior(TestCase):
         self.assertEqual(resolver.options("/unknown"), [])
 
     def testHotCacheCapacityEvictionAndInvalidation(self) -> None:
-        """Bound cached results and rebuild only after eviction or invalidation."""
+        """Bound cached results and rebuild only after eviction or invalidation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/items/{id:int}", route_handler)
         resolver = RouteResolver(compile_router(router), hot_cache_size=1)
@@ -240,7 +306,13 @@ class TestRouteResolverBehavior(TestCase):
         )
 
     def testCachedParametersCannotBeMutated(self) -> None:
-        """Protect both static and dynamic shared results from parameter writes."""
+        """Protect both static and dynamic shared results from parameter writes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/static", route_handler)
         router.get("/items/{id:int}", route_handler)
@@ -255,7 +327,13 @@ class TestRouteResolverBehavior(TestCase):
             )
 
     def testFifoHitsAndChurnPreserveCapacityAndInvalidation(self) -> None:
-        """Evict in insertion order across repeated replacements and cache clears."""
+        """Evict in insertion order across repeated replacements and cache clears.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/items/{id:int}", route_handler)
         resolver = RouteResolver(compile_router(router), hot_cache_size=2)
@@ -272,7 +350,13 @@ class TestRouteResolverBehavior(TestCase):
             self.assertIsNot(resolver.resolve("GET", second_path), second)
 
     def testInvalidCacheCapacity(self) -> None:
-        """Reject capacities that would fail on the first cache insertion."""
+        """Reject capacities that would fail on the first cache insertion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for size in (-1, -100):
             with self.subTest(size=size), self.assertRaises(ValueError):
                 RouteResolver({}, hot_cache_size=size)
@@ -281,14 +365,26 @@ class TestRouteResolverBehavior(TestCase):
                 RouteResolver({}, hot_cache_size=size)
 
     def testConversionFailureDoesNotEscapeAsServerError(self) -> None:
-        """Treat an integer outside Python's conversion limit as unmatched."""
+        """Treat an integer outside Python's conversion limit as unmatched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/items/{id:int}", route_handler)
         with self.assertRaises(RouteNotFound):
             RouteResolver(compile_router(router)).resolve("GET", "/items/" + "9" * 5000)
 
     def testIntrospectionDoesNotExposeTheStoredRouteCollection(self) -> None:
-        """Allow callers to modify allRoutes output without changing dispatch."""
+        """Allow callers to modify allRoutes output without changing dispatch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         resolver = RouteResolver(compile_router(router))
         routes = resolver.allRoutes()
@@ -299,7 +395,13 @@ class TestInvalidRouteDefinitions(TestCase):
     """Reject definitions before they reach request dispatch."""
 
     def testMalformedParameterDefinitions(self) -> None:
-        """Reject invalid syntax, duplicate names and unsupported converters."""
+        """Reject invalid syntax, duplicate names and unsupported converters.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for path in (
             "/x/{",
             "/x/}",
@@ -315,7 +417,13 @@ class TestInvalidRouteDefinitions(TestCase):
                 RouteCompiler.compilePath(path)
 
     def testFinalPathAndPatternCollisions(self) -> None:
-        """Detect collisions after composing prefixes and parameter names."""
+        """Detect collisions after composing prefixes and parameter names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for paths in (("/same", "/same/"), ("/{id:int}", "/{other:int}")):
             router = make_router()
             for path in paths:
@@ -324,7 +432,13 @@ class TestInvalidRouteDefinitions(TestCase):
                 compile_router(router)
 
     def testAmbiguousNamesAndEmptyNames(self) -> None:
-        """Require one nonempty name to identify one path template."""
+        """Require one nonempty name to identify one path template.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         first = router.get("/first", route_handler).name("shared")
         router.get("/second", route_handler).name("shared")
@@ -334,7 +448,13 @@ class TestInvalidRouteDefinitions(TestCase):
             first.name("  ")
 
     def testSameNameOnTheSamePathAcrossMethods(self) -> None:
-        """Allow GET and POST to share an unambiguous named URL."""
+        """Allow GET and POST to share an unambiguous named URL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/login", route_handler).name("login")
         router.post("/login", route_handler).name("login")
@@ -343,7 +463,13 @@ class TestInvalidRouteDefinitions(TestCase):
         self.assertEqual(resolver.resolve("POST", "/login").route.name, "login")
 
     def testInvalidActionsAndPaths(self) -> None:
-        """Reject invalid non-None handlers and nonstring paths immediately."""
+        """Reject invalid non-None handlers and nonstring paths immediately.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for action in (False, 42, object, UserController()):
             with self.assertRaises(TypeError):
@@ -354,10 +480,22 @@ class TestInvalidRouteDefinitions(TestCase):
             router.get("/invalid", [UserController, "missing"])
 
     def testLocalHandlersFailDuringCompilation(self) -> None:
-        """Reject a local function before a kernel tries importing it by name."""
+        """Reject a local function before a kernel tries importing it by name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
 
         def local_handler() -> None:
-            """Supply a nonimportable function."""
+            """Supply a nonimportable function.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
 
         router = make_router()
         router.get("/local", local_handler)
@@ -365,7 +503,13 @@ class TestInvalidRouteDefinitions(TestCase):
             compile_router(router)
 
     def testViewActionCanBeReplacedAndTupleActionsWork(self) -> None:
-        """Honor fluent action changes and typed controller/method tuples."""
+        """Honor fluent action changes and typed controller/method tuples.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.view("/page", "welcome").action(UserController, "index")
         router.get("/tuple", (UserController, "index"))

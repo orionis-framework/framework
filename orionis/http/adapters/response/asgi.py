@@ -18,7 +18,7 @@ class ASGIResponseAdapter(ResponseAdapter):
 
     __slots__ = ()
 
-    async def send(
+    async def send( # NOSONAR
         self,
         adapter: TransportAdapter,
         response: Response,
@@ -68,7 +68,11 @@ class ASGIResponseAdapter(ResponseAdapter):
                 "body": b"",
                 "more_body": False,
             })
-            await response.runBackground()
+            if (
+                response.background is not None
+                or type(response).runBackground is not Response.runBackground
+            ):
+                await response.runBackground()
             return
 
         # Select the requested file interval or the response stream.
@@ -119,7 +123,11 @@ class ASGIResponseAdapter(ResponseAdapter):
                 "body": b"",
                 "more_body": False,
             })
-            await response.runBackground()
+            if (
+                response.background is not None
+                or type(response).runBackground is not Response.runBackground
+            ):
+                await response.runBackground()
             return
 
         # Fall back to a regular buffered body response.
@@ -127,7 +135,11 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         await send({"type": self.RESPONSE_START, "status": status, "headers": headers})
         await send({"type": self.RESPONSE_BODY, "body": body, "more_body": False})
-        await response.runBackground()
+        if (
+            response.background is not None
+            or type(response).runBackground is not Response.runBackground
+        ):
+            await response.runBackground()
 
     def __ensureContentLength(
         self,

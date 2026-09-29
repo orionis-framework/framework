@@ -20,69 +20,101 @@ class _AliasedSchema(Schema):
 class TestFieldAliases(TestCase):
 
     def testFieldIsAnnotated(self) -> None:
-        """
-        Alias ``Field`` to the annotated type constructor.
+        """Alias ``Field`` to the annotated type constructor.
 
         Validates the alias used to attach metadata to a field type.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Field, typing.Annotated)
 
     def testChoiceIsLiteral(self) -> None:
-        """
-        Alias ``Choice`` to the literal type constructor.
+        """Alias ``Choice`` to the literal type constructor.
 
         Validates the alias used to restrict a field to fixed values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Choice, typing.Literal)
 
     def testNullableIsOptional(self) -> None:
-        """
-        Alias ``Nullable`` to the optional type constructor.
+        """Alias ``Nullable`` to the optional type constructor.
 
         Validates the alias used to allow ``None`` on a field.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Nullable, typing.Optional)
 
     def testAnyOfIsUnion(self) -> None:
-        """
-        Alias ``AnyOf`` to the union type constructor.
+        """Alias ``AnyOf`` to the union type constructor.
 
         Validates the alias used to accept several field types.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.AnyOf, typing.Union)
 
     def testConstantIsFinal(self) -> None:
-        """
-        Alias ``Constant`` to the final type qualifier.
+        """Alias ``Constant`` to the final type qualifier.
 
         Validates the alias used to forbid reassignment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Constant, typing.Final)
 
     def testAliasIsTypeAlias(self) -> None:
-        """
-        Alias ``Alias`` to the type-alias qualifier.
+        """Alias ``Alias`` to the type-alias qualifier.
 
         Validates the alias used to name a composite annotation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Alias, typing.TypeAlias)
 
     def testStaticIsClassVar(self) -> None:
-        """
-        Alias ``Static`` to the class-variable qualifier.
+        """Alias ``Static`` to the class-variable qualifier.
 
         Validates the alias used to exclude an attribute from the fields.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(fields.Static, typing.ClassVar)
 
 class TestFieldAliasesInSchemas(TestCase):
 
     def testAliasedAnnotationsBuildAUsableSchema(self) -> None:
-        """
-        Declare a schema entirely through the field aliases.
+        """Declare a schema entirely through the field aliases.
 
         Validates that the aliases behave like their typing counterparts
         once the metaclass compiles the annotations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = _AliasedSchema(name="Alice", role="admin")
         self.assertEqual(instance.name, "Alice")
@@ -90,11 +122,15 @@ class TestFieldAliasesInSchemas(TestCase):
         self.assertIsNone(instance.nickname)
 
     def testAliasedConstraintIsCompiled(self) -> None:
-        """
-        Compile the metadata supplied through the ``Field`` alias.
+        """Compile the metadata supplied through the ``Field`` alias.
 
         Validates that constraints declared with the alias reach the
         generated field metadata.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         declared = {f.name: f.type for f in msgspec.structs.fields(_AliasedSchema)}
         metas = [
@@ -105,10 +141,14 @@ class TestFieldAliasesInSchemas(TestCase):
         self.assertEqual(metas[0].min_length, 2)
 
     def testAliasedChoiceRestrictsTheAcceptedValues(self) -> None:
-        """
-        Reject a value outside the literal alias declared for a field.
+        """Reject a value outside the literal alias declared for a field.
 
         Validates that the ``Choice`` alias narrows the field domain.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(msgspec.ValidationError):
             msgspec.convert({"name": "Alice", "role": "root"}, type=_AliasedSchema)

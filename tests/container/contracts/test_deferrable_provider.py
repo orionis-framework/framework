@@ -8,7 +8,13 @@ class _ConcreteProvider(IDeferrableProvider):
 
     @classmethod
     def provides(cls) -> list[type | str]:
-        """Return the services published by this provider."""
+        """Return the services published by this provider.
+
+        Returns
+        -------
+        list[type | str]
+            Value produced by the helper.
+        """
         return [int, "x-orionis-probe"]
 
 class TestIDeferrableProvider(TestCase):

@@ -41,6 +41,8 @@ class CompiledRoute:
     kind : str
         Route group kind; either ``'web'`` or ``'api'``.
         Set by the loader when importing route files.
+    public : bool
+        Whether automatic session, CSRF, and identity context are omitted.
     converters : dict[str, Callable]
         Maps each path parameter name to its converter function.
         Empty for static routes.
@@ -61,6 +63,7 @@ class CompiledRoute:
     segment_count: int
     priority_score: int = 0
     kind: str = "web"
+    public: bool = False
     converters: dict[str, Callable] = field(default_factory=dict)
     middleware: list = field(default_factory=list)
     without_middleware: set = field(default_factory=set)

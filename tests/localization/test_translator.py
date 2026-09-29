@@ -25,6 +25,18 @@ class _MissingRecorder:
     __slots__ = ("calls", "line")
 
     def __init__(self, line: str | None) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        line : str | None
+            Value supplied for ``line``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.line = line
         self.calls: list[tuple[str, str]] = []
 
@@ -126,39 +138,55 @@ class TestTranslatorDefinition(_TranslatorFixture):
     """Validate the structural contract of the translator."""
 
     def testImplementsTheTranslatorContract(self) -> None:
-        """
-        Implement the declared translator contract.
+        """Implement the declared translator contract.
 
         Validates that the translator can be injected wherever the
         contract is required.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self._translator, ITranslator)
 
     def testInstancesDoNotCarryAnInstanceDictionary(self) -> None:
-        """
-        Keep translator instances free of an instance dictionary.
+        """Keep translator instances free of an instance dictionary.
 
         Validates that the declared slots are effective, which requires
         the contract to declare empty slots as well.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(self._translator, "__dict__"))
 
     def testConstructorRejectsAMalformedActiveLocale(self) -> None:
-        """
-        Reject a malformed active locale at construction time.
+        """Reject a malformed active locale at construction time.
 
         Validates that the translator is the single boundary enforcing
         safe locale codes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._makeTranslator(locale="../etc")
 
     def testConstructorRejectsAMalformedFallbackLocale(self) -> None:
-        """
-        Reject a malformed fallback locale at construction time.
+        """Reject a malformed fallback locale at construction time.
 
         Validates that the fallback code is validated with the same
         rules as the active locale.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._makeTranslator(fallback="en/../es")
@@ -167,54 +195,78 @@ class TestTranslatorLookup(_TranslatorFixture):
     """Validate translation resolution and fallback chaining."""
 
     def testResolvesLinesFromTheActiveLocale(self) -> None:
-        """
-        Resolve a line from the active locale.
+        """Resolve a line from the active locale.
 
         Validates the primary lookup performed before any fallback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Welcome"), "Bienvenido")
 
     def testExplicitLocaleOverridesTheActiveOne(self) -> None:
-        """
-        Resolve a line from an explicitly requested locale.
+        """Resolve a line from an explicitly requested locale.
 
         Validates per-call locale selection without mutating the
         translator state.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Welcome", locale="en"), "Welcome")
         self.assertEqual(self._translator.getLocale(), "es")
 
     def testFallsBackToTheFallbackLocale(self) -> None:
-        """
-        Resolve a missing line from the fallback locale.
+        """Resolve a missing line from the fallback locale.
 
         Validates the second stage of the documented lookup order.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Only English"), "Only English")
 
     def testEchoesTheKeyWhenNoTranslationExists(self) -> None:
-        """
-        Return the key itself when no translation exists.
+        """Return the key itself when no translation exists.
 
         Validates the final stage of the lookup order, which keeps
         templates readable while translations are missing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Unknown Key"), "Unknown Key")
 
     def testSkipsTheFallbackWhenItIsTheRequestedLocale(self) -> None:
-        """
-        Avoid a second lookup when the target is the fallback locale.
+        """Avoid a second lookup when the target is the fallback locale.
 
         Validates that the fallback stage is skipped when it would
         repeat the primary lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Ghost", locale="en"), "Ghost")
 
     def testRejectsAMalformedExplicitLocale(self) -> None:
-        """
-        Reject a malformed locale requested per call.
+        """Reject a malformed locale requested per call.
 
         Validates that untrusted locale codes never reach the loader.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.get("Welcome", locale="")
@@ -223,53 +275,77 @@ class TestTranslatorExistence(_TranslatorFixture):
     """Validate existence checks over the translation maps."""
 
     def testFindsKeysDeclaredInTheActiveLocale(self) -> None:
-        """
-        Report a key declared in the active locale.
+        """Report a key declared in the active locale.
 
         Validates the primary existence check.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(self._translator.has("Welcome"))
 
     def testFindsKeysDeclaredOnlyInTheFallbackLocale(self) -> None:
-        """
-        Report a key declared only in the fallback locale.
+        """Report a key declared only in the fallback locale.
 
         Validates that the fallback locale participates in the check by
         default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(self._translator.has("Only English"))
 
     def testIgnoresTheFallbackWhenDisabled(self) -> None:
-        """
-        Ignore the fallback locale when explicitly disabled.
+        """Ignore the fallback locale when explicitly disabled.
 
         Validates the strict mode used to detect untranslated lines.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(self._translator.has("Only English", fallback=False))
 
     def testReturnsFalseWhenTheTargetIsTheFallbackLocale(self) -> None:
-        """
-        Avoid a redundant check when the target is the fallback.
+        """Avoid a redundant check when the target is the fallback.
 
         Validates that a missing key in the fallback locale is reported
         as absent without a second lookup.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(self._translator.has("Unknown Key", locale="en"))
 
     def testReturnsFalseForUnknownKeys(self) -> None:
-        """
-        Report an unknown key as absent.
+        """Report an unknown key as absent.
 
         Validates the negative case of the existence check.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(self._translator.has("Unknown Key"))
 
     def testRejectsAMalformedExplicitLocale(self) -> None:
-        """
-        Reject a malformed locale requested per call.
+        """Reject a malformed locale requested per call.
 
         Validates that existence checks enforce the same locale rules
         as translation lookups.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.has("Welcome", locale="es!")
@@ -278,10 +354,14 @@ class TestTranslatorReplacements(_TranslatorFixture):
     """Validate placeholder interpolation on resolved lines."""
 
     def testSubstitutesLowercasePlaceholders(self) -> None:
-        """
-        Substitute the raw placeholder variant.
+        """Substitute the raw placeholder variant.
 
         Validates the base case of parameter interpolation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             self._translator.get("Hello :name", name="Carlos"),
@@ -289,11 +369,15 @@ class TestTranslatorReplacements(_TranslatorFixture):
         )
 
     def testSubstitutesCapitalizedAndUppercasedVariants(self) -> None:
-        """
-        Substitute the capitalized and uppercased variants.
+        """Substitute the capitalized and uppercased variants.
 
         Validates that a single parameter feeds the three documented
         placeholder casings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = ":name | :Name | :NAME"
         self.assertEqual(
@@ -302,11 +386,15 @@ class TestTranslatorReplacements(_TranslatorFixture):
         )
 
     def testLongerParameterNamesAreAppliedFirst(self) -> None:
-        """
-        Apply longer parameter names before shorter ones.
+        """Apply longer parameter names before shorter ones.
 
         Validates that a short name never shadows a longer placeholder
         sharing its prefix.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = ":name greets :name_full"
         self.assertEqual(
@@ -315,20 +403,28 @@ class TestTranslatorReplacements(_TranslatorFixture):
         )
 
     def testCoercesNonStringReplacementValues(self) -> None:
-        """
-        Coerce non-string replacement values into text.
+        """Coerce non-string replacement values into text.
 
         Validates that numeric parameters can be interpolated without
         an explicit conversion by the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Total: :total", total=7), "Total: 7")
 
     def testLeavesTheLineUntouchedWithoutParameters(self) -> None:
-        """
-        Skip interpolation when no parameter is provided.
+        """Skip interpolation when no parameter is provided.
 
         Validates the fast path that avoids scanning lines without
         placeholders.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Hello :name"), "Hola :name")
 
@@ -336,20 +432,28 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
     """Validate the hook invoked when a key cannot be resolved."""
 
     def testHandlerSuppliesTheResolvedLine(self) -> None:
-        """
-        Use the line returned by the missing-key handler.
+        """Use the line returned by the missing-key handler.
 
         Validates that the hook can replace the default key echo.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.missing(_MissingRecorder("Sin traduccion"))
         self.assertEqual(self._translator.get("Ghost"), "Sin traduccion")
 
     def testHandlerReceivesTheKeyAndTheTargetLocale(self) -> None:
-        """
-        Pass the key and the target locale to the handler.
+        """Pass the key and the target locale to the handler.
 
         Validates the payload reporting tools rely on to collect
         untranslated lines.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         recorder = _MissingRecorder("x")
         self._translator.missing(recorder)
@@ -357,21 +461,29 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
         self.assertEqual(recorder.calls, [("Ghost", "en")])
 
     def testHandlerReturningNoLineFallsBackToTheKey(self) -> None:
-        """
-        Echo the key when the handler returns no line.
+        """Echo the key when the handler returns no line.
 
         Validates that a reporting-only handler does not break the
         rendered output.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.missing(_MissingRecorder(None))
         self.assertEqual(self._translator.get("Ghost"), "Ghost")
 
     def testHandlerCanBeRemoved(self) -> None:
-        """
-        Restore the default behaviour when the handler is removed.
+        """Restore the default behaviour when the handler is removed.
 
         Validates that passing None detaches a previously registered
         hook.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.missing(_MissingRecorder("Sin traduccion"))
         self._translator.missing(None)
@@ -381,38 +493,54 @@ class TestTranslatorPluralization(_TranslatorFixture):
     """Validate segment selection for pluralized lines."""
 
     def testSelectsTheSingularSegmentForOne(self) -> None:
-        """
-        Select the first segment for a count of one.
+        """Select the first segment for a count of one.
 
         Validates the positional rule applied without explicit
         conditions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "Una manzana|:count manzanas"
         self.assertEqual(self._translator.choice(line, 1), "Una manzana")
 
     def testSelectsThePluralSegmentForOtherCounts(self) -> None:
-        """
-        Select the second segment for any other count.
+        """Select the second segment for any other count.
 
         Validates the plural branch of the positional rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "Una manzana|:count manzanas"
         self.assertEqual(self._translator.choice(line, 5), "5 manzanas")
 
     def testReusesTheSingleSegmentForEveryCount(self) -> None:
-        """
-        Reuse the only segment when no plural form exists.
+        """Reuse the only segment when no plural form exists.
 
         Validates that a line without separators is always usable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.choice("Sin plural", 9), "Sin plural")
 
     def testMatchesExactConditions(self) -> None:
-        """
-        Select the segment whose exact condition matches the count.
+        """Select the segment whose exact condition matches the count.
 
         Validates the ``{n}`` syntax, which takes precedence over the
         positional rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "{0} ninguna|{1} una manzana|[2,*] :count manzanas"
         self.assertEqual(self._translator.choice(line, 0), "ninguna")
@@ -420,19 +548,27 @@ class TestTranslatorPluralization(_TranslatorFixture):
         self.assertEqual(self._translator.choice(line, 7), "7 manzanas")
 
     def testMatchesTheWildcardExactCondition(self) -> None:
-        """
-        Select the segment declaring a wildcard exact condition.
+        """Select the segment declaring a wildcard exact condition.
 
         Validates the catch-all ``{*}`` form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "{*} cualquiera|otra"
         self.assertEqual(self._translator.choice(line, 42), "cualquiera")
 
     def testMatchesBoundedRanges(self) -> None:
-        """
-        Select the segment whose bounded range contains the count.
+        """Select the segment whose bounded range contains the count.
 
         Validates that both bounds of a range are evaluated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "[0,1] pocas|[2,4] varias|[5,*] muchas"
         self.assertEqual(self._translator.choice(line, 1), "pocas")
@@ -440,32 +576,44 @@ class TestTranslatorPluralization(_TranslatorFixture):
         self.assertEqual(self._translator.choice(line, 9), "muchas")
 
     def testIgnoresNonNumericExactConditions(self) -> None:
-        """
-        Fall back to the positional rule for invalid exact conditions.
+        """Fall back to the positional rule for invalid exact conditions.
 
         Validates that a malformed condition never selects a segment by
         accident.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "{x} primera|segunda"
         self.assertEqual(self._translator.choice(line, 1), "primera")
         self.assertEqual(self._translator.choice(line, 2), "segunda")
 
     def testIgnoresNonNumericRangeBounds(self) -> None:
-        """
-        Fall back to the positional rule for invalid range bounds.
+        """Fall back to the positional rule for invalid range bounds.
 
         Validates that a malformed bound is treated as a failed match
         instead of an error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "[a,*] primera|segunda"
         self.assertEqual(self._translator.choice(line, 5), "segunda")
 
     def testInjectsTheCountPlaceholderAutomatically(self) -> None:
-        """
-        Expose the count under the ``:count`` placeholder.
+        """Expose the count under the ``:count`` placeholder.
 
         Validates that pluralized lines can render the quantity without
         an explicit parameter.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             self._translator.choice("Hay :count manzanas", 3),
@@ -473,10 +621,14 @@ class TestTranslatorPluralization(_TranslatorFixture):
         )
 
     def testSubstitutesAdditionalParameters(self) -> None:
-        """
-        Interpolate extra parameters into the selected segment.
+        """Interpolate extra parameters into the selected segment.
 
         Validates that pluralization and interpolation compose.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         line = "Una manzana de :owner|:count manzanas de :owner"
         self.assertEqual(
@@ -485,10 +637,14 @@ class TestTranslatorPluralization(_TranslatorFixture):
         )
 
     def testResolvesTheLineFromTheRequestedLocale(self) -> None:
-        """
-        Resolve the pluralized line from an explicit locale.
+        """Resolve the pluralized line from an explicit locale.
 
         Validates that pluralization honours per-call locale selection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._writeSource("en.json", '{"apples": "one apple|:count apples"}')
         self._repository.flush()
@@ -501,61 +657,85 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
     """Validate runtime locale switching and discovery."""
 
     def testReportsTheActiveLocale(self) -> None:
-        """
-        Report the locale currently in use.
+        """Report the locale currently in use.
 
         Validates the accessor consumed by the template globals.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.getLocale(), "es")
 
     def testSwitchesTheActiveLocaleAtRuntime(self) -> None:
-        """
-        Apply a new active locale immediately.
+        """Apply a new active locale immediately.
 
         Validates that subsequent lookups use the newly selected
         locale.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.setLocale("en")
         self.assertEqual(self._translator.getLocale(), "en")
         self.assertEqual(self._translator.get("Welcome"), "Welcome")
 
     def testRejectsMalformedLocaleCodes(self) -> None:
-        """
-        Reject locale codes that are unsafe for path resolution.
+        """Reject locale codes that are unsafe for path resolution.
 
         Validates the anti-traversal guard enforced at this boundary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for candidate in ("", "../etc", "es/es", "es.json", "es ", "_es"):
             with self.assertRaises(InvalidLocaleException):
                 self._translator.setLocale(candidate)
 
     def testRejectsLocaleCodesThatAreNotStrings(self) -> None:
-        """
-        Reject a locale code that is not a string.
+        """Reject a locale code that is not a string.
 
         Validates that the guard runs before any regular expression
         matching.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.setLocale(42)  # type: ignore[arg-type]
 
     def testAcceptsRegionAndScriptSubtags(self) -> None:
-        """
-        Accept locale codes carrying region or script subtags.
+        """Accept locale codes carrying region or script subtags.
 
         Validates that the guard does not reject legitimate BCP 47
         style codes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for candidate in ("en", "en_US", "en-US", "zh-Hant-TW"):
             self._translator.setLocale(candidate)
             self.assertEqual(self._translator.getLocale(), candidate)
 
     def testDiscoversTheAvailableLocales(self) -> None:
-        """
-        Expose the locales discovered by the loader.
+        """Expose the locales discovered by the loader.
 
         Validates the delegation used by the template globals to render
         language switchers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.availableLocales(), ("en", "es"))
 
@@ -563,11 +743,15 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
     """Validate cache invalidation exposed by the translator."""
 
     def testReloadOfASingleLocalePicksUpFileChanges(self) -> None:
-        """
-        Re-read one locale after invalidating it.
+        """Re-read one locale after invalidating it.
 
         Validates the targeted invalidation used when a single language
         file changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(self._translator.get("Welcome"), "Bienvenido")
         self._writeSource("es.json", '{"Welcome": "Hola de nuevo"}')
@@ -575,10 +759,14 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         self.assertEqual(self._translator.get("Welcome"), "Hola de nuevo")
 
     def testReloadWithoutLocaleDiscardsEveryLocale(self) -> None:
-        """
-        Re-read every locale when no locale is supplied.
+        """Re-read every locale when no locale is supplied.
 
         Validates the bulk invalidation used after a deployment.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.get("Welcome")
         self._translator.get("Welcome", locale="en")
@@ -589,40 +777,56 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         self.assertEqual(self._translator.get("Welcome", locale="en"), "New")
 
     def testReloadRejectsMalformedLocales(self) -> None:
-        """
-        Reject a malformed locale on targeted invalidation.
+        """Reject a malformed locale on targeted invalidation.
 
         Validates that cache management enforces the same locale rules
         as lookups.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.reload("../etc")
 
     def testForgetReportsWhetherAnEntryWasRemoved(self) -> None:
-        """
-        Report whether the invalidated locale was cached.
+        """Report whether the invalidated locale was cached.
 
         Validates the boolean contract used to detect a no-op
         invalidation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.get("Welcome")
         self.assertTrue(self._translator.forget("es"))
         self.assertFalse(self._translator.forget("es"))
 
     def testForgetRejectsMalformedLocales(self) -> None:
-        """
-        Reject a malformed locale when discarding a cache entry.
+        """Reject a malformed locale when discarding a cache entry.
 
         Validates that the guard also protects the eviction path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.forget("es/es")
 
     def testFlushDiscardsEveryCachedLocale(self) -> None:
-        """
-        Discard every cached locale in a single call.
+        """Discard every cached locale in a single call.
 
         Validates the shortcut exposed for full cache invalidation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._translator.get("Welcome")
         self._translator.flush()

@@ -1,0 +1,30 @@
+<aside id="dashboard-sidebar" class="orionis-sidebar" aria-label="{{ __('Main navigation') }}" data-sidebar>
+  <div class="orionis-sidebar-top">
+    <a href="{{ route('home') }}" class="orionis-sidebar-brand" aria-label="{{ config('app.name') }}">
+      <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}">
+      <span class="orionis-sidebar-brand-mark" aria-hidden="true">✦</span>
+    </a>
+    <button type="button" class="orionis-sidebar-close" data-sidebar-close aria-label="{{ __('Close navigation') }}" hidden>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M6 18 18 6"/></svg>
+    </button>
+  </div>
+  <nav class="orionis-sidebar-nav" aria-label="{{ __('Main navigation') }}">
+    <a href="{{ route('home') }}" title="{{ __('Dashboard') }}" class="orionis-nav-link{% if active_page == 'home' %} is-active{% endif %}"{% if active_page == 'home' %} aria-current="page"{% endif %}>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="orionis-nav-label">{{ __('Dashboard') }}</span>
+    </a>
+    <h2 class="orionis-nav-section">{{ __('Administration') }}</h2>
+    <a href="{{ route('admin.roles') }}" title="{{ __('Roles') }}" class="orionis-nav-link{% if active_page == 'roles' %} is-active{% endif %}"{% if active_page == 'roles' %} aria-current="page"{% endif %}>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></svg>
+      <span class="orionis-nav-label">{{ __('Roles') }}</span>
+    </a>
+    <a href="{{ route('admin.users') }}" title="{{ __('Users') }}" class="orionis-nav-link{% if active_page == 'users' %} is-active{% endif %}"{% if active_page == 'users' %} aria-current="page"{% endif %}>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m1-16a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 4v2"/></svg>
+      <span class="orionis-nav-label">{{ __('Users') }}</span>
+    </a>
+  </nav>
+  <div class="orionis-sidebar-bottom">
+    <span class="orionis-sidebar-star" aria-hidden="true">✦</span>
+    <div>Orionis Framework<small>v{{ framework_version() }}</small></div>
+  </div>
+</aside>

@@ -14,7 +14,13 @@ class _DescriptorOwner:
 
     @staticmethod
     def read() -> int:
-        """Return the original descriptor result."""
+        """Return the original descriptor result.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 1
 
 @dataclass(slots=True)
@@ -27,10 +33,14 @@ class TestTemporaryAttributeReplacement(TestCase):
     """Verify restoration of attributes used to isolate HTTP collaborators."""
 
     def testRestoresAnOwnedAttributeIncludingNone(self) -> None:
-        """
-        Restore an existing value after the replacement context exits.
+        """Restore an existing value after the replacement context exits.
 
         Validates that None is retained as a real value rather than absence.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         target = SimpleNamespace(value=None)
         with replace_attribute(target, "value", 2):
@@ -38,10 +48,14 @@ class TestTemporaryAttributeReplacement(TestCase):
         self.assertIsNone(target.value)
 
     def testRemovesAnAttributeCreatedByTheContext(self) -> None:
-        """
-        Remove a temporary attribute that did not originally exist.
+        """Remove a temporary attribute that did not originally exist.
 
         Validates that a test cannot leave a new attribute on its collaborator.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         target = SimpleNamespace()
         with replace_attribute(target, "value", 2):
@@ -49,10 +63,14 @@ class TestTemporaryAttributeReplacement(TestCase):
         self.assertFalse(hasattr(target, "value"))
 
     def testRestoresInheritedAttributeOwnership(self) -> None:
-        """
-        Remove an instance override while retaining its inherited class value.
+        """Remove an instance override while retaining its inherited class value.
 
         Validates that restoration does not materialize inherited attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         target = _InheritedValue()
         with replace_attribute(target, "value", 2):
@@ -61,13 +79,23 @@ class TestTemporaryAttributeReplacement(TestCase):
         self.assertNotIn("value", vars(target))
 
     def testRestoresTheOriginalDescriptor(self) -> None:
-        """
-        Restore the descriptor itself after temporarily replacing a method.
+        """Restore the descriptor itself after temporarily replacing a method.
 
         Validates that static binding semantics remain intact for later tests.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         def replacement() -> int:
-            """Return the temporary descriptor result."""
+            """Return the temporary descriptor result.
+
+            Returns
+            -------
+            int
+                Value produced by the helper.
+            """
             return 2
 
         original = vars(_DescriptorOwner)["read"]
@@ -77,10 +105,14 @@ class TestTemporaryAttributeReplacement(TestCase):
         self.assertEqual(_DescriptorOwner().read(), 1)
 
     def testRestoresSlottedValues(self) -> None:
-        """
-        Restore a value on an object without an instance dictionary.
+        """Restore a value on an object without an instance dictionary.
 
         Validates replacement of slotted transport and request collaborators.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         target = _SlottedValue()
         with replace_attribute(target, "value", 2):
@@ -88,10 +120,19 @@ class TestTemporaryAttributeReplacement(TestCase):
         self.assertEqual(target.value, 1)
 
     def testRestoresValuesAfterAnException(self) -> None:
-        """
-        Restore the original value when the tested operation raises.
+        """Restore the original value when the tested operation raises.
 
         Validates that failed assertions or collaborators cannot leak overrides.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        ValueError
+            Raised by this helper to exercise the failure path.
         """
         target = SimpleNamespace(value=1)
         with (

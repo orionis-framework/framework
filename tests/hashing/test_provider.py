@@ -12,7 +12,6 @@ from orionis.test import TestCase
 # Cheap cost parameters keeping the facade round trip fast.
 _CHEAP_COSTS: dict[str, int] = {"rounds": 1, "memory": 8, "threads": 1}
 
-
 class _StubApp:
     """Application double capturing every binding it receives."""
 
@@ -45,7 +44,6 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete))
 
-
 class _StubHashFacade:
     """Facade double counting how many times it was pinned."""
 
@@ -71,76 +69,101 @@ class _StubHashFacade:
         """
         self.pinned += 1
 
-
 class TestHashProviderDefinition(TestCase):
 
     def testInheritsTheServiceProviderBase(self) -> None:
-        """
-        Extend the base ServiceProvider class.
+        """Extend the base ServiceProvider class.
 
         Validates the provider class hierarchy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(HashProvider, ServiceProvider))
 
     def testIsNotDeferred(self) -> None:
-        """
-        Stay out of the deferred provider mechanism.
+        """Stay out of the deferred provider mechanism.
 
         Validates the requirement imposed by the members that stay
         synchronous: a deferred provider would leave the Hash facade
         unpinned, so the first call of a synchronous consumer would
         receive a dispatcher instead of a value.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(issubclass(HashProvider, DeferrableProvider))
 
     def testIsRegisteredAsACoreProvider(self) -> None:
-        """
-        Ship with the core providers booted by the framework.
+        """Ship with the core providers booted by the framework.
 
         Validates that IHashManager is bound without the application
         having to register anything by hand.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIn(HashProvider, CORE_PROVIDERS)
 
     def testStoresTheApplicationReference(self) -> None:
-        """
-        Keep the container passed to the constructor.
+        """Keep the container passed to the constructor.
 
         Validates the container the provider binds services into.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         self.assertIs(HashProvider(app).app, app)  # type: ignore[arg-type]
 
     def testBootIsDeclaredAsynchronous(self) -> None:
-        """
-        Declare the boot phase as an asynchronous method.
+        """Declare the boot phase as an asynchronous method.
 
         Validates that boot can await the facade pinning.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(HashProvider.boot))
-
 
 class TestHashProviderRegister(TestCase):
 
     def testRegisterBindsTheManagerAsASingleton(self) -> None:
-        """
-        Bind IHashManager to the concrete HashManager implementation.
+        """Bind IHashManager to the concrete HashManager implementation.
 
         Validates the contract resolved by the Hash facade.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         app = _StubApp()
         HashProvider(app).register()  # type: ignore[arg-type]
         self.assertEqual(app.singletons, [(IHashManager, HashManager)])
 
-
 class TestHashProviderBoot(TestCase):
 
     def setUp(self) -> None:
-        """
-        Replace the Hash facade with a double before each test.
+        """Replace the Hash facade with a double before each test.
 
         Prevents the boot phase from pinning the real facade, which would
         require a fully booted application.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._original_facade = provider_module.HashFacade
         self._facade = _StubHashFacade()
@@ -148,64 +171,91 @@ class TestHashProviderBoot(TestCase):
         self._app = _StubApp()
 
     def tearDown(self) -> None:
-        """
-        Restore the original Hash facade after each test.
+        """Restore the original Hash facade after each test.
 
         Guarantees that module level state never leaks between tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         provider_module.HashFacade = self._original_facade
 
     async def testBootPinsTheHashFacade(self) -> None:
-        """
-        Pin the Hash facade once the services are registered.
+        """Pin the Hash facade once the services are registered.
 
         Validates that facade access skips container resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await HashProvider(self._app).boot()  # type: ignore[arg-type]
         self.assertEqual(self._facade.pinned, 1)
 
     async def testBootRegistersNoAdditionalBinding(self) -> None:
-        """
-        Keep the boot phase free of container registrations.
+        """Keep the boot phase free of container registrations.
 
         Validates the separation between register() and boot().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await HashProvider(self._app).boot()  # type: ignore[arg-type]
         self.assertEqual(self._app.singletons, [])
 
-
 class TestHashFacade(TestCase):
 
     def testAccessorIsTheManagerContract(self) -> None:
-        """
-        Resolve the hashing manager contract from the container.
+        """Resolve the hashing manager contract from the container.
 
         Validates the accessor the facade metaclass relies on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(Hash.getFacadeAccessor(), IHashManager)
 
     async def testResolvesTheRegisteredManager(self) -> None:
-        """
-        Resolve the manager bound by the provider.
+        """Resolve the manager bound by the provider.
 
         Validates that the booted application exposes the service.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(await Hash.resolve(), HashManager)
 
     def testIsPinnedAfterTheApplicationBoots(self) -> None:
-        """
-        Expose a pinned instance once the application has booted.
+        """Expose a pinned instance once the application has booted.
 
         Validates the wiring that keeps facade access free of container
         resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(Hash._pinned_instance, HashManager)
 
     async def testHashesAndVerifiesThroughThePinnedFacade(self) -> None:
-        """
-        Hash and verify a value through the pinned facade.
+        """Hash and verify a value through the pinned facade.
 
         Validates the awaited API application code depends on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         hashed = await Hash.make("my-secret-password", **_CHEAP_COSTS)
         self.assertIsInstance(hashed, str)

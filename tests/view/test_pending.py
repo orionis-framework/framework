@@ -28,6 +28,15 @@ class _StubEngine:
         html: str = "<p>ok</p>",
         error: Exception | None = None,
     ) -> None:
+        """Configure the engine output or rendering failure.
+
+        Parameters
+        ----------
+        html : str, optional
+            HTML returned by ``render``.
+        error : Exception | None, optional
+            Exception raised by ``render`` when provided.
+        """
         self.html: str = html
         self.error: Exception | None = error
         self.calls: list[tuple[str, dict[str, Any]]] = []
@@ -45,6 +54,7 @@ class _StubSession:
     __slots__ = ("errors", "inputs", "messages")
 
     def __init__(self) -> None:
+        """Initialize empty bags for messages, old input, and errors."""
         self.messages: dict[str, Any] = {}
         self.inputs: dict[str, Any] = {}
         self.errors: dict[str, Any] = {}
@@ -71,6 +81,15 @@ class _StubSessionFacade:
         session: _StubSession | None = None,
         failure: Exception | None = None,
     ) -> None:
+        """Configure the session returned by the facade double.
+
+        Parameters
+        ----------
+        session : _StubSession | None, optional
+            Session returned by ``resolve``.
+        failure : Exception | None, optional
+            Exception raised by ``resolve`` when provided.
+        """
         self.session: _StubSession | None = session
         self.failure: Exception | None = failure
         self.resolved: int = 0
@@ -86,6 +105,13 @@ class _StubValidationError(Exception):
     """Validation error exposing an ``errors`` mapping like the real one."""
 
     def __init__(self, errors: dict[str, list[str]]) -> None:
+        """Store the validation errors exposed by the exception double.
+
+        Parameters
+        ----------
+        errors : dict[str, list[str]]
+            Messages grouped by field name.
+        """
         super().__init__(_INVALID_PAYLOAD)
         self.errors: dict[str, list[str]] = errors
 

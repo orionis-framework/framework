@@ -65,20 +65,28 @@ def _payload(**overrides: object) -> dict:
 class TestRulesThroughValidator(TestCase):
 
     def testValidPayloadIsDecoded(self) -> None:
-        """
-        Return a typed instance when every custom rule passes.
+        """Return a typed instance when every custom rule passes.
 
         Validates that the rules do not reject a well-formed payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         instance = Validator.validate(_payload(), _Registration)
         self.assertEqual(instance.ident, _UUID_V4)
         self.assertEqual(instance.quantity, 5)
 
     def testFailingRuleRaisesWithItsCode(self) -> None:
-        """
-        Raise ValidationException carrying the failing rule code.
+        """Raise ValidationException carrying the failing rule code.
 
         Validates that the rule identifier reaches the reported failure.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(ValidationException) as ctx:
             Validator.validate(_payload(terms="no"), _Registration)
@@ -86,10 +94,14 @@ class TestRulesThroughValidator(TestCase):
         self.assertEqual(ctx.exception.failure.field, "terms")
 
     def testEveryRuleIsEvaluatedOnItsField(self) -> None:
-        """
-        Report the expected rule code for each failing field.
+        """Report the expected rule code for each failing field.
 
         Validates that the rules are bound to the field they annotate.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cases = (
             ({"ident": "not-a-uuid"}, "ident", "uuid"),
@@ -109,19 +121,27 @@ class TestRulesThroughValidator(TestCase):
             self.assertEqual(ctx.exception.failure.rule, code)
 
     def testCrossFieldRuleReadsTheDecodedInstance(self) -> None:
-        """
-        Compare a field against a sibling resolved on the instance.
+        """Compare a field against a sibling resolved on the instance.
 
         Validates that the schema instance reaches the rule at run time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"start": "2024-01-01T00:00:00", "end": "2024-06-01T00:00:00"}
         self.assertIsNotNone(Validator.validate(payload, _Booking))
 
     def testCustomMessageOverridesTheDefault(self) -> None:
-        """
-        Report the message supplied when the rule was declared.
+        """Report the message supplied when the rule was declared.
 
         Validates that per-instance messages reach the failure entity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"start": "2024-06-01T00:00:00", "end": "2024-01-01T00:00:00"}
         with self.assertRaises(ValidationException) as ctx:
@@ -131,19 +151,27 @@ class TestRulesThroughValidator(TestCase):
 class TestRuleExports(TestCase):
 
     def testPackageExportsMatchItsPublicApi(self) -> None:
-        """
-        Resolve every name declared in the rules package ``__all__``.
+        """Resolve every name declared in the rules package ``__all__``.
 
         Validates that the package exposes exactly what it advertises.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in rules_module.__all__:
             self.assertTrue(hasattr(rules_module, name), name)
 
     def testConstraintsReexportEveryRule(self) -> None:
-        """
-        Re-export every rule from the constraints module.
+        """Re-export every rule from the constraints module.
 
         Validates that both entry points expose the same objects.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in rules_module.__all__:
             self.assertIn(name, constraints_module.__all__)

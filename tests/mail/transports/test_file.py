@@ -32,6 +32,13 @@ class PublicationBoundary:
     __slots__ = ("failure", "name", "observed", "release", "started", "synced")
 
     def __init__(self) -> None:
+        """Initialize the test helper.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.failure: str | None = None
         self.name = "safe-unique-name"
         self.observed: list[tuple[bytes, bool, bool]] = []
@@ -41,11 +48,38 @@ class PublicationBoundary:
         self.synced = False
 
     def token_hex(self, _size: int) -> str:
-        """Return a deterministic safe name for collision tests."""
+        """Return a deterministic safe name for collision tests.
+
+        Parameters
+        ----------
+        _size : int
+            Value supplied for ``_size``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return self.name
 
     def fsync(self, descriptor: int) -> None:
-        """Sync a real temporary file or simulate a persistence failure."""
+        """Sync a real temporary file or simulate a persistence failure.
+
+        Parameters
+        ----------
+        descriptor : int
+            Value supplied for ``descriptor``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        OSError
+            Raised by this helper to exercise the failure path.
+        """
         if self.failure == "sync":
             error_msg = "Injected sync failure."
             raise OSError(error_msg)
@@ -53,7 +87,27 @@ class PublicationBoundary:
         self.synced = True
 
     def link(self, temporary: Path, final: Path) -> None:
-        """Inspect the staged file before its atomic publication."""
+        """Inspect the staged file before its atomic publication.
+
+        Parameters
+        ----------
+        temporary : Path
+            Value supplied for ``temporary``.
+        final : Path
+            Value supplied for ``final``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+
+        Raises
+        ------
+        TimeoutError
+            Raised by this helper to exercise the failure path.
+        OSError
+            Raised by this helper to exercise the failure path.
+        """
         self.observed.append((temporary.read_bytes(), final.exists(), self.synced))
         self.started.set()
         if not self.release.wait(5):
@@ -70,11 +124,34 @@ class ObservedFileTransport(FileTransport):
     __slots__ = ("finished",)
 
     def __init__(self, path: Path) -> None:
+        """Initialize the test helper.
+
+        Parameters
+        ----------
+        path : Path
+            Value supplied for ``path``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__(path)
         self.finished = threading.Event()
 
     def _store(self, payload: bytes) -> Path:
-        """Signal completion once the worker released every resource."""
+        """Signal completion once the worker released every resource.
+
+        Parameters
+        ----------
+        payload : bytes
+            Value supplied for ``payload``.
+
+        Returns
+        -------
+        Path
+            Value produced by the helper.
+        """
         try:
             return super()._store(payload)
         finally:
@@ -83,7 +160,13 @@ class ObservedFileTransport(FileTransport):
 class TestFileTransport(TestCase):
 
     def setUp(self) -> None:
-        """Isolate the output and cwd, replacing publication primitives."""
+        """Isolate the output and cwd, replacing publication primitives.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -105,16 +188,26 @@ class TestFileTransport(TestCase):
         self.app = cast("IApplication", SimpleNamespace(basePath=self.root))
 
     def tearDown(self) -> None:
-        """Restore the production publication primitives."""
+        """Restore the production publication primitives.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.boundary.release.set()
         file_module.os = self.original_os
         file_module.secrets = self.original_secrets
 
     async def testRelativePathsAnchorToApplicationAndPublishCompleteMime(self) -> None:
-        """
-        Resolve a relative output against the application root.
+        """Resolve a relative output against the application root.
 
         Validates that a complete parseable message is published.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transport = create_file_transport(self.app, {"path": "outgoing"})
         result = await transport.send(_PREPARED, mailer="archive", driver="file")
@@ -136,20 +229,28 @@ class TestFileTransport(TestCase):
             self.assertEqual(result.file_path.stat().st_mode & 0o077, 0)
 
     async def testDefaultsToTheConventionalOutputDirectory(self) -> None:
-        """
-        Fall back to the documented storage directory.
+        """Fall back to the documented storage directory.
 
         Validates the behaviour of a mailer that omits its path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transport = create_file_transport(self.app, {})
         result = await transport.send(_PREPARED, mailer="file", driver="file")
         self.assertEqual(result.file_path.parent, self.root / "storage/mail")
 
     async def testAbsoluteOutputPathsAreRespected(self) -> None:
-        """
-        Keep an absolute output path outside the application root.
+        """Keep an absolute output path outside the application root.
 
         Validates that absolute configuration is never re-anchored.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         output = self.root.parent / "absolute"
         transport = create_file_transport(self.app, {"path": str(output)})
@@ -157,10 +258,14 @@ class TestFileTransport(TestCase):
         self.assertEqual(result.file_path.parent, output)
 
     async def testNameCollisionsNeverOverwriteExistingMail(self) -> None:
-        """
-        Let the filesystem arbitrate competing publications.
+        """Let the filesystem arbitrate competing publications.
 
         Validates that an existing message is never replaced.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         transport = FileTransport(self.root / "outgoing")
         results = await asyncio.gather(
@@ -178,10 +283,14 @@ class TestFileTransport(TestCase):
         self.assertEqual(files[0].read_bytes(), _PAYLOAD)
 
     async def testSyncAndPublicationFailuresLeaveNoTemporaryOrFinalFile(self) -> None:
-        """
-        Remove the staged file when durability or publication fails.
+        """Remove the staged file when durability or publication fails.
 
         Validates that no partial message survives a failure.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for failure in ("sync", "link"):
             self.boundary.failure = failure
@@ -195,10 +304,14 @@ class TestFileTransport(TestCase):
             self.assertEqual(list(target.iterdir()), [])
 
     async def testDirectoryCreationFailureIsExplicit(self) -> None:
-        """
-        Report an unwritable output boundary instead of inventing a result.
+        """Report an unwritable output boundary instead of inventing a result.
 
         Validates that an existing file blocks the directory creation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         target = self.root / "not-a-directory"
         target.write_bytes(b"existing")
@@ -207,20 +320,28 @@ class TestFileTransport(TestCase):
         self.assertEqual(target.read_bytes(), b"existing")
 
     def testRejectsInvalidOutputConfiguration(self) -> None:
-        """
-        Validate the configured path when the transport is selected.
+        """Validate the configured path when the transport is selected.
 
         Validates that an ambiguous or empty path never reaches the disk.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for path in ("", "   ", "bad\x00path", None, 7):
             with self.assertRaises(MailConfigurationException):
                 create_file_transport(self.app, {"path": path})
 
     def testRejectsAnchoredButRelativePaths(self) -> None:
-        """
-        Reject a path that is anchored yet not absolute.
+        """Reject a path that is anchored yet not absolute.
 
         Validates that a drive-relative location is never guessed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         candidate = Path("C:outgoing")
         if not candidate.anchor or candidate.is_absolute():
@@ -229,10 +350,14 @@ class TestFileTransport(TestCase):
             create_file_transport(self.app, {"path": str(candidate)})
 
     async def testCancellationDoesNotAbandonTheWorkerTemporary(self) -> None:
-        """
-        Let the worker own its cleanup after the waiter is cancelled.
+        """Let the worker own its cleanup after the waiter is cancelled.
 
         Validates that cancellation never leaves a stray temporary file.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.boundary.release.clear()
         output = self.root / "cancelled"

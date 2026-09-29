@@ -1,17 +1,20 @@
 from xml.etree.ElementTree import ParseError
-
 from defusedxml.common import DefusedXmlException, EntitiesForbidden
-
 from orionis.http.payload.parsers import parse_xml
 from orionis.test import TestCase
 from tests.http.test_request import make_asgi_request
-
 
 class TestXmlExceptionContract(TestCase):
     """Distinguish prohibited entity declarations from malformed XML."""
 
     async def testEntityDeclarationsRaiseEntitiesForbidden(self) -> None:
-        """Expose the security exception unchanged through parser and request."""
+        """Expose the security exception unchanged through parser and request.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payloads = (
             b'<!DOCTYPE root [<!ENTITY item "text">]><root>&item;</root>',
             b'<!DOCTYPE root [<!ENTITY item "unused">]><root/>',
@@ -37,7 +40,13 @@ class TestXmlExceptionContract(TestCase):
             self.assertNotIsInstance(requested.exception, ParseError)
 
     async def testDtdWithoutEntityDeclarationsIsAllowed(self) -> None:
-        """Keep harmless DTDs and predefined entities available to XML callers."""
+        """Keep harmless DTDs and predefined entities available to XML callers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         payloads = (
             (b"<!DOCTYPE root><root/>", None),
             (

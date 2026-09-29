@@ -2,7 +2,8 @@ from __future__ import annotations
 import asyncio
 import json
 import mimetypes
-from collections.abc import AsyncIterable, Iterable, Mapping, MutableMapping
+from collections.abc import AsyncIterable, Iterable, Mapping
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time
 from decimal import Decimal
 from email.utils import format_datetime
@@ -36,6 +37,7 @@ class Response(IResponse):
         "_body",
         "_flash",
         "_headers",
+        "_raw_headers",
         "_stream",
         "background",
         "media_type",
@@ -97,7 +99,8 @@ class Response(IResponse):
         else:
             self._body = self.render(content)
 
-        self._headers: MutableMapping[str, list[str]] = {}
+        self._headers: dict[str, str | list[str]] = {}
+        self._raw_headers: tuple[tuple[bytes, bytes], ...] | None = None
 
         if headers:
             # Accept dictionaries and other mapping implementations.
@@ -110,9 +113,11 @@ class Response(IResponse):
                 key_lower = key.lower()
                 existing = store.get(key_lower)
                 if existing is None:
-                    store[key_lower] = [value]
-                else:
+                    store[key_lower] = value
+                elif isinstance(existing, list):
                     existing.append(value)
+                else:
+                    store[key_lower] = [existing, value]
 
         if background is not None and not isinstance(background, BackgroundTask):
             error_msg = "background must be a BackgroundTask or None"
@@ -169,9 +174,12 @@ class Response(IResponse):
         headers = self._headers
         existing = headers.get(key_lower)
         if existing is None:
-            headers[key_lower] = [value]
-        else:
+            headers[key_lower] = value
+        elif isinstance(existing, list):
             existing.append(value)
+        else:
+            headers[key_lower] = [existing, value]
+        self._raw_headers = None
 
     def setHeader(self, key: str, value: str) -> None:
         """
@@ -189,7 +197,14 @@ class Response(IResponse):
         None
             This method does not return a value.
         """
-        self._headers[key.lower()] = [value]
+        key_lower = key.lower()
+        cached = self._raw_headers
+        if cached is not None:
+            self._raw_headers = (
+                None if key_lower in self._headers else
+                (*cached, (key_lower.encode("latin-1"), value.encode("latin-1")))
+            )
+        self._headers[key_lower] = value
 
     def getHeader(self, key: str) -> list[str] | None:
         """
@@ -205,7 +220,16 @@ class Response(IResponse):
         list[str] | None
             The list of header values, or None if not present.
         """
-        return self._headers.get(key.lower())
+        key_lower = key.lower()
+        value = self._headers.get(key_lower)
+        if value is None:
+            return None
+        # Preserve the mutable list returned by the public header accessor.
+        if not isinstance(value, list):
+            value = [value]
+            self._headers[key_lower] = value
+        self._raw_headers = None
+        return value
 
     def hasHeader(self, key: str) -> bool:
         """
@@ -238,6 +262,7 @@ class Response(IResponse):
             This method does not return a value.
         """
         self._headers.pop(key.lower(), None)
+        self._raw_headers = None
 
     def getRawHeaders(self) -> list[tuple[bytes, bytes]]:
         """
@@ -248,12 +273,19 @@ class Response(IResponse):
         list of tuple of (bytes, bytes)
             The headers as (key, value) pairs encoded in latin-1.
         """
-        # Encode each header pair using Latin-1.
-        return [
-            (key.encode("latin-1"), value.encode("latin-1"))
-            for key, values in self._headers.items()
-            for value in values
-        ]
+        cached = self._raw_headers
+        if cached is not None:
+            return list(cached)
+        result = []
+        for key, values in self._headers.items():
+            encoded_key = key.encode("latin-1")
+            if isinstance(values, str):
+                result.append((encoded_key, values.encode("latin-1")))
+            else:
+                result.extend(
+                    (encoded_key, value.encode("latin-1")) for value in values
+                )
+        return result
 
     def getStringHeaders(self) -> list[tuple[str, str]]:
         """
@@ -264,11 +296,13 @@ class Response(IResponse):
         list of tuple of str
             The headers represented as (key, value) string pairs.
         """
-        return [
-            (key, value)
-            for key, values in self._headers.items()
-            for value in values
-        ]
+        result = []
+        for key, values in self._headers.items():
+            if isinstance(values, str):
+                result.append((key, values))
+            else:
+                result.extend((key, value) for value in values)
+        return result
 
     def setCookie( # NOSONAR
         self,
@@ -660,6 +694,103 @@ class Response(IResponse):
             The media type, or None if not set.
         """
         return self.media_type
+
+@dataclass(frozen=True, slots=True, init=False)
+class ResponseTemplate:
+    """
+    Store validated immutable content for independent response instances.
+
+    Parameters
+    ----------
+    content : bytes | str, optional
+        Constant response content, encoded once as UTF-8.
+    status_code : int, optional
+        HTTP status shared by newly created responses.
+    headers : Mapping[str, str] | None, optional
+        Constant headers copied and encoded when the template is constructed.
+    media_type : str | None, optional
+        Response media type metadata.
+    """
+
+    body: bytes
+    status_code: int
+    media_type: str | None
+    _headers: tuple[tuple[str, str], ...] = field(repr=False)
+    _raw_headers: tuple[tuple[bytes, bytes], ...] = field(repr=False)
+
+    def __init__(
+        self,
+        content: bytes | str = b"",
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+    ) -> None:
+        """
+        Validate and snapshot constant response content and headers.
+
+        Parameters
+        ----------
+        content : bytes | str, optional
+            Constant content to encode once.
+        status_code : int, optional
+            Valid HTTP response status.
+        headers : Mapping[str, str] | None, optional
+            Constant headers copied from the caller's mapping.
+        media_type : str | None, optional
+            Media type metadata copied to each response.
+
+        Returns
+        -------
+        None
+            The immutable template is initialized.
+
+        Raises
+        ------
+        TypeError
+            If the content is not text or bytes, or headers are not strings.
+        """
+        if not isinstance(content, (bytes, str)):
+            error_msg = "ResponseTemplate content must be bytes or str"
+            raise TypeError(error_msg)
+        validated = Response(content, status_code, headers, media_type)
+        pairs = validated.getStringHeaders()
+        if any(not isinstance(value, str) for _, value in pairs):
+            error_msg = "ResponseTemplate header values must be strings"
+            raise TypeError(error_msg)
+        object.__setattr__(self, "body", validated.getBody())
+        object.__setattr__(self, "status_code", status_code)
+        object.__setattr__(self, "media_type", media_type)
+        object.__setattr__(self, "_headers", tuple(pairs))
+        object.__setattr__(self, "_raw_headers", tuple(validated.getRawHeaders()))
+
+    def make(self) -> Response:
+        """
+        Create a response with independent headers, cookies, and background.
+
+        Returns
+        -------
+        Response
+            Mutable response sharing only immutable body and encoded headers.
+        """
+        response = object.__new__(Response)
+        response.status_code = self.status_code
+        response.media_type = self.media_type
+        response._body = self.body  # noqa: SLF001 - Initialize a response owned by this factory.
+        response._stream = None  # noqa: SLF001 - Initialize a response owned by this factory.
+        response._flash = None  # noqa: SLF001 - Initialize a response owned by this factory.
+        response.background = None
+        headers: dict[str, str | list[str]] = {}
+        for key, value in self._headers:
+            previous = headers.get(key)
+            if previous is None:
+                headers[key] = value
+            elif isinstance(previous, list):
+                previous.append(value)
+            else:
+                headers[key] = [previous, value]
+        response._headers = headers  # noqa: SLF001 - Initialize a response owned by this factory.
+        response._raw_headers = self._raw_headers  # noqa: SLF001 - Initialize a response owned by this factory.
+        return response
 
 class HTMLResponse(Response):
 

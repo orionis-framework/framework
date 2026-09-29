@@ -15,108 +15,251 @@ class SampleConcrete:
     __private_attr: str = "private" # NOSONAR
 
     def __init__(self, x: int = 0) -> None:
-        """Initialise with an optional integer."""
+        """Initialise with an optional integer.
+
+        Parameters
+        ----------
+        x : int
+            Value supplied for ``x``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.x = x
 
     def publicMethod(self) -> str:
-        """Return a fixed string."""
+        """Return a fixed string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "public"
 
     async def publicAsyncMethod(self) -> str: # NOSONAR
-        """Return a fixed async string."""
+        """Return a fixed async string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "async_public"
 
     def _protectedMethod(self) -> bool:
-        """Return True."""
+        """Return True.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     async def _protectedAsyncMethod(self) -> None:
-        """No-op async protected method."""
+        """No-op async protected method.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     def __privateMethod(self) -> int:  # NOSONAR
-        """Return zero as a private method."""
+        """Return zero as a private method.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 0
 
     async def __privateAsyncMethod(self) -> int:  # NOSONAR
-        """Return zero as a private async method."""
+        """Return zero as a private async method.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 0
 
     @staticmethod
     def staticMethod() -> bool:
-        """Return True from a static context."""
+        """Return True from a static context.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     @staticmethod
     async def staticAsyncMethod() -> bool: # NOSONAR
-        """Return True from an async static context."""
+        """Return True from an async static context.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+        """
         return True
 
     @staticmethod
     def _protectedStaticMethod() -> int:
-        """Return 0 from a protected static context."""
+        """Return 0 from a protected static context.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 0
 
     @staticmethod
     async def _protectedStaticAsyncMethod() -> int: # NOSONAR
-        """Return 0 from a protected async static context."""
+        """Return 0 from a protected async static context.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 0
 
     @staticmethod
     def __privateStaticMethod() -> int: # NOSONAR
-        """Return 1 from a private static context."""
+        """Return 1 from a private static context.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 1
 
     @staticmethod
     async def __privateStaticAsyncMethod() -> int: # NOSONAR
-        """Return 1 from a private async static context."""
+        """Return 1 from a private async static context.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 1
 
     @classmethod
     def classMethod(cls) -> str:
-        """Return the class name."""
+        """Return the class name.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return cls.__name__
 
     @classmethod
     async def classAsyncMethod(cls) -> str: # NOSONAR
-        """Return the class name from an async class method."""
+        """Return the class name from an async class method.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return cls.__name__
 
     @classmethod
     def _protectedClassMethod(cls) -> None:
-        """No-op protected class method."""
+        """No-op protected class method.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
     @classmethod
     async def _protectedClassAsyncMethod(cls) -> str: # NOSONAR
-        """Return the class name from a protected async class method."""
+        """Return the class name from a protected async class method.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return cls.__name__
 
     @classmethod
     def __privateClassMethod(cls) -> str: # NOSONAR
-        """Return the class name from a private class method."""
+        """Return the class name from a private class method.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return cls.__name__
 
     @classmethod
     async def __privateClassAsyncMethod(cls) -> str: # NOSONAR
-        """Return the class name from a private async class method."""
+        """Return the class name from a private async class method.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return cls.__name__
 
     @property
     def aProperty(self) -> int:
-        """Return a fixed integer property value."""
+        """Return a fixed integer property value.
+
+        Returns
+        -------
+        int
+            Value produced by the helper.
+        """
         return 0
 
     @property
     def _protectedProperty(self) -> str:
-        """Return a fixed protected property string."""
+        """Return a fixed protected property string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "protected_value"
 
     @property
     def __privateProperty(self) -> str: # NOSONAR
-        """Return a fixed private property string."""
+        """Return a fixed private property string.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "private_value"
 
     def __repr__(self) -> str:
-        """Return a developer-friendly string representation."""
+        """Return a developer-friendly string representation.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return f"SampleConcrete(x={self.x})"
 
 def _make_mutable_concrete() -> type:
@@ -132,7 +275,13 @@ def _make_mutable_concrete() -> type:
         mutable_attr: int = 99
 
         def deletableMethod(self) -> int:
-            """Return 1."""
+            """Return 1.
+
+            Returns
+            -------
+            int
+                Value produced by the helper.
+            """
             return 1
 
     return _Mutable
@@ -149,7 +298,13 @@ def _make_private_method_concrete() -> type:
     class _PrivateHolder:
 
         def __hiddenMethod(self) -> int: # NOSONAR
-            """Return 2."""
+            """Return 2.
+
+            Returns
+            -------
+            int
+                Value produced by the helper.
+            """
             return 2
 
     return _PrivateHolder
@@ -255,7 +410,16 @@ class TestReflectionConcreteInit(TestCase):
 
         class _Abstract(ABC):
             @abstractmethod
-            def m(self): ...
+            def m(self):
+                """Run the m helper.
+
+                Returns
+                -------
+                None
+                    Completes the operation described above.
+                """
+                ...
+
 
         with self.assertRaises(TypeError):
             ReflectionConcrete(_Abstract)  # type: ignore[arg-type]
@@ -314,7 +478,13 @@ class TestReflectionConcreteInit(TestCase):
 class TestReflectionConcreteCacheProtocol(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for cache tests."""
+        """Initialise a shared ReflectionConcrete for cache tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testSetAndGetItem(self) -> None:
@@ -394,7 +564,13 @@ class TestReflectionConcreteCacheProtocol(TestCase):
 class TestReflectionConcreteIdentity(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for identity tests."""
+        """Initialise a shared ReflectionConcrete for identity tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetClassReturnsSampleConcrete(self) -> None:
@@ -471,7 +647,13 @@ class TestReflectionConcreteIdentity(TestCase):
 class TestReflectionConcreteMetadata(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for metadata tests."""
+        """Initialise a shared ReflectionConcrete for metadata tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetDocstringReturnsStr(self) -> None:
@@ -601,7 +783,13 @@ class TestReflectionConcreteMetadata(TestCase):
 class TestReflectionConcretePublicAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for attribute tests."""
+        """Initialise a shared ReflectionConcrete for attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPublicAttributesReturnsDict(self) -> None:
@@ -696,7 +884,13 @@ class TestReflectionConcretePublicAttributes(TestCase):
 class TestReflectionConcreteProtectedAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for protected attribute tests."""
+        """Initialise a shared ReflectionConcrete for protected attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetProtectedAttributesReturnsDict(self) -> None:
@@ -736,7 +930,13 @@ class TestReflectionConcreteProtectedAttributes(TestCase):
 class TestReflectionConcreteDunderAttributes(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for dunder attribute tests."""
+        """Initialise a shared ReflectionConcrete for dunder attribute tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetDunderAttributesReturnsDict(self) -> None:
@@ -855,7 +1055,13 @@ class TestReflectionConcreteRemoveAttribute(TestCase):
 class TestReflectionConcretePublicMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for public method tests."""
+        """Initialise a shared ReflectionConcrete for public method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPublicMethodsReturnsList(self) -> None:
@@ -953,7 +1159,13 @@ class TestReflectionConcretePublicMethods(TestCase):
 class TestReflectionConcreteProtectedMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for protected method tests."""
+        """Initialise a shared ReflectionConcrete for protected method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetProtectedMethodsReturnsList(self) -> None:
@@ -1044,7 +1256,13 @@ class TestReflectionConcreteProtectedMethods(TestCase):
 class TestReflectionConcretePrivateMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for private method tests."""
+        """Initialise a shared ReflectionConcrete for private method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPrivateMethodsReturnsList(self) -> None:
@@ -1087,7 +1305,13 @@ class TestReflectionConcretePrivateMethods(TestCase):
 class TestReflectionConcreteClassMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for class method tests."""
+        """Initialise a shared ReflectionConcrete for class method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPublicClassMethodsReturnsList(self) -> None:
@@ -1154,7 +1378,13 @@ class TestReflectionConcreteClassMethods(TestCase):
 class TestReflectionConcreteStaticMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for static method tests."""
+        """Initialise a shared ReflectionConcrete for static method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPublicStaticMethodsReturnsList(self) -> None:
@@ -1221,7 +1451,13 @@ class TestReflectionConcreteStaticMethods(TestCase):
 class TestReflectionConcreteDunderMethods(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for dunder method tests."""
+        """Initialise a shared ReflectionConcrete for dunder method tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetDunderMethodsReturnsList(self) -> None:
@@ -1372,7 +1608,13 @@ class TestReflectionConcreteMethodOperations(TestCase):
 class TestReflectionConcreteProperties(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for property tests."""
+        """Initialise a shared ReflectionConcrete for property tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPropertiesReturnsList(self) -> None:
@@ -1496,7 +1738,13 @@ class TestReflectionConcreteProperties(TestCase):
 class TestReflectionConcreteDependencies(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for dependency tests."""
+        """Initialise a shared ReflectionConcrete for dependency tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetConstructorSignatureReturnsInspectSignature(self) -> None:
@@ -1555,7 +1803,13 @@ class TestReflectionConcreteDependencies(TestCase):
 class TestReflectionConcreteClearCache(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for clearCache tests."""
+        """Initialise a shared ReflectionConcrete for clearCache tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testClearCacheReturnsNone(self) -> None:
@@ -1615,7 +1869,13 @@ class TestReflectionConcreteClearCache(TestCase):
 class TestReflectionConcreteAsyncMembers(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for async member tests."""
+        """Initialise a shared ReflectionConcrete for async member tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetMethodsIncludesEveryVisibility(self) -> None:
@@ -1762,7 +2022,13 @@ class TestReflectionConcreteAsyncMembers(TestCase):
 class TestReflectionConcretePrivateAccess(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for private access tests."""
+        """Initialise a shared ReflectionConcrete for private access tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPropertyResolvesPrivateNames(self) -> None:
@@ -1986,7 +2252,13 @@ class TestReflectionConcreteErrorBranches(TestCase):
 class TestReflectionConcreteMemoization(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for memoization tests."""
+        """Initialise a shared ReflectionConcrete for memoization tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testModuleWithClassNameIsMemoized(self) -> None:
@@ -2161,7 +2433,13 @@ class TestReflectionConcreteMemoization(TestCase):
 class TestReflectionConcreteMissingProperties(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared ReflectionConcrete for missing-name tests."""
+        """Initialise a shared ReflectionConcrete for missing-name tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.rc = ReflectionConcrete(SampleConcrete)
 
     def testGetPropertyRaisesValueErrorForUnknownName(self) -> None:

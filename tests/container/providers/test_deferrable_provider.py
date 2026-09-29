@@ -14,7 +14,13 @@ class _ConcreteDeferred(DeferrableProvider):
 
     @classmethod
     def provides(cls) -> list[type | str]:
-        """Return the services published by this provider."""
+        """Return the services published by this provider.
+
+        Returns
+        -------
+        list[type | str]
+            Value produced by the helper.
+        """
         return [str, _ALIAS]
 
 class _EmptyDeferred(DeferrableProvider):
@@ -22,7 +28,13 @@ class _EmptyDeferred(DeferrableProvider):
 
     @classmethod
     def provides(cls) -> list[type | str]:
-        """Return an empty service list."""
+        """Return an empty service list.
+
+        Returns
+        -------
+        list[type | str]
+            Value produced by the helper.
+        """
         return []
 
 # ===========================================================================

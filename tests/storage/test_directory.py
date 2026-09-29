@@ -9,43 +9,63 @@ from orionis.test import TestCase
 class TestDirectoryPath(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build a fresh memory driver before each test.
+        """Build a fresh memory driver before each test.
 
         Keeps every test isolated in its own in-memory store.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._driver = MemoryStorageDriver()
 
     def testImplementsTheDirectoryContract(self) -> None:
-        """
-        Expose the directory through its published contract.
+        """Expose the directory through its published contract.
 
         Validates that disks can type their return values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(Directory(self._driver), IDirectory)
 
     def testPathDefaultsToTheDiskRoot(self) -> None:
-        """
-        Default the directory path to the disk root.
+        """Default the directory path to the disk root.
 
         Validates the empty-string representation of the root.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(Directory(self._driver).path(), "")
 
     def testPathIsNormalizedOnIngestion(self) -> None:
-        """
-        Normalize the path supplied at construction time.
+        """Normalize the path supplied at construction time.
 
         Validates that separators and redundant segments collapse.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = Directory(self._driver, "\\photos//2026/../2025/")
         self.assertEqual(directory.path(), "photos/2025")
 
     def testEscapingPathIsRejected(self) -> None:
-        """
-        Reject paths escaping the disk root.
+        """Reject paths escaping the disk root.
 
         Validates the traversal guard applied on ingestion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(StoragePathException):
             Directory(self._driver, "../outside")
@@ -53,27 +73,39 @@ class TestDirectoryPath(TestCase):
 class TestDirectoryLifecycle(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build a disk over a fresh memory driver before each test.
+        """Build a disk over a fresh memory driver before each test.
 
         Keeps every test isolated in its own in-memory store.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
 
     async def testCreateIsFluent(self) -> None:
-        """
-        Create the directory and return the same object.
+        """Create the directory and return the same object.
 
         Validates fluent chaining on create().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = self._disk.directory("uploads")
         self.assertIs(await directory.create(), directory)
 
     async def testLifecycleCreateExistsDelete(self) -> None:
-        """
-        Create, detect, and delete a directory.
+        """Create, detect, and delete a directory.
 
         Validates the directory lifecycle end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = self._disk.directory("uploads")
         self.assertFalse(await directory.exists())
@@ -83,46 +115,66 @@ class TestDirectoryLifecycle(TestCase):
         self.assertFalse(await directory.exists())
 
     async def testDeleteReportsWhetherTheDirectoryExisted(self) -> None:
-        """
-        Report whether the deleted directory was present.
+        """Report whether the deleted directory was present.
 
         Validates the boolean contract of delete().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(await self._disk.directory("ghost").delete())
 
     async def testDeleteRemovesNestedContents(self) -> None:
-        """
-        Remove the whole subtree of the directory.
+        """Remove the whole subtree of the directory.
 
         Validates the recursive nature of delete().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
         self.assertTrue(await self._disk.directory("root").delete())
         self.assertFalse(await self._disk.exists("root/a/deep/f.txt"))
 
     async def testRootDirectoryAlwaysExists(self) -> None:
-        """
-        Report the disk root as always present.
+        """Report the disk root as always present.
 
         Validates the special case of the empty path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(await self._disk.directory().exists())
 
 class TestDirectoryListing(TestCase):
 
     def setUp(self) -> None:
-        """
-        Build a disk over a fresh memory driver before each test.
+        """Build a disk over a fresh memory driver before each test.
 
         Keeps every test isolated in its own in-memory store.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
 
     async def testFilesListsDirectChildrenOnly(self) -> None:
-        """
-        List the files directly contained in the directory.
+        """List the files directly contained in the directory.
 
         Validates that nested files are excluded from files().
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("photos/a.png", b"1")
         await self._disk.put("photos/nested/b.png", b"2")
@@ -132,10 +184,14 @@ class TestDirectoryListing(TestCase):
         self.assertEqual([file.path() for file in listing], ["photos/a.png"])
 
     async def testAllFilesWalksTheWholeSubtree(self) -> None:
-        """
-        List every file contained in the directory tree.
+        """List every file contained in the directory tree.
 
         Validates the recursive listing and its ordering.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("photos/a.png", b"1")
         await self._disk.put("photos/nested/b.png", b"2")
@@ -147,10 +203,14 @@ class TestDirectoryListing(TestCase):
         )
 
     async def testDirectoriesListsDirectChildrenOnly(self) -> None:
-        """
-        List the directories directly contained in the directory.
+        """List the directories directly contained in the directory.
 
         Validates that nested directories are excluded.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
 
@@ -161,10 +221,14 @@ class TestDirectoryListing(TestCase):
         )
 
     async def testAllDirectoriesWalksTheWholeSubtree(self) -> None:
-        """
-        List every directory contained in the directory tree.
+        """List every directory contained in the directory tree.
 
         Validates the recursive listing and its ordering.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
 
@@ -175,10 +239,14 @@ class TestDirectoryListing(TestCase):
         )
 
     async def testListingsAreEmptyForUntouchedDirectories(self) -> None:
-        """
-        Return empty listings for directories without contents.
+        """Return empty listings for directories without contents.
 
         Validates the empty-collection contract of the listing API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         directory = await self._disk.directory("empty").create()
         self.assertEqual(await directory.files(), [])

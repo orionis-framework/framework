@@ -13,32 +13,44 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testInstantiation(self) -> None:
-        """
-        Verify that Console can be instantiated without arguments.
+        """Verify that Console can be instantiated without arguments.
 
         Ensures the constructor does not raise any exception and returns
         a valid Console instance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         self.assertIsInstance(console, Console)
 
     def testProgressBarReturnsIProgressBarInstance(self) -> None:
-        """
-        Verify that the progressBar property returns an IProgressBar instance.
+        """Verify that the progressBar property returns an IProgressBar instance.
 
         Ensures that every access to the property produces a new object
         that satisfies the IProgressBar interface contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         pb = console.progressBar
         self.assertIsInstance(pb, IProgressBar)
 
     def testProgressBarReturnsFreshInstanceOnEachAccess(self) -> None:
-        """
-        Verify that progressBar returns a new instance on every access.
+        """Verify that progressBar returns a new instance on every access.
 
         Ensures the property does not cache the object so callers always
         obtain an independent ProgressBar.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         self.assertIsNot(console.progressBar, console.progressBar)
@@ -48,11 +60,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testSuccessCallsPrintWithoutError(self) -> None:
-        """
-        Verify that success() prints without raising any exception.
+        """Verify that success() prints without raising any exception.
 
         Ensures the method completes under normal conditions using a
         standard message string.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -60,11 +76,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testSuccessWithTimestampFalse(self) -> None:
-        """
-        Verify that success() respects the timestamp=False parameter.
+        """Verify that success() respects the timestamp=False parameter.
 
         Ensures the method still prints exactly once when timestamp is
         disabled, confirming the flag does not suppress output.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -72,10 +92,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testInfoCallsPrint(self) -> None:
-        """
-        Verify that info() prints without raising any exception.
+        """Verify that info() prints without raising any exception.
 
         Ensures the method delegates to print for a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -83,10 +107,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testWarningCallsPrint(self) -> None:
-        """
-        Verify that warning() prints without raising any exception.
+        """Verify that warning() prints without raising any exception.
 
         Ensures the method delegates to print for a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -94,10 +122,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testFailCallsPrint(self) -> None:
-        """
-        Verify that fail() prints without raising any exception.
+        """Verify that fail() prints without raising any exception.
 
         Ensures the method delegates to print for a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -105,10 +137,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testErrorCallsPrint(self) -> None:
-        """
-        Verify that error() prints without raising any exception.
+        """Verify that error() prints without raising any exception.
 
         Ensures the method delegates to print for a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -120,11 +156,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testTextSuccessCallsPrint(self) -> None:
-        """
-        Verify that textSuccess() calls print exactly once.
+        """Verify that textSuccess() calls print exactly once.
 
         Ensures the method produces exactly one line of colored output
         for any non-empty message string.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -132,10 +172,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextSuccessBoldCallsPrint(self) -> None:
-        """
-        Verify that textSuccessBold() calls print exactly once.
+        """Verify that textSuccessBold() calls print exactly once.
 
         Ensures bold variant produces output without raising exceptions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -143,11 +187,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextInfoCallsPrint(self) -> None:
-        """
-        Verify that textInfo() calls print exactly once.
+        """Verify that textInfo() calls print exactly once.
 
         Ensures the informational text method produces a single line
         of output for a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -155,10 +203,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextInfoBoldCallsPrint(self) -> None:
-        """
-        Verify that textInfoBold() calls print exactly once.
+        """Verify that textInfoBold() calls print exactly once.
 
         Ensures bold informational variant completes without errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -166,11 +218,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextWarningCallsPrint(self) -> None:
-        """
-        Verify that textWarning() calls print exactly once.
+        """Verify that textWarning() calls print exactly once.
 
         Ensures the warning text method produces output without raising
         any exceptions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -178,10 +234,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextWarningBoldCallsPrint(self) -> None:
-        """
-        Verify that textWarningBold() calls print exactly once.
+        """Verify that textWarningBold() calls print exactly once.
 
         Ensures bold warning variant completes and calls print.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -189,11 +249,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextErrorCallsPrint(self) -> None:
-        """
-        Verify that textError() calls print exactly once.
+        """Verify that textError() calls print exactly once.
 
         Ensures the error text method delegates to print for a
         standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -201,10 +265,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextErrorBoldCallsPrint(self) -> None:
-        """
-        Verify that textErrorBold() calls print exactly once.
+        """Verify that textErrorBold() calls print exactly once.
 
         Ensures the bold error variant completes without exceptions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -212,10 +280,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextMutedCallsPrint(self) -> None:
-        """
-        Verify that textMuted() calls print exactly once.
+        """Verify that textMuted() calls print exactly once.
 
         Ensures the muted (gray) text variant produces output without errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -223,10 +295,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextMutedBoldCallsPrint(self) -> None:
-        """
-        Verify that textMutedBold() calls print exactly once.
+        """Verify that textMutedBold() calls print exactly once.
 
         Ensures the bold muted text variant produces output without errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -234,11 +310,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testTextUnderlineCallsPrint(self) -> None:
-        """
-        Verify that textUnderline() calls print exactly once.
+        """Verify that textUnderline() calls print exactly once.
 
         Ensures the underlined text variant delegates to print for
         a standard message.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -250,11 +330,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testClearWritesAnsiSequenceWhenTty(self) -> None:
-        """
-        Verify that clear() writes the ANSI clear-screen sequence when stdout is a tty.
+        """Verify that clear() writes the ANSI clear-screen sequence to a tty.
 
         Ensures the implementation uses escape codes to clear the terminal
         rather than spawning a subprocess via os.system.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         fake_stdout = io.StringIO()
@@ -265,11 +349,15 @@ class TestConsole(TestCase):
         self.assertIn("\033[2J", output)
 
     def testClearLineWritesToStdout(self) -> None:
-        """
-        Verify that clearLine() writes the carriage-return sequence to stdout.
+        """Verify that clearLine() writes the carriage-return sequence to stdout.
 
         Ensures the cursor-reset escape sequence is written to the
         standard output stream.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         fake_stdout = io.StringIO()
@@ -278,10 +366,14 @@ class TestConsole(TestCase):
         self.assertIn("\r", fake_stdout.getvalue())
 
     def testLineCallsPrint(self) -> None:
-        """
-        Verify that line() calls print exactly once with a newline.
+        """Verify that line() calls print exactly once with a newline.
 
         Ensures a visual separator is produced by a single print call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -289,10 +381,14 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testNewLineDefaultCount(self) -> None:
-        """
-        Verify that newLine() calls print once with the default count of 1.
+        """Verify that newLine() calls print once with the default count of 1.
 
         Ensures the default parameter produces exactly one print call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -300,11 +396,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testNewLineCustomCount(self) -> None:
-        """
-        Verify that newLine(3) calls print once with three newline characters.
+        """Verify that newLine(3) calls print once with three newline characters.
 
         Ensures a count greater than 1 still results in a single print
         containing the requested number of newlines.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -312,22 +412,30 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testNewLineZeroRaisesValueError(self) -> None:
-        """
-        Verify that newLine(0) raises a ValueError.
+        """Verify that newLine(0) raises a ValueError.
 
         Ensures the boundary condition of count=0 is rejected as an
         invalid value.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
             console.newLine(0)
 
     def testNewLineNegativeRaisesValueError(self) -> None:
-        """
-        Verify that newLine with a negative count raises a ValueError.
+        """Verify that newLine with a negative count raises a ValueError.
 
         Ensures that any non-positive count is rejected to prevent
         nonsensical output.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
@@ -338,10 +446,14 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testWriteCallsPrint(self) -> None:
-        """
-        Verify that write() delegates to the built-in print function.
+        """Verify that write() delegates to the built-in print function.
 
         Ensures output is produced for a basic string argument.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -349,11 +461,15 @@ class TestConsole(TestCase):
             mock_print.assert_called_once()
 
     def testWritePassesSeparatorAndEnd(self) -> None:
-        """
-        Verify that write() forwards sep and end to print.
+        """Verify that write() forwards sep and end to print.
 
         Ensures custom separator and end characters are passed through
         correctly so callers can control output formatting.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         buf = io.StringIO()
@@ -361,11 +477,15 @@ class TestConsole(TestCase):
         self.assertEqual(buf.getvalue(), "a-b!")
 
     def testWriteLineCallsPrint(self) -> None:
-        """
-        Verify that writeLine() calls print exactly once.
+        """Verify that writeLine() calls print exactly once.
 
         Ensures a single message is forwarded to print with a trailing
         newline as expected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -377,11 +497,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testAskReturnsUserInput(self) -> None:
-        """
-        Verify that ask() returns the text entered by the user.
+        """Verify that ask() returns the text entered by the user.
 
         Ensures the user's response is forwarded as the return value
         without any transformation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="my answer"):
@@ -389,10 +513,14 @@ class TestConsole(TestCase):
         self.assertEqual(result, "my answer")
 
     def testConfirmReturnsTrueForY(self) -> None:
-        """
-        Verify that confirm() returns True when the user enters 'Y'.
+        """Verify that confirm() returns True when the user enters 'Y'.
 
         Ensures correct interpretation of an affirmative response.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="Y"):
@@ -400,10 +528,14 @@ class TestConsole(TestCase):
         self.assertTrue(result)
 
     def testConfirmReturnsTrueForYes(self) -> None:
-        """
-        Verify that confirm() returns True when the user enters 'YES'.
+        """Verify that confirm() returns True when the user enters 'YES'.
 
         Ensures both the short and long form of affirmation are accepted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="yes"):
@@ -411,10 +543,14 @@ class TestConsole(TestCase):
         self.assertTrue(result)
 
     def testConfirmReturnsFalseForN(self) -> None:
-        """
-        Verify that confirm() returns False when the user enters 'N'.
+        """Verify that confirm() returns False when the user enters 'N'.
 
         Ensures a negative response yields False regardless of default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="N"):
@@ -422,11 +558,15 @@ class TestConsole(TestCase):
         self.assertFalse(result)
 
     def testConfirmUsesDefaultWhenEmpty(self) -> None:
-        """
-        Verify that confirm() returns the default value on empty input.
+        """Verify that confirm() returns the default value on empty input.
 
         Ensures that pressing Enter (empty string) falls back to the
         supplied default parameter.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value=""):
@@ -436,11 +576,15 @@ class TestConsole(TestCase):
         self.assertTrue(result_true)
 
     def testSecretReturnsHiddenInput(self) -> None:
-        """
-        Verify that secret() returns the value provided by getpass.
+        """Verify that secret() returns the value provided by getpass.
 
         Ensures the method delegates to getpass.getpass and returns
         the hidden input without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("getpass.getpass", return_value="s3cr3t"):
@@ -452,11 +596,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testTablePrintsWithValidData(self) -> None:
-        """
-        Verify that table() prints without raising for valid input.
+        """Verify that table() prints without raising for valid input.
 
         Ensures the method completes successfully and calls print
         for a minimal 1-column, 1-row table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -464,33 +612,45 @@ class TestConsole(TestCase):
             self.assertTrue(mock_print.called)
 
     def testTableRaisesForEmptyHeaders(self) -> None:
-        """
-        Verify that table() raises ValueError when headers are empty.
+        """Verify that table() raises ValueError when headers are empty.
 
         Ensures the guard against empty column definitions is active
         and provides useful feedback to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
             console.table([], [["Alice"]])
 
     def testTableRaisesForEmptyRows(self) -> None:
-        """
-        Verify that table() raises ValueError when rows are empty.
+        """Verify that table() raises ValueError when rows are empty.
 
         Ensures the guard against empty row data is active and provides
         useful feedback to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
             console.table(["Name"], [])
 
     def testTableMultipleColumnsAndRows(self) -> None:
-        """
-        Verify that table() handles multiple columns and multiple rows.
+        """Verify that table() handles multiple columns and multiple rows.
 
         Ensures the method produces output for a 2-column, 2-row table
         without raising any exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print:
@@ -505,11 +665,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testAnticipateReturnsMatchingOption(self) -> None:
-        """
-        Verify that anticipate() returns the first matching option.
+        """Verify that anticipate() returns the first matching option.
 
         Ensures the autocomplete logic selects the correct option when
         user input is a prefix of one of the available choices.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="Py"):
@@ -517,11 +681,15 @@ class TestConsole(TestCase):
         self.assertEqual(result, "Python")
 
     def testAnticipateReturnsDefaultWhenNoMatch(self) -> None:
-        """
-        Verify that anticipate() returns the default when no option matches.
+        """Verify that anticipate() returns the default when no option matches.
 
         Ensures that unrecognised input falls back to the caller-supplied
         default value instead of raising an exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="Go"):
@@ -531,11 +699,15 @@ class TestConsole(TestCase):
         self.assertEqual(result, "unknown")
 
     def testAnticipateReturnsInputWhenNoMatchAndNoDefault(self) -> None:
-        """
-        Verify that anticipate() returns raw input when no match and no default.
+        """Verify that anticipate() returns raw input when no match and no default.
 
         Ensures the method falls back to the user's input string when neither
         a matching option nor a default value is available.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="Rust"):
@@ -547,11 +719,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testChoiceReturnsSelectedOption(self) -> None:
-        """
-        Verify that choice() returns the correctly selected option.
+        """Verify that choice() returns the correctly selected option.
 
         Ensures that entering a valid 1-based index returns the
         corresponding item from the choices list.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value="2"):
@@ -559,11 +735,15 @@ class TestConsole(TestCase):
         self.assertEqual(result, "beta")
 
     def testChoiceReturnsDefaultOnEmptyInput(self) -> None:
-        """
-        Verify that choice() returns the default option on empty input.
+        """Verify that choice() returns the default option on empty input.
 
         Ensures pressing Enter (empty string) selects the item at
         default_index without requiring explicit confirmation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.input", return_value=""):
@@ -571,33 +751,45 @@ class TestConsole(TestCase):
         self.assertEqual(result, "beta")
 
     def testChoiceRaisesForEmptyList(self) -> None:
-        """
-        Verify that choice() raises ValueError for an empty choices list.
+        """Verify that choice() raises ValueError for an empty choices list.
 
         Ensures the guard against an empty option set is active so callers
         receive actionable feedback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
             console.choice("Pick one:", [])
 
     def testChoiceRaisesForOutOfRangeDefaultIndex(self) -> None:
-        """
-        Verify that choice() raises ValueError for an invalid default_index.
+        """Verify that choice() raises ValueError for an invalid default_index.
 
         Ensures that a default_index outside the valid range is rejected
         before any user interaction occurs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(ValueError):
             console.choice("Pick one:", ["alpha"], default_index=5)
 
     def testChoiceLoopsOnInvalidInput(self) -> None:
-        """
-        Verify that choice() re-prompts for invalid input before accepting valid.
+        """Verify that choice() re-prompts for invalid input before accepting valid.
 
         Ensures the while-loop guard rejects non-numeric and out-of-range
         input and eventually returns the correct selection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         # First two responses are invalid; third is valid
@@ -610,11 +802,20 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testExceptionPrintsTracebackForValidException(self) -> None:
-        """
-        Verify that exception() prints traceback for a valid Exception.
+        """Verify that exception() prints traceback for a valid Exception.
 
         Ensures the method completes without error when given a properly
         raised exception, delegating rendering to the Rich console.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+
+        Raises
+        ------
+        ValueError
+            Raised by this helper to exercise the failure path.
         """
         console = Console()
         try:
@@ -630,11 +831,15 @@ class TestConsole(TestCase):
             mock_instance.print.assert_called_once()
 
     def testExceptionRaisesTypeErrorForNonException(self) -> None:
-        """
-        Verify that exception() raises TypeError when given a non-Exception.
+        """Verify that exception() raises TypeError when given a non-Exception.
 
         Ensures the type guard is active so callers receive meaningful
         feedback when a non-exception object is passed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with self.assertRaises(TypeError):
@@ -645,11 +850,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testExitSuccessCallsSysExit(self) -> None:
-        """
-        Verify that exitSuccess() calls sys.exit(0).
+        """Verify that exitSuccess() calls sys.exit(0).
 
         Ensures the method always invokes sys.exit with exit code 0,
         regardless of whether a message is provided.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("sys.exit") as mock_exit, patch("os._exit"):
@@ -657,11 +866,15 @@ class TestConsole(TestCase):
         mock_exit.assert_called_once_with(0)
 
     def testExitSuccessWithMessage(self) -> None:
-        """
-        Verify that exitSuccess() prints the success message before exiting.
+        """Verify that exitSuccess() prints the success message before exiting.
 
         Ensures the optional message is displayed to the user prior to the
         process termination call.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print, patch(
@@ -672,11 +885,15 @@ class TestConsole(TestCase):
         mock_print.assert_called()
 
     def testExitErrorCallsSysExit(self) -> None:
-        """
-        Verify that exitError() calls sys.exit(1).
+        """Verify that exitError() calls sys.exit(1).
 
         Ensures the method always invokes sys.exit with exit code 1
         upon invocation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("sys.exit") as mock_exit, patch("os._exit"):
@@ -684,11 +901,15 @@ class TestConsole(TestCase):
         mock_exit.assert_called_once_with(1)
 
     def testExitErrorWithMessage(self) -> None:
-        """
-        Verify that exitError() prints the error message before exiting.
+        """Verify that exitError() prints the error message before exiting.
 
         Ensures the error output is produced before the system exit is
         triggered.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("builtins.print") as mock_print, patch(
@@ -703,11 +924,15 @@ class TestConsole(TestCase):
     # ------------------------------------------------------------------ #
 
     def testDumpDoesNotRaiseForSimpleValue(self) -> None:
-        """
-        Verify that dump() completes without raising for a simple value.
+        """Verify that dump() completes without raising for a simple value.
 
         Ensures the VarDumper chain executes end-to-end when given a
         single basic Python object.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("orionis.console.output.console.VarDumper") as mock_dumper:
@@ -728,11 +953,15 @@ class TestConsole(TestCase):
             mock_chain.print.assert_called_once()
 
     def testDumpForwardsOptions(self) -> None:
-        """
-        Verify that dump() forwards all keyword options to VarDumper.
+        """Verify that dump() forwards all keyword options to VarDumper.
 
         Ensures that non-default values supplied by the caller are passed
         through the fluent builder chain to the underlying VarDumper.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         console = Console()
         with patch("orionis.console.output.console.VarDumper") as mock_dumper2:

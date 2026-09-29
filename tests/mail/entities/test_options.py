@@ -9,10 +9,14 @@ from orionis.test import TestCase
 class TestMailOptions(TestCase):
 
     def testEmptyOptionsProduceAnEmptyEnvelope(self) -> None:
-        """
-        Build an empty envelope when nothing was declared.
+        """Build an empty envelope when nothing was declared.
 
         Validates the default state of a fresh chain.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         options = MailOptions()
         envelope = options.envelope()
@@ -22,10 +26,14 @@ class TestMailOptions(TestCase):
         self.assertIsNone(envelope.from_address)
 
     def testExplicitScalarsReplaceTheDeclaredOnes(self) -> None:
-        """
-        Overlay the sender and subject supplied through the chain.
+        """Overlay the sender and subject supplied through the chain.
 
         Validates that an explicitly empty subject also wins.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = Envelope(subject="Declared", from_address="declared@example.com")
         options = MailOptions(
@@ -37,10 +45,14 @@ class TestMailOptions(TestCase):
         self.assertEqual(envelope.from_address.address, "explicit@example.com")
 
     def testAbsentScalarsKeepTheDeclaredValues(self) -> None:
-        """
-        Preserve declared values when the chain supplied none.
+        """Preserve declared values when the chain supplied none.
 
         Validates that None means "not supplied" instead of "clear".
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = Envelope(subject="Declared", from_address="declared@example.com")
         envelope = MailOptions().envelope(base)
@@ -48,10 +60,14 @@ class TestMailOptions(TestCase):
         self.assertEqual(envelope.from_address.address, "declared@example.com")
 
     def testRecipientCollectionsAreAppended(self) -> None:
-        """
-        Append chain recipients after the declared ones.
+        """Append chain recipients after the declared ones.
 
         Validates that merging never drops a declared recipient.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = Envelope(
             to="declared@example.com",
@@ -80,10 +96,14 @@ class TestMailOptions(TestCase):
         self.assertEqual(len(envelope.reply_to), 2)
 
     def testMergedPrivacyConflictsAreRejected(self) -> None:
-        """
-        Reject a merge that makes a hidden recipient visible.
+        """Reject a merge that makes a hidden recipient visible.
 
         Validates that privacy rules also apply to combined declarations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = Envelope(bcc="ana@example.com")
         options = MailOptions(to=(Address("ana@example.com"),))
@@ -91,10 +111,14 @@ class TestMailOptions(TestCase):
             options.envelope(base)
 
     def testReplacingOptionsLeavesTheOriginalIntact(self) -> None:
-        """
-        Derive new options without mutating the previous snapshot.
+        """Derive new options without mutating the previous snapshot.
 
         Validates the immutability the fluent chains depend on.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         options = MailOptions(mailer="file")
         derived = replace(

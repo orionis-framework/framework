@@ -19,10 +19,14 @@ from tests.mail.fixtures.doubles import RecordingDelivery
 class TestMailPackage(TestCase):
 
     def testDeclaresTheConsumerFacingSurface(self) -> None:
-        """
-        Export the values and base classes consumers compose mail with.
+        """Export the values and base classes consumers compose mail with.
 
         Validates that no second Mail facade is published here.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             mail_package.__all__,
@@ -41,19 +45,27 @@ class TestMailPackage(TestCase):
         self.assertFalse(hasattr(mail_package, "Mail"))
 
     def testNoExportShadowsASubmodule(self) -> None:
-        """
-        Bind every exported name to a class instead of a module.
+        """Bind every exported name to a class instead of a module.
 
         Validates that submodules stay reachable by attribute access.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for name in mail_package.__all__:
             self.assertNotIsInstance(getattr(mail_package, name), ModuleType)
 
     def testPerOperationObjectsAndContractsUseSlots(self) -> None:
-        """
-        Keep operation objects and interfaces free of attribute dictionaries.
+        """Keep operation objects and interfaces free of attribute dictionaries.
 
         Validates the memory contract of the composition API.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         objects = (
             Address("a@example.com"),

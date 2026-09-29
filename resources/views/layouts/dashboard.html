@@ -1,0 +1,30 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="orionis-shell" data-dashboard-shell>
+  <a class="orionis-skip-link" href="#main-content">{{ __('Skip to content') }}</a>
+  {% include "partials/sidebar.html" %}
+  <button type="button" class="orionis-sidebar-backdrop" data-sidebar-backdrop aria-label="{{ __('Close navigation') }}" tabindex="-1" hidden></button>
+  <div class="orionis-shell-content" data-shell-content>
+    {% include "partials/header.html" %}
+    <main id="main-content" class="orionis-main" tabindex="-1">
+      <div class="orionis-page-heading">
+        <div>
+          <p class="orionis-section-label">{{ config('app.name') }}</p>
+          <h1>{{ page_title }}</h1>
+        </div>
+        {% block page_actions %}{% endblock %}
+      </div>
+      {% block dashboard_content %}{% endblock %}
+    </main>
+    {% include "partials/footer.html" %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ asset('js/dashboard.js') }}" defer></script>
+{% block page_scripts %}{% endblock %}
+{% endblock %}

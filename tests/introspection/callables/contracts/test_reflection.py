@@ -13,34 +13,103 @@ class _StubCallable(IReflectionCallable):
     """Minimal concrete stub that satisfies all abstract methods."""
 
     def getCallable(self) -> callable:
+        """Implement the ``getCallable`` contract stub.
+
+        Returns
+        -------
+        callable
+            Value produced by the helper.
+        """
         return lambda: None
 
     def getName(self) -> str:
+        """Implement the ``getName`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "stub"
 
     def getModuleName(self) -> str:
+        """Implement the ``getModuleName`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "stub_module"
 
     def getModuleWithCallableName(self) -> str:
+        """Implement the ``getModuleWithCallableName`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "stub_module.stub"
 
     def getDocstring(self) -> str:
+        """Implement the ``getDocstring`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "stub docstring"
 
     def getSourceCode(self) -> str:
+        """Implement the ``getSourceCode`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "def stub(): pass"
 
     def getFile(self) -> str:
+        """Implement the ``getFile`` contract stub.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return "/stub/file.py"
 
     def getSignature(self) -> inspect.Signature:
+        """Implement the ``getSignature`` contract stub.
+
+        Returns
+        -------
+        inspect.Signature
+            Value produced by the helper.
+        """
         return inspect.signature(lambda: None)
 
     def getDependencies(self):
-        return None
+        """Implement the ``getDependencies`` contract stub.
+
+        Returns
+        -------
+        object
+            Value produced by the helper.
+        """
+        return
 
     def clearCache(self) -> None:
-        pass
+        """Implement the ``clearCache`` contract stub.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
 
 # ---------------------------------------------------------------------------
 # Contract tests
@@ -210,15 +279,96 @@ class TestIReflectionCallablePartialImplementation(TestCase):
             Raises AssertionError on failure.
         """
         class _Partial(IReflectionCallable):
-            def getCallable(self): return None
-            def getName(self): return ""
-            def getModuleName(self): return ""
-            def getModuleWithCallableName(self): return ""
-            def getDocstring(self): return ""
-            def getSourceCode(self): return ""
-            def getFile(self): return ""
-            def getSignature(self): return None
-            def getDependencies(self): return None
+            def getCallable(self):
+                """Implement the ``getCallable`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return
+
+            def getName(self):
+                """Implement the ``getName`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getModuleName(self):
+                """Implement the ``getModuleName`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getModuleWithCallableName(self):
+                """Implement the ``getModuleWithCallableName`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getDocstring(self):
+                """Implement the ``getDocstring`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getSourceCode(self):
+                """Implement the ``getSourceCode`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getFile(self):
+                """Implement the ``getFile`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return ""
+
+            def getSignature(self):
+                """Implement the ``getSignature`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return
+
+            def getDependencies(self):
+                """Implement the ``getDependencies`` contract stub.
+
+                Returns
+                -------
+                object
+                    Value produced by the helper.
+                """
+                return
+
             # clearCache intentionally omitted
 
         with self.assertRaises(TypeError):
@@ -227,7 +377,13 @@ class TestIReflectionCallablePartialImplementation(TestCase):
 class TestIReflectionCallableStubContract(TestCase):
 
     def setUp(self) -> None:
-        """Initialise a shared stub instance for contract return-type tests."""
+        """Initialise a shared stub instance for contract return-type tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.stub = _StubCallable()
 
     def testGetCallableReturnsCallable(self) -> None:

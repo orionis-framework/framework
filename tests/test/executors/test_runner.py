@@ -29,6 +29,13 @@ class _StubSuite:
     __slots__ = ("case", "statuses")
 
     def __init__(self, statuses: tuple[TestStatus, ...] = ()) -> None:
+        """Prepare a suite that reports the supplied outcomes.
+
+        Parameters
+        ----------
+        statuses : tuple[TestStatus, ...], optional
+            Outcomes emitted when the suite is called.
+        """
         self.case = _make_case()
         self.statuses = statuses
 

@@ -5,7 +5,20 @@ from orionis.introspection.dependencies.entities.signature import Signature
 from orionis.test import TestCase
 
 def _make_argument(name: str = "dep", *, resolved: bool = True) -> Argument:
-    """Create a minimal resolved Argument."""
+    """Create a minimal resolved Argument.
+
+    Parameters
+    ----------
+    name : str
+        Value supplied for ``name``.
+    resolved : bool
+        Value supplied for ``resolved``.
+
+    Returns
+    -------
+    Argument
+        Value produced by the helper.
+    """
     return Argument(
         name=name,
         resolved=resolved,
@@ -20,7 +33,22 @@ def _make_signature(
     unresolved: dict | None = None,
     ordered: dict | None = None,
 ) -> Signature:
-    """Create a Signature instance with sensible defaults."""
+    """Create a Signature instance with sensible defaults.
+
+    Parameters
+    ----------
+    resolved : dict | None
+        Value supplied for ``resolved``.
+    unresolved : dict | None
+        Value supplied for ``unresolved``.
+    ordered : dict | None
+        Value supplied for ``ordered``.
+
+    Returns
+    -------
+    Signature
+        Value produced by the helper.
+    """
     return Signature(
         resolved=resolved if resolved is not None else {},
         unresolved=unresolved if unresolved is not None else {},

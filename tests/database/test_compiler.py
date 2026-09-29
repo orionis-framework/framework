@@ -45,7 +45,13 @@ from orionis.orm.schema.types import (
 from orionis.test import TestCase
 
 def _make_table() -> TableDefinition:
-    """Build a small table definition used across the compiler tests."""
+    """Build a small table definition used across the compiler tests.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": Integer().primary().autoIncrement(),
         "name": String(),
@@ -58,35 +64,58 @@ def _make_table() -> TableDefinition:
 class TestSQLCompiler(TestCase):
 
     def setUp(self) -> None:
-        """
-        Create a fresh compiler and table definition per test.
+        """Create a fresh compiler and table definition per test.
 
         Guarantees isolation of the internal table cache.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         self._compiler = SQLCompiler()
         self._table = _make_table()
 
     def _sql(self, statement) -> str:
-        """Render a statement to normalized lowercase SQL."""
+        """Render a statement to normalized lowercase SQL.
+
+        Parameters
+        ----------
+        statement : object
+            Value supplied for ``statement``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return str(statement.compile()).lower()
 
     # ── SELECT ────────────────────────────────────────────────────────────────
 
     def testCompileSelectAllColumns(self) -> None:
-        """
-        Compile a bare select into SELECT ... FROM table.
+        """Compile a bare select into SELECT ... FROM table.
 
         Validates the default full projection.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         sql = self._sql(self._compiler.compileSelect(SelectPlan(table=self._table)))
         self.assertIn("select", sql)
         self.assertIn("from users", sql)
 
     def testCompileSelectProjectsColumns(self) -> None:
-        """
-        Compile an explicit projection into a column list.
+        """Compile an explicit projection into a column list.
 
         Validates that only the requested columns are projected.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table, columns=("name",))
         sql = self._sql(self._compiler.compileSelect(plan))
@@ -94,10 +123,14 @@ class TestSQLCompiler(TestCase):
         self.assertNotIn("users.active", sql)
 
     def testCompileSelectWithWhereAndOrConnector(self) -> None:
-        """
-        Fold consecutive clauses honoring their boolean connectors.
+        """Fold consecutive clauses honoring their boolean connectors.
 
         Validates AND/OR folding order in the where expression.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="active", value=True))
@@ -109,10 +142,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("or", sql)
 
     def testCompileSelectNullPromotion(self) -> None:
-        """
-        Promote equality with None to IS NULL.
+        """Promote equality with None to IS NULL.
 
         Validates the NULL comparison promotion rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="name", value=None))
@@ -120,10 +157,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("is null", sql)
 
     def testCompileSelectInClause(self) -> None:
-        """
-        Compile IN conditions with bound value lists.
+        """Compile IN conditions with bound value lists.
 
         Validates the IN clause expansion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -133,10 +174,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("in", sql)
 
     def testCompileSelectBetweenRequiresTwoBounds(self) -> None:
-        """
-        Raise QueryException for malformed BETWEEN boundaries.
+        """Raise QueryException for malformed BETWEEN boundaries.
 
         Validates the boundary arity check.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -146,10 +191,14 @@ class TestSQLCompiler(TestCase):
             self._compiler.compileSelect(plan)
 
     def testCompileSelectOrderLimitOffset(self) -> None:
-        """
-        Compile ordering and pagination into the statement.
+        """Compile ordering and pagination into the statement.
 
         Validates ORDER BY, LIMIT, and OFFSET emission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.orders.append(
@@ -164,10 +213,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("offset", sql)
 
     def testCompileSelectUnknownColumnRaises(self) -> None:
-        """
-        Raise QueryException for references to unknown columns.
+        """Raise QueryException for references to unknown columns.
 
         Validates the descriptive column resolution error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="ghost", value=1))
@@ -175,10 +228,14 @@ class TestSQLCompiler(TestCase):
             self._compiler.compileSelect(plan)
 
     def testCompileSelectCountAggregate(self) -> None:
-        """
-        Compile COUNT(*) aggregates into the projection.
+        """Compile COUNT(*) aggregates into the projection.
 
         Validates the aggregate projection replacement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._table,
@@ -188,10 +245,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("count", sql)
 
     def testCompileSelectAggregateStarRequiresCount(self) -> None:
-        """
-        Reject non-count aggregates targeting the star column.
+        """Reject non-count aggregates targeting the star column.
 
         Validates the aggregate column requirement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._table,
@@ -203,29 +264,41 @@ class TestSQLCompiler(TestCase):
     # ── INSERT / UPDATE / DELETE ─────────────────────────────────────────────
 
     def testCompileInsertSingleRow(self) -> None:
-        """
-        Compile a single-row insert statement.
+        """Compile a single-row insert statement.
 
         Validates the INSERT statement shape.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = InsertPlan(table=self._table, values=[{"name": "john"}])
         sql = self._sql(self._compiler.compileInsert(plan))
         self.assertIn("insert into users", sql)
 
     def testCompileInsertWithoutValuesRaises(self) -> None:
-        """
-        Raise QueryException for inserts without any row.
+        """Raise QueryException for inserts without any row.
 
         Validates the empty insert guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(QueryException):
             self._compiler.compileInsert(InsertPlan(table=self._table))
 
     def testCompileUpdateWithWhere(self) -> None:
-        """
-        Compile an update restricted by conditions.
+        """Compile an update restricted by conditions.
 
         Validates SET and WHERE emission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = UpdatePlan(
             table=self._table,
@@ -237,19 +310,27 @@ class TestSQLCompiler(TestCase):
         self.assertIn("where", sql)
 
     def testCompileUpdateWithoutValuesRaises(self) -> None:
-        """
-        Raise QueryException for updates without values.
+        """Raise QueryException for updates without values.
 
         Validates the empty update guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(QueryException):
             self._compiler.compileUpdate(UpdatePlan(table=self._table))
 
     def testCompileDeleteWithWhere(self) -> None:
-        """
-        Compile a delete restricted by conditions.
+        """Compile a delete restricted by conditions.
 
         Validates DELETE and WHERE emission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = DeletePlan(
             table=self._table,
@@ -262,10 +343,14 @@ class TestSQLCompiler(TestCase):
     # ── Prefix and DDL ────────────────────────────────────────────────────────
 
     def testPrefixIsAppliedToPhysicalTables(self) -> None:
-        """
-        Prepend the configured prefix to physical table names.
+        """Prepend the configured prefix to physical table names.
 
         Validates prefix application at compile time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         compiler = SQLCompiler(prefix="app_")
         sql = str(
@@ -274,10 +359,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("app_users", sql)
 
     def testNotLikeOperatorCompiles(self) -> None:
-        """
-        Compile the "not like" comparison operator.
+        """Compile the "not like" comparison operator.
 
         Validates the negated pattern comparison.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -287,10 +376,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("not like", sql)
 
     def testIlikeOperatorCompiles(self) -> None:
-        """
-        Compile the "ilike" comparison operator.
+        """Compile the "ilike" comparison operator.
 
         Validates the case-insensitive pattern comparison.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -300,10 +393,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("lower", sql)
 
     def testNotIlikeOperatorCompiles(self) -> None:
-        """
-        Compile the "not ilike" comparison operator.
+        """Compile the "not ilike" comparison operator.
 
         Validates the negated case-insensitive pattern comparison.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -314,13 +411,16 @@ class TestSQLCompiler(TestCase):
         self.assertIn("lower", sql)
 
     def testTextMatcherWhereTypesCompileToLike(self) -> None:
-        """
-        Compile STARTS_WITH/ENDS_WITH/CONTAINS clauses into LIKE.
+        """Compile STARTS_WITH/ENDS_WITH/CONTAINS clauses into LIKE.
 
         Validates the literal pattern where-clause kinds. The bound
         pattern is concatenated with wildcards rather than inlined, so
         assertions check for the ``||`` concatenation markers.
 
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cases = (
             (WhereType.STARTS_WITH, ("like", "|| '%'")),
@@ -337,10 +437,14 @@ class TestSQLCompiler(TestCase):
                 self.assertIn(fragment, sql)
 
     def testRegexpWhereTypeCompiles(self) -> None:
-        """
-        Compile REGEXP where clauses into an engine regexp match.
+        """Compile REGEXP where clauses into an engine regexp match.
 
         Validates the regular-expression where-clause kind.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -350,20 +454,28 @@ class TestSQLCompiler(TestCase):
         self.assertIn("regexp", sql)
 
     def testDistinctAddsSelectDistinct(self) -> None:
-        """
-        Apply SELECT DISTINCT when the plan requests it.
+        """Apply SELECT DISTINCT when the plan requests it.
 
         Validates the distinct flag compilation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table, distinct=True)
         sql = self._sql(self._compiler.compileSelect(plan))
         self.assertIn("distinct", sql)
 
     def testNotInClauseCompiles(self) -> None:
-        """
-        Compile NOT IN conditions with bound value lists.
+        """Compile NOT IN conditions with bound value lists.
 
         Validates the NOT IN clause expansion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -373,10 +485,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("not in", sql)
 
     def testNullChecksCompileToIsExpressions(self) -> None:
-        """
-        Compile NULL and NOT NULL checks into IS expressions.
+        """Compile NULL and NOT NULL checks into IS expressions.
 
         Validates both nullability clause kinds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -393,10 +509,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("is not null", sql_not)
 
     def testInequalityWithNonePromotesToIsNotNull(self) -> None:
-        """
-        Promote inequality with None to IS NOT NULL.
+        """Promote inequality with None to IS NOT NULL.
 
         Validates the negative NULL promotion rule.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -406,10 +526,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("is not null", sql)
 
     def testUnsupportedOperatorRaises(self) -> None:
-        """
-        Raise QueryException for unsupported comparison operators.
+        """Raise QueryException for unsupported comparison operators.
 
         Validates the operator guard at compile time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -419,10 +543,14 @@ class TestSQLCompiler(TestCase):
             self._compiler.compileSelect(plan)
 
     def testGroupByAndHavingCompile(self) -> None:
-        """
-        Compile grouping columns and post-grouping conditions.
+        """Compile grouping columns and post-grouping conditions.
 
         Validates GROUP BY and HAVING emission.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(table=self._table)
         plan.groups.append("active")
@@ -432,10 +560,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("having", sql)
 
     def testAggregateAppliesWhereConditions(self) -> None:
-        """
-        Apply filtering conditions to aggregate projections.
+        """Apply filtering conditions to aggregate projections.
 
         Validates the aggregate + where combination.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._table,
@@ -450,10 +582,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("where", sql)
 
     def testEveryColumnTypeCompilesInDdl(self) -> None:
-        """
-        Compile a table using every supported column type.
+        """Compile a table using every supported column type.
 
         Validates the complete logical-to-engine type registry.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -484,10 +620,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("decimal(10, 2)", ddl)
 
     def testForeignKeyAppearsInDdlWithPrefix(self) -> None:
-        """
-        Emit prefixed foreign key references in the DDL.
+        """Emit prefixed foreign key references in the DDL.
 
         Validates foreign key propagation and prefixing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {
             "id": Integer().primary(),
@@ -502,11 +642,15 @@ class TestSQLCompiler(TestCase):
         self.assertIn("app_companies", ddl)
 
     def testDefaultValueIsAppliedOnInsertCompilation(self) -> None:
-        """
-        Keep column defaults available in the engine metadata.
+        """Keep column defaults available in the engine metadata.
 
         Validates that declared defaults reach the engine column so
         the execution context applies them on insert.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -522,10 +666,14 @@ class TestSQLCompiler(TestCase):
 
 
     def testCompileCreateTableEmitsColumns(self) -> None:
-        """
-        Compile the table definition into a CREATE TABLE statement.
+        """Compile the table definition into a CREATE TABLE statement.
 
         Validates the DDL generation used by the schema helpers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         ddl = str(self._compiler.compileCreateTable(self._table)).lower()
         self.assertIn("create table", ddl)
@@ -533,10 +681,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("name", ddl)
 
     def testCompileDropTableTargetsName(self) -> None:
-        """
-        Compile a DROP TABLE statement for a logical name.
+        """Compile a DROP TABLE statement for a logical name.
 
         Validates the drop DDL generation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         ddl = str(self._compiler.compileDropTable("users")).lower()
         self.assertIn("drop table", ddl)
@@ -545,12 +697,16 @@ class TestSQLCompiler(TestCase):
     # ── Error scenarios and less common table metadata ───────────────────────
 
     def testNoSqlTypeRegisteredRaises(self) -> None:
-        """
-        Raise QueryException for column types without a registered builder.
+        """Raise QueryException for column types without a registered builder.
 
         Validates the guard for mixin-only types such as NumericCommon,
         which exist only to be inherited from and have no SQL type of
         their own.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         column = NumericCommon()
         column.name = "value"
@@ -561,11 +717,15 @@ class TestSQLCompiler(TestCase):
             SQLCompiler().compileCreateTable(table)
 
     def testDistinctIsIgnoredWhenAggregateIsSet(self) -> None:
-        """
-        Skip DISTINCT when the plan also carries an aggregate.
+        """Skip DISTINCT when the plan also carries an aggregate.
 
         Validates that aggregate projections never combine with a
         dangling DISTINCT flag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._table,
@@ -576,11 +736,15 @@ class TestSQLCompiler(TestCase):
         self.assertNotIn("distinct", sql)
 
     def testCompositePrimaryKeyRendersInDdl(self) -> None:
-        """
-        Render a multi-column primary key constraint.
+        """Render a multi-column primary key constraint.
 
         Validates that composite_primary_key takes precedence over the
         single-column primary_key field for DDL purposes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"tenant_id": Integer(), "user_id": Integer()}
         for key, column in columns.items():
@@ -596,10 +760,14 @@ class TestSQLCompiler(TestCase):
         self.assertIn("user_id", ddl)
 
     def testUniqueConstraintRendersInDdl(self) -> None:
-        """
-        Render a composite UNIQUE constraint spanning multiple columns.
+        """Render a composite UNIQUE constraint spanning multiple columns.
 
         Validates unique_constraints propagation to the table DDL.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -623,11 +791,15 @@ class TestSQLCompiler(TestCase):
         self.assertIn("uq_pages_slug", ddl)
 
     def testCompositeForeignKeyRendersInDdl(self) -> None:
-        """
-        Render a multi-column foreign key constraint.
+        """Render a multi-column foreign key constraint.
 
         Validates foreign_keys propagation to the table DDL, including
         prefix application on the referenced table.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"order_id": Integer(), "product_id": Integer()}
         for key, column in columns.items():
@@ -649,13 +821,17 @@ class TestSQLCompiler(TestCase):
         self.assertIn("app_order_products", ddl)
 
     def testAutoIncrementBigIntegerKeyBecomesIntegerOnSqlite(self) -> None:
-        """
-        Render a BIGINT identity column as INTEGER on SQLite.
+        """Render a BIGINT identity column as INTEGER on SQLite.
 
         Validates the dialect variant applied to auto-incrementing
         primary keys: SQLite only aliases a single-column primary key to
         ROWID when the declared type is literally INTEGER, so a BIGINT
         key would never auto-increment there.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"id": BigInteger().primary().autoIncrement()}
         columns["id"].name = "id"
@@ -671,11 +847,15 @@ class TestSQLCompiler(TestCase):
         self.assertEqual(rendered.upper(), "INTEGER")
 
     def testAutoIncrementBigIntegerKeyStaysBigIntElsewhere(self) -> None:
-        """
-        Keep a BIGINT identity column wide on every other backend.
+        """Keep a BIGINT identity column wide on every other backend.
 
         Validates that the SQLite variant never narrows the key on the
         server engines, where a 64-bit identity is the whole point.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"id": BigInteger().primary().autoIncrement()}
         columns["id"].name = "id"
@@ -691,11 +871,15 @@ class TestSQLCompiler(TestCase):
             self.assertIn("BIGINT", rendered.upper(), dialect_name)
 
     def testPlainBigIntegerColumnsKeepTheirTypeOnSqlite(self) -> None:
-        """
-        Leave non identity BIGINT columns untouched.
+        """Leave non identity BIGINT columns untouched.
 
         Validates that the variant only applies to auto-incrementing
         primary keys, so foreign keys pointing at them stay BIGINT.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"owner_id": BigInteger()}
         columns["owner_id"].name = "owner_id"
@@ -709,11 +893,15 @@ class TestSQLCompiler(TestCase):
         self.assertEqual(rendered.upper(), "BIGINT")
 
     def testTableIndexIsRegisteredOnEngineTable(self) -> None:
-        """
-        Register a composite index on the engine table metadata.
+        """Register a composite index on the engine table metadata.
 
         Validates that indexes reach the engine Table object, since
         CREATE TABLE DDL alone does not render index statements.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -735,11 +923,15 @@ class TestSQLCompiler(TestCase):
         self.assertIn("ix_name", index_names)
 
     def testTableSchemaAndCommentPropagateToEngineTable(self) -> None:
-        """
-        Propagate the schema and comment fields to the engine table.
+        """Propagate the schema and comment fields to the engine table.
 
         Validates metadata that does not affect column rendering but is
         still consumed from the table definition.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         columns = {"id": Integer().primary().autoIncrement()}
         for key, column in columns.items():
@@ -757,7 +949,13 @@ class TestSQLCompiler(TestCase):
 
 
 def _make_posts_table() -> TableDefinition:
-    """Build a small "posts" table definition referencing "users"."""
+    """Build a small "posts" table definition referencing "users".
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
     columns = {
         "id": Integer().primary().autoIncrement(),
         "user_id": Integer(),
@@ -772,21 +970,42 @@ class TestSQLCompilerJoins(TestCase):
     """Compile SELECT plans spanning multiple table sources."""
 
     def setUp(self) -> None:
-        """Create a fresh compiler and both table definitions per test."""
+        """Create a fresh compiler and both table definitions per test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._compiler = SQLCompiler()
         self._users = _make_table()
         self._posts = _make_posts_table()
 
     def _sql(self, statement) -> str:
-        """Render a statement to normalized lowercase SQL."""
+        """Render a statement to normalized lowercase SQL.
+
+        Parameters
+        ----------
+        statement : object
+            Value supplied for ``statement``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         return str(statement.compile()).lower()
 
     def testInnerJoinCompilesWithQualifiedCondition(self) -> None:
-        """
-        Compile an INNER JOIN using a column-to-column ON condition.
+        """Compile an INNER JOIN using a column-to-column ON condition.
 
         Validates that qualified references ("users.id"/"posts.user_id")
         resolve against their own table instead of the main one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -805,10 +1024,14 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("users.id = posts.user_id", sql)
 
     def testLeftJoinCompilesAsOuterJoin(self) -> None:
-        """
-        Compile a LEFT JOIN as a SQL LEFT OUTER JOIN.
+        """Compile a LEFT JOIN as a SQL LEFT OUTER JOIN.
 
         Validates the outer join flag reaches the rendered statement.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -826,10 +1049,14 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("left outer join posts", sql)
 
     def testCrossJoinCompilesWithoutConditions(self) -> None:
-        """
-        Compile a CROSS JOIN without requiring any ON condition.
+        """Compile a CROSS JOIN without requiring any ON condition.
 
         Validates the cross join escape hatch in the join compiler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -839,11 +1066,15 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("join posts", sql)
 
     def testJoinRespectsAliasesOnBothSides(self) -> None:
-        """
-        Resolve qualified columns through table and join aliases.
+        """Resolve qualified columns through table and join aliases.
 
         Validates that ``TableReference``-style aliasing threads through
         the source map used for column resolution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -863,10 +1094,14 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("u.id = p.user_id", sql)
 
     def testJoinWithoutConditionsRaises(self) -> None:
-        """
-        Raise QueryException when a non-cross join declares no ON clause.
+        """Raise QueryException when a non-cross join declares no ON clause.
 
         Validates the guard preventing an accidental Cartesian product.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -876,10 +1111,14 @@ class TestSQLCompilerJoins(TestCase):
             self._compiler.compileSelect(plan)
 
     def testJoinWithUnknownTableReferenceRaises(self) -> None:
-        """
-        Raise QueryException when an ON condition references an unknown table.
+        """Raise QueryException when an ON condition references an unknown table.
 
         Validates that column resolution stays scoped to known sources.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -897,11 +1136,15 @@ class TestSQLCompilerJoins(TestCase):
             self._compiler.compileSelect(plan)
 
     def testRightJoinCompilesAsSwappedOuterJoin(self) -> None:
-        """
-        Compile a RIGHT JOIN through an equivalent swapped LEFT JOIN.
+        """Compile a RIGHT JOIN through an equivalent swapped LEFT JOIN.
 
         Validates that the toolkit's missing RIGHT JOIN construct is
         emulated without changing the produced result set.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -921,10 +1164,14 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("users", sql)
 
     def testFullJoinCompilesAsFullOuterJoin(self) -> None:
-        """
-        Compile a FULL JOIN into a full outer join statement.
+        """Compile a FULL JOIN into a full outer join statement.
 
         Validates the direct mapping onto the toolkit's ``full`` flag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,
@@ -942,11 +1189,15 @@ class TestSQLCompilerJoins(TestCase):
         self.assertIn("FULL OUTER JOIN", sql)
 
     def testWhereClauseCanQualifyColumnAcrossJoinedTables(self) -> None:
-        """
-        Filter by a qualified column belonging to a joined table.
+        """Filter by a qualified column belonging to a joined table.
 
         Validates that ``WhereClause`` benefits from the same qualified
         resolution used by ON conditions, without any special-casing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         plan = SelectPlan(
             table=self._users,

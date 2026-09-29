@@ -2,7 +2,6 @@ from datetime import UTC, datetime
 from orionis.auth.entities.access_token import AccessToken
 from orionis.test import TestCase
 
-
 class TestAccessToken(TestCase):
     """Validate the metadata exposed for a stored token."""
 
@@ -10,6 +9,11 @@ class TestAccessToken(TestCase):
         """Build a token entity and try to mutate it.
 
         Validates that audit metadata can never be rewritten in place.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         token = AccessToken(
             id=1,
@@ -26,6 +30,11 @@ class TestAccessToken(TestCase):
 
         Validates that a token without declared abilities keeps the full
         authorization of its owner and reports no lifecycle timestamp.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         token = AccessToken(
             id=1,
@@ -44,6 +53,11 @@ class TestAccessToken(TestCase):
 
         Validates the payload applications render when listing the
         credentials of an identity.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         issued = datetime(2026, 1, 1, tzinfo=UTC)
         token = AccessToken(

@@ -1,0 +1,33 @@
+{% set name_parts = user.name.split() %}
+{% set initials = ((name_parts[0][0] ~ name_parts[-1][0]) if name_parts|length > 1 else (name_parts[0][0] if name_parts else user.email[0]))|upper %}
+<header class="orionis-header">
+  <div class="orionis-header-heading">
+    <button type="button" class="orionis-menu-toggle" data-sidebar-toggle aria-controls="dashboard-sidebar" aria-expanded="false" aria-label="{{ __('Open navigation') }}"
+            data-label-open="{{ __('Open navigation') }}" data-label-close="{{ __('Close navigation') }}"
+            data-label-collapse="{{ __('Collapse sidebar') }}" data-label-expand="{{ __('Expand sidebar') }}" hidden>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <span>{{ page_title }}</span>
+  </div>
+  <details class="orionis-user-menu" data-user-menu>
+    <summary aria-label="{{ __('User menu') }}: {{ user.name }}">
+      <span class="orionis-avatar" aria-hidden="true">{{ initials }}</span>
+      <span class="orionis-header-user-name">{{ user.name }}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="orionis-user-dropdown">
+      <div class="orionis-user-dropdown-info"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div>
+      <a href="{{ route('profile') }}"{% if active_page == 'profile' %} aria-current="page"{% endif %}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        {{ __('Profile') }}
+      </a>
+      <form action="{{ route('logout') }}" method="post">
+        {% csrf %}
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 4H4v16h6m4-13 5 5-5 5m-5-5h12"/></svg>
+          {{ __('Sign out') }}
+        </button>
+      </form>
+    </div>
+  </details>
+</header>

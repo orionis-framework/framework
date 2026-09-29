@@ -123,11 +123,15 @@ class TestReactor(TestCase):
     """Test suite for the Reactor console command dispatcher."""
 
     def setUp(self) -> None:
-        """
-        Set up test fixtures before each test method.
+        """Set up test fixtures before each test method.
 
         Creates a Reactor instance with fully mocked dependencies so that
         each test runs in complete isolation.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
         """
         (
             self.reactor,
@@ -144,60 +148,84 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     def testInheritsFromIReactor(self) -> None:
-        """
-        Verify that Reactor inherits from IReactor.
+        """Verify that Reactor inherits from IReactor.
 
         Ensures the implementation follows the expected class hierarchy
         and satisfies the abstract interface contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(Reactor, IReactor))
         self.assertIsInstance(self.reactor, IReactor)
 
     def testCanBeInstantiated(self) -> None:
-        """
-        Verify that Reactor can be instantiated with valid dependencies.
+        """Verify that Reactor can be instantiated with valid dependencies.
 
         Confirms that object construction succeeds without raising exceptions
         when all required dependencies are provided.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsInstance(self.reactor, Reactor)
 
     def testHasRequiredMethods(self) -> None:
-        """
-        Verify that Reactor exposes all required public methods.
+        """Verify that Reactor exposes all required public methods.
 
         Checks that the command, info, and call methods are present
         and callable on the Reactor instance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(callable(self.reactor.command))
         self.assertTrue(callable(self.reactor.info))
         self.assertTrue(callable(self.reactor.call))
 
     def testInfoAndCallAreAsyncMethods(self) -> None:
-        """
-        Verify that info and call are declared as coroutine functions.
+        """Verify that info and call are declared as coroutine functions.
 
         Ensures the async contract defined in IReactor is fulfilled
         by the concrete Reactor implementation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(self.reactor.info))
         self.assertTrue(inspect.iscoroutinefunction(self.reactor.call))
 
     def testCommandIsNotAsync(self) -> None:
-        """
-        Verify that the command registration method is synchronous.
+        """Verify that the command registration method is synchronous.
 
         Ensures that command registration does not require an event loop,
         maintaining consistency with the interface definition.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertFalse(inspect.iscoroutinefunction(self.reactor.command))
 
     def testInternalStateIsInitialized(self) -> None:
-        """
-        Verify that internal state attributes are set correctly on init.
+        """Verify that internal state attributes are set correctly on init.
 
         Checks that the cache, app, loader, executer, logger, catch, and
         performance counter are stored as private attributes after construction.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(self.reactor._Reactor__cache_info)
         self.assertIs(self.reactor._Reactor__app, self.mock_app)
@@ -212,11 +240,15 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     def testCommandDelegatesToLoader(self) -> None:
-        """
-        Verify that command() proxies to the loader's addFluentCommand.
+        """Verify that command() proxies to the loader's addFluentCommand.
 
         Ensures that calling reactor.command() with a signature and handler
         invokes the loader and returns its result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         expected = MagicMock()
         self.mock_loader.addFluentCommand.return_value = expected
@@ -228,11 +260,15 @@ class TestReactor(TestCase):
         self.assertIs(result, expected)
 
     def testCommandReturnsICommandInstance(self) -> None:
-        """
-        Verify that command() returns whatever the loader returns.
+        """Verify that command() returns whatever the loader returns.
 
         Ensures the return value from the loader is passed back to the
         caller without modification.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         mock_icommand = MagicMock(spec=ICommand)
         self.mock_loader.addFluentCommand.return_value = mock_icommand
@@ -246,11 +282,15 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     async def testInfoReturnsEmptyListWhenNoCommands(self) -> None:
-        """
-        Verify that info() returns an empty list when no commands are loaded.
+        """Verify that info() returns an empty list when no commands are loaded.
 
         Ensures that an empty registry produces an empty result set
         without raising errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.mock_loader.all = AsyncMock(return_value={})
         result = await self.reactor.info()
@@ -258,11 +298,15 @@ class TestReactor(TestCase):
         self.assertEqual(len(result), 0)
 
     async def testInfoIncludesNormalCommands(self) -> None:
-        """
-        Verify that info() includes commands with regular signatures.
+        """Verify that info() includes commands with regular signatures.
 
         Ensures that commands whose signatures do not start and end with
         double underscores are included in the result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="greet", description="Say hello")
         self.mock_loader.all = AsyncMock(return_value={"greet": cmd})
@@ -274,11 +318,15 @@ class TestReactor(TestCase):
         self.assertEqual(result[0]["description"], "Say hello")
 
     async def testInfoSkipsInternalCommands(self) -> None:
-        """
-        Verify that info() excludes internal commands delimited by dunder syntax.
+        """Verify that info() excludes internal commands delimited by dunder syntax.
 
         Ensures that commands whose signatures are both prefixed and suffixed
         with double underscores are filtered out from the result.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         internal = _make_mock_command(signature="__internal__")
         normal = _make_mock_command(signature="normal:cmd")
@@ -294,11 +342,15 @@ class TestReactor(TestCase):
         self.assertIn("normal:cmd", signatures)
 
     async def testInfoReturnsSortedBySignature(self) -> None:
-        """
-        Verify that info() returns commands sorted alphabetically by signature.
+        """Verify that info() returns commands sorted alphabetically by signature.
 
         Ensures the result list is ordered consistently regardless of the
         internal dict insertion order.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.mock_loader.all = AsyncMock(return_value={
             "z:cmd": _make_mock_command(signature="z:cmd"),
@@ -312,11 +364,15 @@ class TestReactor(TestCase):
         self.assertEqual(signatures, sorted(signatures))
 
     async def testInfoCachesResultsOnSecondCall(self) -> None:
-        """
-        Verify that info() caches its result and avoids redundant loader calls.
+        """Verify that info() caches its result and avoids redundant loader calls.
 
         Ensures that the loader's all() method is only invoked once across
         multiple calls to info() on the same Reactor instance.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="cached:cmd")
         self.mock_loader.all = AsyncMock(return_value={"cached:cmd": cmd})
@@ -328,11 +384,15 @@ class TestReactor(TestCase):
         self.mock_loader.all.assert_called_once()
 
     async def testInfoResultContainsExpectedKeys(self) -> None:
-        """
-        Verify that each item returned by info() contains the expected keys.
+        """Verify that each item returned by info() contains the expected keys.
 
         Ensures that the information dictionary per command exposes all
         required metadata fields for downstream consumption.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="check:keys")
         self.mock_loader.all = AsyncMock(return_value={"check:keys": cmd})
@@ -356,11 +416,15 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     async def testCallReturnsZeroOnSuccessfulExecution(self) -> None:
-        """
-        Verify that call() returns 0 when a command executes successfully.
+        """Verify that call() returns 0 when a command executes successfully.
 
         Ensures the success exit code convention is honoured for commands
         that run without raising exceptions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="hello", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -371,11 +435,15 @@ class TestReactor(TestCase):
         self.assertEqual(result, 0)
 
     async def testCallLogsSuccessMessage(self) -> None:
-        """
-        Verify that call() logs an info message after successful execution.
+        """Verify that call() logs an info message after successful execution.
 
         Ensures the logger's info() method is invoked exactly once when
         a command finishes without errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="log:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -385,11 +453,15 @@ class TestReactor(TestCase):
         self.mock_logger.info.assert_called_once()
 
     async def testCallBuildsCommandInstanceViaApp(self) -> None:
-        """
-        Verify that call() uses the app container to build the command instance.
+        """Verify that call() uses the app container to build the command instance.
 
         Ensures that app.build() is invoked with the command's class object
         so that dependency injection is applied.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="di:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -399,11 +471,15 @@ class TestReactor(TestCase):
         self.mock_app.build.assert_awaited_once_with(cmd.obj)
 
     async def testCallInvokesCommandViaApp(self) -> None:
-        """
-        Verify that call() delegates command execution to app.call().
+        """Verify that call() delegates command execution to app.call().
 
         Ensures that the resolved command instance and method are passed to
         the application container for actual execution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="exec:cmd", timestamps=False)
         instance = MagicMock()
@@ -415,11 +491,15 @@ class TestReactor(TestCase):
         self.mock_app.call.assert_awaited_once_with(instance, cmd.method)
 
     async def testCallWithTimestampsEmitsRunningAndDone(self) -> None:
-        """
-        Verify that call() emits running and done output when timestamps enabled.
+        """Verify that call() emits running and done output when timestamps enabled.
 
         Ensures that the executer's running() and done() methods are called
         when a command has timestamps=True and no help flag is passed.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="ts:cmd", timestamps=True)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -430,11 +510,15 @@ class TestReactor(TestCase):
         self.mock_executer.done.assert_called_once()
 
     async def testCallWithTimestampsHelpFlagSuppressesOutput(self) -> None:
-        """
-        Verify that help flag suppresses timestamp output during call().
+        """Verify that help flag suppresses timestamp output during call().
 
         Ensures that passing -h or --help prevents the running/done
         executer calls even when timestamps are enabled on the command.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="ts:help", timestamps=True)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -444,11 +528,15 @@ class TestReactor(TestCase):
         self.mock_executer.running.assert_not_called()
 
     async def testCallStartsAndStopsPerformanceCounter(self) -> None:
-        """
-        Verify that call() starts and stops the performance counter.
+        """Verify that call() starts and stops the performance counter.
 
         Ensures that astart() and astop() are both invoked during a
         command execution cycle.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="perf:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -459,11 +547,15 @@ class TestReactor(TestCase):
         self.mock_perf.astop.assert_awaited_once()
 
     async def testCallSetsKernelContextOnScope(self) -> None:
-        """
-        Verify that call() sets the kernel context on the scope.
+        """Verify that call() sets the kernel context on the scope.
 
         Ensures that the console kernel type is stored in the scope
         at the start of each command execution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="scope:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -484,11 +576,15 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     async def testCallReturnsOneWhenCommandNotFound(self) -> None:
-        """
-        Verify that call() returns 1 when the command signature is not registered.
+        """Verify that call() returns 1 when the command signature is not registered.
 
         Ensures the failure exit code is returned and the exception handler
         is invoked when the loader returns None for the given signature.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.mock_loader.get = AsyncMock(return_value=None)
 
@@ -498,12 +594,16 @@ class TestReactor(TestCase):
         self.mock_catch.exception.assert_awaited_once()
 
     async def testCallLogsErrorOnFailure(self) -> None:
-        """
-        Verify that call() logs an error message when execution fails.
+        """Verify that call() logs an error message when execution fails.
 
         Ensures the logger's error() method is called when an exception
         occurs during command dispatching, with the exception raised after
         the command object has already been resolved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="crash:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -514,12 +614,16 @@ class TestReactor(TestCase):
         self.mock_logger.error.assert_called_once()
 
     async def testCallDelegatesExceptionToCatch(self) -> None:
-        """
-        Verify that call() delegates exceptions to the catch service.
+        """Verify that call() delegates exceptions to the catch service.
 
         Ensures that any unhandled exception during execution is passed
         to catch.exception() for centralised error handling, with the
         exception raised after the command object has been resolved.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         error = RuntimeError("fatal")
         cmd = _make_mock_command(signature="error:cmd", timestamps=False)
@@ -531,11 +635,15 @@ class TestReactor(TestCase):
         self.mock_catch.exception.assert_awaited_once_with(error)
 
     async def testCallEmitsFailOutputOnExceptionWithTimestamps(self) -> None:
-        """
-        Verify that call() emits fail output when a command with timestamps errors.
+        """Verify that call() emits fail output when a command with timestamps errors.
 
         Ensures the executer's fail() is called when a registered command
         that has timestamps=True raises an exception during execution.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="fail:cmd", timestamps=True)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -546,12 +654,16 @@ class TestReactor(TestCase):
         self.mock_executer.fail.assert_called_once()
 
     async def testCallStopsPerformanceCounterOnFailure(self) -> None:
-        """
-        Verify that call() stops the performance counter even when execution fails.
+        """Verify that call() stops the performance counter even when execution fails.
 
         Ensures that astop() is always called so that the timer is properly
         cleaned up regardless of success or failure, with the exception
         raised after command resolution so the except block runs cleanly.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="stop:cmd", timestamps=False)
         self.mock_loader.get = AsyncMock(return_value=cmd)
@@ -566,33 +678,45 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
 
     def testParseCommandArgsReturnsEmptyDictWhenNoParser(self) -> None:
-        """
-        Verify that __parseCommandArgs returns an empty dict when command has no parser.
+        """Verify that __parseCommandArgs returns an empty dict without a parser.
 
         Ensures that commands without an ArgumentParser configured yield
         an empty argument dict without raising errors.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="no:args", args=None)
         result = self.reactor._Reactor__parseCommandArgs(cmd, [])
         self.assertEqual(result, {})
 
     def testParseCommandArgsReturnsEmptyDictForNoneArgs(self) -> None:
-        """
-        Verify that __parseCommandArgs handles None args gracefully.
+        """Verify that __parseCommandArgs handles None args gracefully.
 
         Ensures that passing None as the args parameter does not raise
         an error when the command also has no ArgumentParser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cmd = _make_mock_command(signature="none:args", args=None)
         result = self.reactor._Reactor__parseCommandArgs(cmd, None)
         self.assertEqual(result, {})
 
     def testParseCommandArgsWithValidParser(self) -> None:
-        """
-        Verify that __parseCommandArgs correctly parses known arguments.
+        """Verify that __parseCommandArgs correctly parses known arguments.
 
         Ensures that when a command has an ArgumentParser with defined
         arguments, they are parsed and returned as a dictionary.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         parser = argparse.ArgumentParser()
         parser.add_argument("--name", type=str, default="world")
@@ -604,11 +728,15 @@ class TestReactor(TestCase):
         self.assertEqual(result.get("name"), "alice")
 
     def testParseCommandArgsWithDefaultValues(self) -> None:
-        """
-        Verify that __parseCommandArgs returns default argument values.
+        """Verify that __parseCommandArgs returns default argument values.
 
         Ensures that missing optional arguments are populated with their
         configured default values from the ArgumentParser.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         parser = argparse.ArgumentParser()
         parser.add_argument("--count", type=int, default=42)
@@ -619,11 +747,15 @@ class TestReactor(TestCase):
         self.assertEqual(result.get("count"), 42)
 
     def testParseCommandArgsExitsOnInvalidArgument(self) -> None:
-        """
-        Verify that __parseCommandArgs triggers SystemExit on unrecognised options.
+        """Verify that __parseCommandArgs triggers SystemExit on unrecognised options.
 
         Ensures that argparse raises SystemExit when an unknown flag is
         passed, which is then re-raised as a SystemExit by the method.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         parser = argparse.ArgumentParser()
         parser.add_argument("--valid", type=str)

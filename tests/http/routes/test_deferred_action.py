@@ -21,12 +21,17 @@ from tests.http.test_kernel import boot_kernel, dispatch
 
 _VERBS = ("get", "post", "put", "patch", "delete", "query")
 
-
 class TestDeferredRouteActions(TestCase):
     """Verify route completion before export, cache restoration and dispatch."""
 
     def testPendingFluentExportsFailUntilAnActionIsAssigned(self) -> None:
-        """Reject incomplete omitted/None actions and allow subsequent completion."""
+        """Reject incomplete omitted/None actions and allow subsequent completion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for args in ((), (None,)):
             route = FluentRoute("post", "//orders//", *args)
             route_id = route.id
@@ -47,7 +52,13 @@ class TestDeferredRouteActions(TestCase):
             self.assertEqual(resolved.route.action["method"], "index")
 
     def testEveryVerbRestoresOmittedAndNoneActionsFromCache(self) -> None:
-        """Complete all six verbs and preserve actions and params through JSON."""
+        """Complete all six verbs and preserve actions and params through JSON.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         for verb in _VERBS:
             register = getattr(router, verb)
@@ -81,7 +92,13 @@ class TestDeferredRouteActions(TestCase):
                     })
 
     def testRouterExportRejectsAnIncompleteRouteAndCanRecover(self) -> None:
-        """Block a pending route from the compiled table without losing it."""
+        """Block a pending route from the compiled table without losing it.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         pending = router.delete("/pending").name("pending.delete")
         with self.assertRaises(ValueError) as captured:
@@ -98,7 +115,13 @@ class TestDeferredRouteActions(TestCase):
         self.assertEqual(sum(route["id"] == pending.id for route in exported), 1)
 
     def testPendingRoutesKeepGroupContextAfterCompletionAndCaching(self) -> None:
-        """Keep prefixes, names, middleware exclusions and kind while pending."""
+        """Keep prefixes, names, middleware exclusions and kind while pending.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         pending = (
@@ -130,7 +153,13 @@ class TestDeferredRouteActions(TestCase):
         self.assertEqual(resolved.route.action["method"], "index")
 
     def testImmediateActionsAndViewsStillExportAndResolve(self) -> None:
-        """Keep accepted immediate handlers and handler-free view routes working."""
+        """Keep accepted immediate handlers and handler-free view routes working.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router.get("/function", route_handler)
         router.get("/invokable", UserController)
@@ -152,7 +181,13 @@ class TestDeferredRouteActions(TestCase):
         )
 
     def testInvalidNonNoneActionsFailBeforeRegistration(self) -> None:
-        """Keep invalid and false-valued actions from becoming pending routes."""
+        """Keep invalid and false-valued actions from becoming pending routes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         invalid = (
             (False, TypeError),
             (0, TypeError),
@@ -174,7 +209,13 @@ class TestDeferredRouteActions(TestCase):
                 self.assertEqual(router.export(), original)
 
     async def testCachedDeferredControllerRunsThroughKernelAndMiddleware(self) -> None:
-        """Dispatch an assigned action after cache restoration through the kernel."""
+        """Dispatch an assigned action after cache restoration through the kernel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         router._setKind("api")
         pending = router.get("/controller").name("deferred.controller")
@@ -197,12 +238,17 @@ class TestDeferredRouteActions(TestCase):
         )
         self.assertEqual(catch.handled, [])
 
-
 class TestRequiredFallbackAction(TestCase):
     """Verify rejected fallbacks leave room for one valid registration."""
 
     def testMissingAndNoneFallbacksDoNotRegisterOrConsumeTheSlot(self) -> None:
-        """Reject missing/None actions and preserve a later valid fallback."""
+        """Reject missing/None actions and preserve a later valid fallback.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         router = make_router()
         with self.assertRaises(TypeError):
             router.fallback()
@@ -219,7 +265,13 @@ class TestRequiredFallbackAction(TestCase):
         self.assertEqual(router.export()["fallback"], expected)
 
     async def testValidFallbackFormsSurviveCacheAndKernelDispatch(self) -> None:
-        """Restore callable, invokable and controller fallbacks for missing paths."""
+        """Restore callable, invokable and controller fallbacks for missing paths.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             (route_handler, (None, route_handler)),
             (UserController, (UserController, "__call__")),

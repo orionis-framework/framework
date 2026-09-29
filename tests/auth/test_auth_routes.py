@@ -1,41 +1,60 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from orionis.http.default.controllers.forgot_password_controller import (
     ForgotPasswordController,
 )
 from orionis.http.default.controllers.login_controller import LoginController
 from orionis.http.default.controllers.register_controller import RegisterController
-from orionis.http.routes.router import Router
 from orionis.test import TestCase
 from tests.http.routes.test_nested_routing import make_router
 
+if TYPE_CHECKING:
+    from orionis.http.routes.router import Router
 
 class CustomLoginController(LoginController):
     """Mark application-provided login route handlers."""
 
-
 class CustomRegisterController(RegisterController):
     """Mark application-provided registration route handlers."""
 
-
 class CustomForgotPasswordController(ForgotPasswordController):
     """Mark application-provided password recovery route handlers."""
-
 
 class TestAuthRouteControllers(TestCase):
     """Allow each controller family in the web auth routes to be replaced."""
 
     @staticmethod
-    def _routes_by_path(router: Router) -> dict[tuple[str, str], dict]:
+    def _routesByPath(router: Router) -> dict[tuple[str, str], dict]:
+        """Index exported routes by method and path.
+
+        Parameters
+        ----------
+        router : Router
+            Router containing authentication routes.
+
+        Returns
+        -------
+        dict[tuple[str, str], dict]
+            Exported route definitions keyed by method and path.
+        """
         return {
             (route["method"], route["path"]): route
             for route in router.export()["routes"]
         }
 
     def testUsesTheBuiltInDefaultForEachOmittedController(self) -> None:
+        """Use framework controllers when overrides are omitted.
+
+        Returns
+        -------
+        None
+            Assert each default authentication controller is retained.
+        """
         router = make_router()
 
         router.auth()
 
-        routes = self._routes_by_path(router)
+        routes = self._routesByPath(router)
         self.assertIs(routes[("POST", "/login")]["class"], LoginController)
         self.assertIs(routes[("POST", "/sign-up")]["class"], RegisterController)
         self.assertIs(
@@ -44,6 +63,13 @@ class TestAuthRouteControllers(TestCase):
         )
 
     def testUsesEachProvidedControllerForItsRoutes(self) -> None:
+        """Apply each custom controller to its authentication routes.
+
+        Returns
+        -------
+        None
+            Assert exported routes preserve all configured overrides.
+        """
         router = make_router()
 
         router.auth(
@@ -52,7 +78,7 @@ class TestAuthRouteControllers(TestCase):
             forgot_password_controller=CustomForgotPasswordController,
         )
 
-        routes = self._routes_by_path(router)
+        routes = self._routesByPath(router)
         expected = {
             ("GET", "/login"): (CustomLoginController, "index"),
             ("POST", "/login"): (CustomLoginController, "login"),
@@ -84,11 +110,18 @@ class TestAuthRouteControllers(TestCase):
                 self.assertEqual(routes[key]["handler"], handler)
 
     def testOmittedControllersKeepTheirIndependentDefaults(self) -> None:
+        """Keep omitted controller families independent of supplied overrides.
+
+        Returns
+        -------
+        None
+            Assert an override affects only its own controller family.
+        """
         router = make_router()
 
         router.auth(forgot_password_controller=CustomForgotPasswordController)
 
-        routes = self._routes_by_path(router)
+        routes = self._routesByPath(router)
         self.assertIs(routes[("POST", "/login")]["class"], LoginController)
         self.assertIs(routes[("POST", "/sign-up")]["class"], RegisterController)
         self.assertIs(

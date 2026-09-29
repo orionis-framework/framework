@@ -2,7 +2,6 @@ import base64
 import tempfile
 from dataclasses import asdict
 from pathlib import Path
-
 from config.http import BootstrapHTTP
 from config.view import BootstrapView
 from orionis.database.dialect import build_engine_url, engine_options
@@ -34,10 +33,15 @@ from orionis.foundation.config.view import View
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from tests.foundation.config.support import ConfigurationTestCase
 
-
 class TestConfigurationRegressions(ConfigurationTestCase):
     def testAppNormalizesEnumNamesValuesAndBinaryKeys(self) -> None:
-        """Produce the raw key and canonical cipher required by encryption."""
+        """Produce the raw key and canonical cipher required by encryption.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cipher in Cipher:
             length = 16 if "128" in cipher.value else 32
             raw = bytes(range(length))
@@ -50,7 +54,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     self.assertEqual(config.env, Environments.PRODUCTION.value)
 
     def testGeneratedKeysMatchEveryCipher(self) -> None:
-        """Make absent keys immediately usable by encryption consumers."""
+        """Make absent keys immediately usable by encryption consumers.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cipher in Cipher:
             with self.subTest(cipher=cipher):
                 config = App(key=None, cipher=cipher)
@@ -58,14 +68,26 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertEqual(len(self.environment.writes), len(Cipher))
 
     def testInvalidKeysFailBeforeAnyWrite(self) -> None:
-        """Reject empty, malformed and wrong-length encryption keys."""
+        """Reject empty, malformed and wrong-length encryption keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for value in (b"", "", "base64:???", b"x" * 15, 42):
             with self.subTest(value=value), self.assertRaises((TypeError, ValueError)):
                 App(key=value)
         self.assertEqual(self.environment.writes, [])
 
     def testNumericOptionsRejectBooleans(self) -> None:
-        """Prevent booleans from passing integer range checks across sections."""
+        """Prevent booleans from passing integer range checks across sections.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         cases = (
             (MySQL, "port"),
             (PGSQL, "port"),
@@ -101,7 +123,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     cls(**{field: value})
 
     def testExplicitZeroFalseAndEmptyAllowedValuesSurvive(self) -> None:
-        """Preserve disabled caches, zero waits and unauthenticated credentials."""
+        """Preserve disabled caches, zero waits and unauthenticated credentials.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(SQLite(busy_timeout=0, prefix="").busy_timeout, 0)
         self.assertEqual(Cors(max_age=0).max_age, 0)
         self.assertEqual(Scheduler(jitter=0, coalesce=False).jitter, 0)
@@ -110,7 +138,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertFalse(Testing(fail_fast=False, cache_results=False).cache_results)
 
     def testSqlitePathsAndForeignKeyOptionsReachTheDialect(self) -> None:
-        """Accept memory and arbitrary SQLite filenames with coherent URLs."""
+        """Accept memory and arbitrary SQLite filenames with coherent URLs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for database in (":memory:", "database/app.db", "database/no_extension"):
             for value, expected in (
                 (True, "ON"),
@@ -129,7 +163,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     engine_options(asdict(config))
 
     def testDatabaseEnumWireValuesRoundTrip(self) -> None:
-        """Accept hyphenated PostgreSQL SSL modes and all SQLite enum values."""
+        """Accept hyphenated PostgreSQL SSL modes and all SQLite enum values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for mode in PGSQLSSLMode:
             self.assertEqual(PGSQL(sslmode=mode.value).sslmode, mode.value)
         for charset in PGSQLCharset:
@@ -140,7 +180,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             self.assertEqual(SQLite(synchronous=mode.value).synchronous, mode.value)
 
     def testDatabaseRejectsInvalidEnumsWithoutAttributeErrors(self) -> None:
-        """Report clear configuration exceptions for invalid enum inputs."""
+        """Report clear configuration exceptions for invalid enum inputs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls, field in (
             (PGSQL, "charset"),
             (PGSQL, "sslmode"),
@@ -156,14 +202,26 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     cls(**{field: value})
 
     def testPostgresPortRangeAndNumericStrings(self) -> None:
-        """Keep numeric string ports but enforce real TCP port bounds."""
+        """Keep numeric string ports but enforce real TCP port bounds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(PGSQL(port="5432").port, "5432")
         for value in (0, 65536, "0", "65536", "²", 1.5):
             with self.subTest(value=value), self.assertRaises((TypeError, ValueError)):
                 PGSQL(port=value)
 
     def testSqlServerValidatesAllOptions(self) -> None:
-        """Reject unvalidated SQL Server flags and unsupported encrypt modes."""
+        """Reject unvalidated SQL Server flags and unsupported encrypt modes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for values in (
             {"charset": " "},
             {"prefix_indexes": 1},
@@ -186,7 +244,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             )
 
     def testOracleAlternativeEndpointsAndNullableOptions(self) -> None:
-        """Accept DSN or TNS without requiring a SID or service name."""
+        """Accept DSN or TNS without requiring a SID or service name.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for values in ({"dsn": "host/service"}, {"tns_name": "REPORTS"}, {"sid": "XE"}):
             self.assertEqual(Oracle(service_name=None, **values).driver, "oracle")
         with self.assertRaises(ValueError):
@@ -195,7 +259,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertEqual(Database(connections={}).default, "sqlite")
 
     def testMutableListsAreOwnedByEachConfiguration(self) -> None:
-        """Separate instance state from caller-owned and environment-owned lists."""
+        """Separate instance state from caller-owned and environment-owned lists.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls, name, values in (
             (Cors, "allow_origins", ["https://example.com"]),
             (HTTPProxies, "trusted_proxies", ["127.0.0.1"]),
@@ -212,7 +282,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertIsNot(first.local, second.local)
 
     def testListElementsAndCorsAgeAreValidated(self) -> None:
-        """Reject malformed headers, origins, proxies and template paths early."""
+        """Reject malformed headers, origins, proxies and template paths early.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         for cls, name in (
             (Cors, "allow_origins"),
             (Cors, "allow_headers"),
@@ -234,21 +310,39 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             Cors(allow_origin_regex="[")
 
     def testInheritedValidationRejectsInvalidEnvironmentTypes(self) -> None:
-        """Prevent template factories from coercing invalid values silently."""
+        """Prevent template factories from coercing invalid values silently.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.environment.values.update(VIEW_AUTOESCAPE="false", RATE_LIMIT_REQUESTS=1.5)
         for cls in (View, BootstrapView, HTTPRateLimit, BootstrapHTTP):
             with self.subTest(entity=cls.__name__), self.assertRaises(TypeError):
                 cls()
 
     def testPreviouslyUnvalidatedBooleanFieldsAreChecked(self) -> None:
-        """Run inherited post-init validation for testing and CSRF options."""
+        """Run inherited post-init validation for testing and CSRF options.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with self.assertRaises(TypeError):
             HTTPCsrf(cookie_secure="false")
         with self.assertRaises(TypeError):
             Testing(cache_results=1)
 
     def testConfigurationDoesNotCreateStorageDirectories(self) -> None:
-        """Leave directory creation to runtime drivers after validation succeeds."""
+        """Leave directory creation to runtime drivers after validation succeeds.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         with tempfile.TemporaryDirectory() as directory:
             for cls in (Local, Public, CacheFile):
                 path = Path(directory) / cls.__module__.replace(".", "_")
@@ -257,13 +351,25 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertIn(S3().driver, {"aws", "s3"})
 
     def testHashingMemoryDependsOnParallelism(self) -> None:
-        """Enforce the minimum Argon2 memory needed for every thread."""
+        """Enforce the minimum Argon2 memory needed for every thread.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(Argon2(memory=32, threads=4, time=1).memory, 32)
         with self.assertRaises(ValueError):
             Argon2(memory=31, threads=4)
 
     def testSchedulerUsesSupportedGracePeriodsAndStoreDependencies(self) -> None:
-        """Match APScheduler's positive-or-unlimited grace period contract."""
+        """Match APScheduler's positive-or-unlimited grace period contract.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertIsNone(Scheduler(misfire_grace_time=None).misfire_grace_time)
         with self.assertRaises(ValueError):
             Scheduler(misfire_grace_time=0)
@@ -275,7 +381,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             Redis(key="same", run_times_key="same")
 
     def testMailCopiesNestedMappingsAndKeepsCustomDrivers(self) -> None:
-        """Preserve named mailers and isolate mutable driver settings."""
+        """Preserve named mailers and isolate mutable driver settings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         settings = {"archive": {"driver": "custom", "options": ["a"]}}
         sender = {"address": "from@example.com"}
         first = Mail(default="archive", mailers=settings, from_address=sender)
@@ -292,12 +404,24 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             Mail(default="absent")
 
     def testSmtpUrlOverridesInactiveOperationalOptions(self) -> None:
-        """Keep the transport's documented precedence and lazy validation."""
+        """Keep the transport's documented precedence and lazy validation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         options = Smtp(url="smtps://smtp.example.com", port=-1, timeout=None)
         self.assertEqual(SmtpSettings.fromConfig(asdict(options)).port, 465)
 
     def testViewCacheSupportsDisabledAndUnlimitedModes(self) -> None:
-        """Expose Jinja's zero and minus-one cache modes without coercion."""
+        """Expose Jinja's zero and minus-one cache modes without coercion.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
         self.assertEqual(View(cache_size=-1, cache_path=None).cache_size, -1)
         with self.assertRaises(ValueError):
             View(cache_size=-2)

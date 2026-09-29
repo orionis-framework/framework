@@ -18,6 +18,20 @@ class _FakeFailure:
     """Minimal stand-in for a single validation failure."""
 
     def __init__(self, field: str | None, message: str | None) -> None:
+        """Initialize the test double with its configured state.
+
+        Parameters
+        ----------
+        field : str | None
+            Value supplied for ``field``.
+        message : str | None
+            Value supplied for ``message``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.field = field
         self.message = message
 
@@ -29,6 +43,20 @@ class _FakeValidationException(Exception):
         errors: object | None = None,
         failure: _FakeFailure | None = None,
     ) -> None:
+        """Initialize the test double with its configured state.
+
+        Parameters
+        ----------
+        errors : object | None
+            Value supplied for ``errors``.
+        failure : _FakeFailure | None
+            Value supplied for ``failure``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         super().__init__("invalid")
         if errors is not None:
             self.errors = errors
@@ -39,21 +67,29 @@ class TestFlashConstants(TestCase):
     """Unit tests for the reserved keys owned by the session layer."""
 
     def testReservedKeysAreDistinct(self) -> None:
-        """
-        Keep every reserved session key unique.
+        """Keep every reserved session key unique.
 
         Validates that the old-input, errors and previous-url bags can
         never overwrite one another inside the same payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         keys = {OLD_INPUT_KEY, ERRORS_KEY, PREVIOUS_URL_KEY}
         self.assertEqual(len(keys), 3)
 
     def testSensitiveFieldsCoverCredentialInputs(self) -> None:
-        """
-        Blacklist every credential-like form field.
+        """Blacklist every credential-like form field.
 
         Validates that passwords and CSRF tokens are declared as
         sensitive so they are never repopulated into a form.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         for field in ("password", "password_confirmation", "csrf_token"):
             self.assertIn(field, SENSITIVE_INPUT_FIELDS)
@@ -62,29 +98,41 @@ class TestFilterInput(TestCase):
     """Unit tests for filter_input()."""
 
     def testDropsSensitiveFields(self) -> None:
-        """
-        Remove credential fields from the payload.
+        """Remove credential fields from the payload.
 
         Validates that a submitted password never reaches the flash bag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = filter_input({"email": "a@b.c", "password": "secret"})
         self.assertEqual(result, {"email": "a@b.c"})
 
     def testKeepsNonSensitiveFields(self) -> None:
-        """
-        Preserve every non-credential field verbatim.
+        """Preserve every non-credential field verbatim.
 
         Validates that ordinary form values survive the filtering pass.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"email": "a@b.c", "remember": True}
         self.assertEqual(filter_input(payload), payload)
 
     def testReturnsIndependentCopy(self) -> None:
-        """
-        Never alias the caller's mapping.
+        """Never alias the caller's mapping.
 
         Validates that mutating the result leaves the original payload
         untouched, both on the fast and the filtered path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = {"email": "a@b.c"}
         result = filter_input(payload)
@@ -92,29 +140,41 @@ class TestFilterInput(TestCase):
         self.assertEqual(payload["email"], "a@b.c")
 
     def testDropsEverySensitiveField(self) -> None:
-        """
-        Remove all blacklisted fields at once.
+        """Remove all blacklisted fields at once.
 
         Validates that a payload made exclusively of credentials yields
         an empty mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = dict.fromkeys(SENSITIVE_INPUT_FIELDS, "x")
         self.assertEqual(filter_input(payload), {})
 
     def testEmptyPayloadReturnsEmptyDict(self) -> None:
-        """
-        Handle an empty submission without failing.
+        """Handle an empty submission without failing.
 
         Validates that the disjoint fast path tolerates empty mappings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(filter_input({}), {})
 
     def testAcceptsAnyMappingOnTheFastPath(self) -> None:
-        """
-        Copy a read-only mapping into a plain dictionary.
+        """Copy a read-only mapping into a plain dictionary.
 
         Validates that the credential-free fast path does not assume the
         payload is a mutable dict.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = MappingProxyType({"email": "a@b.c"})
         result = filter_input(payload)
@@ -122,10 +182,14 @@ class TestFilterInput(TestCase):
         self.assertIsInstance(result, dict)
 
     def testAcceptsAnyMappingOnTheFilteredPath(self) -> None:
-        """
-        Filter a read-only mapping containing credentials.
+        """Filter a read-only mapping containing credentials.
 
         Validates that the slow path also accepts non-dict mappings.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         payload = MappingProxyType({"email": "a@b.c", "password": "x"})
         self.assertEqual(filter_input(payload), {"email": "a@b.c"})
@@ -134,11 +198,15 @@ class TestNormalizeErrors(TestCase):
     """Unit tests for normalize_errors()."""
 
     def testStringValueBecomesSingleItemList(self) -> None:
-        """
-        Wrap a single message into a list.
+        """Wrap a single message into a list.
 
         Validates that the ``{field: [message]}`` shape is always
         produced regardless of the caller's input style.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             normalize_errors({"email": "required"}),
@@ -146,10 +214,14 @@ class TestNormalizeErrors(TestCase):
         )
 
     def testListValueIsStringified(self) -> None:
-        """
-        Coerce every item of a sequence to a string.
+        """Coerce every item of a sequence to a string.
 
         Validates that non-string messages are rendered before storage.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             normalize_errors({"age": ["too small", 42]}),
@@ -157,10 +229,14 @@ class TestNormalizeErrors(TestCase):
         )
 
     def testTupleValueIsSupported(self) -> None:
-        """
-        Accept a tuple of messages.
+        """Accept a tuple of messages.
 
         Validates that immutable sequences are treated like lists.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             normalize_errors({"a": ("x", "y")}),
@@ -168,47 +244,67 @@ class TestNormalizeErrors(TestCase):
         )
 
     def testFrozensetValueIsSupported(self) -> None:
-        """
-        Accept a frozenset of messages.
+        """Accept a frozenset of messages.
 
         Validates that set-like containers are expanded instead of being
         stringified as a whole.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(normalize_errors({"a": frozenset({"x"})}), {"a": ["x"]})
 
     def testScalarValueIsStringified(self) -> None:
-        """
-        Render a non-sequence value as a single message.
+        """Render a non-sequence value as a single message.
 
         Validates that arbitrary objects still produce a valid bag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(normalize_errors({"n": 10}), {"n": ["10"]})
 
     def testExceptionWithErrorsMappingIsPreferred(self) -> None:
-        """
-        Read the full error bag from a validation exception.
+        """Read the full error bag from a validation exception.
 
         Validates that every failing field is reported, not just the
         first one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exc = _FakeValidationException(errors={"a": ["x"], "b": ["y", "z"]})
         self.assertEqual(normalize_errors(exc), {"a": ["x"], "b": ["y", "z"]})
 
     def testExceptionWithSingleFailureIsSupported(self) -> None:
-        """
-        Fall back to a single failure attribute.
+        """Fall back to a single failure attribute.
 
         Validates compatibility with exceptions exposing only ``failure``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exc = _FakeValidationException(failure=_FakeFailure("email", "invalid"))
         self.assertEqual(normalize_errors(exc), {"email": ["invalid"]})
 
     def testNonMappingErrorsAttributeFallsBackToFailure(self) -> None:
-        """
-        Ignore an ``errors`` attribute that is not a mapping.
+        """Ignore an ``errors`` attribute that is not a mapping.
 
         Validates that the failure attribute still drives the result
         when the richer bag is unusable.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exc = _FakeValidationException(
             errors=["not", "a", "mapping"],
@@ -217,39 +313,55 @@ class TestNormalizeErrors(TestCase):
         self.assertEqual(normalize_errors(exc), {"email": ["invalid"]})
 
     def testFailureWithoutFieldOrMessageYieldsEmptyStrings(self) -> None:
-        """
-        Tolerate a failure exposing empty attributes.
+        """Tolerate a failure exposing empty attributes.
 
         Validates that ``None`` values are coerced to empty strings
         instead of leaking into the flash bag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         exc = _FakeValidationException(failure=_FakeFailure(None, None))
         self.assertEqual(normalize_errors(exc), {"": [""]})
 
     def testExceptionWithoutErrorBagRaisesTypeError(self) -> None:
-        """
-        Reject an exception carrying no error information.
+        """Reject an exception carrying no error information.
 
         Validates that an unrelated exception cannot be flashed as if it
         were a validation failure.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             normalize_errors(_FakeValidationException())
 
     def testUnsupportedPayloadRaisesTypeError(self) -> None:
-        """
-        Reject payloads that are neither mappings nor exceptions.
+        """Reject payloads that are neither mappings nor exceptions.
 
         Validates that misuse fails loudly instead of flashing garbage.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             normalize_errors("boom")
 
     def testReadOnlyMappingIsSupported(self) -> None:
-        """
-        Accept any mapping implementation as the error bag.
+        """Accept any mapping implementation as the error bag.
 
         Validates that the normaliser never assumes a mutable dict.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(
             normalize_errors(MappingProxyType({"email": "required"})),
@@ -260,10 +372,14 @@ class TestQueueBag(TestCase):
     """Unit tests for queue_bag()."""
 
     def testCreatesBagWhenAbsent(self) -> None:
-        """
-        Create the reserved bag on first use.
+        """Create the reserved bag on first use.
 
         Validates that the stored bag is a copy of the supplied values.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         pending: dict[str, Any] = {}
         values = {"email": "a@b.c"}
@@ -272,20 +388,28 @@ class TestQueueBag(TestCase):
         self.assertIsNot(pending[OLD_INPUT_KEY], values)
 
     def testMergesIntoExistingBag(self) -> None:
-        """
-        Merge new entries into an already queued bag.
+        """Merge new entries into an already queued bag.
 
         Validates that successive calls accumulate instead of replacing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         pending: dict[str, Any] = {OLD_INPUT_KEY: {"a": 1}}
         queue_bag(pending, OLD_INPUT_KEY, {"b": 2})
         self.assertEqual(pending[OLD_INPUT_KEY], {"a": 1, "b": 2})
 
     def testReplacesNonDictValue(self) -> None:
-        """
-        Overwrite a previously stored non-mapping value.
+        """Overwrite a previously stored non-mapping value.
 
         Validates that a corrupted slot is rebuilt as a proper bag.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         pending: dict[str, Any] = {ERRORS_KEY: "oops"}
         queue_bag(pending, ERRORS_KEY, {"a": ["x"]})
@@ -295,11 +419,15 @@ class TestApplyFlash(TestCase):
     """Unit tests for apply_flash()."""
 
     def testRoutesOldInputThroughFlashInput(self) -> None:
-        """
-        Send the reserved input bag through flashInput().
+        """Send the reserved input bag through flashInput().
 
         Validates that sensitive fields are stripped even when the data
         arrives as a raw pending payload.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(
@@ -310,31 +438,43 @@ class TestApplyFlash(TestCase):
         self.assertIsNone(session.getOldInput("password"))
 
     def testRoutesErrorsThroughFlashErrors(self) -> None:
-        """
-        Send the reserved errors bag through flashErrors().
+        """Send the reserved errors bag through flashErrors().
 
         Validates that messages are normalised into lists.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(session, {ERRORS_KEY: {"email": "required"}})
         self.assertEqual(session.getErrors(), {"email": ["required"]})
 
     def testRoutesPlainKeysThroughFlash(self) -> None:
-        """
-        Flash ordinary keys unchanged.
+        """Flash ordinary keys unchanged.
 
         Validates that status messages keep their original value.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(session, {"success": "Saved"})
         self.assertEqual(session.getFlash("success"), "Saved")
 
     def testReservedBagsMergeWithExistingFlash(self) -> None:
-        """
-        Merge reserved bags instead of replacing them.
+        """Merge reserved bags instead of replacing them.
 
         Validates that a payload applied after a direct flashInput()
         call keeps both sets of fields.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -343,21 +483,29 @@ class TestApplyFlash(TestCase):
         self.assertEqual(session.getOldInput("name"), "Ada")
 
     def testEmptyPayloadLeavesSessionUntouched(self) -> None:
-        """
-        Ignore an empty pending payload.
+        """Ignore an empty pending payload.
 
         Validates that no write occurs and the session stays lazy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(session, {})
         self.assertFalse(session.started)
 
     def testRoutesExceptionErrorsThroughFlashErrors(self) -> None:
-        """
-        Normalise a validation exception queued as the errors bag.
+        """Normalise a validation exception queued as the errors bag.
 
         Validates that responses may queue the raised exception itself
         instead of a pre-built mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(
@@ -367,11 +515,15 @@ class TestApplyFlash(TestCase):
         self.assertEqual(session.getErrors(), {"email": ["invalid"]})
 
     def testPreviousUrlKeyIsFlashedVerbatim(self) -> None:
-        """
-        Treat the previous-url key as an ordinary flash entry.
+        """Treat the previous-url key as an ordinary flash entry.
 
         Validates that only the input and error bags receive special
         routing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         session = Session()
         apply_flash(session, {PREVIOUS_URL_KEY: "http://orionis.test/login"})

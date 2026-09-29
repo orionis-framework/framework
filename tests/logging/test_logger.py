@@ -27,26 +27,84 @@ class _StubApp:
     __slots__ = ("config_error", "path_error", "root", "settings")
 
     def __init__(self, root: str, settings: dict) -> None:
-        """Store the application root and the logging configuration."""
+        """Store the application root and the logging configuration.
+
+        Parameters
+        ----------
+        root : str
+            Value supplied for ``root``.
+        settings : dict
+            Value supplied for ``settings``.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self.root: str = root
         self.settings: dict = settings
         self.config_error: Exception | None = None
         self.path_error: Exception | None = None
 
     def config(self, key: str) -> dict:
-        """Return the configuration section requested by the logger."""
+        """Return the configuration section requested by the logger.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+
+        Raises
+        ------
+        self.config_error
+            Raised by this helper to exercise the failure path.
+        """
         if self.config_error is not None:
             raise self.config_error
         return self.settings if key == "logging" else {}
 
     def path(self, key: str) -> str:
-        """Return the absolute directory registered under the given alias."""
+        """Return the absolute directory registered under the given alias.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+
+        Raises
+        ------
+        self.path_error
+            Raised by this helper to exercise the failure path.
+        """
         if self.path_error is not None:
             raise self.path_error
         return self.root if key == _ROOT_KEY else f"{self.root}/{key}"
 
 def _channel(level: object = logging.INFO, path: str = _STACK_PATH) -> dict:
-    """Return a single channel configuration entry."""
+    """Return a single channel configuration entry.
+
+    Parameters
+    ----------
+    level : object
+        Value supplied for ``level``.
+    path : str
+        Value supplied for ``path``.
+
+    Returns
+    -------
+    dict
+        Value produced by the helper.
+    """
     return {"path": path, "level": level}
 
 def _make_app(
@@ -55,40 +113,73 @@ def _make_app(
     default: str = "stack",
     channels: dict | None = None,
 ) -> _StubApp:
-    """Return an application double wired to the given logging channels."""
+    """Return an application double wired to the given logging channels.
+
+    Parameters
+    ----------
+    root : str
+        Value supplied for ``root``.
+    default : str
+        Value supplied for ``default``.
+    channels : dict | None
+        Value supplied for ``channels``.
+
+    Returns
+    -------
+    _StubApp
+        Value produced by the helper.
+    """
     if channels is None:
         channels = {"stack": _channel()}
     return _StubApp(root, {"default": default, "channels": channels})
 
 def _skip_initialisation() -> None:
-    """Stand in for the private initialiser without building any logger."""
+    """Stand in for the private initialiser without building any logger.
+
+    Returns
+    -------
+    None
+        Completes the operation described above.
+    """
 
 class TestLoggerDefinition(TestCase):
 
     def testImplementsTheLoggerContract(self) -> None:
-        """
-        Declare Logger as an implementation of the logging contract.
+        """Declare Logger as an implementation of the logging contract.
 
         Validates that the concrete service can be bound to the ILogger
         abstraction resolved through the container.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(Logger, ILogger))
 
     def testExposesTheFrameworkServiceName(self) -> None:
-        """
-        Publish the framework service name as a class level constant.
+        """Publish the framework service name as a class level constant.
 
         Validates that the abstract property is shadowed by a plain attribute,
         keeping attribute access free of descriptor overhead.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertEqual(Logger.name, _LOGGER_NAME)
 
     def testInstancesReportTheFrameworkServiceName(self) -> None:
-        """
-        Report the service name from any logger instance.
+        """Report the service name from any logger instance.
 
         Validates that consumers reading ``logger.name`` obtain the identifier
         used to register the underlying standard library logger.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             logger = Logger(_make_app(tmp))
@@ -100,49 +191,77 @@ class TestLoggerDefinition(TestCase):
 class TestLoggerLazyInitialisation(TestCase):
 
     def setUp(self) -> None:
-        """Create a temporary application root and an idle logger."""
+        """Create a temporary application root and an idle logger.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
         self._app = _make_app(self._tmp.name)
         self._logger = Logger(self._app)
 
     def tearDown(self) -> None:
-        """Release the logger handles and delete the temporary root."""
+        """Release the logger handles and delete the temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._logger.close()
         self._tmp.cleanup()
 
     def testLoggerIsNotBuiltUntilFirstUse(self) -> None:
-        """
-        Defer the construction of the standard library logger.
+        """Defer the construction of the standard library logger.
 
         Validates that instantiating the service performs no logging setup, so
         an unused logger never touches the filesystem.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIsNone(self._logger._Logger__logger)
 
     def testFirstMessageBuildsTheLogger(self) -> None:
-        """
-        Build the underlying logger on the first logged message.
+        """Build the underlying logger on the first logged message.
 
         Validates the lazy initialisation triggered from the logging methods.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("first message")
         self.assertIsNotNone(self._logger._Logger__logger)
 
     def testSubsequentCallsReuseTheSameLogger(self) -> None:
-        """
-        Reuse the already initialised logger on every later call.
+        """Reuse the already initialised logger on every later call.
 
         Validates that the double checked guard returns the cached instance
         instead of rebuilding the handler stack.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.assertIs(self._logger.getLogger(), self._logger.getLogger())
 
     def testInitialisationFailureIsWrappedInRuntimeError(self) -> None:
-        """
-        Wrap any initialisation failure in a RuntimeError.
+        """Wrap any initialisation failure in a RuntimeError.
 
         Validates that a broken application root lookup surfaces as an explicit
         framework error instead of the raw driver exception.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._app.path_error = OSError("unreachable root")
         with self.assertRaises(RuntimeError) as captured:
@@ -150,11 +269,15 @@ class TestLoggerLazyInitialisation(TestCase):
         self.assertIn("Failed to initialize logger", str(captured.exception))
 
     def testReadinessGuardRaisesWhenNoLoggerIsProduced(self) -> None:
-        """
-        Raise a RuntimeError when initialisation produces no logger.
+        """Raise a RuntimeError when initialisation produces no logger.
 
         Validates the defensive guard protecting every caller from a silently
         unavailable logging backend.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger._Logger__initializeLogger = _skip_initialisation
         with self.assertRaises(RuntimeError) as captured:
@@ -164,77 +287,119 @@ class TestLoggerLazyInitialisation(TestCase):
 class TestLoggerMessages(TestCase):
 
     def setUp(self) -> None:
-        """Create a temporary application root and an idle logger."""
+        """Create a temporary application root and an idle logger.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
         self._logger = Logger(_make_app(self._tmp.name))
 
     def tearDown(self) -> None:
-        """Release the logger handles and delete the temporary root."""
+        """Release the logger handles and delete the temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._logger.close()
         self._tmp.cleanup()
 
     def _readStackLog(self) -> str:
-        """Return the text stored in the default stack log file."""
+        """Return the text stored in the default stack log file.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         path = Path(self._tmp.name) / "storage" / "logs" / "stack.log"
         return path.read_text(encoding="utf-8")
 
     def testInfoIsWrittenToTheChannelFile(self) -> None:
-        """
-        Record an informational message in the active channel.
+        """Record an informational message in the active channel.
 
         Validates that info() reaches the file handler configured for the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("info message")
         self.assertIn("info message", self._readStackLog())
 
     def testWarningIsWrittenToTheChannelFile(self) -> None:
-        """
-        Record a warning message in the active channel.
+        """Record a warning message in the active channel.
 
         Validates that warning() reaches the file handler configured for the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.warning("warning message")
         self.assertIn("warning message", self._readStackLog())
 
     def testErrorIsWrittenToTheChannelFile(self) -> None:
-        """
-        Record an error message in the active channel.
+        """Record an error message in the active channel.
 
         Validates that error() reaches the file handler configured for the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.error("error message")
         self.assertIn("error message", self._readStackLog())
 
     def testCriticalIsWrittenToTheChannelFile(self) -> None:
-        """
-        Record a critical message in the active channel.
+        """Record a critical message in the active channel.
 
         Validates that critical() reaches the file handler configured for the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.critical("critical message")
         self.assertIn("critical message", self._readStackLog())
 
     def testDebugIsDiscardedWhenTheChannelLevelIsHigher(self) -> None:
-        """
-        Discard debug records rejected by the channel level.
+        """Discard debug records rejected by the channel level.
 
         Validates that the handler level configured for the channel filters
         messages below it even though the logger itself accepts them.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("keep the file alive")
         self._logger.debug("debug message")
         self.assertNotIn("debug message", self._readStackLog())
 
     def testDebugIsWrittenWhenTheChannelLevelAllowsIt(self) -> None:
-        """
-        Record a debug message on a channel configured for debugging.
+        """Record a debug message on a channel configured for debugging.
 
         Validates that debug() reaches the file handler when the channel level
         is lowered to DEBUG.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.close()
         channels = {"stack": _channel(level=logging.DEBUG)}
@@ -243,11 +408,15 @@ class TestLoggerMessages(TestCase):
         self.assertIn("debug message", self._readStackLog())
 
     def testMessagesAreForwardedWithoutSanitisation(self) -> None:
-        """
-        Forward blank messages to the logging backend untouched.
+        """Forward blank messages to the logging backend untouched.
 
         Validates that the service performs no trimming or filtering, leaving
         message policy to the caller.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("")
         self._logger.info("   ")
@@ -256,23 +425,39 @@ class TestLoggerMessages(TestCase):
 class TestLoggerFormatter(TestCase):
 
     def setUp(self) -> None:
-        """Isolate the shared formatter cache and build a temporary root."""
+        """Isolate the shared formatter cache and build a temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._original_cache = dict(Logger._formatter_cache)
         Logger._formatter_cache.clear()
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
 
     def tearDown(self) -> None:
-        """Restore the shared formatter cache and delete the temporary root."""
+        """Restore the shared formatter cache and delete the temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         Logger._formatter_cache.clear()
         Logger._formatter_cache.update(self._original_cache)
         self._tmp.cleanup()
 
     def testFormatterIsBuiltOnlyOnce(self) -> None:
-        """
-        Build a single formatter for the default pattern.
+        """Build a single formatter for the default pattern.
 
         Validates that the class level cache is populated once and reused by
         every logger sharing the same format and date format.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = Logger(_make_app(self._tmp.name))
         second = Logger(_make_app(self._tmp.name))
@@ -285,11 +470,15 @@ class TestLoggerFormatter(TestCase):
             second.close()
 
     def testCachedFormatterIsSharedBetweenInstances(self) -> None:
-        """
-        Share the very same formatter object between logger instances.
+        """Share the very same formatter object between logger instances.
 
         Validates that the cache returns the stored formatter instead of an
         equivalent copy.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = Logger(_make_app(self._tmp.name))
         second = Logger(_make_app(self._tmp.name))
@@ -302,10 +491,14 @@ class TestLoggerFormatter(TestCase):
             second.close()
 
     def testMessagesUseTheConfiguredPattern(self) -> None:
-        """
-        Render every record with the timestamp and level pattern.
+        """Render every record with the timestamp and level pattern.
 
         Validates the default format applied to all channels.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_make_app(self._tmp.name))
         try:
@@ -322,19 +515,35 @@ class TestLoggerFormatter(TestCase):
 class TestLoggerDefaultChannel(TestCase):
 
     def setUp(self) -> None:
-        """Create the temporary application root shared by the tests."""
+        """Create the temporary application root shared by the tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
 
     def tearDown(self) -> None:
-        """Delete the temporary application root."""
+        """Delete the temporary application root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp.cleanup()
 
     def testStackChannelUsesAPlainFileHandler(self) -> None:
-        """
-        Attach a plain file handler for the stack channel.
+        """Attach a plain file handler for the stack channel.
 
         Validates the fast path that skips the rotating factory for the most
         common channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_make_app(self._tmp.name))
         try:
@@ -344,11 +553,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testStackChannelAppliesTheConfiguredLevel(self) -> None:
-        """
-        Apply the channel level to the stack handler.
+        """Apply the channel level to the stack handler.
 
         Validates that the configured threshold reaches the handler instead of
         the framework default.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(level=logging.ERROR)}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -358,11 +571,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testStackChannelNormalisesEnumeratedLevels(self) -> None:
-        """
-        Translate an enumerated level before configuring the stack handler.
+        """Translate an enumerated level before configuring the stack handler.
 
         Validates that a configuration declaring levels through the framework
         enumeration starts the logger instead of failing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(level=Level.WARNING)}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -372,11 +589,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testStackChannelNormalisesTextualLevels(self) -> None:
-        """
-        Translate a textual level before configuring the stack handler.
+        """Translate a textual level before configuring the stack handler.
 
         Validates that case insensitive level names are accepted by the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(level="warning")}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -386,10 +607,14 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testStackChannelFallsBackToInfoWhenNoLevelIsDeclared(self) -> None:
-        """
-        Fall back to INFO when the default channel declares no level.
+        """Fall back to INFO when the default channel declares no level.
 
         Validates the threshold applied to incomplete configurations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": {"path": _STACK_PATH}}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -399,11 +624,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testStackChannelCreatesTheParentDirectory(self) -> None:
-        """
-        Create the directory tree required by the stack log file.
+        """Create the directory tree required by the stack log file.
 
         Validates that a missing storage folder never prevents the logger from
         starting.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(path="deep/nested/logs/stack.log")}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -415,11 +644,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testRotatingChannelIsBuiltByTheFactory(self) -> None:
-        """
-        Delegate non stack channels to the rotating handler factory.
+        """Delegate non stack channels to the rotating handler factory.
 
         Validates that a rotating channel selected as default produces an
         advanced rotating handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"daily": _channel(path=_DAILY_PATH)}
         logger = Logger(_make_app(self._tmp.name, default="daily", channels=channels))
@@ -431,11 +664,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testRotatingChannelWritesToTheResolvedPath(self) -> None:
-        """
-        Write records to the file resolved by the rotating suffix.
+        """Write records to the file resolved by the rotating suffix.
 
         Validates that the placeholder of the configured path is replaced
         before the first record is emitted.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"daily": _channel(path=_DAILY_PATH)}
         logger = Logger(_make_app(self._tmp.name, default="daily", channels=channels))
@@ -451,11 +688,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testRotatingChannelNormalisesEnumeratedLevels(self) -> None:
-        """
-        Translate an enumerated level before configuring a rotating handler.
+        """Translate an enumerated level before configuring a rotating handler.
 
         Validates that the normalised threshold is applied to the handler and
         not only forwarded to the factory.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"daily": _channel(level=Level.ERROR, path=_DAILY_PATH)}
         logger = Logger(_make_app(self._tmp.name, default="daily", channels=channels))
@@ -465,11 +706,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testUnsupportedChannelLeavesTheLoggerWithoutHandlers(self) -> None:
-        """
-        Skip handler registration for an unsupported channel type.
+        """Skip handler registration for an unsupported channel type.
 
         Validates that a configured channel with no matching factory leaves the
         logger usable but silent instead of raising.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"custom": _channel(path="storage/logs/custom.log")}
         logger = Logger(_make_app(self._tmp.name, default="custom", channels=channels))
@@ -481,11 +726,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testMissingDefaultChannelFallsBackToADefaultFile(self) -> None:
-        """
-        Fall back to a default file when the channel is not configured.
+        """Fall back to a default file when the channel is not configured.
 
         Validates that an unknown default channel never leaves the application
         without logging output.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_make_app(self._tmp.name, default="missing"))
         try:
@@ -497,11 +746,15 @@ class TestLoggerDefaultChannel(TestCase):
             logger.close()
 
     def testInitialisationClearsPreviouslyRegisteredHandlers(self) -> None:
-        """
-        Replace the handlers left by a previous logger instance.
+        """Replace the handlers left by a previous logger instance.
 
         Validates that the shared standard library logger never accumulates
         duplicated handlers across initialisations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         first = Logger(_make_app(self._tmp.name))
         second = Logger(_make_app(self._tmp.name))
@@ -516,19 +769,35 @@ class TestLoggerDefaultChannel(TestCase):
 class TestLoggerChannelIntrospection(TestCase):
 
     def setUp(self) -> None:
-        """Create the temporary application root shared by the tests."""
+        """Create the temporary application root shared by the tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
 
     def tearDown(self) -> None:
-        """Delete the temporary application root."""
+        """Delete the temporary application root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp.cleanup()
 
     def testAvailableChannelsListEveryConfiguredName(self) -> None:
-        """
-        List every channel declared in the configuration.
+        """List every channel declared in the configuration.
 
         Validates that availability is reported from the configuration and not
         from the handlers currently attached.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(), "daily": _channel(path=_DAILY_PATH)}
         logger = Logger(_make_app(self._tmp.name, channels=channels))
@@ -541,10 +810,14 @@ class TestLoggerChannelIntrospection(TestCase):
             logger.close()
 
     def testAvailableChannelsAreEmptyWithoutConfiguration(self) -> None:
-        """
-        Report no available channel when none is configured.
+        """Report no available channel when none is configured.
 
         Validates the default applied when the channels section is missing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_StubApp(self._tmp.name, {"default": "stack"}))
         try:
@@ -553,10 +826,14 @@ class TestLoggerChannelIntrospection(TestCase):
             logger.close()
 
     def testActiveChannelsAreEmptyBeforeInitialisation(self) -> None:
-        """
-        Report no active channel while the logger stays idle.
+        """Report no active channel while the logger stays idle.
 
         Validates that activation is only recorded once a handler is built.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_make_app(self._tmp.name))
         try:
@@ -566,10 +843,14 @@ class TestLoggerChannelIntrospection(TestCase):
             logger.close()
 
     def testActiveChannelIsTheDefaultChannelAfterInitialisation(self) -> None:
-        """
-        Report the default channel as the single active one.
+        """Report the default channel as the single active one.
 
         Validates that exactly one channel is active at a time.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = Logger(_make_app(self._tmp.name))
         try:
@@ -582,15 +863,38 @@ class TestLoggerChannelIntrospection(TestCase):
 class TestLoggerSwitchChannel(TestCase):
 
     def setUp(self) -> None:
-        """Create the temporary application root shared by the tests."""
+        """Create the temporary application root shared by the tests.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
 
     def tearDown(self) -> None:
-        """Delete the temporary application root."""
+        """Delete the temporary application root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp.cleanup()
 
     def _makeLogger(self, level: object = logging.INFO) -> Logger:
-        """Return a logger configured with a stack and a daily channel."""
+        """Return a logger configured with a stack and a daily channel.
+
+        Parameters
+        ----------
+        level : object
+            Value supplied for ``level``.
+
+        Returns
+        -------
+        Logger
+            Value produced by the helper.
+        """
         channels = {
             "stack": _channel(),
             "daily": {"path": _DAILY_PATH, "level": level},
@@ -598,15 +902,25 @@ class TestLoggerSwitchChannel(TestCase):
         return Logger(_make_app(self._tmp.name, channels=channels))
 
     def _makeLoggerWithoutLevel(self) -> Logger:
-        """Return a logger whose daily channel declares no level."""
+        """Return a logger whose daily channel declares no level.
+
+        Returns
+        -------
+        Logger
+            Value produced by the helper.
+        """
         channels = {"stack": _channel(), "daily": {"path": _DAILY_PATH}}
         return Logger(_make_app(self._tmp.name, channels=channels))
 
     def testSwitchToConfiguredChannelReplacesTheHandler(self) -> None:
-        """
-        Activate the requested channel and drop the previous handler.
+        """Activate the requested channel and drop the previous handler.
 
         Validates that only one channel remains active after switching.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger()
         try:
@@ -618,11 +932,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchWritesTheConfirmationToTheNewChannel(self) -> None:
-        """
-        Confirm the switch through the newly activated channel.
+        """Confirm the switch through the newly activated channel.
 
         Validates that the acknowledgement message is emitted by the handler
         created for the target channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger()
         try:
@@ -640,11 +958,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchBeforeInitialisationStartsTheLogger(self) -> None:
-        """
-        Initialise the logger when switching before the first message.
+        """Initialise the logger when switching before the first message.
 
         Validates that the target channel becomes active even though no record
         has been logged yet.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger()
         try:
@@ -654,11 +976,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchToUnknownChannelIsRejected(self) -> None:
-        """
-        Reject a channel absent from the configuration.
+        """Reject a channel absent from the configuration.
 
         Validates that the guard runs before any handler is built, leaving the
         logger untouched.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger()
         try:
@@ -668,11 +994,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchIsRejectedWhenTheHandlerCannotBeCreated(self) -> None:
-        """
-        Report a failed switch when the target handler cannot be built.
+        """Report a failed switch when the target handler cannot be built.
 
         Validates that a filesystem error raised by the factory is converted
         into a False result instead of propagating.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         blocked = Path(self._tmp.name) / "blocked"
         blocked.write_text("not a directory", encoding="utf-8")
@@ -690,11 +1020,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchIsRejectedWhenTheRootPathIsUnavailable(self) -> None:
-        """
-        Report a failed switch when the application root cannot be resolved.
+        """Report a failed switch when the application root cannot be resolved.
 
         Validates that runtime errors raised while preparing the new handler
         are contained inside the method.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         channels = {"stack": _channel(), "daily": _channel(path=_DAILY_PATH)}
         app = _make_app(self._tmp.name, channels=channels)
@@ -708,11 +1042,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchNormalisesEnumeratedLevels(self) -> None:
-        """
-        Translate an enumerated level into its integer value.
+        """Translate an enumerated level into its integer value.
 
         Validates the normalisation applied to configurations declaring levels
         through the framework enumeration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger(level=Level.WARNING)
         try:
@@ -722,11 +1060,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchNormalisesTextualLevels(self) -> None:
-        """
-        Translate a textual level into its integer value.
+        """Translate a textual level into its integer value.
 
         Validates the normalisation applied to configurations declaring levels
         as case insensitive names.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger(level="warning")
         try:
@@ -736,11 +1078,15 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchFallsBackToInfoForUnknownTextualLevels(self) -> None:
-        """
-        Fall back to INFO when the textual level is not recognised.
+        """Fall back to INFO when the textual level is not recognised.
 
         Validates that an invalid level never prevents the channel from being
         activated.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger(level="not-a-level")
         try:
@@ -750,10 +1096,14 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchFallsBackToInfoWhenNoLevelIsDeclared(self) -> None:
-        """
-        Fall back to INFO when the channel declares no level.
+        """Fall back to INFO when the channel declares no level.
 
         Validates the default threshold applied to incomplete configurations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLoggerWithoutLevel()
         try:
@@ -763,10 +1113,14 @@ class TestLoggerSwitchChannel(TestCase):
             logger.close()
 
     def testSwitchKeepsIntegerLevelsUnchanged(self) -> None:
-        """
-        Preserve levels already expressed as integers.
+        """Preserve levels already expressed as integers.
 
         Validates that the normalisation leaves standard library values alone.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         logger = self._makeLogger(level=logging.ERROR)
         try:
@@ -778,23 +1132,39 @@ class TestLoggerSwitchChannel(TestCase):
 class TestLoggerReloadConfiguration(TestCase):
 
     def setUp(self) -> None:
-        """Create a temporary application root and an idle logger."""
+        """Create a temporary application root and an idle logger.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
         self._app = _make_app(self._tmp.name)
         self._logger = Logger(self._app)
 
     def tearDown(self) -> None:
-        """Release the logger handles and delete the temporary root."""
+        """Release the logger handles and delete the temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._app.config_error = None
         self._logger.close()
         self._tmp.cleanup()
 
     def testReloadKeepsTheLoggerUsable(self) -> None:
-        """
-        Keep logging available after a configuration reload.
+        """Keep logging available after a configuration reload.
 
         Validates that the handler stack is rebuilt instead of being left
         empty.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("before reload")
         self._logger.reloadConfiguration()
@@ -803,11 +1173,15 @@ class TestLoggerReloadConfiguration(TestCase):
         self.assertIn("after reload", path.read_text(encoding="utf-8"))
 
     def testReloadRecordsAConfirmationMessage(self) -> None:
-        """
-        Record the outcome of the reload in the active channel.
+        """Record the outcome of the reload in the active channel.
 
         Validates the acknowledgement emitted once the new configuration is
         applied.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.reloadConfiguration()
         path = Path(self._tmp.name) / "storage" / "logs" / "stack.log"
@@ -817,11 +1191,15 @@ class TestLoggerReloadConfiguration(TestCase):
         )
 
     def testReloadAppliesTheUpdatedConfiguration(self) -> None:
-        """
-        Adopt the configuration published after the first initialisation.
+        """Adopt the configuration published after the first initialisation.
 
         Validates that the reload re-reads the application configuration
         instead of reusing the cached one.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("before reload")
         self._app.settings = {
@@ -832,21 +1210,29 @@ class TestLoggerReloadConfiguration(TestCase):
         self.assertEqual(self._logger.getActiveChannels(), ["daily"])
 
     def testReloadBeforeInitialisationStartsTheLogger(self) -> None:
-        """
-        Start the logger when reloading before the first message.
+        """Start the logger when reloading before the first message.
 
         Validates that the reload path tolerates an idle logger with no
         handler to close.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.reloadConfiguration()
         self.assertEqual(self._logger.getActiveChannel(), "stack")
 
     def testReloadFailureIsWrappedInRuntimeError(self) -> None:
-        """
-        Wrap a failing configuration lookup in a RuntimeError.
+        """Wrap a failing configuration lookup in a RuntimeError.
 
         Validates that a broken application configuration surfaces as an
         explicit framework error.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("before reload")
         self._app.config_error = ValueError("broken configuration")
@@ -857,41 +1243,65 @@ class TestLoggerReloadConfiguration(TestCase):
 class TestLoggerClose(TestCase):
 
     def setUp(self) -> None:
-        """Create a temporary application root and an idle logger."""
+        """Create a temporary application root and an idle logger.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
         self._logger = Logger(_make_app(self._tmp.name))
 
     def tearDown(self) -> None:
-        """Release the logger handles and delete the temporary root."""
+        """Release the logger handles and delete the temporary root.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         self._logger.close()
         self._tmp.cleanup()
 
     def testCloseResetsTheInternalLogger(self) -> None:
-        """
-        Drop the reference to the standard library logger.
+        """Drop the reference to the standard library logger.
 
         Validates that the next call rebuilds the logging stack from scratch.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("populate")
         self._logger.close()
         self.assertIsNone(self._logger._Logger__logger)
 
     def testCloseClearsTheActiveChannels(self) -> None:
-        """
-        Forget every active channel once the logger is closed.
+        """Forget every active channel once the logger is closed.
 
         Validates that cached handlers are released together with the logger.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("populate")
         self._logger.close()
         self.assertEqual(self._logger.getActiveChannels(), [])
 
     def testCloseReleasesHandlersRegisteredByThirdParties(self) -> None:
-        """
-        Detach every handler attached to the underlying logger.
+        """Detach every handler attached to the underlying logger.
 
         Validates that handlers registered outside the service are closed too,
         which requires iterating over a copy of the handler list.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("populate")
         internal = self._logger.getLogger()
@@ -905,10 +1315,14 @@ class TestLoggerClose(TestCase):
         self.assertEqual(internal.handlers, [])
 
     def testCloseIsIdempotent(self) -> None:
-        """
-        Allow repeated close calls without raising.
+        """Allow repeated close calls without raising.
 
         Validates that shutting down an already closed logger is a no-op.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("populate")
         self._logger.close()
@@ -916,21 +1330,29 @@ class TestLoggerClose(TestCase):
         self.assertIsNone(self._logger._Logger__logger)
 
     def testCloseBeforeInitialisationDoesNotRaise(self) -> None:
-        """
-        Close an idle logger without raising.
+        """Close an idle logger without raising.
 
         Validates the guard protecting the teardown of a logger that never
         built any handler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.close()
         self.assertEqual(self._logger.getActiveChannels(), [])
 
     def testLoggerIsRebuiltAfterClose(self) -> None:
-        """
-        Rebuild the logging stack after a shutdown.
+        """Rebuild the logging stack after a shutdown.
 
         Validates that the service can be reused once closed, restoring the
         default channel.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self._logger.info("first cycle")
         self._logger.close()
@@ -941,10 +1363,14 @@ class TestLoggerClose(TestCase):
 class TestLoggerDestructor(TestCase):
 
     def testGarbageCollectionReleasesTheHandlers(self) -> None:
-        """
-        Release the handlers when the logger is garbage collected.
+        """Release the handlers when the logger is garbage collected.
 
         Validates that a discarded logger never keeps file descriptors open.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             logger = Logger(_make_app(tmp))

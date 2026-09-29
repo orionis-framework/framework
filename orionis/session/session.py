@@ -12,11 +12,13 @@ from orionis.session.flash import (
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from datetime import datetime
 
 # Flash-bag keys defined at module level to avoid per-call string allocation.
 _FLASH_NEW: str = "_flash_new"
 _FLASH_OLD: str = "_flash_old"
 _MISSING: object = object()
+_IMMUTABLE_VALUE_TYPES = frozenset({type(None), bool, bytes, float, int, str})
 
 class Session(ISession):
     """
@@ -45,6 +47,9 @@ class Session(ISession):
         ``True`` for sessions that were not restored from a store.
     _regenerate : bool
         ``True`` when the ID must be rotated before the next save.
+    _renew_at : datetime | None
+        Deadline for renewing an unchanged scalar payload. ``None`` requires
+        persistence because no deadline is known or mutable data is present.
 
     Notes
     -----
@@ -60,6 +65,7 @@ class Session(ISession):
         "_invalidated",
         "_is_new",
         "_regenerate",
+        "_renew_at",
         "_started",
     )
 
@@ -97,6 +103,7 @@ class Session(ISession):
         self._invalidated: bool = False
         self._is_new: bool = is_new
         self._regenerate: bool = False
+        self._renew_at: datetime | None = None
 
     # ── Internal activation ─────────────────────────────────────────────────────
 
@@ -120,32 +127,74 @@ class Session(ISession):
 
     @property
     def id(self) -> str | None:
-        """Current session identifier, or ``None`` before the first write."""
+        """
+        Return the current session identifier.
+
+        Returns
+        -------
+        str | None
+            Identifier, or None before the first write.
+        """
         return self._id
 
     @property
     def started(self) -> bool:
-        """``True`` once the session has been activated by a write."""
+        """
+        Report whether the session has been activated.
+
+        Returns
+        -------
+        bool
+            True after activation by a write or restoration from the store.
+        """
         return self._started
 
     @property
     def dirty(self) -> bool:
-        """``True`` if pending changes must be written to the backing store."""
+        """
+        Report whether changes require persistence.
+
+        Returns
+        -------
+        bool
+            True when tracked changes must be written to the backing store.
+        """
         return self._dirty
 
     @property
     def invalidated(self) -> bool:
-        """``True`` when the session has been marked for full deletion."""
+        """
+        Report whether the session has been invalidated.
+
+        Returns
+        -------
+        bool
+            True when the session is marked for full deletion.
+        """
         return self._invalidated
 
     @property
     def isNew(self) -> bool:
-        """``True`` for sessions not loaded from a backing store."""
+        """
+        Report whether the session has a new storage identity.
+
+        Returns
+        -------
+        bool
+            True for sessions not yet persisted under their current identifier.
+        """
         return self._is_new
 
     @property
     def wantsRegenerate(self) -> bool:
-        """``True`` when the session ID should be rotated before saving."""
+        """
+        Report whether the session requests identifier rotation.
+
+        Returns
+        -------
+        bool
+            True when the identifier should be rotated before saving.
+        """
         return self._regenerate
 
     # ── Public API ──────────────────────────────────────────────────────────────
@@ -485,8 +534,52 @@ class Session(ISession):
 
     # ── Framework-internal methods (prefixed with _) ────────────────────────────
 
+    def _setRenewalDeadline(self, deadline: datetime) -> None:
+        """
+        Set a renewal deadline for payloads containing immutable scalars.
+
+        Mutable values can be changed through references returned by ``get()``
+        or ``all()`` without setting the dirty flag. Such payloads retain
+        unconditional persistence, including tuples with mutable descendants.
+
+        Parameters
+        ----------
+        deadline : datetime
+            UTC time at which an unchanged session needs renewal.
+
+        Returns
+        -------
+        None
+            The session retains only the deadline, never request state.
+        """
+        for value in self._data.values():
+            if type(value) not in _IMMUTABLE_VALUE_TYPES:
+                self._renew_at = None
+                return
+        self._renew_at = deadline
+
+    def _needsPersistence(self, now: datetime) -> bool:
+        """
+        Check whether payload changes or the renewal deadline require a save.
+
+        Parameters
+        ----------
+        now : datetime
+            Current UTC time evaluated when the response is ready.
+
+        Returns
+        -------
+        bool
+            Whether to persist this session and refresh its cookie.
+        """
+        return (
+            self._dirty or self._is_new or self._regenerate
+            or self._renew_at is None or now >= self._renew_at
+        )
+
     def _ageFlashData(self) -> None:
-        """Advance the flash lifecycle: new → old; discard previous old.
+        """
+        Advance the flash lifecycle: new → old; discard previous old.
 
         Called by ``SessionManager.start()`` at the beginning of each
         request.  Flash values written in the previous request remain
@@ -530,7 +623,8 @@ class Session(ISession):
         return old_id
 
     def _markClean(self) -> None:
-        """Reset the dirty flag after a successful persistence operation.
+        """
+        Reset the dirty flag after a successful persistence operation.
 
         Returns
         -------

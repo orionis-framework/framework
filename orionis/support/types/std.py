@@ -188,10 +188,10 @@ class StdClass(IStdClass):
         StdClass
             A new StdClass instance with attributes set from the dictionary.
         """
-        # __new__ skips __init__; bulk dict.update is a C-level operation
+        # Allocate the instance without routing values through keyword arguments.
         reserved = cls.RESERVED
         obj = cls.__new__(cls)
-        obj_dict = {}
+        obj_dict = obj.__dict__
         for key, value in dictionary.items():
             if key.startswith(_DUNDER) and key.endswith(_DUNDER):
                 msg = f"Cannot set attribute with reserved name: {key}"
@@ -203,7 +203,6 @@ class StdClass(IStdClass):
                 )
                 raise ValueError(msg)
             obj_dict[key] = value
-        obj.__dict__.update(obj_dict)
         return obj
 
 

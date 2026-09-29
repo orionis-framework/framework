@@ -12,6 +12,7 @@ class _StubApp:
     __slots__ = ("singletons",)
 
     def __init__(self) -> None:
+        """Initialize an empty binding recorder."""
         self.singletons: list[tuple[object, object]] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
@@ -24,6 +25,7 @@ class _StubFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
+        """Initialize the facade pin counter."""
         self.pinned: int = 0
 
     async def pin(self) -> None:

@@ -30,7 +30,13 @@ if TYPE_CHECKING:
 class TestMailManager(TestCase):
 
     def setUp(self) -> None:
-        """Construct a manager with real views and memory-backed storage."""
+        """Construct a manager with real views and memory-backed storage.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
@@ -50,10 +56,14 @@ class TestMailManager(TestCase):
         self.base = self.manager.fromAddress("sender@example.com").to("ana@example.com")
 
     async def testNamedDefaultAndExplicitFileMailerStoreRealMime(self) -> None:
-        """
-        Resolve the default and an explicit mailer by configuration name.
+        """Resolve the default and an explicit mailer by configuration name.
 
         Validates that an unused empty SMTP entry blocks nothing.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         result = await self.base.subject("Notice").raw("Hello")
         explicit = await self.base.mailer("file").html("<p>Hello</p>")
@@ -75,10 +85,14 @@ class TestMailManager(TestCase):
         self.assertNotIn("driver", self.settings["mailers"]["file"])
 
     async def testConventionalEntitiesRemainUsable(self) -> None:
-        """
-        Consume the frozen configuration entities without rebuilding them.
+        """Consume the frozen configuration entities without rebuilding them.
 
         Validates backwards compatibility with the shipped bootstrap.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.app.mail_config = MailConfig(
             default="file",
@@ -91,10 +105,14 @@ class TestMailManager(TestCase):
         self.assertEqual(result.file_path.parent, self.root / "entity")
 
     async def testRealExtensionUsesConfigFactoryAndContainer(self) -> None:
-        """
-        Register a custom driver and send through its normal resolution.
+        """Register a custom driver and send through its normal resolution.
 
         Validates that the factory receives a detached configuration.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.settings["mailers"]["archive"] = {"driver": "recording", "options": [1, 2]}
         factory = RecordingFactory()
@@ -111,10 +129,14 @@ class TestMailManager(TestCase):
         self.assertEqual(len(factory.transports[0].messages), 1)
 
     def testExtensionRejectsDuplicatesAndInvalidRegistrations(self) -> None:
-        """
-        Reject duplicate drivers and malformed registrations.
+        """Reject duplicate drivers and malformed registrations.
 
         Validates that a built-in driver is never silently replaced.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         factory = RecordingFactory()
         self.manager.extend("recording", factory)
@@ -126,10 +148,14 @@ class TestMailManager(TestCase):
             self.manager.extend("other", "not-callable")
 
     async def testUnknownNamesAndDriversFailWithoutFallback(self) -> None:
-        """
-        Report unknown mailers and drivers instead of falling back.
+        """Report unknown mailers and drivers instead of falling back.
 
         Validates that a driver may be registered before its first use.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailConfigurationException):
             await self.base.mailer("missing").raw("text")
@@ -144,10 +170,14 @@ class TestMailManager(TestCase):
         self.assertFalse((self.root / "stored").exists())
 
     async def testInvalidSelectedConfigurationNeverFallsBack(self) -> None:
-        """
-        Validate the section, default, and selected entry only on send.
+        """Validate the section, default, and selected entry only on send.
 
         Validates that each malformed shape produces a clear failure.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         cases = (
             None,
@@ -165,13 +195,31 @@ class TestMailManager(TestCase):
         self.assertFalse((self.root / "stored").exists())
 
     async def testInvalidFactoryResultsAreRejected(self) -> None:
-        """
-        Reject a factory that does not return the transport contract.
+        """Reject a factory that does not return the transport contract.
 
         Validates that only IMailTransport instances are used.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         def invalid_factory(_app: object, _config: object) -> None:
-            return None
+            """Return a result with an unsupported type.
+
+            Parameters
+            ----------
+            _app : object
+                Value supplied for ``_app``.
+            _config : object
+                Value supplied for ``_config``.
+
+            Returns
+            -------
+            None
+                Completes the operation described above.
+            """
+            return
 
         self.settings["mailers"]["archive"] = {"driver": "invalid"}
         self.manager.extend("invalid", invalid_factory)
@@ -180,10 +228,14 @@ class TestMailManager(TestCase):
             await self.base.raw("text")
 
     async def testPreparationFailuresNeverCreateFinalFiles(self) -> None:
-        """
-        Stop publication when a view or final envelope is invalid.
+        """Stop publication when a view or final envelope is invalid.
 
         Validates that transports run only after successful preparation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         with self.assertRaises(MailCompositionException):
             await self.base.send("missing")
@@ -192,10 +244,14 @@ class TestMailManager(TestCase):
         self.assertFalse((self.root / "stored").exists())
 
     async def testConcurrentFileSendsHaveIndependentMimeAndUniqueNames(self) -> None:
-        """
-        Publish unique complete files without mixing operation state.
+        """Publish unique complete files without mixing operation state.
 
         Validates that the shared manager caches nothing per operation.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         base = self.manager.fromAddress("sender@example.com").subject("Notice")
         results = await asyncio.gather(
@@ -215,10 +271,14 @@ class TestMailManager(TestCase):
             self.assertEqual(parsed.get_content().strip(), f"body {index}")
 
     async def testGlobalSenderAppliesOnlyWhenNoneIsDeclared(self) -> None:
-        """
-        Apply the configured sender without overriding an explicit one.
+        """Apply the configured sender without overriding an explicit one.
 
         Validates the Laravel-style global from section for both shapes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.settings["from_address"] = {
             "address": "no-reply@example.com",
@@ -235,10 +295,14 @@ class TestMailManager(TestCase):
         self.assertEqual(self._senderOf(explicit.file_path), "sender@example.com")
 
     async def testGlobalSenderEntityIsReadAndBlankKeepsItMandatory(self) -> None:
-        """
-        Read the configuration entity and ignore a blank global mailbox.
+        """Read the configuration entity and ignore a blank global mailbox.
 
         Validates that an unset sender still fails before any transport runs.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
         """
         self.app.mail_config = MailConfig(
             default="file",
@@ -254,6 +318,17 @@ class TestMailManager(TestCase):
             await self.manager.to("ana@example.com").raw("blank")
 
     def _senderOf(self, path: Path) -> str:
-        """Return the From header of a stored message."""
+        """Return the From header of a stored message.
+
+        Parameters
+        ----------
+        path : Path
+            Value supplied for ``path``.
+
+        Returns
+        -------
+        str
+            Value produced by the helper.
+        """
         parsed = BytesParser(policy=policy.default).parsebytes(path.read_bytes())
         return str(parsed["From"])

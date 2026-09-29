@@ -234,7 +234,7 @@ class Loader(ILoader):
         # Scan the commands directory for Python modules
         modules = ModuleInspector.discoverModules(
             base_path=self.__app.basePath,
-            target_path=self.__app.path("console") / "commands",
+            target_path=self.__app.path("app_console_commands"),
         )
 
         # Iterate through all module names discovered in the commands directory

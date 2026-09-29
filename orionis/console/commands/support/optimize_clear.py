@@ -85,7 +85,7 @@ class OptimizeClearCommand(BaseCommand):
         console.info("Build artifacts cleared!", timestamp=False)
 
         # Remove the framework cache directory if it exists
-        cache_path = app.path("storage") / "framework"
+        cache_path: Path = app.path("storage_framework")
         if cache_path.exists():
             shutil.rmtree(cache_path)
 

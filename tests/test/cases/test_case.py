@@ -55,6 +55,12 @@ class TestTestCaseDefinition(TestCase):
         ancestors = [base.__name__ for base in CoreTestCase.__mro__]
         self.assertIn("TestCase", ancestors)
 
+    async def testAsyncioDebugUsesPracticalSlowCallbackThreshold(self) -> None:
+        """Keep debug enabled while avoiding routine slow-task messages."""
+        loop = asyncio.get_running_loop()
+        self.assertTrue(loop.get_debug())
+        self.assertEqual(loop.slow_callback_duration, 1.0)
+
     def testPackageExportsTheSameClass(self) -> None:
         """
         Export a single test case class from every public entry point.

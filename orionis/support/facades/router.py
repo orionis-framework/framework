@@ -1,7 +1,6 @@
 from orionis.container.facades.facade import Facade
 
 class Route(Facade):
-    """Forward route registration, including ``auth()``, to the pinned router."""
 
     @classmethod
     def getFacadeAccessor(cls) -> str:

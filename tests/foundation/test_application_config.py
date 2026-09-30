@@ -253,6 +253,9 @@ class TestApplicationConfiguration(TestCase):
             boot_calls.append(None)
             app._Application__bootstrap = {
                 "config": {"app": {"env": "testing", "debug": False}},
+                "paths": {
+                    "storage_framework": app.basePath / "storage" / "framework",
+                },
                 "providers": {},
             }
             app._Application__commitConfig()

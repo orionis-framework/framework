@@ -102,7 +102,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: binds `IScheduleStore` and `ISchedule`, pins the `Schedule` facade. |
 | `args/argument.py` | `Argument`, the declarative `argparse` argument definition. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` and their contracts. |
-| `commands/` | The 17 built-in commands (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, `about`, `list`, `optimize*`). |
+| `commands/` | The 38 built-in commands (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, the immutable tuple of built-in command classes. |
 | `core/loader.py` | `Loader`: discovery, metadata cache and `ArgumentParser` construction. |
@@ -114,7 +114,7 @@ reactor (script)
 | `fluent/command.py` | `Command`, the fluent builder used by `Reactor.command()`. |
 | `fluent/task.py` | `Task`, the cron-like builder used by `Schedule.command()`. |
 | `output/` | `Console`, `Executor`, `HelpCommand`, `HTTPRequestPrinter`, `VarDumper`. |
-| `stubs/` | `.stub` templates used by the `make:*` commands. |
+| `templates/` | `.stub` templates used by the `make:*` commands. |
 | `tasks/schedule.py` | `Schedule` plus the module level `_executeScheduledCommand`. |
 | `tasks/store.py` | `ScheduleStore`: builds the Redis / SQLAlchemy job stores. |
 
@@ -206,6 +206,8 @@ def command(
     handler: list[type[Any] | str | None] | str,
 ) -> ICommand: ...
 
+async def hasCommand(self, signature: str) -> bool: ...
+
 async def info(self) -> list[dict]: ...
 
 async def call(self, signature: str, args: list[str] | None = None) -> int: ...
@@ -215,6 +217,8 @@ async def call(self, signature: str, args: list[str] | None = None) -> int: ...
   builder. A bare class is normalised to `[handler, "__call__"]`; a list may
   carry the method name as its second element. Every constructor argument is
   injected by the container.
+- `hasCommand(signature)` checks a signature through `Loader.get()` and returns
+  a boolean; it does not build the complete `info()` listing.
 - `info()` returns one dictionary per registered command with the keys
   `timestamps`, `signature`, `description`, `arguments` (the
   `argparse.ArgumentParser` or `None`), `object` and `method`, sorted by
@@ -770,27 +774,62 @@ bit mask; `orionis.console.enums` exports the enum flags while
 
 ### Built-in commands
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 17 classes:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 38 classes:
 
 | Signature | Class | Notes |
 |---|---|---|
 | `about` | `VersionCommand` | Framework metadata panel. |
 | `list` | `HelpCommand` | Default target when no command is given. |
-| `make:command` | `MakeCommand` | `name`, `--signature/-s`, `--description/-d`. |
+| `make:console-command` | `MakeConsoleCommand` | `name`, `--signature/-s`, `--description/-d`. |
+| `make:console-listener` | `MakeConsoleListener` | `name`. |
+| `make:contract` | `MakeContract` | `name`. |
+| `make:database-migration` | `MakeDatabaseMigration` | `name`; creates a migration in `database/migrations` with an `mYYYYMMDDHHMMSS_` prefix. |
+| `make:database-schema` | `MakeDatabaseSchema` | `name`; creates a schema in `database/schemas`. |
+| `make:database-seeder` | `MakeDatabaseSeeder` | `name`; creates a seeder in `database/seeders`. |
+| `make:facade` | `MakeFacade` | `name`, `--accessor/-a`. |
 | `make:provider` | `MakeProvider` | `name`, `--deferred`. |
-| `make:task:listener` | `MakeTaskListener` | `name`. |
+| `make:service` | `MakeService` | `name`. |
+| `make:test` | `MakeTest` | `name`; creates a discoverable test module under `tests/`. |
+| `make:model` | `MakeModel` | `name`. |
+| `make:mail` | `MakeMail` | `name`. |
+| `make:http-controller` | `MakeHttpController` | `name`, `--invoke`, `--api`. |
+| `make:http-middleware` | `MakeHttpMiddleware` | `name`. |
+| `make:http-schema` | `MakeHttpSchema` | `name`. |
+| `make:http-schema-rule` | `MakeHttpSchemaRule` | `name`. |
 | `migrate` | `MigrateCommand` | `--database/-d`. |
 | `migrate:fresh` | `MigrateFreshCommand` | Drops and re-runs everything. |
 | `migrate:refresh` | `MigrateRefreshCommand` | `--step/-s`. |
 | `migrate:reset` | `MigrateResetCommand` | Reverts every migration. |
 | `migrate:rollback` | `MigrateRollbackCommand` | `--step/-s`, defaults to the last batch. |
 | `migrate:status` | `MigrateStatusCommand` | Status table. |
-| `optimize` | `OptimizeCommand` | `compileall` at optimisation level 2. |
-| `optimize:clear` | `OptimizeClearCommand` | Removes caches, bytecode and build artefacts. |
+| `clear:cache` | `ClearCacheCommand` | Clears the configured default application cache store. |
+| `clear:testing` | `ClearTestingCommand` | Removes cached test-run result files. |
+| `clear:views` | `ClearViewsCommand` | Removes Jinja bytecode cache files. |
+| `down` | `DownCommand` | Enables runtime maintenance responses. |
+| `env` | `EnvironmentCommand` | Displays the current application environment. |
+| `key:generate` | `KeyGenerateCommand` | Generates `APP_KEY`; `--force` replaces an existing key. |
+| `optimize` | `OptimizeCommand` | Compiles project Python files at optimisation level 2. |
+| `optimize:clear` | `OptimizeClearCommand` | Removes compiled state, bytecode and build artefacts. |
 | `schedule:list` | `ScheduleListCommand` | Table of declared tasks. |
 | `schedule:work` | `ScheduleWorkCommand` | Runs the scheduler until interrupted. |
+| `route:list` | `RouteListCommand` | Lists routes by URI with their method, name, action and middleware. |
 | `serve` | `ServerCommand` | `--interface/-i`, `--port/-p`, `--log`, `--export`. |
 | `test` | `TestCommand` | `--verbosity/-v`, `--fail-fast/-f`, `--start-dir/-s`, `--file-pattern`, `--method-pattern`, `--panel`, `--no-panel`. |
+| `up` | `UpCommand` | Disables runtime maintenance responses. |
+
+The migration prefix uses the creation date and time in the application's
+configured timezone (year, month, day, hour, minute and second). Initial
+scaffold migrations retain their numeric prefixes.
+
+`down` and `up` atomically write the state in `storage/framework/maintenance`.
+Each HTTP worker caches the state in memory and refreshes it at most once every
+100 ms. A running worker observes either transition within that interval without
+restarting. The health endpoint reports the same state.
+An explicit state file overrides `APP_MAINTENANCE` until it is removed.
+
+`optimize:clear` removes compiled framework state, Python bytecode and build
+artifacts. `clear:cache`, `clear:views` and `clear:testing` target the application
+cache store, template bytecode and saved test results separately.
 
 `MigrationCommand` (`commands/migrate/base_command.py`) is the shared base of the
 `migrate:*` family: it exposes `targetConnection()`, `progressEvents()` and
@@ -798,6 +837,9 @@ bit mask; `orionis.console.enums` exports the enum flags while
 
 `test` returns a non-zero exit code when any result is `FAILED` or `ERRORED`, so
 it can gate a CI pipeline.
+
+`route:list` sorts registered routes by URI in ascending order, matching the
+default ordering of Laravel's route list command.
 
 ### Service providers
 
@@ -999,12 +1041,12 @@ asyncio.run(main())
 ```
 
 ```text
-19 commands
-['about', 'app:inspire', 'app:test', 'list', 'make:command', 'make:provider', 'make:task:listener', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'schedule:list', 'schedule:work', 'serve', 'test']
+39 commands
+['about', 'app:inspire', 'clear:cache', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
 ```
 
-The 19 signatures are the 17 built-in commands plus the two declared by this
-project (`app:inspire` as a class, `app:test` as a fluent route).
+The 39 signatures are the 38 built-in commands plus `app:inspire`, which is
+declared by this project.
 
 `await Reactor.pin()` is required in a plain script: eager providers only boot
 under the CLI or HTTP runtime, so the facade is still unpinned and

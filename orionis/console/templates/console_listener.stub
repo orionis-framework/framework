@@ -1,0 +1,115 @@
+from orionis.console.base import BaseTaskListener
+from orionis.console.entities import TaskEvent
+
+class {{class_name}}(BaseTaskListener):
+    """
+    Handle lifecycle events emitted by scheduled tasks.
+
+    Override the event hooks to add application behavior for task creation,
+    execution, completion, and failure.
+    """
+
+    async def onTaskAdded(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task is added.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the added task details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskRemoved(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task is removed.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the removed task details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskExecuted(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task starts executing.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the executing task details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskError(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task raises an error.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the task and its error details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskMissed(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a scheduled task is missed.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the missed task details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskSubmitted(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task is submitted for execution.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the submitted task details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """
+
+    async def onTaskMaxInstances(self, event: TaskEvent) -> None:
+        """
+        Handle the event emitted when a task reaches its instance limit.
+
+        Parameters
+        ----------
+        event : TaskEvent
+            Event containing the task instance-limit details.
+
+        Returns
+        -------
+        None
+            This hook does not return a value.
+        """

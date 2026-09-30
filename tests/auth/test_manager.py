@@ -268,11 +268,14 @@ class _ManagerCase(TestCase):
             Prepares isolated state for the test.
         """
         self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
         database = str(Path(self._tmp.name) / "auth.sqlite")
 
         self.app = _StubApp(database)
         self.manager_db = ConnectionManager(self.app)
+        self.addAsyncCleanup(self.manager_db.disconnect)
         self._previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self._previous_manager)
         ConnectionResolver.setManager(self.manager_db)
         self.connection = self.manager_db.connection("sqlite")
 
@@ -360,18 +363,6 @@ class _ManagerCase(TestCase):
             "password": await self.hasher.make("secret"),
             "active": True,
         })
-
-    async def asyncTearDown(self) -> None:
-        """Release the connection and drop the temporary database.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ConnectionResolver.setManager(self._previous_manager)
-        await self.connection.disconnect()
-        self._tmp.cleanup()
 
     def webRequest(self, session: Session | None = None) -> SimpleNamespace:
         """Build a web request double carrying a session.

@@ -30,6 +30,22 @@ class IReactor(ABC):
         """
 
     @abstractmethod
+    async def hasCommand(self, signature: str) -> bool:
+        """
+        Check whether a command signature is registered.
+
+        Parameters
+        ----------
+        signature : str
+            Command signature to look up.
+
+        Returns
+        -------
+        bool
+            Whether the signature identifies a registered command.
+        """
+
+    @abstractmethod
     async def info(self) -> list[dict]:
         """
         Return registered commands metadata.

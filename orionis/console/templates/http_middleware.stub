@@ -1,0 +1,26 @@
+from orionis.http import BaseMiddleware, NextCallable, Request, Response
+
+class {{class_name}}(BaseMiddleware):
+    """Process requests before and after the next middleware."""
+
+    async def handle(
+        self,
+        request: Request,
+        call_next: NextCallable,
+    ) -> Response:
+        """
+        Process the request and continue through the middleware stack.
+
+        Parameters
+        ----------
+        request : Request
+            Incoming HTTP request.
+        call_next : NextCallable
+            Asynchronous callable that invokes the next middleware or route.
+
+        Returns
+        -------
+        Response
+            Response returned by the next middleware or route.
+        """
+        return await call_next()

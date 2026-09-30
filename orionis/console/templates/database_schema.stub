@@ -1,0 +1,12 @@
+from typing import ClassVar
+from orionis.orm.schema import TableDefinition  # noqa: TC001
+
+class {{class_name}}:
+    """
+    Hold a reusable, versioned database table definition.
+
+    Assign ``table_definition`` to a ``TableDefinition`` with the table name,
+    columns and constraints. Models and migrations can import the same version.
+    """
+
+    table_definition: ClassVar[TableDefinition | None] = None

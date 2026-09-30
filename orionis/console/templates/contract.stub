@@ -1,0 +1,15 @@
+from abc import ABC, abstractmethod
+
+class {{class_name}}(ABC):
+    """Define behavior required from implementing application services."""
+
+    @abstractmethod
+    def executeAction(self) -> None:
+        """
+        Perform the operation declared by this contract.
+
+        Returns
+        -------
+        None
+            Implementations perform their declared operation.
+        """

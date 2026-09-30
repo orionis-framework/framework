@@ -12,8 +12,10 @@ class Mailable(ABC):
     Declare reusable mail without I/O or per-send mutation.
 
     Subclasses describe headers, bodies, and attachments synchronously.
-    Rendering, attachment reads, and transport happen afterwards, so the
-    same instance can be sent concurrently without being modified.
+    Pass an instance to ``Mail.send()`` when it is already constructed, or pass
+    its class to let the application container inject constructor dependencies.
+    Rendering, attachment reads, and transport happen afterwards, so the same
+    instance can be sent concurrently without being modified.
     """
 
     __slots__ = ()

@@ -39,6 +39,16 @@ class Reactor(IReactor):
         ----------
         app : IApplication
             Application instance for command processing.
+        loader : Loader
+            Loader instance for managing command loading.
+        executer : Executor
+            Executor instance for managing command output.
+        logger : ILogger
+            Logger instance for logging command execution details.
+        catch : ICatch
+            Catch instance for handling exceptions.
+        performance_counter : PerformanceCounter
+            PerformanceCounter instance for measuring command execution time.
 
         Returns
         -------
@@ -170,6 +180,22 @@ class Reactor(IReactor):
         )
         return self.__loader.addFluentCommand(signature, normalized_handler)
 
+    async def hasCommand(self, signature: str) -> bool:
+        """
+        Check whether a command signature is registered.
+
+        Parameters
+        ----------
+        signature : str
+            Command signature to look up.
+
+        Returns
+        -------
+        bool
+            Whether the signature identifies a registered command.
+        """
+        return await self.__loader.get(signature) is not None
+
     async def info(self) -> list[dict]:
         """
         Return registered commands metadata.
@@ -266,18 +292,18 @@ class Reactor(IReactor):
 
                 # Validate that the command signature is a string
                 if not isinstance(signature, str):
-                    error_msg = "Command signature must be a string."
+                    error_msg: str = "Command signature must be a string."
                     raise TypeError(error_msg)
 
                 # Validate that the command signature is not empty
                 if not signature:
-                    error_msg = "Command signature cannot be empty."
+                    error_msg: str = "Command signature cannot be empty."
                     raise ValueError(error_msg)
 
                 # Retrieve the command from the registry by its signature
                 command = await self.__loader.get(signature)
                 if command is None:
-                    error_msg = f"Command '{signature}' not found."
+                    error_msg: str = f"Command '{signature}' not found."
                     raise ValueError(error_msg)
 
                 # Determine if timestamps should be logged based

@@ -1,15 +1,23 @@
-from pathlib import Path
+from __future__ import annotations
 
-def clear_files(directory: Path, suffix: str) -> tuple[int, list[str]]:
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+def clear_files(
+    directory: Path,
+    suffix: str | tuple[str, ...],
+) -> tuple[int, list[str]]:
     """
-    Remove files with one suffix from a dedicated cache directory.
+    Remove files with the given suffixes from a dedicated directory.
 
     Parameters
     ----------
     directory : Path
-        Cache directory searched recursively.
-    suffix : str
-        File suffix to remove, including its leading dot.
+        Directory searched recursively.
+    suffix : str | tuple[str, ...]
+        File suffix or suffixes to remove, including each leading dot.
 
     Returns
     -------
@@ -26,7 +34,7 @@ def clear_files(directory: Path, suffix: str) -> tuple[int, list[str]]:
         on_error=lambda error: errors.append(str(error)),
     ):
         for filename in filenames:
-            if Path(filename).suffix != suffix:
+            if not filename.endswith(suffix):
                 continue
             cache_file = root / filename
             try:

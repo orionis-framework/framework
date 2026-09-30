@@ -102,7 +102,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: binds `IScheduleStore` and `ISchedule`, pins the `Schedule` facade. |
 | `args/argument.py` | `Argument`, the declarative `argparse` argument definition. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` and their contracts. |
-| `commands/` | The 38 built-in commands (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
+| `commands/` | The 39 built-in commands (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, the immutable tuple of built-in command classes. |
 | `core/loader.py` | `Loader`: discovery, metadata cache and `ArgumentParser` construction. |
@@ -774,7 +774,7 @@ bit mask; `orionis.console.enums` exports the enum flags while
 
 ### Built-in commands
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 38 classes:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 39 classes:
 
 | Signature | Class | Notes |
 |---|---|---|
@@ -803,6 +803,7 @@ bit mask; `orionis.console.enums` exports the enum flags while
 | `migrate:rollback` | `MigrateRollbackCommand` | `--step/-s`, defaults to the last batch. |
 | `migrate:status` | `MigrateStatusCommand` | Status table. |
 | `clear:cache` | `ClearCacheCommand` | Clears the configured default application cache store. |
+| `clear:logs` | `ClearLogsCommand` | Removes framework `.log` and `.log.gz` files, including configured channel paths. |
 | `clear:testing` | `ClearTestingCommand` | Removes cached test-run result files. |
 | `clear:views` | `ClearViewsCommand` | Removes Jinja bytecode cache files. |
 | `down` | `DownCommand` | Enables runtime maintenance responses. |
@@ -828,7 +829,7 @@ restarting. The health endpoint reports the same state.
 An explicit state file overrides `APP_MAINTENANCE` until it is removed.
 
 `optimize:clear` removes compiled framework state, Python bytecode and build
-artifacts. `clear:cache`, `clear:views` and `clear:testing` target the application
+artifacts. `clear:cache`, `clear:logs`, `clear:views` and `clear:testing` target the application
 cache store, template bytecode and saved test results separately.
 
 `MigrationCommand` (`commands/migrate/base_command.py`) is the shared base of the
@@ -1041,11 +1042,11 @@ asyncio.run(main())
 ```
 
 ```text
-39 commands
-['about', 'app:inspire', 'clear:cache', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
+40 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
 ```
 
-The 39 signatures are the 38 built-in commands plus `app:inspire`, which is
+The 40 signatures are the 39 built-in commands plus `app:inspire`, which is
 declared by this project.
 
 `await Reactor.pin()` is required in a plain script: eager providers only boot

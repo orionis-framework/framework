@@ -1,0 +1,7 @@
+class {{class_name}}:
+    """
+    Provide application-specific operations as a reusable service.
+
+    Add methods that coordinate application work and inject the service through
+    the application's container when it is shared with other components.
+    """

@@ -254,11 +254,14 @@ class _AuthorizationCase(TestCase):
             Prepares isolated state for the test.
         """
         self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
         database = str(Path(self._tmp.name) / "auth.sqlite")
 
         self.app = _StubApp(database)
         self.manager = ConnectionManager(self.app)
+        self.addAsyncCleanup(self.manager.disconnect)
         self._previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self._previous_manager)
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection("sqlite")
 
@@ -275,18 +278,6 @@ class _AuthorizationCase(TestCase):
         self.db = QueryBuilder(self.manager)
         self.registrar = PermissionRegistrar(self.db)
         self.repository = DatabasePermissionRepository(self.db)
-
-    async def asyncTearDown(self) -> None:
-        """Release the connection and remove the temporary database.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ConnectionResolver.setManager(self._previous_manager)
-        await self.connection.disconnect()
-        self._tmp.cleanup()
 
 class TestPermissionRegistrar(_AuthorizationCase):
     """Validate how permissions and roles are created and attached."""
@@ -693,41 +684,29 @@ class TestAuthMigrations(TestCase):
             Prepares isolated state for the test.
         """
         self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
         self.app = auth_fixtures._StubApp(str(Path(self._tmp.name) / "schema.sqlite"))
         self.app._tree["database"]["connections"]["sqlite"][
             "foreign_key_constraints"
         ] = True
         self.manager = ConnectionManager(self.app)
+        self.addAsyncCleanup(self.manager.disconnect)
         self._previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self._previous_manager)
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection()
         self.db = QueryBuilder(self.manager)
         self.registrar = PermissionRegistrar(self.db)
         self.repository = DatabasePermissionRepository(self.db)
         self.tokens = AccessTokenRepository(self.app, self.db)
-        self._modules: list[tuple[object, object]] = []
         migrations: dict[str, type] = {}
         for module_name, class_name in _AUTH_MIGRATIONS:
             module = importlib.import_module(f"database.migrations.{module_name}")
-            self._modules.append((module, module.Schema))
+            self.addCleanup(setattr, module, "Schema", module.Schema)
             module.Schema = Schema(self.manager)
             migrations[module_name] = getattr(module, class_name)
         self.migrator = Migrator(self.app, self.manager)
         self.migrator._Migrator__discovered_cache = migrations
-
-    async def asyncTearDown(self) -> None:
-        """Restore migration globals and the original database resolver.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        for module, schema in self._modules:
-            module.Schema = schema
-        ConnectionResolver.setManager(self._previous_manager)
-        await self.manager.disconnect()
-        self._tmp.cleanup()
 
     async def testRealMigrationsSupportUuidOwnersAndRollback(self) -> None:
         """Apply real DDL, issue grants and tokens, then roll back all six tables.

@@ -2,7 +2,6 @@ import base64
 from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from orionis.environment import Env
-from orionis.environment.key.key_generator import SecureKeyGenerator
 from orionis.foundation.config.app.enums import Cipher, Environments
 from orionis.foundation.config.validation import (
     normalize_enum,
@@ -168,6 +167,11 @@ class App(BaseEntity):
         None
             Store the validated key as bytes and persist generated keys.
         """
+        # Resolve key support after the application configuration module is loaded.
+        from orionis.environment.key.key_generator import (  # noqa: PLC0415
+            SecureKeyGenerator,
+        )
+
         # Generate a key only when the configuration does not provide one.
         generated = self.key is None
         key = SecureKeyGenerator.generate(self.cipher) if generated else self.key

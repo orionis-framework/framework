@@ -1,7 +1,7 @@
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import replace
 from inspect import isawaitable, iscoroutine
-from typing import TYPE_CHECKING, cast, overload
+from typing import TYPE_CHECKING, TypeGuard, cast, overload
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.content import Content
 from orionis.mail.entities.envelope import Envelope
@@ -20,14 +20,20 @@ class PendingMail:
     """
     Build independent chains; every fluent call returns a new operation.
 
-    A chain never renders, reads attachments, or resolves a transport: those
-    steps belong to the asynchronous terminals. Deriving a chain copies its
-    immutable options, so concurrent branches never share recipients.
+    A chain never builds a Mailable, renders, reads attachments, or resolves a
+    transport: those steps belong to the asynchronous terminals. Deriving a
+    chain copies its immutable options, so concurrent branches never share
+    recipients.
     """
 
-    __slots__ = ("_delivery", "_options")
+    __slots__ = ("_delivery", "_mailable_builder", "_options")
 
-    def __init__(self, delivery: Delivery, options: MailOptions | None = None) -> None:
+    def __init__(
+        self,
+        delivery: Delivery,
+        options: MailOptions | None = None,
+        mailable_builder: Callable[[type[Mailable]], Awaitable[Mailable]] | None = None,
+    ) -> None:
         """
         Bind an immutable declaration to the manager's delivery pipeline.
 
@@ -37,6 +43,8 @@ class PendingMail:
             Shared preparation and transport entry point.
         options : MailOptions | None
             Immutable explicit options for this chain.
+        mailable_builder : Callable[[type[Mailable]], Awaitable[Mailable]] | None
+            Optional application-container resolver for Mailable classes.
 
         Returns
         -------
@@ -44,6 +52,7 @@ class PendingMail:
             Initialize a chain without performing I/O.
         """
         self._delivery = delivery
+        self._mailable_builder = mailable_builder
         self._options = options if options is not None else MailOptions()
 
     def mailer(self, name: str) -> PendingMail:
@@ -68,7 +77,11 @@ class PendingMail:
         if not isinstance(name, str) or not name.strip():
             error_msg = "Mailer names must be non-empty strings."
             raise MailConfigurationException(error_msg)
-        return PendingMail(self._delivery, replace(self._options, mailer=name))
+        return PendingMail(
+            self._delivery,
+            replace(self._options, mailer=name),
+            self._mailable_builder,
+        )
 
     def fromAddress(
         self,
@@ -197,7 +210,7 @@ class PendingMail:
         return self._derive(Message(self._options).attach(attachment))
 
     @overload
-    async def send(self, mailable: Mailable, /) -> MailResult: ...
+    async def send(self, mailable: Mailable | type[Mailable], /) -> MailResult: ...
 
     @overload
     async def send(
@@ -217,9 +230,9 @@ class PendingMail:
         callback: MessageCallback | None = None,
     ) -> MailResult: ...
 
-    async def send(
+    async def send( # NOSONAR
         self,
-        value: Mailable | str | Content,
+        value: Mailable | type[Mailable] | str | Content,
         /,
         data: object = MISSING,
         callback: object = MISSING,
@@ -229,8 +242,8 @@ class PendingMail:
 
         Parameters
         ----------
-        value : Mailable | str | Content
-            Declaration; a string always identifies an HTML view.
+        value : Mailable | type[Mailable] | str | Content
+            Declaration, resolvable Mailable class, or HTML view identifier.
         data : Mapping[str, object] | None
             View context, accepted only when value is a string.
         callback : MessageCallback | None
@@ -244,18 +257,41 @@ class PendingMail:
         Raises
         ------
         MailCompositionException
-            If arguments, declarations, callbacks, or content are invalid.
+            If arguments, container resolution, declarations, callbacks, or
+            content are invalid.
         MailException
             If preparation or transport fails.
         """
-        if isinstance(value, Mailable):
+        if isinstance(value, Mailable) or _is_mailable_class(value):
 
             # A Mailable owns its context, so supplying either argument here
             # would silently drop it.
             if data is not MISSING or callback is not MISSING:
                 error_msg = "send(mailable) accepts neither data nor callback."
                 raise MailCompositionException(error_msg)
-            return await self._sendMailable(value)
+            if isinstance(value, Mailable):
+                mailable = value
+            else:
+                if self._mailable_builder is None:
+                    error_msg = (
+                        "Sending a Mailable class requires a mail manager with an "
+                        "application container."
+                    )
+                    raise MailCompositionException(error_msg)
+                try:
+                    mailable = await self._mailable_builder(value)
+                except Exception as exc:
+                    error_msg = (
+                        f"Could not resolve Mailable [{value.__name__}] "
+                        "through the application container."
+                    )
+                    raise MailCompositionException(error_msg) from exc
+                if not isinstance(mailable, Mailable):
+                    error_msg = (
+                        "The application container must build a Mailable instance."
+                    )
+                    raise MailCompositionException(error_msg)
+            return await self._sendMailable(mailable)
 
         if isinstance(value, Content):
             if data is not MISSING:
@@ -346,7 +382,11 @@ class PendingMail:
         PendingMail
             Independent operation with no render or transport side effects.
         """
-        return PendingMail(self._delivery, message._snapshot())  # noqa: SLF001
+        return PendingMail(
+            self._delivery,
+            message._snapshot(),  # noqa: SLF001
+            self._mailable_builder,
+        )
 
     async def _sendDirect(self, content: Content, callback: object) -> MailResult:
         """
@@ -497,3 +537,19 @@ def _assert_declaration(value: object, expected: type, label: str) -> None:
 
     error_msg = f"Mailable {label}() must return {expected.__name__} synchronously."
     raise MailCompositionException(error_msg)
+
+def _is_mailable_class(value: object) -> TypeGuard[type[Mailable]]:
+    """
+    Check whether a value is a Mailable subclass.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect.
+
+    Returns
+    -------
+    bool
+        Whether ``value`` is a class derived from ``Mailable``.
+    """
+    return isinstance(value, type) and issubclass(value, Mailable)

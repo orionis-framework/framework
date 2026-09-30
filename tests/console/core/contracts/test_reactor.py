@@ -45,7 +45,7 @@ class TestIReactor(TestCase):
             Assertions verify the behavior described above.
         """
         abstract_methods = IReactor.__abstractmethods__
-        expected_methods = {"command", "info", "call"}
+        expected_methods = {"command", "hasCommand", "info", "call"}
         self.assertEqual(abstract_methods, expected_methods)
 
     def testCommandMethodSignature(self) -> None:
@@ -204,6 +204,22 @@ class TestIReactor(TestCase):
                     Empty command metadata.
                 """
                 return []
+
+            async def hasCommand(self, signature):
+                """Report no registered command for the supplied signature.
+
+                Parameters
+                ----------
+                signature : object
+                    Command signature to look up.
+
+                Returns
+                -------
+                bool
+                    No command is registered in this test double.
+                """
+                del signature
+                return False
 
             async def call(self, signature, args=None):
                 """Accept a command invocation in this contract double.

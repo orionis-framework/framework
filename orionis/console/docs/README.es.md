@@ -103,7 +103,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: vincula `IScheduleStore` e `ISchedule`, fija la fachada `Schedule`. |
 | `args/argument.py` | `Argument`, la definición declarativa de un argumento de `argparse`. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` y sus contratos. |
-| `commands/` | Los 38 comandos integrados (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, mantenimiento, caché y soporte). |
+| `commands/` | Los 39 comandos integrados (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, mantenimiento, caché y soporte). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, la tupla inmutable de clases de comandos integrados. |
 | `core/loader.py` | `Loader`: descubrimiento, caché de metadatos y construcción del `ArgumentParser`. |
@@ -788,7 +788,7 @@ con los mismos nombres.
 
 ### Comandos integrados
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 38 clases:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 39 clases:
 
 | Firma | Clase | Notas |
 |---|---|---|
@@ -817,6 +817,7 @@ con los mismos nombres.
 | `migrate:rollback` | `MigrateRollbackCommand` | `--step/-s`, por defecto el último lote. |
 | `migrate:status` | `MigrateStatusCommand` | Tabla de estado. |
 | `clear:cache` | `ClearCacheCommand` | Limpia el store predeterminado de caché de la aplicación. |
+| `clear:logs` | `ClearLogsCommand` | Elimina archivos `.log` y `.log.gz` del framework, incluidas las rutas configuradas por canal. |
 | `clear:testing` | `ClearTestingCommand` | Elimina resultados de pruebas guardados en caché. |
 | `clear:views` | `ClearViewsCommand` | Elimina el bytecode de plantillas Jinja. |
 | `down` | `DownCommand` | Activa respuestas de mantenimiento en runtime. |
@@ -843,7 +844,7 @@ el mismo estado. Mientras exista el archivo, su estado tiene
 prioridad sobre `APP_MAINTENANCE`.
 
 `optimize:clear` elimina estado compilado del framework, bytecode Python y
-artefactos de compilación. `clear:cache`, `clear:views` y `clear:testing` limpian
+artefactos de compilación. `clear:cache`, `clear:logs`, `clear:views` y `clear:testing` limpian
 por separado el store de caché, el bytecode de plantillas y los resultados de
 pruebas guardados.
 
@@ -1058,11 +1059,11 @@ asyncio.run(main())
 ```
 
 ```text
-39 commands
-['about', 'app:inspire', 'clear:cache', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
+40 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
 ```
 
-Las 39 firmas son los 38 comandos integrados más `app:inspire`, declarado por
+Las 40 firmas son los 39 comandos integrados más `app:inspire`, declarado por
 este proyecto.
 
 `await Reactor.pin()` hace falta en un script suelto: los proveedores eager solo

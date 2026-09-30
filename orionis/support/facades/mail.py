@@ -1,9 +1,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.mail.contracts.manager import IMailManager
 
-
 class Mail(Facade):
-    """Proxy the eager mail manager after normal HTTP or CLI startup."""
 
     __slots__ = ()
 

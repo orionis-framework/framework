@@ -3,16 +3,19 @@ import asyncio
 import inspect
 import locale
 import os
+import sys
+import time
 from collections import OrderedDict, deque
 from contextlib import suppress
 from copy import deepcopy
 from dataclasses import asdict
 from importlib import import_module
 from pathlib import Path
-import sys
-import time
+from threading import Lock
 from typing import TYPE_CHECKING, Any, Self
+from orionis.cache import FileBasedCache
 from orionis.console.base.contracts.scheduler import IBaseScheduler
+from orionis.console.contracts.kernel import IKernelCLI
 from orionis.container.container import Container
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
@@ -29,24 +32,19 @@ from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.layer.contracts.middleware import IBaseMiddleware
-from orionis.metadata.framework import PYTHON_REQUIRES
-from orionis.cache import FileBasedCache
 from orionis.introspection.modules.inspector import ModuleInspector
-from orionis.support.structures.freezer import FreezeThaw
+from orionis.metadata.framework import PYTHON_REQUIRES
 from orionis.support.facades.datetime import DateTime
-from orionis.console.contracts.kernel import IKernelCLI
+from orionis.support.structures.freezer import FreezeThaw
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable
-    from collections.abc import Callable
-    from collections.abc import Coroutine
-    from collections.abc import Mapping
+    from collections.abc import Awaitable, Callable, Coroutine, Mapping
     from granian.rsgi import (
-        Scope,
         HTTPProtocol,
-        WebsocketProtocol,
-        ProtocolError,
         ProtocolClosed,
+        ProtocolError,
+        Scope,
+        WebsocketProtocol,
     )
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.container.contracts.deferrable_provider import IDeferrableProvider
@@ -55,6 +53,7 @@ _SENTINEL = object()
 _ASGI_BODY_QUEUE_SIZE = 8
 _CWD = Path.cwd()
 _CONFIG_KEY_CACHE_SIZE = 256
+_MAINTENANCE_REFRESH_NS = 100_000_000
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
@@ -860,6 +859,11 @@ class Application(Container, IApplication):
             self.__runtime_config_initialized: bool = False
             self.__is_production_cache: bool = False
             self.__is_debug_cache: bool = False
+
+            # Store the shared maintenance marker and its last observed state.
+            self.__maintenance_marker: Path | None = None
+            self.__maintenance_cache: tuple[int, bool] = (0, False)
+            self.__maintenance_lock = Lock()
 
             # Initialize configuration dictionaries.
             self.__bootstrap: dict[str, Any] = {}
@@ -2777,6 +2781,9 @@ class Application(Container, IApplication):
                 raise TypeError(error_msg)
             self.__http_disconnect_monitoring = monitoring is True
 
+            # Resolve the shared maintenance marker once after paths are loaded.
+            self.__maintenance_marker = self.path("storage_framework") / "maintenance"
+
             # Mark configuration and provider registration as complete.
             self.__booted = True
 
@@ -3089,10 +3096,14 @@ class Application(Container, IApplication):
         """
         Determine if the application is currently in maintenance mode.
 
+        The shared marker is refreshed at most once every 100 ms per worker.
+        Runtime changes from other processes become visible after that interval.
+
         Returns
         -------
         bool
-            True if the application is in maintenance mode, otherwise False.
+            True when the effective maintenance state is enabled. The runtime
+            marker overrides the configured value when present.
 
         Raises
         ------
@@ -3103,5 +3114,33 @@ class Application(Container, IApplication):
         if not self.__booted:
             raise RuntimeError(_ERR_NOT_CONFIGURED)
 
-        # Return the maintenance mode flag from the configuration
-        return self.config("app.maintenance") is True
+        cached = self.__maintenance_cache
+        if time.monotonic_ns() < cached[0]:
+            return cached[1]
+
+        # Refresh the shared state once when concurrent callers reach expiry.
+        with self.__maintenance_lock:
+            cached = self.__maintenance_cache
+            if time.monotonic_ns() < cached[0]:
+                return cached[1]
+
+            marker = self.__maintenance_marker
+            try:
+                state = marker.read_text(encoding="utf-8").strip().lower()
+            except FileNotFoundError:
+                maintenance = self.config("app.maintenance") is True
+            except (OSError, UnicodeError):
+                maintenance = True
+            else:
+                if state == "down":
+                    maintenance = True
+                elif state == "up":
+                    maintenance = False
+                else:
+                    maintenance = self.config("app.maintenance") is True
+
+            self.__maintenance_cache = (
+                time.monotonic_ns() + _MAINTENANCE_REFRESH_NS,
+                maintenance,
+            )
+            return maintenance

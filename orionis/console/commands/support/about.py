@@ -4,12 +4,12 @@ from orionis.console.base.command import BaseCommand
 from orionis.metadata import framework
 from orionis.support.facades.datetime import DateTime
 
-# Panel title — built once at import time from static framework constants
+# Show the framework name and version in the panel title.
 _PANEL_TITLE: str = (
     f"[bold green]{framework.NAME.capitalize()} Framework | v{framework.VERSION}[/]"
 )
 
-# Panel body — assembled once at import time; all constituent values are static
+# Show framework details, author contact information, and project links.
 _PANEL_BODY: str = (
     f"📝 [italic]{framework.DESCRIPTION}[/italic]\n\n"
     f"[bold]Author:[/bold] {framework.AUTHOR}  |  "
@@ -26,13 +26,13 @@ class VersionCommand(BaseCommand):
 
     # ruff: noqa: TC002
 
-    # Indicates whether timestamps will be shown in the command output
+    # Control whether this command includes timestamps in its output.
     timestamps: bool = False
 
-    # Command signature and description
+    # Identify the command in the CLI registry.
     signature: str = "about"
 
-    # Command description
+    # Describe the information displayed by this command.
     description: str = "Displays the Orionis framework version and metadata."
 
     def handle(
@@ -42,9 +42,7 @@ class VersionCommand(BaseCommand):
         """
         Display Orionis framework version and metadata.
 
-        Retrieves the version and metadata from the framework module and prints it in a
-        formatted panel to the console. If the '--without-console' flag is set, returns
-        only the version string.
+        Build a panel from framework metadata and print it to the console.
 
         Parameters
         ----------
@@ -56,10 +54,10 @@ class VersionCommand(BaseCommand):
         None
             This method does not return a value. Output is sent to the console.
         """
-        # Retrieve the current timestamp for the panel subtitle
+        # Get the current timestamp for the panel subtitle.
         dt_strftime = DateTime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Assemble the panel with the precomputed static content and dynamic subtitle
+        # Build the panel with framework details and the current timestamp.
         panel = Panel(
             _PANEL_BODY,
             title=_PANEL_TITLE,
@@ -70,7 +68,7 @@ class VersionCommand(BaseCommand):
             subtitle_align="right",
         )
 
-        # Print a blank line, the panel, and another blank line for spacing
+        # Separate the panel from other console output.
         console.line()
         console.print(panel)
         console.line()

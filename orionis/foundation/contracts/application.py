@@ -830,7 +830,7 @@ class IApplication(IContainer, ABC):
         Returns
         -------
         bool
-            True if the application is in maintenance mode, otherwise False.
+            True if configuration or the runtime marker enables maintenance.
 
         Raises
         ------

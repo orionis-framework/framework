@@ -10,6 +10,7 @@ from orionis.mail.entities.address import Address
 from orionis.mail.entities.envelope import Envelope
 from orionis.mail.exceptions import MailConfigurationException
 from orionis.mail.functions import freeze_owned
+from orionis.mail.mailable import Mailable
 from orionis.mail.pending import PendingMail
 from orionis.mail.transports.file import create_file_transport
 from orionis.mail.transports.smtp import create_smtp_transport
@@ -31,7 +32,8 @@ class MailManager(PendingMail, IMailManager):
     The inherited empty chain is never mutated: every fluent entry creates a
     new PendingMail. No operation envelope, body, or attachment is cached on
     the manager, and factories run per send so they may resolve shared
-    stateless transports through the container.
+    stateless transports through the container. A Mailable class is also built
+    through the application container for each send.
 
     Concurrency
     -----------
@@ -66,7 +68,27 @@ class MailManager(PendingMail, IMailManager):
             "smtp": create_smtp_transport,
             "file": create_file_transport,
         }
-        super().__init__(self._deliver)
+        super().__init__(self._deliver, mailable_builder=self._buildMailable)
+
+    async def _buildMailable(self, mailable: type[Mailable]) -> Mailable:
+        """
+        Build one reusable mail declaration with the application container.
+
+        Parameters
+        ----------
+        mailable : type[Mailable]
+            Reusable mail class requested by a send operation.
+
+        Returns
+        -------
+        Mailable
+            A fresh declaration with constructor dependencies injected.
+        """
+        instance = await self._app.build(mailable)
+        if not isinstance(instance, Mailable):
+            error_msg = "The application container must build a Mailable instance."
+            raise TypeError(error_msg)
+        return instance
 
     def extend(self, driver: str, factory: TransportFactory) -> None:
         """

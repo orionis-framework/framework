@@ -4,6 +4,7 @@ import sys
 import threading
 import types
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 from orionis.aio.loop import Loop
 from orionis.test import TestCase
 
@@ -893,8 +894,8 @@ class TestRunEntryPoint(TestCase):
         """
         Refuse to start a loop where another one is already running.
 
-        Validates the documented failure mode, including that the coroutine
-        handed over is left unconsumed and stays the caller's to close.
+        Validates the documented failure mode, including that no runner is
+        opened and the coroutine stays the caller's to close.
 
         Returns
         -------
@@ -904,8 +905,14 @@ class TestRunEntryPoint(TestCase):
         self.assertTrue(Loop.isLoopRunning())
         coro = coroutine_returning("never started")
         try:
-            with self.assertRaises(RuntimeError):
-                Loop.run(coro)
+            with (
+                patch.object(asyncio, "Runner") as runner,
+                patch.object(asyncio, "run") as run,
+            ):
+                with self.assertRaises(RuntimeError):
+                    Loop.run(coro)
+                runner.assert_not_called()
+                run.assert_not_called()
         finally:
             coro.close()
 

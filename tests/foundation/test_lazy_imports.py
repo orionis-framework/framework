@@ -50,6 +50,22 @@ def run_import_probe(source: str) -> dict[str, object]:
 class TestLazyImports(TestCase):
     """Exercise public exports without requiring eager subsystem imports."""
 
+    def testCoreCommandsImportInColdInterpreter(self) -> None:
+        """Import the built-in command registry without prior application imports.
+
+        Returns
+        -------
+        None
+            Assertions verify the cold import resolves the key command.
+        """
+        result = run_import_probe(
+            "import json\n"
+            "from orionis.console.core.commands import CORE_COMMANDS\n"
+            "print(json.dumps({'key_command': any(command.signature == "
+            "'key:generate' for command in CORE_COMMANDS)}))\n",
+        )
+        self.assertTrue(result["key_command"])
+
     def testPackageImportsLeaveImplementationsUnloaded(self) -> None:
         """Keep package inspection independent of implementation imports.
 

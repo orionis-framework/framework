@@ -1,0 +1,5 @@
+from orionis.container.contracts.facade import IFacade
+
+# This interface pairs with the facade implementation that resolves a service.
+class {{class_name}}(IFacade):
+    ...

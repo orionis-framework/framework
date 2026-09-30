@@ -1,38 +1,79 @@
-from orionis.console.commands.make.make_provider import MakeProvider
-from orionis.console.commands.make.task_listener_command import MakeTaskListener
-from orionis.console.commands.migrate.fresh_command import MigrateFreshCommand
-from orionis.console.commands.migrate.migrate_command import MigrateCommand
-from orionis.console.commands.migrate.refresh_command import MigrateRefreshCommand
-from orionis.console.commands.migrate.reset_command import MigrateResetCommand
-from orionis.console.commands.migrate.rollback_command import MigrateRollbackCommand
-from orionis.console.commands.migrate.status_command import MigrateStatusCommand
+from orionis.console.commands.make.console import MakeConsoleCommand
+from orionis.console.commands.make.console_listener import MakeConsoleListener
+from orionis.console.commands.make.contract import MakeContract
+from orionis.console.commands.make.database_migration import MakeDatabaseMigration
+from orionis.console.commands.make.database_schema import MakeDatabaseSchema
+from orionis.console.commands.make.database_seeder import MakeDatabaseSeeder
+from orionis.console.commands.make.facade import MakeFacade
+from orionis.console.commands.make.http_controller import MakeHttpController
+from orionis.console.commands.make.http_middleware import MakeHttpMiddleware
+from orionis.console.commands.make.http_schema import MakeHttpSchema
+from orionis.console.commands.make.http_schema_rule import MakeHttpSchemaRule
+from orionis.console.commands.make.mail import MakeMail
+from orionis.console.commands.make.model import MakeModel
+from orionis.console.commands.make.provider import MakeProvider
+from orionis.console.commands.make.service import MakeService
+from orionis.console.commands.make.test import MakeTest
+from orionis.console.commands.migrate.fresh import MigrateFreshCommand
+from orionis.console.commands.migrate.migrate import MigrateCommand
+from orionis.console.commands.migrate.refresh import MigrateRefreshCommand
+from orionis.console.commands.migrate.reset import MigrateResetCommand
+from orionis.console.commands.migrate.rollback import MigrateRollbackCommand
+from orionis.console.commands.migrate.status import MigrateStatusCommand
+from orionis.console.commands.route.list import RouteListCommand
+from orionis.console.commands.schedule.list import ScheduleListCommand
+from orionis.console.commands.schedule.work import ScheduleWorkCommand
+from orionis.console.commands.serve.serve import ServerCommand
+from orionis.console.commands.support.about import VersionCommand
+from orionis.console.commands.support.clear_cache import ClearCacheCommand
+from orionis.console.commands.support.clear_testing import ClearTestingCommand
+from orionis.console.commands.support.clear_views import ClearViewsCommand
+from orionis.console.commands.support.down import DownCommand
+from orionis.console.commands.support.environment import EnvironmentCommand
+from orionis.console.commands.support.key_generate import KeyGenerateCommand
+from orionis.console.commands.support.list import HelpCommand
 from orionis.console.commands.support.optimize import OptimizeCommand
 from orionis.console.commands.support.optimize_clear import OptimizeClearCommand
-from orionis.console.commands.support.list import HelpCommand
-from orionis.console.commands.support.about import VersionCommand
-from orionis.console.commands.make.make_command import MakeCommand
-from orionis.console.commands.schedule.list_command import ScheduleListCommand
-from orionis.console.commands.schedule.work_command import ScheduleWorkCommand
-from orionis.console.commands.serve.serve_command import ServerCommand
-from orionis.console.commands.test.test_command import TestCommand
+from orionis.console.commands.support.up import UpCommand
+from orionis.console.commands.test.test import TestCommand
 
 def get_core_commands_mapping() -> tuple:
     """
-    Return a read-only mapping of core command classes.
+    Return the immutable collection of core command classes.
 
     Returns
     -------
     tuple
         An immutable tuple of core command classes.
     """
-    # Create an immutable mapping of core command classes for the framework.
+    # Return the command classes registered by the framework.
     return (
         OptimizeClearCommand,
         OptimizeCommand,
+        KeyGenerateCommand,
+        EnvironmentCommand,
+        DownCommand,
+        UpCommand,
+        ClearViewsCommand,
+        ClearCacheCommand,
+        ClearTestingCommand,
         HelpCommand,
-        MakeCommand,
+        MakeConsoleCommand,
+        MakeFacade,
         MakeProvider,
-        MakeTaskListener,
+        MakeConsoleListener,
+        MakeContract,
+        MakeService,
+        MakeModel,
+        MakeMail,
+        MakeHttpController,
+        MakeHttpMiddleware,
+        MakeHttpSchema,
+        MakeHttpSchemaRule,
+        MakeDatabaseMigration,
+        MakeDatabaseSeeder,
+        MakeDatabaseSchema,
+        MakeTest,
         MigrateCommand,
         MigrateFreshCommand,
         MigrateRefreshCommand,
@@ -41,6 +82,7 @@ def get_core_commands_mapping() -> tuple:
         MigrateStatusCommand,
         ScheduleListCommand,
         ScheduleWorkCommand,
+        RouteListCommand,
         TestCommand,
         VersionCommand,
         ServerCommand,

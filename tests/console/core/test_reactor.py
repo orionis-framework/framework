@@ -186,6 +186,7 @@ class TestReactor(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertTrue(callable(self.reactor.command))
+        self.assertTrue(callable(self.reactor.hasCommand))
         self.assertTrue(callable(self.reactor.info))
         self.assertTrue(callable(self.reactor.call))
 
@@ -202,6 +203,16 @@ class TestReactor(TestCase):
         """
         self.assertTrue(inspect.iscoroutinefunction(self.reactor.info))
         self.assertTrue(inspect.iscoroutinefunction(self.reactor.call))
+
+    def testHasCommandIsAsyncMethod(self) -> None:
+        """Verify that hasCommand is declared as a coroutine function.
+
+        Returns
+        -------
+        None
+            Confirms that signature lookup follows the asynchronous loader API.
+        """
+        self.assertTrue(inspect.iscoroutinefunction(self.reactor.hasCommand))
 
     def testCommandIsNotAsync(self) -> None:
         """Verify that the command registration method is synchronous.
@@ -280,6 +291,38 @@ class TestReactor(TestCase):
     # ------------------------------------------------------------------ #
     #  info() method                                                     #
     # ------------------------------------------------------------------ #
+
+    async def testHasCommandUsesDirectLoaderLookup(self) -> None:
+        """Look up one signature without requesting the full command list.
+
+        Returns
+        -------
+        None
+            Verifies the targeted loader call and its boolean result.
+        """
+        self.mock_loader.get = AsyncMock(return_value=_make_mock_command())
+
+        result = await self.reactor.hasCommand("test:cmd")
+
+        self.assertTrue(result)
+        self.mock_loader.get.assert_awaited_once_with("test:cmd")
+        self.mock_loader.all.assert_not_awaited()
+
+    async def testHasCommandReturnsFalseForUnknownSignature(self) -> None:
+        """Return false when the loader cannot resolve a signature.
+
+        Returns
+        -------
+        None
+            Verifies an absent command is reported without listing commands.
+        """
+        self.mock_loader.get = AsyncMock(return_value=None)
+
+        result = await self.reactor.hasCommand("unknown:cmd")
+
+        self.assertFalse(result)
+        self.mock_loader.get.assert_awaited_once_with("unknown:cmd")
+        self.mock_loader.all.assert_not_awaited()
 
     async def testInfoReturnsEmptyListWhenNoCommands(self) -> None:
         """Verify that info() returns an empty list when no commands are loaded.

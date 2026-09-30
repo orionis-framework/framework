@@ -234,17 +234,26 @@ class Loop:
         TypeError
             If *coro* is not a coroutine object.
         RuntimeError
-            Propagated from asyncio when a loop is already running in the
-            calling thread. The message belongs to the standard library and
-            differs between the ``asyncio.Runner`` and ``asyncio.run``
-            branches; *coro* is left unconsumed. Use :meth:`runSync` to
-            bridge into a loop that is already running.
+            Raised when a loop is already running in the calling thread.
+            The message matches the relevant standard library
+            entry point (``asyncio.Runner`` or ``asyncio.run``); *coro* is left
+            unconsumed. Use :meth:`runSync` to bridge into a running loop.
         """
         if not isinstance(coro, types.CoroutineType):
             error_msg = "A coroutine object is required"
             raise TypeError(error_msg)
 
         factory = Loop._getLoopFactory()
+        if Loop._getRunningLoop() is not None:
+            # Runner.close() tries to shut down asynchronous generators even
+            # when Runner.run() refused a nested loop. Check before entering
+            # the context so its cleanup cannot leave that coroutine unawaited.
+            error_msg = (
+                "Runner.run() cannot be called from a running event loop"
+                if factory else
+                "asyncio.run() cannot be called from a running event loop"
+            )
+            raise RuntimeError(error_msg)
         try:
             if factory:
                 with asyncio.Runner(loop_factory=factory) as runner:

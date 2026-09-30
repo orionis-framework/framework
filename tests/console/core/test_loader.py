@@ -1,13 +1,13 @@
 from __future__ import annotations
 import inspect
 import tempfile
-from typing import ClassVar
-from unittest.mock import Mock, patch, AsyncMock
 from pathlib import Path
-from orionis.console.core.loader import Loader
-from orionis.console.core.contracts.loader import ILoader
-from orionis.console.base.command import BaseCommand
+from typing import ClassVar
+from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.args.argument import Argument
+from orionis.console.base.command import BaseCommand
+from orionis.console.core.contracts.loader import ILoader
+from orionis.console.core.loader import Loader
 from orionis.test import TestCase
 
 class MockCommand(BaseCommand):
@@ -140,6 +140,37 @@ class TestLoader(TestCase):
         self.mock_app.compiled = True
         loader = Loader(self.mock_app)
         self.assertTrue(loader._Loader__use_cache)
+
+    def testCommandCacheTracksCoreRegistryChanges(self) -> None:
+        """Invalidate cached command metadata when the core registry changes.
+
+        Returns
+        -------
+        None
+            Assertions verify the registry file is monitored with app sources.
+        """
+        self.mock_app.compiled = True
+        source_dir = self.mock_app.compiledPath.parent
+        app_source = source_dir / "app_commands.py"
+        core_registry = source_dir / "core_commands.py"
+        app_source.write_text("app = 1", encoding="utf-8")
+        core_registry.write_text("core = 1", encoding="utf-8")
+        self.mock_app.compiledInvalidationPathsFiles = [app_source]
+
+        with patch("orionis.console.core.loader._CORE_COMMANDS_PATH", core_registry):
+            loader = Loader(self.mock_app)
+            cache = loader._Loader__persistence
+            self.assertIsNotNone(cache)
+            cache.save({"sample": "command"})
+
+            unchanged_cache = Loader(self.mock_app)._Loader__persistence
+            self.assertEqual(unchanged_cache.get(), {"sample": "command"})
+
+            core_registry.write_text("core = 100", encoding="utf-8")
+            changed_cache = Loader(self.mock_app)._Loader__persistence
+            self.assertIsNone(changed_cache.get())
+
+        self.assertEqual(self.mock_app.compiledInvalidationPathsFiles, [app_source])
 
     def testInitializationWithoutCache(self) -> None:
         """Verify that Loader initializes correctly without cache.
@@ -459,6 +490,22 @@ class TestLoader(TestCase):
         self.assertIn(
             "must contain only alphanumeric characters", error_message,
         )
+
+    def testGetSignatureRejectsTrailingInvalidCharacters(self) -> None:
+        """Reject an invalid suffix after a valid command signature.
+
+        Returns
+        -------
+        None
+            Assertions verify that the entire signature is validated.
+        """
+        loader = Loader(self.mock_app)
+
+        class InvalidSuffixCommand(BaseCommand):
+            signature = "test:valid!"
+
+        with self.assertRaises(ValueError):
+            loader._Loader__getSignature(InvalidSuffixCommand)
 
     def testGetDescriptionDefault(self) -> None:
         """

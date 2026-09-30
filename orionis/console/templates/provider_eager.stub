@@ -1,0 +1,32 @@
+from orionis.container.providers import ServiceProvider
+
+class {{class_name}}(ServiceProvider):
+    """Register and initialize application services during application boot."""
+
+    def register(self) -> None:
+        """
+        Bind application services into the service container.
+
+        Add service bindings and dependency registrations required by the
+        application.
+
+        Returns
+        -------
+        None
+            This method registers services without returning a value.
+        """
+        # Register application-specific services here.
+
+    async def boot(self) -> None:
+        """
+        Initialize application services after registration.
+
+        Perform asynchronous setup that depends on services already being
+        available in the container.
+
+        Returns
+        -------
+        None
+            This method completes initialization without returning a value.
+        """
+        # Perform any asynchronous bootstrapping tasks here.

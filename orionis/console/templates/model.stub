@@ -1,0 +1,21 @@
+from typing import ClassVar
+from orionis.orm import Model
+from orionis.orm.schema import TableDefinition
+
+class {{class_name}}(Model):
+    """
+    Represent a database record managed by the application.
+
+    Define the table mapping and model metadata when the database schema is
+    ready. Mass assignment, hidden fields, casts and appended values start
+    empty so each model can declare only its own behavior.
+    """
+
+    fillable: ClassVar[list[str]] = []
+    guarded: ClassVar[list[str]] = []
+    hidden: ClassVar[list[str]] = []
+    casts: ClassVar[dict[str, str]] = {}
+    appends: ClassVar[list[str]] = []
+
+    # Assign a TableDefinition when the model's schema is ready.
+    table_definition: ClassVar[TableDefinition | None] = None

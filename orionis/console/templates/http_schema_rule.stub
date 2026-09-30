@@ -1,0 +1,38 @@
+from orionis.schemas.rule import Rule
+
+class {{class_name}}(Rule):
+    """
+    Validate a value with an application-specific rule.
+
+    Set ``__message__`` and ``__code__`` for validation errors, then implement
+    ``enforce`` with the field-specific validation criteria.
+    """
+
+    __message__ = "The value is invalid."
+    __code__ = "custom_rule"
+
+    def enforce(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> bool:
+        """
+        Check whether a field value satisfies this rule.
+
+        Parameters
+        ----------
+        field : str
+            Field name associated with the value.
+        value : object
+            Value submitted for validation.
+        instance : object
+            Schema instance that owns the field value.
+
+        Returns
+        -------
+        bool
+            Return ``True`` when the value passes validation.
+        """
+        error_message = "Implement the custom validation rule."
+        raise NotImplementedError(error_message)

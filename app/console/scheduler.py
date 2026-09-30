@@ -2,6 +2,7 @@ from orionis.console.base import BaseScheduler
 from orionis.console.contracts import ISchedule
 from orionis.console.entities import SchedulerEvent
 
+
 class Scheduler(BaseScheduler):
 
     def tasks(
@@ -24,13 +25,7 @@ class Scheduler(BaseScheduler):
         None
             This method does not return any value.
         """
-        # Register a test command that runs every ten seconds
-        schedule.command("app:test", ["--name=Raul"])\
-            .purpose("Test Route Command")\
-            .maxInstances(1)\
-            .everyTenSeconds()
-
-        # Register the inspire command to run every fifteen seconds with a listener
+        # Register the inspire command to run every fifteen seconds.
         schedule.command("app:inspire")\
             .purpose("Test Inspire Command")\
             .maxInstances(1)\

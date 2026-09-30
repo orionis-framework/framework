@@ -1,15 +1,18 @@
 from __future__ import annotations
+import sys
 import tempfile
 from asyncio import gather
 from pathlib import Path
+from types import ModuleType
+from unittest.mock import patch
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.migration import Migration
 from orionis.database.exceptions import (
     ConnectionNotFoundException,
     MigrationNotFoundException,
 )
-from orionis.database.migrations.events import MigrationEvents
 from orionis.database.migrations.context import current_migration_connection
+from orionis.database.migrations.events import MigrationEvents
 from orionis.database.migrations.migrator import Migrator
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
@@ -196,6 +199,7 @@ class TestMigrator(TestCase):
         """
         self._workspace = tempfile.TemporaryDirectory()
         app = _StubApp(str(Path(self._workspace.name) / _DATABASE_FILE))
+        self._app = app
         self._manager = ConnectionManager(app)
         ConnectionResolver.setManager(self._manager)
         self._migrator = Migrator(app, self._manager)
@@ -441,6 +445,108 @@ class TestMigrator(TestCase):
         self.useMigrations({"m01_alpha": _CreateAlpha})
         with self.assertRaises(MigrationNotFoundException):
             await self._migrator.reset()
+
+    async def testMissingHistoricalMigrationDoesNotPartiallyRevert(self) -> None:
+        """Check the full rollback plan before changing the schema.
+
+        Returns
+        -------
+        None
+            Every operation leaves the schema and history intact.
+        """
+        await self._migrator.migrate()
+        self.useMigrations({"m02_beta": _CreateBeta})
+
+        for operation in (
+            self._migrator.reset,
+            self._migrator.refresh,
+            self._migrator.fresh,
+        ):
+            with self.assertRaises(MigrationNotFoundException):
+                await operation()
+            self.assertTrue(await self.tableExists("alpha"))
+            self.assertTrue(await self.tableExists("beta"))
+            rows = await self._manager.connection().select(
+                "SELECT migration FROM migrations ORDER BY id ASC",
+            )
+            self.assertEqual(
+                [row["migration"] for row in rows],
+                ["m01_alpha", "m02_beta"],
+            )
+
+    async def testDiscoveryIgnoresImportedClassesAndPackageInitializers(self) -> None:
+        """Run only the migration defined by its source file.
+
+        Returns
+        -------
+        None
+            Imported and reexported migration classes are ignored.
+        """
+        module_name = "migration_fixture.m01_alpha"
+        init_name = "migration_fixture.__init__"
+        own_migration = type(
+            "OwnMigration", (_CreateAlpha,), {"__module__": module_name},
+        )
+        source_module = ModuleType(module_name)
+        source_module.OwnMigration = own_migration
+        source_module.ImportedMigration = _CreateBeta
+        init_module = ModuleType(init_name)
+        init_module.OwnMigration = own_migration
+        self._migrator._Migrator__discovered_cache = None
+
+        with (
+            patch.object(self._app, "path", return_value=Path.cwd()),
+            patch(
+                "orionis.database.migrations.migrator.ModuleInspector.discoverModules",
+                return_value={module_name, init_name},
+            ),
+            patch.dict(
+                sys.modules,
+                {module_name: source_module, init_name: init_module},
+            ),
+        ):
+            applied = await self._migrator.migrate()
+
+        self.assertEqual(applied, ["m01_alpha"])
+        self.assertTrue(await self.tableExists("alpha"))
+        self.assertFalse(await self.tableExists("beta"))
+
+    async def testDiscoveryRejectsDuplicateMigrationNames(self) -> None:
+        """Reject files that would share one persisted migration name.
+
+        Returns
+        -------
+        None
+            The ambiguous migrations do not run.
+        """
+        first_name = "migration_fixture.alpha.m01_create"
+        second_name = "migration_fixture.beta.m01_create"
+        first_module = ModuleType(first_name)
+        second_module = ModuleType(second_name)
+        first_module.AlphaMigration = type(
+            "AlphaMigration", (_CreateAlpha,), {"__module__": first_name},
+        )
+        second_module.BetaMigration = type(
+            "BetaMigration", (_CreateBeta,), {"__module__": second_name},
+        )
+        self._migrator._Migrator__discovered_cache = None
+
+        with (
+            patch.object(self._app, "path", return_value=Path.cwd()),
+            patch(
+                "orionis.database.migrations.migrator.ModuleInspector.discoverModules",
+                return_value={first_name, second_name},
+            ),
+            patch.dict(
+                sys.modules,
+                {first_name: first_module, second_name: second_module},
+            ),
+            self.assertRaisesRegex(ValueError, "Ambiguous migration 'm01_create'"),
+        ):
+            await self._migrator.migrate()
+
+        self.assertFalse(await self.tableExists("alpha"))
+        self.assertFalse(await self.tableExists("beta"))
 
     async def testProgressEventsAreReported(self) -> None:
         """Report progress for every migration through the callbacks.

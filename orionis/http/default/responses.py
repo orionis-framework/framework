@@ -415,7 +415,7 @@ class DefaultResponses(IDefaultResponses):
             application status. Status is 200 if healthy, 503 if under
             maintenance.
         """
-        config_maintenance: bool = self.__app.config("app.maintenance")
+        config_maintenance: bool = self.__app.underMaintenance()
 
         # Select constants for the current maintenance state.
         app_state, state_label, template_page, key_html = (

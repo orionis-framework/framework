@@ -26,6 +26,7 @@ from orionis.console.commands.schedule.work import ScheduleWorkCommand
 from orionis.console.commands.serve.serve import ServerCommand
 from orionis.console.commands.support.about import VersionCommand
 from orionis.console.commands.support.clear_cache import ClearCacheCommand
+from orionis.console.commands.support.clear_logs import ClearLogsCommand
 from orionis.console.commands.support.clear_testing import ClearTestingCommand
 from orionis.console.commands.support.clear_views import ClearViewsCommand
 from orionis.console.commands.support.down import DownCommand
@@ -36,6 +37,7 @@ from orionis.console.commands.support.optimize import OptimizeCommand
 from orionis.console.commands.support.optimize_clear import OptimizeClearCommand
 from orionis.console.commands.support.up import UpCommand
 from orionis.console.commands.test.test import TestCommand
+
 
 def get_core_commands_mapping() -> tuple:
     """
@@ -56,6 +58,7 @@ def get_core_commands_mapping() -> tuple:
         UpCommand,
         ClearViewsCommand,
         ClearCacheCommand,
+        ClearLogsCommand,
         ClearTestingCommand,
         HelpCommand,
         MakeConsoleCommand,

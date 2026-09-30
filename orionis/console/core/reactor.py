@@ -2,9 +2,10 @@ import argparse
 import operator
 import sys
 from typing import Any
+
 from orionis.console.base.contracts.command import IBaseCommand
-from orionis.console.core.loader import Loader
 from orionis.console.core.contracts.reactor import IReactor
+from orionis.console.core.loader import Loader
 from orionis.console.entities.command import Command
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.console.output.executor import Executor
@@ -15,6 +16,7 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
 from orionis.support.performance.counter import PerformanceCounter
 from orionis.support.types.sentinel import MISSING
+
 
 class Reactor(IReactor):
 
@@ -352,12 +354,13 @@ class Reactor(IReactor):
                 if timestamps:
                     self.__executer.done(program=signature, time=f"{elapsed_time}s")
 
-                # Log successful execution
-                info_msg = (
-                    f"Command '{signature}' executed successfully in "
-                    f"({elapsed_time}) seconds."
-                )
-                self.__logger.info(info_msg)
+                # Record completed commands without recreating cleared log files.
+                if signature != "clear:logs":
+                    info_msg = (
+                        f"Command '{signature}' executed successfully in "
+                        f"({elapsed_time}) seconds."
+                    )
+                    self.__logger.info(info_msg)
 
                 # Return the result of the command execution, ensuring
                 # it is an integer exit code

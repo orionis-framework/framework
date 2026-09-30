@@ -32,6 +32,7 @@ from tests.http._support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 _MODULE: str = __name__
@@ -736,6 +737,17 @@ class _StubApp:
         """
         return self.maintenance
 
+    @property
+    def routeHealthCheck(self) -> str:
+        """Return the health route excluded from the maintenance gate.
+
+        Returns
+        -------
+        str
+            Health endpoint configured for this test application.
+        """
+        return "/health"
+
     def beginScope(self) -> _StubScope:
         """
         Open a per-request container scope.
@@ -882,14 +894,22 @@ class _MaintenancePassThrough:
             Completes the operation described above.
         """
         self.paths: list[str] = []
+        self.states: list[bool] = []
 
-    async def handle(self, adapter: TransportAdapter) -> None:
+    async def handle(
+        self,
+        adapter: TransportAdapter,
+        *,
+        under_maintenance: bool | None = None,
+    ) -> None:
         """Record the request and permit subsequent security checks.
 
         Parameters
         ----------
         adapter : TransportAdapter
             Incoming request adapter checked by the maintenance collaborator.
+        under_maintenance : bool | None, optional
+            Current maintenance state provided by the application.
 
         Returns
         -------
@@ -897,6 +917,7 @@ class _MaintenancePassThrough:
             Completes the operation described above.
         """
         self.paths.append(adapter.path())
+        self.states.append(bool(under_maintenance))
 
 class _StubRsgiScope:
     """Granian RSGI scope double exposing the fields the adapter reads."""
@@ -1536,6 +1557,33 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(app.build_calls.count(_Controller), 2)
         self.assertEqual(catch.handled, [])
 
+    async def testHealthEndpointRemainsAvailableDuringMaintenance(self) -> None:
+        """Allow the health route to report the current maintenance state.
+
+        Returns
+        -------
+        None
+            Assertions verify the health handler remains reachable.
+        """
+        routes = make_routes()
+        routes["GET"]["static"]["/health"] = replace(
+            make_route("/health", controller="DefaultResponses"),
+            action={
+                "module": "orionis.http.default.responses",
+                "class": "DefaultResponses", "method": "health",
+            },
+        )
+        kernel, _app, responses, catch = await boot_kernel(
+            routes=routes,
+            maintenance=True,
+        )
+
+        response = await dispatch(kernel, "/health")
+
+        self.assertEqual(response.getBody(), b"health:1")
+        self.assertEqual(responses.health_calls, 1)
+        self.assertEqual(catch.handled, [])
+
     async def testRendersAPreloadedViewRoute(self) -> None:
         """Render a view route through its preloaded template descriptor.
 
@@ -1829,7 +1877,45 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(allowed.getBody(), b"api")
         self.assertEqual(rejected.getStatusCode(), 400)
         self.assertEqual(maintenance.paths, ["/api", "/api"])
+        self.assertEqual(maintenance.states, [True, True])
         self.assertEqual(catch.handled, [])
+
+    async def testMaintenanceChangesApplyToAnAlreadyBootedKernel(self) -> None:
+        """Observe down/up transitions without rebuilding the HTTP kernel.
+
+        Returns
+        -------
+        None
+            Assertions verify each request uses the current application state.
+        """
+        kernel, app, _responses, _catch = await boot_kernel()
+
+        app.maintenance = True
+        down_response = await dispatch(kernel, "/api")
+        app.maintenance = False
+        up_response = await dispatch(kernel, "/api")
+
+        self.assertEqual(down_response.getStatusCode(), 503)
+        self.assertEqual(up_response.getStatusCode(), 200)
+
+    async def testSkipsMaintenanceMiddlewareWhileApplicationIsUp(self) -> None:
+        """Invoke the maintenance collaborator only for a down application.
+
+        Returns
+        -------
+        None
+            Assertions verify the middleware call path for each state.
+        """
+        kernel, app, _responses, _catch = await boot_kernel()
+        maintenance = _MaintenancePassThrough()
+        with replace_attribute(kernel, "_KernelHTTP__under_maintenance", maintenance):
+            await dispatch(kernel, "/api")
+            self.assertEqual(maintenance.paths, [])
+
+            app.maintenance = True
+            await dispatch(kernel, "/api")
+            self.assertEqual(maintenance.paths, ["/api"])
+            self.assertEqual(maintenance.states, [True])
 
     async def testRejectsEveryRequestUnderMaintenance(self) -> None:
         """Answer with ``503`` while the application is under maintenance.

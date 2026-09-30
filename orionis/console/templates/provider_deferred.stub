@@ -1,0 +1,46 @@
+from orionis.container.providers import DeferrableProvider
+from orionis.container.providers import ServiceProvider
+
+class {{class_name}}(ServiceProvider, DeferrableProvider):
+    """Register services that load only when the application needs them."""
+
+    def register(self) -> None:
+        """
+        Bind application services into the service container.
+
+        Add service bindings and dependency registrations required by the
+        application.
+
+        Returns
+        -------
+        None
+            This method registers services without returning a value.
+        """
+        # Register application-specific services here.
+
+    async def boot(self) -> None:
+        """
+        Initialize application services after registration.
+
+        Perform asynchronous setup that depends on services already being
+        available in the container.
+
+        Returns
+        -------
+        None
+            This method completes initialization without returning a value.
+        """
+        # Perform any asynchronous bootstrapping tasks here.
+
+    @classmethod
+    def provides(cls) -> list[type | str]:
+        """
+        Return the services that can trigger deferred provider loading.
+
+        Returns
+        -------
+        list[type | str]
+            Service types or identifiers offered by this provider.
+        """
+        # Return a list of services that this provider offers.
+        return []

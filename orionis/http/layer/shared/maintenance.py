@@ -42,6 +42,8 @@ class UnderMaintenanceMiddleware:
     async def handle(
         self,
         adapter: TransportAdapter,
+        *,
+        under_maintenance: bool | None = None,
     ) -> Response | None:
         """
         Return a 503 response if the application is under maintenance.
@@ -51,6 +53,8 @@ class UnderMaintenanceMiddleware:
         adapter : TransportAdapter
             Transport adapter providing header access and client-preference
             detection via ``wantsJson()``.
+        under_maintenance : bool | None, optional
+            Current application state; uses the constructor value when omitted.
 
         Returns
         -------
@@ -58,7 +62,12 @@ class UnderMaintenanceMiddleware:
             A 503 response when the application is in maintenance mode,
             ``None`` otherwise.
         """
-        if not self.__under_maintenance:
+        is_under_maintenance = (
+            self.__under_maintenance
+            if under_maintenance is None
+            else under_maintenance
+        )
+        if not is_under_maintenance:
             return None
 
         return await self.__default_responses.error(

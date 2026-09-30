@@ -1,0 +1,59 @@
+from orionis.foundation.contracts.application import IApplication
+from orionis.mail import Address, Content, Envelope, Mailable
+
+class {{class_name}}(Mailable):
+    """Declare a reusable message for application notifications."""
+
+    __slots__ = ("application",)
+
+    def __init__(self, application: IApplication) -> None:
+        """
+        Store application services used to prepare this message.
+
+        Parameters
+        ----------
+        application : IApplication
+            Application instance that provides runtime configuration.
+
+        Returns
+        -------
+        None
+            Store the application for use by the message declarations.
+        """
+        self.application: IApplication = application
+
+    def envelope(self) -> Envelope:
+        """
+        Declare the message subject and headers.
+
+        Returns
+        -------
+        Envelope
+            Message envelope. MailManager applies the configured global sender
+            when this declaration does not specify a From address.
+        """
+        address: object = self.application.config("mail.from_address.address")
+        name: object = self.application.config("mail.from_address.name")
+        sender: Address | None = None
+        if isinstance(address, str) and address.strip():
+            display_name: str | None = (
+                name.strip()
+                if isinstance(name, str) and name.strip()
+                else None
+            )
+            sender = Address(address.strip(), display_name)
+        return Envelope(
+            subject="Notification subject",
+            from_address=sender,
+        )
+
+    def content(self) -> Content:
+        """
+        Declare the message body or view.
+
+        Returns
+        -------
+        Content
+            Body declaration rendered by the configured mail pipeline.
+        """
+        return Content(text="Notification message")

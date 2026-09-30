@@ -24,7 +24,7 @@ delivery pipeline. Production transports are **SMTP** and **file** only.
 ```text
 Mail facade / IMailManager
     -> independent PendingMail
-    -> Mailable declarations OR direct Content + operation-local Message
+    -> Mailable instance OR class built by the application container OR direct Content
     -> merged, validated Envelope
     -> IViewEngine.render + IStorageManager.disk(...).file(...).open(...)
     -> EmailMessage -> immutable PreparedMail (MIME bytes + transport envelope)
@@ -34,9 +34,9 @@ Mail facade / IMailManager
 | Component | Responsibility |
 | --- | --- |
 | [MailManager](../manager.py) / [IMailManager](../contracts/manager.py) | Read central configuration and register/resolve factories. |
-| [PendingMail](../pending.py) | Derive independent synchronous chains; implement all async terminals. |
+| [PendingMail](../pending.py) | Derive independent chains and build Mailable classes at async terminals. |
 | [Message](../message.py) | Mutate the configuration of one direct-send callback. |
-| [Mailable](../mailable.py) | Declare reusable envelope, content, and attachments synchronously. |
+| [Mailable](../mailable.py) | Declare envelope, content, and attachments; its class can receive container dependencies. |
 | [MailComposer](../composer.py) | Validate, render views, close storage streams, and serialize MIME. |
 | [IMailTransport](../contracts/transport.py) | Consume prepared bytes and the separate transport envelope. |
 | [MailProvider](../provider.py) | Bind shared services and eagerly pin the facade. |
@@ -255,7 +255,8 @@ All terminals return `MailResult` and exist on the manager, facade and chains:
 
 | Operation | Interpretation |
 | --- | --- |
-| `await Mail.send(mailable)` | Synchronous Mailable declarations; no `data` or callback accepted. |
+| `await Mail.send(mailable)` | Sends an already constructed instance; no `data` or callback accepted. |
+| `await Mail.send(MailableClass)` | Builds a fresh Mailable with `app.build()` and injects its dependencies; no `data` or callback accepted. |
 | `await Mail.send(view, data=None, callback=None)` | A string always identifies an HTML view. |
 | `await Mail.send(content, *, callback=None)` | A Content owns its data; an additional data argument is invalid. |
 | `await Mail.raw(text, callback=None)` | Literal plain text. |
@@ -324,6 +325,62 @@ async def send_welcome() -> MailResult:
 If `envelope()` already declares recipients, `await Mail.send(mailable)` is
 enough. `envelope()` and `content()` are mandatory synchronous declarations;
 `attachments()` defaults to an empty sequence. Sending never mutates a Mailable.
+
+### Mailable with constructor dependencies
+
+Pass the **class** to `send()` so the application container builds the Mailable
+and injects its dependencies. Register application services in a provider; the
+Mailable constructor declares the types it needs. Each send builds a fresh
+instance. If you need to pass operation-specific values to the constructor,
+build it first with `await app.build(...)` and send that instance.
+
+```python
+from orionis.container.providers import ServiceProvider
+from orionis.mail import Content, Envelope, MailResult, Mailable
+from orionis.support.facades.mail import Mail
+
+
+class WelcomeText:
+    __slots__ = ()
+
+    def make(self) -> str:
+        return "Welcome to our application."
+
+
+class WelcomeMail(Mailable):
+    __slots__ = ("welcome_text",)
+
+    def __init__(self, welcome_text: WelcomeText) -> None:
+        self.welcome_text = welcome_text
+
+    def envelope(self) -> Envelope:
+        return Envelope(
+            from_address="no-reply@example.com",
+            subject="Welcome",
+            to="ana@example.com",
+        )
+
+    def content(self) -> Content:
+        return Content(text=self.welcome_text.make())
+
+
+class WelcomeTextProvider(ServiceProvider):
+    __slots__ = ()
+
+    def register(self) -> None:
+        self.app.singleton(WelcomeText, WelcomeText)
+
+
+async def send_welcome() -> MailResult:
+    return await Mail.send(WelcomeMail)
+```
+
+Sending a class requires the application's mail manager to access its
+container. If a constructor requests a type that cannot be resolved, sending
+fails before message preparation or transport and preserves the resolution
+error as the exception cause. Include `WelcomeTextProvider` in application
+startup, for example with `app.withProviders(WelcomeTextProvider)` before
+calling `create()`.
 
 ### Controller without a Mailable
 
@@ -574,7 +631,7 @@ Exceptions live in `orionis.mail.exceptions`:
 | --- | --- |
 | `MailException` | Common mail failure base. |
 | `MailConfigurationException` | Unknown/malformed mailer, driver, factory, or selected transport options. |
-| `MailCompositionException` | Invalid API combinations, headers, Mailable declarations, callbacks, views, or MIME. |
+| `MailCompositionException` | Invalid API combinations, Mailable resolution, headers, declarations, callbacks, views, or MIME. |
 | `MailAttachmentException` | Composition subclass for unsafe or unreadable attachments. |
 | `MailTransportException` | SMTP transaction or file publication failure. |
 

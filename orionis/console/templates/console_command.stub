@@ -1,0 +1,36 @@
+from typing import ClassVar
+from orionis.console import Argument
+from orionis.console.base import BaseCommand
+
+class {{class_name}}(BaseCommand):
+    """
+    Run a registered application command from the Orionis CLI.
+
+    The command signature and description appear in command help. Add command
+    arguments to ``arguments`` and implement the operation in ``handle``.
+    """
+
+    # Command signature for registration (e.g., "user:create {name}")
+    signature: str = {{signature_literal}}
+
+    # Command description shown in help
+    description: str = {{description_literal}}
+
+    # List of Argument instances defining command-line options and arguments
+    arguments: ClassVar[list[Argument]] = []
+
+    async def handle(self) -> None:
+        """
+        Run the operation implemented by this command.
+
+        Read parsed values with ``getArgument`` or ``getArguments``. Use the
+        command output methods such as ``info``, ``success``, ``warning`` and
+        ``error`` to report progress to the console.
+
+        Returns
+        -------
+        None
+            This method writes command output through the console methods.
+        """
+        error_message = "Implement the command logic."
+        raise NotImplementedError(error_message)

@@ -1,0 +1,15 @@
+from orionis.test import TestCase
+
+class {{class_name}}(TestCase):
+    """Describe the application behavior covered by this test case."""
+
+    async def testExample(self) -> None:
+        """
+        Describe one expected behavior and add its assertions.
+
+        Returns
+        -------
+        None
+            The test completes after its assertions pass.
+        """
+        self.skipTest("Replace this placeholder with assertions.")

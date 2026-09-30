@@ -201,7 +201,7 @@ class KernelHTTP(IKernelHTTP):
         "__default_responses",
         "__fallback",
         "__fn_dispatch",
-        "__maintenance_enabled",
+        "__health_path",
         "__middleware_cache",
         "__printer_enabled",
         "__proxies",
@@ -275,6 +275,7 @@ class KernelHTTP(IKernelHTTP):
             default_responses=self.__default_responses,
             under_maintenance=self.__app.underMaintenance(),
         )
+        self.__health_path = self.__app.routeHealthCheck.rstrip("/")
 
         # Resolve web identities only after session restoration and CSRF checks.
         self.__web_middleware: tuple = (
@@ -425,8 +426,7 @@ class KernelHTTP(IKernelHTTP):
             under_maintenance=under_maintenance,
             default_responses=default_responses,
         )
-        # Record whether maintenance and rate limiting are active.
-        self.__maintenance_enabled = under_maintenance
+        # Record whether rate limiting is active.
         self.__rate_limit_enabled = self.__rate_limit.isEnabled()
 
     async def __rsgiResponse(
@@ -523,9 +523,16 @@ class KernelHTTP(IKernelHTTP):
         # Default pages need their assets even when application access is denied.
         path = adapter.path()
         is_asset = path.startswith(DefaultResponses.ASSET_PREFIX)
-        # Return 503 immediately when the application is in maintenance mode.
-        if self.__maintenance_enabled and not is_asset:
-            response = await self.__under_maintenance.handle(adapter)
+        # Check shared maintenance state for application routes.
+        if (
+            not is_asset
+            and path.rstrip("/") != self.__health_path
+            and self.__app.underMaintenance()
+        ):
+            response = await self.__under_maintenance.handle(
+                adapter,
+                under_maintenance=True,
+            )
             if response is not None:
                 return response
         # Enforce baseline security header policies.

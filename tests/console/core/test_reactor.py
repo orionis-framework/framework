@@ -1,13 +1,16 @@
 from __future__ import annotations
+
 import argparse
 import inspect
 from unittest.mock import AsyncMock, MagicMock
-from orionis.console.fluent.contracts.command import ICommand
-from orionis.console.core.reactor import Reactor
+
 from orionis.console.core.contracts.reactor import IReactor
+from orionis.console.core.reactor import Reactor
 from orionis.console.entities.command import Command
+from orionis.console.fluent.contracts.command import ICommand
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.test import TestCase
+
 
 def _make_mock_command(
     signature: str = "test:cmd",
@@ -494,6 +497,22 @@ class TestReactor(TestCase):
         await self.reactor.call("log:cmd")
 
         self.mock_logger.info.assert_called_once()
+
+    async def testCallDoesNotRecreateClearedLogs(self) -> None:
+        """Leave log files absent after the log cleanup command completes.
+
+        Returns
+        -------
+        None
+            The reactor does not write a new completion log entry.
+        """
+        command = _make_mock_command(signature="clear:logs", timestamps=False)
+        self.mock_loader.get = AsyncMock(return_value=command)
+
+        result = await self.reactor.call("clear:logs")
+
+        self.assertEqual(result, 0)
+        self.mock_logger.info.assert_not_called()
 
     async def testCallBuildsCommandInstanceViaApp(self) -> None:
         """Verify that call() uses the app container to build the command instance.

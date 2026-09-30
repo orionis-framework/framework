@@ -1,0 +1,24 @@
+from orionis.database.contracts.migration import Migration
+
+class {{migration_class_name}}(Migration):
+    """Describe the schema changes applied and reverted by this migration."""
+
+    async def up(self) -> None:
+        """
+        Apply this migration's database changes.
+
+        Returns
+        -------
+        None
+            Complete after the developer-defined changes are applied.
+        """
+
+    async def down(self) -> None:
+        """
+        Reverse the changes applied by this migration.
+
+        Returns
+        -------
+        None
+            Complete after the developer-defined changes are reverted.
+        """

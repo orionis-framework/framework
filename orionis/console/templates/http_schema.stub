@@ -1,0 +1,8 @@
+from orionis.schemas import Schema
+
+class {{class_name}}(Schema):
+    """
+    Declare the fields and validation rules for an HTTP payload.
+
+    Add typed fields and schema metadata to describe the accepted request data.
+    """

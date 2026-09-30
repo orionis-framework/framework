@@ -1,81 +1,97 @@
-import os
-import sys
 import compileall
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
+import sys
 from pathlib import Path
 from orionis.console.base.command import BaseCommand
+from orionis.console.output.console import Console
+from orionis.foundation.contracts.application import IApplication
 
-# Frozen set of well-known virtual environment directory names to exclude
 _VENV_DIR_NAMES: frozenset[str] = frozenset(
     {".venv", "venv", "env", ".env", "virtualenv"},
 )
-
-# Active virtual environment directory base name; empty string when not inside a venv
 _ACTIVE_VENV_BASENAME: str = (
     Path(sys.prefix).name if sys.prefix != sys.base_prefix else ""
 )
-
-# Complete set of directory names to exclude during the project tree walk
-_SKIP_DIRS: frozenset[str] = (
-    _VENV_DIR_NAMES | frozenset({_ACTIVE_VENV_BASENAME})
-    if _ACTIVE_VENV_BASENAME
-    else _VENV_DIR_NAMES
+_SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
+    {
+        ".git",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+        "__pycache__",
+        "build",
+        "dist",
+        "node_modules",
+    },
 )
+if _ACTIVE_VENV_BASENAME:
+    _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 
-# Preconfigured callable for bytecode compilation with fixed parameters
-_COMPILE_FILE = partial(compileall.compile_file, force=True, optimize=2, quiet=1)
 
 class OptimizeCommand(BaseCommand):
+    """Compile application Python source files into optimized bytecode."""
 
-    # Indicates whether timestamps will be shown in the command output
+    # ruff: noqa: TC001
+
     timestamps: bool = True
-
-    # Command signature and description
     signature: str = "optimize"
+    description: str = "Compile application Python files to optimized bytecode."
 
-    # Command description
-    description: str = (
-        "Compiles Python files to optimized bytecode and removes "
-        "configuration, route, and command caches."
-    )
+    def handle(self, app: IApplication, console: Console) -> int: # NOSONAR
+        """
+        Compile Python modules below the application root.
 
-    def handle(self) -> None:
-        """Compile project Python files into optimized bytecode.
+        Parameters
+        ----------
+        app : IApplication
+            Application providing the project root.
+        console : Console
+            Console used to report compilation results.
 
         Returns
         -------
-        None
-            Return ``None`` after reporting success or failure to the console.
+        int
+            Zero when every source compiles; one when compilation or traversal fails.
         """
-        try:
+        source_count = 0
+        errors: list[str] = []
+        for root, directories, filenames in app.basePath.walk(
+            top_down=True,
+            on_error=lambda error: errors.append(str(error)),
+        ):
+            directories[:] = [
+                name
+                for name in directories
+                if name not in _SKIP_DIRS and not name.endswith(".egg-info")
+            ]
+            for filename in filenames:
+                if not filename.endswith(".py"):
+                    continue
+                source_count += 1
+                source_file = root / filename
+                try:
+                    compiled = compileall.compile_file(
+                        str(source_file),
+                        force=True,
+                        optimize=2,
+                        quiet=1,
+                    )
+                except (OSError, RuntimeError, ValueError) as error:
+                    errors.append(f"{source_file}: {error}")
+                else:
+                    if not compiled:
+                        errors.append(f"Could not compile {source_file}.")
 
-            # Local reference to the OS path join function
-            path_join = os.path.join
-
-            # Traverse the project tree and collect all Python source file paths,
-            # skipping virtual environment directories
-            py_files: list[str] = []
-            for root, dirs, files in os.walk(".", topdown=True):
-                dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
-                py_files.extend(
-                    path_join(root, f) for f in files if f.endswith(".py")
-                )
-
-            # Compile all collected files in parallel across all available CPU cores
-            with ProcessPoolExecutor() as executor:
-                list(executor.map(_COMPILE_FILE, py_files, chunksize=4))
-
-            # Log the results of the optimization process to the console
-            self.success(
-                "Application optimized successfully.",
+        if errors:
+            console.error(
+                f"Application optimization failed for {len(errors)} item(s).",
                 timestamp=False,
             )
+            for error in errors:
+                console.error(error, timestamp=False)
+            return 1
 
-        except (OSError, ValueError, RuntimeError) as e:
-
-            # Log any errors that occur during the optimization process to the console
-            self.error(
-                f"An error occurred during optimization: {e}",
-                timestamp=False,
-            )
+        console.success(
+            f"Optimized {source_count} Python file(s).",
+            timestamp=False,
+        )
+        return 0

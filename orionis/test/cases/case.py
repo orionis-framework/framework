@@ -21,6 +21,11 @@ _LIFECYCLE_HOOKS: frozenset[str] = frozenset({
 # Precompiled regex for the default glob pattern avoids repeated fnmatch compilation.
 _DEFAULT_PATTERN: re.Pattern[str] = re.compile(fnmatch.translate("test*"))
 
+# unittest enables asyncio debug for every isolated test. Its 0.1-second
+# default reports routine test work as a slow task; retain debug with a
+# threshold that highlights substantial event-loop blocking.
+_SLOW_CALLBACK_DURATION: float = 1.0
+
 # Context-local pattern: a value set by one run is never seen by another run
 # executing in a different task or thread.
 _METHOD_PATTERN: ContextVar[re.Pattern[str]] = ContextVar(
@@ -72,6 +77,12 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
             original = object.__getattribute__(self, method_name)
             if callable(original):
                 object.__setattr__(self, method_name, self._resolveTest(original))
+
+    def _setupAsyncioRunner(self) -> None:
+        """Keep asyncio debug checks with a practical slow-task threshold."""
+        super()._setupAsyncioRunner()
+        loop = self._asyncioRunner.get_loop()
+        loop.slow_callback_duration = _SLOW_CALLBACK_DURATION
 
     def _resolveTest(self, method: Callable[..., Any]) -> Callable[..., Any]:
         """

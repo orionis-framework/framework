@@ -59,6 +59,16 @@ class _DefaultFixture:
         """
         return self.settings[key]
 
+    def underMaintenance(self) -> bool:
+        """Return the maintenance state configured for the response tests.
+
+        Returns
+        -------
+        bool
+            Whether health responses should report maintenance mode.
+        """
+        return self.settings["app.maintenance"]
+
     def storageAppPublic(self) -> Path:
         """
         Return the public asset directory.
@@ -247,6 +257,33 @@ def _defaults(directory: Path) -> DefaultResponses:
     return DefaultResponses(fixture, fixture, Jinja2Engine(ViewEnvironment(fixture)))
 
 class TestDefaultResponseCache(TestCase):
+
+    async def testHealthResponseReadsCurrentMaintenanceState(self) -> None:
+        """Report maintenance changes made after the response service boots.
+
+        Returns
+        -------
+        None
+            Assertions verify health status follows current application state.
+        """
+        with TemporaryDirectory() as directory:
+            fixture = _DefaultFixture(Path(directory))
+            defaults = DefaultResponses(
+                fixture,
+                fixture,
+                Jinja2Engine(ViewEnvironment(fixture)),
+            )
+            request = _Request(wants_json=True)
+
+            healthy = await defaults.health(request)
+            fixture.settings["app.maintenance"] = True
+            under_maintenance = await defaults.health(request)
+            fixture.settings["app.maintenance"] = False
+            restored = await defaults.health(request)
+
+        self.assertEqual(healthy.getStatusCode(), 200)
+        self.assertEqual(under_maintenance.getStatusCode(), 503)
+        self.assertEqual(restored.getStatusCode(), 200)
 
     async def testHealthResponsesDoNotShareMutableState(self) -> None:
         """Keep headers and flash data private to each health request.

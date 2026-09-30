@@ -3,14 +3,14 @@ from rich.panel import Panel
 from orionis.console.base.command import BaseCommand
 from orionis.console.core.contracts.reactor import IReactor
 
-# Static header portion of the help text, built once at import time
+# Show usage, an example, and the available command list heading.
 _USAGE_HEADER: str = (
     "[bold cyan]Usage:[/]\n  python reactor <command> <params/flags>\n\n"
     "[bold cyan]Example:[/]\n  python reactor app:command --flag\n\n"
     "[bold cyan]Available Commands:[/]\n"
 )
 
-# Static footer portion of the help text, built once at import time
+# Show the help option after the registered commands.
 _USAGE_FOOTER: str = (
     "\n[bold cyan]Options:[/]\n"
     "  -h, --help    Show this help message and exit"
@@ -20,13 +20,13 @@ class HelpCommand(BaseCommand):
 
     # ruff: noqa: TC001, TC002
 
-    # Indicates whether timestamps will be shown in the command output
+    # Control whether this command includes timestamps in its output.
     timestamps: bool = False
 
-    # Command signature and description
+    # Identify the command in the CLI registry.
     signature: str = "list"
 
-    # Command description
+    # Describe the information displayed by this command.
     description: str = "Show available commands and usage."
 
     async def handle(
@@ -49,11 +49,10 @@ class HelpCommand(BaseCommand):
         None
             This method outputs help information to the console and returns None.
         """
-        # Retrieve the list of available commands from the reactor
+        # Get the commands registered with the reactor.
         commands = await reactor.info()
 
-        # Extract signature/description pairs and compute the max signature
-        # length in a single pass to avoid iterating over commands twice
+        # Collect command labels and determine the width used to align them.
         pairs: list[tuple[str, str]] = []
         max_sig_len: int = 0
         for cmd in commands:
@@ -63,15 +62,14 @@ class HelpCommand(BaseCommand):
             sig_len = len(sig)
             max_sig_len = max(max_sig_len, sig_len)
 
-        # Build each command row as a list element and join once to avoid
-        # O(N²) string allocations from repeated += concatenation
+        # Format one aligned help row for each registered command.
         rows: list[str] = [
             f"  [bold yellow]{sig:<{max_sig_len}}[/]  {desc}\n"
             for sig, desc in pairs
         ]
         usage = _USAGE_HEADER + "".join(rows) + _USAGE_FOOTER
 
-        # Assemble the panel with the full help text
+        # Build the panel containing usage information and command rows.
         panel = Panel(
             usage,
             title="[bold green]Orionis Framework | Reactor CLI[/]",
@@ -80,7 +78,7 @@ class HelpCommand(BaseCommand):
             padding=(1, 2),
         )
 
-        # Print the panel to the console
+        # Display the help panel between blank lines.
         console.print()
         console.print(panel)
         console.print()

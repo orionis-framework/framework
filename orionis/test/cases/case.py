@@ -33,7 +33,6 @@ _METHOD_PATTERN: ContextVar[re.Pattern[str]] = ContextVar(
     default=_DEFAULT_PATTERN,
 )
 
-
 class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
 
     @classmethod
@@ -79,7 +78,17 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
                 object.__setattr__(self, method_name, self._resolveTest(original))
 
     def _setupAsyncioRunner(self) -> None:
-        """Keep asyncio debug checks with a practical slow-task threshold."""
+        """
+        Configure the event loop's slow-callback threshold.
+
+        Keep asyncio debug checks enabled while reporting substantial event-loop
+        blocking.
+
+        Returns
+        -------
+        None
+            Set the loop's ``slow_callback_duration`` to the configured threshold.
+        """
         super()._setupAsyncioRunner()
         loop = self._asyncioRunner.get_loop()
         loop.slow_callback_duration = _SLOW_CALLBACK_DURATION

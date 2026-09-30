@@ -247,6 +247,11 @@ class _HttpApp(auth_fixtures._StubApp):
         """
         return False
 
+    @property
+    def routeHealthCheck(self) -> str:
+        """Provide the health route required by the HTTP kernel."""
+        return "/health"
+
 
 class _HttpCatch:
     """Use the real exception status mapping without writing application logs."""
@@ -394,6 +399,9 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         """
         await super().asyncSetUp()
         self.http_app = _HttpApp(Path(self._tmp.name))
+        self.addCleanup(
+            Container._instances.pop, type(self.http_app.container), None,
+        )
         self.http_app.instance(IAuthManager, self.auth)
         self.http_app.instance(IPermissionRepository, self.permissions)
         self.http_app.instance(_Rendezvous, _Rendezvous())
@@ -428,17 +436,6 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         }
         self.kernel = KernelHTTP(self.http_app, self.catch)
         await self.kernel.boot()
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the test container and its database after every request scenario.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        Container._instances.pop(type(self.http_app.container), None)
-        await super().asyncTearDown()
 
     async def asgi(
         self, path: str, headers: list[tuple[bytes, bytes]] | None = None,

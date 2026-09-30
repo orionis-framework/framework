@@ -6,8 +6,8 @@ from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.migration import Migration
 from orionis.database.contracts.migrator import IMigrator
 from orionis.database.exceptions import MigrationNotFoundException
-from orionis.database.migrations.events import NO_EVENTS, MigrationEvents
 from orionis.database.migrations.context import migration_connection_scope
+from orionis.database.migrations.events import NO_EVENTS, MigrationEvents
 from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.introspection.modules.reflection import ReflectionModule
@@ -364,15 +364,18 @@ class Migrator(IMigrator):
 
         rows = self.__selectBatches(ran, steps)
         discovered = self.__discover()
+        # Resolve all recorded classes before changing the schema.
+        for row in rows:
+            name = row["migration"]
+            if name not in discovered:
+                error_msg = f"Migration class for '{name}' could not be found."
+                raise MigrationNotFoundException(error_msg)
+
         reporter = events or NO_EVENTS
         reverted: list[str] = []
         for row in rows:
             name = row["migration"]
-            migration_cls = discovered.get(name)
-            if migration_cls is None:
-                error_msg = f"Migration class for '{name}' could not be found."
-                raise MigrationNotFoundException(error_msg)
-            await self.__runStep(target, name, migration_cls, None, reporter)
+            await self.__runStep(target, name, discovered[name], None, reporter)
             reverted.append(name)
         return reverted
 
@@ -501,13 +504,19 @@ class Migrator(IMigrator):
         The result is cached on the instance after the first call, since
         the migrations directory does not change during a process
         lifetime and discovery involves filesystem traversal, module
-        imports, and reflection.
+        imports, and reflection. Only classes defined in a migration
+        module are eligible; package initializers and reexports are ignored.
 
         Returns
         -------
         dict of str to type
             Migration classes keyed by module file stem, ordered
             chronologically (filenames are zero-padded sequential ids).
+
+        Raises
+        ------
+        ValueError
+            If multiple classes share a persisted migration name.
         """
         # Reuse the previously discovered migrations, if any.
         if self.__discovered_cache is not None:
@@ -525,10 +534,22 @@ class Migrator(IMigrator):
 
         found: dict[str, type[Migration]] = {}
         for module_name in modules:
+            stem = module_name.rsplit(".", 1)[-1]
+            if stem == "__init__":
+                continue
             rf_module = ReflectionModule(module_name)
             for obj in rf_module.getClasses().values():
-                if issubclass(obj, Migration) and obj is not Migration:
-                    found[module_name.rsplit(".", 1)[-1]] = obj
+                if obj.__module__ != module_name or not issubclass(obj, Migration):
+                    continue
+                previous = found.get(stem)
+                if previous is not None:
+                    error_msg = (
+                        f"Ambiguous migration '{stem}': "
+                        f"{previous.__module__}.{previous.__name__} and "
+                        f"{module_name}.{obj.__name__}."
+                    )
+                    raise ValueError(error_msg)
+                found[stem] = obj
 
         self.__discovered_cache = dict(sorted(found.items()))
         return self.__discovered_cache

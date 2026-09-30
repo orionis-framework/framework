@@ -1,5 +1,5 @@
 from typing import Self
-from orionis.console.commands.test.test_command import TestCommand
+from orionis.console.commands.test.test import TestCommand
 from orionis.test import TestCase
 from orionis.test.entities.result import TestResult
 from orionis.test.enums.status import TestStatus
@@ -222,6 +222,7 @@ _FULL_CONFIG: dict[str, object] = {
 }
 
 class TestTestCommandDefinition(TestCase):
+    """Verify the command signature and exposed argument definitions."""
 
     def testSignatureAndDescriptionAreDeclared(self) -> None:
         """Publish the signature consumed by the reactor.
@@ -260,6 +261,7 @@ class TestTestCommandDefinition(TestCase):
         )
 
 class TestTestCommandExitCode(TestCase):
+    """Verify exit codes for passing, failing, and empty test runs."""
 
     async def testPassingReportsReturnSuccess(self) -> None:
         """Report success when every test passed or was skipped.
@@ -325,6 +327,7 @@ class TestTestCommandExitCode(TestCase):
         self.assertEqual(code, _SUCCESS)
 
 class TestTestCommandOptionResolution(TestCase):
+    """Verify precedence and forwarding of command option values."""
 
     async def _apply(
         self,

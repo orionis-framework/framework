@@ -1,7 +1,10 @@
 import argparse
 import importlib
 import re
-from typing import Any, TYPE_CHECKING
+from pathlib import Path
+from typing import Any
+from orionis.cache.contracts.file_based_cache import IFileBasedCache
+from orionis.cache.file_based_cache import FileBasedCache
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.base.contracts.command import IBaseCommand
@@ -12,21 +15,18 @@ from orionis.console.enums.actions import ArgumentAction as _ArgumentAction
 from orionis.console.fluent.command import Command as FluentCommand
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.foundation.contracts.application import IApplication
-from orionis.cache.contracts.file_based_cache import IFileBasedCache
-from orionis.cache.file_based_cache import FileBasedCache
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.introspection.modules.reflection import ReflectionModule
 from orionis.support.types.sentinel import MISSING as _MISSING
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
-# Module-level constants to avoid repeated computation in hot paths
+# Define the sentinel type and command signature pattern.
 _MISSING_TYPE = type(_MISSING)
-_SIGNATURE_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9_:]*[a-zA-Z0-9]$|^[a-zA-Z]$")
+_CORE_COMMANDS_PATH = Path(__file__).with_name("commands.py").resolve()
+_SIGNATURE_RE: re.Pattern[str] = re.compile(
+    r"[a-z][a-z0-9]*(?::[a-z][a-z0-9]*(?:-[a-z0-9]+)*)?",
+)
 
 class Loader(ILoader):
-
     # ruff: noqa: TC001
 
     def __init__(self, app: IApplication) -> None:
@@ -81,7 +81,10 @@ class Loader(ILoader):
             path=self.__app.compiledPath,
             filename="commands",
             monitored_dirs=self.__app.compiledInvalidationPathsDirs,
-            monitored_files=self.__app.compiledInvalidationPathsFiles,
+            monitored_files=[
+                *self.__app.compiledInvalidationPathsFiles,
+                _CORE_COMMANDS_PATH,
+            ],
         )
 
     async def get(self, signature: str) -> Command | None:
@@ -165,7 +168,6 @@ class Loader(ILoader):
         """
         # Validate that handler is a list with at least one element
         if not isinstance(handler, list) or len(handler) < 1:
-
             # Handler must be a list with at least one element (the callable)
             error_msg = (
                 "Handler must be a list with at least one element (the callable)."
@@ -174,7 +176,6 @@ class Loader(ILoader):
 
         # Ensure the first element is a class
         if not callable(handler[0]) or not hasattr(handler[0], "__name__"):
-
             # The first element of handler must be a class
             error_msg = "The first element of handler must be a class."
             raise TypeError(error_msg)
@@ -239,19 +240,17 @@ class Loader(ILoader):
 
         # Iterate through all module names discovered in the commands directory
         for module_name in modules:
-
             # Reflect the module to access its classes
             rf_module = ReflectionModule(module_name)
             classes = rf_module.getClasses()
 
             # Iterate through all classes found in the current module
             for obj in classes.values():
-
                 # Check if the class is a valid command class
                 if (
-                    issubclass(obj, BaseCommand) and
-                    obj is not BaseCommand and
-                    obj is not IBaseCommand
+                    issubclass(obj, BaseCommand)
+                    and obj is not BaseCommand
+                    and obj is not IBaseCommand
                 ):
                     sign = self.__getSignature(obj)
                     self.__metadata[sign] = {
@@ -286,7 +285,6 @@ class Loader(ILoader):
 
         # Iterate through each route file path
         for route_file in routes_path:
-
             # Convert file path to relative path from application root
             relative_path = route_file.relative_to(app_root)
 
@@ -313,15 +311,12 @@ class Loader(ILoader):
 
         # Iterate through all fluent command definitions
         for f_command in self.__fluent_commands:
-
             # Retrieve signature and command entity
             signature, command = f_command.get()
 
             # Convert Argument instances to dictionaries for metadata storage
             arguments = (
-                [self.__argToDict(arg) for arg in command.args]
-                if command.args
-                else []
+                [self.__argToDict(arg) for arg in command.args] if command.args else []
             )
 
             # Register command metadata
@@ -357,39 +352,38 @@ class Loader(ILoader):
         TypeError
             If the 'signature' attribute is not a string.
         """
-        # Ensure the command class has a 'signature' attribute
-        if not hasattr(obj, "signature"):
+        # Read the declared signature from the command class.
+        try:
+            signature = obj.signature
+        except AttributeError as exc:
             error_msg = (
                 f"Command class {obj.__name__} must have a 'signature' attribute."
             )
-            raise ValueError(error_msg)
+            raise ValueError(error_msg) from exc
 
         # Ensure the signature attribute is a string
-        if not isinstance(obj.signature, str):
-            error_msg = (
-                f"Command class {obj.__name__} 'signature' must be a string."
-            )
+        if not isinstance(signature, str):
+            error_msg = f"Command class {obj.__name__} 'signature' must be a string."
             raise TypeError(error_msg)
 
-        # Ensure the signature is not empty after stripping whitespace
-        if obj.signature.strip() == "":
+        # Normalize whitespace around the declared signature.
+        signature = signature.strip()
+        if not signature:
             error_msg = (
                 f"Command class {obj.__name__} 'signature' cannot be an empty string."
             )
             raise ValueError(error_msg)
 
-        # Validate the signature against the required pattern
-        if not _SIGNATURE_RE.match(obj.signature):
+        # Validate the complete signature against the required pattern.
+        if _SIGNATURE_RE.fullmatch(signature) is None:
             error_msg = (
                 f"Command class {obj.__name__} 'signature' must contain only "
-                "alphanumeric characters, underscores (_) and colons (:), cannot "
-                "start or end with underscore or colon, and cannot start with a "
-                "number."
+                "alphanumeric characters with an optional colon and "
+                "hyphen-separated suffix, and must start with a lowercase letter."
             )
             raise ValueError(error_msg)
 
-        # Return the validated signature
-        return obj.signature.strip()
+        return signature
 
     def __getTimestamps(
         self,
@@ -420,9 +414,7 @@ class Loader(ILoader):
 
         # Ensure the 'timestamps' attribute is a boolean
         if not isinstance(obj.timestamps, bool):
-            error_msg = (
-                f"Command class {obj.__name__} 'timestamps' must be a boolean."
-            )
+            error_msg = f"Command class {obj.__name__} 'timestamps' must be a boolean."
             raise TypeError(error_msg)
 
         # Return the value of the 'timestamps' attribute
@@ -463,9 +455,7 @@ class Loader(ILoader):
 
         # Ensure the description is a string
         if not isinstance(description, str):
-            error_msg = (
-                f"Command class {obj.__name__} 'description' must be a string."
-            )
+            error_msg = f"Command class {obj.__name__} 'description' must be a string."
             raise TypeError(error_msg)
 
         # Ensure the description is not empty
@@ -546,7 +536,7 @@ class Loader(ILoader):
         dict
             A dictionary with serialized argument properties.
         """
-        # Cache attribute lookups in locals to avoid repeated __getattribute__ calls
+        # Read the argument fields used in the serialized metadata.
         action = arg.action
         const = arg.const
         default = arg.default
@@ -562,7 +552,8 @@ class Loader(ILoader):
             "default": "__MISSING__" if isinstance(default, _MISSING_TYPE) else default,
             "type_": (
                 f"{type_.__module__}.{type_.__qualname__}"
-                if type_ is not None else None
+                if type_ is not None
+                else None
             ),
             "choices": list(choices) if choices is not None else None,
             "required": arg.required,
@@ -600,7 +591,7 @@ class Loader(ILoader):
             try:
                 mod = importlib.import_module(module_name)
                 d["type_"] = getattr(mod, qualname)
-            except (ImportError, AttributeError):
+            except ImportError, AttributeError:
                 d["type_"] = None
 
         # Restore MISSING sentinel from string marker.
@@ -646,7 +637,7 @@ class Loader(ILoader):
         arg_parser = argparse.ArgumentParser(
             epilog=(
                 "To ensure the command definition is up to date, run "
-                "'python reactor cache-clear' to clear the command cache."
+                "'python reactor optimize:clear' to clear the command cache."
             ),
             usage=f"python reactor {signature}",
             description=f"Command [{signature}]: {description}",
@@ -712,7 +703,7 @@ class Loader(ILoader):
         None
             Populates the internal metadata dictionary.
         """
-        # Skip if metadata already loaded (bool flag avoids dict truthiness check)
+        # Return when command metadata has already been loaded.
         if self.__metadata_loaded:
             return
 

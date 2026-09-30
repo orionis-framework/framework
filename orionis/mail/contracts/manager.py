@@ -207,7 +207,8 @@ class IMailManager(ABC):
         """
 
     @overload
-    async def send(self, mailable: Mailable, /) -> MailResult: ...
+    async def send(self, mailable: Mailable | type[Mailable], /) -> MailResult:
+        ...
 
     @overload
     async def send(
@@ -216,7 +217,8 @@ class IMailManager(ABC):
         /,
         data: Mapping[str, object] | None = None,
         callback: MessageCallback | None = None,
-    ) -> MailResult: ...
+    ) -> MailResult:
+        ...
 
     @overload
     async def send(
@@ -225,12 +227,13 @@ class IMailManager(ABC):
         /,
         *,
         callback: MessageCallback | None = None,
-    ) -> MailResult: ...
+    ) -> MailResult:
+        ...
 
     @abstractmethod
     async def send(
         self,
-        value: Mailable | str | Content,
+        value: Mailable | type[Mailable] | str | Content,
         /,
         data: object = MISSING,
         callback: object = MISSING,
@@ -240,8 +243,8 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        value : Mailable | str | Content
-            A string always names an HTML view.
+        value : Mailable | type[Mailable] | str | Content
+            A Mailable instance or class, an HTML view name, or explicit content.
         data : Mapping[str, object] | None
             Explicit view data, allowed only with a string view name.
         callback : MessageCallback | None

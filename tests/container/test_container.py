@@ -3,7 +3,6 @@ import threading
 from abc import ABC
 from concurrent.futures import ThreadPoolExecutor
 from typing import Self
-from orionis.test import TestCase
 from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
@@ -14,6 +13,7 @@ from orionis.container.exceptions.container import CircularDependencyException
 from orionis.http.request import Request
 from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.schemas.schema import Schema
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Module-level domain helpers
@@ -381,6 +381,7 @@ def _locks_from_two_loops(container: Container) -> tuple[object, object]:
         The lock produced by the first loop and the one produced by a second,
         independent loop.
     """
+
     async def take() -> object:
         """Acquire the creation lock in a new event loop.
 
@@ -705,6 +706,7 @@ def _fresh() -> Container:
     Container
         A brand-new container instance with no registrations.
     """
+
     class _Isolated(Container):
         pass
 
@@ -754,6 +756,7 @@ class TestContainerSingleton(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _S(Container):
             pass
 
@@ -768,6 +771,7 @@ class TestContainerSingleton(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _X(Container):
             pass
 
@@ -799,6 +803,7 @@ class TestContainerSingleton(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _S(Container):
             pass
 
@@ -864,6 +869,7 @@ class TestContainerInstance(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -928,6 +934,7 @@ class TestContainerInstance(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -945,6 +952,7 @@ class TestContainerInstance(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -1153,6 +1161,7 @@ class TestContainerTransient(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -1186,6 +1195,7 @@ class TestContainerSingletonBinding(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -1329,6 +1339,7 @@ class TestContainerBound(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -1456,6 +1467,7 @@ class TestContainerMake(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -1472,6 +1484,7 @@ class TestContainerMake(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Svc:
             pass
 
@@ -2163,6 +2176,7 @@ class TestContainerThreadSafety(_ScopelessTestCase):
         None
             This method does not return a value.
         """
+
         class _Threaded(Container):
             pass
 

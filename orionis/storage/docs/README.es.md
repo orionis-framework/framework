@@ -42,7 +42,7 @@
 
 ## Requisitos
 
-Los drivers `local` y `memory` no requieren nada más allá de `pip install orionis`: solo
+Los drivers `local` y `memory` no requieren nada más allá de `uv add orionis`: solo
 usan la biblioteca estándar (`asyncio`, `hashlib`, `mimetypes`, `shutil`, `pathlib`,
 `secrets`, `io`, `urllib.parse`).
 
@@ -51,10 +51,10 @@ opcional** en `pyproject.toml`:
 
 | Driver | Paquete PyPI | Versión mínima | Instalación |
 | --- | --- | --- | --- |
-| `S3StorageDriver` | `boto3` | `>=1.35` | `pip install orionis[s3]` |
-| `AzureStorageDriver` | `azure-storage-blob` | `>=12.24` | `pip install orionis[azure]` |
-| `GoogleStorageDriver` | `google-cloud-storage` | `>=2.18` | `pip install orionis[gcs]` |
-| Los tres a la vez | — | — | `pip install orionis[storage]` |
+| `S3StorageDriver` | `boto3` | `>=1.35` | `uv add 'orionis[s3]'` |
+| `AzureStorageDriver` | `azure-storage-blob` | `>=12.24` | `uv add 'orionis[azure]'` |
+| `GoogleStorageDriver` | `google-cloud-storage` | `>=2.18` | `uv add 'orionis[gcs]'` |
+| Los tres a la vez | — | — | `uv add 'orionis[storage]'` |
 
 El SDK nunca se importa al construir el driver: cada uno arranca su cliente en la primera
 operación mediante `importDriverDependency()`, de modo que un paquete ausente lanza

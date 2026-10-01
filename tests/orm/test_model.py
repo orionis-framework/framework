@@ -1,22 +1,18 @@
 from __future__ import annotations
+import uuid
 from datetime import datetime
 from typing import ClassVar
+import tests.orm.test_events as feature_fixtures
+from orionis.database.connection import Connection
 from orionis.database.connection_manager import ConnectionManager
-from orionis.orm import (
-    Boolean,
-    DateTime,
-    Integer,
-    Model,
-    String,
-    StrictJson,
-    StrictTimestamp,
-)
+from orionis.orm import DateTime, Integer, Model, StrictJson, StrictTimestamp, String
 from orionis.orm.exceptions import (
     InvalidQueryException,
     MassAssignmentException,
     ModelNotFoundException,
 )
 from orionis.orm.resolver import ConnectionResolver
+from orionis.orm.schema.types import Boolean
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
 
@@ -93,7 +89,6 @@ class Remote(Model):
     timestamps = False
 
 class TestModelCrud(TestCase):
-
     async def asyncSetUp(self) -> None:
         """Wire an isolated in-memory manager and create the tables.
 
@@ -224,14 +219,15 @@ class TestModelCrud(TestCase):
             Assertions verify the behavior described above.
         """
         for index in range(5):
-            await Person.create({
-                "name": f"user{index}",
-                "active": index % 2 == 0,
-            })
-        people = await Person.where("active", True)\
-            .orderBy("name", "desc")\
-            .limit(2)\
-            .get()
+            await Person.create(
+                {
+                    "name": f"user{index}",
+                    "active": index % 2 == 0,
+                },
+            )
+        people = (
+            await Person.where("active", True).orderBy("name", "desc").limit(2).get()
+        )
         self.assertIsInstance(people, Collection)
         self.assertEqual([p.name for p in people], ["user4", "user2"])
 
@@ -830,3 +826,77 @@ class TestModelCrud(TestCase):
         """
         moment = Secret.freshTimestamp()
         self.assertIsNotNone(moment.tzinfo)
+
+class TestUniqueIds(feature_fixtures._ModelFeatureTestCase):
+    """Client-generated primary keys."""
+
+    async def testUuidPrimaryKeyIsGeneratedOnInsert(self) -> None:
+        """Generate the primary key before the row is written.
+
+        Validates ``uuids = True``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        token = await feature_fixtures.Token.create({"label": "api"})
+        self.assertIsInstance(token.id, uuid.UUID)
+        self.assertIsNotNone(await feature_fixtures.Token.query().find(token.id))
+
+    async def testExplicitUuidIsPreserved(self) -> None:
+        """Keep an explicitly assigned identifier.
+
+        Validates that generation only fills a missing key.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        identifier = uuid.uuid4()
+        token = await feature_fixtures.Token.create({"id": identifier, "label": "api"})
+        self.assertEqual(token.id, identifier)
+
+class TestModelConnectionRouting(TestCase):
+    """Exercise instance persistence using an overridable connection resolver."""
+
+    async def testWritesUseDeclaredConnectionHookAndOneTimestamp(self) -> None:
+        """Route all writes through the hook and share creation timestamps.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        connection = Connection("sqlite", {"driver": "sqlite", "database": ":memory:"})
+        self.addAsyncCleanup(connection.disconnect)
+
+        class _Routed(Model):
+            id = Integer().primary().autoIncrement()
+            name = String()
+            created_at = DateTime()
+            updated_at = DateTime()
+            calls: ClassVar[int] = 0
+
+            @classmethod
+            def getConnection(cls) -> Connection:
+                """Return the connection assigned to this model.
+
+                Returns
+                -------
+                Connection
+                    Isolated SQLite connection assigned to the model.
+                """
+                cls.calls += 1
+                return connection
+
+        await connection.createTable(_Routed.__meta__.table)
+        record = await _Routed.create({"name": "initial"})
+        self.assertEqual(record.id, 1)
+        self.assertEqual(record.created_at, record.updated_at)
+        self.assertTrue(await record.update({"name": "updated"}))
+        self.assertEqual(record.getChanges()["name"], "updated")
+        self.assertTrue(record.isClean())
+        self.assertTrue(await record.delete())
+        self.assertEqual(_Routed.calls, 3)

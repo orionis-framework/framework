@@ -44,6 +44,7 @@ exclude = [
 "database/**" = [
     "E501",
     "S608",
+    "TC001",
 ]
 "routes/**" = [
     "E501",

@@ -5,6 +5,7 @@
 ## Tabla de contenidos
 
 - [Requisitos](#requisitos)
+- [Model Factories](../factories/docs/IMPLEMENTATION.es.md)
 - [Descripción funcional](#descripción-funcional)
 - [Referencia de API](#referencia-de-api)
 - [Ejemplos de uso](#ejemplos-de-uso)
@@ -13,9 +14,15 @@
 
 ## Requisitos
 
-No hay pasos de instalación específicos para el ORM además de `pip install orionis`. El ORM usa el subsistema de base de datos del framework, incluidas las dependencias `aiosqlite>=0.22.1` para SQLite y `sqlalchemy[asyncio]>=2.0.54,<3.0`. Los demás motores requieren el extra opcional correspondiente y sus drivers: `orionis[mysql]` (`aiomysql>=0.3.2`, `pymysql>=1.2.3`), `orionis[pgsql]` (`asyncpg>=0.31.0`, `psycopg2-binary>=2.9.13`), `orionis[oracle]` (`oracledb>=26.0.0`) u `orionis[sqlserver]` (`aioodbc>=0.5.0`, `pyodbc>=5.3.0`). Estos requisitos están declarados en `pyproject.toml`.
+No hay pasos de instalación específicos para el ORM además de `uv add orionis`. El ORM usa el subsistema de base de datos del framework, incluidas las dependencias `aiosqlite>=0.22.1` para SQLite y `sqlalchemy[asyncio]>=2.0.54,<3.0`. Los demás motores requieren el extra opcional correspondiente y sus drivers: `orionis[mysql]` (`aiomysql>=0.3.2`, `pymysql>=1.2.3`), `orionis[pgsql]` (`asyncpg>=0.31.0`, `psycopg2-binary>=2.9.13`), `orionis[oracle]` (`oracledb>=26.0.0`) u `orionis[sqlserver]` (`aioodbc>=0.5.0`, `pyodbc>=5.3.0`). Estos requisitos están declarados en `pyproject.toml`.
 
 Para consultar la base de datos, el proveedor de base de datos de la aplicación debe instalar un gestor de conexiones en `ConnectionResolver`. Durante el uso habitual de la aplicación, el arranque del framework realiza esta configuración.
+
+Las [Model Factories](../factories/docs/README.md) opcionales generan datos de
+prueba y seeding mediante estos mismos modelos. Ejecuta
+`uv add 'orionis[factories]'` para usar Faker. La API ofrece `Factory[Model]`,
+`make()` síncrono y `create()` asíncrono; el generador es
+`reactor make:factory UserFactory --model=User`.
 
 ## Descripción funcional
 

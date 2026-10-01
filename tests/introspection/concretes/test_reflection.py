@@ -1,7 +1,7 @@
 import inspect
-from orionis.test import TestCase
 from orionis.introspection.concretes.reflection import ReflectionConcrete
 from orionis.introspection.dependencies.entities.signature import Signature
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Test fixtures
@@ -271,6 +271,7 @@ def _make_mutable_concrete() -> type:
     type
         A new class with a mutable_attr and a deletableMethod.
     """
+
     class _Mutable:
         mutable_attr: int = 99
 
@@ -295,6 +296,7 @@ def _make_private_method_concrete() -> type:
     type
         A new class with a name-mangled private method.
     """
+
     class _PrivateHolder:
 
         def __hiddenMethod(self) -> int: # NOSONAR
@@ -419,7 +421,6 @@ class TestReflectionConcreteInit(TestCase):
                     Completes the operation described above.
                 """
                 ...
-
 
         with self.assertRaises(TypeError):
             ReflectionConcrete(_Abstract)  # type: ignore[arg-type]
@@ -676,6 +677,7 @@ class TestReflectionConcreteMetadata(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         class _NoDoc:
             pass
 
@@ -880,7 +882,6 @@ class TestReflectionConcretePublicAttributes(TestCase):
         """
         self.assertIsInstance(self.rc.getAttributes(), dict)
 
-
 class TestReflectionConcreteProtectedAttributes(TestCase):
 
     def setUp(self) -> None:
@@ -925,7 +926,6 @@ class TestReflectionConcreteProtectedAttributes(TestCase):
             Raises AssertionError on failure.
         """
         self.assertNotIn("public_attr", self.rc.getProtectedAttributes())
-
 
 class TestReflectionConcreteDunderAttributes(TestCase):
 

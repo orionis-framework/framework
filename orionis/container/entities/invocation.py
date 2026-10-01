@@ -3,10 +3,11 @@ import inspect
 from dataclasses import dataclass
 from functools import lru_cache
 from types import FunctionType, MethodDescriptorType, MethodType, WrapperDescriptorType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, get_type_hints
 from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.introspection.concretes.reflection import ReflectionConcrete
 from orionis.introspection.dependencies.reflection import (
+    _build_dependencies,
     _cached_resolved_signature,
 )
 
@@ -90,6 +91,51 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     """
     ReflectionConcrete(target)
     signature = _cached_resolved_signature(constructor)
+    annotations = getattr(constructor, "__annotations__", {})
+    if not any(
+        isinstance(value, str)
+        for name, value in annotations.items()
+        if name != "return"
+    ):
+        return InvocationPlan(tuple(signature.ordered.values()), is_async=False)
+
+    # The generic dependency reflector retains string annotations. Resolve
+    # constructor hints in the declaring module and target class namespace.
+    # Keep unresolved hints on the existing reflector path for compatibility.
+    raw_signature = inspect.signature(constructor)
+    module = inspect.getmodule(constructor)
+    globalns = vars(module) if module is not None else {}
+    localns = dict(vars(target))
+    localns[target.__name__] = target
+    parameters = []
+    changed = False
+    for parameter in raw_signature.parameters.values():
+        hint = parameter.annotation
+        updated = parameter
+        if (
+            isinstance(hint, str)
+            and parameter.default is inspect.Parameter.empty
+        ):
+            probe = type("_ConstructorHint", (), {
+                "__annotations__": {"value": hint},
+            })
+            try:
+                resolved = get_type_hints(
+                    probe,
+                    globalns=globalns,
+                    localns=localns,
+                )["value"]
+            except (AttributeError, NameError, SyntaxError, TypeError):
+                pass
+            else:
+                if isinstance(resolved, type):
+                    updated = parameter.replace(annotation=resolved)
+                    changed = True
+        parameters.append(updated)
+
+    if changed:
+        raw_signature = raw_signature.replace(parameters=parameters)
+        signature = _build_dependencies(raw_signature)
     return InvocationPlan(tuple(signature.ordered.values()), is_async=False)
 
 def warm_controller_plan(target: type, method_name: str) -> None:

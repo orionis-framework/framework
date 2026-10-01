@@ -1,8 +1,8 @@
 from __future__ import annotations
 import inspect
 from unittest.mock import MagicMock, patch
-from orionis.console.debug.dumper import Dumper
 from orionis.console.debug.contracts.dumper import IDumper
+from orionis.console.debug.dumper import Dumper
 from orionis.test import TestCase
 
 class TestDumper(TestCase):

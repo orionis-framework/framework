@@ -6,7 +6,7 @@ from orionis.http.payload import part as multipart_part
 from orionis.http.payload.stream_parser import MultipartStreamParser
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable
@@ -99,6 +99,7 @@ def upload_factory(
     Callable[[str, str | None, int], UploadedFile]
         A factory with the UploadedFile constructor's positional signature.
     """
+
     def create_upload(
         _filename: str,
         _content_type: str | None,

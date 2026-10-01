@@ -1,5 +1,5 @@
+from orionis.support.types.sentinel import _MISSING_TYPE, MISSING
 from orionis.test import TestCase
-from orionis.support.types.sentinel import MISSING, _MISSING_TYPE
 
 class TestMissingSentinel(TestCase):
 
@@ -99,9 +99,7 @@ class TestMissingSentinel(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        from orionis.support.types.sentinel import (
-            MISSING as REIMPORTED,
-        )
+        from orionis.support.types.sentinel import MISSING as REIMPORTED
         self.assertIs(MISSING, REIMPORTED)
 
     def testNewInstanceIsDifferentObject(self):
@@ -186,6 +184,7 @@ class TestMissingSentinel(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def func(value=MISSING):
             """Check whether the supplied value is the missing sentinel.
 
@@ -214,6 +213,7 @@ class TestMissingSentinel(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def func(value=MISSING):
             """Check whether the supplied value is the missing sentinel.
 

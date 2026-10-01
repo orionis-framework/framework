@@ -9,8 +9,8 @@ from orionis.test.cases.case import (
     _DEFAULT_PATTERN,
     _LIFECYCLE_HOOKS,
     _METHOD_PATTERN,
-    TestCase as CoreTestCase,
 )
+from orionis.test.cases.case import TestCase as CoreTestCase
 
 # Value returned by the probe method to prove the wrapper forwards results.
 _PROBE_RESULT: str = "probe-executed"
@@ -143,6 +143,7 @@ class TestTestCaseMethodPattern(TestCase):
         Validates that two runs executing at the same time never
         overwrite the discovery pattern of each other.
         """
+
         async def _configure() -> str:
             """Set this task's pattern and return its compiled form.
 

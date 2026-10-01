@@ -11,8 +11,7 @@ class GCS(BaseEntity):
 
     Using this disk requires the official Google Cloud client
     library, which is an optional dependency: install it with
-    ``pip install google-cloud-storage`` (or ``pip install
-    orionis[gcs]``).
+    ``uv add 'orionis[gcs]'``.
 
     Parameters
     ----------

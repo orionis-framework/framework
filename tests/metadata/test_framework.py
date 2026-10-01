@@ -36,7 +36,6 @@ _EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # Accepted shape for a module level constant name.
 _CONSTANT_NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
-
 def public_names() -> set[str]:
     """
     Collect the public attribute names declared by the metadata module.
@@ -49,7 +48,6 @@ def public_names() -> set[str]:
     """
     return {name for name in vars(framework) if not name.startswith("_")}
 
-
 def read_project_table() -> dict[str, Any]:
     """
     Read the ``[project]`` table of the repository manifest.
@@ -61,7 +59,6 @@ def read_project_table() -> dict[str, Any]:
     """
     with _PYPROJECT.open("rb") as handle:
         return tomllib.load(handle)["project"]
-
 
 class TestFrameworkModuleSurface(TestCase):
     """Structural guarantees of the metadata module."""
@@ -119,7 +116,6 @@ class TestFrameworkModuleSurface(TestCase):
         """
         for name in _PUBLIC_CONSTANTS:
             self.assertGreater(len(getattr(framework, name)), 0, msg=name)
-
 
 class TestFrameworkIdentity(TestCase):
     """Distribution name and short description."""
@@ -188,7 +184,6 @@ class TestFrameworkIdentity(TestCase):
         """
         self.assertGreater(len(framework.DESCRIPTION), 20)
 
-
 class TestFrameworkVersion(TestCase):
     """Released version string."""
 
@@ -243,7 +238,6 @@ class TestFrameworkVersion(TestCase):
         """
         self.assertEqual(framework.VERSION, framework.VERSION.strip())
 
-
 class TestFrameworkAuthor(TestCase):
     """Maintainer contact details."""
 
@@ -295,7 +289,6 @@ class TestFrameworkAuthor(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertEqual(framework.AUTHOR_EMAIL.count("@"), 1)
-
 
 class TestFrameworkUrls(TestCase):
     """Absolute URLs advertised by the framework."""
@@ -386,7 +379,6 @@ class TestFrameworkUrls(TestCase):
             f"https://pypi.org/pypi/{framework.NAME}/json",
         )
 
-
 class TestFrameworkPythonRequires(TestCase):
     """Minimum interpreter version required by the framework."""
 
@@ -457,7 +449,6 @@ class TestFrameworkPythonRequires(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertEqual(framework.PYTHON_REQUIRES, (3, 14))
-
 
 class TestFrameworkProjectManifest(TestCase):
     """Consistency between the metadata module and ``pyproject.toml``."""

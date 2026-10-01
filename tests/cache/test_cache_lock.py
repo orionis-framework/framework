@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
-from orionis.cache.locks.lock import CacheLock, _FILE_LOCKS
+from orionis.cache.locks.lock import _FILE_LOCKS, CacheLock
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.database.connection import Connection
@@ -251,7 +251,6 @@ class TestCacheLock(TestCase):
                 pass  # Should not reach here.
 
         await holder_task
-
 
 class TestDatabaseCacheLock(TestCase):
 

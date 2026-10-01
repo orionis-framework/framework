@@ -1,5 +1,5 @@
-from orionis.test import TestCase
 from orionis.support.types.stringable import Stringable
+from orionis.test import TestCase
 
 class TestStringablePlural(TestCase):
     """Unit tests for Stringable pluralisation and parse methods."""

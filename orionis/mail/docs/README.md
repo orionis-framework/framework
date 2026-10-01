@@ -785,11 +785,10 @@ the original bootstrap, named dictionary configuration, both composition styles,
 DI/facades, actual Jinja rendering, local and pathless storage, MIME/privacy,
 SMTP modes and failures, atomic file publication and concurrent cancellation.
 
-[The isolated application fixture](../../../tests/mail/fixtures/application.py)
+[The isolated application fixture](../../../tests/mail/test_integration.py)
 executes the examples after both normal HTTP lifespan and CLI startup, including
 a real controller response and a provider-registered custom test transport.
-[The type fixture](../../../tests/mail/fixtures/typecheck.py) checks public
-overloads from consumer code. The only localized SMTP type suppressions reflect
+The only localized SMTP type suppressions reflect
 typeshed's float-only timeout annotation; tests verify that Python 3.14 accepts
 `None` in both real SMTP constructors without opening a connection.
 
@@ -797,7 +796,7 @@ typeshed's float-only timeout annotation; tests verify that Python 3.14 accepts
 $env:PYTHONIOENCODING = "utf-8"
 .\.venv\Scripts\python.exe reactor test --start-dir=tests/mail --verbosity=1
 .\.venv\Scripts\python.exe -m ruff check orionis/mail tests/mail
-uvx pyright --pythonpath .venv/Scripts/python.exe --pythonversion 3.14 orionis/mail orionis/support/facades/mail.pyi tests/mail/fixtures/typecheck.py
+uvx pyright --pythonpath .venv/Scripts/python.exe --pythonversion 3.14 orionis/mail orionis/support/facades/mail.pyi
 ```
 
 Live SMTP-server interoperability and non-local filesystems require deployment

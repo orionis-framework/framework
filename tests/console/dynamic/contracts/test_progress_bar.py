@@ -120,6 +120,7 @@ class TestIProgressBar(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class Partial(IProgressBar):
             def start(self) -> None: # NOSONAR
                 """Accept the progress operation in the test double.
@@ -129,6 +130,7 @@ class TestIProgressBar(TestCase):
                 None
                     Completes the operation described above.
                 """
+
             def advance(self, increment: int = 1) -> None: # NOSONAR
                 """Accept a progress update in the test double.
 
@@ -156,6 +158,7 @@ class TestIProgressBar(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class Concrete(IProgressBar):
             def start(self) -> None: # NOSONAR
                 """Accept the progress operation in the test double.
@@ -165,6 +168,7 @@ class TestIProgressBar(TestCase):
                 None
                     Completes the operation described above.
                 """
+
             def advance(self, increment: int = 1) -> None: # NOSONAR
                 """Accept a progress update in the test double.
 
@@ -178,6 +182,7 @@ class TestIProgressBar(TestCase):
                 None
                     Completes the operation described above.
                 """
+
             def finish(self) -> None: # NOSONAR
                 """Accept the progress completion in the test double.
 

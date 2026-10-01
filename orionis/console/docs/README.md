@@ -102,7 +102,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: binds `IScheduleStore` and `ISchedule`, pins the `Schedule` facade. |
 | `args/argument.py` | `Argument`, the declarative `argparse` argument definition. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` and their contracts. |
-| `commands/` | The 39 built-in commands (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
+| `commands/` | The 44 built-in commands (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, the immutable tuple of built-in command classes. |
 | `core/loader.py` | `Loader`: discovery, metadata cache and `ArgumentParser` construction. |
@@ -774,18 +774,22 @@ bit mask; `orionis.console.enums` exports the enum flags while
 
 ### Built-in commands
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 39 classes:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 44 classes:
 
 | Signature | Class | Notes |
 |---|---|---|
 | `about` | `VersionCommand` | Framework metadata panel. |
 | `list` | `HelpCommand` | Default target when no command is given. |
+| `db:seed` | `DbSeedCommand` | Runs pending seeders; `--database/-d`. |
+| `db:show` | `DbShowCommand` | Connection and table overview; `--database/-d`, `--counts`, `--views`. |
+| `db:table` | `DbTableCommand` | Table details; `table`, `--database/-d`. |
+| `db:wipe` | `DbWipeCommand` | Drops user tables, views, and types; `--database/-d`, `--force`. |
 | `make:console-command` | `MakeConsoleCommand` | `name`, `--signature/-s`, `--description/-d`. |
 | `make:console-listener` | `MakeConsoleListener` | `name`. |
 | `make:contract` | `MakeContract` | `name`. |
 | `make:database-migration` | `MakeDatabaseMigration` | `name`; creates a migration in `database/migrations` with an `mYYYYMMDDHHMMSS_` prefix. |
 | `make:database-schema` | `MakeDatabaseSchema` | `name`; creates a schema in `database/schemas`. |
-| `make:database-seeder` | `MakeDatabaseSeeder` | `name`; creates a seeder in `database/seeders`. |
+| `make:database-seeder` | `MakeDatabaseSeeder` | `name`; creates a `Seeder` subclass in `database/seeders`. |
 | `make:facade` | `MakeFacade` | `name`, `--accessor/-a`. |
 | `make:provider` | `MakeProvider` | `name`, `--deferred`. |
 | `make:service` | `MakeService` | `name`. |
@@ -796,12 +800,13 @@ bit mask; `orionis.console.enums` exports the enum flags while
 | `make:http-middleware` | `MakeHttpMiddleware` | `name`. |
 | `make:http-schema` | `MakeHttpSchema` | `name`. |
 | `make:http-schema-rule` | `MakeHttpSchemaRule` | `name`. |
-| `migrate` | `MigrateCommand` | `--database/-d`. |
-| `migrate:fresh` | `MigrateFreshCommand` | Drops and re-runs everything. |
+| `migrate` | `MigrateCommand` | `--database/-d`, `--seed`. |
+| `migrate:fresh` | `MigrateFreshCommand` | Clears migration and seeder history; reapplies migrations. |
 | `migrate:refresh` | `MigrateRefreshCommand` | `--step/-s`. |
 | `migrate:reset` | `MigrateResetCommand` | Reverts every migration. |
 | `migrate:rollback` | `MigrateRollbackCommand` | `--step/-s`, defaults to the last batch. |
 | `migrate:status` | `MigrateStatusCommand` | Status table. |
+| `seed` | `SeedCommand` | Runs pending seeders; `--database/-d`. |
 | `clear:cache` | `ClearCacheCommand` | Clears the configured default application cache store. |
 | `clear:logs` | `ClearLogsCommand` | Removes framework `.log` and `.log.gz` files, including configured channel paths. |
 | `clear:testing` | `ClearTestingCommand` | Removes cached test-run result files. |
@@ -822,6 +827,46 @@ The migration prefix uses the creation date and time in the application's
 configured timezone (year, month, day, hour, minute and second). Initial
 scaffold migrations retain their numeric prefixes.
 
+`python reactor seed` runs only seeders absent from the selected connection's
+`seeders` tracking table. Seeder classes must extend `Seeder` and implement an
+async `run()` method. Files under `database/seeders` run in filename-stem order;
+use ordered prefixes when one seeder depends on another. Stems must be unique,
+including across nested directories. The application container constructs each
+seeder and migration, so their constructors may declare resolvable dependencies.
+`python reactor migrate --seed` completes
+pending migrations before running pending seeders; a migration failure stops
+the command before seeding. Both commands accept `--database NAME` or its
+short form `-d NAME` to select a configured connection. For example:
+
+```shell
+python reactor make:database-seeder CreatePlans
+python reactor migrate --seed
+python reactor seed --database sqlite
+python reactor db:seed --database sqlite
+python reactor db:show --counts --views
+python reactor db:table users --database sqlite
+python reactor db:wipe --database sqlite
+```
+
+`db:seed` shares `seed` tracking and runs only pending seeders. `db:show`
+reports the size, driver, open connection count, and tables; `--counts`
+adds row counts and `--views` lists views. `db:table` reports rows, size,
+columns, indexes, and foreign keys. `db:wipe` removes user objects from the
+selected connection, including migration and seeder tracking; it asks for
+terminal confirmation and requires `--force` without a terminal.
+
+After a complete migration rollback on a connection, its `seeders` tracking
+table is removed so a later `migrate --seed` runs seeders on the rebuilt schema.
+A partial rollback keeps the tracking table. Rollback does not directly undo
+seeder data; migration `down()` methods determine which data is removed.
+
+Before the first `seed` or `migrate --seed` run, edit the literal administrator
+name, email, and password in
+`database/seeders/s0000000001_create_admin_authorization.py`. The bundled authorization
+seeder hashes it through Orionis before storage. A successfully recorded
+seeder does not run again when these values change; add a new seeder for later
+data changes.
+
 `down` and `up` atomically write the state in `storage/framework/maintenance`.
 Each HTTP worker caches the state in memory and refreshes it at most once every
 100 ms. A running worker observes either transition within that interval without
@@ -831,6 +876,9 @@ An explicit state file overrides `APP_MAINTENANCE` until it is removed.
 `optimize:clear` removes compiled framework state, Python bytecode and build
 artifacts. `clear:cache`, `clear:logs`, `clear:views` and `clear:testing` target the application
 cache store, template bytecode and saved test results separately.
+After updating framework command sources in an optimized application, run
+`python reactor optimize:clear` to refresh the compiled `commands` cache before
+checking `python reactor list` or running `seed`.
 
 `MigrationCommand` (`commands/migrate/base_command.py`) is the shared base of the
 `migrate:*` family: it exposes `targetConnection()`, `progressEvents()` and
@@ -1042,11 +1090,11 @@ asyncio.run(main())
 ```
 
 ```text
-40 commands
-['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
+45 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
 ```
 
-The 40 signatures are the 39 built-in commands plus `app:inspire`, which is
+The 45 signatures are the 44 built-in commands plus `app:inspire`, which is
 declared by this project.
 
 `await Reactor.pin()` is required in a plain script: eager providers only boot

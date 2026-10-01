@@ -59,9 +59,7 @@ class S3StorageDriver(IStorageDriver):
     **optional dependency**: it is not installed with the framework.
     Install it before using this driver::
 
-        pip install boto3
-        # or
-        pip install orionis[s3]
+        uv add 'orionis[s3]'
 
     The SDK is imported lazily on first operation, and every blocking
     call runs on a worker thread via :func:`asyncio.to_thread` so the

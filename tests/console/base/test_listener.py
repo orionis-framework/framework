@@ -2,8 +2,8 @@ from __future__ import annotations
 import asyncio
 import inspect
 from annotationlib import Format
-from orionis.console.base.listener import BaseTaskListener
 from orionis.console.base.contracts.listener import IBaseTaskListener
+from orionis.console.base.listener import BaseTaskListener
 from orionis.console.entities.task_event import TaskEvent
 from orionis.console.enums.events import TaskEvent as TaskEventEnum
 from orionis.console.output.console import Console

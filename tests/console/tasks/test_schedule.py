@@ -1,10 +1,10 @@
 from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 from orionis.console.contracts.schedule import ISchedule
-from orionis.console.tasks.schedule import Schedule
 from orionis.console.enums.events import SchedulerEvent
 from orionis.console.enums.states import ScheduleStates
 from orionis.console.fluent.contracts.task import ITask
+from orionis.console.tasks.schedule import Schedule
 from orionis.test import TestCase
 
 class TestSchedule(TestCase):

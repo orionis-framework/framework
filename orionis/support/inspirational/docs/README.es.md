@@ -33,7 +33,7 @@ inyectado.
 ## Requisitos
 
 No se necesita ningún paso de instalación adicional más allá de
-`pip install orionis`. El módulo solo utiliza la biblioteca estándar de
+`uv add orionis`. El módulo solo utiliza la biblioteca estándar de
 Python (`secrets`, `typing`, `abc`) — no tiene dependencias de terceros.
 
 ## Qué problema resuelve

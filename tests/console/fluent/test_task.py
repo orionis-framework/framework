@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from orionis.test import TestCase
-from orionis.console.fluent.task import Task
 from orionis.console.base.listener import BaseTaskListener
 from orionis.console.entities.task import Task as TaskEntity
 from orionis.console.enums.events import TaskEvent
+from orionis.console.fluent.task import Task
+from orionis.test import TestCase
 
 def _make_task(signature="test:sig", args=None, purpose=None):
     """Create a Task instance with minimal required arguments.
@@ -913,6 +913,7 @@ class TestTask(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _CountingListener(BaseTaskListener):
             def onTaskAdded(self, event):
                 """Accept the task-added event in the test listener.
@@ -947,6 +948,7 @@ class TestTask(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _FullListener(BaseTaskListener):
             def onTaskAdded(self, event):
                 """Accept the task-added event in the test listener.
@@ -961,6 +963,7 @@ class TestTask(TestCase):
                 None
                     Completes the operation described above.
                 """
+
             def onTaskExecuted(self, event):
                 """Accept the task-executed event in the test listener.
 
@@ -974,6 +977,7 @@ class TestTask(TestCase):
                 None
                     Completes the operation described above.
                 """
+
             def onTaskError(self, event):
                 """Accept the task-error event in the test listener.
 
@@ -1008,6 +1012,7 @@ class TestTask(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _FakeListener:
             def onTaskAdded(self, event):
                 """Accept the task-added event in the test listener.

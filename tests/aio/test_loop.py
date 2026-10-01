@@ -45,6 +45,7 @@ def new_loop_probe(**overrides: object) -> type[Loop]:
     type[Loop]
         A ``Loop`` subclass with isolated state.
     """
+
     class LoopProbe(Loop):
         """Loop manager whose shared state never reaches the real class."""
 

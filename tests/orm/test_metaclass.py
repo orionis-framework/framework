@@ -1,7 +1,13 @@
 from __future__ import annotations
+import ast
+import re
+from pathlib import Path
 from typing import ClassVar
-from orionis.orm import Boolean, Integer, Model, String
+import tests.orm.query.test_base_builder as plan_fixtures
+from orionis.orm import Boolean, DateTime, Integer, Model, String
+from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.metaclass import pluralize, snake_case
+from orionis.orm.schema.table import TableDefinition
 from orionis.test import TestCase
 
 class _User(Model):
@@ -39,7 +45,6 @@ class _Invoice(_BaseAudit):
     casts: ClassVar[dict[str, str]] = {"total": "int"}
 
 class TestNamingHelpers(TestCase):
-
     def testSnakeCaseSplitsCamelWords(self) -> None:
         """Convert CamelCase names into snake_case.
 
@@ -69,7 +74,6 @@ class TestNamingHelpers(TestCase):
         self.assertEqual(pluralize("day"), "days")
 
 class TestModelMetaclass(TestCase):
-
     def testTableNameDerivedFromClassName(self) -> None:
         """Derive the table name from the pluralized class name.
 
@@ -347,3 +351,176 @@ class TestModelMetaclass(TestCase):
             set(_ConcreteChild.__meta__.columns),
             {"id", "name", "extra"},
         )
+
+class TestModelQueryForwarding(TestCase):
+    def testForwardedClassEntryPointsStartBuilders(self) -> None:
+        """Start builders from forwarded class-level entry points.
+
+        Validates the metaclass forwarding whitelist.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        builder = plan_fixtures._Item.where("name", "a")
+        self.assertEqual(len(builder._plan.wheres), 1)
+        chained = plan_fixtures._Item.orderBy("name").limit(1)
+        self.assertEqual(chained._plan.limit_value, 1)
+
+    def testUnknownClassAttributeRaises(self) -> None:
+        """Raise AttributeError for non-forwarded class attributes.
+
+        Validates the metaclass forwarding guard.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        with self.assertRaises(AttributeError):
+            _ = plan_fixtures._Item.notAQueryMethod
+
+class TestSharedModelSchema(TestCase):
+    """Exercise attribute state and serialization without database access."""
+
+    def testSharedSchemaRetainsItsTableAndConstraints(self) -> None:
+        """Adopt the same versioned table used by schema migrations.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        definition = TableDefinition(
+            name="shared_records",
+            schema="example",
+            columns={"key": Integer().primary(), "name": String()},
+            primary_key="key",
+            comment="Shared schema version one",
+        )
+
+        class _Shared(Model):
+            table_definition = definition
+
+        class _Descendant(_Shared):
+            pass
+
+        self.assertIs(_Shared.__meta__.table, definition)
+        self.assertIs(_Descendant.__meta__.table, definition)
+        self.assertEqual(_Shared.__meta__.primary_key, "key")
+        self.assertEqual(_Shared({"name": "valid"}).name, "valid")
+
+    def testSharedSchemaRejectsConflictingDeclarations(self) -> None:
+        """Reject duplicate columns, table names and primary keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        definition = TableDefinition(
+            name="records",
+            columns={"id": Integer().primary()},
+        )
+        for overrides in (
+            {"id": Integer()},
+            {"table": "other"},
+            {"primary_key": "other"},
+            {"table_definition": "invalid"},
+        ):
+            with (
+                self.subTest(overrides=overrides),
+                self.assertRaises(
+                    OrmConfigurationException,
+                ),
+            ):
+                type("Invalid", (Model,), {"table_definition": definition, **overrides})
+
+    def testSoftDeleteInheritanceDoesNotModifyParentSchema(self) -> None:
+        """Keep a child nullable delete column isolated from its parent.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+
+        class _Parent(Model):
+            id = Integer().primary()
+            deleted_at = DateTime()
+
+        class _SoftChild(_Parent):
+            soft_deletes = True
+
+        self.assertFalse(_Parent.__meta__.columns["deleted_at"].is_nullable)
+        self.assertTrue(_SoftChild.__meta__.columns["deleted_at"].is_nullable)
+
+    def testSharedSoftDeleteSchemaRequiresNullableColumn(self) -> None:
+        """Reject invalid shared schemas without modifying historical definitions.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        definition = TableDefinition(
+            name="records",
+            columns={"id": Integer().primary(), "deleted_at": DateTime()},
+        )
+        with self.assertRaises(OrmConfigurationException):
+            type(
+                "Invalid",
+                (Model,),
+                {
+                    "table_definition": definition,
+                    "soft_deletes": True,
+                },
+            )
+        self.assertFalse(definition.columns["deleted_at"].is_nullable)
+
+_ROOT = Path(__file__).resolve().parents[2]
+
+_METHOD_NAME = re.compile(r"_{0,2}[a-z][a-zA-Z0-9]*\Z")
+
+_FUNCTION_NAME = re.compile(r"_?[a-z][a-z0-9_]*\Z")
+
+class TestDatabaseNamingConventions(TestCase):
+    """Check public and internal Python names across the database and ORM."""
+
+    def testMethodsAndModuleFunctionsFollowConventions(self) -> None:
+        """Keep methods camelCase and module functions snake_case.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        failures = []
+        for package in ("database", "orm"):
+            root = _ROOT / "orionis" / package
+            self.assertTrue(root.is_dir())
+            for path in (*root.rglob("*.py"), *root.rglob("*.pyi")):
+                tree = ast.parse(path.read_text(encoding="utf-8"))
+                for node in ast.walk(tree):
+                    if not isinstance(node, (ast.ClassDef, ast.Module)):
+                        continue
+                    pattern = (
+                        _METHOD_NAME
+                        if isinstance(node, ast.ClassDef)
+                        else (_FUNCTION_NAME)
+                    )
+                    for member in node.body:
+                        if not isinstance(
+                            member,
+                            (ast.FunctionDef, ast.AsyncFunctionDef),
+                        ):
+                            continue
+                        name = member.name
+                        if name.startswith("__") and name.endswith("__"):
+                            continue
+                        if pattern.fullmatch(name) is None:
+                            failures.append(
+                                f"{path.relative_to(_ROOT)}:{member.lineno} {name}",
+                            )
+        self.assertEqual(failures, [])

@@ -1,6 +1,6 @@
 from __future__ import annotations
-from abc import ABC
 import inspect
+from abc import ABC
 from unittest.mock import Mock
 from orionis.console.core.contracts.loader import ILoader
 from orionis.test import TestCase
@@ -206,6 +206,7 @@ class TestILoader(TestCase):
             Assertions verify the behavior described above.
         """
         # Test that complete implementation works
+
         class CompleteLoader(ILoader):
             async def get(self, signature: str):
                 """Return the loader result required by the test double.
@@ -220,6 +221,7 @@ class TestILoader(TestCase):
                 object
                     Value produced by the helper.
                 """
+
             async def all(self):
                 """Return the command registry exposed by the test double.
 
@@ -229,6 +231,7 @@ class TestILoader(TestCase):
                     Value produced by the helper.
                 """
                 return {}
+
             def addFluentCommand(self, _signature: str, _handler):
                 """Record a fluent command registration.
 
@@ -245,6 +248,7 @@ class TestILoader(TestCase):
                     Value produced by the helper.
                 """
                 return Mock()
+
             async def load(self) -> None:
                 """Leave loading unimplemented in the partial loader.
 

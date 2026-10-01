@@ -1,7 +1,6 @@
 from orionis.auth import contracts
 from orionis.test import TestCase
 
-
 class TestContractsPackage(TestCase):
     """Validate the public surface of the contracts package."""
 

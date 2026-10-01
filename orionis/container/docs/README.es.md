@@ -1252,7 +1252,7 @@ shared singleton: 1
   `importlib`, `inspect`, `threading`, `collections`, `abc`, `dataclasses`, `enum`,
   `asyncio`), más los módulos hermanos de Orionis `orionis.introspection`,
   `orionis.schemas`, `orionis.http` y `orionis.support.entities`. No hay nada extra que
-  instalar más allá de `pip install orionis`.
+  instalar más allá de `uv add orionis`.
 - **Coste de import:** `container.py` importa `orionis.http.request.Request` y
   `orionis.schemas.validator.Schema` a nivel de módulo, así que importar el contenedor
   arrastra también esas capas.

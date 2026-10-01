@@ -662,6 +662,19 @@ class Application(Container, IApplication):
 
     # --- Application Properties ---
 
+    @classmethod
+    def current(cls) -> Self | None:
+        """
+        Return the existing application without constructing or booting it.
+
+        Returns
+        -------
+        Self or None
+            Application singleton for this class, if already instantiated.
+            Its configuration may still be uninitialized before ``create()``.
+        """
+        return cls._instances.get(cls)
+
     @property
     def isBooted(self) -> bool:
         """

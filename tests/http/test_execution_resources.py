@@ -109,6 +109,7 @@ class TestExecutionResources(TestCase):
         None
             ASGI and RSGI preserve hooks for HEAD, buffered, and stream responses.
         """
+
         def protocol_send(*_args: object) -> None:
             """Accept a buffered RSGI response.
 

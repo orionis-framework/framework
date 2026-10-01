@@ -10,8 +10,7 @@ class Azure(BaseEntity):
     Represent an Azure Blob Storage configuration.
 
     Using this disk requires the official Azure SDK, which is an
-    optional dependency: install it with ``pip install
-    azure-storage-blob`` (or ``pip install orionis[azure]``).
+    optional dependency: install it with ``uv add 'orionis[azure]'``.
 
     Parameters
     ----------

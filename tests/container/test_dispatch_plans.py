@@ -213,6 +213,7 @@ class TestDispatchPlans(TestCase):
         None
             New constructor and action defaults are honored immediately.
         """
+
         class MutableController:
             """Expose a controller whose callable descriptors can change."""
 

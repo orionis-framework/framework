@@ -17,8 +17,8 @@ from orionis.auth.middleware.authorize import (
     RequirePermissionMiddleware,
     RequireRoleMiddleware,
 )
-from orionis.auth.middleware.policy import RequirePolicyMiddleware
 from orionis.auth.middleware.guest import GuestMiddleware
+from orionis.auth.middleware.policy import RequirePolicyMiddleware
 from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
 from orionis.container.context.manager import ScopeManager
 from orionis.http.middleware import BaseMiddleware

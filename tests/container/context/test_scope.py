@@ -1,7 +1,7 @@
 from __future__ import annotations
 import contextvars
-from orionis.test import TestCase
 from orionis.container.context.scope import ScopedContext
+from orionis.test import TestCase
 
 class TestScopedContext(TestCase):
 

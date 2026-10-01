@@ -1,6 +1,6 @@
 # Orionis Database
 
-> Async database connections, SQL compilation, schema creation, and migration management for Orionis applications.
+> Async database connections, SQL compilation, schema creation, migrations, and seeders for Orionis applications.
 
 ## Table of contents
 
@@ -19,7 +19,7 @@ The database subsystem is included with `pip install orionis`. The base package 
 
 `orionis.database` loads named connection configurations from the application, lazily creates asynchronous SQLAlchemy engines, and exposes Orionis connection and transaction APIs. `SQLCompiler` translates query plans from `orionis.orm.query` and schema descriptions from `orionis.orm.schema` into SQLAlchemy Core statements.
 
-The module also provides fluent schema declarations and a migration runner. It directly uses `orionis.foundation.contracts.application`, `orionis.foundation.config.database.entities.database`, `orionis.container.providers.service_provider`, and `orionis.introspection.modules` for application configuration, provider registration, and migration discovery. `ConnectionManagerProvider` installs the manager in `orionis.orm.resolver.ConnectionResolver`; `SchemaProvider` binds `ISchema` to `Schema`.
+The module also provides fluent schema declarations, a migration runner, and a seeder runner. It directly uses `orionis.foundation.contracts.application`, `orionis.foundation.config.database.entities.database`, `orionis.container.providers.service_provider`, and `orionis.introspection.modules` for application configuration, provider registration, and module discovery. `ConnectionManagerProvider` installs the manager in `orionis.orm.resolver.ConnectionResolver`; `SchemaProvider` binds `ISchema` to `Schema`.
 
 ## API reference
 
@@ -151,20 +151,78 @@ Table-level definition objects are `Comment(text: str)`, `ForeignKey(column: str
 
 Subclasses of the abstract `Migration` contract implement `async def up(self) -> None` and `async def down(self) -> None`. `__init__(self, app: IApplication, conn_manager: IConnectionManager) -> None` initializes `Migrator`, which discovers migrations under the application's `database/migrations` directory and applies them in filename order.
 
+For both application and rollback, the migrator constructs each discovered
+migration with `await app.build(migration_cls)`. Type-annotated constructor
+dependencies are resolved by the application container. The runner then awaits
+the migration's `up()` or `down()` method.
+
 | `Migrator` signature | Behavior |
 |---|---|
 | `migrate(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: applies pending migrations and returns their names in run order. |
 | `rollback(self, steps: int = 1, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: reverts the selected most recent batches and returns migration names most recent first. Raises `ValueError` if `steps` is not a positive integer, and `MigrationNotFoundException` if a recorded migration file is missing. |
 | `reset(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: reverts recorded migrations. |
 | `refresh(self, steps: int | None = None, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: rolls migrations back and applies them again, optionally limiting the rollback steps. |
-| `fresh(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: drops the default migrations tracking table, then applies pending migrations. |
+| `fresh(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Async: clears migration and seeder history on the selected connection, then reapplies all migrations. |
 | `status(self, *, connection: str | None = None) -> list[dict[str, Any]]` | Async: returns per-migration status records. |
 
 Each migration step and its tracking record run within a transaction. An exception from `up` or `down` propagates; the failed migration is not recorded as successfully applied. A recorded migration whose module/class cannot be discovered raises `MigrationNotFoundException` when a rollback needs it.
 
+After a successful rollback removes every recorded migration on the selected
+connection, the migrator also drops that connection's `seeders` tracking table.
+The next `migrate --seed` can then run seeders against the recreated schema.
+A partial rollback preserves seeder tracking because seeded data may remain in
+tables that were not reverted. Migration rollback does not directly undo seeder
+data; each migration's `down()` determines what happens to its tables and data.
+`fresh()` also clears seeder history when an earlier rollback already left the
+`migrations` table without records.
+
 `MigrationEvents` is a frozen, slotted, keyword-only dataclass with optional callbacks `on_start: Callable[[str], None] | None`, `on_success: Callable[[str, float], None] | None`, and `on_error: Callable[[str, float], None] | None`. Its `started(name: str) -> None`, `succeeded(name: str, elapsed: float) -> None`, and `failed(name: str, elapsed: float) -> None` methods invoke the corresponding callback only when one is set. `migrate`, `rollback`, `reset`, `refresh`, and `fresh` accept it; `status` does not.
 
 `current_migration_connection() -> IConnection | None` returns the connection bound to the current migration context. `migration_connection_scope(connection: IConnection) -> Generator[None]` binds the connection for the duration of its `with` block and restores the previous binding on exit. The migrator uses this scope so unqualified schema and ORM operations inside a migration use the same connection as the migration transaction.
+
+### Seeders: `Seeder`, `SeederRunner`, and `SeederEvents`
+
+An application seeder is a subclass of `orionis.database.seeders.Seeder` with
+`async def run(self) -> None`. Place it in `database/seeders/`; the bundled
+`make:database-seeder` command generates the subclass. `SeederRunner` discovers
+classes defined in these modules and orders them lexicographically by filename
+stem. Each stem is the persisted identifier and must be unique, including
+across subdirectories. Use ordered filename prefixes for dependencies.
+
+The runner constructs each pending seeder with `await app.build(seeder_cls)`
+before awaiting `run()`. A seeder may declare type-annotated constructor
+dependencies that the application container can resolve.
+
+| `SeederRunner` signature | Behavior |
+|---|---|
+| `__init__(self, app: IApplication, conn_manager: IConnectionManager) -> None` | Resolves the configured seeder directory and database connection. |
+| `seed(self, *, connection: str | None = None, events: SeederEvents | None = None) -> list[str]` | Async: runs pending seeders and returns the names completed by this call in execution order. |
+
+The selected connection has a `seeders` tracking table with an `id` primary
+key, unique `seeder` name, `batch`, and `seeded_at` epoch timestamp. The runner uses the
+tracking rows to select pending seeders. It claims each seeder through the
+unique key before calling `run()` and commits the row and seed data in one
+transaction. The completion timestamp is written after `run()` succeeds; a
+failure rolls back both writes, so the seeder can be retried. A concurrent
+claim cannot commit a second copy of the same name. A conflicting attempt
+skips a seeder if its completed row is visible; other database errors propagate.
+Each invocation with pending seeders uses the highest previous batch plus one.
+The transaction scope also binds ordinary Orionis ORM operations in the seeder
+to the selected connection. Transactional guarantees depend on the configured
+database engine and on the operations performed by the seeder.
+
+`SeederEvents` offers the same `on_start`, `on_success`, and `on_error`
+callbacks as `MigrationEvents`. The CLI renders them through the existing
+console progress output. Run `python reactor seed` for pending seeders alone,
+or `python reactor migrate --seed` to migrate successfully before seeding;
+both accept `--database/-d` for a named connection.
+
+The bundled authorization seeder creates an administrator with the `admin`
+role and `full_access` permission. Before its first run, edit the literal
+administrator name, email, and password directly in
+`database/seeders/s0000000001_create_admin_authorization.py`. The seeder hashes the
+password through Orionis before storage. Once recorded, editing these values
+does not rerun it; add a new seeder for later changes.
 
 ### `Transaction`, `InsertResult`, and exceptions
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 import asyncio
-from orionis.test import TestCase
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
+from orionis.test import TestCase
 
 class TestScopeManager(TestCase):
 
@@ -469,6 +469,7 @@ class TestScopeManager(TestCase):
         None
             This method does not return a value.
         """
+
         async def _make_value() -> str: # NOSONAR
             """Return the marker used by asynchronous resolution.
 
@@ -501,6 +502,7 @@ class TestScopeManager(TestCase):
         None
             This method does not return a value.
         """
+
         async def _worker() -> int: # NOSONAR
             """Return the marker produced by the worker.
 
@@ -582,6 +584,7 @@ class TestScopeManager(TestCase):
         None
             This method does not return a value.
         """
+
         async def _produce() -> str: # NOSONAR
             """Produce the value delivered by asynchronous resolution.
 

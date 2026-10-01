@@ -8,7 +8,7 @@ from orionis.foundation.config.logging import (
     Stack,
     Weekly,
 )
-from tests.foundation.config.support import ConfigurationTestCase
+from tests.foundation.config.test_environment import ConfigurationTestCase
 
 class TestLoggingConfiguration(ConfigurationTestCase):
     def testAllChannelsNormalizeTheSameLevelRepresentations(self) -> None:

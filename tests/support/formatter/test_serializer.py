@@ -1,7 +1,7 @@
 from unittest.mock import patch
-from orionis.test import TestCase
-from orionis.support.formatter.serializer import Parser
 from orionis.support.formatter.exceptions.parser import ExceptionParser
+from orionis.support.formatter.serializer import Parser
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Custom exception fixtures

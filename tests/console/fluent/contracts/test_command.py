@@ -142,6 +142,7 @@ class TestICommand(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class Partial(ICommand):
             def timestamp(self, *, enabled: bool = True): # noqa: ARG002
                 """Return the command after accepting its timestamp.
@@ -157,6 +158,7 @@ class TestICommand(TestCase):
                     Value produced by the helper.
                 """
                 return self
+
             def description(self, desc: str): # noqa: ARG002
                 """Return the command after accepting its description.
 
@@ -186,6 +188,7 @@ class TestICommand(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class Concrete(ICommand):
             def timestamp(self, *, enabled: bool = True): # noqa: ARG002
                 """Return the command after accepting its timestamp.
@@ -201,6 +204,7 @@ class TestICommand(TestCase):
                     Value produced by the helper.
                 """
                 return self
+
             def description(self, desc: str): # noqa: ARG002
                 """Return the command after accepting its description.
 
@@ -215,6 +219,7 @@ class TestICommand(TestCase):
                     Value produced by the helper.
                 """
                 return self
+
             def arguments(self, args: list): # noqa: ARG002
                 """Return the command after accepting its arguments.
 
@@ -229,6 +234,7 @@ class TestICommand(TestCase):
                     Value produced by the helper.
                 """
                 return self
+
             def get(self):
                 """Return the loader result required by the test double.
 

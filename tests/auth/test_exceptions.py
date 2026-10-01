@@ -89,7 +89,6 @@ class TestExceptionHierarchy(TestCase):
             issubclass(AuthenticationException, AuthorizationException),
         )
 
-
 class TestExceptionModuleSurface(TestCase):
     """Validate what the exception module publishes."""
 
@@ -126,7 +125,6 @@ class TestExceptionModuleSurface(TestCase):
         for exception in (AuthException, *_SPECIALISED):
             docstring = exception.__doc__ or ""
             self.assertTrue(docstring.strip(), exception.__name__)
-
 
 class TestExceptionBehaviour(TestCase):
     """Validate how the failures behave once raised."""
@@ -201,7 +199,6 @@ class TestExceptionBehaviour(TestCase):
             with self.assertRaises(AuthException) as captured:
                 raise exception(error_msg)
             self.assertIsInstance(captured.exception, exception)
-
 
 class TestHttpStatusMapping(TestCase):
     """Validate how the failures become HTTP responses."""

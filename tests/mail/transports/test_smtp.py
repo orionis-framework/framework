@@ -18,7 +18,7 @@ from orionis.mail.manager import MailManager
 from orionis.mail.transports import smtp as smtp_module
 from orionis.mail.transports.smtp import SmtpTransport
 from orionis.test import TestCase
-from tests.mail.fixtures.doubles import MailApplication
+from tests.mail.test_composer import MailApplication
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum
-from orionis.test import TestCase
 from orionis.container.enums.lifetimes import Lifetime
+from orionis.test import TestCase
 
 _EXPECTED_VALUES = {
     "TRANSIENT": 1,

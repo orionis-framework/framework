@@ -1,0 +1,250 @@
+from __future__ import annotations
+from orionis.database.connection_manager import ConnectionManager
+from orionis.orm.exceptions import InvalidQueryException
+from orionis.orm.query_builder import QueryBuilder
+from orionis.orm.resolver import ConnectionResolver
+from orionis.orm.schema.table import TableDefinition
+from orionis.orm.schema.types import Boolean, Integer, String
+from orionis.support.facades.db import DB
+from orionis.test import TestCase
+
+class _StubApp:
+    """Minimal application stub exposing the database configuration."""
+
+    __slots__ = ()
+
+    def config(self, key: str) -> dict:  # noqa: ARG002
+        """Run the config helper.
+
+        Parameters
+        ----------
+        key : str
+            Value supplied for ``key``.
+
+        Returns
+        -------
+        dict
+            Value produced by the helper.
+        """
+        return {
+            "default": "sqlite",
+            "connections": {
+                "sqlite": {
+                    "driver": "sqlite",
+                    "database": ":memory:",
+                    "prefix": "",
+                },
+            },
+        }
+
+def _users_table() -> TableDefinition:
+    """Build the physical "users" table used by every test.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
+    columns = {
+        "id": Integer().primary().autoIncrement(),
+        "name": String(),
+        "active": Boolean(),
+    }
+    for key, column in columns.items():
+        column.name = key
+    return TableDefinition(name="users", columns=columns, primary_key="id")
+
+def _posts_table() -> TableDefinition:
+    """Build the physical "posts" table used by the join test.
+
+    Returns
+    -------
+    TableDefinition
+        Value produced by the helper.
+    """
+    columns = {
+        "id": Integer().primary().autoIncrement(),
+        "user_id": Integer(),
+        "title": String(),
+    }
+    for key, column in columns.items():
+        column.name = key
+    return TableDefinition(name="posts", columns=columns, primary_key="id")
+
+class TestRawQueryBuilder(TestCase):
+    """
+    Integration tests for ``DB.table()`` against a real sqlite connection.
+
+    ``RawQueryBuilder`` never sees the schema created here: it only knows
+    the table name, exercising the compiler's schemaless column support.
+    """
+
+    async def asyncSetUp(self) -> None:
+        """Wire an isolated in-memory manager and create both tables.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, previous_manager)
+        self.addCleanup(setattr, DB, "_pinned_instance", DB._pinned_instance)
+        self._manager = ConnectionManager(_StubApp())
+        ConnectionResolver.setManager(self._manager)
+        DB._pinned_instance = QueryBuilder(self._manager)
+        connection = self._manager.connection()
+        await connection.createTable(_users_table())
+        await connection.createTable(_posts_table())
+
+    async def asyncTearDown(self) -> None:
+        """Dispose the manager and clear the resolver after each test.
+
+        Returns
+        -------
+        None
+            Completes the operation described above.
+        """
+        await self._manager.disconnect()
+        ConnectionResolver.clear()
+
+    async def testInsertAndGetReturnPlainDictionaries(self) -> None:
+        """Insert a row and read it back as a plain dictionary.
+
+        Validates the model-less insert/get round trip.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert({"name": "John", "active": True})
+        rows = await DB.table("users").get()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["name"], "John")
+
+    async def testWhereFiltersRows(self) -> None:
+        """Filter rows by an equality condition.
+
+        Validates that ``where()`` narrows the result set.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert(
+            [
+                {"name": "John", "active": True},
+                {"name": "Jane", "active": False},
+            ],
+        )
+        rows = await DB.table("users").where("active", True).get()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["name"], "John")
+
+    async def testFirstReturnsNoneWithoutMatches(self) -> None:
+        """Return ``None`` from ``first()`` when nothing matches.
+
+        Validates the empty-result path.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        row = await DB.table("users").where("name", "Ghost").first()
+        self.assertIsNone(row)
+
+    async def testCountReturnsMatchingRows(self) -> None:
+        """Count rows matching a condition without fetching them.
+
+        Validates the aggregate terminal.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert(
+            [
+                {"name": "a", "active": True},
+                {"name": "b", "active": True},
+                {"name": "c", "active": False},
+            ],
+        )
+        count = await DB.table("users").where("active", True).count()
+        self.assertEqual(count, 2)
+
+    async def testUpdateAndDeleteAffectMatchingRows(self) -> None:
+        """Update then delete a row through the raw builder.
+
+        Validates both mutation terminals end to end.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert({"name": "John", "active": True})
+        affected = (
+            await DB.table("users").where("name", "John").update({"active": False})
+        )
+        self.assertEqual(affected, 1)
+        deleted = await DB.table("users").where("name", "John").delete()
+        self.assertEqual(deleted, 1)
+
+    async def testJoinAcrossTwoRawTables(self) -> None:
+        """Join two model-less tables using qualified projected columns.
+
+        Validates that ``join()`` reuses the JoinExpression compiler
+        support without either side declaring a schema upfront.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert({"name": "John", "active": True})
+        await DB.table("posts").insert({"user_id": 1, "title": "Hello"})
+
+        rows = await (
+            DB.table("users")
+            .join("posts", "users.id", "=", "posts.user_id")
+            .select("users.name", "posts.title")
+            .get()
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["title"], "Hello")
+
+    async def testAliasAndOrderByWork(self) -> None:
+        """Order rows through an aliased table reference.
+
+        Validates that ``alias=`` on ``DB.table()`` reaches the compiler.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await DB.table("users").insert(
+            [
+                {"name": "B", "active": True},
+                {"name": "A", "active": True},
+            ],
+        )
+        rows = await DB.table("users", alias="u").orderBy("name").get()
+        self.assertEqual([row["name"] for row in rows], ["A", "B"])
+
+    async def testInsertWithoutValuesRaises(self) -> None:
+        """Reject an insert call carrying no rows.
+
+        Validates the same guard used by ``ModelQueryBuilder``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        with self.assertRaises(InvalidQueryException):
+            await DB.table("users").insert([])

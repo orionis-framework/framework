@@ -14,6 +14,8 @@ class IBelongsToManyRelation(IRelation):
     have no equivalent on the single-table relationship kinds.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def wherePivot(
         self,

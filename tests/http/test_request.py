@@ -1587,6 +1587,7 @@ class TestRequestPayloadDispatch(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def parse_custom_payload(raw: bytes) -> dict[str, str]:
             """Decode custom request bytes into their expected mapping.
 

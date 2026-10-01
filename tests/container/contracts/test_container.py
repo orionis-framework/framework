@@ -1,9 +1,9 @@
 from __future__ import annotations
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.container.container import Container
 from orionis.container.contracts.container import IContainer
+from orionis.test import TestCase
 
 _ABSTRACT_METHODS = frozenset({
     "instance", "transient", "singleton", "scoped",

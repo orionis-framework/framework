@@ -4,8 +4,8 @@ import gc
 import threading
 import time
 import weakref
-from orionis.test import TestCase
 from orionis.support.patterns.singleton.meta import Singleton
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixture helpers - each test that needs a *fresh* singleton must define its
@@ -125,6 +125,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _ThreadedSingleton(metaclass=Singleton):
             pass
 
@@ -166,6 +167,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _AsyncSingleton(metaclass=Singleton):
             pass
 
@@ -184,6 +186,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _MixedSingleton(metaclass=Singleton):
             pass
 
@@ -202,6 +205,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _AsyncFirstSingleton(metaclass=Singleton):
             pass
 
@@ -220,6 +224,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _ConcurrentSingleton(metaclass=Singleton):
             pass
 
@@ -271,6 +276,7 @@ class TestSingletonMeta(TestCase):
             None
                 Completes the operation described above.
             """
+
             async def _resolve() -> object:
                 """Wait for the concurrent singleton construction to finish.
 
@@ -307,6 +313,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _SingletonX(metaclass=Singleton):
             pass
 
@@ -377,6 +384,7 @@ class TestSingletonMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _Parent(metaclass=Singleton):
             pass
 

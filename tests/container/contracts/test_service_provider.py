@@ -1,8 +1,8 @@
 from __future__ import annotations
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.container.contracts.service_provider import IServiceProvider
+from orionis.test import TestCase
 
 class _ConcreteProvider(IServiceProvider):
     """Minimal IServiceProvider implementation for structural tests."""

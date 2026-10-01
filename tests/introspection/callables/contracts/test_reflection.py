@@ -1,9 +1,9 @@
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.introspection.callables.contracts.reflection import (
     IReflectionCallable,
 )
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Minimal concrete implementation used only in contract tests
@@ -278,6 +278,7 @@ class TestIReflectionCallablePartialImplementation(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         class _Partial(IReflectionCallable):
             def getCallable(self):
                 """Implement the ``getCallable`` contract stub.

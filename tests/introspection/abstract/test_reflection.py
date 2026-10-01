@@ -1,7 +1,7 @@
 import inspect
 from abc import ABC, ABCMeta, abstractmethod
-from orionis.test import TestCase
 from orionis.introspection.abstract.reflection import ReflectionAbstract
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Test fixtures
@@ -282,7 +282,6 @@ class _NoDocABC(ABC):
         """
         ...
 
-
 class _ConcreteClass:
     """Represent an ordinary non-abstract class fixture."""
 
@@ -300,6 +299,7 @@ def _make_mutable_abc() -> type:
     Calling this function every time ensures test isolation: each test
     that mutates the class starts with a clean, independent type.
     """
+
     class _MutableABC(ABC):
         mutable_attr: int = 99
 
@@ -313,7 +313,6 @@ def _make_mutable_abc() -> type:
                 Value produced by the helper.
             """
             ...
-
 
         def deletableMethod(self) -> int:
             """
@@ -337,6 +336,7 @@ def _make_private_method_abc() -> type:
     type
         A new ABC subclass with a name-mangled private method.
     """
+
     class _PrivateMethodABC(ABC):
 
         @abstractmethod
@@ -349,7 +349,6 @@ def _make_private_method_abc() -> type:
                 Value produced by the helper.
             """
             ...
-
 
         def __hiddenMethod(self) -> int: # NOSONAR
             """
@@ -373,6 +372,7 @@ def _make_sourceless_abc() -> type:
     type
         A new abstract class whose source lines cannot be located.
     """
+
     def _method(self) -> None:
         """Do nothing.
 
@@ -397,6 +397,7 @@ def _make_moduleless_abc() -> type:
     type
         A new abstract class pointing at a module missing from sys.modules.
     """
+
     def _method(self) -> None:
         """Do nothing.
 
@@ -703,6 +704,7 @@ class TestReflectionAbstractMetadata(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         class _Bare(ABC):
             @abstractmethod
             def m(self):
@@ -714,7 +716,6 @@ class TestReflectionAbstractMetadata(TestCase):
                     Completes the operation described above.
                 """
                 ...
-
 
         # Force __doc__ to None to simulate a class with no docstring
         _Bare.__doc__ = None
@@ -1224,7 +1225,6 @@ class TestReflectionAbstractPublicMethods(TestCase):
         """
         self.assertIsInstance(self.r.getMethods(), list)
 
-
 class TestReflectionAbstractProtectedMethods(TestCase):
 
     def setUp(self) -> None:
@@ -1295,7 +1295,6 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         async_methods = self.r.getProtectedAsyncMethods()
         self.assertIsInstance(async_methods, list)
         self.assertIn("_protectedAsyncMethod", async_methods)
-
 
 class TestReflectionAbstractPrivateMethods(TestCase):
 

@@ -57,7 +57,6 @@ class _RecordingReactor:
         self.calls.append((signature, args))
         return self.exit_code
 
-
 class _StubApp:
     """Application double resolving the reactor contract."""
 
@@ -96,7 +95,6 @@ class _StubApp:
         self.requested.append(abstract)
         return self.reactor
 
-
 async def boot_kernel(exit_code: int = 0) -> tuple[KernelCLI, _RecordingReactor]:
     """
     Build a kernel already booted against a recording reactor.
@@ -115,7 +113,6 @@ async def boot_kernel(exit_code: int = 0) -> tuple[KernelCLI, _RecordingReactor]
     kernel = KernelCLI()
     await kernel.boot(_StubApp(reactor))  # type: ignore[arg-type]
     return kernel, reactor
-
 
 class TestKernelCliDefinition(TestCase):
 
@@ -203,7 +200,6 @@ class TestKernelCliDefinition(TestCase):
         self.assertEqual(KernelCLI.__slots__, ("__reactor",))
         self.assertFalse(hasattr(KernelCLI(), "__dict__"))
 
-
 class TestKernelCliBoot(TestCase):
 
     async def testResolvesTheReactorFromTheApplication(self) -> None:
@@ -242,7 +238,6 @@ class TestKernelCliBoot(TestCase):
 
         self.assertEqual(reactor.calls, [("migrate", [])])
 
-
 class TestKernelCliArgumentValidation(TestCase):
 
     async def testRejectsArgumentsThatAreNotAList(self) -> None:
@@ -264,7 +259,6 @@ class TestKernelCliArgumentValidation(TestCase):
             self.assertEqual(str(captured.exception), _TYPE_ERROR_MESSAGE)
 
         self.assertEqual(reactor.calls, [])
-
 
 class TestKernelCliHelpFallback(TestCase):
 
@@ -337,7 +331,6 @@ class TestKernelCliHelpFallback(TestCase):
         await kernel.handle(["reactor"])
 
         self.assertEqual(reactor.calls, [("list", None)])
-
 
 class TestKernelCliDispatch(TestCase):
 

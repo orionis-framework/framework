@@ -1,10 +1,13 @@
 import ast
 import importlib.util
+from asyncio import gather
 from datetime import UTC, datetime
 from itertools import pairwise
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from threading import get_ident
+from orionis.console.commands.make import database_migration as migration_module
+from orionis.console.commands.make._base import MakeStubCommand
 from orionis.console.commands.make.console import MakeConsoleCommand
 from orionis.console.commands.make.console_listener import MakeConsoleListener
 from orionis.console.commands.make.contract import MakeContract
@@ -27,28 +30,185 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_paths import CORE_APP_PATHS
 from orionis.test import TestCase
 
+class _RecordedMakeCommand(MakeStubCommand):
+    """Record output and file creation while retaining each command's behavior."""
+
+    __slots__ = ("creation_threads", "errors", "lines", "successes", "timestamps")
+
+    def __init__(self) -> None:
+        """Initialize command arguments and isolated output records.
+
+        Returns
+        -------
+        None
+            Create empty message and thread records and reset the line count.
+        """
+        super().__init__()
+        self.creation_threads: list[int] = []
+        self.errors: list[str] = []
+        self.lines = 0
+        self.successes: list[str] = []
+        self.timestamps: list[bool] = []
+
+    def newLine(self, count: int = 1) -> None:
+        """Record requested blank lines without terminal output.
+
+        Parameters
+        ----------
+        count : int, optional
+            Number of blank lines to add to the total; defaults to one.
+
+        Returns
+        -------
+        None
+            Increment the recorded blank-line count.
+        """
+        self.lines += count
+
+    def success(self, message: str, *, timestamp: bool = True) -> None:
+        """Record a success message and its timestamp flag.
+
+        Parameters
+        ----------
+        message : str
+            Success notification to record without terminal output.
+        timestamp : bool, optional
+            Timestamp flag to record alongside the message; defaults to True.
+
+        Returns
+        -------
+        None
+            Append the message and timestamp flag to their respective records.
+        """
+        self.successes.append(message)
+        self.timestamps.append(timestamp)
+
+    def error(self, message: object, *, timestamp: bool = True) -> None:
+        """Record a command error as text with its timestamp flag.
+
+        Parameters
+        ----------
+        message : object
+            Error value to convert to text without terminal output.
+        timestamp : bool, optional
+            Timestamp flag to record alongside the error; defaults to True.
+
+        Returns
+        -------
+        None
+            Append the error text and timestamp flag to their respective records.
+        """
+        self.errors.append(str(message))
+        self.timestamps.append(timestamp)
+
+    def createFile(
+        self,
+        app: IApplication,
+        name: str,
+        *,
+        template_name: str | None = None,
+        extension: str = "py",
+        replacements: dict[str, str] | None = None,
+    ) -> str:
+        """Record the current thread and delegate stub file creation.
+
+        Parameters
+        ----------
+        app : IApplication
+            Application supplying output paths.
+        name : str
+            Requested class name or relative file path.
+        template_name : str or None, optional
+            Packaged template override, or None to use the command's default.
+        extension : str, optional
+            Output file extension; defaults to ``"py"``.
+        replacements : dict of str to str or None, optional
+            Placeholder values forwarded to the renderer, when provided.
+
+        Returns
+        -------
+        str
+            Application-relative path returned by the stub generator.
+        """
+        self.creation_threads.append(get_ident())
+        return super().createFile(
+            app, name, template_name=template_name,
+            extension=extension, replacements=replacements,
+        )
+
+def _record_command(command_type: type[MakeStubCommand]) -> _RecordedMakeCommand:
+    """Instantiate a recording subclass that preserves command overrides.
+
+    Parameters
+    ----------
+    command_type : type of MakeStubCommand
+        Command class to combine with the recording implementation.
+
+    Returns
+    -------
+    _RecordedMakeCommand
+        Fresh command that creates real files and records console notifications.
+    """
+    recorded_type = type(
+        f"_Recorded{command_type.__name__}",
+        (command_type, _RecordedMakeCommand),
+        {"__slots__": ()},
+    )
+    return recorded_type()
+
+class _Clock:
+    """Supply successive fixed timestamps to the migration generator."""
+
+    __slots__ = ("calls",)
+
+    def __init__(self) -> None:
+        """Reset the deterministic timestamp request counter.
+
+        Returns
+        -------
+        None
+            Set the number of observed timestamp requests to zero.
+        """
+        self.calls = 0
+
+    def now(self) -> datetime:
+        """Return a fixed UTC timestamp with the next sequential second.
+
+        Returns
+        -------
+        datetime
+            Timestamp on 2026-09-30 at 12:22 with the call count as its second.
+
+        Raises
+        ------
+        ValueError
+            If the incremented call count reaches 60 and is not a valid second.
+        """
+        self.calls += 1
+        return datetime(2026, 9, 30, 12, 22, self.calls, tzinfo=UTC)
+
 class _Application:
     """Resolve core application paths inside a temporary project directory."""
 
     __slots__ = ("basePath",)
 
     def __init__(self, base_path: Path) -> None:
-        """Store the root used by the generated files.
+        """Store the temporary project root for generated files.
 
         Parameters
         ----------
         base_path : Path
-            Temporary application root.
+            Project root used to resolve application output paths.
 
         Returns
         -------
         None
-            Store the application root.
+            Assign the project root to ``basePath``.
         """
         self.basePath = base_path
 
     def path(self, key: str) -> Path:
-        """Resolve a core application path key below the temporary root.
+        """Resolve a core application path relative to the project root.
 
         Parameters
         ----------
@@ -58,12 +218,17 @@ class _Application:
         Returns
         -------
         Path
-            Absolute output directory for the requested key.
+            Project root joined with the requested core path.
+
+        Raises
+        ------
+        KeyError
+            If the key is not declared in ``CORE_APP_PATHS``.
         """
         return self.basePath.joinpath(*CORE_APP_PATHS[key].split("/"))
 
     def config(self, key: str) -> object:
-        """Return mail sender settings used by the generated Mailable.
+        """Look up a fixed mail sender setting by configuration key.
 
         Parameters
         ----------
@@ -72,8 +237,8 @@ class _Application:
 
         Returns
         -------
-        object
-            Configured sender address or display name, when requested.
+        str or None
+            Sender address or display name, or None for an unknown key.
         """
         return {
             "mail.from_address.address": "notifications@example.test",
@@ -86,32 +251,32 @@ class _Reactor:
     __slots__ = ("registered",)
 
     def __init__(self) -> None:
-        """Initialize the isolated signature registry.
+        """Create an isolated command signature registry.
 
         Returns
         -------
         None
-            Create an empty set of registered signatures.
+            Initialize an empty set of registered command signatures.
         """
         self.registered: set[str] = set()
 
     async def hasCommand(self, signature: str) -> bool:
-        """Check whether a command signature is already registered.
+        """Check whether the test registry contains a command signature.
 
         Parameters
         ----------
         signature : str
-            Command signature requested by the generated command.
+            Command signature to look up in the registry.
 
         Returns
         -------
         bool
-            Return whether the test registry contains the signature.
+            True if the signature is registered, otherwise False.
         """
         return signature in self.registered
 
 def _get_python_sources(root: Path) -> set[Path]:
-    """Collect Python source and stub files below a directory.
+    """Collect Python source and interface files recursively.
 
     Parameters
     ----------
@@ -120,21 +285,102 @@ def _get_python_sources(root: Path) -> set[Path]:
 
     Returns
     -------
-    set[Path]
-        Python source and interface stub paths.
+    set of Path
+        Paths matching ``*.py`` or ``*.pyi`` below the root.
     """
     return set(root.rglob("*.py")) | set(root.rglob("*.pyi"))
 
 class TestMakeCommands(TestCase):
     """Verify built-in make command registration and file generation."""
 
-    def testGeneratedStringLiteralsPreserveQuotedAndMultilineValues(self) -> None:
-        """Generate valid Python for values containing quotes and newlines.
+    def setUp(self) -> None:
+        """Install a deterministic migration clock and register its restoration.
 
         Returns
         -------
         None
-            Parsed literals retain the original command and facade values.
+            Bind a fresh clock and schedule restoration of the original DateTime.
+        """
+        self.clock = _Clock()
+        self.addCleanup(
+            setattr, migration_module, "DateTime", migration_module.DateTime,
+        )
+        migration_module.DateTime = self.clock
+
+    async def testConsoleHandleCreatesFilesOnAWorkerThread(self) -> None:
+        """Verify console file creation runs on a worker thread.
+
+        Returns
+        -------
+        None
+            Assert one worker write, one success, no errors, and two blank lines.
+        """
+        with TemporaryDirectory() as temporary:
+            command = _record_command(MakeConsoleCommand)
+            command.setArguments({
+                "name": "worker", "signature": "generated:worker",
+            })
+            await command.handle(_Application(Path(temporary)), _Reactor())
+            self.assertEqual(len(command.creation_threads), 1)
+            self.assertNotEqual(command.creation_threads[0], get_ident())
+            self.assertEqual(len(command.successes), 1)
+            self.assertEqual(command.errors, [])
+            self.assertEqual(command.lines, 2)
+
+    async def testConsoleRejectsInvalidOrRegisteredSignaturesBeforeWriting(
+        self,
+    ) -> None:
+        """Verify invalid, missing, or registered signatures prevent file writes.
+
+        Returns
+        -------
+        None
+            Assert each rejection records an error without creating any files.
+        """
+        with TemporaryDirectory() as temporary:
+            app = _Application(Path(temporary))
+            reactor = _Reactor()
+            reactor.registered.add("generated:taken")
+            for signature in ("INVALID", "generated:taken", None):
+                command = _record_command(MakeConsoleCommand)
+                command.setArguments({"name": "rejected", "signature": signature})
+                await command.handle(app, reactor)
+                self.assertEqual(command.creation_threads, [])
+                self.assertEqual(command.successes, [])
+                self.assertEqual(len(command.errors), 1)
+            self.assertEqual(_get_python_sources(app.basePath), set())
+
+    async def testIndependentGeneratorsCreateTheirOwnFilesConcurrently(
+        self,
+    ) -> None:
+        """Verify concurrent service generators keep their output independent.
+
+        Returns
+        -------
+        None
+            Assert each file contains its own class and reports error-free success.
+        """
+        with TemporaryDirectory() as temporary:
+            app = _Application(Path(temporary))
+            commands = [_record_command(MakeService) for _ in range(8)]
+            for index, command in enumerate(commands):
+                command.setArguments({"name": f"worker_{index}"})
+            await gather(*(command.handle(app) for command in commands))
+            for index, command in enumerate(commands):
+                target = app.basePath / f"app/services/worker_{index}.py"
+                self.assertIn(
+                    f"class Worker{index}", target.read_text(encoding="utf-8"),
+                )
+                self.assertEqual(len(command.successes), 1)
+                self.assertEqual(command.errors, [])
+
+    def testGeneratedStringLiteralsPreserveQuotedAndMultilineValues(self) -> None:
+        """Verify generated literals preserve quoted and multiline values.
+
+        Returns
+        -------
+        None
+            Assert command metadata and facade accessors round-trip unchanged.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -186,25 +432,20 @@ class TestMakeCommands(TestCase):
             self.assertEqual(ast.literal_eval(accessor_return.value), accessor)
 
     async def testMakeTestCreatesDiscoverableNestedModule(self) -> None:
-        """Prefix the final test filename once and preserve nested directories.
+        """Verify nested test modules use a single discovery prefix.
 
         Returns
         -------
         None
-            Assertions verify generated names, syntax, and test inheritance.
+            Assert paths, class names, inheritance, and async method documentation.
         """
         for name in ("billing/invoice.py", "billing/test_invoice.py"):
             with TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                command = MakeTest()
+                command = _record_command(MakeTest)
                 command.setArguments({"name": name})
 
-                with (
-                    patch.object(command, "newLine"),
-                    patch.object(command, "success") as success,
-                    patch.object(command, "error") as error,
-                ):
-                    await command.handle(_Application(root))
+                await command.handle(_Application(root))
 
                 target = root / "tests" / "billing" / "test_invoice.py"
                 self.assertTrue(target.is_file())
@@ -222,39 +463,26 @@ class TestMakeCommands(TestCase):
                 )
                 self.assertEqual(test_method.name, "testExample")
                 self.assertIsNotNone(ast.get_docstring(test_method))
-                self.assertTrue(success.called)
-                error.assert_not_called()
+                self.assertEqual(len(command.successes), 1)
+                self.assertEqual(command.errors, [])
 
     async def testMakeDatabaseMigrationTimestampsDiscoverableModules(self) -> None:
-        """Timestamp migrations across nested directories for discovery.
+        """Verify timestamped migrations remain importable in nested directories.
 
         Returns
         -------
         None
-            Assertions verify timestamped paths and migration methods.
+            Assert file paths, class names, async methods, and Migration inheritance.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             app = _Application(root)
-            created_at = (
-                datetime(2026, 9, 30, 12, 22, 1, tzinfo=UTC),
-                datetime(2026, 9, 30, 12, 22, 2, tzinfo=UTC),
-            )
-            with patch(
-                "orionis.console.commands.make.database_migration.DateTime.now",
-                side_effect=created_at,
-            ) as now:
-                for name in ("create_accounts.py", "billing/create_invoices.py"):
-                    command = MakeDatabaseMigration()
-                    command.setArguments({"name": name})
-                    with (
-                        patch.object(command, "newLine"),
-                        patch.object(command, "success"),
-                        patch.object(command, "error") as error,
-                    ):
-                        await command.handle(app)
-                    error.assert_not_called()
-                self.assertEqual(now.call_count, 2)
+            for name in ("create_accounts.py", "billing/create_invoices.py"):
+                command = _record_command(MakeDatabaseMigration)
+                command.setArguments({"name": name})
+                await command.handle(app)
+                self.assertEqual(command.errors, [])
+            self.assertEqual(self.clock.calls, 2)
 
             migration_root = root / "database" / "migrations"
             expected = (
@@ -292,12 +520,12 @@ class TestMakeCommands(TestCase):
                 )
 
     async def testMakeDatabaseMigrationIgnoresScaffoldSequence(self) -> None:
-        """Use the current timestamp despite existing numbered migrations.
+        """Verify existing migration numbering does not alter timestamp prefixes.
 
         Returns
         -------
         None
-            Assertions verify scaffold numbering does not affect the prefix.
+            Assert the generated filename uses the deterministic clock's timestamp.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -307,32 +535,23 @@ class TestMakeCommands(TestCase):
                 "",
                 encoding="utf-8",
             )
-            command = MakeDatabaseMigration()
+            command = _record_command(MakeDatabaseMigration)
             command.setArguments({"name": "create_orders.py"})
 
-            with (
-                patch.object(command, "newLine"),
-                patch.object(command, "success"),
-                patch.object(command, "error") as error,
-                patch(
-                    "orionis.console.commands.make.database_migration.DateTime.now",
-                    return_value=datetime(2026, 9, 30, 12, 22, 1, tzinfo=UTC),
-                ),
-            ):
-                await command.handle(_Application(root))
+            await command.handle(_Application(root))
 
             self.assertTrue(
                 (migration_root / "m20260930122201_create_orders.py").is_file(),
             )
-            error.assert_not_called()
+            self.assertEqual(command.errors, [])
 
     async def testMakeDatabaseSeederAndSchemaUseConfiguredPaths(self) -> None:
-        """Generate reusable seeder and schema skeletons with one suffix.
+        """Verify seeders and schemas use configured paths and single suffixes.
 
         Returns
         -------
         None
-            Assertions verify output paths, suffixes, and class names.
+            Assert generated class names, base classes, and template defaults.
         """
         cases = (
             (
@@ -357,14 +576,9 @@ class TestMakeCommands(TestCase):
         for command_type, name, relative_path, expected_class in cases:
             with TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                command = command_type()
+                command = _record_command(command_type)
                 command.setArguments({"name": name})
-                with (
-                    patch.object(command, "newLine"),
-                    patch.object(command, "success"),
-                    patch.object(command, "error") as error,
-                ):
-                    await command.handle(_Application(root))
+                await command.handle(_Application(root))
 
                 target = root / relative_path
                 self.assertTrue(target.is_file())
@@ -403,55 +617,45 @@ class TestMakeCommands(TestCase):
                             for node in generated_class.body
                         ),
                     )
-                error.assert_not_called()
+                self.assertEqual(command.errors, [])
 
     async def testMakeServiceCreatesNestedFileAfterRemovingExtension(self) -> None:
-        """Generate a nested service from a name ending in ``.py``.
+        """Verify service generation strips extensions and preserves nested paths.
 
         Returns
         -------
         None
-            Assertions verify the configured service path and class name.
+            Assert the service path, class name, and successful command output.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             app = _Application(root)
-            command = MakeService()
+            command = _record_command(MakeService)
             command.setArguments({"name": "billing/invoice_service.py"})
 
-            with (
-                patch.object(command, "newLine"),
-                patch.object(command, "success") as success,
-                patch.object(command, "error") as error,
-            ):
-                await command.handle(app)
+            await command.handle(app)
 
             target = root / "app" / "services" / "billing" / "invoice_service.py"
             self.assertTrue(target.is_file())
             self.assertIn("class InvoiceService", target.read_text(encoding="utf-8"))
-            self.assertTrue(success.called)
-            error.assert_not_called()
+            self.assertEqual(len(command.successes), 1)
+            self.assertEqual(command.errors, [])
 
     async def testMakeControllerGeneratesAsyncApiResourceActions(self) -> None:
-        """Generate all resource actions with explicit JSON response types.
+        """Verify API controllers declare documented async resource actions.
 
         Returns
         -------
         None
-            Assertions verify method names, async declarations, and syntax.
+            Assert JSON return types, method spacing, and docstring-only bodies.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             app = _Application(root)
-            command = MakeHttpController()
+            command = _record_command(MakeHttpController)
             command.setArguments({"name": "api/invoice.py", "api": True})
 
-            with (
-                patch.object(command, "newLine"),
-                patch.object(command, "success"),
-                patch.object(command, "error") as error,
-            ):
-                await command.handle(app)
+            await command.handle(app)
 
             target = (
                 root / "app" / "http" / "controllers" / "api"
@@ -498,28 +702,23 @@ class TestMakeCommands(TestCase):
                 ),
             )
             self.assertNotIn("return ", content)
-            error.assert_not_called()
+            self.assertEqual(command.errors, [])
 
     async def testMakeControllerCanGenerateAnInvokableAction(self) -> None:
-        """Generate a single asynchronous ``__call__`` controller action.
+        """Verify invokable controllers declare a single async ``__call__`` action.
 
         Returns
         -------
         None
-            Assertions verify invokable syntax and the HTML response type.
+            Assert the action name, HttpResponse import, and absence of return code.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             app = _Application(root)
-            command = MakeHttpController()
+            command = _record_command(MakeHttpController)
             command.setArguments({"name": "health", "invoke": True})
 
-            with (
-                patch.object(command, "newLine"),
-                patch.object(command, "success"),
-                patch.object(command, "error") as error,
-            ):
-                await command.handle(app)
+            await command.handle(app)
 
             target = root / "app" / "http" / "controllers" / "health_controller.py"
             content = target.read_text(encoding="utf-8")
@@ -536,30 +735,24 @@ class TestMakeCommands(TestCase):
             self.assertEqual(methods, ["__call__"])
             self.assertIn("HttpResponse", content)
             self.assertNotIn("return ", content)
-            error.assert_not_called()
+            self.assertEqual(command.errors, [])
 
     async def testMakeProviderAddsProviderPostfixOnce(self) -> None:
-        """Add the provider suffix to filenames and class names once.
+        """Verify provider filenames and class names receive one suffix.
 
         Returns
         -------
         None
-            Assertions verify generated provider names with and without an
-            explicitly supplied suffix.
+            Assert flat and nested paths retain the expected provider class name.
         """
         for index, name in enumerate(("cache", "billing/cache_provider.py")):
             with TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 app = _Application(root)
-                command = MakeProvider()
+                command = _record_command(MakeProvider)
                 command.setArguments({"name": name})
 
-                with (
-                    patch.object(command, "newLine"),
-                    patch.object(command, "success"),
-                    patch.object(command, "error") as error,
-                ):
-                    await command.handle(app)
+                await command.handle(app)
 
                 relative_path = (
                     Path("app") / "providers" / "cache_provider.py"
@@ -571,15 +764,15 @@ class TestMakeCommands(TestCase):
                     )
                 content = (root / relative_path).read_text(encoding="utf-8")
                 self.assertIn("class CacheProvider", content)
-                error.assert_not_called()
+                self.assertEqual(command.errors, [])
 
     async def testMakeModelAndMailUseTheirApplicationDirectories(self) -> None:
-        """Generate model and reusable mail templates in configured paths.
+        """Verify model and mail templates use their configured directories.
 
         Returns
         -------
         None
-            Assertions verify model defaults and application injection.
+            Assert model defaults, runtime application typing, and mail senders.
         """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -588,15 +781,10 @@ class TestMakeCommands(TestCase):
                 (MakeModel, "user"),
                 (MakeMail, "welcome"),
             ):
-                command = command_type()
+                command = _record_command(command_type)
                 command.setArguments({"name": name})
-                with (
-                    patch.object(command, "newLine"),
-                    patch.object(command, "success"),
-                    patch.object(command, "error") as error,
-                ):
-                    await command.handle(app)
-                error.assert_not_called()
+                await command.handle(app)
+                self.assertEqual(command.errors, [])
 
             model = (root / "app" / "models" / "user.py").read_text(encoding="utf-8")
             mail = (root / "app" / "notifications" / "welcome_mail.py").read_text(
@@ -631,13 +819,12 @@ class TestMakeCommands(TestCase):
             self.assertEqual(sender.name, "Example Notifications")
 
     async def testEveryMakeStubProducesDocumentedPython(self) -> None:
-        """Render each make template and verify generated documentation.
+        """Verify every make template renders documented Python declarations.
 
         Returns
         -------
         None
-            Assertions verify generated modules parse and document every class
-            and method.
+            Assert syntax, runtime imports, and class and method documentation.
         """
         cases = (
             (
@@ -665,26 +852,21 @@ class TestMakeCommands(TestCase):
             root = Path(temporary)
             app = _Application(root)
             for index, (command_type, extra_arguments) in enumerate(cases):
-                command = command_type()
+                command = _record_command(command_type)
                 arguments = {
                     "name": f"generated/file_{index}.py",
                     **extra_arguments,
                 }
                 command.setArguments(arguments)
                 before = _get_python_sources(root)
-                with (
-                    patch.object(command, "newLine"),
-                    patch.object(command, "success"),
-                    patch.object(command, "error") as error,
-                ):
-                    if isinstance(command, MakeConsoleCommand):
-                        await command.handle(app, _Reactor())
-                    else:
-                        await command.handle(app)
+                if isinstance(command, MakeConsoleCommand):
+                    await command.handle(app, _Reactor())
+                else:
+                    await command.handle(app)
 
                 generated = _get_python_sources(root) - before
                 self.assertTrue(generated, command.signature)
-                error.assert_not_called()
+                self.assertEqual(command.errors, [])
                 for file_path in generated:
                     content = file_path.read_text(encoding="utf-8")
                     if command_type is MakeHttpMiddleware:
@@ -727,12 +909,12 @@ class TestMakeCommands(TestCase):
                             )
 
     def testRegistersEveryPlannedMakeCommand(self) -> None:
-        """Expose all planned make commands through the core command registry.
+        """Verify all planned make commands appear in the core registry.
 
         Returns
         -------
         None
-            Assertions verify every planned signature is registered.
+            Assert signature coverage, uniqueness, and canonical seeder spelling.
         """
         signatures = {command.signature for command in CORE_COMMANDS}
 

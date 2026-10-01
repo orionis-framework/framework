@@ -21,7 +21,7 @@ _ASYNC_DIALECTS: dict[str, str] = {
     "sqlserver": "mssql+aioodbc",
 }
 
-# Map of Orionis driver names to (pip package, install extra) hints.
+# Map of Orionis driver names to (driver package, install extra) hints.
 _ASYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
     "sqlite": ("aiosqlite", "orionis"),
     "mysql": ("aiomysql", "orionis[mysql]"),
@@ -41,7 +41,7 @@ _SYNC_DIALECTS: dict[str, str] = {
     "sqlserver": "mssql+pyodbc",
 }
 
-# Map of Orionis driver names to (pip package, install extra) hints for the
+# Map of Orionis driver names to (driver package, install extra) hints for the
 # synchronous DBAPI drivers above. SQLite needs nothing extra (stdlib
 # sqlite3); Oracle reuses the async package, which also works synchronously.
 # The other extras install both the async and sync driver together.
@@ -122,7 +122,7 @@ def missing_dependency_error(
     Returns
     -------
     MissingDatabaseDependencyException
-        Exception with an actionable installation hint.
+        Exception with an actionable uv installation hint.
     """
     packages: dict[str, tuple[str, str]] = (
         _SYNC_DRIVER_PACKAGES if sync else _ASYNC_DRIVER_PACKAGES
@@ -130,7 +130,7 @@ def missing_dependency_error(
     package, extra = packages.get(driver, (driver, "orionis"))
     error_msg = (
         f"The '{driver}' connection requires the '{package}' package "
-        f"({cause}). Install it with: pip install {extra}"
+        f"({cause}). Install it with: uv add '{extra}'"
     )
     return MissingDatabaseDependencyException(error_msg)
 

@@ -49,6 +49,7 @@ class TestCsrfExtension(TestCase):
         Validates that the coroutine returned by the template global is
         awaited before its markup is written to the output.
         """
+
         async def csrf_field() -> Markup:
             """Return the hidden CSRF field used by the template.
 

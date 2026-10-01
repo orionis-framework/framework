@@ -4,10 +4,10 @@ from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.metadata import Message, Title
 from orionis.schemas.rule import Rule
 from orionis.schemas.rules_executor import (
+    _PLAN_CACHE,
     _build_plan,
     _collect_nested,
     _collect_with_plan,
-    _PLAN_CACHE,
     _type_contains_nested,
     _warm_child_plan,
 )

@@ -1,5 +1,5 @@
-from orionis.test import TestCase
 from orionis.support.types.std import StdClass
+from orionis.test import TestCase
 
 class TestStdClass(TestCase):
 

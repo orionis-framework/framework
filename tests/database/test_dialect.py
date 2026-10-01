@@ -427,7 +427,7 @@ class TestDialect(TestCase):
     def testMissingDependencyErrorCarriesInstallHint(self) -> None:
         """Build actionable errors for missing async driver packages.
 
-        Validates the package name and install extra in the message.
+        Validate the package name and uv command for the install extra.
 
         Returns
         -------
@@ -438,12 +438,12 @@ class TestDialect(TestCase):
         error = missing_dependency_error("sqlserver", cause)
         self.assertIsInstance(error, MissingDatabaseDependencyException)
         self.assertIn("aioodbc", str(error))
-        self.assertIn("orionis[sqlserver]", str(error))
+        self.assertIn("uv add 'orionis[sqlserver]'", str(error))
 
     def testMissingDependencyErrorForEveryDriver(self) -> None:
         """Provide hints for every supported driver.
 
-        Validates the hint registry completeness.
+        Validate the hint registry and its uv installation commands.
 
         Returns
         -------
@@ -456,23 +456,33 @@ class TestDialect(TestCase):
             ("mysql", "aiomysql"),
             ("pgsql", "asyncpg"),
             ("oracle", "oracledb"),
+            ("sqlserver", "aioodbc"),
         ):
-            self.assertIn(package, str(missing_dependency_error(driver, cause)))
+            error = missing_dependency_error(driver, cause)
+            requirement = "orionis" if driver == "sqlite" else f"orionis[{driver}]"
+            self.assertIn(package, str(error))
+            self.assertIn(f"uv add '{requirement}'", str(error))
 
     def testMissingDependencyErrorForSyncDriver(self) -> None:
         """Report the synchronous package name for a missing sync driver.
 
-        Validates the sync-specific installation hint used by the
-        APScheduler jobstore builder.
+        Validate uv install hints for the optional APScheduler DBAPI drivers.
 
         Returns
         -------
         None
             Assertions verify the behavior described above.
         """
-        cause = ModuleNotFoundError("No module named 'psycopg2'")
-        error = missing_dependency_error("pgsql", cause, sync=True)
-        self.assertIn("psycopg2", str(error))
+        cause = ModuleNotFoundError("Missing DBAPI driver")
+        for driver, package in (
+            ("mysql", "pymysql"),
+            ("pgsql", "psycopg2"),
+            ("oracle", "oracledb"),
+            ("sqlserver", "pyodbc"),
+        ):
+            error = missing_dependency_error(driver, cause, sync=True)
+            self.assertIn(package, str(error))
+            self.assertIn(f"uv add 'orionis[{driver}]'", str(error))
 
     # ── Synchronous engine (APScheduler jobstore) ────────────────────────────
 

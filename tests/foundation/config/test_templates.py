@@ -3,7 +3,7 @@ from dataclasses import fields, is_dataclass
 from pathlib import Path
 from config.database import BootstrapDatabase
 from config.logging import BootstrapLogging
-from tests.foundation.config.support import (
+from tests.foundation.config.test_environment import (
     ConfigurationTestCase,
     configuration_classes,
 )

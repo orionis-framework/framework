@@ -1,3 +1,5 @@
+from orionis.schemas.meta.document import DocumentMetadata
+from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.metadata import (
     Description,
     Examples,
@@ -6,8 +8,6 @@ from orionis.schemas.metadata import (
     Message,
     Title,
 )
-from orionis.schemas.meta.document import DocumentMetadata
-from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.test import TestCase
 
 class TestTitleMetadata(TestCase):

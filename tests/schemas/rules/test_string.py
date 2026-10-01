@@ -1,5 +1,5 @@
-from unittest.mock import patch
 import socket
+from unittest.mock import patch
 from orionis.schemas.rules.accepted import Accepted
 from orionis.schemas.rules.active_url import ActiveUrl
 from orionis.schemas.rules.alpha import Alpha

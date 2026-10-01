@@ -771,7 +771,7 @@ global, filter or extension is registered: a template using `{% csrf %}`,
   `globals/collection.py`).
 - **No extra installation.** Every dependency of this module is already a
   core dependency of `orionis`: `jinja2~=3.1` (which brings `markupsafe`),
-  `markdown~=3.7`, `msgspec>=0.21.1`, `pendulum~=3.2`. `pip install orionis`
+  `markdown~=3.7`, `msgspec>=0.21.1`, `pendulum~=3.2`. `uv add orionis`
   is enough.
 - **`from __future__ import annotations`:** used in `cache.py`,
   `exceptions.py`, `pending.py`, the contracts and every implementation

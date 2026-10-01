@@ -103,7 +103,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: vincula `IScheduleStore` e `ISchedule`, fija la fachada `Schedule`. |
 | `args/argument.py` | `Argument`, la definición declarativa de un argumento de `argparse`. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` y sus contratos. |
-| `commands/` | Los 44 comandos integrados (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, mantenimiento, caché y soporte). |
+| `commands/` | Los 46 comandos integrados (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, `install`, mantenimiento, caché y soporte). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, la tupla inmutable de clases de comandos integrados. |
 | `core/loader.py` | `Loader`: descubrimiento, caché de metadatos y construcción del `ArgumentParser`. |
@@ -788,12 +788,13 @@ con los mismos nombres.
 
 ### Comandos integrados
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 44 clases:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 46 clases:
 
 | Firma | Clase | Notas |
 |---|---|---|
 | `about` | `VersionCommand` | Panel con los metadatos del framework. |
 | `list` | `HelpCommand` | Destino por defecto cuando no se indica comando. |
+| `install` | `InstallCommand` | Catálogo Rich de dependencias opcionales y grupos; `options`, `--list`, `--yes/-y`. |
 | `db:seed` | `DbSeedCommand` | Ejecuta seeders pendientes; `--database/-d`. |
 | `db:show` | `DbShowCommand` | Resumen de conexión y tablas; `--database/-d`, `--counts`, `--views`. |
 | `db:table` | `DbTableCommand` | Detalles de una tabla; `table`, `--database/-d`. |
@@ -809,6 +810,7 @@ con los mismos nombres.
 | `make:service` | `MakeService` | `name`. |
 | `make:test` | `MakeTest` | `name`; crea un módulo de pruebas detectable en `tests/`. |
 | `make:model` | `MakeModel` | `name`. |
+| `make:factory` | `MakeFactory` | `name`; opcional `--model` / `-m`. Genera una factory explícita en `database/factories`. |
 | `make:mail` | `MakeMail` | `name`. |
 | `make:http-controller` | `MakeHttpController` | `name`, `--invoke`, `--api`. |
 | `make:http-middleware` | `MakeHttpMiddleware` | `name`. |
@@ -836,6 +838,42 @@ con los mismos nombres.
 | `serve` | `ServerCommand` | `--interface/-i`, `--port/-p`, `--log`, `--export`. |
 | `test` | `TestCommand` | `--verbosity/-v`, `--fail-fast/-f`, `--start-dir/-s`, `--file-pattern`, `--method-pattern`, `--panel`, `--no-panel`. |
 | `up` | `UpCommand` | Desactiva las respuestas de mantenimiento en runtime. |
+
+`python -B reactor install` lee `pyproject.toml` de la raíz de la aplicación
+con `tomllib` y muestra un catálogo Rich de `[project.optional-dependencies]`
+y `[dependency-groups]`. Expande los grupos incluidos; las referencias inválidas
+o cíclicas fallan antes de instalar. Selecciona uno o varios nombres o números
+de fila, separados por espacios o comas. Usa `extra:NOMBRE` o `group:NOMBRE`
+cuando los nombres coincidan. Escribir `0` o rechazar la confirmación cancela
+sin instalar paquetes.
+
+El catálogo compacto usa una fila por opción y muestra la cantidad de paquetes
+de cada conjunto. Las listas largas se recortan visualmente al ancho de la
+terminal; la instalación sigue usando todos los requisitos de las opciones
+seleccionadas.
+
+`uv` debe estar disponible en `PATH`. El comando ejecuta
+`uv pip install --python <sys.executable> -- <requirements...>` sin un shell,
+por lo que los paquetes se instalan en el intérprete que ejecuta Reactor,
+incluso en entornos virtuales sin pip. Los requisitos conservan sus extras
+y marcadores de entorno; las rutas relativas se resuelven desde la raíz de
+la aplicación. No modifica `pyproject.toml` ni `uv.lock`. `--list` solo muestra
+el catálogo; `--yes` omite la confirmación y es obligatorio para una selección
+explícita en una terminal no interactiva. Sin selección, una invocación
+no interactiva solo muestra el catálogo.
+
+```shell
+python -B reactor install
+python -B reactor install --list
+python -B reactor install s3 mysql --yes
+python -B reactor install group:dev --yes
+```
+
+La instalación devuelve el código positivo de error de uv, o `1` ante
+declaraciones inválidas, ausencia de uv, errores de arranque o terminación por
+señal. Una entrada interrumpida o la cancelación del instalador en ejecución
+devuelve `130`; la cancelación detiene el proceso hijo y espera su finalización.
+El listado, la instalación exitosa y el rechazo de la confirmación devuelven `0`.
 
 El prefijo de migración usa la fecha y hora de creación en la zona horaria
 configurada por la aplicación (año, mes, día, hora, minuto y segundo). Las
@@ -1110,11 +1148,11 @@ asyncio.run(main())
 ```
 
 ```text
-45 commands
-['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
+47 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'install', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:factory', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
 ```
 
-Las 45 firmas son los 44 comandos integrados más `app:inspire`, declarado por
+Las 47 firmas son los 46 comandos integrados más `app:inspire`, declarado por
 este proyecto.
 
 `await Reactor.pin()` hace falta en un script suelto: los proveedores eager solo
@@ -1307,6 +1345,11 @@ sección de configuración `scheduler` salvo que la tarea los sobrescriba.
 - **Resolución con ámbito.** Cada `Reactor.call` abre su propio ámbito del
   contenedor; los servicios con ámbito no se filtran entre dos comandos
   ejecutados en el mismo proceso.
+- **Generación de stubs.** Los handlers asíncronos de `make:*` renderizan y
+  crean archivos mediante `asyncio.to_thread`; la validación y los mensajes
+  permanecen en el bucle. `createFile` y `createFiles` siguen siendo síncronos.
+  Usa instancias independientes para llamadas concurrentes. Cancelar un
+  handler no detiene un worker de archivos en marcha ni deshace sus escrituras.
 - **Concurrencia del planificador.** `AsyncIOScheduler` ejecuta los trabajos en
   el mismo bucle de eventos. `max_instances` (por defecto `1`) acota las
   ejecuciones concurrentes de una firma y `coalesce` fusiona las perdidas. Los

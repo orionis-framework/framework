@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
-from orionis.test import TestCase
 from orionis.support.entities.base import BaseEntity
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixtures: dataclasses used across all tests
@@ -256,6 +256,7 @@ class TestBaseEntity(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         @dataclass
         class ContainerEntity(BaseEntity):
             payload: dict = field(default_factory=lambda: {"items": [1]})
@@ -273,6 +274,7 @@ class TestBaseEntity(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         @dataclass
         class ContainerEntity(BaseEntity):
             colors: list = field(default_factory=lambda: [Color.RED])
@@ -287,6 +289,7 @@ class TestBaseEntity(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         @dataclass(slots=True)
         class SlottedEntity(BaseEntity):
             value: int = 1
@@ -623,6 +626,7 @@ class TestBaseEntity(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         @dataclass
         class ValidatedEntity(BaseEntity):
             value: int = 0

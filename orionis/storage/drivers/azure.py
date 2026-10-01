@@ -42,9 +42,7 @@ class AzureStorageDriver(IStorageDriver):
     which is an **optional dependency**: it is not installed with the
     framework. Install it before using this driver::
 
-        pip install azure-storage-blob
-        # or
-        pip install orionis[azure]
+        uv add 'orionis[azure]'
 
     The SDK is imported lazily on first operation, and every blocking
     call runs on a worker thread via :func:`asyncio.to_thread`.

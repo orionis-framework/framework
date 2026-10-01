@@ -9,7 +9,6 @@ class _Note(Model):
     timestamps = False
 
 class TestModelState(TestCase):
-
     def _hydrated(self) -> _Note:
         """Build a hydrated model mimicking a database row.
 
@@ -133,3 +132,76 @@ class TestModelState(TestCase):
         self.assertTrue(note.wasChanged("title"))
         self.assertFalse(note.wasChanged("body"))
         self.assertEqual(note.getChanges(), {"title": "b"})
+
+class _Record(Model):
+    id = Integer().primary()
+    name = String()
+    timestamps = False
+
+class _ComparisonGuard:
+    """Reject comparisons to an attribute outside the requested selection."""
+
+    def __ne__(self, other: object) -> bool:
+        """Raise if the caller evaluates this attribute.
+
+        Parameters
+        ----------
+        other : object
+            Value supplied for ``other``.
+
+        Returns
+        -------
+        bool
+            Value produced by the helper.
+
+        Raises
+        ------
+        AssertionError
+            Raised by this helper to exercise the failure path.
+        """
+        error_msg = f"Unexpected comparison with {type(other).__name__}."
+        raise AssertionError(error_msg)
+
+class TestModelHotPaths(TestCase):
+    """Exercise attribute state and serialization without database access."""
+
+    def testSelectedDirtyCheckDoesNotCompareUnrequestedAttributes(self) -> None:
+        """Inspect only the requested attributes, including missing keys.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        record = _Record._newFromDatabase({"id": 1, "name": "before"})
+        record.setAttribute("unrelated", _ComparisonGuard())
+        self.assertFalse(record.isDirty("name", "missing"))
+        record.name = "after"
+        self.assertTrue(record.isDirty("missing", "name"))
+
+    def testDirtyCheckStopsAtFirstChange(self) -> None:
+        """Return after the first changed attribute without comparing the rest.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        record = _Record({"name": "changed"})
+        record.setAttribute("unrelated", _ComparisonGuard())
+        self.assertTrue(record.isDirty())
+
+    def testMissingAndNoneRemainDistinct(self) -> None:
+        """Track newly assigned null values and ignore absent attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        record = _Record()
+        self.assertFalse(record.isDirty("name"))
+        record.name = None
+        self.assertTrue(record.isDirty("name"))
+        record.syncOriginal()
+        self.assertTrue(record.isClean())

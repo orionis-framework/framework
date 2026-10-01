@@ -16,7 +16,6 @@ from orionis.http.routes.route_cache import RouteCache
 from orionis.http.routes.route_compiler import RouteCompiler
 from orionis.http.routes.route_resolver import RouteResolver
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
 from tests.http.routes.test_nested_routing import (
     Namespace,
     OneMiddleware,
@@ -26,6 +25,7 @@ from tests.http.routes.test_nested_routing import (
     route_handler,
 )
 from tests.http.test_kernel import boot_kernel, dispatch, make_asgi_scope
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

@@ -1,8 +1,8 @@
 import inspect
 import types
-from orionis.test import TestCase
 from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.introspection.dependencies.entities.signature import Signature
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Test fixtures
@@ -154,6 +154,7 @@ class TestReflectionCallableInit(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         class _Plain:
             pass
 
@@ -644,6 +645,7 @@ class TestReflectionCallableDependencies(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         def _bare() -> None: # NOSONAR
             """Run the bare helper.
 

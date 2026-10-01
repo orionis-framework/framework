@@ -346,11 +346,11 @@ class TestScheduleWorkCommand(TestCase):
         Returns
         -------
         None
-            Assertions verify the exit code and installation guidance.
+            Assertions verify the exit code and uv installation guidance.
         """
         error = MissingDatabaseDependencyException(
             "The 'pgsql' connection requires 'psycopg2'. "
-            "Install it with: pip install orionis[pgsql]",
+            "Install it with: uv add 'orionis[pgsql]'",
         )
         schedule = _ScheduleService(boot_error=error)
         application = _Application(_Scheduler(), schedule)
@@ -361,7 +361,7 @@ class TestScheduleWorkCommand(TestCase):
 
         self.assertEqual(result, 1)
         self.assertIn("Scheduler backend error:", output.getvalue())
-        self.assertIn("orionis[pgsql]", output.getvalue())
+        self.assertIn("uv add 'orionis[pgsql]'", output.getvalue())
         self.assertFalse(schedule.booted)
         self.assertEqual(schedule.shutdownCalls, 0)
         self.assertEqual(schedule.waitCalls, 0)

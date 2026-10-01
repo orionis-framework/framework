@@ -2,8 +2,8 @@ from __future__ import annotations
 import io
 import sys
 from unittest.mock import patch
-from orionis.console.dynamic.progress_bar import ProgressBar
 from orionis.console.dynamic.contracts.progress_bar import IProgressBar
+from orionis.console.dynamic.progress_bar import ProgressBar
 from orionis.test import TestCase
 
 class TestProgressBar(TestCase):

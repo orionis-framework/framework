@@ -30,6 +30,7 @@ class _StubApp:
         None
             Initialize the app paths, configuration, and container.
         """
+
         class _IsolatedContainer(Container):
             """Keep seeder test bindings separate from the application."""
 

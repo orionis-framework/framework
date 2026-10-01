@@ -29,7 +29,6 @@ class _StubApp:
         }
 
 class TestConnectionResolver(TestCase):
-
     def setUp(self) -> None:
         """Snapshot the globally installed manager before each test.
 

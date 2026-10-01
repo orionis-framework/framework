@@ -16,7 +16,7 @@ from orionis.mail.manager import MailManager
 from orionis.test import TestCase
 from orionis.view.engine import Jinja2Engine
 from orionis.view.environment import ViewEnvironment
-from tests.mail.fixtures.doubles import (
+from tests.mail.test_composer import (
     MailApplication,
     MemoryStorage,
     RecordingFactory,
@@ -204,6 +204,7 @@ class TestMailManager(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def invalid_factory(_app: object, _config: object) -> None:
             """Return a result with an unsupported type.
 

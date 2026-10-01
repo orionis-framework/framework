@@ -806,7 +806,7 @@ True
   (`pyproject.toml`). El módulo usa `from __future__ import annotations` en
   todos sus archivos, uniones `X | Y` y `ClassVar`.
 - **Dependencia de terceros:** `python-dotenv~=1.2`, que ya es dependencia
-  base de `orionis`, así que basta con `pip install orionis`. El módulo usa
+  base de `orionis`, así que basta con `uv add orionis`. El módulo usa
   `dotenv_values`, `load_dotenv`, `set_key` y `unset_key` sin cambiar sus
   valores por defecto, lo que implica codificación UTF-8,
   `quote_mode="always"` (los valores se escriben entre comillas simples) e

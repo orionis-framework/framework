@@ -102,7 +102,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: binds `IScheduleStore` and `ISchedule`, pins the `Schedule` facade. |
 | `args/argument.py` | `Argument`, the declarative `argparse` argument definition. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` and their contracts. |
-| `commands/` | The 44 built-in commands (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, maintenance, cache clearing and support commands). |
+| `commands/` | The 46 built-in commands (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, `install`, maintenance, cache clearing and support commands). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, the immutable tuple of built-in command classes. |
 | `core/loader.py` | `Loader`: discovery, metadata cache and `ArgumentParser` construction. |
@@ -774,12 +774,13 @@ bit mask; `orionis.console.enums` exports the enum flags while
 
 ### Built-in commands
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 44 classes:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) is a tuple of 46 classes:
 
 | Signature | Class | Notes |
 |---|---|---|
 | `about` | `VersionCommand` | Framework metadata panel. |
 | `list` | `HelpCommand` | Default target when no command is given. |
+| `install` | `InstallCommand` | Rich catalog of optional dependencies and groups; `options`, `--list`, `--yes/-y`. |
 | `db:seed` | `DbSeedCommand` | Runs pending seeders; `--database/-d`. |
 | `db:show` | `DbShowCommand` | Connection and table overview; `--database/-d`, `--counts`, `--views`. |
 | `db:table` | `DbTableCommand` | Table details; `table`, `--database/-d`. |
@@ -795,6 +796,7 @@ bit mask; `orionis.console.enums` exports the enum flags while
 | `make:service` | `MakeService` | `name`. |
 | `make:test` | `MakeTest` | `name`; creates a discoverable test module under `tests/`. |
 | `make:model` | `MakeModel` | `name`. |
+| `make:factory` | `MakeFactory` | `name`; optional `--model` / `-m`. Generates an explicit model factory in `database/factories`. |
 | `make:mail` | `MakeMail` | `name`. |
 | `make:http-controller` | `MakeHttpController` | `name`, `--invoke`, `--api`. |
 | `make:http-middleware` | `MakeHttpMiddleware` | `name`. |
@@ -822,6 +824,38 @@ bit mask; `orionis.console.enums` exports the enum flags while
 | `serve` | `ServerCommand` | `--interface/-i`, `--port/-p`, `--log`, `--export`. |
 | `test` | `TestCommand` | `--verbosity/-v`, `--fail-fast/-f`, `--start-dir/-s`, `--file-pattern`, `--method-pattern`, `--panel`, `--no-panel`. |
 | `up` | `UpCommand` | Disables runtime maintenance responses. |
+
+`python -B reactor install` reads `pyproject.toml` from the application root
+with `tomllib` and displays a Rich catalog of `[project.optional-dependencies]`
+and `[dependency-groups]`. Included groups are expanded; invalid or cyclic
+references fail before installation. Choose one or more names or row numbers,
+separated by spaces or commas. Use `extra:NAME` or `group:NAME` when names overlap.
+Entering `0` or declining confirmation cancels without installing packages.
+
+The compact catalog uses one row per option and shows package counts for bundles.
+Long requirement lists are visually truncated to fit the terminal; installation
+still uses every requirement declared by the selected options.
+
+`uv` must be available on `PATH`. The command runs
+`uv pip install --python <sys.executable> -- <requirements...>` without a shell,
+so packages go into the interpreter running Reactor, including pip-free virtual
+environments. Requirements retain their extras and environment markers; relative
+paths resolve from the application root. Neither `pyproject.toml` nor `uv.lock`
+is modified. `--list` only displays the catalog; `--yes` skips confirmation and
+is required for an explicit selection in a non-interactive terminal. With no
+selection, a non-interactive invocation only displays the catalog.
+
+```shell
+python -B reactor install
+python -B reactor install --list
+python -B reactor install s3 mysql --yes
+python -B reactor install group:dev --yes
+```
+
+Installation returns uv's positive failure code, or `1` for invalid declarations,
+missing uv, startup errors or signal termination. Interrupted input or a canceled
+running installer returns `130`; cancellation stops and waits for the child.
+Successful listing, installation and declined confirmation return `0`.
 
 The migration prefix uses the creation date and time in the application's
 configured timezone (year, month, day, hour, minute and second). Initial
@@ -1090,11 +1124,11 @@ asyncio.run(main())
 ```
 
 ```text
-45 commands
-['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
+47 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'install', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:factory', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
 ```
 
-The 45 signatures are the 44 built-in commands plus `app:inspire`, which is
+The 47 signatures are the 46 built-in commands plus `app:inspire`, which is
 declared by this project.
 
 `await Reactor.pin()` is required in a plain script: eager providers only boot
@@ -1284,6 +1318,11 @@ the `scheduler` configuration section unless the task overrides them.
   `Schedule` caches the set of available signatures after the first lookup.
 - **Scoped resolution.** Each `Reactor.call` opens its own container scope; scoped
   services do not leak between two commands executed in the same process.
+- **Stub generation.** Async `make:*` handlers run rendering and file creation
+  through `asyncio.to_thread`; validation and console messages remain on the
+  event loop. Direct `createFile` and `createFiles` calls remain synchronous.
+  Use separate command instances for concurrent calls. Cancelling a handler
+  does not stop an already running filesystem worker or undo its writes.
 - **Scheduler concurrency.** `AsyncIOScheduler` runs jobs on the same event loop.
   `max_instances` (default `1`) bounds the concurrent runs of a signature and
   `coalesce` collapses missed runs. Listener callbacks are wrapped in managed

@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
-from orionis.http.default.controllers.login_controller import LoginController
 from orionis.auth.authorization.authorizer import Authorizer
 from orionis.auth.authorization.policy import Policy
 from orionis.auth.authorization.registrar import PermissionRegistrar
@@ -19,8 +18,8 @@ from orionis.auth.context.functions import (
 )
 from orionis.auth.contracts.manager import IAuthManager  # noqa: TC001
 from orionis.auth.exceptions import (
-    AuthException,
     AuthenticationException,
+    AuthException,
     AuthorizationException,
     GuardNotFoundException,
 )
@@ -37,6 +36,7 @@ from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 from orionis.database.connection_manager import ConnectionManager
 from orionis.hashing.hash_manager import HashManager
+from orionis.http.default.controllers.login_controller import LoginController
 from orionis.http.request import Request
 from orionis.orm import BigInteger, Boolean, Model, String, Uuid
 from orionis.orm.query_builder import QueryBuilder
@@ -1322,7 +1322,6 @@ class TestAuthManagerContext(_ManagerCase):
             self.assertIs(context.identity, self.ada)
             self.assertEqual(context.guard, "session")
 
-
 class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
     """Validate the immutable authorization view of a request."""
 
@@ -1400,7 +1399,6 @@ class TestAuthManagerAuthorizationSnapshot(_ManagerCase):
                 snapshot.permissions, frozenset({"users.view", "users.delete"}),
             )
 
-
 class TestAuthManagerPartialPermissionChecks(_ManagerCase):
     """Validate the any-of permission check of the manager."""
 
@@ -1460,7 +1458,6 @@ class TestAuthManagerPartialPermissionChecks(_ManagerCase):
         """
         self.assertFalse(await self.auth.canAny(["users.view"]))
 
-
 class TestAuthManagerTokenOwnership(_ManagerCase):
     """Validate which identities may own a personal access token."""
 
@@ -1518,7 +1515,6 @@ class TestAuthManagerTokenOwnership(_ManagerCase):
         self.assertIsNotNone(
             await self.tokens.findByPlainText(issued.plain_text),
         )
-
 
 class TestAuthManagerOutsideAnHttpRequest(_ManagerCase):
     """Validate the guard protecting the session lifecycle operations."""

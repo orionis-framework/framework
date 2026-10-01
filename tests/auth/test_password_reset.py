@@ -26,8 +26,8 @@ from orionis.http.default.controllers.forgot_password_controller import (
 )
 from orionis.http.default.schemas.forgot_password import ForgotPasswordSchema
 from orionis.http.default.schemas.reset_password import ResetPasswordSchema
-from orionis.http.responses import HTMLResponse
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
+from orionis.http.responses import HTMLResponse
 from orionis.http.routes.route_resolver import RouteResolver
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
@@ -53,7 +53,6 @@ from tests.http.test_kernel import (
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-
 
 class TestPasswordReset(TestCase):
     """Exercise persistence, races, hashing and revocation through the broker."""
@@ -314,7 +313,6 @@ class TestPasswordReset(TestCase):
         self.assertIsNone(await guard.resolve(fake_request(session)))
         self.assertIsNone(session.get("_auth_identifier"))
 
-
 class TestPasswordResetValidation(TestCase):
     """Enforce credential policy and trusted link configuration."""
 
@@ -358,7 +356,6 @@ class TestPasswordResetValidation(TestCase):
         for values in ({"expiration": 0}, {"throttle": -1}, {"expiration": True}):
             with self.assertRaises(ValueError):
                 PasswordReset(**values)
-
 
 class _View:
     """Record explicit context and errors without a live view container."""
@@ -415,7 +412,6 @@ class _View:
             return HTMLResponse("form")
 
         return render().__await__()
-
 
 class TestPasswordResetController(TestCase):
     """Test browser responses and mail construction without sending email."""
@@ -602,7 +598,6 @@ class TestPasswordResetController(TestCase):
         self.assertIsNone(result.getFlashData())
         self.assertNotIn("password", render.call_args.kwargs)
         self.assertIsInstance(view.errors, ValidationException)
-
 
 class TestPasswordResetWeb(TestCase):
     """Compile production routes, reject missing CSRF and render real views."""

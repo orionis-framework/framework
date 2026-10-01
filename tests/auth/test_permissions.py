@@ -9,9 +9,9 @@ from orionis.auth.authorization.repository import DatabasePermissionRepository
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.exceptions import AuthException
 from orionis.auth.tokens.repository import AccessTokenRepository
-from orionis.database.connection_manager import ConnectionManager
-from orionis.database.connection import Connection
 from orionis.database.compiler import SQLCompiler
+from orionis.database.connection import Connection
+from orionis.database.connection_manager import ConnectionManager
 from orionis.database.exceptions import QueryException
 from orionis.database.migrations.migrator import Migrator
 from orionis.database.schema.schema import Schema

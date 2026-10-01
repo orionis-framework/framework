@@ -1,9 +1,9 @@
 from __future__ import annotations
 import math
 from unittest.mock import patch
+from orionis.support.system import workers as workers_module
 from orionis.support.system.contracts.workers import IWorkers
 from orionis.support.system.workers import Workers
-from orionis.support.system import workers as workers_module
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 import os as _os_mod
 import sys
 import types
-from orionis.test import TestCase
 from orionis.introspection.modules.reflection import ReflectionModule
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Synthetic fixture module

@@ -2,7 +2,7 @@ from orionis.foundation.contracts.application import IApplication  # noqa: TC001
 from orionis.test import TestCase
 from orionis.foundation.directory import Directory  # noqa: TC001 - Resolve injected parameters from runtime annotations.
 
-class Prueba(TestCase):
+class TestExample(TestCase):
 
     async def testAsyncMethod(
         self,

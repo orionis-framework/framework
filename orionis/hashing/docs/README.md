@@ -683,7 +683,7 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
 |---|---|---|
 | `module` | `str` | Fully qualified module exposing the backend class. |
 | `attribute` | `str` | Name of the backend class inside `module`. |
-| `package` | `str` | Distribution name reported to the user when the import fails. |
+| `package` | `str` | Distribution requirement used in the uv hint when the import fails. |
 
 **Returns:** `Any` — the backend class, ready to be instantiated. The class
 itself is returned; nothing is instantiated here.
@@ -692,7 +692,7 @@ itself is returned; nothing is instantiated here.
 raises `ImportError` or when the backend module raises
 `pwdlib.exceptions.HasherNotAvailable` while being imported. The original error
 is preserved as `__cause__` and the message reads `The '<package>' package is
-required by this hashing driver. Install it with: pip install <package>`.
+required by this hashing driver. Install it with: uv add '<package>'`.
 
 An `attribute` that does not exist in the imported module raises a plain
 `AttributeError`, which is not translated.

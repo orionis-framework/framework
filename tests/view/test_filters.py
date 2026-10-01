@@ -109,7 +109,6 @@ class TestJsonifyFilter(TestCase):
         result = _jsonify(False)
         self.assertEqual(result, "false")
 
-
 class TestMarkdownFilter(TestCase):
 
     def testConvertsH1HeadingToHtml(self) -> None:
@@ -161,7 +160,6 @@ class TestMarkdownFilter(TestCase):
         """
         result = _markdown("*italic*")
         self.assertIn("<em>", result)
-
 
 class TestFilterBuilders(TestCase):
 

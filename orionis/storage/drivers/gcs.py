@@ -54,9 +54,7 @@ class GoogleStorageDriver(IStorageDriver):
     it is not installed with the framework. Install it before using
     this driver::
 
-        pip install google-cloud-storage
-        # or
-        pip install orionis[gcs]
+        uv add 'orionis[gcs]'
 
     The SDK is imported lazily on first operation, and every blocking
     call runs on a worker thread via :func:`asyncio.to_thread`.

@@ -16,7 +16,7 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     attribute : str
         Name of the backend class inside ``module``.
     package : str
-        Distribution name reported to the user when the import fails.
+        Distribution requirement used in the uv hint when the import fails.
 
     Returns
     -------
@@ -33,7 +33,7 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     except (ImportError, HasherNotAvailable) as exc:
         error_msg = (
             f"The '{package}' package is required by this hashing driver. "
-            f"Install it with: pip install {package}"
+            f"Install it with: uv add '{package}'"
         )
         raise MissingHashDependencyException(error_msg) from exc
 

@@ -496,7 +496,6 @@ class TestFileCacheBackend(TestCase):
         self.assertEqual(await self._backend.get("kA"), "A")
         self.assertEqual(await self._backend.get("kB"), "B")
 
-
 class TestFileCacheBackendConcurrency(TestCase):
 
     def setUp(self) -> None:
@@ -558,6 +557,7 @@ class TestFileCacheBackendConcurrency(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         async def attempt(index: int) -> bool:
             """Try to add an entry and report whether it wins.
 

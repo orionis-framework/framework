@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import FrozenInstanceError
-from orionis.test import TestCase
 from orionis.container.entities.binding import Binding
 from orionis.container.enums.lifetimes import Lifetime
+from orionis.test import TestCase
 
 class TestBinding(TestCase):
 
@@ -43,6 +43,7 @@ class TestBinding(TestCase):
         None
             This method does not return a value.
         """
+
         class IService:
             pass
 
@@ -58,6 +59,7 @@ class TestBinding(TestCase):
         None
             This method does not return a value.
         """
+
         class ServiceImpl:
             pass
 
@@ -114,6 +116,7 @@ class TestBinding(TestCase):
         None
             This method does not return a value.
         """
+
         class IFoo:
             pass
 
@@ -229,6 +232,7 @@ class TestBinding(TestCase):
         None
             This method does not return a value.
         """
+
         class Svc:
             pass
 

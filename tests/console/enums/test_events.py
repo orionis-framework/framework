@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import IntEnum
-from orionis.console.enums.events import TaskEvent, SchedulerEvent
+from orionis.console.enums.events import SchedulerEvent, TaskEvent
 from orionis.test import TestCase
 
 class TestTaskEvent(TestCase):
@@ -208,7 +208,6 @@ class TestTaskEvent(TestCase):
             v = int(member)
             self.assertGreater(v, 0)
             self.assertEqual(v & (v - 1), 0)
-
 
 class TestSchedulerEvent(TestCase):
     """Test suite for the SchedulerEvent IntEnum."""

@@ -3,7 +3,7 @@ import asyncio
 from contextlib import suppress
 from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase
-from orionis.foundation.application import Application, _ASGI_BODY_QUEUE_SIZE
+from orionis.foundation.application import _ASGI_BODY_QUEUE_SIZE, Application
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.http.contracts.kernel import IKernelHTTP
 
@@ -905,6 +905,7 @@ class TestApplicationAsync(IsolatedAsyncioTestCase):
         None
             Raises AssertionError if kernel cancellation becomes a normal response.
         """
+
         async def cancel_self(*_args: object) -> None:
             """
             Cancel the currently executing kernel task.

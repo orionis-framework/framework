@@ -2,19 +2,16 @@ from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
 class MigrateFreshCommand(MigrationCommand):
-    """Drop the tracking table and apply every migration from scratch."""
+    """Clear migration and seeder history, then rebuild the schema."""
 
     # ruff: noqa: TC001
 
-    # Command signature and description
     signature: str = "migrate:fresh"
-
-    # Command description
-    description: str = "Drops the migrations table and migrates from scratch."
+    description: str = "Clears migration and seeder history, then migrates."
 
     async def handle(self, migrator: Migrator) -> None:
         """
-        Drop the tracking table and apply every migration from scratch.
+        Clear migration and seeder history, then apply every migration.
 
         Parameters
         ----------

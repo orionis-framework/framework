@@ -15,9 +15,9 @@ from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.auth.manager import AuthManager
 from orionis.auth.provider import AuthProvider
 from orionis.auth.tokens.repository import AccessTokenRepository
+from orionis.container.context.manager import ScopeManager
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
-from orionis.container.context.manager import ScopeManager
 from orionis.foundation.application import Application
 from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.support.facades.auth import Auth as AuthFacade

@@ -1,0 +1,21 @@
+from typing import Any
+from {{model_module}} import {{model_class}}
+from orionis.orm.factories import Factory
+
+class {{factory_class}}(Factory[{{model_class}}]):
+    """Define default attributes for generated {{model_class}} models."""
+
+    __slots__ = ()
+
+    model = {{model_class}}
+
+    def definition(self) -> dict[str, Any]:
+        """
+        Define the model's default attributes.
+
+        Returns
+        -------
+        dict[str, Any]
+            Explicit mass-assignable attributes, using ``self.fake`` as needed.
+        """
+        return {}

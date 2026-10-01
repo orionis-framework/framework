@@ -1,8 +1,8 @@
 from __future__ import annotations
 import asyncio
 import inspect
-from unittest.mock import AsyncMock, MagicMock
 from typing import get_args
+from unittest.mock import AsyncMock, MagicMock
 from orionis.failure.catch import Catch
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext

@@ -32,7 +32,7 @@ or Uvicorn's `--workers` flag.
 No installation beyond the framework itself is required:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 or newer.

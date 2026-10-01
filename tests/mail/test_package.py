@@ -14,7 +14,7 @@ from orionis.mail import (
 from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.contracts.transport import IMailTransport
 from orionis.test import TestCase
-from tests.mail.fixtures.doubles import RecordingDelivery
+from tests.mail.test_composer import RecordingDelivery
 
 class TestMailPackage(TestCase):
 

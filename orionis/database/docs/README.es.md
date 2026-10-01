@@ -1,6 +1,6 @@
 # Base de datos de Orionis
 
-> Conexiones asíncronas, compilación SQL, creación de esquemas y gestión de migraciones para aplicaciones Orionis.
+> Conexiones asíncronas, compilación SQL, creación de esquemas, migraciones y seeders para aplicaciones Orionis.
 
 ## Tabla de contenidos
 
@@ -19,7 +19,7 @@ El subsistema de base de datos se instala con `pip install orionis`. El paquete 
 
 `orionis.database` carga configuraciones de conexión con nombre desde la aplicación, crea motores SQLAlchemy asíncronos de manera diferida y expone las API de conexión y transacción de Orionis. `SQLCompiler` traduce planes de consulta de `orionis.orm.query` y descripciones de esquema de `orionis.orm.schema` a sentencias SQLAlchemy Core.
 
-El módulo también ofrece declaraciones fluidas de esquema y un ejecutor de migraciones. Usa directamente `orionis.foundation.contracts.application`, `orionis.foundation.config.database.entities.database`, `orionis.container.providers.service_provider` y `orionis.introspection.modules` para la configuración de la aplicación, el registro de proveedores y el descubrimiento de migraciones. `ConnectionManagerProvider` instala el gestor en `orionis.orm.resolver.ConnectionResolver`; `SchemaProvider` vincula `ISchema` con `Schema`.
+El módulo también ofrece declaraciones fluidas de esquema, un ejecutor de migraciones y un ejecutor de seeders. Usa directamente `orionis.foundation.contracts.application`, `orionis.foundation.config.database.entities.database`, `orionis.container.providers.service_provider` y `orionis.introspection.modules` para la configuración de la aplicación, el registro de proveedores y el descubrimiento de módulos. `ConnectionManagerProvider` instala el gestor en `orionis.orm.resolver.ConnectionResolver`; `SchemaProvider` vincula `ISchema` con `Schema`.
 
 ## Referencia de API
 
@@ -151,20 +151,83 @@ Los objetos de definición a nivel de tabla son `Comment(text: str)`, `ForeignKe
 
 Las subclases del contrato abstracto `Migration` implementan `async def up(self) -> None` y `async def down(self) -> None`. `__init__(self, app: IApplication, conn_manager: IConnectionManager) -> None` inicializa `Migrator`, que descubre migraciones en el directorio `database/migrations` de la aplicación y las aplica en orden de nombre de archivo.
 
+Tanto al aplicar como al revertir, el migrador construye cada migración
+descubierta con `await app.build(migration_cls)`. El contenedor de la aplicación
+resuelve las dependencias del constructor anotadas con tipos. Después, el
+runner espera el método `up()` o `down()` de la migración.
+
 | Firma de `Migrator` | Comportamiento |
 |---|---|
 | `migrate(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: aplica las migraciones pendientes y devuelve sus nombres en orden de ejecución. |
 | `rollback(self, steps: int = 1, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: revierte los batches recientes seleccionados y devuelve los nombres desde el más reciente. Lanza `ValueError` si `steps` no es un entero positivo y `MigrationNotFoundException` si falta un archivo de migración registrada. |
 | `reset(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: revierte las migraciones registradas. |
 | `refresh(self, steps: int | None = None, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: revierte migraciones y luego las aplica de nuevo; puede limitar la cantidad de pasos a revertir. |
-| `fresh(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: elimina la tabla de seguimiento de migraciones predeterminada y luego aplica todas las migraciones desde cero. |
+| `fresh(self, *, connection: str | None = None, events: MigrationEvents | None = None) -> list[str]` | Asíncrono: elimina el historial de migraciones y seeders en la conexión seleccionada, y aplica las migraciones desde cero. |
 | `status(self, *, connection: str | None = None) -> list[dict[str, Any]]` | Asíncrono: devuelve registros de estado por migración. |
 
 Cada paso de migración y su registro de seguimiento se ejecutan dentro de una transacción. Las excepciones de `up` o `down` se propagan; una migración fallida no se registra como aplicada correctamente. Si durante una reversión no se puede encontrar el módulo o la clase de una migración registrada, se lanza `MigrationNotFoundException`.
 
+Cuando una reversión completa termina correctamente y deja sin registros el
+historial de migraciones de la conexión seleccionada, el migrador también
+elimina su tabla de seguimiento `seeders`. Así, el siguiente `migrate --seed`
+puede ejecutar los seeders sobre el esquema recreado. Una reversión parcial
+conserva ese historial, porque los datos sembrados pueden seguir en tablas que
+no se revirtieron. El rollback de migraciones no deshace directamente los datos
+de los seeders; cada método `down()` determina qué ocurre con sus tablas y datos.
+`fresh()` también elimina el historial de seeders aunque una reversión anterior
+hubiera dejado la tabla `migrations` sin registros.
+
 `MigrationEvents` es un dataclass congelado con slots y argumentos solo por nombre. Tiene callbacks opcionales `on_start: Callable[[str], None] | None`, `on_success: Callable[[str, float], None] | None` y `on_error: Callable[[str, float], None] | None`. Los métodos `started(name: str) -> None`, `succeeded(name: str, elapsed: float) -> None` y `failed(name: str, elapsed: float) -> None` llaman al callback correspondiente si está definido. Los aceptan `migrate`, `rollback`, `reset`, `refresh` y `fresh`; `status` no los acepta.
 
 `current_migration_connection() -> IConnection | None` devuelve la conexión vinculada al contexto de migración actual. `migration_connection_scope(connection: IConnection) -> Generator[None]` vincula la conexión mientras dura su bloque `with` y restaura la vinculación previa al salir. El migrador usa este ámbito para que las operaciones de esquema y ORM sin conexión explícita dentro de una migración usen la misma conexión que la transacción de migración.
+
+### Seeders: `Seeder`, `SeederRunner` y `SeederEvents`
+
+Cada seeder de aplicación hereda de `orionis.database.seeders.Seeder` e
+implementa `async def run(self) -> None`. Debe estar en `database/seeders/`;
+el comando `make:database-seeder` genera la subclase. `SeederRunner` descubre
+las clases definidas en esos módulos y las ordena lexicográficamente por el
+nombre base del archivo. Ese nombre identifica el registro persistente y debe
+ser único, incluso entre subdirectorios. Usa prefijos ordenados para expresar
+dependencias entre seeders.
+
+El runner construye cada seeder pendiente con `await app.build(seeder_cls)`
+antes de esperar `run()`. Un seeder puede declarar dependencias del constructor
+anotadas con tipos que el contenedor de la aplicación pueda resolver.
+
+| Firma de `SeederRunner` | Comportamiento |
+|---|---|
+| `__init__(self, app: IApplication, conn_manager: IConnectionManager) -> None` | Resuelve el directorio de seeders y la conexión configurada. |
+| `seed(self, *, connection: str | None = None, events: SeederEvents | None = None) -> list[str]` | Asíncrono: ejecuta seeders pendientes y devuelve los nombres completados por esta llamada en orden de ejecución. |
+
+La conexión seleccionada contiene una tabla de tracking `seeders` con clave
+primaria `id`, nombre `seeder` único, `batch` y fecha Unix de finalización
+`seeded_at`. El runner usa los
+registros para elegir los seeders pendientes. Reserva cada seeder mediante
+la clave única antes de llamar a `run()` y confirma el registro junto con los
+datos en una sola transacción. Escribe `seeded_at` después de que `run()`
+termine; si falla, revierte los datos y la reserva para permitir otro intento.
+Una reserva concurrente no puede confirmar una segunda copia del mismo nombre.
+Si el registro completado queda visible, el intento concurrente omite ese
+seeder; otros errores de base de datos se propagan. El batch de cada llamada
+pendiente es el máximo batch previo más uno. El ámbito de la transacción
+también vincula las operaciones habituales del ORM de Orionis dentro del seeder
+a la conexión elegida. Las garantías transaccionales dependen del motor de
+base de datos y de las operaciones que realice el seeder.
+
+`SeederEvents` ofrece los mismos callbacks `on_start`, `on_success` y
+`on_error` que `MigrationEvents`. La CLI los presenta con la salida de progreso
+existente. Ejecuta `python reactor seed` para seeders pendientes o
+`python reactor migrate --seed` para migrar correctamente antes de sembrar; ambos
+aceptan `--database/-d` para indicar una conexión configurada.
+
+El seeder de autorización incluido crea un administrador con rol `admin` y
+permiso `full_access`. Antes de la primera ejecución, edita los valores
+literales de nombre, correo y contraseña directamente en
+`database/seeders/s0000000001_create_admin_authorization.py`. El seeder aplica hashing de
+Orionis a la contraseña antes de almacenarla. Después de su registro, editar
+estos valores no vuelve a ejecutarlo; para cambios posteriores, añade otro
+seeder.
 
 ### `Transaction`, `InsertResult` y excepciones
 

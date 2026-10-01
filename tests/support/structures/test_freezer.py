@@ -1,6 +1,6 @@
 from types import MappingProxyType
-from orionis.test import TestCase
 from orionis.support.structures.freezer import FreezeThaw
+from orionis.test import TestCase
 
 class TestFreezeThaw(TestCase):
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
-from orionis.test import TestCase
 from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Module-level doubles

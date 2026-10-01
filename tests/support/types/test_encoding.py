@@ -1,6 +1,6 @@
 import hashlib
-from orionis.test import TestCase
 from orionis.support.types.stringable import Stringable
+from orionis.test import TestCase
 
 class TestStringableEncoding(TestCase):
     """Unit tests for Stringable encoding, hashing, and serialization."""

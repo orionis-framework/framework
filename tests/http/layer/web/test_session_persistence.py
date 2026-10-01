@@ -12,7 +12,6 @@ from tests.http.test_request import make_asgi_request
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
-
     from orionis.http.request import Request
 
 _COOKIE_NAME = "test_session"
@@ -276,6 +275,7 @@ async def _run_csrf_pipeline(
     Response
         Value produced by the helper.
     """
+
     async def next_middleware() -> Response:
         """Advance from the session middleware into CSRF validation.
 

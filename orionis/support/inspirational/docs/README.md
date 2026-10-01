@@ -31,7 +31,7 @@ service.
 
 ## Requirements
 
-No extra installation step is required beyond `pip install orionis`. The
+No extra installation step is required beyond `uv add orionis`. The
 module only uses the Python standard library (`secrets`, `typing`, `abc`) —
 there are no third-party dependencies.
 

@@ -38,7 +38,7 @@ No se necesita ningún paso de instalación adicional además del propio
 framework:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 o superior.

@@ -49,7 +49,6 @@ class _StubApplication:
         self.requested.append(key)
         return self.paths[key]
 
-
 class TestDirectory(TestCase):
     """Test the application directory accessors."""
 

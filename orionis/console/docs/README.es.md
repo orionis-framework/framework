@@ -103,7 +103,7 @@ reactor (script)
 | `scheduler_provider.py` | `ScheduleProvider`: vincula `IScheduleStore` e `ISchedule`, fija la fachada `Schedule`. |
 | `args/argument.py` | `Argument`, la definición declarativa de un argumento de `argparse`. |
 | `base/` | `BaseCommand`, `BaseScheduler`, `BaseTaskListener` y sus contratos. |
-| `commands/` | Los 39 comandos integrados (`make:*`, `migrate:*`, `schedule:*`, `serve`, `test`, mantenimiento, caché y soporte). |
+| `commands/` | Los 44 comandos integrados (`db:*`, `make:*`, `migrate:*`, `seed`, `schedule:*`, `serve`, `test`, mantenimiento, caché y soporte). |
 | `contracts/` | `IKernelCLI`, `ISchedule`, `IScheduleStore`. |
 | `core/commands.py` | `CORE_COMMANDS`, la tupla inmutable de clases de comandos integrados. |
 | `core/loader.py` | `Loader`: descubrimiento, caché de metadatos y construcción del `ArgumentParser`. |
@@ -788,18 +788,22 @@ con los mismos nombres.
 
 ### Comandos integrados
 
-`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 39 clases:
+`CORE_COMMANDS` (`orionis/console/core/commands.py`) es una tupla de 44 clases:
 
 | Firma | Clase | Notas |
 |---|---|---|
 | `about` | `VersionCommand` | Panel con los metadatos del framework. |
 | `list` | `HelpCommand` | Destino por defecto cuando no se indica comando. |
+| `db:seed` | `DbSeedCommand` | Ejecuta seeders pendientes; `--database/-d`. |
+| `db:show` | `DbShowCommand` | Resumen de conexión y tablas; `--database/-d`, `--counts`, `--views`. |
+| `db:table` | `DbTableCommand` | Detalles de una tabla; `table`, `--database/-d`. |
+| `db:wipe` | `DbWipeCommand` | Elimina tablas, vistas y tipos de usuario; `--database/-d`, `--force`. |
 | `make:console-command` | `MakeConsoleCommand` | `name`, `--signature/-s`, `--description/-d`. |
 | `make:console-listener` | `MakeConsoleListener` | `name`. |
 | `make:contract` | `MakeContract` | `name`. |
 | `make:database-migration` | `MakeDatabaseMigration` | `name`; crea una migración en `database/migrations` con prefijo `mYYYYMMDDHHMMSS_`. |
 | `make:database-schema` | `MakeDatabaseSchema` | `name`; crea un esquema en `database/schemas`. |
-| `make:database-seeder` | `MakeDatabaseSeeder` | `name`; crea un seeder en `database/seeders`. |
+| `make:database-seeder` | `MakeDatabaseSeeder` | `name`; crea una subclase de `Seeder` en `database/seeders`. |
 | `make:facade` | `MakeFacade` | `name`, `--accessor/-a`. |
 | `make:provider` | `MakeProvider` | `name`, `--deferred`. |
 | `make:service` | `MakeService` | `name`. |
@@ -810,12 +814,13 @@ con los mismos nombres.
 | `make:http-middleware` | `MakeHttpMiddleware` | `name`. |
 | `make:http-schema` | `MakeHttpSchema` | `name`. |
 | `make:http-schema-rule` | `MakeHttpSchemaRule` | `name`. |
-| `migrate` | `MigrateCommand` | `--database/-d`. |
-| `migrate:fresh` | `MigrateFreshCommand` | Elimina y vuelve a ejecutar todo. |
+| `migrate` | `MigrateCommand` | `--database/-d`, `--seed`. |
+| `migrate:fresh` | `MigrateFreshCommand` | Elimina el historial de migraciones y seeders; vuelve a aplicar las migraciones. |
 | `migrate:refresh` | `MigrateRefreshCommand` | `--step/-s`. |
 | `migrate:reset` | `MigrateResetCommand` | Revierte todas las migraciones. |
 | `migrate:rollback` | `MigrateRollbackCommand` | `--step/-s`, por defecto el último lote. |
 | `migrate:status` | `MigrateStatusCommand` | Tabla de estado. |
+| `seed` | `SeedCommand` | Ejecuta seeders pendientes; `--database/-d`. |
 | `clear:cache` | `ClearCacheCommand` | Limpia el store predeterminado de caché de la aplicación. |
 | `clear:logs` | `ClearLogsCommand` | Elimina archivos `.log` y `.log.gz` del framework, incluidas las rutas configuradas por canal. |
 | `clear:testing` | `ClearTestingCommand` | Elimina resultados de pruebas guardados en caché. |
@@ -836,6 +841,49 @@ El prefijo de migración usa la fecha y hora de creación en la zona horaria
 configurada por la aplicación (año, mes, día, hora, minuto y segundo). Las
 migraciones iniciales conservan sus prefijos numéricos.
 
+`python reactor seed` ejecuta únicamente los seeders ausentes de la tabla de
+tracking `seeders` de la conexión seleccionada. Cada seeder debe heredar de
+`Seeder` e implementar `run()` de forma asíncrona. Los archivos en
+`database/seeders` se ejecutan en orden lexicográfico del nombre de archivo;
+usa prefijos ordenados cuando un seeder dependa de otro. Los nombres base de
+archivo deben ser únicos, incluso entre subdirectorios. El contenedor de la
+aplicación construye cada seeder y migración, por lo que sus constructores
+pueden declarar dependencias resolubles. Al ejecutar
+`python reactor migrate --seed`, terminan las migraciones pendientes antes de
+ejecutar los seeders pendientes; si falla una migración, no se ejecuta ninguno.
+Ambos comandos aceptan `--database NOMBRE` (o `-d NOMBRE`) para elegir una conexión
+configurada. Por ejemplo:
+
+```shell
+python reactor make:database-seeder CreatePlans
+python reactor migrate --seed
+python reactor seed --database sqlite
+python reactor db:seed --database sqlite
+python reactor db:show --counts --views
+python reactor db:table users --database sqlite
+python reactor db:wipe --database sqlite
+```
+
+`db:seed` comparte el seguimiento de `seed`: ejecuta únicamente seeders
+pendientes. `db:show` muestra el tamaño, motor, conexiones abiertas y tablas;
+`--counts` añade conteos de filas y `--views` lista vistas. `db:table` muestra
+filas, tamaño, columnas, índices y claves foráneas. `db:wipe` borra los objetos
+de usuario de la conexión seleccionada, incluidos los historiales de migraciones
+y seeders; pide confirmación en un terminal y requiere `--force` si no hay uno.
+
+Tras revertir completamente las migraciones de una conexión, se elimina su
+tabla de seguimiento `seeders` para que un `migrate --seed` posterior ejecute
+los seeders sobre el esquema recreado. Una reversión parcial conserva esa tabla.
+El rollback no deshace directamente los datos sembrados; los métodos `down()`
+de las migraciones determinan qué datos se eliminan.
+
+Antes del primer `seed` o `migrate --seed`, edita los valores literales de
+nombre, correo y contraseña en
+`database/seeders/s0000000001_create_admin_authorization.py`. El seeder de autorización
+incluido aplica hashing de Orionis antes de almacenarla. Cambiar estos valores
+no vuelve a ejecutar un seeder ya registrado; para cambios posteriores de
+datos, añade otro seeder.
+
 `down` y `up` escriben de forma atómica el estado en
 `storage/framework/maintenance`. Cada worker HTTP conserva el estado en memoria
 y lo actualiza como máximo una vez cada 100 ms. Un worker activo observa ambos
@@ -847,6 +895,9 @@ prioridad sobre `APP_MAINTENANCE`.
 artefactos de compilación. `clear:cache`, `clear:logs`, `clear:views` y `clear:testing` limpian
 por separado el store de caché, el bytecode de plantillas y los resultados de
 pruebas guardados.
+Después de actualizar el código de comandos del framework en una aplicación
+optimizada, ejecuta `python reactor optimize:clear` para refrescar la caché
+compilada `commands` antes de revisar `python reactor list` o ejecutar `seed`.
 
 `MigrationCommand` (`commands/migrate/base_command.py`) es la base común de la
 familia `migrate:*`: expone `targetConnection()`, `progressEvents()` y
@@ -1059,11 +1110,11 @@ asyncio.run(main())
 ```
 
 ```text
-40 commands
-['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'serve', 'test', 'up']
+45 commands
+['about', 'app:inspire', 'clear:cache', 'clear:logs', 'clear:testing', 'clear:views', 'db:seed', 'db:show', 'db:table', 'db:wipe', 'down', 'env', 'key:generate', 'list', 'make:console-command', 'make:console-listener', 'make:contract', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:facade', 'make:http-controller', 'make:http-middleware', 'make:http-schema', 'make:http-schema-rule', 'make:mail', 'make:model', 'make:provider', 'make:service', 'make:test', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status', 'optimize', 'optimize:clear', 'route:list', 'schedule:list', 'schedule:work', 'seed', 'serve', 'test', 'up']
 ```
 
-Las 40 firmas son los 39 comandos integrados más `app:inspire`, declarado por
+Las 45 firmas son los 44 comandos integrados más `app:inspire`, declarado por
 este proyecto.
 
 `await Reactor.pin()` hace falta en un script suelto: los proveedores eager solo

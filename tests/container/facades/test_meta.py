@@ -1,8 +1,8 @@
 from __future__ import annotations
 import inspect
-from orionis.test import TestCase
 from orionis.container.facades.facade import Facade
 from orionis.container.facades.meta import FacadeMeta
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Module-level doubles

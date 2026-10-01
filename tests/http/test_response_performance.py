@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 from orionis.http.responses import FileResponse, Response, StreamingResponse
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from os import stat_result

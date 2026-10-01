@@ -9,7 +9,6 @@ from orionis.auth.exceptions import AuthenticationException
 from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.manager import AuthManager
-from orionis.auth.tokens.functions import hash_token_secret
 from orionis.auth.middleware import (
     AuthenticateMiddleware,
     AuthenticateSessionMiddleware,
@@ -20,6 +19,7 @@ from orionis.auth.middleware import (
     ResolveSessionIdentityMiddleware,
     ResolveTokenIdentityMiddleware,
 )
+from orionis.auth.tokens.functions import hash_token_secret
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext

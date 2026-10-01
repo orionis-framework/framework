@@ -1,6 +1,6 @@
 from __future__ import annotations
-from orionis.test import TestCase
 from orionis.container.exceptions.container import CircularDependencyException
+from orionis.test import TestCase
 
 _MESSAGE = "A -> B -> A"
 

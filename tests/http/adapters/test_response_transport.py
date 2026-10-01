@@ -12,7 +12,7 @@ from orionis.http.adapters.response.ranges import parse_range
 from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.responses import FileResponse, Response, StreamingResponse
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable, Iterator

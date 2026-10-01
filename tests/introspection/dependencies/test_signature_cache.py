@@ -125,6 +125,7 @@ class TestSignatureCache(TestCase):
         None
             Dependency metadata matches the signature Python exposes.
         """
+
         @wraps(_Controller.handle)
         def wrapped(*args: object, **kwargs: object) -> tuple:
             """Delegate to the original method.

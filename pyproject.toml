@@ -99,7 +99,7 @@ Repository = "https://github.com/orionis-framework/framework"
 [project.optional-dependencies]
 # Cloud storage drivers rely on the official SDK of each platform.
 # These packages are NOT installed with the framework; install the
-# extra matching the driver you plan to use, e.g. `pip install orionis[s3]`.
+# extra matching the driver you plan to use, e.g. `uv add 'orionis[s3]'`.
 s3 = [
     "boto3>=1.43.99",
 ]
@@ -142,10 +142,14 @@ database = [
     "aioodbc>=0.5.0",
     "pyodbc>=5.3.0",
 ]
+factories = [
+    "faker>=40.40.0,<41.0",
+]
 
 [dependency-groups]
 dev = [
     "coverage>=7.16.1",
+    "faker>=40.40.0,<41.0",
     "ruff>=0.16.8",
 ]
 docs = [

@@ -13,7 +13,10 @@
 
 ## Requirements
 
-The database subsystem is included with `pip install orionis`. The base package declares `sqlalchemy[asyncio]>=2.0.54,<3.0` and `aiosqlite>=0.22.1`; SQLite uses the latter. Other drivers require the matching package extra: `orionis[mysql]` installs `aiomysql>=0.3.2` and `pymysql>=1.2.3`; `orionis[pgsql]` installs `asyncpg>=0.31.0` and `psycopg2-binary>=2.9.13`; `orionis[oracle]` installs `oracledb>=26.0.0`; `orionis[sqlserver]` installs `aioodbc>=0.5.0` and `pyodbc>=5.3.0`. These requirements and bounds are declared in `pyproject.toml`.
+The database subsystem is included with `uv add orionis`. The base package declares `sqlalchemy[asyncio]>=2.0.54,<3.0` and `aiosqlite>=0.22.1`; SQLite uses the latter. Other drivers require the matching package extra: `orionis[mysql]` installs `aiomysql>=0.3.2` and `pymysql>=1.2.3`; `orionis[pgsql]` installs `asyncpg>=0.31.0` and `psycopg2-binary>=2.9.13`; `orionis[oracle]` installs `oracledb>=26.0.0`; `orionis[sqlserver]` installs `aioodbc>=0.5.0` and `pyodbc>=5.3.0`. These requirements and bounds are declared in `pyproject.toml`.
+
+For example, run `uv add 'orionis[pgsql]'` for the PostgreSQL extra, or
+`uv add 'orionis[database]'` for all optional database drivers.
 
 ## Functional description
 

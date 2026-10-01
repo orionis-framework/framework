@@ -3,7 +3,7 @@ import asyncio
 from orionis.http.layer.store import memory_rate_limit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+from tests.http.test_support import replace_attribute
 
 class _Clock:
     """Expose an explicitly controlled monotonic time to the rate-limit store."""
@@ -32,7 +32,6 @@ class _Clock:
             Value produced by the helper.
         """
         return self.now
-
 
 class TestMemoryRateLimitStore(TestCase):
     """Exercise quotas and incremental reclamation of inactive clients."""

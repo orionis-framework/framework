@@ -154,11 +154,9 @@ class TestInspireInit(TestCase):
         with self.assertRaises(ValueError):
             Inspire(quotes=mixed)
 
-
 # ===========================================================================
 # TestInspireRandom
 # ===========================================================================
-
 
 class TestInspireRandom(TestCase):
     """Tests for the Inspire.random method."""

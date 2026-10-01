@@ -17,6 +17,8 @@ class IRelation(IModelQueryBuilder):
     drive any of them without knowing its concrete type.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def addConstraints(self) -> None:
         """

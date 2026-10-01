@@ -789,7 +789,7 @@ la aplicación) cuando la plantilla dependa de ellos.
 - **Sin instalación adicional.** Todas las dependencias de este módulo ya
   son dependencias base de `orionis`: `jinja2~=3.1` (que arrastra
   `markupsafe`), `markdown~=3.7`, `msgspec>=0.21.1`, `pendulum~=3.2`. Con
-  `pip install orionis` es suficiente.
+  `uv add orionis` es suficiente.
 - **`from __future__ import annotations`:** se usa en `cache.py`,
   `exceptions.py`, `pending.py`, los contratos y todos los módulos de
   implementación de `globals/`, `filters/` y `extensions/` (sus

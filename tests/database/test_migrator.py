@@ -45,6 +45,7 @@ class _StubApp:
         """
         self.basePath = Path.cwd()
         self._database = database
+
         class _IsolatedContainer(Container):
             """Keep constructor bindings private to this migration test."""
 

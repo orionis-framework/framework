@@ -7,7 +7,7 @@ from typing import get_args, get_type_hints
 from orionis.foundation.config.app import App
 from orionis.foundation.config.startup import Configuration
 from orionis.foundation.core_config import CORE_CONFIG
-from tests.foundation.config.support import (
+from tests.foundation.config.test_environment import (
     ConfigurationTestCase,
     configuration_classes,
 )

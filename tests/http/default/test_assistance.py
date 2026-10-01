@@ -11,9 +11,9 @@ from orionis.support.formatter.exceptions.parser import ExceptionParser
 from orionis.test import TestCase
 from orionis.view.engine import Jinja2Engine
 from orionis.view.environment import ViewEnvironment
-from tests.http._support import replace_attribute
 from tests.http.default.test_response_cache import _DefaultFixture
 from tests.http.default.test_templates import _Page
+from tests.http.test_support import replace_attribute
 
 def make_trace(count: int = 3, source: str = "return missing_account") -> dict:
     """Build a captured traceback ordered from the failing frame to its callers.

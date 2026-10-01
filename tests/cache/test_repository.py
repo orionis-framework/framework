@@ -554,7 +554,6 @@ class TestCacheRepository(TestCase):
         async with lock:
             self.assertTrue(await self._repo.has("resource") or True)
 
-
 class TestCacheRepositoryOnMemoryBackend(TestCase):
     """Tests for CacheRepository backed by the in-memory aiocache store."""
 

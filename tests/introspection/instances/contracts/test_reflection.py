@@ -1,9 +1,9 @@
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.introspection.instances.contracts.reflection import (
     IReflectionInstance,
 )
+from orionis.test import TestCase
 
 class _StubInstance(IReflectionInstance):
     """

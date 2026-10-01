@@ -31,7 +31,7 @@ from orionis.foundation.config.session import Session
 from orionis.foundation.config.testing import Testing
 from orionis.foundation.config.view import View
 from orionis.mail.entities.smtp_settings import SmtpSettings
-from tests.foundation.config.support import ConfigurationTestCase
+from tests.foundation.config.test_environment import ConfigurationTestCase
 
 class TestConfigurationRegressions(ConfigurationTestCase):
     def testAppNormalizesEnumNamesValuesAndBinaryKeys(self) -> None:

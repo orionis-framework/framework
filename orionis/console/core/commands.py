@@ -9,6 +9,7 @@ from orionis.console.commands.make.database_migration import MakeDatabaseMigrati
 from orionis.console.commands.make.database_schema import MakeDatabaseSchema
 from orionis.console.commands.make.database_seeder import MakeDatabaseSeeder
 from orionis.console.commands.make.facade import MakeFacade
+from orionis.console.commands.make.factory import MakeFactory
 from orionis.console.commands.make.http_controller import MakeHttpController
 from orionis.console.commands.make.http_middleware import MakeHttpMiddleware
 from orionis.console.commands.make.http_schema import MakeHttpSchema
@@ -36,6 +37,7 @@ from orionis.console.commands.support.clear_testing import ClearTestingCommand
 from orionis.console.commands.support.clear_views import ClearViewsCommand
 from orionis.console.commands.support.down import DownCommand
 from orionis.console.commands.support.environment import EnvironmentCommand
+from orionis.console.commands.support.install import InstallCommand
 from orionis.console.commands.support.key_generate import KeyGenerateCommand
 from orionis.console.commands.support.list import HelpCommand
 from orionis.console.commands.support.optimize import OptimizeCommand
@@ -65,6 +67,7 @@ def get_core_commands_mapping() -> tuple:
         ClearLogsCommand,
         ClearTestingCommand,
         HelpCommand,
+        InstallCommand,
         MakeConsoleCommand,
         MakeFacade,
         MakeProvider,
@@ -72,6 +75,7 @@ def get_core_commands_mapping() -> tuple:
         MakeContract,
         MakeService,
         MakeModel,
+        MakeFactory,
         MakeMail,
         MakeHttpController,
         MakeHttpMiddleware,

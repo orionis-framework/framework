@@ -34,7 +34,7 @@ client, without making the client wait for that side effect to finish.
 No installation steps beyond the framework itself are required:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 or newer.

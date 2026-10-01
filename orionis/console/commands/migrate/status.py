@@ -6,10 +6,7 @@ class MigrateStatusCommand(MigrationCommand):
 
     # ruff: noqa: TC001
 
-    # Command signature and description
     signature: str = "migrate:status"
-
-    # Command description
     description: str = "Shows the status of every discovered migration."
 
     async def handle(self, migrator: Migrator) -> None:

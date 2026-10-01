@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 from typing import ClassVar
-from orionis.test import TestCase
 from orionis.container.container import Container
 from orionis.container.entities.invocation import (
     _callable_plan,
@@ -16,6 +15,7 @@ from orionis.introspection.dependencies.reflection import (
     _get_resolved_signature,
     _get_signature,
 )
+from orionis.test import TestCase
 
 def function_handler(item: int = 2) -> Response:
     """Return the value resolved from route parameters.

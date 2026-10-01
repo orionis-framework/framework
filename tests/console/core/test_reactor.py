@@ -1,16 +1,13 @@
 from __future__ import annotations
-
 import argparse
 import inspect
 from unittest.mock import AsyncMock, MagicMock
-
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.reactor import Reactor
 from orionis.console.entities.command import Command
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.test import TestCase
-
 
 def _make_mock_command(
     signature: str = "test:cmd",

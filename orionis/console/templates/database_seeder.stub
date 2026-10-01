@@ -1,4 +1,6 @@
-class {{class_name}}:
+from orionis.database.seeders.seeder import Seeder
+
+class {{class_name}}(Seeder):
     """Define application data to seed into the database."""
 
     async def run(self) -> None:

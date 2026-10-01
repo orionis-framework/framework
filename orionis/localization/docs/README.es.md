@@ -689,7 +689,7 @@ argumentos que los métodos equivalentes del translator.
 - **Python:** `>= 3.14` (`requires-python` en `pyproject.toml`). `types.py`
   usa sentencias de alias `type` de PEP 695.
 - **Dependencias:** `msgspec>=0.21.1`, dependencia base del framework; no hace
-  falta instalar nada más allá de `pip install orionis`.
+  falta instalar nada más allá de `uv add orionis`.
 - **Codificación:** los archivos de traducción deben ser JSON codificado en
   UTF-8. Se leen como bytes con `Path.read_bytes()` y los decodifica
   `msgspec.json.decode`; un archivo guardado en cualquier otra codificación

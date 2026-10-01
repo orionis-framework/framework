@@ -1,10 +1,10 @@
-from orionis.test import TestCase
-from orionis.introspection.dependencies.reflection import (
-    ReflectDependencies,
-)
 from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )
+from orionis.introspection.dependencies.reflection import (
+    ReflectDependencies,
+)
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Target fixtures used across multiple test classes
@@ -182,7 +182,6 @@ class _ForwardRef:
             Completes the operation described above.
         """
         self.dep = dep
-
 
 def _plain_function(a: int, b: str = "hello") -> str:
     """

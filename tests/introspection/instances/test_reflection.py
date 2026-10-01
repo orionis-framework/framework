@@ -1,7 +1,7 @@
 import inspect
-from orionis.test import TestCase
-from orionis.introspection.instances.reflection import ReflectionInstance
 from orionis.introspection.dependencies.entities.signature import Signature
+from orionis.introspection.instances.reflection import ReflectionInstance
+from orionis.test import TestCase
 
 class SampleReflected:
     """Sample class used as a fixture for ReflectionInstance tests."""
@@ -295,6 +295,7 @@ def _make_mutable_instance() -> ReflectionInstance:
     ReflectionInstance
         A reflection wrapper around a fresh MutableSample instance.
     """
+
     class MutableSample:
         """Mutable sample class for mutation-based tests."""
 

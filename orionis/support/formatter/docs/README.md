@@ -34,7 +34,7 @@ exception needs to be turned into structured data.
 No extra installation is required beyond the framework itself:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 or newer (the same minimum as the rest of the framework).

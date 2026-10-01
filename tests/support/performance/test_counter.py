@@ -1,8 +1,8 @@
 import asyncio
 import time
 from unittest.mock import patch
-from orionis.test import TestCase
 from orionis.support.performance.counter import PerformanceCounter
+from orionis.test import TestCase
 
 class TestPerformanceCounterSync(TestCase):
     # ------------------------------------------------ start / stop

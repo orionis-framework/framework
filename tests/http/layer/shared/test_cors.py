@@ -1,8 +1,7 @@
 from orionis.http.layer.shared.cors import CORSMiddleware
 from orionis.http.responses import Response
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
-from tests.http.layer.shared._support import make_adapter
+from tests.http.test_support import make_adapter, replace_attribute
 
 class TestCORSLifecycle(TestCase):
     """Exercise preflight and ordinary cross-origin response behavior."""

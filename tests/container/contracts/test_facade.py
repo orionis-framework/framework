@@ -1,9 +1,9 @@
 from __future__ import annotations
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.container.contracts.facade import IFacade
 from orionis.container.facades.facade import Facade
+from orionis.test import TestCase
 
 _ABSTRACT_METHODS = frozenset({
     "getFacadeAccessor", "resolve", "pin", "unpin",

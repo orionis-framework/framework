@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC
-from orionis.test import TestCase
 from orionis.container.contracts.deferrable_provider import IDeferrableProvider
+from orionis.test import TestCase
 
 class _ConcreteProvider(IDeferrableProvider):
     """Minimal IDeferrableProvider implementation for structural tests."""

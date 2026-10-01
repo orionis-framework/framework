@@ -1,9 +1,9 @@
 from abc import ABC
 from inspect import isabstract
-from orionis.test import TestCase
 from orionis.introspection.abstract.contracts.reflection import (
     IReflectionAbstract,
 )
+from orionis.test import TestCase
 
 class TestIReflectionAbstractBaseType(TestCase):
 
@@ -82,6 +82,7 @@ class TestIReflectionAbstractBaseType(TestCase):
         All abstract methods must be implemented before instantiation is allowed.
         """
         # Subclass that only overrides one of many required abstract methods
+
         class _PartialImpl(IReflectionAbstract):
             def getClass(self):
                 """Implement the ``getClass`` contract stub.

@@ -35,7 +35,7 @@
 
 ## Requisitos
 
-No hace falta instalar nada más allá de `pip install orionis`: los cuatro stores
+No hace falta instalar nada más allá de `uv add orionis`: los cuatro stores
 vienen con el framework. Cada driver sí tiene su propio prerrequisito en tiempo
 de ejecución:
 
@@ -44,7 +44,7 @@ de ejecución:
 | `memory`   | Ninguno.                                                                               |
 | `file`     | Un directorio con permisos de escritura; lo crea `FileSessionStore.__init__`.          |
 | `cache`    | Un store de caché configurado (`orionis.cache`); sirve cualquier backend.               |
-| `database` | Una conexión configurada (`orionis.database`). Los drivers de SQLite y PostgreSQL son dependencias base; MySQL, Oracle y SQL Server requieren su extra (`pip install "orionis[mysql]"`, `[oracle]`, `[sqlserver]`). |
+| `database` | Una conexión configurada (`orionis.database`). Los drivers de SQLite y PostgreSQL son dependencias base; MySQL, Oracle y SQL Server requieren su extra (`uv add 'orionis[mysql]'`, `uv add 'orionis[oracle]'`, `uv add 'orionis[sqlserver]'`). |
 
 La serialización de los stores `file` y `database` se apoya en
 `msgspec>=0.21.1`, que ya es dependencia base del framework.

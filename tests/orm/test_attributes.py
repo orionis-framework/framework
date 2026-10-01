@@ -2,9 +2,12 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, date, datetime
 from typing import ClassVar
-from orionis.orm import Integer, Model, String, StrictJson, Text, Uuid
+import tests.orm.test_events as feature_fixtures
+import tests.orm.test_state as state_fixtures
+from orionis.orm import Integer, Model, StrictJson, String, Text
 from orionis.orm.attributes import get_cast_handler, serialize_for_storage
 from orionis.orm.exceptions import OrmException
+from orionis.orm.schema.types import Uuid
 from orionis.test import TestCase
 
 class _Doc(Model):
@@ -17,7 +20,6 @@ class _Doc(Model):
     casts: ClassVar[dict[str, str]] = {"body": "json"}
 
 class TestCastHandlers(TestCase):
-
     def testIntAndFloatCasts(self) -> None:
         """Cast textual and numeric inputs to int and float.
 
@@ -142,7 +144,6 @@ class TestCastHandlers(TestCase):
         self.assertIs(get_cast_handler("Bool"), get_cast_handler("bool"))
 
 class TestSerializeForStorage(TestCase):
-
     def testJsonStructureOnNonJsonColumnIsDumped(self) -> None:
         """Serialize structures targeting non-JSON columns to strings.
 
@@ -218,7 +219,6 @@ class TestSerializeForStorage(TestCase):
         self.assertEqual(result["ghost"], 5)
 
 class TestAttributeHelpers(TestCase):
-
     def testGetAttributeReturnsDefaultWhenAbsent(self) -> None:
         """Return the provided default for missing attributes.
 
@@ -259,3 +259,87 @@ class TestAttributeHelpers(TestCase):
         """
         doc = _Doc({"label": "x"})
         self.assertEqual(doc.serialize(), doc.toDict())
+
+class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
+    """Attribute transformation on read and write."""
+
+    async def testAccessorTransformsStoredValue(self) -> None:
+        """Serve a stored value through its accessor.
+
+        Validates ``get<Name>Attribute``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await self.seed()
+        account = await feature_fixtures.Account.query().firstOrFail()
+        self.assertEqual(account.role, "ADMIN")
+        self.assertEqual(account.getOriginal("role"), "admin")
+
+    async def testMutatorTransformsAssignedValue(self) -> None:
+        """Transform a value before it is stored.
+
+        Validates ``set<Name>Attribute``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        account = feature_fixtures.Account({"first_name": "Cid", "last_name": "Kane"})
+        account.secret = "plain"  # noqa: S105
+        self.assertEqual(account.getOriginal("secret"), None)
+        self.assertEqual(account._attributes["secret"], "nialp")
+
+    async def testComputedAttributeNeedsNoColumn(self) -> None:
+        """Expose an attribute backed only by an accessor.
+
+        Validates accessor-only attributes.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await self.seed()
+        account = await feature_fixtures.Account.query().firstOrFail()
+        self.assertEqual(account.display_name, "Ada Lovelace")
+
+    async def testAppendsAreSerializedAndHiddenIsHonored(self) -> None:
+        """Add appended attributes and drop hidden ones on serialization.
+
+        Validates ``appends`` together with ``hidden``.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        await self.seed()
+        account = await feature_fixtures.Account.query().firstOrFail()
+        data = account.toDict()
+        self.assertEqual(data["display_name"], "Ada Lovelace")
+        self.assertEqual(data["role"], "ADMIN")
+        self.assertNotIn("secret", data)
+
+class TestSerializationIsolation(TestCase):
+    """Exercise attribute state and serialization without database access."""
+
+    def testSerializationReturnsIndependentMapping(self) -> None:
+        """Keep serialization result edits outside the attribute store.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        record = state_fixtures._Record({"name": "original"})
+        result = record.toDict()
+        result["name"] = "changed"
+        self.assertEqual(record.name, "original")
+        values = {"name": "original", "unknown": {"nested": True}}
+        stored = serialize_for_storage(record.__meta__, values)
+        self.assertEqual(stored, values)
+        self.assertIsNot(stored, values)

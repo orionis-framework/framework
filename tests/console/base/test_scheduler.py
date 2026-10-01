@@ -1,8 +1,8 @@
 from __future__ import annotations
 import inspect
 from unittest.mock import Mock
-from orionis.console.base.scheduler import BaseScheduler
 from orionis.console.base.contracts.scheduler import IBaseScheduler
+from orionis.console.base.scheduler import BaseScheduler
 from orionis.test import TestCase
 
 class TestBaseScheduler(TestCase):

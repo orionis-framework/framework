@@ -34,7 +34,7 @@ proyecto.
 No se necesita instalación adicional además del propio framework:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 o superior (el mismo mínimo que el resto del framework).

@@ -9,8 +9,8 @@ from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.tokens import repository as token_module
 from orionis.auth.tokens.functions import generate_token_secret, hash_token_secret
 from orionis.auth.tokens.repository import AccessTokenRepository
-from orionis.database.connection_manager import ConnectionManager
 from orionis.database.compiler import SQLCompiler
+from orionis.database.connection_manager import ConnectionManager
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition

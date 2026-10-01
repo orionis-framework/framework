@@ -10,7 +10,7 @@ from orionis.mail.mailable import Mailable
 from orionis.mail.message import Message
 from orionis.mail.pending import PendingMail
 from orionis.test import TestCase
-from tests.mail.fixtures.doubles import RecordingDelivery
+from tests.mail.test_composer import RecordingDelivery
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -410,6 +410,7 @@ class TestPendingMail(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def configure(message: Message) -> Message:
             """Configure the callback message with test values.
 
@@ -557,6 +558,7 @@ class TestPendingMail(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         async def declaration() -> Envelope:
             """Return the envelope requested by the callback.
 
@@ -604,6 +606,7 @@ class TestPendingMail(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         async def cancel(_message: Message) -> None:
             """Cancel delivery before it reaches the transport.
 

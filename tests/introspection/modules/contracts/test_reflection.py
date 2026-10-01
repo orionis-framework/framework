@@ -1,8 +1,8 @@
 from abc import ABC
-from orionis.test import TestCase
 from orionis.introspection.modules.contracts.reflection import (
     IReflectionModule,
 )
+from orionis.test import TestCase
 
 class _StubModule(IReflectionModule):
     """

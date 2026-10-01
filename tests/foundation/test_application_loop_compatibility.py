@@ -9,8 +9,8 @@ from unittest.mock import patch
 from tests.foundation.test_application_async import (
     _AsyncCall,
     _AsyncGate,
-    _ReceiveChannel,
     _new_application,
+    _ReceiveChannel,
 )
 
 class _TaskRecorder:

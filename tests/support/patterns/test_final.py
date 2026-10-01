@@ -1,7 +1,7 @@
 from __future__ import annotations
 import threading
-from orionis.test import TestCase
 from orionis.support.patterns.final.meta import Final
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixture helpers
@@ -124,6 +124,7 @@ class TestFinalMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _Child(_UnrelatedBase):
             pass
 
@@ -141,6 +142,7 @@ class TestFinalMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _NonFinal(_UnrelatedBase):
             pass
 
@@ -162,6 +164,7 @@ class TestFinalMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _FinalA(metaclass=Final):
             pass
 
@@ -182,6 +185,7 @@ class TestFinalMeta(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class _Config(metaclass=Final):
             VERSION: str = "1.0"
 

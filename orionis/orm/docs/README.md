@@ -5,6 +5,7 @@
 ## Table of contents
 
 - [Requirements](#requirements)
+- [Model factories](../factories/docs/README.md)
 - [Functional description](#functional-description)
 - [API reference](#api-reference)
 - [Usage examples](#usage-examples)
@@ -13,9 +14,14 @@
 
 ## Requirements
 
-There is no ORM-specific installation step beyond `pip install orionis`. The ORM uses the framework's database subsystem, including `aiosqlite>=0.22.1` for SQLite and `sqlalchemy[asyncio]>=2.0.54,<3.0`. Other database engines require the matching optional package extra and its driver dependencies: `orionis[mysql]` (`aiomysql>=0.3.2`, `pymysql>=1.2.3`), `orionis[pgsql]` (`asyncpg>=0.31.0`, `psycopg2-binary>=2.9.13`), `orionis[oracle]` (`oracledb>=26.0.0`), or `orionis[sqlserver]` (`aioodbc>=0.5.0`, `pyodbc>=5.3.0`). These requirements are declared in `pyproject.toml`.
+There is no ORM-specific installation step beyond `uv add orionis`. The ORM uses the framework's database subsystem, including `aiosqlite>=0.22.1` for SQLite and `sqlalchemy[asyncio]>=2.0.54,<3.0`. Other database engines require the matching optional package extra and its driver dependencies: `orionis[mysql]` (`aiomysql>=0.3.2`, `pymysql>=1.2.3`), `orionis[pgsql]` (`asyncpg>=0.31.0`, `psycopg2-binary>=2.9.13`), `orionis[oracle]` (`oracledb>=26.0.0`), or `orionis[sqlserver]` (`aioodbc>=0.5.0`, `pyodbc>=5.3.0`). These requirements are declared in `pyproject.toml`.
 
 Queries require the application database provider to install a connection manager in `ConnectionResolver`. In normal application use, framework boot performs this wiring.
+
+Optional [model factories](../factories/docs/README.md) generate test and seed
+data through these same models. Run `uv add 'orionis[factories]'` for Faker
+support; use `Factory[Model]`, synchronous `make()` and async `create()`, or generate an
+application factory with `reactor make:factory UserFactory --model=User`.
 
 ## Functional description
 

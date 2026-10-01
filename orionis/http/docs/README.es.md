@@ -7105,7 +7105,7 @@ Imports directos de terceros y restricciones de dependencias declaradas por este
 | `defusedxml` | `>=0.7.1,<1.0` | Parser XML. |
 | `granian[dotenv,pname,reload,uvloop,winloop]` | `>=2.8.3,<3.0` | Tipos/protocolo de transporte RSGI; los imports directos de HTTP están bajo `TYPE_CHECKING`. |
 
-Estos paquetes ya son dependencias del proyecto que instala `pip install orionis`; no se declara requisito de instalación ni extra HTTP separado. Las versiones anteriores son rangos declarados, no afirmaciones sobre versiones instaladas. Los servicios internos tienen sus propias dependencias y configuración; importar la raíz `orionis` también carga infraestructura de aplicación.
+Estos paquetes ya son dependencias del proyecto que instala `uv add orionis`; no se declara requisito de instalación ni extra HTTP separado. Las versiones anteriores son rangos declarados, no afirmaciones sobre versiones instaladas. Los servicios internos tienen sus propias dependencias y configuración; importar la raíz `orionis` también carga infraestructura de aplicación.
 
 Comportamientos relevantes al integrar esta revisión:
 

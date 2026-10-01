@@ -7105,7 +7105,7 @@ Direct third-party imports and the dependency constraints declared by this check
 | `defusedxml` | `>=0.7.1,<1.0` | XML parser. |
 | `granian[dotenv,pname,reload,uvloop,winloop]` | `>=2.8.3,<3.0` | RSGI transport types/protocol; direct HTTP imports are under `TYPE_CHECKING`. |
 
-These packages are already project dependencies installed by `pip install orionis`; no separate HTTP installation requirement or extra is declared. Dependency versions above are declared ranges, not assertions about installed versions. Internal services have their own project dependencies and configuration; importing the root `orionis` package also loads application infrastructure.
+These packages are already project dependencies installed by `uv add orionis`; no separate HTTP installation requirement or extra is declared. Dependency versions above are declared ranges, not assertions about installed versions. Internal services have their own project dependencies and configuration; importing the root `orionis` package also loads application infrastructure.
 
 Behavior that matters when integrating this revision:
 

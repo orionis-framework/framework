@@ -69,7 +69,6 @@ class _Application:
             raise KeyError(key)
         return self.logs_path
 
-
 class TestClearLogsCommand(TestCase):
     """Verify cleanup of framework log files."""
 

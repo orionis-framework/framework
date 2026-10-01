@@ -1,7 +1,7 @@
 from orionis.foundation.config.http import HTTPCsrf
 from orionis.foundation.config.session import Session
 from orionis.http.responses import Response
-from tests.foundation.config.support import ConfigurationTestCase
+from tests.foundation.config.test_environment import ConfigurationTestCase
 
 class TestCookieConfiguration(ConfigurationTestCase):
     def testInvalidNamesAreRejectedBeforeResponseSerialization(self) -> None:

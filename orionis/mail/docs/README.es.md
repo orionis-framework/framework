@@ -804,12 +804,11 @@ bootstrap original, diccionarios nombrados, ambos estilos de composición,
 DI/fachadas, Jinja real, storage local y sin rutas locales, MIME/privacidad,
 modos y fallos SMTP, publicación atómica, concurrencia y cancelación.
 
-[La fixture de aplicación aislada](../../../tests/mail/fixtures/application.py)
+[La fixture de aplicación aislada](../../../tests/mail/test_integration.py)
 ejecuta los ejemplos tras arranque HTTP lifespan y CLI normales, con una respuesta
 real de controlador y un transporte personalizado registrado por provider.
-[La fixture de tipos](../../../tests/mail/fixtures/typecheck.py) verifica las
-sobrecargas desde código consumidor. Las únicas supresiones localizadas de tipos
-SMTP corresponden al timeout float-only del stub de typeshed; las pruebas
+Las únicas supresiones localizadas de tipos SMTP corresponden al timeout
+float-only del stub de typeshed; las pruebas
 confirman que Python 3.14 acepta `None` en los dos constructores SMTP reales sin
 abrir conexiones.
 
@@ -817,7 +816,7 @@ abrir conexiones.
 $env:PYTHONIOENCODING = "utf-8"
 .\.venv\Scripts\python.exe reactor test --start-dir=tests/mail --verbosity=1
 .\.venv\Scripts\python.exe -m ruff check orionis/mail tests/mail
-uvx pyright --pythonpath .venv/Scripts/python.exe --pythonversion 3.14 orionis/mail orionis/support/facades/mail.pyi tests/mail/fixtures/typecheck.py
+uvx pyright --pythonpath .venv/Scripts/python.exe --pythonversion 3.14 orionis/mail orionis/support/facades/mail.pyi
 ```
 
 La interoperabilidad con servidores SMTP reales y filesystems no locales debe

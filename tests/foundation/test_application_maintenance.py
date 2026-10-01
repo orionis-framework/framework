@@ -80,7 +80,6 @@ class _RuntimeApplication:
             raise KeyError(key)
         return self.maintenance
 
-
 class _ReadableMarker:
     """Record reads of a maintenance marker and simulate a read error."""
 
@@ -117,7 +116,6 @@ class _ReadableMarker:
         if self.error:
             raise PermissionError
         return self.path.read_text(encoding=encoding)
-
 
 class TestApplicationMaintenance(TestCase):
     """Verify runtime maintenance state follows its shared state file."""

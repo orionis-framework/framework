@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Self
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.transaction import ITransaction
+from orionis.database.migrations.context import current_migration_connection
 from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
 
@@ -346,7 +347,12 @@ class QueryBuilder(IQueryBuilder):
         ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
-        return self._db_manager.connection(name or self._connection_name)
+        target = name or self._connection_name
+        if target is None:
+            scoped = current_migration_connection()
+            if scoped is not None:
+                return scoped
+        return self._db_manager.connection(target)
 
 
 

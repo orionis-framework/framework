@@ -19,4 +19,4 @@ class User(Model, Authenticatable, Authorizable, MustVerifyEmail):
     hidden: ClassVar[list[str]] = ["password", "remember_token"]
 
     # Attributes allowed for mass assignment.
-    fillable: ClassVar[list[str]] = ["name", "email", "password"]
+    fillable: ClassVar[list[str]] = ["name", "email", "password", "active"]

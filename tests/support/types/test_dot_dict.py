@@ -1,5 +1,5 @@
-from orionis.test import TestCase
 from orionis.support.types.dot_dict import DotDict
+from orionis.test import TestCase
 
 class TestDotDict(TestCase):
 

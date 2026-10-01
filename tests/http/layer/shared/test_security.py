@@ -1,7 +1,7 @@
 from orionis.http.layer.shared.security import SecurityMiddleware
 from orionis.http.responses import Response
 from orionis.test import TestCase
-from tests.http.layer.shared._support import make_adapter
+from tests.http.test_support import make_adapter
 
 class _DefaultResponses:
     """Produce plain error responses for middleware assertions."""

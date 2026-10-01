@@ -139,6 +139,7 @@ class TestIDumper(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class PartialDumper(IDumper):
             @staticmethod
             def dd(*args, **kwargs): # noqa: ANN002, ANN003, ANN205
@@ -171,6 +172,7 @@ class TestIDumper(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class ConcreteDumper(IDumper):
             @staticmethod
             def dd(*args, **kwargs): # noqa: ANN002, ANN003, ANN205

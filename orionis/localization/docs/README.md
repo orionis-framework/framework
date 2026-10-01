@@ -679,7 +679,7 @@ arguments as the matching translator methods.
 - **Python:** `>= 3.14` (`requires-python` in `pyproject.toml`). `types.py`
   uses PEP 695 `type` alias statements.
 - **Dependencies:** `msgspec>=0.21.1`, a core dependency of the framework; no
-  extra installation is required beyond `pip install orionis`.
+  extra installation is required beyond `uv add orionis`.
 - **Encoding:** translation files must be UTF-8 encoded JSON. They are read as
   bytes with `Path.read_bytes()` and decoded by `msgspec.json.decode`; a file
   stored in any other encoding raises `TranslationSyntaxException`.

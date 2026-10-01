@@ -665,7 +665,7 @@ $env:PYTHONIOENCODING = "utf-8"
 - **Python:** `>= 3.14` (`requires-python` in `pyproject.toml`). The module
   uses `typing.Self` in return annotations and `enum.StrEnum`.
 - **External dependency:** `rich~=15.0`, a core (non-optional) dependency of
-  the framework. No extra installation beyond `pip install orionis`.
+  the framework. No extra installation beyond `uv add orionis`.
 - **A booted application is required.** `TestCase` resolves each test method
   through the `Application` facade and `TestingEngine` needs `IApplication`
   configuration; running these test cases with a bare `python -m unittest`

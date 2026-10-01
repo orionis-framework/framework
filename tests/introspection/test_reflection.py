@@ -2,8 +2,8 @@ import abc
 import inspect
 import types
 import typing
-from orionis.test import TestCase
 from orionis.introspection.reflection import Reflection
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixtures

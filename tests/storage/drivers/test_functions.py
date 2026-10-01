@@ -28,21 +28,24 @@ class TestDriverFunctions(TestCase):
     def testImportDriverDependencyRaisesWithInstallHint(self) -> None:
         """Raise a descriptive error for a missing optional package.
 
-        Validates that the exception names the package and both
-        installation commands.
+        Validate the SDK name, uv command, and import error chaining.
 
         Returns
         -------
         None
             Assertions verify the behavior described above.
         """
-        with self.assertRaises(MissingStorageDependencyException) as ctx:
-            importDriverDependency(
-                "orionis_missing_sdk_xyz", "fake-sdk", "faker",
-            )
-        message = str(ctx.exception)
-        self.assertIn("pip install fake-sdk", message)
-        self.assertIn("orionis[faker]", message)
+        for package, extra in (
+            ("boto3", "s3"),
+            ("azure-storage-blob", "azure"),
+            ("google-cloud-storage", "gcs"),
+        ):
+            with self.assertRaises(MissingStorageDependencyException) as ctx:
+                importDriverDependency("orionis_missing_sdk_xyz", package, extra)
+            message = str(ctx.exception)
+            self.assertIn(f"[{package}]", message)
+            self.assertIn(f"uv add 'orionis[{extra}]'", message)
+            self.assertIsInstance(ctx.exception.__cause__, ModuleNotFoundError)
 
     def testAssertBinaryModeAcceptsBinaryModes(self) -> None:
         """Accept every supported binary mode without raising.

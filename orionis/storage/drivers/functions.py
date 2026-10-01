@@ -33,7 +33,7 @@ def importDriverDependency(module: str, package: str, extra: str) -> ModuleType:
         PyPI package that provides the module (e.g. ``'boto3'``).
     extra : str
         Orionis extra that pulls the package (e.g. ``'s3'``), used to
-        suggest ``pip install orionis[extra]``.
+        suggest ``uv add 'orionis[extra]'``.
 
     Returns
     -------
@@ -50,8 +50,7 @@ def importDriverDependency(module: str, package: str, extra: str) -> ModuleType:
     except ImportError as exc:
         error_msg = (
             f"The [{extra}] storage driver requires the optional package "
-            f"[{package}]. Install it with 'pip install {package}' or "
-            f"'pip install orionis[{extra}]'."
+            f"[{package}]. Install it with: uv add 'orionis[{extra}]'."
         )
         raise MissingStorageDependencyException(error_msg) from exc
 

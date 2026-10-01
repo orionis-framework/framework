@@ -148,6 +148,7 @@ class TestIReactor(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class PartialReactor(IReactor):
             def command(self, signature, handler): # NOSONAR
                 """Accept command registration in the test double.
@@ -179,6 +180,7 @@ class TestIReactor(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class ConcreteReactor(IReactor):
             def command(self, signature, handler):
                 """Accept a command registration in this contract double.

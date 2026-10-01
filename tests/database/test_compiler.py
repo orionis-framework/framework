@@ -664,7 +664,6 @@ class TestSQLCompiler(TestCase):
         engine_table = compiler._sqlTable(table)
         self.assertEqual(engine_table.c["status"].default.arg, "draft")
 
-
     def testCompileCreateTableEmitsColumns(self) -> None:
         """Compile the table definition into a CREATE TABLE statement.
 
@@ -947,7 +946,6 @@ class TestSQLCompiler(TestCase):
         self.assertEqual(engine_table.schema, "reporting")
         self.assertEqual(engine_table.comment, "Audit trail table.")
 
-
 def _make_posts_table() -> TableDefinition:
     """Build a small "posts" table definition referencing "users".
 
@@ -964,7 +962,6 @@ def _make_posts_table() -> TableDefinition:
     for key, column in columns.items():
         column.name = key
     return TableDefinition(name="posts", columns=columns, primary_key="id")
-
 
 class TestSQLCompilerJoins(TestCase):
     """Compile SELECT plans spanning multiple table sources."""

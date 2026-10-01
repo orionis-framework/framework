@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
-from typing import ClassVar
 from types import SimpleNamespace
+from typing import ClassVar
 import msgspec
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.auth.contracts.manager import IAuthManager
@@ -47,7 +47,6 @@ class _ExpiredIdentity(AuthenticationException):
 class _DeniedOperation(AuthorizationException):
     """Represent an application-specific authorization denial."""
 
-
 class _Rendezvous:
     """Force two requests to interleave inside their real controller."""
 
@@ -62,7 +61,6 @@ class _Rendezvous:
             Initializes the test object.
         """
         self.barrier = asyncio.Barrier(2)
-
 
 async def identity_handler(
     auth: IAuthManager,
@@ -89,7 +87,6 @@ async def identity_handler(
         "credential": context.credentialId,
         "allowed": await auth.can("users.view"),
     }
-
 
 async def concurrent_handler(
     auth: IAuthManager,
@@ -120,7 +117,6 @@ async def concurrent_handler(
     payload["after"] = auth.identifier()
     return payload
 
-
 async def logout_handler(auth: IAuthManager) -> Response:
     """Invalidate the current web session from a kernel-dispatched handler.
 
@@ -136,7 +132,6 @@ async def logout_handler(auth: IAuthManager) -> Response:
     """
     await auth.logout()
     return Response(status_code=204)
-
 
 class _HttpApp(auth_fixtures._StubApp):
     """Supply isolated services while delegating invocation to the real container."""
@@ -252,7 +247,6 @@ class _HttpApp(auth_fixtures._StubApp):
         """Provide the health route required by the HTTP kernel."""
         return "/health"
 
-
 class _HttpCatch:
     """Use the real exception status mapping without writing application logs."""
 
@@ -292,7 +286,6 @@ class _HttpCatch:
         """
         return await self.handler.handleHTTP(exc, request)
 
-
 class _RsgiProtocol:
     """Record bytes emitted by the real RSGI response adapter."""
 
@@ -331,7 +324,6 @@ class _RsgiProtocol:
         """
         self.status, self.headers, self.body = status, headers, body
 
-
 def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
     """Build a route descriptor using native middleware classes.
 
@@ -364,7 +356,6 @@ def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
         kind="web" if web else "api",
         compiled_middlewares=middleware,
     )
-
 
 class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
     """Exercise request identity through the actual HTTP kernel and transports."""

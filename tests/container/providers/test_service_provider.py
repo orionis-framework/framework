@@ -1,8 +1,8 @@
 from __future__ import annotations
 import inspect
-from orionis.test import TestCase
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.providers.service_provider import ServiceProvider
+from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Module-level doubles — no external dependencies

@@ -194,6 +194,7 @@ class TestLocalStorageDriver(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         async def producer():
             """Yield the next storage payload chunk.
 
@@ -222,6 +223,7 @@ class TestLocalStorageDriver(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         async def producer():
             """Yield the next storage payload chunk.
 

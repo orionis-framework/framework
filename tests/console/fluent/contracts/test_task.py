@@ -1,7 +1,7 @@
 import inspect
 from abc import ABC
-from orionis.test import TestCase
 from orionis.console.fluent.contracts.task import ITask
+from orionis.test import TestCase
 
 class TestITaskContract(TestCase):
 
@@ -43,6 +43,7 @@ class TestITaskContract(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         class IncompleteTask(ITask):
             pass
 

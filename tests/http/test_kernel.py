@@ -28,11 +28,10 @@ from orionis.http.routes.loader import RouteLoader
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
-
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 _MODULE: str = __name__
@@ -194,7 +193,6 @@ class _BrokenFallbackController:
             Deliberately not a response object.
         """
         return
-
 
 # ---------------------------------------------------------------------------
 # Middleware doubles.
@@ -979,7 +977,6 @@ class _StubRsgiProtocol:
         """
         return
         yield b""
-
 
 # ---------------------------------------------------------------------------
 # Fixtures.

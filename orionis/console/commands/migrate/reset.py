@@ -6,10 +6,7 @@ class MigrateResetCommand(MigrationCommand):
 
     # ruff: noqa: TC001
 
-    # Command signature and description
     signature: str = "migrate:reset"
-
-    # Command description
     description: str = "Reverts every applied database migration."
 
     async def handle(self, migrator: Migrator) -> None:

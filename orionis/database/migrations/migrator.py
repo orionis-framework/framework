@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 # Name of the table used to track already-applied migrations.
 _MIGRATIONS_TABLE: str = "migrations"
 
+# Seeder history belongs to a schema built by the recorded migrations.
+_SEEDERS_TABLE: str = "seeders"
+
 def _build_migrations_table(table: str) -> TableDefinition:
     """
     Build the table definition for the migrations tracking table.
@@ -269,10 +272,11 @@ class Migrator(IMigrator):
         events: MigrationEvents | None = None,
     ) -> list[str]:
         """
-        Drop the tracking table and apply every migration from scratch.
+        Drop migration and seeder history, then apply every migration.
 
         Unlike :meth:`refresh`, the tracking table itself is dropped, so
-        the whole history is rebuilt as a single first batch.
+        the whole history is rebuilt as a single first batch. Seeder history
+        is also removed when an older rollback left it behind.
 
         Parameters
         ----------
@@ -287,7 +291,9 @@ class Migrator(IMigrator):
             Names of the migrations applied, in the order they ran.
         """
         target = self.__connection(connection)
-        await self.reset(connection=connection, events=events)
+        reverted = await self.reset(connection=connection, events=events)
+        if not reverted:
+            await target.dropTable(_SEEDERS_TABLE)
         await target.dropTable(_MIGRATIONS_TABLE)
         return await self.migrate(connection=connection, events=events)
 
@@ -373,9 +379,17 @@ class Migrator(IMigrator):
 
         reporter = events or NO_EVENTS
         reverted: list[str] = []
-        for row in rows:
+        clears_seeders = len(rows) == len(ran)
+        for index, row in enumerate(rows):
             name = row["migration"]
-            await self.__runStep(target, name, discovered[name], None, reporter)
+            await self.__runStep(
+                target,
+                name,
+                discovered[name],
+                None,
+                reporter,
+                clear_seeders=clears_seeders and index == len(rows) - 1,
+            )
             reverted.append(name)
         return reverted
 
@@ -406,13 +420,15 @@ class Migrator(IMigrator):
         targets = set(nlargest(steps, {row["batch"] for row in ran}))
         return [row for row in reversed(ran) if row["batch"] in targets]
 
-    async def __runStep(
+    async def __runStep(  # noqa: PLR0913
         self,
         connection: IConnection,
         name: str,
         migration_cls: type[Migration],
         batch: int | None,
         events: MigrationEvents,
+        *,
+        clear_seeders: bool = False,
     ) -> None:
         """
         Run one migration and its tracking write atomically.
@@ -430,6 +446,8 @@ class Migrator(IMigrator):
             migration instead.
         events : MigrationEvents
             Progress callbacks reported for this migration.
+        clear_seeders : bool, optional
+            Drop seeder history when this is the last applied migration.
 
         Returns
         -------
@@ -450,10 +468,12 @@ class Migrator(IMigrator):
             # that did not fully apply on engines with transactional DDL.
             with migration_connection_scope(connection):
                 async with connection.transaction():
-                    instance = migration_cls()
+                    instance: Migration = await self.__app.build(migration_cls)
                     if batch is None:
                         await instance.down()
                         await self.__deleteRecord(connection, name)
+                        if clear_seeders:
+                            await connection.dropTable(_SEEDERS_TABLE)
                     else:
                         await instance.up()
                         await self.__insertRecord(connection, name, batch)

@@ -1,8 +1,78 @@
+from __future__ import annotations
+from contextlib import contextmanager
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
+from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+_MISSING = object()
+
+@contextmanager
+def replace_attribute(target: object, name: str, value: object) -> Iterator[None]:
+    """
+    Replace an attribute and restore its original ownership on exit.
+
+    Parameters
+    ----------
+    target : object
+        Object or class receiving the temporary attribute.
+    name : str
+        Attribute name to replace.
+    value : object
+        Value to expose inside the context.
+
+    Yields
+    ------
+    None
+        Control while the replacement is active.
+    """
+    try:
+        original = vars(target).get(name, _MISSING)
+    except TypeError:
+        original = getattr(target, name, _MISSING)
+    setattr(target, name, value)
+    try:
+        yield
+    finally:
+        if original is _MISSING:
+            delattr(target, name)
+        else:
+            setattr(target, name, original)
+
+def make_adapter(
+    headers: list[tuple[bytes, bytes]],
+    method: str = "GET",
+) -> ASGITransportAdapter:
+    """
+    Create a request transport carrying the supplied raw headers.
+
+    Parameters
+    ----------
+    headers : list[tuple[bytes, bytes]]
+        Encoded request header names and values.
+    method : str, optional
+        HTTP method exposed by the request scope.
+
+    Returns
+    -------
+    ASGITransportAdapter
+        A concrete adapter for middleware assertions.
+    """
+    return ASGITransportAdapter(
+        {
+            "type": "http",
+            "method": method,
+            "path": "/",
+            "headers": headers,
+            "scheme": "http",
+            "query_string": b"",
+            "server": ("localhost", 80),
+        },
+    )
 
 class _InheritedValue:
     """Expose a class-owned value for instance override checks."""
@@ -88,6 +158,7 @@ class TestTemporaryAttributeReplacement(TestCase):
         None
             Assertions verify the behavior described above.
         """
+
         def replacement() -> int:
             """Return the temporary descriptor result.
 

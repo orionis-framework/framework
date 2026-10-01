@@ -1,4 +1,5 @@
 import re
+from asyncio import to_thread
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
@@ -71,7 +72,7 @@ class MakeConsoleCommand(MakeStubCommand):
         reactor: IReactor,
     ) -> None:
         """
-        Create a command after validating its registration signature.
+        Validate a command signature and create its file on a worker thread.
 
         Parameters
         ----------
@@ -103,7 +104,8 @@ class MakeConsoleCommand(MakeStubCommand):
                 )
                 raise ValueError(error_msg)
 
-            file_path = self.createFile(
+            file_path = await to_thread(
+                self.createFile,
                 app,
                 name,
                 replacements=replacements,

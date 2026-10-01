@@ -19,8 +19,8 @@ from orionis.database.schema.schema import Schema as DatabaseSchema
 from orionis.foundation.config.auth import RememberAuth
 from orionis.hashing.hash_manager import HashManager
 from orionis.http.default.controllers.login_controller import LoginController
-from orionis.http.responses import Response
 from orionis.http.payload.estructures.cookies import Cookies
+from orionis.http.responses import Response
 from orionis.orm import BigInteger, Boolean, Model, String
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
@@ -38,7 +38,6 @@ class RememberAccount(Model, Authenticatable):
     password = String(255)
     active = Boolean()
     remember_token = String(100).nullable()
-
 
 def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamespace:
     """Create an independent browser session with an optional remembered login.
@@ -61,7 +60,6 @@ def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamesp
         cookies={} if cookie is None else {"orionis_remember": cookie},
     )
 
-
 def queued_cookie(incoming: SimpleNamespace) -> str:
     """Read the raw cookie only inside a test, never in application logs.
 
@@ -76,7 +74,6 @@ def queued_cookie(incoming: SimpleNamespace) -> str:
         Value produced by the helper.
     """
     return incoming.state._auth_remember_cookie["value"]
-
 
 class TestRememberMe(TestCase):
     """Exercise real database updates and token races without live browser data."""
@@ -429,7 +426,6 @@ class TestRememberMe(TestCase):
         )
         self.assertIsNone((await RememberAccount.find(self.user.id)).remember_token)
         self.assertIsNone(await self.guard.resolve(request(original)))
-
 
 class TestRememberConfigurationAndController(TestCase):
     """Verify opt-in wiring and the configuration's safety checks."""

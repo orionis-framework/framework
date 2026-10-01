@@ -1,10 +1,10 @@
 import inspect
 from abc import ABC
 from typing import TYPE_CHECKING
-from orionis.test import TestCase
 from orionis.introspection.concretes.contracts.reflection import (
     IReflectionConcrete,
 )
+from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from orionis.introspection.dependencies.entities.signature import Signature
@@ -298,6 +298,7 @@ class _StubConcrete(IReflectionConcrete):
             Value produced by the helper.
         """
         return inspect.signature(lambda: None)
+
     def getMethods(self) -> list:
         """Implement the ``getMethods`` contract stub.
 
@@ -667,6 +668,7 @@ class _StubConcrete(IReflectionConcrete):
             Value produced by the helper.
         """
         return inspect.signature(lambda: None)
+
     def getPropertyDocstring(self, _name: str) -> str | None:
         """Implement the ``getPropertyDocstring`` contract stub.
 
@@ -691,6 +693,7 @@ class _StubConcrete(IReflectionConcrete):
             Value produced by the helper.
         """
         return inspect.signature(lambda: None)
+
     def constructorSignature(self) -> Signature:
         """Implement the ``constructorSignature`` contract stub.
 
@@ -701,6 +704,7 @@ class _StubConcrete(IReflectionConcrete):
         """
         return None  # type: ignore[return-value]
   # type: ignore[return-value]
+
     def methodSignature(self, _method_name: str) -> Signature:
         """Implement the ``methodSignature`` contract stub.
 
@@ -716,6 +720,7 @@ class _StubConcrete(IReflectionConcrete):
         """
         return None  # type: ignore[return-value]
   # type: ignore[return-value]
+
     def clearCache(self) -> None:
         """Implement the ``clearCache`` contract stub.
 
@@ -724,7 +729,6 @@ class _StubConcrete(IReflectionConcrete):
         None
             Completes the operation described above.
         """
-
 
 # ---------------------------------------------------------------------------
 # Contract structure tests
@@ -1511,6 +1515,7 @@ class TestIReflectionConcretePartialImplementation(TestCase):
         None
             Raises AssertionError on failure.
         """
+
         class _OnlyGetClass(IReflectionConcrete):
             """Purposely incomplete subclass."""
 

@@ -1,3 +1,7 @@
+from orionis.console.commands.db.seed import DbSeedCommand
+from orionis.console.commands.db.show import DbShowCommand
+from orionis.console.commands.db.table import DbTableCommand
+from orionis.console.commands.db.wipe import DbWipeCommand
 from orionis.console.commands.make.console import MakeConsoleCommand
 from orionis.console.commands.make.console_listener import MakeConsoleListener
 from orionis.console.commands.make.contract import MakeContract
@@ -23,6 +27,7 @@ from orionis.console.commands.migrate.status import MigrateStatusCommand
 from orionis.console.commands.route.list import RouteListCommand
 from orionis.console.commands.schedule.list import ScheduleListCommand
 from orionis.console.commands.schedule.work import ScheduleWorkCommand
+from orionis.console.commands.seed.seed import SeedCommand
 from orionis.console.commands.serve.serve import ServerCommand
 from orionis.console.commands.support.about import VersionCommand
 from orionis.console.commands.support.clear_cache import ClearCacheCommand
@@ -37,7 +42,6 @@ from orionis.console.commands.support.optimize import OptimizeCommand
 from orionis.console.commands.support.optimize_clear import OptimizeClearCommand
 from orionis.console.commands.support.up import UpCommand
 from orionis.console.commands.test.test import TestCommand
-
 
 def get_core_commands_mapping() -> tuple:
     """
@@ -77,12 +81,17 @@ def get_core_commands_mapping() -> tuple:
         MakeDatabaseSeeder,
         MakeDatabaseSchema,
         MakeTest,
+        DbSeedCommand,
+        DbShowCommand,
+        DbTableCommand,
+        DbWipeCommand,
         MigrateCommand,
         MigrateFreshCommand,
         MigrateRefreshCommand,
         MigrateResetCommand,
         MigrateRollbackCommand,
         MigrateStatusCommand,
+        SeedCommand,
         ScheduleListCommand,
         ScheduleWorkCommand,
         RouteListCommand,

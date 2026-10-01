@@ -109,19 +109,19 @@ class TestImportHasherBackendMissingModule(TestCase):
     def testMissingModuleExplainsHowToInstallThePackage(self) -> None:
         """Report the distribution the driver needs to become usable.
 
-        Validates that the message names the package and the command that
-        installs it.
+        Validate the package name and uv command for both hashing backends.
 
         Returns
         -------
         None
             Assertions verify the behavior described above.
         """
-        with self.assertRaises(MissingHashDependencyException) as captured:
-            import_hasher_backend(_ABSENT_MODULE, _INSTALLED_CLASS, _PACKAGE)
-        message = str(captured.exception)
-        self.assertIn(_PACKAGE, message)
-        self.assertIn(f"pip install {_PACKAGE}", message)
+        for package in ("pwdlib[argon2]", "pwdlib[bcrypt]"):
+            with self.assertRaises(MissingHashDependencyException) as captured:
+                import_hasher_backend(_ABSENT_MODULE, _INSTALLED_CLASS, package)
+            message = str(captured.exception)
+            self.assertIn(package, message)
+            self.assertIn(f"uv add '{package}'", message)
 
 class TestImportHasherBackendUnavailableBackend(TestCase):
 
@@ -161,8 +161,7 @@ class TestImportHasherBackendUnavailableBackend(TestCase):
     def testUnavailableBackendIsReportedAsAMissingDependency(self) -> None:
         """Translate an unavailable backend into a module level failure.
 
-        Validates the branch that catches the error raised by the backend
-        library when its optional dependency is absent.
+        Validate the uv hint and the error raised by an unavailable backend.
 
         Returns
         -------
@@ -176,3 +175,4 @@ class TestImportHasherBackendUnavailableBackend(TestCase):
                 _PACKAGE,
             )
         self.assertIsInstance(captured.exception.__cause__, HasherNotAvailable)
+        self.assertIn(f"uv add '{_PACKAGE}'", str(captured.exception))

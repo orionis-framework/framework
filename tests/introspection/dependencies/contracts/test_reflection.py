@@ -1,11 +1,11 @@
 from abc import ABC
-from orionis.test import TestCase
 from orionis.introspection.dependencies.contracts.reflection import (
     IReflectDependencies,
 )
 from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )
+from orionis.test import TestCase
 
 class _StubDeps(IReflectDependencies):
 
@@ -172,7 +172,6 @@ class TestIReflectDependenciesPartialImplementation(TestCase):
         """
         with self.assertRaises(TypeError):
             _OnlyConstructor()
-
 
 class TestIReflectDependenciesStubReturnTypes(TestCase):
 

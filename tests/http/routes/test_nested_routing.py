@@ -12,8 +12,8 @@ from orionis.http.routes.route_resolver import RouteResolver
 from orionis.http.routes.router import Router
 from orionis.support.facades.router import Route
 from orionis.test import TestCase
-from tests.http._support import replace_attribute
 from tests.http.test_kernel import boot_kernel, dispatch
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

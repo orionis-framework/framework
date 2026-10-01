@@ -1,5 +1,5 @@
-from orionis.test import TestCase
 from orionis.support.types.collection import Collection
+from orionis.test import TestCase
 
 class TestCollection(TestCase):
 

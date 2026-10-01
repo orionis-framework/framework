@@ -33,7 +33,7 @@ como Gunicorn o el flag `--workers` de Uvicorn.
 No se requiere ninguna instalación adicional a la del propio framework:
 
 ```bash
-pip install orionis
+uv add orionis
 ```
 
 - **Python:** 3.14 o superior.

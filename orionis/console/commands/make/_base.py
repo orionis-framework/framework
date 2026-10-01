@@ -1,3 +1,4 @@
+from asyncio import to_thread
 from pathlib import Path
 from typing import ClassVar
 from orionis.console.args.argument import Argument
@@ -140,7 +141,7 @@ class MakeStubCommand(BaseCommand):
 
     async def handle(self, app: IApplication) -> None:
         """
-        Create files declared by the command's stub configuration.
+        Create configured files without blocking the running event loop.
 
         Parameters
         ----------
@@ -159,7 +160,8 @@ class MakeStubCommand(BaseCommand):
                 error_msg = "The 'name' argument is required."
                 raise ValueError(error_msg)
 
-            for label, file_path in self.createFiles(app, name):
+            files = await to_thread(self.createFiles, app, name)
+            for label, file_path in files:
                 self.success(f"{label} [{file_path}] created successfully.")
         except (OSError, TypeError, ValueError) as error:
             self.error(error)

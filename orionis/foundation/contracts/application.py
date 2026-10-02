@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 _SENTINEL = object()
 
 class IApplication(IContainer, ABC):
+    """Define application configuration, lifecycle and runtime entry points."""
+
+    __slots__ = ()
 
     @property
     @abstractmethod

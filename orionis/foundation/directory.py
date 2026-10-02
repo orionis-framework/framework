@@ -1,9 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from orionis.foundation.contracts.application import IApplication  # noqa: TC001
 from orionis.foundation.contracts.directory import IDirectory
-from orionis.foundation.core_paths import CORE_APP_PATHS
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from pathlib import Path
 
 class Directory(IDirectory):
@@ -12,7 +12,7 @@ class Directory(IDirectory):
     __slots__ = ("_all_paths",)
 
     def __init__(self, app: IApplication) -> None:
-        """Cache all application paths resolved by the application.
+        """Snapshot all resolved application paths from their shared mapping.
 
         Parameters
         ----------
@@ -22,13 +22,9 @@ class Directory(IDirectory):
         Returns
         -------
         None
-            The directory accessors are initialized.
+            Initialize directory accessors with an independent path mapping.
         """
-        path = app.path
-        paths = {"root": path("root")}
-        for key in CORE_APP_PATHS:
-            paths[key] = path(key)
-        self._all_paths = paths
+        self._all_paths = dict(cast("Mapping[str, Path]", app.path()))
 
     def _path(self, key: str) -> Path:
         """Return a cached path for a configured key.

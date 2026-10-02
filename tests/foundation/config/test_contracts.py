@@ -147,6 +147,28 @@ class TestConfigurationContracts(ConfigurationTestCase):
                             )
                             self.assertTrue(special or camel)
 
+    def testValidationFunctionsStayInTheSharedModule(self) -> None:
+        """Keep standalone validators in the shared configuration module.
+
+        Returns
+        -------
+        None
+            Assertions reject validation functions defined outside the module.
+        """
+        root = Path("orionis/foundation/config")
+        misplaced = []
+        for path in root.rglob("*.py"):
+            if path == root / "validation.py":
+                continue
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            misplaced.extend(
+                f"{path}:{node.name}"
+                for node in tree.body
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and node.name.lstrip("_").startswith("validate")
+            )
+        self.assertEqual(misplaced, [])
+
     def testNoConfigurationUsesRuntimeAssertions(self) -> None:
         """Keep validation active when Python runs with optimization enabled.
 

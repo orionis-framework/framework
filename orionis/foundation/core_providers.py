@@ -15,6 +15,7 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
     ("orionis.logging.provider", "LoggerProvider"),
     ("orionis.mail.provider", "MailProvider"),
     ("orionis.orm.provider", "QueryBuilderProvider"),
+    ("orionis.queues.provider", "QueueProvider"),
     ("orionis.console.reactor_provider", "ReactorProvider"),
     ("orionis.http.routes.provider", "RouterProvider"),
     ("orionis.console.scheduler_provider", "ScheduleProvider"),

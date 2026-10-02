@@ -1,5 +1,3 @@
-from .strategy import Strategy
+from orionis.foundation.config.queue.enums.drivers import Drivers
 
-__all__ = [
-    "Strategy",
-]
+__all__ = ["Drivers"]

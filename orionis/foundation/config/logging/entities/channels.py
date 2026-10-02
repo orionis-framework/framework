@@ -8,6 +8,15 @@ from orionis.foundation.config.logging.entities.stack import Stack
 from orionis.foundation.config.logging.entities.weekly import Weekly
 from orionis.support.entities.base import BaseEntity
 
+_CHANNEL_ENTITIES: tuple[tuple[str, type], ...] = (
+    ("stack", Stack),
+    ("hourly", Hourly),
+    ("daily", Daily),
+    ("weekly", Weekly),
+    ("monthly", Monthly),
+    ("chunked", Chunked),
+)
+
 @dataclass(frozen=True, kw_only=True)
 class Channels(BaseEntity):
     """
@@ -81,6 +90,11 @@ class Channels(BaseEntity):
         """
         Validate and construct every configured logging channel.
 
+        Returns
+        -------
+        None
+            Replace nested mappings with validated channel entities.
+
         Raises
         ------
         TypeError
@@ -88,14 +102,7 @@ class Channels(BaseEntity):
             or the expected entity instance.
         """
         super().__post_init__()
-        for name, entity in (
-            ("stack", Stack),
-            ("hourly", Hourly),
-            ("daily", Daily),
-            ("weekly", Weekly),
-            ("monthly", Monthly),
-            ("chunked", Chunked),
-        ):
+        for name, entity in _CHANNEL_ENTITIES:
             value = getattr(self, name)
             if isinstance(value, dict):
                 object.__setattr__(self, name, entity(**value))

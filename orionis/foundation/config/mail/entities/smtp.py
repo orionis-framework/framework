@@ -106,6 +106,11 @@ class Smtp(BaseEntity):
         This method ensures that the 'driver' is set to 'smtp' and that all other
         attributes conform to their expected types. It allows 'timeout' to be None.
 
+        Returns
+        -------
+        None
+            Keep structurally valid settings for transport-level validation.
+
         Raises
         ------
         TypeError

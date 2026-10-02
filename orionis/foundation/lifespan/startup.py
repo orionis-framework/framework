@@ -1,7 +1,6 @@
 from __future__ import annotations
 import asyncio
 import os
-import time
 from typing import TYPE_CHECKING
 from orionis.support.facades.datetime import DateTime
 from rich.console import Console
@@ -37,12 +36,9 @@ def before_startup_orionis_generator() -> None:
     Returns
     -------
     None
-        Displays the panel for 0.5 s using a fullscreen context, then returns.
+        Leave the startup panel visible while lifecycle hooks execute.
     """
-    # Display the pre-built splash panel for 0.5 s in fullscreen mode
-    with _console.screen():
-        _console.print(_BEFORE_STARTUP_PANEL)
-        time.sleep(0.5)
+    _console.print(_BEFORE_STARTUP_PANEL)
 
 def after_startup_orionis_generator(host: str, port: int) -> None:
     """

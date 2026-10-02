@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 from contextlib import suppress
+from functools import partial
 from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase
 from orionis.foundation.application import _ASGI_BODY_QUEUE_SIZE, Application
@@ -906,12 +907,17 @@ class TestApplicationAsync(IsolatedAsyncioTestCase):
             Raises AssertionError if kernel cancellation becomes a normal response.
         """
 
-        async def cancel_self(*_args: object) -> None:
+        async def cancel_self(
+            monitor_started: asyncio.Event,
+            *_args: object,
+        ) -> None:
             """
-            Cancel the currently executing kernel task.
+            Cancel the kernel after its transport monitor starts receiving.
 
             Parameters
             ----------
+            monitor_started : asyncio.Event
+                Event indicating that the monitor has entered its receive call.
             *_args : object
                 Ignored protocol handler arguments.
 
@@ -920,6 +926,7 @@ class TestApplicationAsync(IsolatedAsyncioTestCase):
             None
                 Cancellation interrupts the next suspension point.
             """
+            await monitor_started.wait()
             asyncio.current_task().cancel()
             await asyncio.sleep(0)
 
@@ -927,11 +934,12 @@ class TestApplicationAsync(IsolatedAsyncioTestCase):
             with self.subTest(interface=interface):
                 application = _new_application()
                 channel = _ReceiveChannel()
+                handler = partial(cancel_self, channel.entered)
                 if interface == "asgi":
-                    application._Application__kernel_http_asgi = cancel_self
+                    application._Application__kernel_http_asgi = handler
                     task = self._requestTask(application, channel)
                 else:
-                    application._Application__kernel_http_rsgi = cancel_self
+                    application._Application__kernel_http_rsgi = handler
                     task = self._rsgiTask(application, channel.receive)
                 with self.assertRaises(asyncio.CancelledError):
                     await asyncio.wait_for(task, timeout=2)

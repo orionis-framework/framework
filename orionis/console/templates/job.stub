@@ -1,0 +1,36 @@
+from typing import ClassVar
+
+from orionis.logging.contracts.logger import ILogger
+from orionis.queues import BaseJob
+
+
+class {{class_name}}(BaseJob):
+    """Log processing of the stored record identifier."""
+
+    __slots__ = ("record_id",)
+
+    record_id: int
+    tries: ClassVar[int] = 3
+    timeout: ClassVar[float] = 30.0
+    backoff: ClassVar[tuple[float, ...]] = (1.0, 5.0)
+
+    def __init__(self, record_id: int) -> None:
+        """Store the persistent record identifier.
+
+        Parameters
+        ----------
+        record_id : int
+            Record identifier restored when the job is executed.
+        """
+        self.record_id = record_id
+
+    async def handle(self, logger: ILogger) -> None:
+        """Log the record identifier through an injected application service.
+
+        Parameters
+        ----------
+        logger : ILogger
+            Application logger resolved for this job execution.
+        """
+        message = f"Queue job processed record {self.record_id}."
+        logger.info(message)

@@ -1,4 +1,7 @@
 class __IsValidPath:
+    """Validate logging paths without storing per-call state."""
+
+    __slots__ = ()
 
     def __call__(self, value: str, *, suffix: bool = False) -> None:
         """
@@ -15,6 +18,7 @@ class __IsValidPath:
         Returns
         -------
         None
+            Accept valid log paths without changing their representation.
 
         Raises
         ------

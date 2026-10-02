@@ -47,6 +47,11 @@ class Stack(BaseEntity):
         """
         Validate the log path and normalize the configured level.
 
+        Returns
+        -------
+        None
+            Store the validated numeric logging level.
+
         Raises
         ------
         ValueError

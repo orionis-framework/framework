@@ -1,0 +1,1 @@
+"""Verify queue configuration normalization."""

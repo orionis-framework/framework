@@ -15,6 +15,7 @@ from orionis.console.commands.make.http_middleware import MakeHttpMiddleware
 from orionis.console.commands.make.http_schema import MakeHttpSchema
 from orionis.console.commands.make.http_schema_rule import MakeHttpSchemaRule
 from orionis.console.commands.make.mail import MakeMail
+from orionis.console.commands.make.job import MakeJob
 from orionis.console.commands.make.model import MakeModel
 from orionis.console.commands.make.provider import MakeProvider
 from orionis.console.commands.make.service import MakeService
@@ -26,6 +27,11 @@ from orionis.console.commands.migrate.reset import MigrateResetCommand
 from orionis.console.commands.migrate.rollback import MigrateRollbackCommand
 from orionis.console.commands.migrate.status import MigrateStatusCommand
 from orionis.console.commands.route.list import RouteListCommand
+from orionis.console.commands.queue.clear import QueueClearCommand
+from orionis.console.commands.queue.failed import QueueFailedCommand
+from orionis.console.commands.queue.forget import QueueForgetCommand
+from orionis.console.commands.queue.retry import QueueRetryCommand
+from orionis.console.commands.queue.work import QueueWorkCommand
 from orionis.console.commands.schedule.list import ScheduleListCommand
 from orionis.console.commands.schedule.work import ScheduleWorkCommand
 from orionis.console.commands.seed.seed import SeedCommand
@@ -77,6 +83,7 @@ def get_core_commands_mapping() -> tuple:
         MakeModel,
         MakeFactory,
         MakeMail,
+        MakeJob,
         MakeHttpController,
         MakeHttpMiddleware,
         MakeHttpSchema,
@@ -98,6 +105,11 @@ def get_core_commands_mapping() -> tuple:
         SeedCommand,
         ScheduleListCommand,
         ScheduleWorkCommand,
+        QueueWorkCommand,
+        QueueFailedCommand,
+        QueueRetryCommand,
+        QueueForgetCommand,
+        QueueClearCommand,
         RouteListCommand,
         TestCommand,
         VersionCommand,

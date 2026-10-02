@@ -7,6 +7,14 @@ from orionis.foundation.config.filesystems.entitites.local import Local
 from orionis.foundation.config.filesystems.entitites.public import Public
 from orionis.support.entities.base import BaseEntity
 
+_DISK_ENTITIES: tuple[tuple[str, type], ...] = (
+    ("local", Local),
+    ("public", Public),
+    ("s3", S3),
+    ("azure", Azure),
+    ("gcs", GCS),
+)
+
 @dataclass(frozen=True, kw_only=True)
 class Disks(BaseEntity):
     """
@@ -91,20 +99,13 @@ class Disks(BaseEntity):
         super().__post_init__()
 
         # Validate and convert every disk attribute in a single pass
-        conversions: tuple[tuple[str, type], ...] = (
-            ("local", Local),
-            ("public", Public),
-            ("s3", S3),
-            ("azure", Azure),
-            ("gcs", GCS),
-        )
-        for name, entity in conversions:
+        for name, entity in _DISK_ENTITIES:
             value = getattr(self, name)
-            if not isinstance(value, (entity, dict)):
+            if isinstance(value, dict):
+                object.__setattr__(self, name, entity(**value))
+            elif not isinstance(value, entity):
                 error_msg = (
                     f"The '{name}' attribute must be a {entity.__name__} "
                     "object or a dictionary."
                 )
                 raise TypeError(error_msg)
-            if isinstance(value, dict):
-                object.__setattr__(self, name, entity(**value))

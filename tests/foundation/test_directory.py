@@ -26,28 +26,34 @@ class _StubApplication:
     __slots__ = ("paths", "requested")
 
     def __init__(self) -> None:
-        """Initialize the path map and request log."""
+        """Initialize the path map and request log.
+
+        Returns
+        -------
+        None
+            Store independent paths and an empty call log.
+        """
         self.paths = {"root": Path("/project")}
         self.paths.update(
             {key: Path("/project") / key for key in CORE_APP_PATHS},
         )
-        self.requested: list[str] = []
+        self.requested: list[str | None] = []
 
-    def path(self, key: str) -> Path:
-        """Return and record a configured application path.
+    def path(self, key: str | None = None) -> Path | dict[str, Path]:
+        """Return and record a configured path or the complete mapping.
 
         Parameters
         ----------
-        key : str
-            Requested application path key.
+        key : str or None, optional
+            Requested path key, or None for all configured paths.
 
         Returns
         -------
-        Path
-            Path configured for ``key``.
+        Path or dict[str, Path]
+            Configured path or the caller-owned path mapping.
         """
         self.requested.append(key)
-        return self.paths[key]
+        return self.paths if key is None else self.paths[key]
 
 class TestDirectory(TestCase):
     """Test the application directory accessors."""
@@ -79,7 +85,38 @@ class TestDirectory(TestCase):
             self.assertEqual(getattr(directory, method_name)(), app.paths[key])
 
     def testResolvesAllConfiguredKeysDuringInitialization(self) -> None:
-        """Verify that initialization requests every configured path once."""
+        """Retrieve the complete path mapping with one application call.
+
+        Returns
+        -------
+        None
+            Construction obtains all configured paths in one read.
+        """
         app = _StubApplication()
         Directory(app)
-        self.assertEqual(app.requested, ["root", *CORE_APP_PATHS])
+        self.assertEqual(app.requested, [None])
+
+    def testKeepsAnIndependentSnapshotOfThePathMapping(self) -> None:
+        """Preserve cached paths after the application's mapping changes.
+
+        Returns
+        -------
+        None
+            Accessors retain their construction-time paths without further calls.
+        """
+        app = _StubApplication()
+        original = app.paths["root"]
+        directory = Directory(app)
+        app.paths["root"] = Path("changed")
+        self.assertIs(directory.root(), original)
+        self.assertEqual(app.requested, [None])
+
+    def testStoresTheSnapshotWithoutAnInstanceDictionary(self) -> None:
+        """Keep the directory service state inside its declared slot.
+
+        Returns
+        -------
+        None
+            The concrete service does not allocate an instance dictionary.
+        """
+        self.assertFalse(hasattr(Directory(_StubApplication()), "__dict__"))

@@ -1,9 +1,33 @@
+import ast
+import re
 from inspect import Parameter, iscoroutinefunction, signature
 from pathlib import Path
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 from orionis.foundation.application import Application
 from orionis.foundation.contracts.application import IApplication
 from orionis.test import TestCase
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+def foundation_definitions() -> Iterator[
+    tuple[Path, ast.FunctionDef | ast.AsyncFunctionDef, bool]
+]:
+    """Collect explicit function definitions across the foundation package.
+
+    Yields
+    ------
+    tuple[Path, ast.FunctionDef | ast.AsyncFunctionDef, bool]
+        Source path, definition and whether it belongs directly to a class.
+    """
+    root = Path(__file__).resolve().parents[3] / "orionis" / "foundation"
+    for path in root.rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for parent in ast.walk(tree):
+            for node in ast.iter_child_nodes(parent):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    yield path, node, isinstance(parent, ast.ClassDef)
 
 class TestApplicationContract(TestCase):
     """Verify that the interface describes Application's public API."""
@@ -32,6 +56,71 @@ class TestApplicationContract(TestCase):
         self.assertEqual(set(contract_members), set(implementation_members))
         self.assertTrue(IApplication.__abstractmethods__)
         self.assertFalse(Application.__abstractmethods__)
+
+    def testContractDoesNotIntroduceAnInstanceDictionary(self) -> None:
+        """Declare the application contract as a stateless slotted interface.
+
+        Returns
+        -------
+        None
+            The contract itself adds no instance dictionary to implementations.
+        """
+        self.assertEqual(vars(IApplication)["__slots__"], ())
+
+    def testFoundationNamesFollowProjectConventions(self) -> None:
+        """Require camelCase methods and snake_case standalone functions.
+
+        Returns
+        -------
+        None
+            All explicit definitions follow naming or protocol conventions.
+        """
+        violations = []
+        for path, node, is_method in foundation_definitions():
+            name = node.name
+            if name.startswith("__") and name.endswith("__"):
+                continue
+            pattern = r"_{0,2}[a-z][a-zA-Z0-9]*" if is_method else r"_?[a-z][a-z0-9_]*"
+            if re.fullmatch(pattern, name) is None:
+                violations.append(f"{path.name}:{node.lineno}:{name}")
+        self.assertEqual(violations, [])
+
+    def testFoundationDefinitionsHaveNumpyDocsAndAnnotations(self) -> None:
+        """Require NumPy result sections and annotated function signatures.
+
+        Returns
+        -------
+        None
+            Every explicit definition is documented and annotated.
+        """
+        violations = []
+        for path, node, _ in foundation_definitions():
+            doc = ast.get_docstring(node) or ""
+            parameters = [
+                *node.args.posonlyargs,
+                *node.args.args,
+                *node.args.kwonlyargs,
+            ]
+            if node.args.vararg is not None:
+                parameters.append(node.args.vararg)
+            if node.args.kwarg is not None:
+                parameters.append(node.args.kwarg)
+            missing_annotations = any(
+                parameter.annotation is None
+                for parameter in parameters
+                if parameter.arg not in {"self", "cls"}
+            )
+            missing_result = not (
+                "Returns\n-------" in doc or "Yields\n------" in doc
+            )
+            if (
+                missing_result
+                or missing_annotations
+                or node.returns is None
+                or "Examples\n--------" in doc
+            ):
+                violations.append(f"{path.name}:{node.lineno}:{node.name}")
+        self.assertEqual(violations, [])
 
     def testMethodSignaturesMatchImplementation(self) -> None:
         """

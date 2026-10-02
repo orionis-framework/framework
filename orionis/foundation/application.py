@@ -9,6 +9,7 @@ from collections import OrderedDict, deque
 from contextlib import suppress
 from copy import deepcopy
 from dataclasses import asdict
+from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from threading import Lock
@@ -57,6 +58,22 @@ _MAINTENANCE_REFRESH_NS = 100_000_000
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
+
+@lru_cache(maxsize=_CONFIG_KEY_CACHE_SIZE)
+def _parse_config_key(key: str) -> tuple[str, ...]:
+    """Parse a dot-notated configuration key into immutable path components.
+
+    Parameters
+    ----------
+    key : str
+        Validated configuration key whose empty segments must be preserved.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Path components shared independently of application configuration values.
+    """
+    return tuple(key.split("."))
 
 def _create_http_handler_task(
     loop: asyncio.AbstractEventLoop,
@@ -881,7 +898,6 @@ class Application(Container, IApplication):
             # Initialize configuration dictionaries.
             self.__bootstrap: dict[str, Any] = {}
             self.__runtime_config: dict[str, Any] = {}
-            self.__config_key_parts: dict[str, tuple[str, ...]] = {}
 
             # Initialize kernel caches.
             self.__kernel_cli: Callable | None = None
@@ -1182,14 +1198,15 @@ class Application(Container, IApplication):
         """
         # Build and return the default bootstrap dictionary
         return {
-            "commands": {},
             "config": {},
-            "exception_handler": FreezeThaw.thaw(CORE_EXCEPTION_HANDLER),
-            "kernels": FreezeThaw.thaw(CORE_KERNELS),
+            "exception_handler": dict(CORE_EXCEPTION_HANDLER),
+            "kernels": {
+                name: dict(metadata) for name, metadata in CORE_KERNELS.items()
+            },
             "paths": {},
             "providers": {},
             "routing": {},
-            "scheduler": FreezeThaw.thaw(CORE_SCHEDULER),
+            "scheduler": dict(CORE_SCHEDULER),
             "middleware": [],
         }
 
@@ -2851,14 +2868,7 @@ class Application(Container, IApplication):
             error_msg = "Configuration key must be a string."
             raise TypeError(error_msg)
 
-        # Store parsed paths for subsequent configuration lookups.
-        key_cache = self.__config_key_parts
-        key_parts = key_cache.get(key)
-        if key_parts is None:
-            key_parts = tuple(key.split("."))
-            if len(key_cache) >= _CONFIG_KEY_CACHE_SIZE:
-                key_cache.clear()
-            key_cache[key] = key_parts
+        key_parts = _parse_config_key(key)
 
         # If value is not provided, retrieve the configuration value
         if value is _SENTINEL:

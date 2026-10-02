@@ -1,6 +1,7 @@
 from __future__ import annotations
 import tempfile
 from pathlib import Path
+import orionis.foundation.application as application_module
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.container.context.scope import ScopedContext
 from orionis.container.providers.service_provider import ServiceProvider
@@ -143,10 +144,33 @@ class TestApplicationConfiguration(TestCase):
         app = make_application({})
         for index in range(600):
             self.assertEqual(app.config(f"dynamic.item{index}", index), index)
-        self.assertLessEqual(len(app._Application__config_key_parts), 256)
+        self.assertLessEqual(
+            application_module._parse_config_key.cache_info().currsize, 256,
+        )
         for index in range(600):
             self.assertEqual(app.config(f"dynamic.item{index}"), index)
-        self.assertLessEqual(len(app._Application__config_key_parts), 256)
+        self.assertLessEqual(
+            application_module._parse_config_key.cache_info().currsize, 256,
+        )
+
+    def testCacheOverflowPreservesFrequentlyReadPaths(self) -> None:
+        """
+        Keep frequently used paths cached while unrelated configuration keys vary.
+
+        Returns
+        -------
+        None
+            Assertions validate bounded storage and a hit for the frequent key.
+        """
+        app = make_application({"stable": {"value": 7}})
+        for index in range(600):
+            self.assertEqual(app.config("stable.value"), 7)
+            app.config(f"dynamic.item{index}", index)
+        cache_info = application_module._parse_config_key.cache_info
+        previous_hits = cache_info().hits
+        self.assertEqual(app.config("stable.value"), 7)
+        self.assertEqual(cache_info().hits, previous_hits + 1)
+        self.assertLessEqual(cache_info().currsize, 256)
 
     def testAccessRejectsUnconfiguredApplicationsAndInvalidKeys(self) -> None:
         """
@@ -228,6 +252,26 @@ class TestApplicationConfiguration(TestCase):
             self.assertIs(app._Application__bootstrap, bootstrap)
             self.assertEqual(bootstrap, expected)
             self.assertEqual(cache.get(), expected)
+
+    def testBootstrapMetadataCopiesRemainIndependent(self) -> None:
+        """
+        Isolate mutable bootstrap descriptors from other application snapshots.
+
+        Returns
+        -------
+        None
+            Changes to one descriptor never affect the next bootstrap snapshot.
+        """
+        app = make_application()
+        first = app._Application__defaultBootstrap()
+        second = app._Application__defaultBootstrap()
+        first["kernels"]["KernelHTTP"]["class"] = "CustomKernel"
+        first["exception_handler"]["class"] = "CustomHandler"
+        first["scheduler"]["class"] = "CustomScheduler"
+        self.assertEqual(second["kernels"]["KernelHTTP"]["class"], "KernelHTTP")
+        self.assertEqual(second["exception_handler"]["class"], "BaseExceptionHandler")
+        self.assertEqual(second["scheduler"]["class"], "BaseScheduler")
+        self.assertNotIn("commands", second)
 
     def testCreateCapturesCallerAndInitializesOnlyOnce(self) -> None:
         """

@@ -11,14 +11,16 @@ class _IsValidLevel:
 
     Attributes
     ----------
-    _level_names : set[str]
-        Set of valid logging level names.
-    _level_values : set[int]
-        Set of valid logging level integer values.
+    _level_names : frozenset[str]
+        Valid logging level names.
+    _level_values : frozenset[int]
+        Valid logging level integer values.
     """
 
-    _level_names: ClassVar[set[str]] = {level.name for level in Level}
-    _level_values: ClassVar[set[int]] = {level.value for level in Level}
+    __slots__ = ()
+
+    _level_names: ClassVar[frozenset[str]] = frozenset(level.name for level in Level)
+    _level_values: ClassVar[frozenset[int]] = frozenset(level.value for level in Level)
 
     def normalize(self, value: Level | int | str) -> int:
         """
@@ -41,16 +43,35 @@ class _IsValidLevel:
         TypeError
             If the value is not of an accepted type (int, str, or Level).
         """
-        self(value)
         if isinstance(value, Level):
             return value.value
+
+        if isinstance(value, int) and not isinstance(value, bool):
+            if value not in self._level_values:
+                error_msg = (
+                    f"'level' must be one of {sorted(self._level_values)}, got {value}."
+                )
+                raise ValueError(error_msg)
+            return value
+
         if isinstance(value, str):
-            return Level[value.strip().upper()].value
-        return value
+            name = value.strip().upper()
+            if name not in self._level_names:
+                error_msg = (
+                    f"'level' must be one of {sorted(self._level_names)}, "
+                    f"got '{value}'."
+                )
+                raise ValueError(error_msg)
+            return Level[name].value
+
+        error_msg = (
+            f"'level' must be int, str, or Level enum, got {type(value).__name__}."
+        )
+        raise TypeError(error_msg)
 
     def __call__(self, value: Level | int | str) -> None:
         """
-        Validate if the provided value is a valid logging level.
+        Validate a logging level without returning its normalized value.
 
         Parameters
         ----------
@@ -70,35 +91,7 @@ class _IsValidLevel:
         TypeError
             If the value is not of an accepted type (int, str, or Level).
         """
-        # Accept Level enum instances directly
-        if isinstance(value, Level):
-            return
-
-        # Validate integer values
-        if isinstance(value, int) and not isinstance(value, bool):
-            if value not in self._level_values:
-                error_msg = (
-                    f"'level' must be one of {sorted(self._level_values)}, got {value}."
-                )
-                raise ValueError(error_msg)
-            return
-
-        # Validate string values
-        if isinstance(value, str):
-            name = value.strip().upper()
-            if name not in self._level_names:
-                error_msg = (
-                    f"'level' must be one of {sorted(self._level_names)}, "
-                    f"got '{value}'."
-                )
-                raise ValueError(error_msg)
-            return
-
-        # Raise TypeError for unsupported types
-        error_msg = (
-            f"'level' must be int, str, or Level enum, got {type(value).__name__}."
-        )
-        raise TypeError(error_msg)
+        self.normalize(value)
 
 # Exported singleton instance
 IsValidLevel = _IsValidLevel()

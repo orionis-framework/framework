@@ -21,6 +21,9 @@ _PACKAGES = (
     "orionis.test",
     "orionis.failure",
     "orionis.schemas",
+    "orionis.queues",
+    "orionis.foundation.config.database",
+    "orionis.foundation.config.database.enums",
 )
 
 def run_import_probe(source: str) -> dict[str, object]:
@@ -109,6 +112,29 @@ class TestLazyImports(TestCase):
         )
         self.assertEqual(result["loaded"], [])
 
+    def testSqliteImportLeavesOtherDatabaseConfigurationsUnloaded(self) -> None:
+        """Import one database entity without evaluating other driver catalogs.
+
+        Returns
+        -------
+        None
+            Direct and public imports share the same selectively loaded class.
+        """
+        result = run_import_probe(
+            "import json, sys\n"
+            "from orionis.foundation.config.database.entities.sqlite import SQLite\n"
+            "from orionis.foundation.config.database import SQLite as Exported\n"
+            "prefix = 'orionis.foundation.config.database.'\n"
+            "excluded = ('entities.mysql', 'entities.oracle', 'entities.pgsql',\n"
+            "    'entities.sqlserver', 'entities.connections',\n"
+            "    'enums.mysql_collations', 'enums.pgsql_charsets')\n"
+            "print(json.dumps({'same': SQLite is Exported,\n"
+            "    'loaded': [name for name in excluded\n"
+            "        if prefix + name in sys.modules]}))\n",
+        )
+        self.assertTrue(result["same"])
+        self.assertEqual(result["loaded"], [])
+
     def testPublicExportsResolveAndCacheTheirOriginalObjects(self) -> None:
         """Preserve named exports, repeated access and importlib identities.
 
@@ -191,7 +217,7 @@ class TestLazyImports(TestCase):
             [(provider.__module__, provider.__name__) for provider in CORE_PROVIDERS],
             list(CORE_PROVIDER_METADATA),
         )
-        self.assertEqual(len(CORE_PROVIDERS), 17)
+        self.assertEqual(len(CORE_PROVIDERS), 18)
 
     def testConfigurationMappingsHaveIndependentNestedDefaults(self) -> None:
         """Keep configuration edits isolated from subsequent application defaults.

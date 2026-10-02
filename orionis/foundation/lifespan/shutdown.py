@@ -28,12 +28,9 @@ def before_shutdown_orionis_generator() -> None:
     Returns
     -------
     None
-        Displays the panel for 0.1 s using a fullscreen context, then returns.
+        Leave the shutdown panel visible while lifecycle hooks execute.
     """
-    # Display the pre-built shutdown panel for 0.1 s in fullscreen mode
-    with _console.screen():
-        _console.print(_BEFORE_SHUTDOWN_PANEL)
-        time.sleep(0.1)
+    _console.print(_BEFORE_SHUTDOWN_PANEL)
 
 def after_shutdown_orionis_generator(
     start_at: int,

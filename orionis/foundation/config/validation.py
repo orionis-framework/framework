@@ -1,9 +1,18 @@
 from __future__ import annotations
+import re
+from functools import lru_cache
 from http.cookies import CookieError, SimpleCookie
+from math import isfinite
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from enum import Enum
+    from orionis.foundation.config.queue.enums.drivers import Drivers
+
+_NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
+_TABLE_PATTERN = re.compile(r"[A-Za-z_]\w*", re.ASCII)
+_ENUM_SCALAR_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
 
 def validate_integer(
     value: object,
@@ -107,6 +116,34 @@ def validate_boolean(value: object, name: str) -> None:
         error_msg = f"'{name}' must be a boolean."
         raise TypeError(error_msg)
 
+@lru_cache(maxsize=64)
+def _enum_values(
+    enum_type: type[Enum], _member_count: int,
+) -> MappingProxyType | None:
+    """
+    Index enum names and values in declaration order.
+
+    Parameters
+    ----------
+    enum_type : type[Enum]
+        Enum class defining the accepted names and values.
+    _member_count : int
+        Number of declared names, including aliases, used as a cache revision.
+
+    Returns
+    -------
+    MappingProxyType or None
+        Read-only scalar lookup preserving declaration order, or None when values
+        require their current string representation on every lookup.
+    """
+    values = {}
+    for member_name, member in enum_type.__members__.items():
+        if type(member.value) not in _ENUM_SCALAR_TYPES:
+            return None
+        values.setdefault(member_name.casefold(), member.value)
+        values.setdefault(str(member.value).casefold(), member.value)
+    return MappingProxyType(values)
+
 def normalize_enum(value: object, enum_type: type[Enum], name: str) -> object:
     """
     Normalize an enum member, member name, or string value.
@@ -138,10 +175,19 @@ def normalize_enum(value: object, enum_type: type[Enum], name: str) -> object:
         error_msg = f"'{name}' must be a string or {enum_type.__name__}."
         raise TypeError(error_msg)
     normalized = value.strip().casefold()
-    # Match both member names and string representations without case.
-    for member_name, member in enum_type.__members__.items():
-        if normalized in {member_name.casefold(), str(member.value).casefold()}:
-            return member.value
+    values = _enum_values(enum_type, len(enum_type.__members__))
+    if values is not None:
+        try:
+            return values[normalized]
+        except KeyError:
+            pass
+    else:
+        for member_name, member in enum_type.__members__.items():
+            if (
+                normalized == member_name.casefold()
+                or normalized == str(member.value).casefold()
+            ):
+                return member.value
     error_msg = f"'{name}' must be one of {list(enum_type.__members__)}."
     raise ValueError(error_msg)
 
@@ -207,3 +253,95 @@ def validate_cookie_name(value: object, name: str) -> None:
     except CookieError as exc:
         error_msg = f"'{name}' must be a valid cookie name."
         raise ValueError(error_msg) from exc
+
+def validate_name(value: object, name: str, *, table: bool = False) -> None:
+    """
+    Require a safe connection, queue, or SQL table identifier.
+
+    Parameters
+    ----------
+    value : object
+        Identifier to validate.
+    name : str
+        Configuration field used in errors.
+    table : bool, optional
+        Restrict the identifier to an unqualified SQL table name.
+
+    Returns
+    -------
+    None
+        Validate the identifier without changing it.
+
+    Raises
+    ------
+    TypeError
+        If the identifier is not a string.
+    ValueError
+        If the identifier is empty or unsafe.
+    """
+    validate_string(value, name)
+    pattern = _TABLE_PATTERN if table else _NAME_PATTERN
+    if pattern.fullmatch(value) is None:
+        message = f"'{name}' must be a valid identifier."
+        raise ValueError(message)
+
+def validate_seconds(value: object, name: str, *, positive: bool = False) -> None:
+    """
+    Require finite nonnegative or strictly positive seconds.
+
+    Parameters
+    ----------
+    value : object
+        Numeric duration to validate.
+    name : str
+        Configuration field used in errors.
+    positive : bool, optional
+        Reject zero when true.
+
+    Returns
+    -------
+    None
+        Validate the duration without coercion.
+
+    Raises
+    ------
+    TypeError
+        If the duration is not numeric or is a boolean.
+    ValueError
+        If the duration is nonfinite or outside its allowed range.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        message = f"'{name}' must be a number of seconds."
+        raise TypeError(message)
+    if not isfinite(value) or value < 0 or (positive and value == 0):
+        constraint = "positive" if positive else "nonnegative"
+        message = f"'{name}' must contain finite {constraint} seconds."
+        raise ValueError(message)
+
+def validate_driver(value: object, expected: Drivers) -> None:
+    """
+    Require the driver implemented by a connection entity.
+
+    Parameters
+    ----------
+    value : object
+        Configured driver name or enum member.
+    expected : Drivers
+        Driver supported by the entity.
+
+    Returns
+    -------
+    None
+        Validate the driver without changing its representation.
+
+    Raises
+    ------
+    TypeError
+        If the driver is not a string or string enum.
+    ValueError
+        If the driver does not match the connection entity.
+    """
+    validate_string(value, "driver")
+    if value != expected:
+        message = f"'driver' must be '{expected}' for this queue connection."
+        raise ValueError(message)

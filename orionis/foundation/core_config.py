@@ -2,19 +2,26 @@ from dataclasses import asdict
 from importlib import import_module
 from types import MappingProxyType
 
-# ruff: noqa: E501
 _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("app", "orionis.foundation.config.app.entities.app", "App"),
     ("auth", "orionis.foundation.config.auth.entities.auth", "Auth"),
     ("cache", "orionis.foundation.config.cache.entities.cache", "Cache"),
     ("database", "orionis.foundation.config.database.entities.database", "Database"),
-    ("filesystems", "orionis.foundation.config.filesystems.entitites.filesystems", "Filesystems"),
+    (
+        "filesystems",
+        "orionis.foundation.config.filesystems.entitites.filesystems",
+        "Filesystems",
+    ),
     ("hashing", "orionis.foundation.config.hashing.entities.hashing", "Hashing"),
     ("http", "orionis.foundation.config.http.entitites.http", "HTTP"),
     ("logging", "orionis.foundation.config.logging.entities.logging", "Logging"),
     ("mail", "orionis.foundation.config.mail.entities.mail", "Mail"),
     ("queue", "orionis.foundation.config.queue.entities.queue", "Queue"),
-    ("scheduler", "orionis.foundation.config.scheduler.entities.scheduler", "Scheduler"),
+    (
+        "scheduler",
+        "orionis.foundation.config.scheduler.entities.scheduler",
+        "Scheduler",
+    ),
     ("session", "orionis.foundation.config.session.entities.session", "Session"),
     ("testing", "orionis.foundation.config.testing.entities.testing", "Testing"),
     ("view", "orionis.foundation.config.view.entities.view", "View"),

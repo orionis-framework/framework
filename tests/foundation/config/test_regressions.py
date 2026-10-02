@@ -1,4 +1,5 @@
 import base64
+import dataclasses
 import tempfile
 from dataclasses import asdict
 from pathlib import Path
@@ -24,14 +25,35 @@ from orionis.foundation.config.filesystems import S3, Disks, Local, Public
 from orionis.foundation.config.hashing import Argon2, Bcrypt
 from orionis.foundation.config.http import Cors, HTTPCsrf, HTTPProxies, HTTPRateLimit
 from orionis.foundation.config.logging import Chunked, Daily, Hourly, Monthly, Weekly
-from orionis.foundation.config.mail import Mail, Smtp
-from orionis.foundation.config.queue.entities.database import Database as QueueDatabase
+from orionis.foundation.config.mail import Mail, Mailers, Smtp
+from orionis.foundation.config.queue import Queue
 from orionis.foundation.config.scheduler import Redis, Scheduler, Stores
 from orionis.foundation.config.session import Session
 from orionis.foundation.config.testing import Testing
 from orionis.foundation.config.view import View
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from tests.foundation.config.test_environment import ConfigurationTestCase
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class _ExtendedMailers(Mailers):
+    archive: Smtp = dataclasses.field(default_factory=Smtp)
+
+    def toDict(self) -> dict[str, object]:
+        """
+        Reject serialization when only declared mailer names are needed.
+
+        Returns
+        -------
+        dict[str, object]
+            Never return a serialized mapping.
+
+        Raises
+        ------
+        AssertionError
+            If a name-only check serializes the transport settings.
+        """
+        message = "Mailer membership must not serialize transport settings."
+        raise AssertionError(message)
 
 class TestConfigurationRegressions(ConfigurationTestCase):
     def testAppNormalizesEnumNamesValuesAndBinaryKeys(self) -> None:
@@ -106,9 +128,6 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             (Hourly, "retention_hours"),
             (Weekly, "retention_weeks"),
             (Monthly, "retention_months"),
-            (QueueDatabase, "visibility_timeout"),
-            (QueueDatabase, "retry_delay"),
-            (QueueDatabase, "max_attempts"),
             (Scheduler, "jitter"),
             (HTTPRateLimit, "rate_limit_requests"),
             (Smtp, "port"),
@@ -121,6 +140,13 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     self.assertRaises((TypeError, ValueError)),
                 ):
                     cls(**{field: value})
+        for field in ("concurrency", "tries", "sleep", "timeout"):
+            for value in (False, True):
+                with (
+                    self.subTest(entity="Queue", field=field, value=value),
+                    self.assertRaises((TypeError, ValueError)),
+                ):
+                    Queue(worker={field: value})
 
     def testExplicitZeroFalseAndEmptyAllowedValuesSurvive(self) -> None:
         """Preserve disabled caches, zero waits and unauthenticated credentials.
@@ -281,6 +307,22 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         second = Disks()
         self.assertIsNot(first.local, second.local)
 
+    def testDiskMappingsRestoreIndependentTypedEntities(self) -> None:
+        """Reconstruct disk entities without sharing caller-owned dictionaries.
+
+        Returns
+        -------
+        None
+            Nested mappings round-trip into independent typed disk settings.
+        """
+        original = Disks()
+        restored = Disks(**asdict(original))
+        self.assertEqual(asdict(restored), asdict(original))
+        self.assertIsNot(restored.local, original.local)
+        self.assertIsNot(restored.s3, original.s3)
+        with self.assertRaises(TypeError):
+            Disks(local=object())
+
     def testListElementsAndCorsAgeAreValidated(self) -> None:
         """Reject malformed headers, origins, proxies and template paths early.
 
@@ -402,6 +444,21 @@ class TestConfigurationRegressions(ConfigurationTestCase):
             Mail(mailers={"smtp": {"port": "587"}})
         with self.assertRaises(ValueError):
             Mail(default="absent")
+
+    def testMailChecksDeclaredFieldsWithoutSerializingTransports(self) -> None:
+        """
+        Accept subclass fields while rejecting methods as default mailer names.
+
+        Returns
+        -------
+        None
+            Membership checks retain the original entity without serializing it.
+        """
+        mailers = _ExtendedMailers()
+        configured = Mail(default="archive", mailers=mailers)
+        self.assertIs(configured.mailers, mailers)
+        with self.assertRaises(ValueError):
+            Mail(default="toDict", mailers=mailers)
 
     def testSmtpUrlOverridesInactiveOperationalOptions(self) -> None:
         """Keep the transport's documented precedence and lazy validation.

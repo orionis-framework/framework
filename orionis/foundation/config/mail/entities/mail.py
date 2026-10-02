@@ -1,6 +1,6 @@
 from __future__ import annotations
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from orionis.environment import Env
 from orionis.foundation.config.mail.entities.file import File
 from orionis.foundation.config.mail.entities.from_address import FromAddress
@@ -51,11 +51,12 @@ class Mail(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Post-initialization processing for the Mail entity.
+        Validate the default mailer and isolate nested configuration mappings.
 
-        This method validates the default mailer, the from_address, and the mailers.
-        It ensures that the default mailer is declared in the mailers and that all
-        nested settings are correctly typed and structured.
+        Returns
+        -------
+        None
+            Retain validated entities and copy caller-owned mappings.
 
         Raises
         ------
@@ -79,18 +80,19 @@ class Mail(BaseEntity):
             self.__validateMailers()
             available = self.mailers
         else:
-            available = self.mailers.toDict()
+            available = (item.name for item in fields(self.mailers))
         if self.default not in available:
             message = "The default mailer must be declared in 'mailers'."
             raise ValueError(message)
 
     def __validateMailers(self) -> None:
         """
-        Validate nested mailer settings and ensure they are correctly typed.
+        Validate and copy named mailer settings without converting their shape.
 
-        This method iterates over the mailers, checking that each mailer is either
-        a dictionary, Smtp, or File instance. If a mailer is a dictionary, it will
-        be validated and converted to the appropriate type.
+        Returns
+        -------
+        None
+            Store an isolated mapping after validating each known transport.
 
         Raises
         ------

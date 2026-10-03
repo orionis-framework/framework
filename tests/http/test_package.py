@@ -9,6 +9,7 @@ from orionis.test import TestCase
 
 _EXPECTED_EXPORTS: tuple[str, ...] = (
     "BaseMiddleware",
+    "EventStreamResponse",
     "FileResponse",
     "HTMLResponse",
     "HttpResponse",
@@ -20,6 +21,7 @@ _EXPECTED_EXPORTS: tuple[str, ...] = (
     "Response",
     "ResponseFactory",
     "ResponseTemplate",
+    "ServerSentEvent",
     "StreamingResponse",
     "WebSocket",
     "WebSocketDisconnected",

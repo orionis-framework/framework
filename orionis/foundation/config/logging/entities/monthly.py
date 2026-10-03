@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
+from orionis.foundation.config.logging.channel_options import channel_option
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
@@ -21,8 +22,8 @@ class Monthly(BaseEntity):
     """
 
     path: str = field(
-        default_factory=lambda: Env.get(
-            "LOG_PATH",
+        default_factory=lambda: channel_option(
+            "monthly", "LOG_PATH",
             "storage/logs/monthly_{suffix}.log",
         ),
         metadata={
@@ -42,7 +43,7 @@ class Monthly(BaseEntity):
     )
 
     retention_months: int = field(
-        default_factory=lambda: Env.get("LOG_RETENTION", 4),
+        default_factory=lambda: channel_option("monthly", "LOG_RETENTION", 4),
         metadata={
             "description": (
                 "The number of months to retain log files before deletion."

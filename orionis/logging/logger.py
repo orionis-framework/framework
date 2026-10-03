@@ -12,11 +12,10 @@ class Logger(ILogger):
 
     # ruff: noqa: RUF012, TC001
 
-    # Class-level constant; shadows the abstract property via MRO —
-    # avoids property descriptor overhead on every access (B2)
+    # Identify the standard logger channel.
     name: ClassVar[str] = "__orionis__"
 
-    # Cache for formatters to optimize performance
+    # Share formatters configured with the same message and date formats.
     _formatter_cache: dict[str, logging.Formatter] = {}
 
     def __init__(self, app: IApplication) -> None:
@@ -38,7 +37,7 @@ class Logger(ILogger):
         self.__logger: logging.Logger | None = None
         self.__handlers_cache: dict[str, logging.Handler] = {}
         self.__init_lock = Lock()
-        # Individual attributes replace the config dict to avoid hash lookups (B3)
+        # Store the default formatter and logger settings.
         self.__log_format: str = "%(asctime)s [%(levelname)s]: %(message)s"
         self.__date_format: str = "%Y-%m-%d %H:%M:%S"
         self.__logger_name: str = "__orionis__"
@@ -64,33 +63,34 @@ class Logger(ILogger):
         """
         try:
 
-            # Reuse existing logger if available in cache
+            # Retrieve the standard logger by name.
             logger = logging.getLogger(self.__logger_name)
 
-            # Fast path: if logger already configured, minimal setup
-            if logger.hasHandlers():
-                logger.handlers.clear()
+            # Close handlers left by an earlier logger instance.
+            for handler in logger.handlers[:]:
+                handler.close()
+                logger.removeHandler(handler)
 
             # Basic logger setup
             logger.setLevel(self.__default_level)
             logger.propagate = False
 
-            # Get cached formatter for ultra-fast setup
+            # Retrieve the formatter for the default channel.
             formatter = self.__createFormatter()
 
-            # Optimized handler creation for default channel only
+            # Configure the handler selected by the default channel.
             default_channel_name = self.__config.get("default", "stack")
             channels = self.__config.get("channels", {})
             app_root = self.__app.path("root")
 
             if default_channel_name in channels:
 
-                # Normalize once: setLevel below requires an integer level
+                # Convert the configured logging level to an integer.
                 channel_config: dict = self.__normalizeChannelConfig(
                     channels[default_channel_name],
                 )
 
-                # Ultra-fast path for stack handler (most common case)
+                # Create the stack channel's file handler.
                 if default_channel_name == "stack":
                     log_path = f"{app_root}/{channel_config.get(
                         'path',
@@ -137,14 +137,14 @@ class Logger(ILogger):
         logging.Formatter
             The configured formatter instance for log messages.
         """
-        # Build cache key from format and date format
+        # Identify the formatter by its message and date formats.
         cache_key: str = f"{self.__log_format}|{self.__date_format}"
 
-        # Return cached formatter if available
+        # Return a formatter already configured with these formats.
         if cache_key in Logger._formatter_cache:
             return Logger._formatter_cache[cache_key]
 
-        # Create new formatter and cache it for future use
+        # Store the newly configured formatter.
         formatter: logging.Formatter = logging.Formatter(
             self.__log_format,
             datefmt=self.__date_format,
@@ -202,7 +202,7 @@ class Logger(ILogger):
         dict
             Normalized channel configuration with ensured defaults.
         """
-        # Copy to avoid mutating the original config
+        # Normalize a separate copy of the channel configuration.
         normalized: dict = dict(config)
 
         # Ensure the logging level is an integer value
@@ -232,11 +232,11 @@ class Logger(ILogger):
         None
             This method does not return a value.
         """
-        # Ultra-fast path: if already initialized, return immediately
+        # Return when the logger has already been initialized.
         if self.__logger is not None:
             return
 
-        # Lazy initialization with minimal locking overhead
+        # Initialize the logger once under the instance lock.
         with self.__init_lock:
             if self.__logger is None:
                 self.__initializeLogger()
@@ -260,8 +260,7 @@ class Logger(ILogger):
         None
             This method does not return a value.
         """
-        # Inline guard avoids a function-call frame on every hot-path log (H2)
-        # Direct level method skips str/strip allocations and log() dispatch (H1)
+        # Initialize the logger before writing the first message.
         if self.__logger is None:
             self.__ensureLoggerReady()
         self.__logger.info(message)

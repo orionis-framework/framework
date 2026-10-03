@@ -9,6 +9,7 @@ if _TYPE_CHECKING:
     )
     from orionis.http.request import Request
     from orionis.http.responses import (
+        EventStreamResponse,
         FileResponse,
         HTMLResponse,
         JSONResponse,
@@ -18,12 +19,14 @@ if _TYPE_CHECKING:
         ResponseTemplate,
         StreamingResponse,
     )
+    from orionis.http.sse import ServerSentEvent
     from orionis.http.types import HttpResponse
     from orionis.http.websocket import WebSocket, WebSocketDisconnected
     from orionis.http.websocket_middleware import WebSocketMiddleware, WebSocketNext
 
 __all__ = [
     "BaseMiddleware",
+    "EventStreamResponse",
     "FileResponse",
     "HTMLResponse",
     "HttpResponse",
@@ -35,6 +38,7 @@ __all__ = [
     "Response",
     "ResponseFactory",
     "ResponseTemplate",
+    "ServerSentEvent",
     "StreamingResponse",
     "WebSocket",
     "WebSocketDisconnected",
@@ -45,6 +49,7 @@ __all__ = [
 
 _EXPORTS = {
     "BaseMiddleware": ("orionis.http.middleware", "BaseMiddleware"),
+    "EventStreamResponse": ("orionis.http.responses", "EventStreamResponse"), # NOSONAR
     "FileResponse": ("orionis.http.responses", "FileResponse"), # NOSONAR
     "HTMLResponse": ("orionis.http.responses", "HTMLResponse"),
     "HttpResponse": ("orionis.http.types", "HttpResponse"),
@@ -56,6 +61,7 @@ _EXPORTS = {
     "Response": ("orionis.http.responses", "Response"),
     "ResponseFactory": ("orionis.http.factory", "ResponseFactory"),
     "ResponseTemplate": ("orionis.http.responses", "ResponseTemplate"),
+    "ServerSentEvent": ("orionis.http.sse", "ServerSentEvent"),
     "StreamingResponse": ("orionis.http.responses", "StreamingResponse"),
     "WebSocket": ("orionis.http.websocket", "WebSocket"),
     "WebSocketDisconnected": ("orionis.http.websocket", "WebSocketDisconnected"),

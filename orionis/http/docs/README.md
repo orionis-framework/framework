@@ -2,6 +2,9 @@
 
 > Requests, routing, middleware, payload parsing and HTTP responses for ASGI/RSGI applications.
 
+WebSocket dispatch, connection DI/middleware, Origin guards, resource limits and
+protocol integration evidence are documented in [WebSockets](websockets.md).
+
 ## Table of contents
 
 - [Functional overview](#functional-overview)
@@ -135,7 +138,8 @@ The package root exports the following names; other APIs in this reference must 
 from orionis.http import (
     BaseMiddleware, FileResponse, HTMLResponse, HttpResponse, JSONResponse,
     NextCallable, PlainTextResponse, RedirectResponse, Request, Response,
-    ResponseFactory, StreamingResponse, response,
+    ResponseFactory, ResponseTemplate, StreamingResponse, response,
+    WebSocket, WebSocketDisconnected, WebSocketMiddleware, WebSocketNext,
 )
 ```
 
@@ -162,14 +166,14 @@ from orionis.http import (
 
 ### Source inventory
 
-All 104 Python files, including package initializers, are listed below. Definitions with a leading underscore are internal; public API entries include locally defined methods and selected lifecycle/mapping dunders. Inherited methods are documented with their defining class. The inventory also includes bundled non-Python response resources.
+All 112 Python files, including package initializers, are listed below. Definitions with a leading underscore are internal; public API entries include locally defined methods and selected lifecycle/mapping dunders. Inherited methods are documented with their defining class. The inventory also includes bundled non-Python response resources.
 
 <details>
 <summary>Expand the complete file inventory</summary>
 
 | File | Definitions / package exports |
 |---|---|
-| [`__init__.py`](../__init__.py) | `ResponseFactory`, `response`, `BaseMiddleware`, `NextCallable`, `Request`, `FileResponse`, `HTMLResponse`, `JSONResponse`, `PlainTextResponse`, `RedirectResponse`, `Response`, `StreamingResponse`, `HttpResponse` |
+| [`__init__.py`](../__init__.py) | `BaseMiddleware`, `FileResponse`, `HTMLResponse`, `HttpResponse`, `JSONResponse`, `NextCallable`, `PlainTextResponse`, `RedirectResponse`, `Request`, `Response`, `ResponseFactory`, `ResponseTemplate`, `StreamingResponse`, `WebSocket`, `WebSocketDisconnected`, `WebSocketMiddleware`, `WebSocketNext`, `response` |
 | [`adapters/__init__.py`](../adapters/__init__.py) | No local class/function definitions. |
 | [`adapters/request/__init__.py`](../adapters/request/__init__.py) | No local class/function definitions. |
 | [`adapters/request/asgi.py`](../adapters/request/asgi.py) | `ASGITransportAdapter` |
@@ -190,15 +194,19 @@ All 104 Python files, including package initializers, are listed below. Definiti
 | [`contracts/request.py`](../contracts/request.py) | `IRequest` |
 | [`contracts/response.py`](../contracts/response.py) | `IResponse` |
 | [`default/__init__.py`](../default/__init__.py) | No local class/function definitions. |
+| [`default/assistance.py`](../default/assistance.py) | `_encode_bounded`, `_encode_field`, `_header_parts`, `_prompt_parts`, `_frame_parts`, `_try_prompt`, `_compact_header`, `_compact_frame`, `_compact_prompt`, `build_chatgpt_url` |
 | [`default/contracts/__init__.py`](../default/contracts/__init__.py) | No local class/function definitions. |
 | [`default/contracts/responses.py`](../default/contracts/responses.py) | `IDefaultResponses` |
 | [`default/controllers/__init__.py`](../default/controllers/__init__.py) | No local class/function definitions. |
+| [`default/controllers/forgot_password_controller.py`](../default/controllers/forgot_password_controller.py) | `ForgotPasswordController` |
 | [`default/controllers/login_controller.py`](../default/controllers/login_controller.py) | `LoginController` |
 | [`default/controllers/register_controller.py`](../default/controllers/register_controller.py) | `RegisterController` |
 | [`default/responses.py`](../default/responses.py) | `_validate_status_code`, `_compile_placeholders`, `DefaultResponses` |
 | [`default/schemas/__init__.py`](../default/schemas/__init__.py) | No local class/function definitions. |
+| [`default/schemas/forgot_password.py`](../default/schemas/forgot_password.py) | `ForgotPasswordSchema` |
 | [`default/schemas/login.py`](../default/schemas/login.py) | `LoginSchema` |
 | [`default/schemas/register.py`](../default/schemas/register.py) | `RegisterSchema` |
+| [`default/schemas/reset_password.py`](../default/schemas/reset_password.py) | `ResetPasswordSchema` |
 | [`enums/__init__.py`](../enums/__init__.py) | `Interface`, `HTTPStatus`, `WebSocketStatus` |
 | [`enums/interfaces.py`](../enums/interfaces.py) | `Interface` |
 | [`enums/status.py`](../enums/status.py) | `HTTPStatus`, `WebSocketStatus` |
@@ -216,6 +224,7 @@ All 104 Python files, including package initializers, are listed below. Definiti
 | [`layer/shared/security.py`](../layer/shared/security.py) | `SecurityMiddleware` |
 | [`layer/store/__init__.py`](../layer/store/__init__.py) | No local class/function definitions. |
 | [`layer/store/memory_rate_limit.py`](../layer/store/memory_rate_limit.py) | `_RateLimitBucket`, `MemoryRateLimitStore` |
+| [`layer/store/redis_rate_limit.py`](../layer/store/redis_rate_limit.py) | `RedisRateLimitStore` |
 | [`layer/web/__init__.py`](../layer/web/__init__.py) | No local class/function definitions. |
 | [`layer/web/csrf_token.py`](../layer/web/csrf_token.py) | `CSRFTokenMiddleware` |
 | [`layer/web/exceptions.py`](../layer/web/exceptions.py) | `CSRFTokenMismatchException` |
@@ -241,8 +250,9 @@ All 104 Python files, including package initializers, are listed below. Definiti
 | [`payload/stream_parser.py`](../payload/stream_parser.py) | `complete_in_thread`, `MultipartStreamParser` |
 | [`payload/uploaded_file.py`](../payload/uploaded_file.py) | `UploadedFile` |
 | [`request.py`](../request.py) | `UnsupportedMediaTypeException`, `Request` |
-| [`responses.py`](../responses.py) | `Response`, `HTMLResponse`, `PlainTextResponse`, `JSONResponse`, `RedirectResponse`, `StreamingResponse`, `FileResponse` |
+| [`responses.py`](../responses.py) | `Response`, `ResponseTemplate`, `HTMLResponse`, `PlainTextResponse`, `JSONResponse`, `RedirectResponse`, `StreamingResponse`, `FileResponse` |
 | [`routes/__init__.py`](../routes/__init__.py) | No local class/function definitions. |
+| [`routes/auth.py`](../routes/auth.py) | `build_auth_routes` |
 | [`routes/contracts/__init__.py`](../routes/contracts/__init__.py) | No local class/function definitions. |
 | [`routes/contracts/fluent.py`](../routes/contracts/fluent.py) | `IFluentRoute` |
 | [`routes/contracts/loader.py`](../routes/contracts/loader.py) | `IRouteLoader` |
@@ -273,6 +283,8 @@ All 104 Python files, including package initializers, are listed below. Definiti
 | [`routes/types.py`](../routes/types.py) | `RouteAction`, `MiddlewareInput` |
 | [`types.py`](../types.py) | `HttpResponse` |
 | [`validation.py`](../validation.py) | `_url_origin`, `_is_local_reference`, `validation_response`, `previous_url` |
+| [`websocket.py`](../websocket.py) | `WebSocketDisconnected`, `WebSocket` |
+| [`websocket_middleware.py`](../websocket_middleware.py) | `WebSocketNext`, `WebSocketMiddleware` |
 | [`default/assets/favicon.ico`](../default/assets/favicon.ico) | Bundled response asset/template. |
 | [`default/assets/robots.txt`](../default/assets/robots.txt) | Bundled response asset/template. |
 | [`default/pages/down.html`](../default/pages/down.html) | Bundled response asset/template. |
@@ -361,10 +373,12 @@ def __init__(
     self,
     interface: Interface,
     adapter: TransportAdapter,
-    body_stream: IBodyStream,
+    body_stream: IBodyStream | None = None,
     *,
     registry: MediaTypeRegistry | None = None,
+    receive_or_protocol: object = None,
     params: Mapping[str, Any] | None = None,
+    body_limits: HTTPBodyLimits | None = None,
 ) -> None:
 ```
 
@@ -374,9 +388,13 @@ Retains adapter scope and body reader, initializes lazy caches, and copies path 
 |---|---|---|
 | `interface` | `Interface` | Transport interface. |
 | `adapter` | `TransportAdapter` | Transport adapter supplying the scope and headers. |
-| `body_stream` | `IBodyStream` | Body reader supplied by the caller. |
+| `body_stream` | `IBodyStream \| None` | Optional injected body reader; absent readers are created lazily with finite limits. |
 | `registry` | `MediaTypeRegistry \| None` | MIME parser registry; None selects DEFAULT_MEDIA_TYPES. |
+| `receive_or_protocol` | `object` | Transport source used for lazy body construction. |
 | `params` | `Mapping[str, Any] \| None` | Path parameters, copied into an internal dict when nonempty. |
+| `body_limits` | `HTTPBodyLimits \| None` | Request and multipart budgets; None uses the default finite entity. |
+
+`Request.close()` closes cached multipart uploads. The HTTP kernel invokes it after response delivery and awaited background work, including cancellation; manually created requests can call it explicitly. See [resource limits and migration](body-limits.md).
 
 Declared return type: `None`.
 
@@ -4109,10 +4127,10 @@ No parameters; returns `None` and declares clearing the hot-path cache. The abst
 Source: [body.py](../payload/body.py).
 
 ```python
-class PayloadTooLargeException(Exception):
+class PayloadTooLargeException(ValueError):
 ```
 
-Exception subclass raised by `BodyStream` when the accumulated nonempty transport chunks exceed its configured limit. It adds no constructor, fields or methods; construction and exception arguments come from `Exception`.
+ValueError subclass raised when request bytes, buffering or multipart resources exceed configured limits. `KernelHTTP` returns 413 for this exception. It adds no constructor, fields or methods.
 
 <a id="api-064"></a>
 
@@ -4124,13 +4142,14 @@ Source: [body.py](../payload/body.py).
 class BodyStream(IBodyStream):
 ```
 
-Owns one ASGI receive callable or one RSGI async iterable. `interface is Interface.RSGI` selects RSGI; every other value follows the ASGI path. `None` is represented internally by `sys.maxsize`, so it is a finite sentinel. There is no validation of a negative limit. The consumed flag is set before the first transport await. ASGI message types are not inspected: only `body` and `more_body` are read.
+Owns one ASGI receive callable or one RSGI async iterable. `interface is Interface.RSGI` selects RSGI; every other value follows the ASGI path. Defaults are 16 MiB of transport bytes and 2 MiB of buffered bytes; explicitly supplied `None` disables the corresponding direct-constructor limit. Negative or boolean limits are rejected. Application configuration always requires positive finite limits. The consumed flag is set before the first transport await. ASGI message types are not inspected: only `body` and `more_body` are read. See [request resource limits](body-limits.md).
 
 ```python
 __slots__ = (
         "__body",
         "__consumed",
         "__is_rsgi",
+        "__max_buffer_size",
         "__max_size",
         "__receive",
     )
@@ -4143,7 +4162,9 @@ def __init__(
     self,
     interface: Interface,
     receive_or_protocol: object,
-    max_body_size: int | None = None,
+    max_body_size: int | None = 16 * 1024 * 1024,
+    *,
+    max_buffer_size: int | None = 2 * 1024 * 1024,
 ) -> None:
 ```
 
@@ -4151,11 +4172,12 @@ Parameters:
 
 - `interface` (`Interface`): Transport interface selector.
 - `receive_or_protocol` (`object`): ASGI receive callable or RSGI async protocol.
-- `max_body_size` (`int | None`): Maximum accumulated body bytes; `None` selects the sentinel limit.
+- `max_body_size` (`int | None`): Maximum accumulated body bytes; explicit `None` disables this direct-constructor limit.
+- `max_buffer_size` (`int | None`): Maximum buffered bytes during `read()`; explicit `None` disables this direct-constructor limit.
 
-Stores the transport and limit, initializes an empty cache and an unconsumed state; returns `None`. Does not read the transport.
+Stores the transport and limits, initializes an empty cache and an unconsumed state; returns `None`. Does not read the transport.
 
-Exceptions: No explicit `raise` in this operation; failures of called operations are not intercepted unless described above.
+Exceptions: `TypeError` if either limit is a boolean or is neither an integer nor `None`; `ValueError` if either integer limit is negative.
 
 Declared return/yield type: `None`.
 
@@ -4203,7 +4225,7 @@ Declared return/yield type: `AsyncGenerator[bytes]`.
 async def read(self) -> bytes:
 ```
 
-Collects chunks and joins them into one `bytes` value, caches it, and returns it. Later calls return that same cached object. Keeps both the chunk list and joined result during buffering.
+Extends a bytearray only while the buffering budget permits each chunk, converts it to one `bytes` value, caches it and returns it. Later calls return that same cached object. The conversion temporarily holds both bytearray and bytes; input chunks are not retained in a list.
 
 Exceptions: Propagates the errors of `stream()`; a failed read leaves no complete cache and the consumed flag remains set.
 
@@ -5573,9 +5595,9 @@ Parameters:
 - `function` (`Callable[..., T]`): Blocking callable to run in a worker.
 - `args` (`object`): Positional arguments forwarded to `function`.
 
-Runs `function(*args)` with `asyncio.to_thread`, creates a task and awaits it through `shield`; returns its result `T`. On cancellation it awaits the task and re-raises cancellation when the worker finishes successfully. This keeps a worker using the multipart memoryview alive until completion before parser cleanup under a single cancellation.
+Runs `function(*args)` with `asyncio.to_thread`, creates a task and awaits it through `shield`; returns its result `T`. On cancellation it keeps awaiting through `shield` until the worker finishes, including when further cancellations arrive. Parser cleanup therefore retains the multipart memoryview and file until an active write completes.
 
-Exceptions: Worker exceptions propagate; a worker failure while awaiting cancellation can replace `CancelledError`. A further cancellation during the unshielded `await task` is suppressed there; the function does not implement a loop ensuring worker completion under repeated cancellation.
+Exceptions: Worker exceptions propagate during normal operation. After cancellation, worker failures are retrieved and the first `CancelledError` is re-raised after worker completion.
 
 Declared return/yield type: `T`.
 
@@ -5589,7 +5611,7 @@ Source: [stream_parser.py](../payload/stream_parser.py).
 class MultipartStreamParser(IMultipartStreamParser):
 ```
 
-Stateful async multipart parser over a supplied byte stream. Constructor attributes expose `stream`, prefixed `boundary`, mutable `buffer`, limits and counters (`files_count`, `fields_count`, `current_part_size`). Boundary search recognizes CRLF delimiters, optional spaces/tabs and a closing delimiter, including a final close at EOF; incomplete input is rejected. It may finish without exhausting the supplied stream once the closing delimiter is recognized. It does not reset state for another parse.
+Stateful async multipart parser over a supplied byte stream. Constructor attributes expose `stream`, prefixed `boundary`, mutable `buffer`, limits and counters (`files_count`, `fields_count`, `current_part_size`). Boundary search recognizes CRLF delimiters, optional spaces/tabs and a closing delimiter, including a final close at EOF; incomplete input is rejected. It drains discarded epilogue bytes to enforce the complete request budget. It does not reset state for another parse. See [request resource limits](body-limits.md).
 
 ```python
 __slots__ = (
@@ -5597,16 +5619,24 @@ __slots__ = (
         "_currentPart",
         "_eof",
         "_headerSearch",
+        "_memorySize",
         "_paddingEnd",
         "_paddingStart",
+        "_partMemorySize",
+        "_pendingChunk",
+        "_pendingOffset",
+        "_totalSize",
         "boundary",
         "buffer",
         "current_part_size",
         "fields_count",
         "files_count",
+        "max_body_size",
+        "max_field_size",
         "max_fields",
         "max_files",
         "max_header_size",
+        "max_memory_size",
         "max_part_size",
         "memory_threshold",
         "stream",
@@ -5621,11 +5651,14 @@ def __init__(  # noqa: PLR0913
     stream: AsyncIterable[bytes],
     boundary: bytes,
     *,
-    max_files: int = 1000,
-    max_fields: int = 1000,
+    max_files: int = 32,
+    max_fields: int = 128,
     max_part_size: int = 1024 * 1024 * 10,
-    memory_threshold: int = 1024 * 1024,
-    max_header_size: int = 64 * 1024,
+    memory_threshold: int = 256 * 1024,
+    max_header_size: int = 16 * 1024,
+    max_body_size: int = 16 * 1024 * 1024,
+    max_field_size: int = 1024 * 1024,
+    max_memory_size: int = 8 * 1024 * 1024,
 ) -> None:
 ```
 
@@ -5638,8 +5671,11 @@ Parameters:
 - `max_part_size` (`int`): Maximum raw bytes in one part.
 - `memory_threshold` (`int`): Per-file spool size threshold in bytes.
 - `max_header_size` (`int`): Header-block limit and delimiter trailing-line limit, in bytes.
+- `max_body_size` (`int`): Total input bytes including framing, preamble and epilogue.
+- `max_field_size` (`int`): Raw bytes in one text field.
+- `max_memory_size` (`int`): Retained field strings and unspooled file content budget.
 
-Stores `stream`, sets `boundary = b"--" + boundary`, allocates the working bytearray and initializes counters; returns `None`. All limits are stored as supplied, with no positivity checks. `max_part_size` counts incoming bytes before transfer-encoding decoding. `memory_threshold` applies to files only.
+Stores `stream`, sets `boundary = b"--" + boundary`, allocates the working bytearray and initializes counters; returns `None`. Limits reject booleans and invalid types/ranges; counts may be zero and other limits must be positive. Boundary must contain 1–70 bytes without CR/LF. `max_part_size` counts incoming bytes before transfer-encoding decoding. `memory_threshold` applies to files only.
 
 Exceptions: `ValueError("Missing multipart boundary")` for a false/empty boundary.
 
@@ -6560,7 +6596,7 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
 
 `path: Path` identifies the file opened with `path.open("rb")`; `start: int = 0` is the byte offset, passed to `seek` only when truthy. Returns the open `BinaryIO` positioned at that offset. The caller owns normal closure.
 
-Opening/seeking runs in the current asyncio loop's default executor. `asyncio.shield` prevents the waiting task's cancellation from cancelling the open future; on `asyncio.CancelledError`, it awaits opening, closes the resulting file in the executor, then re-raises. An `OSError` during seek closes the file and propagates. Opening/seek/close exceptions can propagate, including `FileNotFoundError`/`PermissionError`; a failure during cancellation cleanup may replace the cancellation. Uses file I/O and a worker thread.
+Opening/seeking runs in the current asyncio loop's default executor. `asyncio.shield` protects the open future; on `asyncio.CancelledError`, it waits through further cancellations for opening and closes any resulting file in the executor before re-raising the first cancellation. An `OSError` during seek closes the file and propagates. Opening/seek errors such as `FileNotFoundError`/`PermissionError` propagate during normal operation; cancellation takes precedence over errors during cancellation cleanup. Uses file I/O and a worker thread.
 
 <a id="api-097"></a>
 
@@ -6572,7 +6608,7 @@ Source: [adapters/response/files.py](../adapters/response/files.py).
 async def complete_file_read(pending: Future[bytes]) -> bytes:
 ```
 
-`pending: Future[bytes]` is an already scheduled worker-read future. Returns its `bytes` result, awaiting it through `asyncio.shield`. If the caller is cancelled, waits for `pending` before re-raising `asyncio.CancelledError`, keeping a reader from being closed while that read is outstanding. Exceptions from the future propagate and may replace cancellation during cleanup. Does not schedule a read or close a file itself.
+`pending: Future[bytes]` is an already scheduled worker-read future. Returns its `bytes` result, awaiting it through `asyncio.shield`. If the caller is cancelled, keeps shielding `pending` through repeated cancellation until it finishes, then re-raises the first `asyncio.CancelledError`. This keeps the reader open while its worker read is outstanding. Worker errors propagate during normal operation; cancellation takes precedence during cleanup. Does not schedule a read or close a file itself.
 
 <a id="api-098"></a>
 
@@ -6618,7 +6654,8 @@ Source: [layer/store/memory_rate_limit.py](../layer/store/memory_rate_limit.py).
 ```python
 class MemoryRateLimitStore:
 
-    def __init__(self) -> None:
+    def __init__(self, *, max_keys: int = 10_000,
+                 max_events: int = 100_000) -> None:
 
     async def hit( # NOSONAR
         self,
@@ -6628,11 +6665,11 @@ class MemoryRateLimitStore:
     ) -> bool:
 ```
 
-Per-instance in-memory sliding window of **accepted** attempts. `__init__` takes no arguments, creates empty dictionary/deque storage and a zero tick counter, and returns `None`. `_GC_INTERVAL: int = 16` and `_GC_BATCH_SIZE: int = 64` control incremental cleanup.
+Per-instance in-memory sliding window of **accepted** attempts. The constructor accepts positive integer `max_keys` and `max_events`, defaulting to 10,000 buckets and 100,000 accepted timestamps. Capacity exhaustion rejects attempts without retaining new identities or evicting active quotas. `_GC_INTERVAL = 16` and `_GC_BATCH_SIZE = 64` control incremental cleanup. See [bounded and distributed rate limiting](RATE_LIMITING.md).
 
 `hit` parameters: `key: str`, entity identifier; `limit: int`, maximum accepted attempts; `window: int`, seconds in the sliding window. Returns `bool`: `False` for `limit <= 0` or an exhausted window, otherwise records the current `monotonic()` timestamp and returns `True`. It evicts accepted timestamps `<= now - window`; rejected attempts do not enter the timestamp deque. Every 16 attempts, including rejections, private `__gc` examines up to 64 keys and removes expired buckets. Its private slotted dataclass `_RateLimitBucket` stores `expires_at: float` and `timestamps: deque[float]` with a fresh deque factory.
 
-There are no `await` points inside `hit`, so calls on one event loop do not interleave inside it. No cross-thread/process lock or shared persistence exists. Each key should use a consistent window; direct calls do not validate positive windows or input types. No explicit exceptions are raised; invalid arithmetic/key types can propagate ordinary `TypeError`. Memory grows with retained keys and accepted timestamps; cleanup happens only on later calls, not on a timer.
+`hit` holds a threading lock around quota and capacity updates, serializing callers across event loops and threads. Each key should use a consistent window. Cleanup happens on subsequent calls. The memory store remains process-local; shared quotas use `RedisRateLimitStore` with atomic Lua, server time and expiring keys.
 
 <a id="api-101"></a>
 
@@ -6657,9 +6694,9 @@ class RateLimitMiddleware:
     ) -> Response | None:
 ```
 
-`__init__` accepts `config: dict` expanded into `HTTPRateLimit` and `default_responses: IDefaultResponses`, the error-response builder; returns `None`. Configuration keys are `rate_limit_enabled: bool`, `rate_limit_requests: int`, and `rate_limit_window_seconds: int`. Their entity defaults read `RATE_LIMIT_ENABLED` (fallback `False`), `RATE_LIMIT_REQUESTS` (`100`), and `RATE_LIMIT_WINDOW` (`60`) through `Env`. Invalid field types/unknown keys raise `TypeError`; nonpositive request/window values and failed environment integer conversions raise `ValueError`. Creates a private `MemoryRateLimitStore` only when enabled and precomputes `Retry-After` as the configured whole window.
+`__init__` validates `config` through `HTTPRateLimit`. Existing enable/quota/window settings retain their defaults. `rate_limit_store` selects `memory` or `redis`; key/event budgets bound memory, while Redis URL, prefix and timeout configure shared quotas. See [all configuration fields](RATE_LIMITING.md). `await close()` releases an owned Redis pool; the HTTP kernel registers it for shutdown.
 
-`isEnabled()` takes no arguments and returns the cached `bool` flag. `handle(adapter: TransportAdapter)` returns `Response | None` when awaited: disabled limiting, absent/false client IP, and an accepted hit return `None`; a rejected hit returns `default_responses.error(status_code=429, content="Too Many Requests", expects_json=adapter.wantsJson(), headers={"Retry-After": ...})`. The quota key is the client IP alone. It mutates store state, propagates adapter/store/default-response errors, and has no explicit raises. `Retry-After` is not computed from the oldest accepted timestamp.
+`isEnabled()` returns the cached flag. `handle(adapter)` returns `None` when disabled, without a client IP, or for an accepted attempt. Quota/capacity rejection returns 429 with `Retry-After` set to the configured window. Redis unavailability returns 503. The identity remains the resolved client IP; configure trusted proxies before relying on it. `Retry-After` is not calculated from the oldest timestamp.
 
 <a id="api-102"></a>
 
@@ -7078,18 +7115,21 @@ The following are implementation limits/defaults, not benchmark claims:
 
 | Component | Verified behavior |
 |---|---|
-| `BodyStream` | `read()` buffers the full body; `stream()` replays that buffer if already read. Direct streaming consumes the transport once. Default limit is represented by `sys.maxsize`; `KernelHTTP` supplies no explicit smaller limit. |
-| `MultipartStreamParser` | Defaults: 1000 files, 1000 fields, 10 MiB per part, 1 MiB file memory threshold, 64 KiB part headers. These are not a total-request memory cap. |
+| `BodyStream` | Default request limit 16 MiB and buffering limit 2 MiB; replay after successful read remains supported. Kernel snapshots configurable `http.body_limits` and maps overflows to 413. |
+| `MultipartStreamParser` | Defaults: total 16 MiB, 32 files, 128 fields, 10 MiB per part, 1 MiB per field, 256 KiB file spooling and 16 KiB headers. Retained field/file memory budget is 8 MiB. [Budget scope and migration](body-limits.md). |
+| HTTP admission | Default 128 active requests per kernel; a thread-safe semaphore rejects saturation with 503 and releases capacity after sending/background work, errors and cancellation. Absolute RSS and external transport memory require deployment limits. |
 | File output | `FileResponse` defaults to 64 KiB reads; ASGI range output also uses 64 KiB. Constructor `stat()` is synchronous; reads use executor helpers. RSGI file delivery delegates to Granian. |
 | Routes | Static routes use mappings; dynamic matching is indexed by segment count. Successful dynamic resolutions use a FIFO cache of 512 entries by default; zero disables it. Hits do not refresh eviction order. |
-| Rate limiting | In-memory deques store accepted timestamps; cleanup examines at most 64 keys every 16 attempts. There is no configured hard global key/memory cap or cross-process sharing. |
+| Rate limiting | Memory defaults to 10,000 keys/100,000 events with locked updates and bounded cleanup. Optional Redis coordinates quotas across workers; connection failures return 503. |
 | Default pages | First HTML access reads bundled templates synchronously; instance caches retain bytes/templates/substitution plans. Error status labels use a module-level dict. |
 
-`MemoryRateLimitStore.hit()` contains no suspension, and its source limits the atomicity claim to a single event loop. Requests, body readers and multipart parsers contain mutable consumption state; route and default-response caches have no synchronization locks. Kernel middleware instances are cached and reused, while continuation state is per request. Neither concurrent boot nor general cross-thread use is guaranteed.
+`MemoryRateLimitStore.hit()` serializes updates across threads. Application provider/kernel startup shares its existing async coordination locks. Requests, parsers and continuations remain owned by one request; route/default-response caches and runtime configuration do not establish general cross-thread safety. Use one worker event loop per application and shared Redis quotas across processes.
 
-General thread-safety, throughput, latency and global memory bounds:
-
-> ⚠️ No especificado en el código fuente
+Local throughput, latency and server RSS samples are available in the
+[runtime benchmarks](../../../benchmarks/README.md). Request/message budgets and
+concurrent request/connection admission bound framework-owned workload; server
+buffers, third-party allocations, background tasks and process RSS require
+deployment limits. These measurements do not certify arbitrary production load.
 
 Cancellation-aware file helpers shield worker operations and wait for completion before propagating cancellation. Multipart failures clean up active/completed uploads on `BaseException`; successful parses transfer ownership to the returned form. This does not establish a guarantee for arbitrary repeated cancellation or failures in cleanup collaborators. Synchronous iterable output still iterates on the event-loop thread. Background tasks are awaited after successful sending, not dispatched as detached work.
 
@@ -7115,4 +7155,4 @@ Behavior that matters when integrating this revision:
 - Session middleware stores a previous URL only for GET/HEAD responses with 2xx status and excludes AJAX and JSON requests.
 - `RegisterController` requires an application user model, configured database/hash services and application views. `Router.auth()` loads those controllers lazily.
 - Public names such as `estructures`, `httpVersion`, `formUrlEncoded`, `robotsTxt` and `noContent` retain their source spelling.
-- `WebSocketStatus` enumerates close codes; the HTTP kernel provides no WebSocket dispatch API.
+- `Route.websocket()` dispatches scoped connection handlers under ASGI and RSGI; see [WebSockets](websockets.md) for middleware, limits and protocol differences. `WebSocketStatus` supplies close codes.

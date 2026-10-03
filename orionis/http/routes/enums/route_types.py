@@ -13,3 +13,4 @@ class RouteType(StrEnum):
     FUNCTION = "function"
     INVOKABLE = "invokable"
     VIEW = "view"
+    HUB = "hub"

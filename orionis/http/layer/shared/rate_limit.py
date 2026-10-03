@@ -1,7 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from redis.exceptions import RedisError
 from orionis.foundation.config.http.entitites.rate_limit import HTTPRateLimit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
+from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
@@ -46,16 +48,33 @@ class RateLimitMiddleware:
         # Pre-render the Retry-After header value for rejection responses.
         self.__retry_after_value = str(cfg.rate_limit_window_seconds)
 
-        # The in-memory store is only needed when the limiter is active.
-        self.__store = (
-            MemoryRateLimitStore()
-            if cfg.rate_limit_enabled
-            else None
-        )
+        self.__store = None
+        if cfg.rate_limit_enabled:
+            self.__store = (
+                RedisRateLimitStore(cfg)
+                if cfg.rate_limit_store == "redis"
+                else MemoryRateLimitStore(
+                    max_keys=cfg.rate_limit_max_keys,
+                    max_events=cfg.rate_limit_max_events,
+                )
+            )
         self.__default_responses = default_responses
 
+    async def close(self) -> None:
+        """
+        Release an owned Redis connection pool during application shutdown.
+
+        Returns
+        -------
+        None
+            Leave quota state intact while closing network resources.
+        """
+        if isinstance(self.__store, RedisRateLimitStore):
+            await self.__store.close()
+
     def isEnabled(self) -> bool:
-        """Report whether rate limiting is active for this application.
+        """
+        Report whether rate limiting is active for this application.
 
         Returns
         -------
@@ -95,11 +114,19 @@ class RateLimitMiddleware:
         if not client_ip:
             return None
 
-        allowed = await self.__store.hit(
-            client_ip,
-            self.__rate_limit_requests,
-            self.__rate_limit_window_seconds,
-        )
+        try:
+            allowed = await self.__store.hit(
+                client_ip,
+                self.__rate_limit_requests,
+                self.__rate_limit_window_seconds,
+            )
+        except RedisError:
+            return await self.__default_responses.error(
+                status_code=503,
+                content="Rate limit service unavailable",
+                expects_json=adapter.wantsJson(),
+                headers={"Retry-After": "1"},
+            )
 
         # If the request exceeds the limit, return a 429 response with a
         # Retry-After header indicating when the client can retry.

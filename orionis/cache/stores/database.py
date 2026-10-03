@@ -20,8 +20,7 @@ _DEFAULT_LOCK_TABLE = "cache_locks"
 # Compare-and-swap rounds allowed before an increment gives up on contention.
 _INCREMENT_ATTEMPTS = 25
 
-
-def _buildEntriesTable(table: str) -> TableDefinition:
+def _build_entries_table(table: str) -> TableDefinition:
     """
     Build the table definition for the cache entries table.
 
@@ -57,8 +56,7 @@ def _buildEntriesTable(table: str) -> TableDefinition:
         primary_key="cache_key",
     )
 
-
-def _buildLocksTable(table: str) -> TableDefinition:
+def _build_locks_table(table: str) -> TableDefinition:
     """
     Build the table definition for the atomic-locks table.
 
@@ -92,7 +90,6 @@ def _buildLocksTable(table: str) -> TableDefinition:
         },
         primary_key="cache_key",
     )
-
 
 class DatabaseCacheBackend:
     """
@@ -151,8 +148,8 @@ class DatabaseCacheBackend:
         async with self._ready_lock:
             if self._ready:
                 return
-            await self._connection.createTable(_buildEntriesTable(self._table))
-            await self._connection.createTable(_buildLocksTable(self._lock_table))
+            await self._connection.createTable(_build_entries_table(self._table))
+            await self._connection.createTable(_build_locks_table(self._lock_table))
             self._ready = True
 
     # ── Serialization helpers ────────────────────────────────────────────────
@@ -425,51 +422,9 @@ class DatabaseCacheBackend:
             await self.set(key, value, ttl=ttl)
         return True
 
-    # aiocache-compatible aliases so CacheRepository.getMany/setMany work
-    # with this backend without modification.
-
-    async def multi_get(
-        self,
-        keys: list[str],
-        default: Any = None,
-    ) -> list[Any]:
-        """
-        Return a list of values for *keys* (aiocache-compatible alias).
-
-        Parameters
-        ----------
-        keys : list[str]
-            Cache keys.
-        default : Any
-            Returned for each missing/expired key.
-
-        Returns
-        -------
-        list[Any]
-        """
-        return await self.multiGet(keys, default)
-
-    async def multi_set(
-        self,
-        pairs: list[tuple[str, Any]],
-        ttl: float | None = None,
-    ) -> bool:
-        """
-        Store multiple key/value pairs (aiocache-compatible alias).
-
-        Parameters
-        ----------
-        pairs : list[tuple[str, Any]]
-            Sequence of (key, value) pairs.
-        ttl : float | None
-            Shared TTL applied to every pair.
-
-        Returns
-        -------
-        bool
-            Always True.
-        """
-        return await self.multiSet(pairs, ttl=ttl)
+    # Expose bulk operations through aiocache's method names.
+    multi_get = multiGet
+    multi_set = multiSet
 
     async def add(self, key: str, value: Any, ttl: float | None = None) -> bool:
         """

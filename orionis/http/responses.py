@@ -11,13 +11,14 @@ from enum import Enum
 from http.cookies import SimpleCookie
 from pathlib import Path
 from stat import S_ISREG
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self, cast
 from urllib.parse import quote
 from uuid import UUID
 import msgspec.json as _msgspec_json
 from orionis.background.task import BackgroundTask
 from orionis.http.adapters.response.files import complete_file_read, open_file
 from orionis.http.contracts.response import IResponse
+from orionis.http.sse import ServerSentEvent, _EventStreamIterator
 from orionis.session.flash import (
     ERRORS_KEY,
     OLD_INPUT_KEY,
@@ -1186,6 +1187,94 @@ class StreamingResponse(Response):
             else:
                 error_msg = "StreamingResponse chunks must be bytes"
                 raise TypeError(error_msg)
+
+class EventStreamResponse(StreamingResponse):
+    """Stream typed server-sent events through the existing response transport."""
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        content: AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str],
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+    ) -> None:
+        """
+        Initialize a lazy UTF-8 event stream with SSE response headers.
+
+        Parameters
+        ----------
+        content : AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str]
+            Events or strings, each encoded only when the transport requests it.
+        status_code : HTTPStatus | int, optional
+            HTTP status code for the response.
+        headers : Mapping[str, str] | None, optional
+            Response headers; Content-Length is discarded for event streams.
+        background : BackgroundTask | None, optional
+            Task to run after successful delivery and producer cleanup.
+
+        Returns
+        -------
+        None
+            Validate response metadata while deferring producer iteration and I/O.
+
+        Raises
+        ------
+        TypeError
+            If the content does not implement synchronous or asynchronous iteration.
+        """
+        super().__init__(
+            content=_EventStreamIterator(content),
+            status_code=status_code,
+            headers=headers,
+            media_type="text/event-stream",
+            background=background,
+        )
+        if not self.hasHeader("cache-control"):
+            self.setHeader("cache-control", "no-cache")
+        if not self.hasHeader("x-accel-buffering"):
+            self.setHeader("x-accel-buffering", "no")
+        self.removeHeader("content-length")
+
+    def getStream(self) -> _EventStreamIterator:
+        """
+        Return the owned byte iterator without starting its event source.
+
+        Returns
+        -------
+        _EventStreamIterator
+            Lazy encoder whose ``aclose()`` method finalizes the event source.
+        """
+        return cast("_EventStreamIterator", self._stream)
+
+    def getRawHeaders(self) -> list[tuple[bytes, bytes]]:
+        """
+        Serialize headers without a fixed event-stream content length.
+
+        Returns
+        -------
+        list of tuple of bytes
+            ASGI response headers, excluding any later Content-Length mutation.
+        """
+        headers = super().getRawHeaders()
+        if "content-length" in self._headers:
+            return [pair for pair in headers if pair[0] != b"content-length"]
+        return headers
+
+    def getStringHeaders(self) -> list[tuple[str, str]]:
+        """
+        Serialize headers without a fixed event-stream content length.
+
+        Returns
+        -------
+        list of tuple of str
+            RSGI response headers, excluding any later Content-Length mutation.
+        """
+        headers = super().getStringHeaders()
+        if "content-length" in self._headers:
+            return [pair for pair in headers if pair[0] != "content-length"]
+        return headers
 
 class FileResponse(StreamingResponse):
 

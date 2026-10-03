@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.http.responses import (
+    EventStreamResponse,
     FileResponse,
     HTMLResponse,
     JSONResponse,
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
     from pathlib import Path
     from orionis.background.task import BackgroundTask
     from orionis.http.enums.status import HTTPStatus
+    from orionis.http.sse import ServerSentEvent
     from orionis.view.pending import PendingView
 
 class ResponseFactory:
@@ -237,6 +239,39 @@ class ResponseFactory:
             status_code=status_code,
             headers=headers,
             media_type=media_type,
+            background=background,
+        )
+
+    def eventStream(
+        self,
+        content: AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str],
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+    ) -> EventStreamResponse:
+        """
+        Build a streaming response carrying UTF-8 server-sent events.
+
+        Parameters
+        ----------
+        content : AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str]
+            Typed events or text payloads, consumed lazily during delivery.
+        status_code : HTTPStatus | int, optional
+            HTTP status code for the response.
+        headers : Mapping[str, str] | None, optional
+            Extra headers; Content-Length is discarded.
+        background : BackgroundTask | None, optional
+            Task to run after successful delivery and stream cleanup.
+
+        Returns
+        -------
+        EventStreamResponse
+            The configured server-sent event response.
+        """
+        return EventStreamResponse(
+            content=content,
+            status_code=status_code,
+            headers=headers,
             background=background,
         )
 

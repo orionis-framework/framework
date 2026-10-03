@@ -12,7 +12,7 @@ from orionis.schemas.rules_executor import (
     _collect_with_plan,
 )
 
-# Alias msgspec entry points for faster local access on the error path.
+# Bind the msgspec conversion entry point.
 _convert = msgspec.convert
 _ValidationError = msgspec.ValidationError
 
@@ -20,7 +20,7 @@ _ValidationError = msgspec.ValidationError
 # (encode_name, field_type, required, nested, rules).
 _FIELD_PLAN_CACHE: dict[type, tuple] = {}
 
-# Alias for faster local access.
+# Bind the field plan lookup.
 _plan_get = _FIELD_PLAN_CACHE.get
 
 def _nested_schema(tp: object) -> type | None:

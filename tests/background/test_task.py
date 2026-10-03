@@ -566,6 +566,40 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
 
         self.assertIsNone(await BackgroundTask(sync_func)())
 
+    async def testAwaitsCoroutineReturnedBySynchronousCallable(self) -> None:
+        """Complete an awaitable returned by a worker thread callable.
+
+        Returns
+        -------
+        None
+            Assertions verify that the returned coroutine runs to completion.
+        """
+        calls: list[str] = []
+
+        async def finish() -> None:
+            """Record completion on the event loop.
+
+            Returns
+            -------
+            None
+                Records the final effect.
+            """
+            calls.append("completed")
+
+        def create_coroutine() -> object:
+            """Return a coroutine from a synchronous callable.
+
+            Returns
+            -------
+            object
+                Coroutine to execute on the event loop.
+            """
+            calls.append("created")
+            return finish()
+
+        await BackgroundTask(create_coroutine)()
+        self.assertEqual(calls, ["created", "completed"])
+
     async def testCanBeAwaitedRepeatedly(self) -> None:
         """Allow a task instance to be reused.
 

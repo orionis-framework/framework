@@ -874,6 +874,14 @@ class MemoryStorageDriver(IStorageDriver):
         entry = self.__entryOrFail(normalized)
 
         def _persist() -> Path:
+            """
+            Write the in-memory object to a local path.
+
+            Returns
+            -------
+            Path
+                Destination of the written object.
+            """
             # Keep the original name when the destination is a directory.
             target = Path(destination)
             if target.is_dir():
@@ -912,6 +920,14 @@ class MemoryStorageDriver(IStorageDriver):
             raise UnsupportedStorageOperationException(error_msg)
 
         def opener() -> BinaryIO:
+            """
+            Open the binary stream backing this object.
+
+            Returns
+            -------
+            BinaryIO
+                Stream handle for reading or writing.
+            """
             # Read-oriented modes require the file to already exist.
             if mode in ("rb", "rb+"):
                 buffer = io.BytesIO(self.__entryOrFail(normalized).content)
@@ -924,6 +940,19 @@ class MemoryStorageDriver(IStorageDriver):
             return buffer
 
         def flush(handle: BinaryIO) -> None:
+            """
+            Persist the writable stream content to storage.
+
+            Parameters
+            ----------
+            handle : BinaryIO
+                Buffered stream being closed.
+
+            Returns
+            -------
+            None
+                Completes after writing the content.
+            """
             # Persist the buffered content back into the store on close.
             handle.seek(0)
             self.__storeSync(normalized, handle.read(), None)

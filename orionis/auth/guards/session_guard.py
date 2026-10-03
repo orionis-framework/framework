@@ -36,7 +36,8 @@ class SessionGuard(ISessionGuard):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = (
-        "__csrf_key", "__csrf_length", "__identities", "__remember", "__session_key",
+        "__csrf_key", "__csrf_length", "__identities", "__password_key",
+        "__remember", "__session_key",
     )
 
     def __init__(self, app: IApplication, identities: IIdentityProvider) -> None:
@@ -58,6 +59,7 @@ class SessionGuard(ISessionGuard):
         self.__session_key: str = (
             app.config("auth.session.key") or _DEFAULT_SESSION_KEY
         )
+        self.__password_key: str = self.__session_key + "_password"
         self.__identities = identities
         self.__csrf_key: str = app.config("http.csrf.session_key") or "_csrf_token"
         self.__csrf_length: int = app.config("http.csrf.token_length") or 32
@@ -101,7 +103,7 @@ class SessionGuard(ISessionGuard):
             return await self.__restoreRemembered(request)
 
         identity = await self.__identities.retrieveById(identifier)
-        fingerprint = session.get(self.__session_key + "_password")
+        fingerprint = session.get(self.__password_key)
         if (
             identity is None
             or not isinstance(fingerprint, str)
@@ -110,7 +112,7 @@ class SessionGuard(ISessionGuard):
             )
         ):
             session.forget(self.__session_key)
-            session.forget(self.__session_key + "_password")
+            session.forget(self.__password_key)
             return await self.__restoreRemembered(request)
 
         return GuardResult(identity=identity, guard=Guards.SESSION.value)
@@ -222,7 +224,7 @@ class SessionGuard(ISessionGuard):
         session.regenerate()
         session.put(self.__session_key, str(identifier))
         session.put(
-            self.__session_key + "_password",
+            self.__password_key,
             hash_token_secret(identity.getAuthPassword()),
         )
         csrf = secrets.token_urlsafe(self.__csrf_length)
@@ -251,7 +253,7 @@ class SessionGuard(ISessionGuard):
 
         await self.__remember.revoke(request, session.get(self.__session_key))
         session.forget(self.__session_key)
-        session.forget(self.__session_key + "_password")
+        session.forget(self.__password_key)
         session.invalidate()
 
     @staticmethod

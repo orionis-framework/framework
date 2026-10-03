@@ -1,11 +1,10 @@
 from __future__ import annotations
-
 import re
 from operator import attrgetter
 from typing import TYPE_CHECKING
-
 from orionis.http.routes.contracts.route_compiler import IRouteCompiler
 from orionis.http.routes.entities.compiled_route import CompiledRoute
+from orionis.http.routes.enums.protocols import RouteProtocol
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.functions import parse_action
 from orionis.http.routes.params_types import PARAM_TYPES
@@ -13,7 +12,6 @@ from orionis.http.websocket_middleware import WebSocketMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
     from orionis.http.middleware import BaseMiddleware
 
 # Precompiled pattern for path parameter placeholders like {name} or {name:type}.
@@ -22,9 +20,9 @@ _PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::(\w+))?\}")
 # Precompiled pattern to normalise named capture groups for collision detection.
 _NAMED_GROUP_RE: re.Pattern = re.compile(r"\(\?P<\w+>")
 
-
 def _validate_literal(fragment: str, path: str) -> None:
-    """Reject unmatched braces and malformed parameter declarations.
+    """
+    Reject unmatched braces and malformed parameter declarations.
 
     Raises
     ------
@@ -35,9 +33,9 @@ def _validate_literal(fragment: str, path: str) -> None:
         error_msg = f"Malformed route parameter in path '{path}'"
         raise ValueError(error_msg)
 
-
 def _action_name(handler: Callable | type) -> str:
-    """Return an importable handler name for boot-time dispatch and caching.
+    """
+    Return an importable handler name for boot-time dispatch and caching.
 
     Raises
     ------
@@ -52,7 +50,8 @@ def _action_name(handler: Callable | type) -> str:
 
 
 def _register_name(names: dict[str, str], route: dict) -> None:
-    """Require one unambiguous URL template per route name.
+    """
+    Require one unambiguous URL template per route name.
 
     Raises
     ------
@@ -194,7 +193,7 @@ class RouteCompiler(IRouteCompiler):
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
-    def __compileRoute(
+    def __compileRoute( # NOSONAR
         self,
         route: dict,
         app_middleware: list[type] | None = None,
@@ -214,13 +213,20 @@ class RouteCompiler(IRouteCompiler):
         """
         # Determine the final middleware stack for this route, respecting
         # global and route-specific middleware and exclusions.
+        protocol = (
+            RouteProtocol.WEBSOCKET
+            if route["method"] == "WEBSOCKET" else RouteProtocol.HTTP
+        )
+        if RouteProtocol(route.get("protocol", protocol)) is not protocol:
+            error_msg = "Route protocol does not match its dispatch method"
+            raise ValueError(error_msg)
         without_middleware = set(route.get("without_middleware", ()))
         middleware = list(route.get("middleware", ()))
         seen: set[type[BaseMiddleware]] = set()
         stack: list[type[BaseMiddleware]] = []
 
         # Global middleware first
-        for mw in (() if route["method"] == "WEBSOCKET" else app_middleware or ()):
+        for mw in (() if protocol is RouteProtocol.WEBSOCKET else app_middleware or ()):
             if mw in without_middleware or mw in seen:
                 continue
             seen.add(mw)
@@ -231,7 +237,7 @@ class RouteCompiler(IRouteCompiler):
             if mw in without_middleware or mw in seen:
                 continue
             is_socket_middleware = issubclass(mw, WebSocketMiddleware)
-            if is_socket_middleware != (route["method"] == "WEBSOCKET"):
+            if is_socket_middleware != (protocol is RouteProtocol.WEBSOCKET):
                 error_msg = "Route middleware must match its HTTP/WebSocket protocol"
                 raise TypeError(error_msg)
             seen.add(mw)
@@ -242,10 +248,17 @@ class RouteCompiler(IRouteCompiler):
 
         # Resolve the action type and build the action descriptor for dispatch.
         path = route["path"]
-        if route["method"] == "WEBSOCKET" and route.get("view") is not None:
+        if protocol is RouteProtocol.WEBSOCKET and route.get("view") is not None:
             error_msg = "WebSocket routes require a connection handler, not a view"
             raise ValueError(error_msg)
         route_type, action = self.__buildAction(route)
+        hub_protocol = route.get("hub_protocol")
+        if route_type is RouteType.HUB and (
+            protocol is not RouteProtocol.WEBSOCKET
+            or hub_protocol not in ("json", "msgpack")
+        ):
+            error_msg = "Hub routes require WebSocket and a json or msgpack codec"
+            raise ValueError(error_msg)
         is_static, regex, converters = self.compilePath(path)
         segment_count, priority_score = self.__routeMetrics(path)
 
@@ -265,6 +278,8 @@ class RouteCompiler(IRouteCompiler):
             middleware=middleware,
             without_middleware=without_middleware,
             compiled_middlewares=compiled_middlewares,
+            protocol=protocol,
+            hub_protocol=hub_protocol,
         )
         return is_static, compiled
 
@@ -292,6 +307,12 @@ class RouteCompiler(IRouteCompiler):
         """
         # View routes carry only a template name, so they stay JSON-safe and
         # survive the compiled route cache without importing any module.
+        hub = route.get("hub")
+        if hub is not None:
+            return RouteType.HUB, {
+                "class": _action_name(hub),
+                "module": hub.__module__,
+            }
         view_name = route.get("view")
         if view_name is not None:
             return RouteType.VIEW, {"view": view_name}

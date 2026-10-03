@@ -6,7 +6,7 @@ from orionis.foundation.config.scheduler.enums.drivers import Drivers
 from orionis.foundation.config.validation import validate_integer
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid driver names for O(1) membership checks
+# Define the supported scheduler driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

@@ -16,7 +16,7 @@ _ALLOWED_MODES: frozenset[str] = frozenset(
     {"rb", "wb", "ab", "rb+", "wb+", "ab+"},
 )
 
-def importDriverDependency(module: str, package: str, extra: str) -> ModuleType:
+def import_driver_dependency(module: str, package: str, extra: str) -> ModuleType:
     """
     Import an optional SDK module required by a storage driver.
 
@@ -54,7 +54,7 @@ def importDriverDependency(module: str, package: str, extra: str) -> ModuleType:
         )
         raise MissingStorageDependencyException(error_msg) from exc
 
-def assertBinaryMode(mode: str) -> None:
+def assert_binary_mode(mode: str) -> None:
     """
     Validate a stream mode against the supported binary modes.
 
@@ -77,7 +77,7 @@ def assertBinaryMode(mode: str) -> None:
         error_msg = f"Unsupported stream mode [{mode}]."
         raise UnsupportedStorageOperationException(error_msg)
 
-def resolveDownloadTarget(normalized: str, destination: str | Path) -> Path:
+def resolve_download_target(normalized: str, destination: str | Path) -> Path:
     """
     Resolve the local target path for a download operation.
 
@@ -105,7 +105,7 @@ def resolveDownloadTarget(normalized: str, destination: str | Path) -> Path:
     target.parent.mkdir(parents=True, exist_ok=True)
     return target
 
-def filterFiles(
+def filter_files(
     keys: Iterable[str],
     base: str,
     *,
@@ -146,7 +146,7 @@ def filterFiles(
     results.sort()
     return results
 
-def _directoryAncestors(key: str, base: str) -> Iterator[str]:
+def _directory_ancestors(key: str, base: str) -> Iterator[str]:
     """
     Yield every directory prefix implied by *key* down to *base*.
 
@@ -175,7 +175,7 @@ def _directoryAncestors(key: str, base: str) -> Iterator[str]:
         yield candidate
         candidate = candidate.rsplit("/", 1)[0] if "/" in candidate else ""
 
-def deriveDirectories(
+def derive_directories(
     keys: Iterable[str],
     base: str,
     *,
@@ -207,7 +207,7 @@ def deriveDirectories(
     found: set[str] = set()
     for key in keys:
         if key.startswith(prefix):
-            found.update(_directoryAncestors(key, base))
+            found.update(_directory_ancestors(key, base))
 
     results = [entry for entry in found if entry.startswith(prefix)]
     if not recursive:
@@ -216,3 +216,37 @@ def deriveDirectories(
         ]
     results.sort()
     return results
+
+_LEGACY_EXPORTS = {
+    "importDriverDependency": import_driver_dependency,
+    "assertBinaryMode": assert_binary_mode,
+    "resolveDownloadTarget": resolve_download_target,
+    "filterFiles": filter_files,
+    "deriveDirectories": derive_directories,
+}
+
+def __getattr__(name: str) -> object:
+    """
+    Resolve and cache a legacy driver helper name.
+
+    Parameters
+    ----------
+    name : str
+        Attribute requested from this module.
+
+    Returns
+    -------
+    object
+        Existing helper function bound to the requested name.
+
+    Raises
+    ------
+    AttributeError
+        If the requested name is not a compatibility export.
+    """
+    try:
+        value = _LEGACY_EXPORTS[name]
+    except KeyError as exc:
+        raise AttributeError(name) from exc
+    globals()[name] = value
+    return value

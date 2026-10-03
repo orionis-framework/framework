@@ -3,6 +3,31 @@
 Manual en ingles: [README.md](README.md).
 Muestras medidas: [benchmark-results.json](benchmark-results.json).
 
+## Estados Explicitos Y Arranque Sin Servidor
+
+`create()` conserva su comportamiento síncrono de configuración y registro.
+Para scripts o workers propios, usar `await app.boot()` antes de consumir
+facades. Ejecuta `create()`, espera los providers eager pendientes y devuelve
+la aplicación. Las llamadas concurrentes comparten el bloqueo existente;
+un fallo o cancelación conserva el provider pendiente para reintentar.
+No inicia kernels ni ejecuta hooks del runtime HTTP o CLI.
+
+| Fase | Estado observable | Acceso a servicios |
+| --- | --- | --- |
+| Construida | `isCreated == False` | Bindings explícitos del container; configurar antes de usar servicios con configuración. |
+| Creada | `isCreated == isBooted == True` | Bindings registrados; resolver contratos con `await`. Los efectos del boot eager asíncrono pueden seguir pendientes. |
+| Providers iniciados | `areProvidersBooted == True` | Boot eager terminado; los providers deferred siguen resolviéndose bajo demanda. |
+| HTTP inicializado | `isHttpReady == True` | Ambos handlers publicados después del boot eager y del kernel. No certifica sockets ni dependencias externas. |
+| Scoped | `app.getCurrentScope()` devuelve un scope | Estado aislado por petición, conexión WebSocket o job; no retener servicios scoped en singletons. |
+| Facade pinned | El provider esperó `Facade.pin()` | Acceso directo siguiendo la API síncrona/asíncrona del servicio. Antes del pin, el dispatcher requiere `await`, incluso para métodos síncronos. |
+
+Los flags registran etapas de arranque completadas; shutdown no los reinicia
+y no representan el estado de salud actual del proceso o sus servicios.
+`isBooted` sigue siendo el alias compatible de la fase creada. HTTP lifespan y
+Reactor siguen ejecutando sus hooks; los scripts que los necesitan deben usar
+el entry point del runtime correspondiente. Resolver un contrato explícito
+evita depender del momento de pin de una facade durante el arranque.
+
 ## Alcance
 
 Revision de 157 archivos Python y 390 funciones o metodos explicitos de

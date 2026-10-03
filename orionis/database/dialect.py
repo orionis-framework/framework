@@ -9,6 +9,7 @@ from orionis.database.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from sqlalchemy.engine import Connection as SqlConnection
     from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -70,6 +71,72 @@ _MYSQL_RELAXED_MODE: str = "NO_ENGINE_SUBSTITUTION"
 
 # SQLite database markers that identify an in-memory database.
 _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
+
+
+class _MySQLParameterEscaper:
+    """Escape binary parameters independently of aiomysql's removed converter."""
+
+    __slots__ = ("_original",)
+
+    def __init__(self, original: Callable[[object], object]) -> None:
+        """
+        Retain the connection's existing nonbinary parameter conversion.
+
+        Parameters
+        ----------
+        original : Callable
+            Original escape method owned by this connection.
+
+        Returns
+        -------
+        None
+            Initialize a connection-local converter without global mutations.
+        """
+        self._original = original
+
+    def __call__(self, value: object) -> object:
+        """
+        Convert binary values to charset-independent MySQL hex literals.
+
+        Parameters
+        ----------
+        value : object
+            One bound DBAPI parameter.
+
+        Returns
+        -------
+        object
+            Binary hex literal or the original nonbinary conversion result.
+        """
+        if isinstance(value, (bytes, bytearray, memoryview)):
+            return "_binary X'" + bytes(value).hex() + "'"
+        return self._original(value)
+
+
+def _configure_mysql_binary_parameters(dbapi_connection: object) -> None:
+    """
+    Install safe binary conversion on one adapted aiomysql connection.
+
+    PyMySQL 1.2.3 keeps ``escape_bytes_prefixed`` as a noncallable import alias;
+    aiomysql 0.3.2 calls that alias for every bytes parameter. Hex literals keep
+    binary storage working without downgrading PyMySQL or patching its modules.
+
+    Parameters
+    ----------
+    dbapi_connection : object
+        SQLAlchemy DBAPI adapter exposing its underlying driver connection.
+
+    Returns
+    -------
+    None
+        Replace only this connection's binary escape path when available.
+    """
+    connection = getattr(dbapi_connection, "driver_connection", None)
+    if connection is None:
+        return
+    original = getattr(connection, "escape", None)
+    if callable(original) and not isinstance(original, _MySQLParameterEscaper):
+        connection.escape = _MySQLParameterEscaper(original)
 
 def resolve_driver(config: dict[str, Any]) -> str:
     """
@@ -276,8 +343,10 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
         This function does not return a value.
     """
     statements = _session_statements(config)
-    sqlite = resolve_driver(config) == "sqlite"
-    if not statements and not sqlite:
+    driver = resolve_driver(config)
+    sqlite = driver == "sqlite"
+    mysql_async = driver == "mysql" and engine.sync_engine.dialect.driver == "aiomysql"
+    if not statements and not sqlite and not mysql_async:
         return
 
     if sqlite:
@@ -310,6 +379,8 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
         """
         if sqlite:
             dbapi_connection.isolation_level = None
+        if mysql_async:
+            _configure_mysql_binary_parameters(dbapi_connection)
         if not statements:
             return
         cursor = dbapi_connection.cursor()

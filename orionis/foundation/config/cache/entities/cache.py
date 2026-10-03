@@ -5,7 +5,7 @@ from orionis.foundation.config.cache.entities.stores import Stores
 from orionis.foundation.config.cache.enums import Drivers
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid driver names for O(1) membership checks
+# Define the supported cache driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

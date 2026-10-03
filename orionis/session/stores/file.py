@@ -17,6 +17,7 @@ from orionis.session.exceptions import SessionStorageException
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from filelock import BaseFileLock
 
 class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
     """
@@ -104,8 +105,9 @@ class FileSessionStore(ISessionStore):
             for index in range(_LOCK_STRIPES)
         )
 
-    def _lock(self, path: Path) -> FileLock:
-        """Select a bounded, stable cross-process lock for a session file.
+    def _lock(self, path: Path) -> BaseFileLock:
+        """
+        Select a bounded, stable cross-process lock for a session file.
 
         Parameters
         ----------
@@ -114,8 +116,8 @@ class FileSessionStore(ISessionStore):
 
         Returns
         -------
-        FileLock
-            Reentrant lock serializing validation, replacement and deletion.
+        BaseFileLock
+            Platform lock serializing validation, replacement and deletion.
         """
         return self._locks[crc32(path.name.encode()) % _LOCK_STRIPES]
 

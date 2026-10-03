@@ -59,23 +59,23 @@ def _warm_child_plan(tp: object) -> None:
     Parameters
     ----------
     tp : object
-        Field type annotation, potentially a ``Union`` or bare class.
+        Field type annotation, potentially an ``Annotated`` type, ``Union``
+        or bare class.
     """
     # Fast path for common case: a non-generic schema type.
     origin = get_origin(tp)
 
+    # Resolve the wrapped type before looking for child schema plans.
+    if origin is Annotated:
+        _warm_child_plan(get_args(tp)[0])
+        return
+
     # Unions may contain nested schemas in any member, so check all members.
     if origin is Union or origin is types.UnionType:
         for arg in get_args(tp):
-            if (
-                isinstance(arg, type)
-                and "__orionis_meta__" in arg.__dict__
-                and _cache_get(arg) is None
-            ):
-                _build_plan(arg)
+            _warm_child_plan(arg)
 
-    # Annotated may wrap a nested schema, but the metadata items it carries are
-    # irrelevant for plan caching, so skip directly to the wrapped type.
+    # Build a plan for a bare schema type when it has no existing plan.
     elif (
         isinstance(tp, type)
         and "__orionis_meta__" in tp.__dict__

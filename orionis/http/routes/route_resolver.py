@@ -1,12 +1,10 @@
 from __future__ import annotations
-
 import re
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
 from heapq import merge
 from typing import TYPE_CHECKING
-
 from orionis.http.routes.contracts.route_resolver import IRouteResolver
 from orionis.http.routes.entities.resolved_route import ResolvedRoute
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
@@ -14,6 +12,7 @@ from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.functions import normalize_request_path, strip_regex_anchors
 
 if TYPE_CHECKING:
+    from typing import Never
     from orionis.http.routes.entities.compiled_route import CompiledRoute
 
 _GROUP_NAME_RE: re.Pattern = re.compile(r"\(\?P<(\w+)>")
@@ -45,21 +44,23 @@ class _DepthBucket:
         entries: list[BucketEntry],
         marker_to_entry: dict[int, int] | None = None,
     ) -> None:
-        """Initialize bucket data used to resolve dynamic routes.
+        """
+        Store matching and parameter extraction metadata for dynamic routes.
 
         Parameters
         ----------
         pattern : re.Pattern[str]
-            Compiled regex that matches all dynamic routes at one depth.
+            Compiled regex for the bucket's dynamic route candidates.
         entries : list[BucketEntry]
             Extraction metadata and route pairs aligned with regex alternatives.
         marker_to_entry : dict[int, int] | None, optional
-            Map of marker group IDs to ``entries`` indices for fast lookup.
+            Map of terminal capture group IDs to entry indices, or None for
+            a single-route bucket. Defaults to None.
 
         Returns
         -------
         None
-            Store the provided matching structures on the instance.
+            Initialize the matcher, ordered entries, and optional marker lookup.
         """
         self.pattern = pattern
         self.entries = entries
@@ -73,16 +74,31 @@ class _PrefixIndex:
     branches: dict[str, _DepthBucket | _PrefixIndex]
     fallback: _DepthBucket | None = None
 
-
 type DepthTable = dict[int, _DepthBucket | _PrefixIndex]
-
 
 def _select_bucket(
     table: DepthTable,
     path: str,
     depth: int,
 ) -> _DepthBucket | None:
-    """Select a depth and, when available, a literal first-segment bucket."""
+    """
+    Select a dynamic route bucket by path depth and literal segments.
+
+    Parameters
+    ----------
+    table : DepthTable
+        Dynamic candidates grouped by depth for one HTTP method.
+    path : str
+        Normalized request path used to traverse literal prefix branches.
+    depth : int
+        Number of path separators, or zero for the root path.
+
+    Returns
+    -------
+    _DepthBucket | None
+        Bucket selected by depth and prefix, or None if no branch or fallback
+        applies. The bucket's regex is not evaluated.
+    """
     bucket = table.get(depth)
     while isinstance(bucket, _PrefixIndex):
         start = bucket.start
@@ -91,19 +107,37 @@ def _select_bucket(
         bucket = bucket.branches.get(segment, bucket.fallback)
     return bucket
 
-
 def _path_allowed_for_method(
     static_table: dict[str, ResolvedRoute],
     dynamic_table: DepthTable,
     path: str,
     depth: int,
 ) -> bool:
-    """Check a method's existing lookup structures without extracting params."""
+    """
+    Check whether a method has a static or regex match for a path.
+
+    Inspect lookup structures without extracting or converting parameters.
+
+    Parameters
+    ----------
+    static_table : dict[str, ResolvedRoute]
+        Static paths mapped to resolved routes for one HTTP method.
+    dynamic_table : DepthTable
+        Dynamic candidates grouped by depth for the same method.
+    path : str
+        Normalized request path to check.
+    depth : int
+        Number of path separators, or zero for the root path.
+
+    Returns
+    -------
+    bool
+        True if a static path or dynamic pattern matches; otherwise, False.
+    """
     if path in static_table:
         return True
     bucket = _select_bucket(dynamic_table, path, depth)
     return bucket is not None and bucket.pattern.fullmatch(path) is not None
-
 
 def _build_extractors(
     converters: dict[str, ParamConverter],
@@ -111,21 +145,26 @@ def _build_extractors(
     groupindex: dict[str, int],
 ) -> list[Extractor]:
     """
-    Build extraction tuples from route converters.
+    Build parameter extraction tuples from route converters.
 
     Parameters
     ----------
     converters : dict[str, ParamConverter]
-        Converter mapping from parameter name to converter callable.
+        Parameter names mapped to converter callables, in extraction order.
     prefix : str
-        Prefix applied to regex group names.
+        Prefix prepended to parameter names in the regex capture groups.
     groupindex : dict[str, int]
-        Map of named groups to their numeric group indices.
+        Named capture groups mapped to their numeric indices.
 
     Returns
     -------
     list[Extractor]
         Ordered list of ``(param_name, group_index, converter)`` tuples.
+
+    Raises
+    ------
+    KeyError
+        If a prefixed parameter name is absent from ``groupindex``.
     """
     return [
         (name, groupindex[prefix + name], conv)
@@ -134,17 +173,24 @@ def _build_extractors(
 
 def _build_matching_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
     """
-    Build a matching bucket for dynamic routes at one depth.
+    Build an ordered matcher and extractors for dynamic routes.
 
     Parameters
     ----------
     routes : list[CompiledRoute]
-        Depth-grouped routes sorted by compiler priority.
+        Dynamic candidates at one depth, sorted by compiler priority.
 
     Returns
     -------
     _DepthBucket
-        Bucket with compiled regex and extraction metadata.
+        Regex matcher with per-route extractors and optional alternative markers.
+
+    Raises
+    ------
+    re.PatternError
+        If rewritten route patterns cannot form a valid combined regex.
+    KeyError
+        If a converter has no corresponding named capture group.
     """
     if len(routes) == 1:
         route = routes[0]
@@ -192,26 +238,69 @@ def _build_matching_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
         marker_to_entry=marker_to_entry,
     )
 
+def _partition_route_segments(
+    routes: list[CompiledRoute],
+    start: int,
+) -> tuple[
+    dict[str, list[tuple[int, CompiledRoute]]],
+    list[tuple[int, CompiledRoute]],
+] | None:
+    """
+    Partition literal and wildcard path segments in candidate order.
+
+    Parameters
+    ----------
+    routes : list[CompiledRoute]
+        Candidates sorted by compiler priority.
+    start : int
+        Character offset of the path segment to partition.
+
+    Returns
+    -------
+    tuple | None
+        Literal branches and wildcard candidates as ``(index, route)`` pairs,
+        or None if any selected segment is empty.
+    """
+    branches: dict[str, list[tuple[int, CompiledRoute]]] = {}
+    wildcards: list[tuple[int, CompiledRoute]] = []
+    for index, route in enumerate(routes):
+        end = route.path.find("/", start)
+        segment = route.path[start:end] if end != -1 else route.path[start:]
+        if "{" in segment:
+            wildcards.append((index, route))
+        elif segment:
+            branches.setdefault(segment, []).append((index, route))
+        else:
+            return None
+    return branches, wildcards
+
 def _build_depth_bucket(
     routes: list[CompiledRoute],
     start: int = 1,
 ) -> _DepthBucket | _PrefixIndex:
-    """Partition literal segments while preserving overlapping route order."""
+    """
+    Build a depth matcher, splitting literal prefixes when useful.
+
+    Parameters
+    ----------
+    routes : list[CompiledRoute]
+        Dynamic candidates at one depth, sorted by compiler priority.
+    start : int, optional
+        Character offset of the next path segment to partition. Defaults to 1.
+
+    Returns
+    -------
+    _DepthBucket | _PrefixIndex
+        Shared matcher or prefix index preserving route priority and overlap.
+    """
     minimum_partition_size = 16
     if len(routes) < minimum_partition_size:
         return _build_matching_bucket(routes)
     while True:
-        branches: dict[str, list[tuple[int, CompiledRoute]]] = {}
-        wildcards: list[tuple[int, CompiledRoute]] = []
-        for index, route in enumerate(routes):
-            end = route.path.find("/", start)
-            segment = route.path[start:end] if end != -1 else route.path[start:]
-            if "{" in segment:
-                wildcards.append((index, route))
-            elif segment:
-                branches.setdefault(segment, []).append((index, route))
-            else:
-                return _build_matching_bucket(routes)
+        partition = _partition_route_segments(routes, start)
+        if partition is None:
+            return _build_matching_bucket(routes)
+        branches, wildcards = partition
         if wildcards:
             return _build_overlapping_index(routes, start, branches, wildcards)
         if len(branches) > 1:
@@ -227,17 +316,33 @@ def _build_depth_bucket(
             )
         start += len(next(iter(branches))) + 1
 
-
 def _build_overlapping_index(
     routes: list[CompiledRoute],
     start: int,
     branches: dict[str, list[tuple[int, CompiledRoute]]],
     wildcards: list[tuple[int, CompiledRoute]],
 ) -> _DepthBucket | _PrefixIndex:
-    """Include overlapping candidates in each literal branch in route order.
+    """
+    Merge wildcard candidates into literal branches in route order.
 
-    At most eight wildcard alternatives are repeated per branch. Larger
-    wildcard populations retain the shared ordered matcher to bound storage.
+    Reuse a shared matcher when fewer than two literal branches exist or more
+    than eight wildcard candidates would be duplicated.
+
+    Parameters
+    ----------
+    routes : list[CompiledRoute]
+        Complete candidate list in priority order for the shared matcher.
+    start : int
+        Character offset of the segment used to select a literal branch.
+    branches : dict[str, list[tuple[int, CompiledRoute]]]
+        Literal segment values mapped to sorted ``(index, route)`` pairs.
+    wildcards : list[tuple[int, CompiledRoute]]
+        Wildcard candidates with original indices, in priority order.
+
+    Returns
+    -------
+    _DepthBucket | _PrefixIndex
+        Prefix index with a wildcard fallback, or the shared ordered matcher.
     """
     maximum_wildcards = 8
     minimum_branches = 2
@@ -254,22 +359,28 @@ def _build_overlapping_index(
         _build_matching_bucket([route for _, route in wildcards]),
     )
 
-
 def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute:
     """
-    Extract a resolved route from a combined-regex match.
+    Extract a resolved route and convert its matched parameters.
 
     Parameters
     ----------
     match : re.Match[str]
-        Successful regex match.
+        Successful match against the bucket's regex.
     bucket : _DepthBucket
-        Bucket used for the match.
+        Ordered route candidates and their parameter extraction metadata.
 
     Returns
     -------
     ResolvedRoute
-        Resolved route with converted path parameters.
+        Compiled route with its extracted and converted parameter mapping.
+
+    Raises
+    ------
+    RouteNotFound
+        If a combined match lacks its identifying route marker.
+    ValueError, OverflowError
+        If a parameter converter rejects a captured value.
     """
     marker_to_entry = bucket.marker_to_entry
     entry_index = 0
@@ -290,11 +401,54 @@ def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute
         },
     )
 
+def _extract_converter_fallback(
+    path: str,
+    bucket: _DepthBucket,
+    match: re.Match[str],
+) -> ResolvedRoute | None:
+    """
+    Try later matching routes after a parameter conversion failure.
+
+    Skip candidates whose converters raise ``ValueError`` or ``OverflowError``.
+
+    Parameters
+    ----------
+    path : str
+        Normalized request path to match against later routes.
+    bucket : _DepthBucket
+        Ordered routes in the selected dynamic bucket.
+    match : re.Match[str]
+        Match whose parameter converter failed.
+
+    Returns
+    -------
+    ResolvedRoute | None
+        First later route whose parameters convert successfully, or None.
+    """
+    marker_to_entry = bucket.marker_to_entry
+    first_index = (
+        marker_to_entry[match.lastindex]
+        if marker_to_entry is not None else 0
+    )
+    for _, route in bucket.entries[first_index + 1:]:
+        candidate = route.regex.fullmatch(path)
+        if candidate is None:
+            continue
+        try:
+            params = {
+                name: converter(candidate.group(name))
+                for name, converter in route.converters.items()
+            }
+        except (ValueError, OverflowError):
+            continue
+        return ResolvedRoute._fromOwnedParams(route, params)  # noqa: SLF001
+    return None
+
 class RouteResolver(IRouteResolver):
     """Resolve compiled routes using static maps and ordered dynamic buckets."""
 
     __slots__ = (
-        "_cache", "_cache_max", "_cache_order", "_fallback", "_global_static",
+        "_cache_max", "_cache_order", "_fallback", "_global_static",
         "_routes", "_tables",
     )
 
@@ -304,21 +458,29 @@ class RouteResolver(IRouteResolver):
         hot_cache_size: int = 512,
         fallback: tuple | None = None,
     ) -> None:
-        """Build lookup tables and the bounded FIFO result cache.
+        """
+        Build lookup tables and the bounded FIFO result cache.
 
         Parameters
         ----------
         routes : dict[str, dict]
             Compiler output grouped by method and static/dynamic paths.
         hot_cache_size : int, optional
-            Maximum cached dynamic results; zero disables caching.
+            Maximum dynamic results cached across all methods; zero disables
+            caching. Defaults to 512.
         fallback : tuple | None, optional
-            Handler for unmatched paths.
+            Fallback handler metadata. None or ``(None, None)`` disables the
+            fallback. Defaults to None.
+
+        Returns
+        -------
+        None
+            Initialize route tables, the route inventory, and the FIFO cache.
 
         Raises
         ------
         TypeError
-            If the cache capacity is not an integer.
+            If the cache capacity is a boolean or not an integer.
         ValueError
             If the cache capacity is negative.
         """
@@ -344,32 +506,40 @@ class RouteResolver(IRouteResolver):
                 depth: _build_depth_bucket(members)
                 for depth, members in grouped.items()
             }
-            self._tables[method] = static, dynamic
+            self._tables[method] = static, dynamic, {}
             for route in bucket["static"].values():
                 all_routes[id(route)] = route
             for route in bucket["dynamic"]:
                 all_routes[id(route)] = route
         self._routes = tuple(all_routes.values())
         self._global_static = frozenset(static_paths)
-        self._cache: dict[tuple[str, str], ResolvedRoute] = {}
         self._cache_order: deque[tuple[str, str]] = deque()
         self._cache_max = hot_cache_size
         self._fallback = None if fallback == (None, None) else fallback
 
     def resolve(self, method: str, path: str) -> ResolvedRoute:
-        """Resolve the method/path pair using prebuilt dispatch metadata.
+        """
+        Resolve a request method and path using prebuilt dispatch metadata.
+
+        Parameters
+        ----------
+        method : str
+            HTTP method, matched case-insensitively; HEAD uses the GET table.
+        path : str
+            Request path to normalize before lookup.
 
         Returns
         -------
         ResolvedRoute
-            Matched route and immutable, converted parameters.
+            Matched route and immutable, converted parameters. Cached results
+            may be reused.
 
         Raises
         ------
         RouteNotFound
-            If no route matches the path.
+            If no route can be resolved and no other method matches the path.
         MethodNotAllowed
-            If the path exists only under another method.
+            If no route is resolved and another method has a matching path.
         """
         canonical = _METHOD_MAP.get(method)
         if canonical is None:
@@ -382,20 +552,46 @@ class RouteResolver(IRouteResolver):
             resolved = tables[0].get(path)
             if resolved is not None:
                 return resolved
-        if tables is not None and tables[1]:
-            cache_key = (method, path) if self._cache_max else None
-            cached = self._cache.get(cache_key) if cache_key is not None else None
-            if cached is not None:
+            method_cache = tables[2] if self._cache_max else None
+            if method_cache and (cached := method_cache.get(path)) is not None:
                 return cached
-            depth = path.count("/") if path != "/" else 0
-            resolved = self.__resolveDynamic(path, depth, tables[1], cache_key)
+        depth = path.count("/") if path != "/" else 0
+        if tables is not None and tables[1]:
+            resolved = self.__resolveDynamic(
+                path, depth, tables[1], method, method_cache,
+            )
             if resolved is not None:
                 return resolved
-        else:
-            depth = path.count("/") if path != "/" else 0
+        return self.__raiseForUnmatchedPath(method, path, depth)
+
+    def __raiseForUnmatchedPath(self, method: str, path: str, depth: int) -> Never:
+        """
+        Distinguish an unknown path from a path registered for another method.
+
+        Parameters
+        ----------
+        method : str
+            Canonical request method that did not match.
+        path : str
+            Normalized request path.
+        depth : int
+            Number of path separators, or zero for the root path.
+
+        Returns
+        -------
+        Never
+            Always raise a routing exception; never return a value.
+
+        Raises
+        ------
+        MethodNotAllowed
+            If another method has a static or regex match for the path.
+        RouteNotFound
+            If no method has a static or regex match for the path.
+        """
         if path in self._global_static or any(
-            _path_allowed_for_method(static, dynamic, path, depth)
-            for other, (static, dynamic) in self._tables.items() if other != method
+            _path_allowed_for_method(tables[0], tables[1], path, depth)
+            for other, tables in self._tables.items() if other != method
         ):
             raise MethodNotAllowed(path)
         raise RouteNotFound(path)
@@ -405,9 +601,36 @@ class RouteResolver(IRouteResolver):
         path: str,
         depth: int,
         table: DepthTable,
-        cache_key: tuple[str, str] | None,
+        method: str,
+        method_cache: dict[str, ResolvedRoute] | None,
     ) -> ResolvedRoute | None:
-        """Match a dynamic bucket, caching only successful immutable results."""
+        """
+        Resolve dynamic candidates and cache a successful conversion.
+
+        Parameters
+        ----------
+        path : str
+            Normalized request path.
+        depth : int
+            Number of path separators, or zero for the root path.
+        table : DepthTable
+            Dynamic route buckets for the request method.
+        method : str
+            Canonical request method used as part of the cache key.
+        method_cache : dict[str, ResolvedRoute] | None
+            Per-method result cache, or None when caching is disabled.
+
+        Returns
+        -------
+        ResolvedRoute | None
+            First matching route with valid parameter conversions, or None if
+            no candidate succeeds.
+
+        Raises
+        ------
+        RouteNotFound
+            If a combined match lacks its identifying route marker.
+        """
         bucket = _select_bucket(table, path, depth)
         if bucket is None:
             return None
@@ -418,18 +641,36 @@ class RouteResolver(IRouteResolver):
             result = _extract_result(match, bucket)
         except (ValueError, OverflowError):
             # A converter can reject a regex match, such as an oversized integer.
-            return None
-        if cache_key is not None:
-            self.__storeCache(cache_key, result)
+            result = _extract_converter_fallback(path, bucket, match)
+            if result is None:
+                return None
+        if method_cache is not None:
+            self.__storeCache(method_cache, method, path, result)
         return result
 
     def options(self, path: str) -> list[str]:
-        """Return sorted allowed methods, including implicit HEAD and OPTIONS."""
+        """
+        Return the sorted HTTP methods whose routes match a path.
+
+        Inspect path patterns without converting parameters.
+
+        Parameters
+        ----------
+        path : str
+            Request path to normalize before checking registered methods.
+
+        Returns
+        -------
+        list[str]
+            Matching methods, adding HEAD for GET and OPTIONS for any match.
+            Return GET, HEAD, and OPTIONS for an unmatched path with a fallback,
+            or an empty list when no fallback is configured.
+        """
         path = normalize_request_path(path)
         depth = path.count("/") if path != "/" else 0
         allowed = [
-            method for method, (static, dynamic) in self._tables.items()
-            if _path_allowed_for_method(static, dynamic, path, depth)
+            method for method, tables in self._tables.items()
+            if _path_allowed_for_method(tables[0], tables[1], path, depth)
         ]
         if "GET" in allowed and "HEAD" not in allowed:
             allowed.append("HEAD")
@@ -441,24 +682,70 @@ class RouteResolver(IRouteResolver):
         return sorted(allowed)
 
     def fallback(self) -> tuple | None:
-        """Return the fallback handler, or None when none is registered."""
+        """
+        Return the configured fallback handler metadata.
+
+        Returns
+        -------
+        tuple | None
+            Registered handler tuple, or None when no fallback is configured.
+        """
         return self._fallback
 
     def allRoutes(self) -> list[CompiledRoute]:
-        """Return every compiled route once in registration-table order."""
+        """
+        Return a fresh list of all unique compiled routes.
+
+        Returns
+        -------
+        list[CompiledRoute]
+            Routes deduplicated by identity in their original table traversal
+            order. The returned list shares the compiled route objects.
+        """
         return list(self._routes)
 
     def invalidateCache(self) -> None:
-        """Clear cached dynamic lookup results."""
-        self._cache.clear()
+        """
+        Clear all dynamic route results and their FIFO eviction order.
+
+        Returns
+        -------
+        None
+            Empty per-method caches and the shared queue, preserving route tables.
+        """
+        for tables in self._tables.values():
+            tables[2].clear()
         self._cache_order.clear()
 
-    def __storeCache(self, key: tuple[str, str], result: ResolvedRoute) -> None:
-        """Evict the oldest result when adding to a full FIFO cache."""
-        cache = self._cache
-        if key not in cache:
-            order = self._cache_order
-            if len(cache) >= self._cache_max:
-                del cache[order.popleft()]
-            order.append(key)
-        cache[key] = result
+    def __storeCache(
+        self,
+        cache: dict[str, ResolvedRoute],
+        method: str,
+        path: str,
+        result: ResolvedRoute,
+    ) -> None:
+        """
+        Cache a dynamic result, evicting the oldest entry at capacity.
+
+        Parameters
+        ----------
+        cache : dict[str, ResolvedRoute]
+            Cache belonging to the request method.
+        method : str
+            Canonical request method.
+        path : str
+            Normalized request path.
+        result : ResolvedRoute
+            Immutable route resolution to retain.
+
+        Returns
+        -------
+        None
+            Store the result and append its method/path key to the FIFO queue.
+        """
+        order = self._cache_order
+        if len(order) >= self._cache_max:
+            old_method, old_path = order.popleft()
+            del self._tables[old_method][2][old_path]
+        cache[path] = result
+        order.append((method, path))

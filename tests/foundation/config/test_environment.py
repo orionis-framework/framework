@@ -1,14 +1,16 @@
 import importlib
 import pkgutil
-from dataclasses import is_dataclass
+from dataclasses import fields, is_dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 from config.database import BootstrapDatabase
 from config.logging import BootstrapLogging
+from config.realtime import BootstrapRealtime
 from config.view import BootstrapView
 from orionis.foundation.config.database import ConnectionName, Database
 from orionis.foundation.config.http import Cors
 from orionis.foundation.config.logging import Logging
+from orionis.foundation.config.realtime import RealtimeConfig
 from orionis.foundation.config.view import View
 from orionis.test import TestCase
 
@@ -234,3 +236,81 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertFalse(config.autoescape)
                 self.assertFalse(config.auto_reload)
                 self.assertIsNone(config.cache_path)
+
+class TestRealtimeConfigurationEnvironment(ConfigurationTestCase):
+    def testDefaultsMatchStaticMetadata(self) -> None:
+        """Keep realtime defaults and their descriptive metadata aligned.
+
+        Returns
+        -------
+        None
+            Verify all seven defaults in both configuration layers.
+        """
+        expected = {
+            "max_message_size": 1048576,
+            "max_concurrent_invocations": 16,
+            "max_pending_client_invocations": 32,
+            "invocation_timeout": 30.0,
+            "client_result_timeout": 30.0,
+            "broadcast_concurrency": 32,
+            "max_groups_per_connection": 64,
+        }
+        self.assertEqual(RealtimeConfig().toDict(), expected)
+        self.assertEqual(BootstrapRealtime().toDict(), expected)
+        self.assertEqual(set(BootstrapRealtime.__annotations__), set(expected))
+        for item in fields(RealtimeConfig):
+            with self.subTest(field=item.name):
+                self.assertEqual(item.metadata["default"], expected[item.name])
+                self.assertTrue(item.metadata["description"])
+
+    def testEnvironmentIsReadForEveryNewInstance(self) -> None:
+        """Read current environment values without changing static metadata.
+
+        Returns
+        -------
+        None
+            Verify lazy reads and explicit overrides in both layers.
+        """
+        for cls in (RealtimeConfig, BootstrapRealtime):
+            for item in fields(RealtimeConfig):
+                key = "REALTIME_" + item.name.upper()
+                default = item.metadata["default"]
+                with self.subTest(entity=cls.__name__, field=item.name):
+                    self.environment.values[key] = default + 1
+                    first = cls()
+                    self.assertEqual(getattr(first, item.name), default + 1)
+                    self.environment.values[key] = default + 2
+                    self.assertEqual(getattr(cls(), item.name), default + 2)
+                    self.assertEqual(getattr(first, item.name), default + 1)
+                    explicit = cls(**{item.name: default})
+                    self.assertEqual(getattr(explicit, item.name), default)
+                    self.assertEqual(item.metadata["default"], default)
+
+    def testInvalidEnvironmentBudgetsRemainRejected(self) -> None:
+        """Validate environment budgets through the existing entity checks.
+
+        Returns
+        -------
+        None
+            Reject booleans, nonpositive budgets and nonfinite timeouts.
+        """
+        for cls in (RealtimeConfig, BootstrapRealtime):
+            for item in fields(RealtimeConfig):
+                key = "REALTIME_" + item.name.upper()
+                for value, error in (
+                    (True, TypeError), (0, ValueError), (-1, ValueError),
+                ):
+                    self.environment.values.clear()
+                    self.environment.values[key] = value
+                    with self.subTest(
+                        entity=cls.__name__, field=item.name, value=value,
+                    ), self.assertRaises(error):
+                        cls()
+            for name in ("invocation_timeout", "client_result_timeout"):
+                for value in (float("inf"), float("nan")):
+                    self.environment.values.clear()
+                    self.environment.values["REALTIME_" + name.upper()] = value
+                    with self.subTest(
+                        entity=cls.__name__, field=name, value=value,
+                    ), self.assertRaises(ValueError):
+                        cls()

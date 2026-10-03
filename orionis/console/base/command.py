@@ -81,7 +81,7 @@ class BaseCommand(Console, IBaseCommand):
             error_msg = "Argument key must be a string."
             raise TypeError(error_msg)
 
-        # Single dict lookup; local var avoids repeated LOAD_ATTR on self.__arguments__
+        # Read the parsed command arguments.
         args = self.__arguments__
         value = args.get(key, _MISSING)
         return default if value is _MISSING else value

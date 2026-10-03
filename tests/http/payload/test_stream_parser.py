@@ -3,7 +3,7 @@ import asyncio
 from threading import Event, get_ident
 from typing import TYPE_CHECKING
 from orionis.http.payload import part as multipart_part
-from orionis.http.payload.stream_parser import MultipartStreamParser
+from orionis.http.payload.stream_parser import MultipartStreamParser, complete_in_thread
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
 from tests.http.test_support import replace_attribute
@@ -525,6 +525,10 @@ class TestMultipartStreaming(TestCase):
                 self.assertTrue(await asyncio.to_thread(started.wait, 5))
                 task.cancel()
                 await asyncio.sleep(0)
+                task.cancel()
+                await asyncio.sleep(0)
+                self.assertFalse(task.done())
+                self.assertFalse(finished.is_set())
                 self.assertFalse(upload._file.closed)
             finally:
                 release.set()
@@ -532,3 +536,59 @@ class TestMultipartStreaming(TestCase):
                 await task
         self.assertTrue(finished.is_set())
         self.assertTrue(upload._file.closed)
+
+    async def testRepeatedCancellationPreservesFirstCancellationAfterWorkerFailure(
+        self,
+    ) -> None:
+        """Drain a failing worker while preserving the original cancellation.
+
+        Returns
+        -------
+        None
+            Verify repeated cancellation cannot detach unfinished thread work.
+        """
+        started = Event()
+        release = Event()
+        finished = Event()
+
+        def fail_after_release() -> None:
+            """Wait at the cancellation barrier and then fail in the worker.
+
+            Returns
+            -------
+            None
+                Raise after recording that the blocking operation has finished.
+
+            Raises
+            ------
+            RuntimeError
+                Simulated failure while finishing a cancelled operation.
+            """
+            started.set()
+            release.wait(5)
+            finished.set()
+            error_msg = "worker failed"
+            raise RuntimeError(error_msg)
+
+        # Python 3.14 reports failures from cancelled shields through this hook.
+        failures = []
+        with replace_attribute(
+            asyncio.get_running_loop(), "call_exception_handler", failures.append,
+        ):
+            task = asyncio.create_task(complete_in_thread(fail_after_release))
+            try:
+                self.assertTrue(await asyncio.to_thread(started.wait, 5))
+                task.cancel("first cancellation")
+                await asyncio.sleep(0)
+                task.cancel("second cancellation")
+                await asyncio.sleep(0)
+                self.assertFalse(task.done())
+                self.assertFalse(finished.is_set())
+            finally:
+                release.set()
+            with self.assertRaises(asyncio.CancelledError) as caught:
+                await task
+        self.assertEqual(caught.exception.args, ("first cancellation",))
+        self.assertTrue(finished.is_set())
+        for failure in failures:
+            self.assertIsInstance(failure["exception"], RuntimeError)

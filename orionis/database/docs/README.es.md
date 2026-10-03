@@ -375,6 +375,13 @@ asyncio.run(main())
 
 ## Notas de compatibilidad
 
+La certificación real reprodujo un fallo aiomysql 0.3.2/PyMySQL 1.2.3 al
+escribir payloads binarios de colas. Las conexiones aiomysql nuevas convierten
+bytes, bytearray y memoryview en literales hexadecimales binarios independientes
+del charset; otros tipos conservan la conversión del driver. El ajuste es local
+a cada conexión, sin bajar versiones ni modificar módulos de terceros. Ver la
+[evidencia operativa](../../../certification/REVIEW.es.md).
+
 - `pyproject.toml` declara `requires-python = ">=3.14"`. También declara SQLAlchemy `>=2.0.54,<3.0`, `aiosqlite>=0.22.1` y las restricciones de drivers indicadas en [Requisitos](#requisitos).
 - Los dialectos SQLAlchemy asíncronos configurados en el código son SQLite (`sqlite+aiosqlite`), MySQL (`mysql+aiomysql`), PostgreSQL (`postgresql+asyncpg`), Oracle (`oracle+oracledb_async`) y SQL Server (`mssql+aioodbc`). `build_engine_url(..., sync=True)` también permite obtener URLs DBAPI síncronas para componentes compatibles del framework.
 - La configuración de base de datos debe incluir un `driver` reconocido; los drivers de servidor usan los valores de conexión de la configuración y SQLite usa la ruta `database`. Oracle puede usar los campos DSN/TNS-name configurados. `orionis.database.dialect` implementa otros comportamientos particulares por driver.

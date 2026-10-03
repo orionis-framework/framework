@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
+from orionis.foundation.config.logging.channel_options import channel_option
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
@@ -30,8 +31,8 @@ class Chunked(BaseEntity):
     """
 
     path: str = field(
-        default_factory=lambda: Env.get(
-            "LOG_PATH",
+        default_factory=lambda: channel_option(
+            "chunked", "LOG_PATH",
             "storage/logs/chunked_{suffix}.log",
         ),
         metadata={

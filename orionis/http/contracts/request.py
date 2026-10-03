@@ -18,6 +18,17 @@ class IRequest(ABC):
 
     __slots__ = ()
 
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Close request-owned uploaded file handles after response delivery.
+
+        Returns
+        -------
+        None
+            Release parsed multipart resources; repeated calls must be safe.
+        """
+
     @property
     @abstractmethod
     def url(self) -> str:

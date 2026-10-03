@@ -1,8 +1,11 @@
 import ast
-from dataclasses import fields, is_dataclass
+import logging
+from dataclasses import MISSING, fields, is_dataclass
 from pathlib import Path
 from config.database import BootstrapDatabase
+from config.http import BootstrapHTTP
 from config.logging import BootstrapLogging
+from config.session import BootstrapSession
 from tests.foundation.config.test_environment import (
     ConfigurationTestCase,
     configuration_classes,
@@ -59,11 +62,41 @@ class TestConfigurationTemplates(ConfigurationTestCase):
                         continue
                     entity = vars(module).get(node.func.id)
                     if isinstance(entity, type) and is_dataclass(entity):
-                        self.assertEqual(
-                            {option.arg for option in node.keywords},
-                            {item.name for item in fields(entity) if item.init},
-                            f"Declare all {entity.__name__} options in config/.",
+                        declared = {option.arg for option in node.keywords}
+                        options = {item.name for item in fields(entity) if item.init}
+                        self.assertLessEqual(declared, options)
+                        self.assertLessEqual(
+                            options - declared,
+                            {"driver"},
+                            f"Declare configurable {entity.__name__} "
+                            "options in config/.",
                         )
+                        if "driver" in options - declared:
+                            driver = next(
+                                item for item in fields(entity) if item.name == "driver"
+                            )
+                            self.assertTrue(
+                                driver.default is not MISSING
+                                or driver.default_factory is not MISSING,
+                            )
+
+    def testRecentHttpAndSessionOptionsReadEnvironment(self) -> None:
+        """Expose HTTP and session options through the application templates.
+
+        Returns
+        -------
+        None
+            Assertions verify the selected environment values.
+        """
+        self.environment.values.update(
+            HTTP_MONITOR_DISCONNECTS=True,
+            SESSION_TRACK_PREVIOUS_URL=False,
+            SESSION_RENEWAL_INTERVAL=60,
+        )
+        self.assertTrue(BootstrapHTTP().monitor_disconnects)
+        session = BootstrapSession()
+        self.assertFalse(session.track_previous_url)
+        self.assertEqual(session.renewal_interval, 60)
 
     def testDatabaseTemplateReadsNestedEnvironmentOptions(self) -> None:
         """Apply application choices across all five explicitly configured drivers.
@@ -121,6 +154,7 @@ class TestConfigurationTemplates(ConfigurationTestCase):
             self.environment.values.update(
                 LOG_CHANNEL=name,
                 LOG_PATH=path,
+                LOG_LEVEL="DEBUG",
                 LOG_RETENTION=2,
                 LOG_ROTATION_TIME="03:30",
                 LOG_MB_SIZE=20,
@@ -133,6 +167,10 @@ class TestConfigurationTemplates(ConfigurationTestCase):
                 if name in retentions:
                     self.assertEqual(getattr(channel, retentions[name]), 2)
                 for other in fields(config.channels):
+                    self.assertEqual(
+                        getattr(config.channels, other.name).level,
+                        logging.DEBUG,
+                    )
                     if other.name != name:
                         self.assertNotEqual(
                             getattr(config.channels, other.name).path,

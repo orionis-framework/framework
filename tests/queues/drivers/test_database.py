@@ -2,16 +2,43 @@ import tempfile
 import asyncio
 from pathlib import Path
 from orionis.database.connection import Connection
+from orionis.queues.drivers import database as database_module
 from orionis.queues.drivers.database import DatabaseQueueDriver
 from orionis.queues.exceptions import QueueConfigurationError, QueueStorageError
 from orionis.test import TestCase
 from tests.queues.drivers.contract import DurableDriverContract, make_envelope
 
+class _Clock:
+    """Expose a controlled wall clock without assuming SQLite operation speed."""
+
+    __slots__ = ("now",)
+
+    def __init__(self) -> None:
+        """Start with an exactly representable epoch timestamp.
+
+        Returns
+        -------
+        None
+            Set the current time for queue storage operations.
+        """
+        self.now = 1000.0
+
+    def __call__(self) -> float:
+        """Return the controlled timestamp.
+
+        Returns
+        -------
+        float
+            Timestamp advanced only by the contract's explicit time hook.
+        """
+        return self.now
 
 class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
     """Run the durable driver contract against a prefixed SQLite file."""
 
-    __slots__ = ("_connection", "_driver", "_path", "_temporary")
+    __slots__ = (
+        "_clock", "_connection", "_driver", "_original_time", "_path", "_temporary",
+    )
 
     async def asyncSetUp(self) -> None:
         """Create independent pooled connections backed by a temporary file.
@@ -21,6 +48,10 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         None
             Prepare real database arbitration for concurrent reservations.
         """
+        self._original_time = database_module.current_time
+        self.addCleanup(setattr, database_module, "current_time", self._original_time)
+        self._clock = _Clock()
+        database_module.current_time = self._clock
         self._temporary = tempfile.TemporaryDirectory()
         self._path = str(Path(self._temporary.name) / "queues.sqlite")
         self._connection = Connection("queues", {
@@ -38,8 +69,27 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         None
             Release the SQLite file and its containing directory.
         """
-        await self._connection.disconnect()
-        self._temporary.cleanup()
+        try:
+            await self._connection.disconnect()
+            self._temporary.cleanup()
+        finally:
+            database_module.current_time = self._original_time
+
+    async def _advanceTime(self, seconds: float) -> None:
+        """Advance queue deadlines deterministically, independent of I/O speed.
+
+        Parameters
+        ----------
+        seconds : float
+            Duration added to the controlled queue clock.
+
+        Returns
+        -------
+        None
+            Yield once after changing the backend's current timestamp.
+        """
+        self._clock.now += seconds
+        await asyncio.sleep(0)
 
     async def testPersistenceAcrossConnectionRecreation(self) -> None:
         """Retain queued state after rebuilding the driver and connection.

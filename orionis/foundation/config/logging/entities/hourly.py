@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
+from orionis.foundation.config.logging.channel_options import channel_option
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
@@ -26,7 +27,9 @@ class Hourly(BaseEntity):
     """
 
     path: str = field(
-        default_factory=lambda: Env.get("LOG_PATH", "storage/logs/hourly_{suffix}.log"),
+        default_factory=lambda: channel_option(
+            "hourly", "LOG_PATH", "storage/logs/hourly_{suffix}.log",
+        ),
         metadata={
             "description": "The file path where the log is stored.",
             "default": "storage/logs/hourly_{suffix}.log",
@@ -44,7 +47,7 @@ class Hourly(BaseEntity):
     )
 
     retention_hours: int = field(
-        default_factory=lambda: Env.get("LOG_RETENTION", 24),
+        default_factory=lambda: channel_option("hourly", "LOG_RETENTION", 24),
         metadata={
             "description": ("The number of hours to retain log files before deletion."),
             "default": 24,

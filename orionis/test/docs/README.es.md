@@ -246,8 +246,10 @@ devuelve `self`, de modo que las llamadas se pueden encadenar:
 
 **`discover() -> unittest.TestSuite`**
 
-1. Inserta `app.basePath.absolute().as_posix()` en la posición 0 de `sys.path`
-   si no está presente, para que el paquete raíz sea importable.
+1. Inserta `app.basePath.resolve().as_posix()` en la posición 0 de `sys.path`
+   si no está presente. La raíz del proyecto y el directorio de descubrimiento
+   usan rutas canónicas, con los nombres cortos de Windows expandidos y los
+   enlaces simbólicos resueltos.
 2. Resuelve el directorio inicial con `Path(self.__start_dir).resolve()` — un
    valor relativo se resuelve contra el **directorio de trabajo actual**, no
    contra `basePath`.
@@ -257,10 +259,10 @@ devuelve `self`, de modo que las llamadas se pueden encadenar:
    `__init__.py` (algo que `unittest.discover()` omite).
 5. Por cada archivo que casa con `file_pattern`, deriva el nombre de módulo con
    puntos a partir de su ruta relativa al directorio raíz y llama a
-   `loader.loadTestsFromName(module_name)` dentro de
-   `contextlib.suppress(Exception)`: un archivo no importable (error de
-   sintaxis, dependencia faltante, etc.) se omite en silencio y el
-   descubrimiento continúa.
+   `loader.loadTestsFromName(module_name)`. Los errores de importación que
+   registra el loader permanecen en la suite aunque no coincidan con
+   `method_pattern`; otras excepciones, incluidos los errores de sintaxis,
+   se propagan al llamador.
 6. Aplana las suites anidadas con el generador recursivo privado
    `__extractTests` y agrega solo los casos cuyo `_testMethodName` casa con
    `method_pattern`.

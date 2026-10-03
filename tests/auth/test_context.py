@@ -1,4 +1,5 @@
 import asyncio
+from typing import TYPE_CHECKING, cast
 from orionis.auth.context.context import GUEST_CONTEXT, AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context, current_auth_context
 from orionis.auth.contracts.context import IAuthenticationContext
@@ -9,6 +10,10 @@ from orionis.session.contracts.session import ISession
 from orionis.session.session import Session
 from orionis.support.facades.session import Session as SessionFacade
 from orionis.test import TestCase
+
+if TYPE_CHECKING:
+    from orionis.auth.contracts.authenticatable import IAuthenticatable
+    from orionis.auth.contracts.permission_repository import IPermissionRepository
 
 class _ScopelessTestCase(TestCase):
     """Base case running without the ambient scope of the test runner.
@@ -346,6 +351,121 @@ class TestAuthenticationContext(_ScopelessTestCase):
 
 class TestAuthenticationContextBinding(_ScopelessTestCase):
     """Validate how the context is stored in the container scope."""
+
+    async def testForkUsesIndependentScopesAndAuthorizationSnapshots(self) -> None:
+        """Preserve credential limits while resolving authorization per scope.
+
+        Returns
+        -------
+        None
+            Concurrent forks do not retain their parent scope or snapshot.
+        """
+        identity = _Identity(7)
+        repository = _CountingRepository(permissions=("users.view", "users.edit"))
+        context = AuthenticationContext(
+            identity=cast("IAuthenticatable", identity),
+            guard="token",
+            abilities=("users.view",),
+            repository=cast("IPermissionRepository", repository),
+            credential_id=9,
+        )
+
+        async def resolve(context: AuthenticationContext) -> object:
+            """Bind one fork and retain its resolved snapshot for comparison.
+
+            Parameters
+            ----------
+            context : AuthenticationContext
+                Fresh context created in the parent scope.
+
+            Returns
+            -------
+            object
+                Independent immutable authorization snapshot.
+            """
+            async with ScopeManager():
+                bind_auth_context(context)
+                await asyncio.sleep(0)
+                self.assertIs(current_auth_context().identity, identity)
+                self.assertEqual(context.guard, "token")
+                self.assertEqual(context.credentialId, 9)
+                snapshot = await context.authorization()
+                self.assertTrue(snapshot.can("users.view"))
+                self.assertFalse(snapshot.can("users.edit"))
+                return snapshot
+
+        async with ScopeManager():
+            bind_auth_context(context)
+            original_snapshot = await context.authorization()
+            first, second = context._fork(), context._fork()
+            snapshots = await asyncio.gather(resolve(first), resolve(second))
+            self.assertIs(current_auth_context(), context)
+            self.assertIs(context.identity, identity)
+            self.assertIsNot(snapshots[0], snapshots[1])
+            self.assertTrue(all(item is not original_snapshot for item in snapshots))
+            self.assertEqual(repository.calls, 3)
+            self.assertIsNone(first.identity)
+            self.assertIsNone(second.identity)
+
+    async def testForkCannotReviveAStaleIdentity(self) -> None:
+        """Ensure a closed or foreign context can only produce a guest fork.
+
+        Returns
+        -------
+        None
+            Forking never bypasses the source context ownership check.
+        """
+        context = AuthenticationContext(
+            identity=cast("IAuthenticatable", _Identity(7)), guard="session",
+        )
+        async with ScopeManager():
+            bind_auth_context(context)
+            async with ScopeManager():
+                self.assertIsNone(context._fork().identity)
+        self.assertIsNone(context._fork().identity)
+
+    async def testForkSurvivesCancellationOnlyUntilItsScopeCloses(self) -> None:
+        """Restore the connection context when an invocation is cancelled.
+
+        Returns
+        -------
+        None
+            Cancellation releases the fork without clearing the parent identity.
+        """
+        context = AuthenticationContext(
+            identity=cast("IAuthenticatable", _Identity(7)), guard="session",
+        )
+        entered = asyncio.Event()
+
+        async def invocation(fork: AuthenticationContext) -> None:
+            """Hold an invocation scope until cancellation.
+
+            Parameters
+            ----------
+            fork : AuthenticationContext
+                Invocation context copied from the parent.
+
+            Returns
+            -------
+            None
+                The scope is released during cancellation.
+            """
+            async with ScopeManager():
+                bind_auth_context(fork)
+                entered.set()
+                await asyncio.Event().wait()
+
+        async with ScopeManager():
+            bind_auth_context(context)
+            fork = context._fork()
+            task = asyncio.create_task(invocation(fork))
+            await entered.wait()
+            task.cancel()
+            with self.assertRaises(asyncio.CancelledError):
+                await task
+            self.assertIsNone(fork.identity)
+            self.assertIs(current_auth_context(), context)
+            self.assertEqual(context.identifier(), 7)
 
     def testWithoutAScopeTheGuestContextIsReturned(self) -> None:
         """Validates the answer outside an HTTP request.

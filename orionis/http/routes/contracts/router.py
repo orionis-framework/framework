@@ -11,6 +11,27 @@ if TYPE_CHECKING:
 class IRouter(ABC):
 
     @abstractmethod
+    def websocket(
+        self,
+        path: str,
+        action: RouteAction | None = None,
+    ) -> FluentRoute:
+        """Register a WebSocket connection handler independently of HTTP routes.
+
+        Parameters
+        ----------
+        path : str
+            Connection path with optional converted parameters.
+        action : RouteAction | None, optional
+            Function, controller action, or invokable controller.
+
+        Returns
+        -------
+        FluentRoute
+            Registered connection route builder.
+        """
+
+    @abstractmethod
     def auth(
         self,
         login_controller: type | None = None,

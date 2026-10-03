@@ -2,7 +2,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Any
 
-# Module-level constants: single global-lookup per isinstance; most common types first.
+# Define container types handled by the freezer.
 # Avoids re-creating the type-tuple on every call and enables JIT specialization.
 _CONTAINER_TYPES: tuple[type, ...] = (dict, list, tuple, MappingProxyType)
 _MUTABLE_TYPES: tuple[type, ...] = (dict, list, tuple)
@@ -53,11 +53,10 @@ class FreezeThaw:
             return {} if isinstance(obj, (MappingProxyType, dict)) else []
 
         obj_id = id(obj)
-        # list is ~40% faster than deque for LIFO: contiguous memory, no block overhead
+        # Traverse nested values with a last-in-first-out stack.
         stack: list[object] = [obj]
         cache: dict[int, Any] = {}
-        # fixups tracks only container entries -> second pass O(N_containers)
-        # instead of O(N_total), critical when most values are primitives
+        # Track container entries that need references fixed after traversal.
         fixups: list[tuple[Any, Any]] = []
 
         while stack:
@@ -77,7 +76,7 @@ class FreezeThaw:
                         fixups.append((new_obj, k))
 
             else:  # list or tuple
-                # list(current) uses C-level list_extend: faster than [None]*n + fill
+                # Copy the sequence before replacing nested values.
                 new_seq: list[Any] = list(current)
                 cache[c_id] = new_seq
                 for i, v in enumerate(current):
@@ -86,7 +85,7 @@ class FreezeThaw:
                             stack.append(v)
                         fixups.append((new_seq, i))
 
-        # Local alias: avoids bound-method re-lookup on every loop iteration
+        # Resolve cached references while applying container fixups.
         cache_get = cache.get
         for container, key in fixups:
             v = container[key]
@@ -94,7 +93,7 @@ class FreezeThaw:
             if cached is not None:
                 container[key] = cached
 
-        # root is already list or dict in cache; no additional O(N) copy needed
+        # Return the copied root container from the traversal cache.
         return cache.get(obj_id, obj)
 
     @staticmethod

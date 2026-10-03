@@ -199,6 +199,24 @@ class TestWarmChildPlan(TestCase):
         _warm_child_plan(klass | None)
         self.assertIn(klass, _PLAN_CACHE)
 
+    def testAnnotatedChildPlanIsBuilt(self) -> None:
+        """Warm nested plans through annotated and optional field types.
+
+        Returns
+        -------
+        None
+            Assertions validate first-use plan readiness.
+        """
+        direct = _uncached_struct("_WarmAnnotated")
+        optional = _uncached_struct("_WarmAnnotatedOptional")
+        union_member = _uncached_struct("_WarmAnnotatedUnionMember")
+        _warm_child_plan(Annotated[direct, Title("Child")])
+        _warm_child_plan(Annotated[optional | None, Title("Optional child")])
+        _warm_child_plan(Annotated[union_member, Title("Union child")] | None)
+        self.assertIn(direct, _PLAN_CACHE)
+        self.assertIn(optional, _PLAN_CACHE)
+        self.assertIn(union_member, _PLAN_CACHE)
+
     def testCachedPlanIsReused(self) -> None:
         """Keep the cached plan when the schema was already warmed up.
 

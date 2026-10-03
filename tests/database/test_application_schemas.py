@@ -317,7 +317,7 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
             Assertions verify the behavior described above.
         """
         for attribute in (
-            "id", "active", "email_verified_at", "remember_token",
+            "id", "email_verified_at", "remember_token",
             "created_at", "updated_at", "unknown_column",
         ):
             with (
@@ -326,6 +326,15 @@ class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
             ):
                 await User.create({attribute: "untrusted"})
         self.assertEqual(await User.query().count(), 0)
+
+    async def testUserMassAssignmentAcceptsDeclaredActiveFlag(self) -> None:
+        """Persist the active flag declared in the User fillable policy."""
+        user = await User.create({
+            "name": "Ada", "email": "inactive@example.test",
+            "password": "digest", "active": False,
+        })
+        loaded = await User.find(user.id)
+        self.assertIs(loaded.active, False)
 
     async def testHistoricalMigrationKeepsItsVersionWhenUserSchemaChanges(
         self,

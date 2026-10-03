@@ -4,7 +4,7 @@ import contextvars
 import importlib
 import inspect
 import threading
-from typing import TYPE_CHECKING, Any, ClassVar, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Self, cast
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import get_current_scope
 from orionis.container.contracts.container import IContainer
@@ -231,7 +231,7 @@ class Container(IContainer):
         self,
         override: bool,
         abstract: type[Any],
-        scope: dict[Any, Any],
+        scope: ScopeManager,
     ) -> None:
         """
         Ensure that a service can be overridden in the current scope.
@@ -242,8 +242,8 @@ class Container(IContainer):
             Whether to allow overriding existing registrations.
         abstract : type[Any]
             The abstract contract type to check.
-        scope : dict[Any, Any]
-            The current scope dictionary.
+        scope : ScopeManager
+            The current scoped service registry.
 
         Returns
         -------
@@ -506,7 +506,7 @@ class Container(IContainer):
         alias = self.__aliasService(alias)
 
         # Get the current scope for registration
-        scope: dict[Any, Any] | None = self.getCurrentScope()
+        scope = self.getCurrentScope()
 
         # Enforce override rules for service registration
         if scope is not None:
@@ -671,7 +671,7 @@ class Container(IContainer):
             abstract = key
 
         # Check if the abstract type is present in the current scope
-        scope: dict[Any, Any] | None = self.getCurrentScope()
+        scope = self.getCurrentScope()
         if scope is not None and abstract in scope:
             return True
 
@@ -698,7 +698,7 @@ class Container(IContainer):
         # Instantiate and return a new ScopeManager for scoped service management
         return ScopeManager()
 
-    def getCurrentScope(self) -> dict[Any, Any] | None:
+    def getCurrentScope(self) -> ScopeManager | None:
         """
         Get the current active scope context for scoped services.
 
@@ -709,7 +709,7 @@ class Container(IContainer):
 
         Returns
         -------
-        dict[Any, Any] | None
+        ScopeManager | None
             The current active scope context if available, otherwise None.
             The scope context is a dictionary-like object that contains
             instances of scoped services registered in the current scope.
@@ -720,7 +720,7 @@ class Container(IContainer):
         a new scope context before accessing scoped services.
         """
         # Return the current active scope context from ScopedContext
-        return get_current_scope()
+        return cast("ScopeManager | None", get_current_scope())
 
     async def __resolveDeferredProvider(
         self,
@@ -1290,8 +1290,8 @@ class Container(IContainer):
         self,
         instance: object,
         method_name: str,
-        *args: tuple,
-        **kwargs: dict,
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Invoke a method on an object instance with automatic dependency injection.
@@ -1302,9 +1302,9 @@ class Container(IContainer):
             The object instance containing the method.
         method_name : str
             The name of the method to invoke.
-        *args : tuple
+        *args : object
             Positional arguments for the method.
-        **kwargs : dict
+        **kwargs : object
             Keyword arguments for the method.
 
         Returns
@@ -1344,8 +1344,8 @@ class Container(IContainer):
     async def __autoResolveCallable(
         self,
         type_: Callable[..., Any],
-        *args: tuple,
-        **kwargs: dict,
+        *args: object,
+        **kwargs: object,
     ) -> type[Any]:
         """
         Resolve and invoke a callable, injecting dependencies.
@@ -1354,9 +1354,9 @@ class Container(IContainer):
         ----------
         type_ : Callable[..., Any]
             The callable to invoke.
-        *args : tuple
+        *args : object
             Positional arguments for the callable.
-        **kwargs : dict
+        **kwargs : object
             Keyword arguments for the callable.
 
         Returns
@@ -1393,8 +1393,8 @@ class Container(IContainer):
     async def __resolveSignature(  # noqa: PLR0912  # NOSONAR
         self,
         arguments: tuple[Argument, ...],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> tuple[list[Any], dict[str, Any]]:
         """
         Resolve arguments for a callable signature using dependency injection.
@@ -1403,9 +1403,9 @@ class Container(IContainer):
         ----------
         arguments : tuple[Argument, ...]
             Parameter metadata in declaration order.
-        *args : tuple[Any, ...]
+        *args : object
             Positional arguments to pass to the callable.
-        **kwargs : dict[str, Any]
+        **kwargs : object
             Keyword arguments to pass to the callable.
 
         Returns

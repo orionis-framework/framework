@@ -1,5 +1,7 @@
 import importlib
+from contextlib import suppress
 from operator import attrgetter
+from threading import BoundedSemaphore
 from typing import TYPE_CHECKING
 import msgspec
 from orionis.auth.middleware.resolve_identity import (
@@ -11,6 +13,10 @@ from orionis.container.entities.invocation import callable_plan, warm_controller
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.foundation.contracts.application import IApplication
+from orionis.foundation.enums.lifespan import Lifespan
+from orionis.foundation.enums.runtimes import Runtime
+from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
+from orionis.foundation.config.http.entitites.websocket import HTTPWebSocket
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.adapters.request.rsgi import RSGITransportAdapter
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
@@ -18,6 +24,7 @@ from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.enums.interfaces import Interface
+from orionis.http.enums.status import HTTPStatus
 from orionis.http.layer.shared.cors import CORSMiddleware
 from orionis.http.layer.shared.maintenance import UnderMaintenanceMiddleware
 from orionis.http.layer.shared.proxies import ProxiesMiddleware
@@ -25,19 +32,22 @@ from orionis.http.layer.shared.rate_limit import RateLimitMiddleware
 from orionis.http.layer.shared.security import SecurityMiddleware
 from orionis.http.layer.web.csrf_token import CSRFTokenMiddleware
 from orionis.http.layer.web.start_session import StartSessionMiddleware
+from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import Request
 from orionis.http.responses import JSONResponse, Response
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
+from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.loader import RouteLoader
 from orionis.http.routes.route_resolver import RouteResolver
 from orionis.http.validation import validation_response
+from orionis.http.websocket import WebSocket, WebSocketDisconnected
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.support.facades.view import View
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
-    from granian.rsgi import HTTPProtocol, Scope
+    from granian.rsgi import HTTPProtocol, Scope, WebsocketProtocol
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.routes.contracts.loader import IRouteLoader
@@ -49,7 +59,7 @@ _JSON_RESPONSE_TYPES: tuple[type, ...] = (dict, msgspec.Struct)
 # Kernel context identifier reused across all request scopes.
 _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
 
-class _MiddlewareNext:
+class _MiddlewareNext[T]:
     """Hold one request-local continuation that can be consumed only once."""
 
     __slots__ = ("_args", "_called", "_terminal")
@@ -74,7 +84,7 @@ class _MiddlewareNext:
         self._args = args
         self._called = False
 
-    async def __call__(self) -> Response:
+    async def __call__(self) -> T:
         """
         Advance once, including when concurrent tasks call the continuation.
 
@@ -94,7 +104,7 @@ class _MiddlewareNext:
         self._called = True
         return await self._terminal(*self._args)
 
-class _MiddlewarePipeline:
+class _MiddlewarePipeline[T]:
     """
     Middleware pipeline with request-local execution state.
 
@@ -115,8 +125,8 @@ class _MiddlewarePipeline:
     def __init__(
         self,
         instances: tuple,
-        request: Request,
-        terminal: Callable[..., Awaitable[Response]],
+        request: Request | WebSocket,
+        terminal: Callable[..., Awaitable[T]],
         terminal_args: tuple = (),
     ) -> None:
         """
@@ -144,7 +154,7 @@ class _MiddlewarePipeline:
         self._n = len(instances)
         self._called_mask = 0
 
-    async def __call__(self) -> Response:
+    async def __call__(self) -> T:
         """
         Advance to the next middleware layer or invoke the terminal handler.
 
@@ -160,7 +170,7 @@ class _MiddlewarePipeline:
         """
         return await self.__advance(0)
 
-    async def __advance(self, depth: int) -> Response:
+    async def __advance(self, depth: int) -> T:
         """
         Invoke the layer at a fixed depth with its own continuation.
 
@@ -194,6 +204,7 @@ class KernelHTTP(IKernelHTTP):
         "__api_middleware",
         "__app",
         "__asgi_adapter",
+        "__body_limits",
         "__boot",
         "__catch",
         "__cls_dispatch",
@@ -208,12 +219,15 @@ class KernelHTTP(IKernelHTTP):
         "__rate_limit",
         "__rate_limit_enabled",
         "__request_printer",
+        "__request_slots",
         "__routes",
         "__rsgi_adapter",
         "__security",
         "__under_maintenance",
         "__view_dispatch",
         "__web_middleware",
+        "__websocket_config",
+        "__websocket_slots",
     )
 
     def __init__(
@@ -238,6 +252,14 @@ class KernelHTTP(IKernelHTTP):
         self.__app = app
         self.__boot: bool = False
         self.__catch: ICatch = catch
+        self.__body_limits = HTTPBodyLimits()
+        self.__request_slots = BoundedSemaphore(
+            self.__body_limits.max_concurrent_requests,
+        )
+        self.__websocket_config = HTTPWebSocket()
+        self.__websocket_slots = BoundedSemaphore(
+            self.__websocket_config.max_connections,
+        )
         # Associate each route middleware stack with its instances.
         self.__middleware_cache: dict[tuple, tuple] = {}
 
@@ -408,6 +430,21 @@ class KernelHTTP(IKernelHTTP):
         -------
         None
         """
+        limits = http_config.get("body_limits", {})
+        websocket = http_config.get("websocket", {})
+        self.__websocket_config = (
+            websocket if isinstance(websocket, HTTPWebSocket)
+            else HTTPWebSocket(**websocket)
+        )
+        self.__websocket_slots = BoundedSemaphore(
+            self.__websocket_config.max_connections,
+        )
+        self.__body_limits = (
+            limits if isinstance(limits, HTTPBodyLimits) else HTTPBodyLimits(**limits)
+        )
+        self.__request_slots = BoundedSemaphore(
+            self.__body_limits.max_concurrent_requests,
+        )
         self.__proxies = ProxiesMiddleware(
             config=http_config.get("proxies"),
         )
@@ -428,6 +465,13 @@ class KernelHTTP(IKernelHTTP):
         )
         # Record whether rate limiting is active.
         self.__rate_limit_enabled = self.__rate_limit.isEnabled()
+        if (
+            self.__rate_limit_enabled
+            and http_config["rate_limit"].get("rate_limit_store", "memory") == "redis"
+        ):
+            self.__app.on(
+                Lifespan.SHUTDOWN, self.__rate_limit.close, runtime=Runtime.HTTP,
+            )
 
     async def __rsgiResponse(
         self,
@@ -562,6 +606,8 @@ class KernelHTTP(IKernelHTTP):
         None
         """
         for route in self.__routes.allRoutes():
+            if route.method == "WEBSOCKET":
+                continue
             stack = route.compiled_middlewares
             if stack and stack not in self.__middleware_cache:
                 built = [await self.__app.build(mw_class) for mw_class in stack]
@@ -814,6 +860,12 @@ class KernelHTTP(IKernelHTTP):
         Response
             Appropriate HTTP response for the given exception type.
         """
+        if isinstance(exc, PayloadTooLargeException):
+            return await self.__default_responses.error(
+                status_code=413,
+                content="Request payload exceeds the configured limits.",
+                expects_json=request.wantsJson(),
+            )
         if isinstance(exc, ValidationException):
             # API routes always answer with the structured field errors; web
             # routes never reach this point (see __webTerminal).
@@ -827,6 +879,43 @@ class KernelHTTP(IKernelHTTP):
             return await self.__callFallback(self.__fallback)
         # Forward all other exceptions to the application failure handler.
         return await self.__catch.exception(exc, request)
+
+    async def __bodyLengthResponse(self, adapter: TransportAdapter) -> Response | None:
+        """
+        Reject invalid framing and declared oversized bodies before reading.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Incoming transport metadata.
+
+        Returns
+        -------
+        Response | None
+            A 400 or 413 response for rejected framing, otherwise None. Stream
+            byte counting remains authoritative when length is absent or false.
+        """
+        headers = adapter.headers()
+        raw_length = headers.get("content-length")
+        if raw_length is None:
+            return None
+        length = raw_length.strip()
+        if (
+            headers.count("content-length") != 1
+            or "transfer-encoding" in headers
+            or not length.isascii() or not length.isdecimal()
+        ):
+            return await self.__default_responses.error(
+                status_code=400, content="Invalid Content-Length framing.",
+                expects_json=adapter.wantsJson(),
+            )
+        length = length.lstrip("0") or "0"
+        maximum = str(self.__body_limits.max_body_size)
+        if len(length) > len(maximum) or (
+            len(length) == len(maximum) and length > maximum
+        ):
+            raise PayloadTooLargeException
+        return None
 
     async def __processRequest(
         self,
@@ -869,6 +958,8 @@ class KernelHTTP(IKernelHTTP):
         try:
             # Execute global middleware and resolve packaged static assets.
             response = await self.__globalMiddleware(adapter)
+            if response is None:
+                response = await self.__bodyLengthResponse(adapter)
             if response is None and self.__rate_limit_enabled:
                 response = await self.__rate_limit.handle(adapter)
             if response is not None:
@@ -896,6 +987,7 @@ class KernelHTTP(IKernelHTTP):
                 adapter=adapter,
                 receive_or_protocol=receive_or_protocol,
                 params=resolved_route.params,
+                body_limits=self.__body_limits,
             )
             request_context[Request] = request  # type: ignore[index]
 
@@ -909,7 +1001,7 @@ class KernelHTTP(IKernelHTTP):
     async def handleRSGI(
         self,
         scope: Scope,
-        protocol: HTTPProtocol,
+        protocol: HTTPProtocol | WebsocketProtocol,
     ) -> object | None:
         """
         Handle an incoming RSGI HTTP request end-to-end.
@@ -927,11 +1019,29 @@ class KernelHTTP(IKernelHTTP):
             Result of sending the RSGI response, or None on error.
         """
         adapter = RSGITransportAdapter(scope)
-        async with self.__app.beginScope() as request_context:
-            response = await self.__processRequest(
-                Interface.RSGI, adapter, protocol, request_context,
+        if getattr(scope, "proto", "http") == "ws":
+            return await self.__handleWebSocket(
+                Interface.RSGI, adapter, protocol,
+            )
+        if not self.__request_slots.acquire(blocking=False):
+            response = Response(
+                status_code=503, headers={"Retry-After": "1"},
+                content="HTTP request capacity exceeded.",
             )
             return await self.__rsgiResponse(adapter, response, protocol)
+        try:
+            async with self.__app.beginScope() as request_context:
+                try:
+                    response = await self.__processRequest(
+                        Interface.RSGI, adapter, protocol, request_context,
+                    )
+                    return await self.__rsgiResponse(adapter, response, protocol)
+                finally:
+                    request = request_context[Request]
+                    if isinstance(request, Request):
+                        request.close()
+        finally:
+            self.__request_slots.release()
 
     async def handleASGI(
         self,
@@ -956,8 +1066,194 @@ class KernelHTTP(IKernelHTTP):
         None
         """
         adapter = ASGITransportAdapter(scope)
-        async with self.__app.beginScope() as request_context:
-            response = await self.__processRequest(
-                Interface.ASGI, adapter, receive, request_context,
+        if scope["type"] == "websocket":
+            adapter["method"] = "GET"
+            return await self.__handleWebSocket(
+                Interface.ASGI, adapter, receive, send,
+            )
+        if not self.__request_slots.acquire(blocking=False):
+            response = Response(
+                status_code=503, headers={"Retry-After": "1"},
+                content="HTTP request capacity exceeded.",
             )
             return await self.__asgiResponse(adapter, response, receive, send)
+        try:
+            async with self.__app.beginScope() as request_context:
+                try:
+                    response = await self.__processRequest(
+                        Interface.ASGI, adapter, receive, request_context,
+                    )
+                    return await self.__asgiResponse(adapter, response, receive, send)
+                finally:
+                    request = request_context[Request]
+                    if isinstance(request, Request):
+                        request.close()
+        finally:
+            self.__request_slots.release()
+
+    def __websocketOriginAllowed(self, adapter: TransportAdapter) -> bool:
+        """
+        Check browser origins before allowing an application handshake.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Proxy-normalized handshake metadata.
+
+        Returns
+        -------
+        bool
+            True for missing Origin, same origin, or an explicit allowed origin.
+        """
+        origin = adapter.headers().get("origin")
+        if not origin:
+            return True
+        origin = origin.lower().rstrip("/")
+        allowed = self.__websocket_config.allow_origins
+        if "*" in allowed or origin in allowed:
+            return True
+        scheme = adapter.scheme()
+        scheme = {"ws": "http", "wss": "https"}.get(scheme, scheme)
+        host = adapter.headers().get("host", "").lower()
+        return bool(host) and origin == f"{scheme}://{host}"
+
+    async def __callWebSocketHandler(
+        self, resolved_route: ResolvedRoute, socket: WebSocket,
+    ) -> None:
+        """
+        Invoke a preloaded connection handler through the scoped container.
+
+        Parameters
+        ----------
+        resolved_route : ResolvedRoute
+            Compiled route with converted parameters.
+        socket : WebSocket
+            Scoped connection injected into application handlers.
+
+        Returns
+        -------
+        None
+            Run the handler for the lifetime of the connection.
+
+        Raises
+        ------
+        TypeError
+            If the handler returns an HTTP response or another value.
+        """
+        route_id = id(resolved_route.route)
+        function = self.__fn_dispatch.get(route_id)
+        if function is not None:
+            result = await self.__app.invoke(function, **socket.routeParams())
+        else:
+            controller, method = self.__cls_dispatch[route_id]
+            instance = await self.__app.build(controller)
+            result = await self.__app.call(instance, method, **socket.routeParams())
+        if result is not None:
+            error_msg = "WebSocket handlers must return None"
+            raise TypeError(error_msg)
+
+    async def __handleWebSocket(
+        self,
+        interface: Interface,
+        adapter: TransportAdapter,
+        receive_or_protocol: object,
+        send: object = None,
+    ) -> None:
+        """
+        Dispatch a bounded connection inside a dedicated lifetime scope.
+
+        Parameters
+        ----------
+        interface : Interface
+            Server protocol identifier.
+        adapter : TransportAdapter
+            Handshake request metadata.
+        receive_or_protocol : object
+            ASGI receive callback or Granian WebsocketProtocol.
+        send : object, optional
+            ASGI send callback, omitted for RSGI.
+
+        Returns
+        -------
+        None
+            Await the connection pipeline and always release admission.
+        """
+        socket = WebSocket(
+            interface, adapter, receive_or_protocol, send,
+            max_message_size=self.__websocket_config.max_message_size,
+        )
+        if not self.__websocket_slots.acquire(blocking=False):
+            await socket.reject(status_code=503)
+            return
+        try:
+            async with self.__app.beginScope() as connection_context:
+                connection_context.set("kernel", _KERNEL_CONTEXT)
+                connection_context[WebSocket] = socket
+                try:
+                    await self.__processWebSocket(adapter, socket)
+                except WebSocketDisconnected:
+                    pass
+                except Exception:
+                    if socket.accepted and interface is Interface.ASGI:
+                        # Cleanup failure must not replace the handler's error.
+                        with suppress(Exception):
+                            await socket.close(code=1011)
+                    raise
+                finally:
+                    if not socket.closed:
+                        await socket.close()
+        finally:
+            self.__websocket_slots.release()
+
+    async def __processWebSocket(
+        self, adapter: TransportAdapter, socket: WebSocket,
+    ) -> None:
+        """
+        Validate a handshake and run its connection middleware and handler.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Handshake metadata for global guards and route matching.
+        socket : WebSocket
+            Connection already bound to the active application scope.
+
+        Returns
+        -------
+        None
+            Reject the handshake or await the application connection lifetime.
+
+        Raises
+        ------
+        TypeError
+            If middleware returns a value instead of None.
+        """
+        rejection = await self.__globalMiddleware(adapter)
+        if rejection is None and self.__rate_limit_enabled:
+            rejection = await self.__rate_limit.handle(adapter)
+        if rejection is not None:
+            status = rejection.getStatusCode()
+            await socket.reject(
+                status_code=status if status >= HTTPStatus.BAD_REQUEST else 404,
+            )
+            return
+        if not self.__websocketOriginAllowed(adapter):
+            await socket.reject()
+            return
+        try:
+            resolved = self.__routes.resolve("WEBSOCKET", adapter.path())
+        except (RouteNotFound, MethodNotAllowed):
+            await socket.reject(status_code=404)
+            return
+        socket.routeParams().update(resolved.params)
+        instances = tuple([ # NOSONAR
+            await self.__app.build(middleware)
+            for middleware in resolved.route.compiled_middlewares
+        ])
+        pipeline = _MiddlewarePipeline(
+            instances, socket, self.__callWebSocketHandler, (resolved, socket),
+        )
+        result = await pipeline()
+        if result is not None:
+            error_msg = "WebSocket middleware must return None"
+            raise TypeError(error_msg)

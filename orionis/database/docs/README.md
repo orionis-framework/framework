@@ -370,6 +370,13 @@ asyncio.run(main())
 
 ## Compatibility notes
 
+Real MySQL queue certification exposed an aiomysql 0.3.2/PyMySQL 1.2.3
+incompatibility when binding binary values. New aiomysql connections now escape
+bytes, bytearray and memoryview as charset-independent binary hex literals;
+nonbinary values keep their driver's conversion. The hook is connection-local
+and does not downgrade PyMySQL or mutate third-party modules. See the
+[operational evidence](../../../certification/REVIEW.es.md).
+
 - `pyproject.toml` declares `requires-python = ">=3.14"`. It also declares SQLAlchemy `>=2.0.54,<3.0`, `aiosqlite>=0.22.1`, and the driver constraints listed under [Requirements](#requirements).
 - The async SQLAlchemy dialects configured in source are SQLite (`sqlite+aiosqlite`), MySQL (`mysql+aiomysql`), PostgreSQL (`postgresql+asyncpg`), Oracle (`oracle+oracledb_async`), and SQL Server (`mssql+aioodbc`). Sync DBAPI URLs are available from `build_engine_url(..., sync=True)` for supporting framework consumers.
 - Database configuration must include a recognized `driver`; server drivers use connection values from the database configuration, while SQLite uses the `database` path. Oracle can use configured DSN/TNS-name fields. Additional per-driver behavior is implemented in `orionis.database.dialect`.

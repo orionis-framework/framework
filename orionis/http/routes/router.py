@@ -18,6 +18,7 @@ from orionis.http.routes.types import MiddlewareInput, RouteAction
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from orionis.realtime.hub import Hub
 
 class Router(IRouter):
 
@@ -162,6 +163,42 @@ class Router(IRouter):
             Route builder accepting WebSocketMiddleware and route groups.
         """
         return self.__addSingleRoute("WEBSOCKET", path, action)
+
+    def hub(
+        self,
+        path: str,
+        hub: type[Hub],
+        *,
+        protocol: str = "json",
+    ) -> FluentRoute:
+        """
+        Register a Hub endpoint using a fixed JSON or MessagePack codec.
+
+        Parameters
+        ----------
+        path : str
+            Connection path supporting converted route parameters.
+        hub : type[Hub]
+            Hub class providing explicitly decorated remote methods.
+        protocol : str, optional
+            Realtime codec, either ``json`` (default) or ``msgpack``.
+
+        Returns
+        -------
+        FluentRoute
+            Connection route supporting names, groups and socket middleware.
+
+        Raises
+        ------
+        TypeError
+            If hub is not a Hub subclass.
+        ValueError
+            If the protocol is unsupported.
+        """
+        route = FluentRoute("WEBSOCKET", path)._hub(hub, protocol)  # noqa: SLF001
+        route._kind(self.__current_kind)  # noqa: SLF001
+        self.__routes[route.id] = route
+        return route
 
     def auth(
         self,

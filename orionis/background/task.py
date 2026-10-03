@@ -103,7 +103,9 @@ class BackgroundTask(IBackgroundTask):
                 bound: functools.partial[Any] = functools.partial(
                     self.__func, *self.__args, **self.__kwargs,  # type: ignore[arg-type]
                 )
-                await loop.run_in_executor(None, bound)
+                result = await loop.run_in_executor(None, bound)
+                if inspect.isawaitable(result):
+                    await result
         except Exception as error:
             Log.error(f"Background task '{task_name}' failed: {error}")
             raise

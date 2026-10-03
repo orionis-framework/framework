@@ -523,6 +523,9 @@ class TestFluentRouteExport(TestCase):
         expected_keys = {
             "id",
             "method",
+            "protocol",
+            "hub",
+            "hub_protocol",
             "path",
             "class",
             "handler",

@@ -10,6 +10,7 @@ from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.logging.entities.logging import Logging
 from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.queue.entities.queue import Queue
+from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
 from orionis.foundation.config.scheduler.entities.scheduler import Scheduler
 from orionis.foundation.config.session.entities.session import Session
 from orionis.foundation.config.testing.entities.testing import Testing
@@ -27,6 +28,7 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
     ("logging", Logging),
     ("mail", Mail),
     ("queue", Queue),
+    ("realtime", RealtimeConfig),
     ("session", Session),
     ("hashing", Hashing),
     ("scheduler", Scheduler),
@@ -65,6 +67,8 @@ class Configuration(BaseEntity):
         HTTP configuration settings.
     queue : Queue | dict, optional
         Queue configuration settings.
+    realtime : RealtimeConfig | dict, optional
+        Realtime invocation, message and broadcast limits.
     session : Session | dict, optional
         Session configuration settings.
     testing : Testing | dict, optional
@@ -153,6 +157,14 @@ class Configuration(BaseEntity):
         },
     )
 
+    realtime: RealtimeConfig | dict = field(
+        default_factory=RealtimeConfig,
+        metadata={
+            "description": "Realtime configuration settings.",
+            "default": lambda: RealtimeConfig().toDict(),
+        },
+    )
+
     session: Session | dict = field(
         default_factory=Session,
         metadata={
@@ -169,11 +181,29 @@ class Configuration(BaseEntity):
         },
     )
 
-    hashing: Hashing | dict = field(default_factory=Hashing)
+    hashing: Hashing | dict = field(
+        default_factory=Hashing,
+        metadata={
+            "description": "Password hashing configuration settings.",
+            "default": lambda: Hashing().toDict(),
+        },
+    )
 
-    scheduler: Scheduler | dict = field(default_factory=Scheduler)
+    scheduler: Scheduler | dict = field(
+        default_factory=Scheduler,
+        metadata={
+            "description": "Scheduled task configuration settings.",
+            "default": lambda: Scheduler().toDict(),
+        },
+    )
 
-    view: View | dict = field(default_factory=View)
+    view: View | dict = field(
+        default_factory=View,
+        metadata={
+            "description": "Template rendering configuration settings.",
+            "default": lambda: View().toDict(),
+        },
+    )
 
     def __post_init__(self) -> None:
         """

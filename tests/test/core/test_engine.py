@@ -1,4 +1,5 @@
 import contextlib
+import ctypes
 import io
 import json
 import shutil
@@ -137,6 +138,41 @@ def _write_module(directory: Path, name: str, source: str) -> None:
 def _count_import_entries(entry: str) -> int:
     """Count how many times a directory is registered for imports."""
     return sys.path.count(entry)
+
+def _project_alias(directory: Path) -> Path:
+    """Create an alternative spelling for an existing project directory.
+
+    Parameters
+    ----------
+    directory : Path
+        Root of the generated project tree.
+
+    Returns
+    -------
+    Path
+        Windows short path or directory symbolic link to the project.
+
+    Raises
+    ------
+    OSError
+        If the operating system cannot provide a directory alias.
+    """
+    resolved = directory.resolve()
+    if sys.platform == "win32":
+        get_short_path_name = ctypes.windll.kernel32.GetShortPathNameW
+        length = get_short_path_name(str(resolved), None, 0)
+        if not length:
+            raise ctypes.WinError()
+        buffer = ctypes.create_unicode_buffer(length)
+        if not get_short_path_name(str(resolved), buffer, length):
+            raise ctypes.WinError()
+        short_path = Path(buffer.value)
+        if short_path != resolved:
+            return short_path
+
+    alias = directory / "project-alias"
+    alias.symlink_to(resolved, target_is_directory=True)
+    return alias
 
 class _EngineTestCase(TestCase):
     """Base scenario creating an isolated project tree for every test."""
@@ -298,16 +334,19 @@ class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
         self.assertIs(_engine_state(engine, "fail_fast"), False)
         self.assertIs(_engine_state(engine, "json_cache"), False)
 
-    def testBareConfigurationStillDiscoversTests(self) -> None:
+    async def testBareConfigurationStillDiscoversTests(self) -> None:
         """
         Discover tests through the fallback values end to end.
 
         Validates that the defaults form a usable configuration instead
         of only avoiding a crash.
         """
-        _write_module(self._root / "tests", "test_passing", _PASSING_SOURCE)
-        engine = self._makeBareEngine().setStartDir(str(self._root / "tests"))
-        self.assertEqual(engine.discover().countTestCases(), 1)
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        engine = self._makeBareEngine().setStartDir(str(self._suite_dir))
+        results = await engine.setVerbosity(0).withoutPanel().run()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].status, TestStatus.PASSED)
+        self.assertEqual(results[0].module, f"{_PACKAGE}.test_passing")
 
 class TestTestingEngineSetters(_EngineTestCase):
 
@@ -407,6 +446,21 @@ class TestTestingEngineSetters(_EngineTestCase):
 
 class TestTestingEngineDiscovery(_EngineTestCase):
 
+    async def testDiscoverResolvesProjectAliases(self) -> None:
+        """Import and run tests when the project root uses a filesystem alias."""
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        try:
+            alias = _project_alias(self._root)
+        except OSError as error:
+            self.skipTest(f"Filesystem aliases are unavailable: {error}")
+        self.assertNotEqual(alias, alias.resolve())
+        app = _StubApp(alias, self._storage)
+        engine = TestingEngine(app)  # type: ignore[arg-type]
+        results = await engine.withoutPanel().run()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].status, TestStatus.PASSED)
+        self.assertEqual(results[0].module, f"{_PACKAGE}.test_passing")
+
     def testDiscoverCollectsGeneratedTests(self) -> None:
         """
         Collect every test declared by a generated module.
@@ -485,7 +539,7 @@ class TestTestingEngineDiscovery(_EngineTestCase):
         engine = self._makeEngine()
         engine.discover()
         engine.discover()
-        top_level = self._root.absolute().as_posix()
+        top_level = self._root.resolve().as_posix()
         self.assertEqual(_count_import_entries(top_level), 1)
 
     def testDiscoverReturnsIndependentSuites(self) -> None:

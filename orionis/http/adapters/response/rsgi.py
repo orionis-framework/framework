@@ -1,9 +1,12 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
 from orionis.http.adapters.response.ranges import parse_range
-from orionis.http.responses import FileResponse, Response
+from orionis.http.adapters.response.streams import close_stream, send_until_disconnect
+from orionis.http.responses import EventStreamResponse, FileResponse, Response
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
     from granian.rsgi import HTTPProtocol
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
@@ -33,6 +36,11 @@ class RSGIResponseAdapter(ResponseAdapter):
         -------
         None
             Sends the response via protocol and returns nothing.
+
+        Raises
+        ------
+        BaseException
+            Propagate metadata or delivery failures after closing an owned SSE source.
         """
         # Identify the server software via the Server header.
         response.setHeader("server", "Orionis RSGI")
@@ -41,24 +49,20 @@ class RSGIResponseAdapter(ResponseAdapter):
         status = response.getStatusCode()
 
         # Read response headers as name/value string tuples.
-        headers: list[tuple[str, str]] = response.getStringHeaders()
+        try:
+            headers: list[tuple[str, str]] = response.getStringHeaders()
+        except BaseException as failure:
+            await close_stream(response.getStream(), failure)
+            raise
 
         # Send the selected response representation.
         if adapter.method() == "HEAD":
-            self.__ensureContentLength(headers, response)
-            protocol.response_empty(status, headers)
+            await self.__sendHead(response, protocol, status, headers)
         elif isinstance(response, FileResponse):
             self.__sendFile(adapter, response, protocol, status, headers)
         elif response.hasStream():
-            transport = protocol.response_stream(status, headers)
-            iterator = aiter(response.getStream())
-            try:
-                async for chunk in iterator:
-                    await transport.send_bytes(chunk)
-            finally:
-                close = getattr(iterator, "aclose", None)
-                if close is not None:
-                    await close()
+            if not await self.__sendResponseStream(response, protocol, status, headers):
+                return
         else:
             body = response.getBody() or b""
             if body:
@@ -72,6 +76,131 @@ class RSGIResponseAdapter(ResponseAdapter):
         ):
             await response.runBackground()
 
+    async def __sendResponseStream(
+        self,
+        response: Response,
+        protocol: HTTPProtocol,
+        status: int,
+        headers: list[tuple[str, str]],
+    ) -> bool:
+        """
+        Deliver an ordinary stream or observe disconnects for an event stream.
+
+        Parameters
+        ----------
+        response : Response
+            Response owning the selected stream.
+        protocol : HTTPProtocol
+            RSGI response writer and disconnect notifier.
+        status : int
+            Response status code.
+        headers : list[tuple[str, str]]
+            Serialized response headers.
+
+        Returns
+        -------
+        bool
+            Whether delivery and cleanup completed before a client disconnect.
+        """
+        if not isinstance(response, EventStreamResponse):
+            iterator = aiter(response.getStream())
+            await self.__sendStream(iterator, protocol, status, headers)
+            return True
+        event_stream = response.getStream()
+        try:
+            return await send_until_disconnect(
+                self.__sendStream(event_stream, protocol, status, headers),
+                self.__waitDisconnect(protocol),
+            )
+        finally:
+            await event_stream.aclose()
+
+    async def __sendHead(
+        self,
+        response: Response,
+        protocol: HTTPProtocol,
+        status: int,
+        headers: list[tuple[str, str]],
+    ) -> None:
+        """
+        Send HEAD metadata without starting an event producer.
+
+        Parameters
+        ----------
+        response : Response
+            Response whose metadata is sent.
+        protocol : HTTPProtocol
+            RSGI response writer.
+        status : int
+            Response status code.
+        headers : list[tuple[str, str]]
+            Response headers.
+
+        Returns
+        -------
+        None
+            Close an unstarted event stream after sending the empty response.
+        """
+        self.__ensureContentLength(headers, response)
+        try:
+            protocol.response_empty(status, headers)
+        finally:
+            if isinstance(response, EventStreamResponse):
+                await response.getStream().aclose()
+
+    async def __waitDisconnect(self, protocol: HTTPProtocol) -> None:
+        """
+        Await Granian's supported HTTP client disconnect notification.
+
+        Parameters
+        ----------
+        protocol : HTTPProtocol
+            RSGI protocol exposing ``client_disconnect()``.
+
+        Returns
+        -------
+        None
+            Return when the client connection closes.
+        """
+        await protocol.client_disconnect()
+
+    async def __sendStream(
+        self,
+        iterator: AsyncIterator[bytes],
+        protocol: HTTPProtocol,
+        status: int,
+        headers: list[tuple[str, str]],
+    ) -> None:
+        """
+        Send and close a stream through the existing RSGI transport.
+
+        Parameters
+        ----------
+        iterator : AsyncIterator[bytes]
+            Owned iterator, closed even when stream creation fails.
+        protocol : HTTPProtocol
+            RSGI response protocol.
+        status : int
+            Response status code.
+        headers : list[tuple[str, str]]
+            Response headers.
+
+        Returns
+        -------
+        None
+            Return after all bytes have been sent and cleanup succeeds.
+        """
+        failure = None
+        try:
+            transport = protocol.response_stream(status, headers)
+            async for chunk in iterator:
+                await transport.send_bytes(chunk)
+        except BaseException as exc:
+            failure = exc
+            raise
+        finally:
+            await close_stream(iterator, failure)
+
     def __sendFile(
         self,
         adapter: TransportAdapter,
@@ -80,7 +209,8 @@ class RSGIResponseAdapter(ResponseAdapter):
         status: int,
         headers: list[tuple[str, str]],
     ) -> None:
-        """Send a file or the byte interval selected by the request.
+        """
+        Send a file or the byte interval selected by the request.
 
         Parameters
         ----------

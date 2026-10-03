@@ -30,9 +30,9 @@ _provider_stack: contextvars.ContextVar[frozenset[tuple[int, tuple[str, str]]]] 
     contextvars.ContextVar("x-orionis-provider-stack", default=frozenset())
 )
 
-# Sentinel value for empty parameters in inspect signatures,
-# used for clarity and to avoid magic numbers.
+# Sentinel for parameters without annotations or default values.
 _INSPECT_EMPTY = inspect.Parameter.empty
+_MISSING = object()
 
 class Container(IContainer):
     """
@@ -924,7 +924,7 @@ class Container(IContainer):
         ValueError
             If no binding exists and the service cannot be resolved.
         """
-        # Lookup the binding for the abstract type. This is a single lookup that
+        # Read the binding registered for the abstract type.
         binding = self.__bindings.get(abstract)
 
         # If no binding exists, attempt to resolve a deferred provider
@@ -1235,6 +1235,10 @@ class Container(IContainer):
         -----
         Resolves deferred providers before attempting instantiation.
         """
+        if not isinstance(type_, type):
+            error_msg = "build() expects a class type to instantiate."
+            raise TypeError(error_msg)
+
         # Wait for a provider that has published bindings but is still booting.
         if self.__pending_deferred:
             await self.__awaitPendingProvider(type_)
@@ -1242,11 +1246,6 @@ class Container(IContainer):
         # Resolve deferred providers for the given type if not already bound
         if not self.bound(type_):
             await self.__resolveDeferredProvider(type_)
-
-        # Ensure the provided type is a class
-        if not isinstance(type_, type):
-            error_msg = "build() expects a class type to instantiate."
-            raise TypeError(error_msg)
 
         # Auto-resolve and instantiate the class with provided arguments
         return await self.__autoResolveClass(type_, *args, **kwargs)
@@ -1391,7 +1390,7 @@ class Container(IContainer):
             return await type_(*final_args, **final_kwargs)
         return type_(*final_args, **final_kwargs)
 
-    async def __resolveSignature( # NOSONAR
+    async def __resolveSignature(  # noqa: PLR0912  # NOSONAR
         self,
         arguments: tuple[Argument, ...],
         *args: tuple[Any, ...],
@@ -1423,8 +1422,8 @@ class Container(IContainer):
         final_args: list[Any] = []
         final_kwargs: dict[str, Any] = {}
 
-        # Track deferred registration for the current argument sequence.
-        _has_deferred = bool(self._deferred_providers)
+        # Read deferred registrations for the current argument sequence.
+        deferred = self._deferred_providers
 
         # Read current bindings so overrides apply to previously compiled plans.
         _bindings       = self.__bindings
@@ -1434,26 +1433,8 @@ class Container(IContainer):
         for argument in arguments:
             name = argument.name
 
-            # Resolve deferred provider for this argument's type if applicable.
-            if _has_deferred and argument.full_class_path in self._deferred_providers:
-                await self.__resolveDeferredProvider(argument.full_class_path)
-
             # Handle positional or positional-or-keyword arguments
             if not argument.is_keyword_only:
-
-                # Special handling for msgspec.Struct subclasses with default value
-                if argument.is_schema:
-                    final_args.append(await self.__resolveSchemaArgument(argument))
-                    continue
-
-                # Resolve arguments registered by type in the container.
-                arg_type = argument.type
-                is_bound = arg_type in _bindings or arg_type in _singleton
-                if is_bound and name not in remaining_kwargs:
-                    resolved = await self.make(arg_type)
-                    final_args.append(resolved)
-                    continue
-
                 # Use next positional argument if available
                 if position < positional_count:
                     final_args.append(args[position])
@@ -1461,9 +1442,26 @@ class Container(IContainer):
                     continue
 
                 # Use provided keyword argument if available
-                if name in remaining_kwargs:
-                    final_args.append(remaining_kwargs[name])
-                    del remaining_kwargs[name]
+                provided = remaining_kwargs.pop(name, _MISSING)
+                if provided is not _MISSING:
+                    final_args.append(provided)
+                    continue
+
+                # Resolve deferred registrations for this parameter.
+                if deferred and argument.full_class_path in deferred:
+                    await self.__resolveDeferredProvider(argument.full_class_path)
+
+                # Read request data for a schema parameter.
+                if argument.is_schema:
+                    final_args.append(await self.__resolveSchemaArgument(argument))
+                    continue
+
+                # Resolve a dependency registered by type.
+                arg_type = argument.type
+                if (arg_type in _bindings or arg_type in _singleton) and not (
+                    arg_type is str and argument.module_name == "typing"
+                ):
+                    final_args.append(await self.make(arg_type))
                     continue
 
                 # Fallback to automatic resolution if no explicit value
@@ -1472,20 +1470,26 @@ class Container(IContainer):
 
             else:
 
-                # Special handling for msgspec.Struct subclasses with default value
+                # Use provided keyword argument if available
+                provided = remaining_kwargs.pop(name, _MISSING)
+                if provided is not _MISSING:
+                    final_kwargs[name] = provided
+                    continue
+
+                # Resolve deferred registrations for this parameter.
+                if deferred and argument.full_class_path in deferred:
+                    await self.__resolveDeferredProvider(argument.full_class_path)
+
+                # Read request data for a schema parameter.
                 if argument.is_schema:
                     final_kwargs[name] = await self.__resolveSchemaArgument(argument)
                     continue
 
-                # Use provided keyword argument if available
-                if name in remaining_kwargs:
-                    final_kwargs[name] = remaining_kwargs[name]
-                    del remaining_kwargs[name]
-                    continue
-
                 # Resolve keyword-only arguments registered by type.
                 arg_type = argument.type
-                if arg_type in _bindings or arg_type in _singleton:
+                if (arg_type in _bindings or arg_type in _singleton) and not (
+                    arg_type is str and argument.module_name == "typing"
+                ):
                     resolved = await self.make(arg_type)
                     final_kwargs[name] = resolved
                     continue
@@ -1557,6 +1561,13 @@ class Container(IContainer):
         TypeError
             If the argument cannot be resolved or is a built-in type.
         """
+        if argument.type is str and argument.module_name == "typing":
+            error_msg = (
+                f"Cannot resolve forward reference '{argument.class_name}' "
+                f"for parameter '{argument.name}'."
+            )
+            raise TypeError(error_msg)
+
         if not argument.resolved:
 
             # Do not auto-resolve built-in or typing types

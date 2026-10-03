@@ -728,6 +728,16 @@ class _StubApp:
         """
         return self.config_data.get(key)
 
+    def on(self, *_callbacks: object, **_options: object) -> Self:
+        """Accept lifecycle wiring in kernel fixtures.
+
+        Returns
+        -------
+        Self
+            This application double.
+        """
+        return self
+
     def isDebug(self) -> bool:
         """
         Report whether the application runs in debug mode.

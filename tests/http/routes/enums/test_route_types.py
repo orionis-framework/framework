@@ -67,7 +67,7 @@ class TestRouteType(TestCase):
             self.assertIsInstance(str(member), str)
 
     def testMemberCount(self) -> None:
-        """Verify that exactly four route types are defined.
+        """Verify that exactly five route action types are defined.
 
         Validates that no undocumented member has been introduced.
 
@@ -76,4 +76,4 @@ class TestRouteType(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(len(list(RouteType)), 4)
+        self.assertEqual(len(list(RouteType)), 5)

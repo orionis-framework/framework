@@ -637,6 +637,19 @@ class TestAdvancedRotatingFileHandlerEmit(TestCase):
         self._handler.emit(_make_record("12345"))
         self.assertEqual(self._handler.file_size, 6)
 
+    def testEmitTracksUtf8BytesForRotation(self) -> None:
+        """Count encoded bytes when deciding whether to rotate a log file.
+
+        Returns
+        -------
+        None
+            Assertions verify the byte count of a multibyte log record.
+        """
+        self._handler.emit(_make_record("café"))
+        path = Path(self._tmp.name, _LOG_DIR, "app_emit.log")
+        self.assertEqual(self._handler.file_size, path.stat().st_size)
+        self.assertEqual(self._handler.file_size, len("café\n".encode()))
+
     def testEmitReportsWriteFailuresThroughTheHandlerHook(self) -> None:
         """Report a failing stream through the standard error hook.
 
@@ -1005,6 +1018,17 @@ class TestAdvancedRotatingFileHandlerCleanup(TestCase):
         handler = self._makeHandler(1)
         handler.current_path = str(newest)
         handler._cleanupOldFiles()
+        self.assertTrue(foreign.exists())
+
+    def testCleanupDoesNotTreatTemplatePunctuationAsRegex(self) -> None:
+        """Keep files whose names only match regex interpretations of a template."""
+        newest = _seed_file(self._logs, "app_1.log", 2000)
+        foreign = _seed_file(self._logs, "app_0xlog", 1000)
+        handler = self._makeHandler(1)
+        handler.current_path = str(newest)
+
+        handler._cleanupOldFiles()
+
         self.assertTrue(foreign.exists())
 
     def testCleanupNeverPropagatesFilesystemErrors(self) -> None:

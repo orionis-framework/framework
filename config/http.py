@@ -2,15 +2,50 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.http import (
-    HTTP, Cors, HTTPCsrf, HTTPProxies, HTTPRateLimit, HTTPSecurity,
+    HTTP, Cors, HTTPBodyLimits, HTTPCsrf, HTTPProxies, HTTPRateLimit, HTTPSecurity,
+    HTTPWebSocket,
 )
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHTTP(HTTP):
 
-    # Enable request cancellation when the client disconnects.
+    # ----------------------------------------------------------------------------------
+    # body_limits : HTTPBodyLimits | dict, optional
+    # --- Finite per-request budgets and immediate overload rejection per worker.
+    # ----------------------------------------------------------------------------------
+    body_limits: HTTPBodyLimits | dict = field(
+        default_factory=lambda: HTTPBodyLimits(
+            max_body_size=Env.get("HTTP_MAX_BODY_SIZE", 16 * 1024 * 1024),
+            max_buffer_size=Env.get("HTTP_MAX_BUFFER_SIZE", 2 * 1024 * 1024),
+            max_concurrent_requests=Env.get("HTTP_MAX_CONCURRENT_REQUESTS", 128),
+            max_files=Env.get("HTTP_MAX_FILES", 32),
+            max_fields=Env.get("HTTP_MAX_FIELDS", 128),
+            max_part_size=Env.get("HTTP_MAX_PART_SIZE", 10 * 1024 * 1024),
+            max_field_size=Env.get("HTTP_MAX_FIELD_SIZE", 1024 * 1024),
+            max_header_size=Env.get("HTTP_MAX_PART_HEADER_SIZE", 16 * 1024),
+            memory_threshold=Env.get("HTTP_UPLOAD_MEMORY_THRESHOLD", 256 * 1024),
+            max_memory_size=Env.get("HTTP_MAX_MULTIPART_MEMORY_SIZE", 8 * 1024 * 1024),
+        ),
+    )
+
+    # ----------------------------------------------------------------------------------
+    # monitor_disconnects : bool, optional
+    # --- Enable request cancellation when the client disconnects.
+    # ----------------------------------------------------------------------------------
     monitor_disconnects: bool = field(
         default_factory=lambda: Env.get("HTTP_MONITOR_DISCONNECTS", False),
+    )
+
+    # ----------------------------------------------------------------------------------
+    # websocket : HTTPWebSocket | dict, optional
+    # --- Bound connection scopes and messages; browser origins default to same origin.
+    # ----------------------------------------------------------------------------------
+    websocket: HTTPWebSocket | dict = field(
+        default_factory=lambda: HTTPWebSocket(
+            max_connections=Env.get("WEBSOCKET_MAX_CONNECTIONS", 128),
+            max_message_size=Env.get("WEBSOCKET_MAX_MESSAGE_SIZE", 1024 * 1024),
+            allow_origins=Env.get("WEBSOCKET_ALLOW_ORIGINS", []),
+        ),
     )
 
     # ----------------------------------------------------------------------------------
@@ -71,6 +106,40 @@ class BootstrapHTTP(HTTP):
             # --- Uses 'RATE_LIMIT_WINDOW' env var or 60 if not set.
             # --------------------------------------------------------------------------
             rate_limit_window_seconds=Env.get("RATE_LIMIT_WINDOW", 60),
+            # --------------------------------------------------------------------------
+            # rate_limit_store : str, optional
+            # --- Select memory for per-process quotas or redis for shared quotas.
+            # --------------------------------------------------------------------------
+            rate_limit_store=Env.get("RATE_LIMIT_STORE", "memory"),
+            # --------------------------------------------------------------------------
+            # rate_limit_max_keys : int, optional
+            # --- Reject new clients instead of evicting active memory quotas.
+            # --------------------------------------------------------------------------
+            rate_limit_max_keys=Env.get("RATE_LIMIT_MAX_KEYS", 10_000),
+            # --------------------------------------------------------------------------
+            # rate_limit_max_events : int, optional
+            # --- Reject new events instead of evicting active memory quotas.
+            # --------------------------------------------------------------------------
+            rate_limit_max_events=Env.get("RATE_LIMIT_MAX_EVENTS", 100_000),
+            # --------------------------------------------------------------------------
+            # rate_limit_redis_url : str, optional
+            # --- Redis URL for shared quotas; the connection is lazy.
+            # --------------------------------------------------------------------------
+            rate_limit_redis_url=Env.get(
+                "RATE_LIMIT_REDIS_URL", "redis://127.0.0.1:6379/0",
+            ),
+            # --------------------------------------------------------------------------
+            # rate_limit_redis_prefix : str, optional
+            # --- Namespace prefix used for Redis quota keys.
+            # --------------------------------------------------------------------------
+            rate_limit_redis_prefix=Env.get(
+                "RATE_LIMIT_REDIS_PREFIX", "orionis:http:rate-limit",
+            ),
+            # --------------------------------------------------------------------------
+            # rate_limit_redis_timeout_seconds : int, optional
+            # --- Timeout in seconds for each complete Redis attempt.
+            # --------------------------------------------------------------------------
+            rate_limit_redis_timeout_seconds=Env.get("RATE_LIMIT_REDIS_TIMEOUT", 1),
         ),
     )
 

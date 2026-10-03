@@ -9,6 +9,7 @@ from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.functions import parse_action
 from orionis.http.routes.params_types import PARAM_TYPES
+from orionis.http.websocket_middleware import WebSocketMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -219,7 +220,7 @@ class RouteCompiler(IRouteCompiler):
         stack: list[type[BaseMiddleware]] = []
 
         # Global middleware first
-        for mw in app_middleware or ():
+        for mw in (() if route["method"] == "WEBSOCKET" else app_middleware or ()):
             if mw in without_middleware or mw in seen:
                 continue
             seen.add(mw)
@@ -229,6 +230,10 @@ class RouteCompiler(IRouteCompiler):
         for mw in middleware:
             if mw in without_middleware or mw in seen:
                 continue
+            is_socket_middleware = issubclass(mw, WebSocketMiddleware)
+            if is_socket_middleware != (route["method"] == "WEBSOCKET"):
+                error_msg = "Route middleware must match its HTTP/WebSocket protocol"
+                raise TypeError(error_msg)
             seen.add(mw)
             stack.append(mw)
 
@@ -237,6 +242,9 @@ class RouteCompiler(IRouteCompiler):
 
         # Resolve the action type and build the action descriptor for dispatch.
         path = route["path"]
+        if route["method"] == "WEBSOCKET" and route.get("view") is not None:
+            error_msg = "WebSocket routes require a connection handler, not a view"
+            raise ValueError(error_msg)
         route_type, action = self.__buildAction(route)
         is_static, regex, converters = self.compilePath(path)
         segment_count, priority_score = self.__routeMetrics(path)

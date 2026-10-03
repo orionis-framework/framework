@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from urllib.parse import urlsplit
 from orionis.environment import Env
+from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -16,6 +18,18 @@ class HTTPRateLimit(BaseEntity):
         Maximum number of requests allowed per window.
     rate_limit_window_seconds : int
         Time window in seconds for rate limit counting.
+    rate_limit_store : str
+        ``memory`` for one process or ``redis`` for shared worker quotas.
+    rate_limit_max_keys : int
+        Maximum retained clients in the memory store.
+    rate_limit_max_events : int
+        Maximum retained accepted timestamps in the memory store.
+    rate_limit_redis_url : str
+        Redis connection URL, used only by the Redis store.
+    rate_limit_redis_prefix : str
+        Application namespace for Redis quota keys.
+    rate_limit_redis_timeout_seconds : int
+        Bound Redis connect and socket operations in seconds.
     """
 
     rate_limit_enabled: bool = field(
@@ -42,6 +56,55 @@ class HTTPRateLimit(BaseEntity):
         },
     )
 
+    rate_limit_store: str = field(
+        default_factory=lambda: Env.get("RATE_LIMIT_STORE", "memory"),
+        metadata={
+            "description": "Rate-limit backend.",
+            "default": "memory",
+        },
+    )
+
+    rate_limit_max_keys: int = field(
+        default_factory=lambda: Env.get("RATE_LIMIT_MAX_KEYS", 10_000),
+        metadata={
+            "description": "Memory client capacity.",
+            "default": 10_000,
+        },
+    )
+
+    rate_limit_max_events: int = field(
+        default_factory=lambda: Env.get("RATE_LIMIT_MAX_EVENTS", 100_000),
+        metadata={
+            "description": "Memory timestamp capacity.",
+            "default": 100_000,
+        },
+    )
+
+    rate_limit_redis_url: str = field(
+        default_factory=lambda: Env.get(
+            "RATE_LIMIT_REDIS_URL", "redis://127.0.0.1:6379/0",
+        ),
+        metadata={
+            "description": "Redis connection URL.",
+            "default": "redis://127.0.0.1:6379/0",
+        },
+    )
+
+    rate_limit_redis_prefix: str = field(
+        default_factory=lambda: Env.get(
+            "RATE_LIMIT_REDIS_PREFIX", "orionis:http:rate-limit",
+        ),
+        metadata={
+            "description": "Application namespace for Redis rate limits.",
+            "default": "orionis:http:rate-limit",
+        },
+    )
+
+    rate_limit_redis_timeout_seconds: int = field(
+        default_factory=lambda: Env.get("RATE_LIMIT_REDIS_TIMEOUT", 1),
+        metadata={"description": "Redis operation timeout.", "default": 1},
+    )
+
     def __post_init__(self) -> None:
         """
         Validate rate-limiting fields.
@@ -59,6 +122,31 @@ class HTTPRateLimit(BaseEntity):
         """
         super().__post_init__()
         self.__validateRateLimiting()
+        self.__validateStore()
+
+    def __validateStore(self) -> None:
+        """
+        Validate backend selection, bounded capacity and Redis transport.
+
+        Returns
+        -------
+        None
+            Reject invalid backend settings during configuration loading.
+        """
+        validate_string(self.rate_limit_store, "rate_limit_store")
+        if self.rate_limit_store not in {"memory", "redis"}:
+            error_msg = "'rate_limit_store' must be 'memory' or 'redis'."
+            raise ValueError(error_msg)
+        for name in (
+            "rate_limit_max_keys", "rate_limit_max_events",
+            "rate_limit_redis_timeout_seconds",
+        ):
+            validate_integer(getattr(self, name), name, minimum=1)
+        validate_string(self.rate_limit_redis_url, "rate_limit_redis_url")
+        if urlsplit(self.rate_limit_redis_url).scheme not in {"redis", "rediss"}:
+            error_msg = "'rate_limit_redis_url' must use redis:// or rediss://."
+            raise ValueError(error_msg)
+        validate_string(self.rate_limit_redis_prefix, "rate_limit_redis_prefix")
 
     def __validateRateLimiting(self) -> None:
         """

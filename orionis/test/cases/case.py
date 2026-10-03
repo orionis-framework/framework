@@ -110,6 +110,21 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         """
         @functools.wraps(method)
         async def wrapper(*args: object, **kwargs: object) -> object:
+            """
+            Invoke a test method within the application context.
+
+            Parameters
+            ----------
+            *args : object
+                Positional arguments passed to the test method.
+            **kwargs : object
+                Keyword arguments passed to the test method.
+
+            Returns
+            -------
+            object
+                Result returned by the test method.
+            """
             # Execute the test method inside the application context.
             return await Application.invoke(method, *args, **kwargs)
 

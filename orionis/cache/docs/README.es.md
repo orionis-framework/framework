@@ -392,6 +392,10 @@ def build(
 
 Los tres backends de aiocache se construyen siempre con
 `serializer=MsgspecSerializer()`.
+La fábrica Redis selecciona RESP2 explícitamente para conservar compatibilidad
+con servidores sin el handshake `HELLO` de RESP3. La comprobación real de
+certificación pasó con Redis 5.0.14.1 en Windows; las versiones y disponibilidad
+del despliegue requieren su propia certificación.
 
 ### `MsgspecSerializer`
 

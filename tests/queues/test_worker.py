@@ -41,7 +41,7 @@ class TestWorker(TestCase):
         self.assertEqual(len(self.state.events), 3)
         identities = {id(event[3]) for event in self.state.events}
         self.assertEqual(len(identities), 3)
-        self.assertNotIn(JobContext, self.app.getCurrentScope())
+        self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
         self.assertEqual(await self.driver.size("default"), 0)
 
     async def testRetryExhaustionPersistsOriginalFailure(self) -> None:
@@ -57,7 +57,7 @@ class TestWorker(TestCase):
         self.assertEqual(failure.attempts, 3)
         self.assertEqual(failure.exception_type, "ValueError")
         self.assertIn("Application job failure", failure.traceback)
-        self.assertNotIn(JobContext, self.app.getCurrentScope())
+        self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
 
     async def testExplicitReleaseSkipsAutomaticAcknowledgement(self) -> None:
         """Reserve an explicitly released job again with the next attempt."""
@@ -104,7 +104,7 @@ class TestWorker(TestCase):
             self.assertEqual(await self.worker.run(stop_when_empty=True), 1)
         self.assertEqual((await self.failed.all())[0].exception_type,
                          "TimeoutError")
-        self.assertNotIn(JobContext, self.app.getCurrentScope())
+        self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
 
     async def testNearExpiredLeaseBoundsExecutionTimeout(self) -> None:
         """Shorten a job timeout to the remaining reservation lifetime."""
@@ -136,7 +136,7 @@ class TestWorker(TestCase):
         self.assertEqual(self.state.events, [])
         self.assertEqual((await self.failed.all())[0].exception_type,
                          "TimeoutError")
-        self.assertNotIn(JobContext, app.getCurrentScope())
+        self.assertNotIn(JobContext, app.getCurrentScope() or {})
 
     async def testExpiredLeaseNeverExecutesSideEffects(self) -> None:
         """Skip a stale claim before invoking the job handler."""

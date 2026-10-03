@@ -172,7 +172,7 @@ class IContainer(ABC):
         """
 
     @abstractmethod
-    def getCurrentScope(self) -> dict[Any, Any] | None:
+    def getCurrentScope(self) -> ScopeManager | None:
         """
         Get the current active scope context for scoped services.
 
@@ -183,7 +183,7 @@ class IContainer(ABC):
 
         Returns
         -------
-        dict[Any, Any] | None
+        ScopeManager | None
             The current active scope context if available, otherwise None.
             The scope context is a dictionary-like object that contains
             instances of scoped services registered in the current scope.
@@ -293,8 +293,8 @@ class IContainer(ABC):
         self,
         instance: object,
         method_name: str,
-        *args: tuple,
-        **kwargs: dict,
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Invoke a method on an object instance with automatic dependency injection.
@@ -305,9 +305,9 @@ class IContainer(ABC):
             The object instance containing the method.
         method_name : str
             The name of the method to invoke.
-        *args : tuple
+        *args : object
             Positional arguments for the method.
-        **kwargs : dict
+        **kwargs : object
             Keyword arguments for the method.
 
         Returns

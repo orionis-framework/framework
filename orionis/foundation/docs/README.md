@@ -3,6 +3,46 @@
 Spanish manual and performance review: [README.es.md](README.es.md).
 Measured samples: [benchmark-results.json](benchmark-results.json).
 
+## Explicit Readiness And Headless Startup
+
+`create()` retains its synchronous configuration/registration behavior.
+For a script or a custom worker, use `await app.boot()` before resolving
+services or calling facades. This method calls `create()` and awaits pending
+eager providers, shares their existing startup lock, and returns the application.
+A failure or cancellation retains the unfinished provider for a later retry.
+It does not initialize a server/CLI kernel or execute runtime lifecycle hooks.
+
+| Phase | Observable state | Legal service access |
+| --- | --- | --- |
+| Constructed | `isCreated == False` | Explicit container bindings; configure the application before using configured services. |
+| Created | `isCreated == isBooted == True` | Bindings are registered; inject contracts and await resolutions. Eager async provider side effects can still be pending. |
+| Providers started | `areProvidersBooted == True` | Eager boot side effects are complete. Deferred providers still boot when their binding is first resolved. |
+| HTTP initialized | `isHttpReady == True` | Both HTTP protocol handlers are published after eager provider startup and kernel boot. The flag does not certify sockets, external dependencies or deployment health. |
+| Scoped | `app.getCurrentScope()` returns a scope | Scoped instances belong to the current request, WebSocket connection or queue job; never retain them in a singleton. |
+| Facade pinned | The provider has awaited `Facade.pin()` | Direct passthrough follows the resolved service's sync/async API. Before pinning, facade attribute dispatch requires `await`, including synchronous service methods. |
+
+`isBooted` remains a compatibility alias for the created stage. Use the new
+readiness properties when distinguishing provider startup from HTTP readiness.
+These properties report completed startup stages and are not reset by runtime
+shutdown; they are not live process or service health checks.
+HTTP lifespan and Reactor keep their existing lifecycle callbacks; scripts that
+need those callbacks must run the corresponding runtime entry point.
+
+```python
+from pathlib import Path
+from orionis import Application
+from orionis.queues.contracts.manager import IQueueManager
+
+async def main() -> None:
+    app = await Application(Path.cwd()).boot()
+    manager = await app.make(IQueueManager)
+    try:
+        # Dispatch or consume jobs through manager here.
+        assert app.areProvidersBooted
+    finally:
+        await manager.close()
+```
+
 ## Scope
 
 Foundation owns application configuration, provider registration, lifecycle

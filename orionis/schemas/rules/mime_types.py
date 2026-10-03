@@ -43,7 +43,7 @@ class MimeTypes(Rule):
             error_msg = "MimeTypes requires at least one MIME type."
             raise ValueError(error_msg)
 
-        # Split wildcards from exact types once, so matching stays O(1).
+        # Separate wildcard patterns from exact MIME types.
         exact: set[str] = set()
         prefixes: list[str] = []
         for mime_type in mime_types:

@@ -24,6 +24,31 @@ _MIME_URLENCODED = "application/x-www-form-urlencoded"
 _BEARER_PREFIX = "bearer "
 _BEARER_PREFIX_LEN = 7
 
+def _asgi_server_authority(
+    server: tuple[str, int | None],
+    scheme: str,
+) -> str:
+    """
+    Format an ASGI server address for use as a URL authority.
+
+    Parameters
+    ----------
+    server : tuple[str, int | None]
+        Server hostname or IP address and optional port.
+    scheme : str
+        Request URL scheme.
+
+    Returns
+    -------
+    str
+        Host with IPv6 brackets and a nondefault port when present.
+    """
+    host, port = server
+    if ":" in host and not host.startswith("["):
+        host = f"[{host}]"
+    default_port = 80 if scheme in ("http", "ws") else 443
+    return host if port is None or port == default_port else f"{host}:{port}"
+
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Mapping
     from xml.etree.ElementTree import Element as XMLElement
@@ -224,17 +249,7 @@ class Request(IRequest):
         if host is None:
             server = scope.get("server")
             if server:
-                host_name, port = server
-
-                default_port = (
-                    80 if scheme in ("http", "ws") else 443
-                )
-
-                host = (
-                    host_name
-                    if port == default_port
-                    else f"{host_name}:{port}"
-                )
+                host = _asgi_server_authority(server, scheme)
             else:
                 return f"{path}?{query}" if query else path
 
@@ -282,12 +297,7 @@ class Request(IRequest):
         host = headers.get("host")
         if host is None:
             server = scope.get("server")
-            if server:
-                host_name, port = server
-                default_port = 80 if scheme == "http" else 443
-                host = host_name if port == default_port else f"{host_name}:{port}"
-            else:
-                host = "localhost"
+            host = _asgi_server_authority(server, scheme) if server else "localhost"
 
         # Include root_path if present
         if root_path:
@@ -442,7 +452,10 @@ class Request(IRequest):
         if self.__cached_method is not None:
             return self.__cached_method
 
-        self.__cached_method = self.__getScope()["method"]
+        method = self.__adapter.method()
+        self.__cached_method = (
+            method if method is not None else self.__getScope()["method"]
+        )
         return self.__cached_method
 
     @property
@@ -458,7 +471,7 @@ class Request(IRequest):
         if self.__cached_scheme is not None:
             return self.__cached_scheme
 
-        self.__cached_scheme = self.__getScope().get("scheme", "http")
+        self.__cached_scheme = self.__adapter.scheme() or "http"
         return self.__cached_scheme
 
     @property
@@ -472,7 +485,7 @@ class Request(IRequest):
             The path component of the request URL.
         """
         if self.__cached_path is None:
-            self.__cached_path = self.__getScope().get("path", "/")
+            self.__cached_path = self.__adapter.path() or "/"
         return self.__cached_path
 
     @property

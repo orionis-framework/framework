@@ -142,6 +142,27 @@ class Router(IRouter):
         """
         self.__current_kind = kind
 
+    def websocket(
+        self,
+        path: str,
+        action: RouteAction | None = None,
+    ) -> FluentRoute:
+        """Register a WebSocket connection handler independently of HTTP routes.
+
+        Parameters
+        ----------
+        path : str
+            Connection path, supporting the usual converted path parameters.
+        action : RouteAction | None, optional
+            Function, controller action, or invokable controller.
+
+        Returns
+        -------
+        FluentRoute
+            Route builder accepting WebSocketMiddleware and route groups.
+        """
+        return self.__addSingleRoute("WEBSOCKET", path, action)
+
     def auth(
         self,
         login_controller: type | None = None,

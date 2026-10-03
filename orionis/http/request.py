@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 from orionis.http.contracts.request import IRequest
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.body import BodyStream
+from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
 from orionis.http.payload.estructures.cookies import Cookies
 from orionis.http.payload.estructures.query_params import QueryParams
 from orionis.http.payload.media_types import DEFAULT_MEDIA_TYPES, MediaTypeRegistry
@@ -71,6 +72,7 @@ class Request(IRequest):
 
     __slots__ = (
         "__adapter",
+        "__body_limits",
         "__body_stream",
         "__cached_accept_lower",
         "__cached_base_url",
@@ -108,6 +110,7 @@ class Request(IRequest):
         registry: MediaTypeRegistry | None = None,
         receive_or_protocol: object = None,
         params: Mapping[str, Any] | None = None,
+        body_limits: HTTPBodyLimits | None = None,
     ) -> None:
         """
         Initialize an HTTP request from an interface, adapter, and body stream.
@@ -126,6 +129,8 @@ class Request(IRequest):
             Content-type parser registry.  Defaults to ``DEFAULT_MEDIA_TYPES``.
         params : Mapping[str, Any] | None, optional
             Path parameters extracted from the URL. Defaults to None.
+        body_limits : HTTPBodyLimits | None, optional
+            Finite request and multipart limits. Defaults to HTTPBodyLimits().
 
         Returns
         -------
@@ -140,6 +145,9 @@ class Request(IRequest):
             else Interface(interface)
         )
         self.__body_stream: IBodyStream | None = body_stream
+        self.__body_limits = (
+            body_limits if body_limits is not None else HTTPBodyLimits()
+        )
         self.__receive_or_protocol = receive_or_protocol
         self.__registry: MediaTypeRegistry = (
             registry if registry is not None else DEFAULT_MEDIA_TYPES
@@ -192,7 +200,11 @@ class Request(IRequest):
         """
         stream = self.__body_stream
         if stream is None:
-            stream = BodyStream(self.__interface, self.__receive_or_protocol)
+            stream = BodyStream(
+                self.__interface, self.__receive_or_protocol,
+                self.__body_limits.max_body_size,
+                max_buffer_size=self.__body_limits.max_buffer_size,
+            )
             self.__body_stream = stream
         return stream
 
@@ -993,10 +1005,31 @@ class Request(IRequest):
         parser = MultipartStreamParser(
             self.__getBodyStream().stream(),
             boundary_str.encode(),
+            max_body_size=self.__body_limits.max_body_size,
+            max_files=self.__body_limits.max_files,
+            max_fields=self.__body_limits.max_fields,
+            max_part_size=self.__body_limits.max_part_size,
+            max_field_size=self.__body_limits.max_field_size,
+            max_header_size=self.__body_limits.max_header_size,
+            memory_threshold=self.__body_limits.memory_threshold,
+            max_memory_size=self.__body_limits.max_memory_size,
         )
 
         self.__cached_multipart = await parser.parse()
         return self.__cached_multipart
+
+    def close(self) -> None:
+        """
+        Close uploaded files retained by the parsed multipart request.
+
+        Returns
+        -------
+        None
+            Release upload handles after response delivery. Calling this method
+            repeatedly is safe; background tasks must finish before closure.
+        """
+        if self.__cached_multipart is not None:
+            self.__cached_multipart.close()
 
     async def payload(self) -> object:
         """

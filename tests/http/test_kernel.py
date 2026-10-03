@@ -378,6 +378,21 @@ class _StubScope:
         """
         self.entries[key] = value
 
+    def __getitem__(self, key: object) -> object | None:
+        """Retrieve a bound instance with the production scope semantics.
+
+        Parameters
+        ----------
+        key : object
+            Contract identifying the request-local instance.
+
+        Returns
+        -------
+        object | None
+            The bound instance, or None when absent.
+        """
+        return self.entries.get(key)
+
 class _StubDefaultResponses:
     """Default response factory double returning JSON payloads."""
 
@@ -1079,6 +1094,7 @@ def make_http_config(
     *,
     csrf_enabled: bool = False,
     rate_limit: dict[str, object] | None = None,
+    body_limits: dict[str, int] | None = None,
 ) -> dict[str, dict]:
     """
     Build the HTTP configuration section served to the kernel.
@@ -1089,6 +1105,8 @@ def make_http_config(
         Whether CSRF protection must be active.
     rate_limit : dict[str, object] | None, optional
         Rate-limit settings; defaults to the disabled limiter.
+    body_limits : dict[str, int] | None, optional
+        Request body and concurrency limits; defaults to framework values.
 
     Returns
     -------
@@ -1104,6 +1122,7 @@ def make_http_config(
             "allow_headers": ["*"],
         },
         "rate_limit": rate_limit if rate_limit is not None else {},
+        "body_limits": body_limits if body_limits is not None else {},
         "csrf": {"enabled": csrf_enabled},
     }
 
@@ -1115,6 +1134,7 @@ async def boot_kernel(  # noqa: PLR0913
     maintenance: bool = False,
     csrf_enabled: bool = False,
     rate_limit: dict[str, object] | None = None,
+    body_limits: dict[str, int] | None = None,
 ) -> tuple[KernelHTTP, _StubApp, _StubDefaultResponses, _StubCatch]:
     """
     Build and boot a kernel wired to fully controlled collaborators.
@@ -1133,6 +1153,8 @@ async def boot_kernel(  # noqa: PLR0913
         Whether CSRF protection must be active.
     rate_limit : dict[str, object] | None, optional
         Rate-limit settings applied to the global middleware stack.
+    body_limits : dict[str, int] | None, optional
+        Request body and concurrency limits.
 
     Returns
     -------
@@ -1160,6 +1182,7 @@ async def boot_kernel(  # noqa: PLR0913
             "http": make_http_config(
                 csrf_enabled=csrf_enabled,
                 rate_limit=rate_limit,
+                body_limits=body_limits,
             ),
         },
         debug=debug,

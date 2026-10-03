@@ -52,7 +52,7 @@ class Executor(IExecutor):
         # Define the total width for the output line
         width = 60
 
-        # Cache ANSI color codes to avoid repeated lookups
+        # Store the ANSI color codes used by this executor.
         muted = ANSIColors.TEXT_MUTED.value
         default = ANSIColors.DEFAULT.value
 

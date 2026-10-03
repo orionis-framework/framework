@@ -223,7 +223,7 @@ class FormData(IFormData):
         int
             Count of distinct keys, not the total item count.
         """
-        # O(1) — dict length is maintained as an internal counter.
+        # Return the number of stored form fields.
         return len(self._index)
 
     # Canonical string representation of this instance

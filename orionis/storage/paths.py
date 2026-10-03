@@ -1,7 +1,7 @@
 from __future__ import annotations
 from orionis.storage.exceptions import StoragePathException
 
-def normalizePath(path: str) -> str:
+def normalize_path(path: str) -> str:
     """
     Normalize a storage path into a canonical root-relative form.
 
@@ -57,11 +57,11 @@ def normalizePath(path: str) -> str:
 
     return "/".join(segments)
 
-def normalizeFilePath(path: str) -> str:
+def normalize_file_path(path: str) -> str:
     """
     Normalize a storage path and require it to reference a file.
 
-    Applies :func:`normalizePath` and additionally rejects the empty
+    Apply :func:`normalize_path` and additionally reject the empty
     result, since the disk root can never be treated as a file.
 
     Parameters
@@ -80,7 +80,7 @@ def normalizeFilePath(path: str) -> str:
         If the path is invalid or resolves to the disk root.
     """
     # Reuse the shared normalization rules for consistency.
-    normalized = normalizePath(path)
+    normalized = normalize_path(path)
 
     # A file operation always requires a concrete target path.
     if not normalized:
@@ -88,3 +88,34 @@ def normalizeFilePath(path: str) -> str:
         raise StoragePathException(error_msg)
 
     return normalized
+
+_LEGACY_EXPORTS = {
+    "normalizePath": normalize_path,
+    "normalizeFilePath": normalize_file_path,
+}
+
+def __getattr__(name: str) -> object:
+    """
+    Resolve and cache a legacy path function name.
+
+    Parameters
+    ----------
+    name : str
+        Attribute requested from this module.
+
+    Returns
+    -------
+    object
+        Existing path function bound to the requested name.
+
+    Raises
+    ------
+    AttributeError
+        If the requested name is not a compatibility export.
+    """
+    try:
+        value = _LEGACY_EXPORTS[name]
+    except KeyError as exc:
+        raise AttributeError(name) from exc
+    globals()[name] = value
+    return value

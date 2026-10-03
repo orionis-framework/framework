@@ -29,7 +29,7 @@ class ProgressBar(IProgressBar):
         # Initialize progress to zero
         self.progress = 0
 
-        # Cache references to sys.stdout methods for faster access in the hot path
+        # Store output stream methods used while drawing the bar.
         _stdout = sys.stdout
         self._write = _stdout.write
         self._flush = _stdout.flush
@@ -46,7 +46,7 @@ class ProgressBar(IProgressBar):
         None
             This method does not return a value.
         """
-        # Cache local variables for faster access in the hot path
+        # Read the current bar dimensions and progress.
         progress = self.progress
         total = self.total
         width = self.bar_width
@@ -94,7 +94,7 @@ class ProgressBar(IProgressBar):
         None
             This method does not return a value.
         """
-        # Inline clamp: avoids min() function-call overhead in the hot path
+        # Keep progress within the configured total.
         progress = self.progress + increment
         self.progress = min(self.total, progress)
 

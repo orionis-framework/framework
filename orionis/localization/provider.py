@@ -44,5 +44,5 @@ class LocalizationProvider(ServiceProvider):
         manager: ILocalizationManager = await self.app.make(ILocalizationManager)
         self.app.instance(ITranslator, manager.translator())
 
-        # Pin the facade for direct attribute access without DI overhead.
+        # Store the localization facade on the provider.
         await LangFacade.pin()

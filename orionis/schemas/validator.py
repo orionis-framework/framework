@@ -6,7 +6,7 @@ from orionis.schemas.failure_collector import FailureCollector
 from orionis.schemas.rules_executor import _cache_get, _build_plan, _collect_with_plan
 
 if TYPE_CHECKING:
-    from orionis.schemas.schema import Schema
+    from orionis.schemas.schema import Schema as SchemaType
 
 # Alias msgspec's convert function to avoid direct dependency on msgspec in the
 # rest of the codebase.
@@ -22,7 +22,7 @@ class Schema:
     __slots__ = ()
 
     @staticmethod
-    def validate(payload: object, schema: type[Schema]) -> Schema:
+    def validate(payload: object, schema: type[SchemaType]) -> SchemaType:
         """
         Validate payload against a schema and return a typed instance.
 

@@ -334,6 +334,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _read() -> bytes:
+            """
+            Read the requested object from storage.
+
+            Returns
+            -------
+            bytes
+                Complete object content.
+            """
             blob = self.__blob(normalized)
             try:
                 return blob.download_blob().readall()
@@ -374,6 +382,14 @@ class AzureStorageDriver(IStorageDriver):
         del chunk_size
 
         def _open() -> Any:
+            """
+            Open a stream for the requested object.
+
+            Returns
+            -------
+            Any
+                Readable object stream.
+            """
             blob = self.__blob(normalized)
             try:
                 return blob.download_blob().chunks()
@@ -444,6 +460,14 @@ class AzureStorageDriver(IStorageDriver):
         )
 
         def _write() -> None:
+            """
+            Write the supplied content to storage.
+
+            Returns
+            -------
+            None
+                Completes after writing the object.
+            """
             container = self.__containerClient()
             container.upload_blob(
                 name=normalized,
@@ -485,6 +509,14 @@ class AzureStorageDriver(IStorageDriver):
         buffer = await self.__spool(stream)
 
         def _upload() -> None:
+            """
+            Upload the supplied local file to storage.
+
+            Returns
+            -------
+            None
+                Completes after uploading the file.
+            """
             container = self.__containerClient()
             container.upload_blob(
                 name=normalized,
@@ -515,6 +547,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _delete() -> bool:
+            """
+            Delete the requested object from storage.
+
+            Returns
+            -------
+            bool
+                Whether an object was deleted.
+            """
             blob = self.__blob(normalized)
             try:
                 blob.delete_blob()
@@ -552,6 +592,14 @@ class AzureStorageDriver(IStorageDriver):
         destination = normalizeFilePath(target)
 
         def _copy() -> None:
+            """
+            Copy the requested object to another key.
+
+            Returns
+            -------
+            None
+                Completes after copying the object.
+            """
             container = self.__containerClient()
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
                 max_size=_SPOOL_THRESHOLD,
@@ -705,6 +753,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _visibility() -> str:
+            """
+            Read the visibility of the requested object.
+
+            Returns
+            -------
+            str
+                Configured object visibility.
+            """
             # Assert existence first to honor the driver contract.
             self.__propsSync(normalized)
             container = self.__containerClient()
@@ -782,6 +838,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _hash() -> str:
+            """
+            Calculate the hash of the requested object.
+
+            Returns
+            -------
+            str
+                Content digest for the object.
+            """
             try:
                 hasher = hashlib.new(algorithm, usedforsecurity=False)
             except ValueError as exc:
@@ -825,6 +889,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _info() -> FileInfo:
+            """
+            Read metadata for the requested object.
+
+            Returns
+            -------
+            FileInfo
+                Object metadata.
+            """
             props = self.__propsSync(normalized)
             container = self.__containerClient()
             try:
@@ -875,6 +947,14 @@ class AzureStorageDriver(IStorageDriver):
             return
 
         def _create() -> None:
+            """
+            Create a directory marker in storage.
+
+            Returns
+            -------
+            None
+                Completes after creating the marker.
+            """
             container = self.__containerClient()
             container.upload_blob(
                 name=f"{normalized}/", data=b"", overwrite=True,
@@ -901,6 +981,14 @@ class AzureStorageDriver(IStorageDriver):
         prefix = f"{normalized}/" if normalized else ""
 
         def _purge() -> bool:
+            """
+            Delete objects beneath the requested directory.
+
+            Returns
+            -------
+            bool
+                Whether any object was deleted.
+            """
             container = self.__containerClient()
             names = self.__listKeysSync(prefix)
             for name in names:
@@ -929,6 +1017,14 @@ class AzureStorageDriver(IStorageDriver):
             return True
 
         def _exists() -> bool:
+            """
+            Check whether the requested object exists.
+
+            Returns
+            -------
+            bool
+                Whether the object exists.
+            """
             container = self.__containerClient()
             iterator = container.list_blobs(
                 name_starts_with=f"{normalized}/",
@@ -1043,6 +1139,14 @@ class AzureStorageDriver(IStorageDriver):
             raise UnsupportedStorageOperationException(error_msg)
 
         def _sign() -> str:
+            """
+            Create a signed URL for the requested object.
+
+            Returns
+            -------
+            str
+                Temporary URL for the object.
+            """
             # Bootstrap ensures the SDK module reference is available.
             self.__containerClient()
             sas = self._sdk.generate_blob_sas(
@@ -1082,6 +1186,14 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _download() -> Path:
+            """
+            Download the requested object to a local path.
+
+            Returns
+            -------
+            Path
+                Destination of the downloaded object.
+            """
             target = resolveDownloadTarget(normalized, destination)
             blob = self.__blob(normalized)
             try:
@@ -1124,6 +1236,14 @@ class AzureStorageDriver(IStorageDriver):
         assertBinaryMode(mode)
 
         def opener() -> BinaryIO:
+            """
+            Open the binary stream backing this object.
+
+            Returns
+            -------
+            BinaryIO
+                Stream handle for reading or writing.
+            """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
                 max_size=_SPOOL_THRESHOLD,
             )
@@ -1144,6 +1264,19 @@ class AzureStorageDriver(IStorageDriver):
             return buffer
 
         def flush(handle: BinaryIO) -> None:
+            """
+            Persist the writable stream content to storage.
+
+            Parameters
+            ----------
+            handle : BinaryIO
+                Buffered stream being closed.
+
+            Returns
+            -------
+            None
+                Completes after writing the content.
+            """
             # Persist the buffered content back to Azure on close.
             handle.seek(0)
             self.__containerClient().upload_blob(

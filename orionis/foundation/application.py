@@ -259,7 +259,7 @@ class Application(Container, IApplication):
             return await self.__asgiLifespan(receive, send)
 
         # Route HTTP requests to the kernel handler.
-        if scope_type == "http":
+        if scope_type in {"http", "websocket"}:
             return await self.__handleHttpAsgi(scope, receive, send)
 
         # Ignore unsupported scopes per ASGI specification
@@ -377,7 +377,7 @@ class Application(Container, IApplication):
             await self.__initializeHttpKernel("asgi")
             handler = self.__kernel_http_asgi
 
-        if not self.__http_disconnect_monitoring:
+        if not self.__http_disconnect_monitoring or scope.get("type") == "websocket":
             return await handler(scope, receive, send)
 
         loop = asyncio.get_running_loop()
@@ -415,7 +415,7 @@ class Application(Container, IApplication):
             The result of handling the RSGI request.
         """
         # Delegate to the appropriate kernel handler based on protocol type.
-        if scope.proto == "http":
+        if scope.proto in {"http", "ws"}:
             return await self.__handleHttpRsgi(scope, protocol)
 
         # Unsupported protocol; return None per RSGI specification.
@@ -503,7 +503,7 @@ class Application(Container, IApplication):
             await self.__initializeHttpKernel("rsgi")
             handler = self.__kernel_http_rsgi
 
-        if not self.__http_disconnect_monitoring:
+        if not self.__http_disconnect_monitoring or scope.proto == "ws":
             return await handler(scope, protocol)
 
         loop = asyncio.get_running_loop()
@@ -703,6 +703,48 @@ class Application(Container, IApplication):
             kernel readiness are completed separately during lifespan startup.
         """
         return self.__booted
+
+    @property
+    def isCreated(self) -> bool:
+        """
+        Check whether configuration and service registration are complete.
+
+        Returns
+        -------
+        bool
+            Alias of the legacy ``isBooted`` configuration-stage flag.
+        """
+        return self.__booted
+
+    @property
+    def areProvidersBooted(self) -> bool:
+        """
+        Check whether every registered eager provider has finished startup.
+
+        Returns
+        -------
+        bool
+            True after creation and successful eager provider startup. Deferred
+            providers still boot on first resolution.
+        """
+        return self.__booted and not self.__pending_boot_providers
+
+    @property
+    def isHttpReady(self) -> bool:
+        """
+        Check whether both HTTP protocol handlers have been published.
+
+        Returns
+        -------
+        bool
+            True after eager providers and the HTTP kernel finish startup.
+            This flag does not report listening sockets or deployment health.
+        """
+        return (
+            self.areProvidersBooted
+            and self.__kernel_http_asgi is not None
+            and self.__kernel_http_rsgi is not None
+        )
 
     @property
     def startAt(self) -> int:
@@ -2816,6 +2858,27 @@ class Application(Container, IApplication):
             self.__booted = True
 
         # Return the application instance for method chaining
+        return self
+
+    async def boot(self) -> Self:
+        """Create the application and await eager providers for headless use.
+
+        Repeated and concurrent calls share provider startup coordination.
+        HTTP and Reactor continue to own their kernels and lifecycle callbacks.
+
+        Returns
+        -------
+        Self
+            The application with all eager provider boot methods completed.
+
+        Raises
+        ------
+        Exception
+            Propagate configuration or provider startup failures. An unfinished
+            provider remains pending so another call can retry its startup.
+        """
+        self.create()
+        await self.__bootEagerProviders()
         return self
 
     # --- Runtime Configuration Access Methods ---

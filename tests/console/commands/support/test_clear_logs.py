@@ -179,12 +179,15 @@ class TestClearLogsCommand(TestCase):
         Returns
         -------
         None
-            Assertions verify a nonzero result and continued cleanup.
+            Assertions verify a nonzero result and continued cleanup even when
+            the configured directory has a different canonical path.
         """
         with TemporaryDirectory() as temporary:
-            logs = Path(temporary) / "logs"
+            alias = Path(temporary) / "alias"
+            alias.mkdir()
+            logs = alias / ".." / "logs"
             logs.mkdir()
-            protected = logs / "protected.log"
+            protected = (logs / "protected.log").resolve()
             removable = logs / "removable.log"
             protected.write_text("keep", encoding="utf-8")
             removable.write_text("remove", encoding="utf-8")
@@ -234,15 +237,19 @@ class TestClearLogsCommand(TestCase):
         Returns
         -------
         None
-            Assertions verify closing precedes the first unlink operation.
+            Assertions verify closing precedes unlink even when the configured
+            directory has a different canonical path.
         """
         with TemporaryDirectory() as temporary:
-            logs = Path(temporary) / "logs"
+            alias = Path(temporary) / "alias"
+            alias.mkdir()
+            logs = alias / ".." / "logs"
             logs.mkdir()
-            log = logs / "stack.log"
+            log = (logs / "stack.log").resolve()
             log.write_text("entry", encoding="utf-8")
             original_unlink = Path.unlink
             logger = Mock(spec=ILogger)
+            removed: list[Path] = []
 
             def unlink_after_close(path: Path, *args: object, **kwargs: object) -> None:
                 """Verify the logger is closed before a file is removed.
@@ -257,6 +264,7 @@ class TestClearLogsCommand(TestCase):
                     Keyword arguments for ``Path.unlink``.
                 """
                 if path == log:
+                    removed.append(path)
                     self.assertTrue(logger.close.called)
                 original_unlink(path, *args, **kwargs)
 
@@ -267,4 +275,5 @@ class TestClearLogsCommand(TestCase):
 
             self.assertEqual(result, 0)
             self.assertFalse(log.exists())
+            self.assertEqual(removed, [log])
             logger.close.assert_called_once_with()

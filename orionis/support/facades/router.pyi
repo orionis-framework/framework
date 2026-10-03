@@ -8,6 +8,13 @@ from orionis.http.routes.types import MiddlewareInput, RouteAction
 class Route(IRouter, IFacade):
 
     @classmethod
+    def websocket(
+        cls,
+        path: str,
+        action: RouteAction | None = None,
+    ) -> FluentRoute: ...
+
+    @classmethod
     def auth(
         cls,
         login_controller: type | None = None,

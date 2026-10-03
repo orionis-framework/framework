@@ -66,7 +66,7 @@ class DotEnv(metaclass=Singleton):
                 # Load environment variables from the .env file into the process env.
                 load_dotenv(self.__resolved_path, override=True)
 
-                # Build in-memory cache of .env values — avoids disk I/O on every get().
+                # Keep parsed .env values in memory for subsequent reads.
                 self.__cache: dict[str, str] = dict(dotenv_values(self.__resolved_path))
 
         except OSError as e:
@@ -357,7 +357,7 @@ class DotEnv(metaclass=Singleton):
         # Compute normalized form once and reuse for all comparisons
         lower_stripped: str = value_str.lower().strip()
 
-        # Handle common null representations using pre-built frozenset (O(1))
+        # Recognize common null representations.
         if lower_stripped in _NULL_VALUES:
             return None
 
@@ -365,7 +365,7 @@ class DotEnv(metaclass=Singleton):
         if lower_stripped in ("true", "false"):
             return lower_stripped == "true"
 
-        # O(1) prefix check: split at first ':' and test against frozenset
+        # Check the prefix before the first colon.
         if ":" in value_str:
             prefix, _ = value_str.split(":", 1)
             if prefix in _ENV_TYPE_PREFIXES:

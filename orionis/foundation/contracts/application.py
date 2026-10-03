@@ -36,6 +36,42 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
+    def isCreated(self) -> bool:
+        """
+        Check whether configuration and service registration are complete.
+
+        Returns
+        -------
+        bool
+            Alias of the legacy ``isBooted`` configuration-stage flag.
+        """
+
+    @property
+    @abstractmethod
+    def areProvidersBooted(self) -> bool:
+        """
+        Check whether every eager provider has finished startup.
+
+        Returns
+        -------
+        bool
+            True after creation and eager startup; deferred providers remain lazy.
+        """
+
+    @property
+    @abstractmethod
+    def isHttpReady(self) -> bool:
+        """
+        Check whether eager providers and both HTTP handlers are ready.
+
+        Returns
+        -------
+        bool
+            HTTP kernel readiness, excluding sockets and deployment health.
+        """
+
+    @property
+    @abstractmethod
     def startAt(self) -> int:
         """
         Return the application startup timestamp in nanoseconds.
@@ -656,6 +692,21 @@ class IApplication(IContainer, ABC):
         -------
         Self
             The current Application instance for method chaining.
+        """
+
+    @abstractmethod
+    async def boot(self) -> Self:
+        """Create the application and await eager providers for headless use.
+
+        Returns
+        -------
+        Self
+            The application after successful eager provider startup.
+
+        Raises
+        ------
+        Exception
+            Propagate configuration or provider startup failures for retry.
         """
 
     @abstractmethod

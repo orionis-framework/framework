@@ -16,6 +16,7 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
     ("orionis.mail.provider", "MailProvider"),
     ("orionis.orm.provider", "QueryBuilderProvider"),
     ("orionis.queues.provider", "QueueProvider"),
+    ("orionis.realtime.provider", "RealtimeProvider"),
     ("orionis.console.reactor_provider", "ReactorProvider"),
     ("orionis.http.routes.provider", "RouterProvider"),
     ("orionis.console.scheduler_provider", "ScheduleProvider"),
@@ -26,7 +27,8 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
 )
 
 def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
-    """Load the built-in provider classes in registration order.
+    """
+    Load the built-in provider classes in registration order.
 
     Returns
     -------
@@ -38,7 +40,8 @@ def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
     )
 
 def __getattr__(name: str) -> object:
-    """Expose the built-in provider tuple on its first explicit access.
+    """
+    Expose the built-in provider tuple on its first explicit access.
 
     Parameters
     ----------
@@ -69,7 +72,8 @@ def __getattr__(name: str) -> object:
     return value
 
 def __dir__() -> list[str]:
-    """List loaded attributes and provider exports.
+    """
+    List loaded attributes and provider exports.
 
     Returns
     -------

@@ -17,11 +17,6 @@ class LocalizationManager(ILocalizationManager):
     and the translator, and caches the resulting translator so a single
     shared instance serves the whole application.
 
-    Notes
-    -----
-    This module must not enable ``from __future__ import annotations``:
-    the container resolves constructor dependencies from evaluated
-    annotations, and stringized annotations cannot be injected.
     """
 
     __slots__ = ("_app", "_translator")

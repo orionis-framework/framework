@@ -5,7 +5,7 @@ from orionis.foundation.config.database.entities.connections import Connections
 from orionis.foundation.config.database.enums.connection_name import ConnectionName
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid connection names for O(1) membership checks
+# Define the supported database connection names.
 _CONNECTION_NAMES: frozenset[str] = frozenset(ConnectionName._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

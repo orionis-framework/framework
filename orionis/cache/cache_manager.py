@@ -69,6 +69,7 @@ class CacheManager(ICacheManager):
         Returns
         -------
         CacheRepository
+            Repository for the selected backend.
 
         Raises
         ------
@@ -76,8 +77,9 @@ class CacheManager(ICacheManager):
             When the requested store is not configured.
         """
         resolved: str = name or self._default
-        if resolved in self._repositories:
-            return self._repositories[resolved]
+        repository = self._repositories.get(resolved)
+        if repository is not None:
+            return repository
 
         backend = self._buildBackend(resolved)
         repo = CacheRepository(backend=backend, prefix=self._prefix)
@@ -135,7 +137,11 @@ class CacheManager(ICacheManager):
         if name == Drivers.DATABASE.value:
             return self._buildDatabaseBackend()
 
-        # Default: file driver
+        if name != Drivers.FILE.value:
+            msg = f"Cache store [{name}] is not configured."
+            raise CacheStoreException(msg)
+
+        # Build the file store from its configured directory.
         cfg = getattr(stores, "file", None)
         raw_path: str = (
             getattr(cfg, "path", "storage/framework/cache/data")

@@ -7,7 +7,6 @@ import sys
 import time
 from collections import OrderedDict, deque
 from contextlib import suppress
-from copy import deepcopy
 from dataclasses import asdict
 from functools import lru_cache
 from importlib import import_module
@@ -1710,15 +1709,16 @@ class Application(Container, IApplication):
         None
             Modifies the internal providers registry in-place.
         """
-        # Import each module and register its service providers
-        for module_name in modules:
-            module = __import__(module_name, fromlist=["*"])
+        # Register concrete provider classes defined by each discovered module.
+        for module_name in sorted(modules):
+            module = import_module(module_name)
             for attribute in vars(module).values():
                 if (
                     isinstance(attribute, type)
                     and issubclass(attribute, ServiceProvider)
                     and attribute is not ServiceProvider
-                    and attribute is not DeferrableProvider
+                    and attribute.__module__ == module_name
+                    and not attribute.__abstractmethods__
                 ):
                     self.__storeProviderClass(attribute)
 
@@ -2649,10 +2649,8 @@ class Application(Container, IApplication):
             ),
         )
 
-        # Retrieve custom configuration values if provided
-        custom_config: dict = {}
-        if "config" in self.__bootstrap:
-            custom_config = deepcopy(self.__bootstrap["config"])
+        # Read overrides while merging into independent core defaults.
+        custom_config: dict = self.__bootstrap.get("config", {})
 
         # Merge custom configuration and dataclass defaults into the base config
         final_config: dict = self.__loadCustomConfig(
@@ -2763,7 +2761,11 @@ class Application(Container, IApplication):
             # Lock and commit the configuration
             self.__commitConfig()
 
-        # Register and boot all service providers
+        # Expose deferred services while eager providers register their bindings.
+        providers: dict = self.__bootstrap.get("providers", {})
+        self._deferred_providers = providers.get("deferred", {})
+
+        # Register and boot all service providers.
         self.__resolveEagerProvider()
 
     def create(self) -> Self:
@@ -2795,10 +2797,6 @@ class Application(Container, IApplication):
 
             # Set timezone and locale based on configuration
             self.__setTimezoneAndLocale()
-
-            # Set deferred providers for resolution during provider booting
-            providers: dict = self.__bootstrap.get("providers", {})
-            self._deferred_providers = providers.get("deferred", {})
 
             # Pre-compute and cache frequently accessed environment flags
             self.__is_production_cache = "prod" in str(self.config("app.env") or "")

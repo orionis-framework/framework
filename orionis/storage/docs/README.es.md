@@ -57,7 +57,7 @@ opcional** en `pyproject.toml`:
 | Los tres a la vez | — | — | `uv add 'orionis[storage]'` |
 
 El SDK nunca se importa al construir el driver: cada uno arranca su cliente en la primera
-operación mediante `importDriverDependency()`, de modo que un paquete ausente lanza
+operación mediante `import_driver_dependency()`, de modo que un paquete ausente lanza
 `MissingStorageDependencyException` con el comando exacto de instalación en lugar de un
 `ImportError` durante el arranque.
 
@@ -101,8 +101,8 @@ UploadedFile  ->  manager.disk(disk).file(target).writeStream(chunks)
 ```
 
 Toda operación de `Disk`, `File` y `Directory` se delega al driver, y el driver solo habla
-en rutas canónicas relativas a la raíz producidas por `normalizePath()` /
-`normalizeFilePath()`.
+en rutas canónicas relativas a la raíz producidas por `normalize_path()` /
+`normalize_file_path()`.
 
 ### Mapa de archivos
 
@@ -114,7 +114,7 @@ en rutas canónicas relativas a la raíz producidas por `normalizePath()` /
 | `directory.py` | `Directory`: creación, borrado, existencia y listados que devuelven objetos, nunca cadenas. |
 | `uploaded_file.py` | `UploadedFile`: adapta un payload multipart HTTP para persistirlo en cualquier disco. |
 | `stream.py` | `AsyncStream`: envoltorio asíncrono sobre un handle binario abierto de forma perezosa. |
-| `paths.py` | `normalizePath()` / `normalizeFilePath()`: forma canónica y protección ante traversal. |
+| `paths.py` | `normalize_path()` / `normalize_file_path()`: forma canónica y protección ante traversal. |
 | `exceptions.py` | Jerarquía de excepciones con raíz en `StorageException`. |
 | `provider.py` | `StorageProvider`: vincula `IStorageManager` y fija la facade `Storage`. |
 | `contracts/` | ABCs: `IStorageManager`, `IDisk`, `IFile`, `IDirectory`, `IUploadedFile`, `IStorageStream`, `IStorageDriver`. |
@@ -145,6 +145,24 @@ en rutas canónicas relativas a la raíz producidas por `normalizePath()` /
   de modo que los drivers pueden asumir que la ruta ya es segura.
 - **Provider diferible** — `StorageProvider` implementa `DeferrableProvider`, así que nada
   del stack de storage se construye hasta que se resuelve `IStorageManager` por primera vez.
+
+### Política de importación y construcción
+
+`orionis.storage.__init__` y `orionis.storage.drivers.__init__` resuelven sus
+exportaciones públicas en el primer acceso y almacenan cada clase resuelta.
+Importar el paquete no carga las implementaciones de los drivers. Elegir el
+driver local tampoco carga los drivers de nube. Los inicializadores pequeños de
+`contracts`, `entities` y `enums` siguen siendo eager porque agrupan tipos
+cohesivos sin dependencias de backend opcionales.
+
+`StorageManager`, `Disk`, `File` y `Directory` inicializan de inmediato el
+estado necesario. `File` y `Directory` normalizan la ruta al construirse para
+que las operaciones posteriores usen rutas canónicas. Los constructores de
+drivers de nube difieren la carga del SDK y la creación del cliente hasta la
+primera operación de almacenamiento.
+
+Los nombres canónicos de funciones del módulo usan `snake_case`. Los nombres
+mixtos anteriores siguen disponibles como exportaciones de compatibilidad.
 
 ## Referencia de API
 
@@ -212,7 +230,7 @@ def __init__(self, name: str, driver: IStorageDriver) -> None
 def __init__(self, driver: IStorageDriver, path: str) -> None
 ```
 
-La ruta se normaliza con `normalizeFilePath()` al construir el objeto, así que una ruta
+La ruta se normaliza con `normalize_file_path()` al construir el objeto, así que una ruta
 inválida falla de inmediato con `StoragePathException` y nunca llega al driver.
 
 | Método | Firma | Notas |
@@ -250,7 +268,7 @@ inválida falla de inmediato con `StoragePathException` y nunca llega al driver.
 def __init__(self, driver: IStorageDriver, path: str = "") -> None
 ```
 
-La ruta se normaliza con `normalizePath()`; la cadena vacía denota la raíz del disco.
+La ruta se normaliza con `normalize_path()`; la cadena vacía denota la raíz del disco.
 
 | Método | Firma | Notas |
 | --- | --- | --- |
@@ -483,11 +501,11 @@ drivers de nube.
 
 | Función | Firma | Descripción |
 | --- | --- | --- |
-| `importDriverDependency` | `importDriverDependency(module: str, package: str, extra: str) -> ModuleType` | Importa un módulo SDK opcional y convierte `ImportError` en `MissingStorageDependencyException` con el comando de instalación. |
-| `assertBinaryMode` | `assertBinaryMode(mode: str) -> None` | Valida un modo de stream contra `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`. |
-| `resolveDownloadTarget` | `resolveDownloadTarget(normalized: str, destination: str \| Path) -> Path` | Resuelve el destino local de una descarga, conservando el nombre original si el destino es un directorio existente y creando los padres que falten. |
-| `filterFiles` | `filterFiles(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Selecciona las claves que son archivos bajo `base`; las claves terminadas en `/` son marcadores de directorio y siempre se excluyen. Devuelve una lista ordenada. |
-| `deriveDirectories` | `deriveDirectories(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Deduce rutas de directorio a partir de claves de objeto (los object stores no tienen directorios físicos). Devuelve una lista ordenada. |
+| `import_driver_dependency` | `import_driver_dependency(module: str, package: str, extra: str) -> ModuleType` | Importa un módulo SDK opcional y convierte `ImportError` en `MissingStorageDependencyException` con el comando de instalación. |
+| `assert_binary_mode` | `assert_binary_mode(mode: str) -> None` | Valida un modo de stream contra `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`. |
+| `resolve_download_target` | `resolve_download_target(normalized: str, destination: str \| Path) -> Path` | Resuelve el destino local de una descarga, conservando el nombre original si el destino es un directorio existente y creando los padres que falten. |
+| `filter_files` | `filter_files(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Selecciona las claves que son archivos bajo `base`; las claves terminadas en `/` son marcadores de directorio y siempre se excluyen. Devuelve una lista ordenada. |
+| `derive_directories` | `derive_directories(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Deduce rutas de directorio a partir de claves de objeto (los object stores no tienen directorios físicos). Devuelve una lista ordenada. |
 
 ### `FileInfo`
 
@@ -520,17 +538,17 @@ lugar donde se acepte una cadena de visibilidad.
 `orionis.storage.paths` — dos funciones a nivel de módulo aplicadas en cada borde.
 
 ```python
-def normalizePath(path: str) -> str
-def normalizeFilePath(path: str) -> str
+def normalize_path(path: str) -> str
+def normalize_file_path(path: str) -> str
 ```
 
-`normalizePath()` convierte `\` en `/`, descarta segmentos vacíos y `.`, resuelve `..` de
+`normalize_path()` convierte `\` en `/`, descarta segmentos vacíos y `.`, resuelve `..` de
 forma lógica (sin tocar el sistema de archivos) y devuelve una ruta sin barra inicial ni
 final. La cadena vacía representa la raíz del disco. Lanza `StoragePathException` cuando la
 ruta contiene un byte nulo, cuando un segmento contiene `:` (bloqueando letras de unidad y
 separadores de flujo) o cuando un `..` escapa de la raíz.
 
-`normalizeFilePath()` aplica las mismas reglas y además rechaza el resultado vacío, porque
+`normalize_file_path()` aplica las mismas reglas y además rechaza el resultado vacío, porque
 la raíz del disco nunca puede tratarse como un archivo.
 
 ### Excepciones

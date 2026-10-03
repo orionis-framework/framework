@@ -23,7 +23,7 @@ _CSRF_VALUE: str = "abc123"
 class _StubRSGIAdapter:
     """Expose the dictionary view of a Granian RSGI scope for request tests."""
 
-    __slots__ = ("_headers", "_scope")
+    __slots__ = ("_headers", "_scope", "scopeReads")
 
     def __init__(
         self,
@@ -46,6 +46,7 @@ class _StubRSGIAdapter:
         """
         self._scope = scope
         self._headers = Headers(raw_headers)
+        self.scopeReads = 0
 
     def getScope(self) -> dict[str, Any]:
         """
@@ -56,7 +57,38 @@ class _StubRSGIAdapter:
         dict[str, Any]
             Scope view consumed by the request.
         """
+        self.scopeReads += 1
         return self._scope
+
+    def method(self) -> str:
+        """Return the request method from the RSGI scope double.
+
+        Returns
+        -------
+        str
+            HTTP request method.
+        """
+        return self._scope["method"]
+
+    def path(self) -> str:
+        """Return the request path from the RSGI scope double.
+
+        Returns
+        -------
+        str
+            HTTP request path.
+        """
+        return self._scope["path"]
+
+    def scheme(self) -> str:
+        """Return the request scheme from the RSGI scope double.
+
+        Returns
+        -------
+        str
+            Request URL scheme.
+        """
+        return self._scope["scheme"]
 
     def headers(self) -> Headers:
         """
@@ -367,6 +399,27 @@ class TestRequestLine(TestCase):
         """
         self.assertEqual(make_asgi_request(remove=("path",)).path, "/")
 
+    def testRsgiRequestLineKeepsScopeLazy(self) -> None:
+        """Read request-line fields without building the RSGI scope mapping.
+
+        Returns
+        -------
+        None
+            Assertions verify deferred scope construction.
+        """
+        adapter = _StubRSGIAdapter(
+            {"method": "GET", "path": "/items", "scheme": "https"},
+            [],
+        )
+        request = Request(interface=Interface.RSGI, adapter=adapter)
+        self.assertEqual(
+            (request.method, request.path, request.scheme),
+            ("GET", "/items", "https"),
+        )
+        self.assertEqual(adapter.scopeReads, 0)
+        self.assertEqual(request.httpVersion, "1.1")
+        self.assertEqual(adapter.scopeReads, 1)
+
     def testExposesTheHttpVersion(self) -> None:
         """Expose the negotiated HTTP version and cache it.
 
@@ -563,6 +616,39 @@ class TestAsgiRequestUrls(TestCase):
             scope_overrides={"scheme": "https", "server": ("app.test", 443)},
         )
         self.assertEqual(request.baseUrl, "https://app.test")
+
+    def testServerIpv6AuthorityIsBracketed(self) -> None:
+        """Build valid absolute URLs from an IPv6 ASGI server address.
+
+        Returns
+        -------
+        None
+            Assertions verify both URL forms and optional ports.
+        """
+        request = make_asgi_request(
+            scope_overrides={"server": ("::1", 8080)},
+        )
+        self.assertEqual(request.url, "http://[::1]:8080/users")
+        self.assertEqual(request.baseUrl, "http://[::1]:8080")
+
+        without_port = make_asgi_request(
+            scope_overrides={"server": ("::1", None)},
+        )
+        self.assertEqual(without_port.baseUrl, "http://[::1]")
+
+    def testWebSocketSchemeUsesPortEighty(self) -> None:
+        """Omit the default WS port from both URL forms.
+
+        Returns
+        -------
+        None
+            Assertions verify consistent scheme defaults.
+        """
+        request = make_asgi_request(
+            scope_overrides={"scheme": "ws", "server": ("app.test", 80)},
+        )
+        self.assertEqual(request.url, "ws://app.test/users")
+        self.assertEqual(request.baseUrl, "ws://app.test")
 
     def testBaseUrlFallsBackToLocalhost(self) -> None:
         """Fall back to ``localhost`` when the origin is unknown.

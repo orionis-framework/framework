@@ -343,6 +343,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _read() -> bytes:
+            """
+            Read the requested object from storage.
+
+            Returns
+            -------
+            bytes
+                Complete object content.
+            """
             blob = self.__blob(normalized)
             try:
                 return blob.download_as_bytes()
@@ -379,6 +387,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _open() -> Any:
+            """
+            Open a stream for the requested object.
+
+            Returns
+            -------
+            Any
+                Readable object stream.
+            """
             blob = self.__blobOrFail(normalized)
             return blob.open("rb")
 
@@ -446,6 +462,14 @@ class GoogleStorageDriver(IStorageDriver):
         acl = self.__aclFor(visibility) if visibility is not None else None
 
         def _write() -> None:
+            """
+            Write the supplied content to storage.
+
+            Returns
+            -------
+            None
+                Completes after writing the object.
+            """
             blob = self.__blob(normalized)
             blob.upload_from_string(
                 data,
@@ -490,6 +514,14 @@ class GoogleStorageDriver(IStorageDriver):
         buffer = await self.__spool(stream)
 
         def _upload() -> None:
+            """
+            Upload the supplied local file to storage.
+
+            Returns
+            -------
+            None
+                Completes after uploading the file.
+            """
             blob = self.__blob(normalized)
             blob.upload_from_file(
                 buffer,
@@ -522,6 +554,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _delete() -> bool:
+            """
+            Delete the requested object from storage.
+
+            Returns
+            -------
+            bool
+                Whether an object was deleted.
+            """
             blob = self.__blob(normalized)
             try:
                 blob.delete()
@@ -555,6 +595,14 @@ class GoogleStorageDriver(IStorageDriver):
         destination = normalizeFilePath(target)
 
         def _copy() -> None:
+            """
+            Copy the requested object to another key.
+
+            Returns
+            -------
+            None
+                Completes after copying the object.
+            """
             bucket = self.__bucket()
             blob = self.__blobOrFail(origin)
             bucket.copy_blob(blob, bucket, destination)
@@ -588,6 +636,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(source)
 
         def _cleanup() -> None:
+            """
+            Remove the temporary object after a move.
+
+            Returns
+            -------
+            None
+                Completes after cleanup.
+            """
             blob = self.__blob(normalized)
             with suppress(self._not_found):
                 blob.delete()
@@ -691,6 +747,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _visibility() -> str:
+            """
+            Read the visibility of the requested object.
+
+            Returns
+            -------
+            str
+                Configured object visibility.
+            """
             blob = self.__blobOrFail(normalized)
             return (
                 Visibility.PUBLIC.value
@@ -732,6 +796,14 @@ class GoogleStorageDriver(IStorageDriver):
         make_public = str(visibility) == Visibility.PUBLIC.value
 
         def _apply() -> None:
+            """
+            Apply visibility to the requested object.
+
+            Returns
+            -------
+            None
+                Completes after updating visibility.
+            """
             blob = self.__blobOrFail(normalized)
             if make_public:
                 blob.make_public()
@@ -769,6 +841,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _hash() -> str:
+            """
+            Calculate the hash of the requested object.
+
+            Returns
+            -------
+            str
+                Content digest for the object.
+            """
             try:
                 hasher = hashlib.new(algorithm, usedforsecurity=False)
             except ValueError as exc:
@@ -809,6 +889,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _info() -> FileInfo:
+            """
+            Read metadata for the requested object.
+
+            Returns
+            -------
+            FileInfo
+                Object metadata.
+            """
             blob = self.__blobOrFail(normalized)
             checksum = (
                 base64.b64decode(blob.md5_hash).hex()
@@ -878,6 +966,14 @@ class GoogleStorageDriver(IStorageDriver):
         prefix = f"{normalized}/" if normalized else ""
 
         def _purge() -> bool:
+            """
+            Delete objects beneath the requested directory.
+
+            Returns
+            -------
+            bool
+                Whether any object was deleted.
+            """
             bucket = self.__bucket()
             blobs = list(bucket.list_blobs(prefix=prefix or None))
             for blob in blobs:
@@ -906,6 +1002,14 @@ class GoogleStorageDriver(IStorageDriver):
             return True
 
         def _exists() -> bool:
+            """
+            Check whether the requested object exists.
+
+            Returns
+            -------
+            bool
+                Whether the object exists.
+            """
             bucket = self.__bucket()
             iterator = bucket.list_blobs(
                 prefix=f"{normalized}/", max_results=1,
@@ -1013,6 +1117,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _sign() -> str:
+            """
+            Create a signed URL for the requested object.
+
+            Returns
+            -------
+            str
+                Temporary URL for the object.
+            """
             blob = self.__blob(normalized)
             return blob.generate_signed_url(
                 version="v4",
@@ -1047,6 +1159,14 @@ class GoogleStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _download() -> Path:
+            """
+            Download the requested object to a local path.
+
+            Returns
+            -------
+            Path
+                Destination of the downloaded object.
+            """
             target = resolveDownloadTarget(normalized, destination)
             blob = self.__blob(normalized)
             try:
@@ -1087,6 +1207,14 @@ class GoogleStorageDriver(IStorageDriver):
         assertBinaryMode(mode)
 
         def opener() -> BinaryIO:
+            """
+            Open the binary stream backing this object.
+
+            Returns
+            -------
+            BinaryIO
+                Stream handle for reading or writing.
+            """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
                 max_size=_SPOOL_THRESHOLD,
             )
@@ -1107,6 +1235,19 @@ class GoogleStorageDriver(IStorageDriver):
             return buffer
 
         def flush(handle: BinaryIO) -> None:
+            """
+            Persist the writable stream content to storage.
+
+            Parameters
+            ----------
+            handle : BinaryIO
+                Buffered stream being closed.
+
+            Returns
+            -------
+            None
+                Completes after writing the content.
+            """
             # Persist the buffered content back to GCS on close.
             handle.seek(0)
             self.__blob(normalized).upload_from_file(

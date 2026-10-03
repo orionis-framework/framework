@@ -11,6 +11,7 @@ import msgspec.json as _msgjson
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from filelock import BaseFileLock
 
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
@@ -35,8 +36,9 @@ class FileCacheBackend:
         path : Path
             Directory where cache files will be stored.
         """
+        path = path.resolve()
         self._path: Path = path
-        # Serializes the read-modify-write cycle of increment() in this loop.
+        # Queue counter updates made through this backend instance.
         self._counter_lock = asyncio.Lock()
         # Writes run in worker threads, so the rename needs a thread lock.
         self._rename_lock = threading.Lock()
@@ -46,9 +48,20 @@ class FileCacheBackend:
             for index in range(_LOCK_STRIPES)
         )
 
+    @property
+    def lockNamespace(self) -> Path:
+        """Return the canonical directory used to identify cache locks.
+
+        Returns
+        -------
+        Path
+            Absolute directory shared by backends storing the same files.
+        """
+        return self._path
+
     # ── Internal helpers ────────────────────────────────────────────────────
 
-    def __lock(self, file: Path) -> FileLock:
+    def __lock(self, file: Path) -> BaseFileLock:
         """Select the stable cross-process lock stripe for a cache file.
 
         Parameters
@@ -58,8 +71,8 @@ class FileCacheBackend:
 
         Returns
         -------
-        FileLock
-            Reentrant lock shared by writes, replacement and deletion.
+        BaseFileLock
+            Platform lock shared by writes, replacement and deletion.
         """
         return self._locks[crc32(file.name.encode()) % _LOCK_STRIPES]
 
@@ -113,17 +126,34 @@ class FileCacheBackend:
             Decoded entry, or ``None`` on any error.
         """
         with self.__lock(file):
-            try:
-                entry = _msgjson.decode(file.read_bytes())
-            except (OSError, msgspec.DecodeError):
-                return None
-            if not isinstance(entry, dict):
-                return None
-            expiration = entry.get("e")
-            if expiration is not None and time.monotonic() >= expiration:
-                file.unlink(missing_ok=True)
-                return None
-            return entry
+            return self.__readEntryUnlocked(file)
+
+    @staticmethod
+    def __readEntryUnlocked(file: Path) -> dict | None:
+        """
+        Read a cache entry while its file lock is held.
+
+        Parameters
+        ----------
+        file : Path
+            Path to the cache entry.
+
+        Returns
+        -------
+        dict | None
+            Live decoded entry, or None when missing, expired, or invalid.
+        """
+        try:
+            entry = _msgjson.decode(file.read_bytes())
+        except (OSError, msgspec.DecodeError):
+            return None
+        if not isinstance(entry, dict):
+            return None
+        expiration = entry.get("e")
+        if expiration is not None and time.monotonic() >= expiration:
+            file.unlink(missing_ok=True)
+            return None
+        return entry
 
     def __writeSync(self, file: Path, entry: dict) -> None:
         """
@@ -142,14 +172,32 @@ class FileCacheBackend:
             If the entry cannot be staged or renamed into place.
         """
         with self.__lock(file):
-            data = _msgjson.encode(entry)
-            tmp = self.__tempPath(file)
-            try:
-                tmp.write_bytes(data)
-                self.__replaceSync(tmp, file)
-            except OSError:
-                tmp.unlink(missing_ok=True)
-                raise
+            self.__writeEntryUnlocked(file, entry)
+
+    def __writeEntryUnlocked(self, file: Path, entry: dict) -> None:
+        """
+        Publish a cache entry while its file lock is held.
+
+        Parameters
+        ----------
+        file : Path
+            Destination cache file.
+        entry : dict
+            Encodable cache entry.
+
+        Raises
+        ------
+        OSError
+            If staging or publishing the entry fails.
+        """
+        data = _msgjson.encode(entry)
+        tmp = self.__tempPath(file)
+        try:
+            tmp.write_bytes(data)
+            self.__replaceSync(tmp, file)
+        except OSError:
+            tmp.unlink(missing_ok=True)
+            raise
 
     def __replaceSync(self, tmp: Path, file: Path) -> None:
         """
@@ -197,12 +245,13 @@ class FileCacheBackend:
             ``True`` when the file was created by this call, ``False``
             when another writer got there first.
         """
-        try:
-            with file.open("xb") as handle:
-                handle.write(_msgjson.encode(entry))
-        except FileExistsError:
-            return False
-        return True
+        with self.__lock(file):
+            try:
+                with file.open("xb") as handle:
+                    handle.write(_msgjson.encode(entry))
+            except FileExistsError:
+                return False
+            return True
 
     def __unlinkSync(self, file: Path) -> int:
         """
@@ -241,9 +290,9 @@ class FileCacheBackend:
             False when the previous entry has disappeared or expired.
         """
         with self.__lock(file):
-            if self.__readSync(file) is None:
+            if self.__readEntryUnlocked(file) is None:
                 return False
-            self.__writeSync(file, entry)
+            self.__writeEntryUnlocked(file, entry)
             return True
 
     # ── Public async API (mirrors aiocache BaseCache interface) ─────────────
@@ -366,10 +415,24 @@ class FileCacheBackend:
             Always True.
         """
         def _clear_all() -> None:
+            """
+            Remove cache entries and abandoned staging files.
+
+            Returns
+            -------
+            None
+                Removes matching files from the backend directory.
+            """
             for f in self._path.glob("*.json"):
                 self.__unlinkSync(f)
             for f in self._path.glob("*.tmp"):
-                f.unlink(missing_ok=True)
+                stem, marker, _token = f.name.rpartition(".json.")
+                if marker:
+                    target = f.with_name(f"{stem}.json")
+                    with self.__lock(target):
+                        f.unlink(missing_ok=True)
+                else:
+                    f.unlink(missing_ok=True)
 
         await asyncio.to_thread(_clear_all)
         return True
@@ -415,51 +478,9 @@ class FileCacheBackend:
             await self.set(key, value, ttl=ttl)
         return True
 
-    # aiocache-compatible aliases so CacheRepository.getMany/setMany work
-    # with this backend without modification.
-
-    async def multi_get(
-        self,
-        keys: list[str],
-        default: Any = None,
-    ) -> list[Any]:
-        """
-        Return a list of values for *keys* (aiocache-compatible alias).
-
-        Parameters
-        ----------
-        keys : list[str]
-            Cache keys.
-        default : Any
-            Returned for each missing/expired key.
-
-        Returns
-        -------
-        list[Any]
-        """
-        return await self.multiGet(keys, default)
-
-    async def multi_set(
-        self,
-        pairs: list[tuple[str, Any]],
-        ttl: float | None = None,
-    ) -> bool:
-        """
-        Store multiple key/value pairs (aiocache-compatible alias).
-
-        Parameters
-        ----------
-        pairs : list[tuple[str, Any]]
-            Sequence of (key, value) pairs.
-        ttl : float | None
-            Shared TTL applied to every pair.
-
-        Returns
-        -------
-        bool
-            Always True.
-        """
-        return await self.multiSet(pairs, ttl=ttl)
+    # Expose bulk operations through aiocache's method names.
+    multi_get = multiGet
+    multi_set = multiSet
 
     async def add(self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
@@ -524,9 +545,29 @@ class FileCacheBackend:
         int
             New value after increment.
         """
-        file = self.__file(key)
         async with self._counter_lock:
-            entry = await asyncio.to_thread(self.__readSync, file)
+            return await asyncio.to_thread(
+                self.__incrementSync, self.__file(key), delta,
+            )
+
+    def __incrementSync(self, file: Path, delta: int) -> int:
+        """
+        Update a counter while holding its file lock.
+
+        Parameters
+        ----------
+        file : Path
+            Counter file to update.
+        delta : int
+            Amount to add to the current value.
+
+        Returns
+        -------
+        int
+            Updated counter value.
+        """
+        with self.__lock(file):
+            entry = self.__readEntryUnlocked(file)
             current: Any = 0
             expiration: float | None = None
 
@@ -537,9 +578,5 @@ class FileCacheBackend:
                     expiration = stored_expiry
 
             new_value = int(current) + delta
-            await asyncio.to_thread(
-                self.__writeSync,
-                file,
-                {"v": new_value, "e": expiration},
-            )
-        return new_value
+            self.__writeEntryUnlocked(file, {"v": new_value, "e": expiration})
+            return new_value

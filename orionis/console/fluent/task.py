@@ -23,7 +23,7 @@ class Task(ITask):
     _ERROR_MSG_INVALID_SECOND = "Second must be between 0 and 59."
     _ERROR_MSG_INVALID_HOUR = "Hour must be between 0 and 23."
 
-    # Built once at import time; avoids dict allocation on each registerListener call
+    # Map event labels to their listener methods.
     _LISTENER_METHODS_MAP: ClassVar[dict[str, TaskEvent]] = {
         "onTaskAdded": TaskEvent.ADDED,
         "onTaskRemoved": TaskEvent.REMOVED,

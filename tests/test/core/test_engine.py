@@ -449,16 +449,22 @@ class TestTestingEngineDiscovery(_EngineTestCase):
         engine = self._makeEngine({"testing.method_pattern": "testAlpha*"})
         self.assertEqual(engine.discover().countTestCases(), 1)
 
-    def testDiscoverSkipsModulesThatCannotBeImported(self) -> None:
-        """
-        Skip modules raising an error while being imported.
-
-        Validates that a single broken file never aborts the whole
-        discovery phase.
-        """
+    def testDiscoverRejectsModulesThatCannotBeImported(self) -> None:
+        """Propagate syntax errors instead of silently omitting a test module."""
         _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
         _write_module(self._suite_dir, "test_broken", _BROKEN_SOURCE)
-        self.assertEqual(self._makeEngine().discover().countTestCases(), 1)
+        with self.assertRaises(SyntaxError):
+            self._makeEngine().discover()
+
+    async def testImportFailureSurvivesMethodFilter(self) -> None:
+        """Report import failures even when no method matches the filter."""
+        _write_module(
+            self._suite_dir, "test_broken", "import _orionis_missing_test_dependency\n",
+        )
+        engine = self._makeEngine({"testing.method_pattern": "testOnlySelected*"})
+        results = await engine.withoutPanel().run()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].status, TestStatus.ERRORED)
 
     def testDiscoverReturnsEmptySuiteWhenNothingMatches(self) -> None:
         """

@@ -183,6 +183,75 @@ class TestResultProcessor(unittest.TestResult):
         self.__printTestResult(result)
         super().addSkip(test, reason)
 
+    def addSubTest(
+        self,
+        test: unittest.case.TestCase,
+        subtest: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object] | None,
+    ) -> None:
+        """
+        Record a failed subtest in both native and exported results.
+
+        Parameters
+        ----------
+        test : unittest.case.TestCase
+            Parent test providing source and method metadata.
+        subtest : unittest.case.TestCase
+            Subtest providing its parameterized identifier.
+        err : tuple or None
+            Exception details, or None when the subtest passed.
+        """
+        super().addSubTest(test, subtest, err)
+        if err is None:
+            return
+        status = (
+            TestStatus.FAILED
+            if issubclass(err[0], test.failureException)
+            else TestStatus.ERRORED
+        )
+        result = self.__createTestResult(test, status, err, subtest=subtest)
+        self.__test_results.append(result)
+        self.__printTestResult(result)
+
+    def addExpectedFailure(
+        self,
+        test: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object],
+    ) -> None:
+        """
+        Report an expected failure as a skipped outcome.
+
+        Parameters
+        ----------
+        test : unittest.case.TestCase
+            Test marked as an expected failure.
+        err : tuple
+            Exception details retained for diagnostics.
+        """
+        super().addExpectedFailure(test, err)
+        result = self.__createTestResult(test, TestStatus.SKIPPED, err)
+        self.__test_results.append(result)
+        self.__printTestResult(result)
+
+    def addUnexpectedSuccess(self, test: unittest.case.TestCase) -> None:
+        """
+        Report an unexpected success as a failed outcome.
+
+        Parameters
+        ----------
+        test : unittest.case.TestCase
+            Test that passed despite its expected-failure marker.
+        """
+        super().addUnexpectedSuccess(test)
+        error = AssertionError(
+            "Test passed despite being marked as an expected failure.",
+        )
+        result = self.__createTestResult(
+            test, TestStatus.FAILED, (AssertionError, error, None),
+        )
+        self.__test_results.append(result)
+        self.__printTestResult(result)
+
     def __printTestResult(self, result: TestResult) -> None: # NOSONAR
         """
         Print the result of a test that did not fail.
@@ -204,7 +273,7 @@ class TestResultProcessor(unittest.TestResult):
         test_id: str = result.name
         exec_time_text: str = f"~ {result.execution_time:.3f}s"
 
-        # Read verbosity once to avoid repeated attribute lookup.
+        # Select the rendering detail requested by this processor.
         verbosity: int | None = self.__print_verbosity
 
         # Compact single-line output with dot-filler alignment.
@@ -237,7 +306,7 @@ class TestResultProcessor(unittest.TestResult):
 
             filler: str = "." * filler_length
 
-            # Assemble with tuples to avoid allocating intermediate Text objects.
+            # Assemble the styled segments of the result line.
             formatted_text: Text = Text.assemble(
                 (status_text, f"bold white on {status_style}"),
                 (" • ", "dim"),
@@ -370,6 +439,8 @@ class TestResultProcessor(unittest.TestResult):
         test: unittest.case.TestCase,
         status: TestStatus,
         exc_info: tuple[type[BaseException], BaseException, object] | None = None,
+        *,
+        subtest: unittest.case.TestCase | None = None,
     ) -> TestResult:
         """
         Create and return a TestResult instance for the given test.
@@ -382,6 +453,8 @@ class TestResultProcessor(unittest.TestResult):
             The status of the test (e.g., PASSED, FAILED).
         exc_info : tuple[type[BaseException], BaseException, object] or None, optional
             Exception info tuple as returned by sys.exc_info(), by default None.
+        subtest : unittest.case.TestCase or None, optional
+            Subtest whose identity replaces the parent identity in the report.
 
         Returns
         -------
@@ -393,7 +466,7 @@ class TestResultProcessor(unittest.TestResult):
         cls = type(test)
         method_name: str | None = getattr(test, "_testMethodName", None)
 
-        # Resolve the source file path without creating a full ReflectionInstance.
+        # Resolve the source file associated with the test class.
         try:
             file_path: str | None = inspect.getfile(cls)
         except (TypeError, OSError):
@@ -412,10 +485,11 @@ class TestResultProcessor(unittest.TestResult):
             inspect.getdoc(test_method_fn) if test_method_fn is not None else None
         )
 
-        # Construct and return the TestResult with metadata resolved via direct access.
+        # Preserve parent source metadata and parameterized subtest identities.
+        identity = test if subtest is None else subtest
         return TestResult(
-            id=id(test),
-            name=test.id(),
+            id=id(identity),
+            name=identity.id(),
             status=status,
             execution_time=elapsed,
             error_message=str(exc_info[1]) if exc_info else None,

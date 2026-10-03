@@ -292,6 +292,8 @@ A continuación se enumeran los archivos Python, incluidos los inicializadores d
 | [`sse.py`](../sse.py) | `ServerSentEvent`, `_encode_data` y `_EventStreamIterator` internos. |
 | [`validation.py`](../validation.py) | `_url_origin`, `_is_local_reference`, `validation_response`, `previous_url` |
 | [`websocket.py`](../websocket.py) | `WebSocketDisconnected`, `WebSocket` |
+| [`websocket_message.py`](../websocket_message.py) | `WebSocketMessage`, `WebSocketMessageType`, `WebSocketState` |
+| [`adapters/websocket/`](../adapters/websocket/) | `IWebSocketTransport`, `ASGIWebSocketTransport`, `RSGIWebSocketTransport` |
 | [`websocket_middleware.py`](../websocket_middleware.py) | `WebSocketNext`, `WebSocketMiddleware` |
 | [`default/assets/favicon.ico`](../default/assets/favicon.ico) | Recurso/plantilla de respuesta incluido. |
 | [`default/assets/robots.txt`](../default/assets/robots.txt) | Recurso/plantilla de respuesta incluido. |

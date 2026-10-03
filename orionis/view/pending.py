@@ -165,6 +165,21 @@ class PendingView:
             raise AttributeError(error_msg)  # noqa: TRY004
 
         def queue(*args: Any, **kwargs: Any) -> PendingView:
+            """
+            Store a response mutation until rendering completes.
+
+            Parameters
+            ----------
+            *args : Any
+                Positional arguments for the response method.
+            **kwargs : Any
+                Keyword arguments for the response method.
+
+            Returns
+            -------
+            PendingView
+                The same pending view for fluent chaining.
+            """
             mutations = self._mutations
             if mutations is None:
                 mutations = self._mutations = []

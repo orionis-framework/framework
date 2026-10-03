@@ -5,6 +5,7 @@ from dataclasses import asdict, fields
 from pathlib import Path
 from typing import get_args, get_type_hints
 from orionis.foundation.config.app import App
+from orionis.foundation.config.database import Oracle
 from orionis.foundation.config.startup import Configuration
 from orionis.foundation.core_config import CORE_CONFIG
 from tests.foundation.config.test_environment import (
@@ -55,7 +56,10 @@ class TestConfigurationContracts(ConfigurationTestCase):
             for field in fields(cls):
                 with self.subTest(entity=cls.__name__, field=field.name):
                     if type(None) in get_args(annotations[field.name]):
-                        cls(**{field.name: None})
+                        values = {field.name: None}
+                        if cls is Oracle and field.name == "service_name":
+                            values["sid"] = "XE"
+                        cls(**values)
                     else:
                         with self.assertRaises((TypeError, ValueError)):
                             cls(**{field.name: None})

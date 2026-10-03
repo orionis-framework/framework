@@ -52,7 +52,7 @@ class FileBasedCache:
 
         self.__path = path
         self.__file = path / filename
-        # Resolved once at init time — avoids repeated syscalls in the hot path
+        # Store the resolved cache file path for later access.
         self.__file_resolved = self.__file.resolve()
 
         # Directories and files to monitor for cache invalidation
@@ -76,7 +76,7 @@ class FileBasedCache:
         dict or None
             The cached data if valid, otherwise None.
         """
-        # EAFP: loadFromFile handles the missing-file case with a single syscall
+        # Load the cache payload when the file exists.
         payload = Serializer.loadFromFile(self.__file)
         if not payload:
             return None
@@ -261,7 +261,7 @@ class FileBasedCache:
         str
             The computed SHA-1 hash as a hexadecimal string.
         """
-        # monotonic clock: faster than time.time(), no NTP/DST adjustments
+        # Measure cache age with a monotonic clock.
         now = time.monotonic()
 
         # Use cached hash if within the allowed interval

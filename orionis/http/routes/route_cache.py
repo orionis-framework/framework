@@ -5,13 +5,14 @@ from pkgutil import resolve_name
 
 from orionis.http.routes.contracts.route_cache import IRouteCache
 from orionis.http.routes.entities.compiled_route import CompiledRoute
+from orionis.http.routes.enums.protocols import RouteProtocol
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.route_compiler import RouteCompiler
 
 
 class RouteCache(IRouteCache):
 
-    VERSION = 2
+    VERSION = 3
 
     def toCache(
         self,
@@ -68,20 +69,33 @@ class RouteCache(IRouteCache):
         -------
         tuple[dict[str, dict], tuple | None]
             ``(routes, fallback)`` ready to be stored on the loader.
+
+        Raises
+        ------
+        ValueError
+            If the cache schema version is missing or incompatible.
         """
-        fallback = self.__deserializeFallback(cached.get("fallback"))
+        version = cached.get("version")
+        if type(version) is not int or version != self.VERSION:
+            error_msg = "Incompatible route cache version; rebuild the route cache"
+            raise ValueError(error_msg)
+        fallback = self.__deserializeFallback(cached["fallback"])
         routes: dict[str, dict] = {}
         resolved_classes: dict[str, type] = {}
 
-        for method, bucket in cached.get("routes", {}).items():
+        for method, bucket in cached["routes"].items():
             routes[method] = {"static": {}, "dynamic": []}
             for path, route_data in bucket["static"].items():
                 routes[method]["static"][path] = (
-                    self.__deserializeCompiledRoute(route_data, resolved_classes)
+                    self.__deserializeCompiledRoute(
+                        route_data, resolved_classes, method, static_path=path,
+                    )
                 )
             for route_data in bucket["dynamic"]:
                 routes[method]["dynamic"].append(
-                    self.__deserializeCompiledRoute(route_data, resolved_classes),
+                    self.__deserializeCompiledRoute(
+                        route_data, resolved_classes, method,
+                    ),
                 )
 
         return routes, fallback
@@ -90,7 +104,8 @@ class RouteCache(IRouteCache):
 
     @staticmethod
     def __serializeCompiledRoute(cr: CompiledRoute) -> dict:
-        """Convert a ``CompiledRoute`` to a JSON-safe dict.
+        """
+        Convert a ``CompiledRoute`` to a JSON-safe dict.
 
         ``regex`` and ``converters`` are omitted — they are fully
         deterministic from ``path`` and recomputed on deserialisation.
@@ -109,6 +124,8 @@ class RouteCache(IRouteCache):
         return {
             "path": cr.path,
             "method": cr.method,
+            "protocol": cr.protocol.value,
+            "hub_protocol": cr.hub_protocol,
             "type": cr.type.value,
             "action": cr.action,
             "name": cr.name,
@@ -134,8 +151,12 @@ class RouteCache(IRouteCache):
     def __deserializeCompiledRoute(
         route_data: dict,
         resolved_classes: dict[str, type],
+        method: str,
+        *,
+        static_path: str | None = None,
     ) -> CompiledRoute:
-        """Rebuild a ``CompiledRoute`` from a cache dict.
+        """
+        Rebuild a ``CompiledRoute`` from a cache dict.
 
         ``regex`` and ``converters`` are recomputed via
         :meth:`RouteCompiler.compilePath` so that callable converters
@@ -147,24 +168,56 @@ class RouteCache(IRouteCache):
             Dict produced by :meth:`__serializeCompiledRoute`.
         resolved_classes : dict[str, type]
             Class references shared across this cache load.
+        method : str
+            Dispatch method owning this cache bucket.
+        static_path : str | None, optional
+            Expected path for static entries; None selects a dynamic entry.
 
         Returns
         -------
         CompiledRoute
             Fully initialised compiled route.
+
+        Raises
+        ------
+        ValueError
+            If transport, path or bucket metadata contradicts the cached route.
         """
-        _, regex, converters = RouteCompiler.compilePath(route_data["path"])
+        if route_data["method"] != method:
+            error_msg = "Cached route method does not match its dispatch bucket"
+            raise ValueError(error_msg)
+        protocol = RouteProtocol(route_data["protocol"])
+        is_socket = route_data["method"] == "WEBSOCKET"
+        if (protocol is RouteProtocol.WEBSOCKET) != is_socket:
+            error_msg = "Cached route protocol does not match its dispatch method"
+            raise ValueError(error_msg)
+        route_type = RouteType(route_data["type"])
+        hub_protocol = route_data["hub_protocol"]
+        if route_type is RouteType.HUB and (
+            protocol is not RouteProtocol.WEBSOCKET
+            or hub_protocol not in ("json", "msgpack")
+        ):
+            error_msg = "Cached Hub route has invalid transport or codec metadata"
+            raise ValueError(error_msg)
+        is_static, regex, converters = RouteCompiler.compilePath(route_data["path"])
+        if is_static != (static_path is not None) or (
+            static_path is not None and static_path != route_data["path"]
+        ):
+            error_msg = "Cached route path does not match its static/dynamic bucket"
+            raise ValueError(error_msg)
         return CompiledRoute(
             path=route_data["path"],
             method=route_data["method"],
-            type=RouteType(route_data["type"]),
+            protocol=protocol,
+            hub_protocol=hub_protocol,
+            type=route_type,
             action=route_data["action"],
             name=route_data["name"],
             regex=regex,
             segment_count=route_data["segment_count"],
             priority_score=route_data["priority_score"],
-            kind=route_data.get("kind", "web"),
-            public=route_data.get("public", False),
+            kind=route_data["kind"],
+            public=route_data["public"],
             converters=converters,
             middleware=[
                 RouteCache.__resolveClass(s, resolved_classes)
@@ -184,7 +237,8 @@ class RouteCache(IRouteCache):
 
     @staticmethod
     def __serializeFallback(fallback: tuple | None) -> dict | None:
-        """Serialise the fallback tuple to a JSON-safe descriptor dict.
+        """
+        Serialise the fallback tuple to a JSON-safe descriptor dict.
 
         Parameters
         ----------
@@ -218,7 +272,8 @@ class RouteCache(IRouteCache):
 
     @staticmethod
     def __deserializeFallback(data: dict | None) -> tuple | None:
-        """Rebuild the fallback tuple from a cache descriptor dict.
+        """
+        Rebuild the fallback tuple from a cache descriptor dict.
 
         Parameters
         ----------
@@ -253,7 +308,8 @@ class RouteCache(IRouteCache):
         dotted_path: str,
         resolved_classes: dict[str, type] | None = None,
     ) -> type:
-        """Import and return a class given its fully-qualified dotted path.
+        """
+        Import and return a class given its fully-qualified dotted path.
 
         Parameters
         ----------
@@ -281,7 +337,8 @@ class RouteCache(IRouteCache):
         module_path: str,
         qualname: str,
     ) -> object:
-        """Resolve a module-level qualname into its target object.
+        """
+        Resolve a module-level qualname into its target object.
 
         Parameters
         ----------

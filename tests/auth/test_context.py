@@ -229,7 +229,7 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertEqual(repository.calls, 0)
 
     async def testAnAuthenticatedContextResolvesItsSnapshotOnce(self) -> None:
-        """Validates the per request caching of the authorization.
+        """Cache the authorization snapshot after its first resolution.
 
         Repeated ``can()`` calls must not repeat the queries.
 
@@ -245,9 +245,11 @@ class TestAuthenticationContext(_ScopelessTestCase):
             identity=_Identity(1), guard="session", repository=repository,
         )
 
+        self.assertIsNone(context._AuthenticationContext__lock)
         first = await context.authorization()
         second = await context.authorization()
 
+        self.assertIsNotNone(context._AuthenticationContext__lock)
         self.assertIs(first, second)
         self.assertEqual(repository.calls, 1)
         self.assertTrue(first.can("users.view"))

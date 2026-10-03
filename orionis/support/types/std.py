@@ -30,8 +30,7 @@ class StdClass(IStdClass):
         int
             Hash value computed from the object's attributes.
         """
-        # XOR of individual item hashes: O(n) time, O(1) space, commutative
-        # (order-independent), no temporary list/tuple allocations
+        # Combine attribute hashes independently of their order.
         h = 0
         for item in self.__dict__.items():
             h ^= hash(item)
@@ -64,7 +63,7 @@ class StdClass(IStdClass):
         str
             String representation of the object with its attributes.
         """
-        # type(self).__name__ avoids the intermediate __class__ attribute lookup
+        # Include the concrete class name and its attributes.
         return f"{type(self).__name__}({self.__dict__})"
 
     def __str__(self) -> str:
@@ -93,7 +92,7 @@ class StdClass(IStdClass):
         bool
             True if both objects have the same attributes and values, otherwise False.
         """
-        # Exact-type pointer comparison: O(1), no MRO traversal
+        # Require both values to have the same concrete class.
         if type(other) is not type(self):
             return False
         return self.__dict__ == other.__dict__
@@ -135,7 +134,7 @@ class StdClass(IStdClass):
             if key.startswith(_DUNDER) and key.endswith(_DUNDER):
                 msg = f"Cannot set attribute with reserved name: {key}"
                 raise ValueError(msg)
-            # O(1) frozenset lookup replaces O(MRO-depth) hasattr traversal
+            # Reject names reserved by the object protocol.
             if key in reserved:
                 msg = (
                     f"Cannot set attribute '{key}'"
@@ -166,7 +165,7 @@ class StdClass(IStdClass):
         """
         d = self.__dict__
         for attr in attributes:
-            # EAFP: single dict lookup instead of hasattr + delattr double-lookup
+            # Remove each present attribute from the instance dictionary.
             try:
                 del d[attr]
             except KeyError as exc:

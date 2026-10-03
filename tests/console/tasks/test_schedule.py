@@ -1,5 +1,6 @@
 from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
+import orionis.console.tasks.schedule as schedule_module
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
 from orionis.console.enums.states import ScheduleStates
@@ -8,6 +9,13 @@ from orionis.console.tasks.schedule import Schedule
 from orionis.test import TestCase
 
 class TestSchedule(TestCase):
+
+    def testLegacyScheduledCallableRemainsImportable(self) -> None:
+        """Resolve jobs stored with the earlier callable path."""
+        self.assertIs(
+            vars(schedule_module)["_executeScheduledCommand"],
+            schedule_module._execute_scheduled_command,
+        )
 
     # ------------------------------------------------------------------ #
     #  Helpers                                                           #

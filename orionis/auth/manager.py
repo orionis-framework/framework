@@ -98,8 +98,7 @@ class AuthManager(IAuthManager):
         self.__tokens = tokens
         self.__session_guard = session_guard
 
-        # Pre-build the registry so guard resolution is a dict lookup and
-        # never reflection on the hot path.
+        # Register the configured guard classes by name.
         self.__guards: dict[str, IGuard] = {
             session_guard.name: session_guard,
             token_guard.name: token_guard,

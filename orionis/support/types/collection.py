@@ -13,8 +13,7 @@ from orionis.support.types.contracts.collection import ICollection
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-# Module-level constant: avoids re-creating the dict on every __makeComparison
-# call, which is invoked once per item in the where() hot path.
+# Map comparison names to their implementations.
 _OPERATORS: dict[str, Any] = {
     "<": operator.lt,
     "<=": operator.le,
@@ -258,7 +257,7 @@ class Collection(ICollection):
             error_msg = "Chunk size must be greater than 0"
             raise ValueError(error_msg)
 
-        # Create chunks using list comprehension; len(_items) avoids count() call
+        # Divide the collection into chunks of the requested size.
         items = [self[i : i + size] for i in range(0, len(self._items), size)]
         return self.__class__(items)
 
@@ -301,10 +300,7 @@ class Collection(ICollection):
         if value is not None:
             return self.contains(lambda x: self.__dataGet(x, key) == value)
 
-        # If key is callable, short-circuit at first match: avoids building
-        # a full filtered Collection (self.first materialises all matches).
-        # Also fixes: first() returns None for a valid None-valued item,
-        # which would incorrectly report "not found".
+        # Stop at the first item matching the callable.
         if callable(key):
             return any(key(x) for x in self._items)
 
@@ -342,8 +338,7 @@ class Collection(ICollection):
         """
         # Extract items from Collection if necessary
         items = self.__getItems(items)
-        # Set membership is O(1) vs O(N) for list; total cost O(N+M) instead
-        # of O(N*M). Fall back to list for unhashable elements (e.g. dicts).
+        # Use a set for hashable values and a list for unhashable values.
         try:
             items_set = set(items)
             return self.__class__([x for x in self._items if x not in items_set])
@@ -368,8 +363,7 @@ class Collection(ICollection):
             The current collection instance.
         """
         self.__checkIsCallable(callback)
-        # Direct _items access: avoids __iter__ frame overhead and
-        # __setitem__ dispatch on every iteration.
+        # Update the stored items using the supplied callback.
         _its = self._items
         for k in range(len(_its)):
             result = callback(_its[k])
@@ -430,6 +424,19 @@ class Collection(ICollection):
             A new Collection containing all items, flattened to a single dimension.
         """
         def _flatten(items: object) -> Iterator[Any]:
+            """
+            Yield scalar values from nested lists and dictionaries.
+
+            Parameters
+            ----------
+            items : object
+                Value or nested container to flatten.
+
+            Yields
+            ------
+            Any
+                Scalar values in traversal order.
+            """
             if isinstance(items, dict):
                 for v in items.values():
                     yield from _flatten(v)
@@ -910,7 +917,7 @@ class Collection(ICollection):
         Collection
             The current collection instance with items in reversed order.
         """
-        # In-place reverse: O(1) memory vs O(N) for list(reversed(...))
+        # Reverse the current collection in place.
         self._items.reverse()
         return self
 
@@ -924,6 +931,19 @@ class Collection(ICollection):
             The serialized items in the collection.
         """
         def _serialize(item: object) -> object:
+            """
+            Serialize one collection item with its declared appends.
+
+            Parameters
+            ----------
+            item : object
+                Collection item to serialize.
+
+            Returns
+            -------
+            object
+                Serialized representation of the item.
+            """
             # Set appends if present for each item
             if self.__appends__:
                 set_appends = getattr(item, "set_appends", _MISSING)
@@ -1042,8 +1062,7 @@ class Collection(ICollection):
             unique value from the specified key, and each value is a list of items
             sharing that key.
         """
-        # Precompute the grouping key once per item: avoids calling __dataGet
-        # twice (once in sort, once in groupby) — halves the introspection cost.
+        # Pair each item with its grouping key before sorting.
         keyed = [(self.__dataGet(x, key), x) for x in self._items]
         keyed.sort(key=lambda t: t[0])
 
@@ -1177,8 +1196,7 @@ class Collection(ICollection):
                 items.append(item)
                 keys.add(comparison)
         except TypeError:
-            # Handle unhashable comparison values; any() short-circuits
-            # and avoids materialising a filtered list
+            # Compare unhashable values against existing keys.
             if not any(comp == comparison for comp in keys):
                 items.append(item)
 
@@ -1354,8 +1372,7 @@ class Collection(ICollection):
         # Extract items from Collection if necessary
         items = self.__getItems(items)
 
-        # List comprehension + direct _items access: avoids __iter__ frame
-        # and per-iteration append overhead.
+        # Pair collection items with the supplied values.
         return self.__class__(
             [[x, y] for x, y in zip(self._items, items, strict=False)],
         )
@@ -1429,7 +1446,7 @@ class Collection(ICollection):
         # Iterate through each item and extract value by key or callback
         for item in self._items:
             if isinstance(key, str):
-                # Single getattr with sentinel: avoids hasattr+getattr double-lookup
+                # Read the named attribute when it exists.
                 val = getattr(item, key, _MISSING)
                 if val is not _MISSING:
                     items.append(val)
@@ -1468,13 +1485,13 @@ class Collection(ICollection):
             if isinstance(item, (list, tuple)):
                 return item[int(key)] if key.isdigit() else default
             if isinstance(item, dict):
-                # Fast path: skip dotty wrapper for plain keys (most common case).
+                # Read a plain key directly from the item.
                 # dotty() is only needed for dot-notation or wildcard (*) keys.
                 if "." not in key and "*" not in key:
                     return item.get(key, default)
                 dotty_key = key.replace("*", ":")
                 return dotty(item).get(dotty_key, default)
-            # Single getattr with sentinel: avoids hasattr+getattr double-lookup
+            # Read the named attribute when it exists.
             val = getattr(item, key, _MISSING)
             if val is not _MISSING:
                 return val
@@ -1562,7 +1579,7 @@ class Collection(ICollection):
         bool
             True if the comparison is valid, otherwise False.
         """
-        # Use module-level _OPERATORS constant: no per-call dict allocation
+        # Select the comparison implementation by operator name.
         if op not in _OPERATORS:
             msg = "Unsupported operator: " + str(op)
             raise ValueError(msg)

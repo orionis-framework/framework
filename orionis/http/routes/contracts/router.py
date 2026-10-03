@@ -7,8 +7,36 @@ if TYPE_CHECKING:
     from orionis.http.routes.fluent import FluentRoute
     from orionis.http.routes.group import RouteGroup
     from orionis.http.routes.types import MiddlewareInput, RouteAction
+    from orionis.realtime.hub import Hub
 
 class IRouter(ABC):
+
+    __slots__ = ()
+
+    @abstractmethod
+    def hub(
+        self,
+        path: str,
+        hub: type[Hub],
+        *,
+        protocol: str = "json",
+    ) -> FluentRoute:
+        """Register a Hub connection endpoint with a fixed wire codec.
+
+        Parameters
+        ----------
+        path : str
+            WebSocket route path, with optional converted parameters.
+        hub : type[Hub]
+            Hub subclass resolved through the application container.
+        protocol : str, optional
+            ``json`` by default, or ``msgpack`` for binary frames.
+
+        Returns
+        -------
+        FluentRoute
+            Registered Hub route builder.
+        """
 
     @abstractmethod
     def websocket(

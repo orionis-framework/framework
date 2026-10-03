@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-# Precompiled regex patterns: avoids per-call compilation overhead in hot paths.
+# Define the patterns used by string transformations.
 _RE_CAMEL_SEP = re.compile(r"[_\-\s]+")
 _RE_KEBAB_CAMEL = re.compile(r"([a-z0-9])([A-Z])")
 _RE_KEBAB_SEP = re.compile(r"[_\s]+")
@@ -191,8 +191,7 @@ class Stringable(str):
             needles = [needles]
 
         # Prepare string for case-insensitive comparison if needed.
-        # Split paths before the any() to avoid evaluating the ternary
-        # on every iteration when ignore_case is a constant for this call.
+        # Select the comparison for the requested case sensitivity.
         if ignore_case:
             s = self.lower()
             return any(needle.lower() in s for needle in needles)
@@ -219,7 +218,6 @@ class Stringable(str):
         # Normalize needles to a list of strings
         if isinstance(needles, str):
             needles = [needles]
-        # Qualify via str to avoid Sonar name-clash warning with endsWith.
         return any(str.endswith(self, needle) for needle in needles)
 
     def exactly(self, value: str) -> bool:
@@ -265,7 +263,6 @@ class Stringable(str):
         bool
             True if the string contains one or more characters, otherwise False.
         """
-        # Directly evaluate truthiness; avoids an extra function call.
         return bool(self)
 
     def lower(self) -> Stringable:
@@ -600,7 +597,6 @@ class Stringable(str):
         bool
             True if all characters in the string are alphanumeric, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isAlnum.
         return str.isalnum(self)
 
     def isAlpha(self) -> bool:
@@ -612,7 +608,6 @@ class Stringable(str):
         bool
             True if all characters are alphabetic, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isAlpha.
         return str.isalpha(self)
 
     def isDecimal(self) -> bool:
@@ -624,7 +619,6 @@ class Stringable(str):
         bool
             True if all characters are decimal, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isDecimal.
         return str.isdecimal(self)
 
     def isDigit(self) -> bool:
@@ -636,7 +630,6 @@ class Stringable(str):
         bool
             True if all characters in the string are digits, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isDigit.
         return str.isdigit(self)
 
     def isIdentifier(self) -> bool:
@@ -648,7 +641,6 @@ class Stringable(str):
         bool
             True if the string is a valid identifier, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isIdentifier.
         return str.isidentifier(self)
 
     def isLower(self) -> bool:
@@ -660,7 +652,6 @@ class Stringable(str):
         bool
             True if all cased characters are lowercase, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isLower.
         return str.islower(self)
 
     def isNumeric(self) -> bool:
@@ -672,7 +663,6 @@ class Stringable(str):
         bool
             True if all characters are numeric, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isNumeric.
         return str.isnumeric(self)
 
     def isPrintable(self) -> bool:
@@ -684,7 +674,6 @@ class Stringable(str):
         bool
             True if all characters are printable, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isPrintable.
         return str.isprintable(self)
 
     def isSpace(self) -> bool:
@@ -696,7 +685,6 @@ class Stringable(str):
         bool
             True if the string contains only whitespace characters, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isSpace.
         return str.isspace(self)
 
     def isTitle(self) -> bool:
@@ -708,7 +696,6 @@ class Stringable(str):
         bool
             True if the string is titlecased, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isTitle.
         return str.istitle(self)
 
     def isUpper(self) -> bool:
@@ -720,7 +707,6 @@ class Stringable(str):
         bool
             True if all cased characters are uppercase, otherwise False.
         """
-        # Qualify via str to avoid Sonar name-clash warning with isUpper.
         return str.isupper(self)
 
     def lStrip(self, chars: str | None = None) -> Stringable:
@@ -814,8 +800,7 @@ class Stringable(str):
         Stringable
             A new Stringable instance containing only ASCII characters.
         """
-        # Normalize and encode to ASCII at C level: ~10x faster than a
-        # Python-level 'ord(c) < 128' loop for non-trivial strings.
+        # Normalize Unicode and discard non-ASCII code points.
         normalized = unicodedata.normalize("NFKD", self)
         ascii_str = normalized.encode("ascii", "ignore").decode("ascii")
         return Stringable(ascii_str)
@@ -1162,8 +1147,7 @@ class Stringable(str):
         bool
             True if the string is a valid ULID, otherwise False.
         """
-        # ULID: 26 chars in Crockford's Base32; precompiled pattern,
-        # fullmatch avoids anchoring overhead of match+^$.
+        # Validate the full 26-character Crockford Base32 identifier.
         return _ULID_RE.fullmatch(self.upper()) is not None
 
     def chopStart(self, needle: str | list[str]) -> Stringable:
@@ -1688,8 +1672,7 @@ class Stringable(str):
         bool
             True if the string matches the pattern, otherwise False.
         """
-        # Direct re.search: avoids the type-check, list-normalisation and
-        # per-element validation overhead of isMatch() for a single str pattern.
+        # Search the string for the supplied regular expression.
         return re.search(pattern, self) is not None
 
     def numbers(self) -> Stringable:

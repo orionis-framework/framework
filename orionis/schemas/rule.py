@@ -3,8 +3,7 @@ from orionis.schemas.entities.failure import ValidationFailure
 
 class Rule(IRule):
 
-    # Use __slots__ to optimize memory usage
-    # by preventing the creation of __dict__ for each instance.
+    # Restrict rule instances to their declared attributes.
     __slots__ = ("_code", "_message")
 
     def __init__(self, *, message: str | None = None) -> None:

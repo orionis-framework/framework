@@ -1,18 +1,14 @@
 from __future__ import annotations
 import ast
 import importlib
-import inspect
-import re
-from dataclasses import is_dataclass
+import os
 from pathlib import Path
 import sys
 from types import MappingProxyType
 from typing import Any
 
-# Precompiled patterns for module path normalization applied inside the discovery loop
-_RE_SITE_PACKAGES = re.compile(r"[Ll]ib\.(?:python[^.]+\.)?site-packages\.?")
-_RE_VENV = re.compile(r"\.?v?env\.?")
-_RE_DOTS = re.compile(r"\.+")
+_EXCLUDED_DIRECTORIES = frozenset({"__pycache__", "site-packages"})
+_VENV_DIRECTORIES = frozenset({".env", ".venv", "env", "venv"})
 
 class ModuleInspector:
 
@@ -30,8 +26,9 @@ class ModuleInspector:
         Discover Python modules in a directory tree.
 
         Traverse the target directory to find Python files and convert their
-        paths to module notation. Exclude virtual environment and site-packages
-        directories from results.
+        paths to module notation. Exclude virtual environments and import caches.
+        Collect each directory's modules with package initializers normalized
+        to their package module names.
 
         Parameters
         ----------
@@ -44,33 +41,71 @@ class ModuleInspector:
         -------
         set of str
             Set of discovered module names in dot notation.
+
+        Raises
+        ------
+        ValueError
+            If the target directory is outside the base directory.
         """
+        base = base_path.resolve()
+        target = target_path.resolve()
+        relative_target = target.relative_to(base)
+        current = base
+        for part in relative_target.parts:
+            current /= part
+            directory_name = part.casefold()
+            if directory_name in _EXCLUDED_DIRECTORIES or (
+                directory_name in _VENV_DIRECTORIES
+                and (current / "pyvenv.cfg").is_file()
+            ):
+                return set()
+
         modules: set[str] = set()
-        # Compute base posix string once to avoid repeated conversion inside the loop
-        base_posix = base_path.as_posix()
-        # Recursively search for all .py files in target_path
-        for file_path in target_path.rglob("*.py"):
-            if not file_path.is_file():
-                continue
-            # Convert absolute path to dot-separated module notation
-            pre_module = (
-                file_path.parent.as_posix()
-                .replace(base_posix, "")
-                .replace("/", ".")
-                .lstrip(".")
-            )
-            # Strip site-packages and virtual environment segments from the path
-            pre_module = _RE_SITE_PACKAGES.sub("", pre_module)
-            pre_module = _RE_VENV.sub("", pre_module)
-            # Collapse consecutive dots and trim leading/trailing dots
-            pre_module = _RE_DOTS.sub(".", pre_module).strip(".")
-            # Skip entries that resolve to an empty string after cleanup
-            if not pre_module:
-                continue
-            # Add the fully qualified module name to the result set
-            modules.add(f"{pre_module}.{file_path.stem}")
-        # Return the complete set of discovered module names
+        for directory, subdirectories, files in os.walk(target):
+            # Prevent traversal into virtual environments and import caches.
+            subdirectories[:] = [
+                name for name in subdirectories
+                if name.casefold() not in _EXCLUDED_DIRECTORIES
+                and (
+                    name.casefold() not in _VENV_DIRECTORIES
+                    or not (Path(directory) / name / "pyvenv.cfg").is_file()
+                )
+            ]
+            package = ".".join(Path(directory).relative_to(base).parts)
+            ModuleInspector._collectDirectoryModules(package, files, modules)
         return modules
+
+    @staticmethod
+    def _collectDirectoryModules(
+        package: str,
+        files: list[str],
+        modules: set[str],
+    ) -> None:
+        """
+        Add Python module names from one discovered directory.
+
+        Parameters
+        ----------
+        package : str
+            Dotted package name relative to the application root.
+        files : list[str]
+            File names reported by the directory walk.
+        modules : set[str]
+            Destination set shared by the discovery traversal.
+
+        Returns
+        -------
+        None
+            Add modules in place, omitting a root-level package initializer.
+        """
+        for filename in files:
+            if not filename.endswith(".py"):
+                continue
+            stem = filename[:-3]
+            if stem != "__init__":
+                modules.add(f"{package}.{stem}" if package else stem)
+            elif package:
+                modules.add(package)
 
     @classmethod
     def loadClass(
@@ -128,7 +163,7 @@ class ModuleInspector:
         # Use the fully qualified class name as the cache key
         class_key: str = f"{module_path}.{class_name}"
 
-        # Return the cached class with a single dict lookup instead of two
+        # Return the class previously resolved for this path.
         _resolved = cls.__cache_resolved_classes.get(class_key)
         if _resolved is not None:
             return _resolved
@@ -186,8 +221,8 @@ class ModuleInspector:
         bool
             True if the file imports any of the target modules, otherwise False.
         """
-        # Return False if the file does not exist
-        if not file_path.is_file():
+        # Return when there is no source or no import target to inspect.
+        if not target_modules or not file_path.is_file():
             return False
 
         try:
@@ -233,31 +268,20 @@ class ModuleInspector:
             If a module cannot be imported.
         """
         dataclasses: set[tuple[str, str, str, type[Any]]] = set()
-        # Bind frequently used callables as locals to reduce global lookups in the loop
-        _isclass = inspect.isclass
-        _is_dataclass = is_dataclass
         for module_path in modules:
             try:
-                # Import the module and cache its name for attribute lookups
+                # Inspect classes declared directly by the imported module.
                 module = importlib.import_module(module_path)
                 module_name = module.__name__
+                file_name = Path(getattr(module, "__file__", None) or "unknown.py").stem
                 for attr_name, attr in vars(module).items():
-                    # Filter to classes defined in this module that are dataclasses
-                    if (
-                        _isclass(attr)
-                        and attr.__module__ == module_name
-                        and _is_dataclass(attr)
-                    ):
-                        # Access __dataclass_params__ for the frozen flag
-                        params = getattr(attr, "__dataclass_params__", None)
-                        if params is not None and params.frozen:
-                            # Derive the file stem with a single Path construction
-                            file_name = Path(
-                                getattr(module, "__file__", "unknown.py"),
-                            ).stem
-                            dataclasses.add(
-                                (file_name, module_path, attr_name, attr),
-                            )
+                    if not isinstance(attr, type) or attr.__module__ != module_name:
+                        continue
+                    params = vars(attr).get("__dataclass_params__")
+                    if params is not None and params.frozen:
+                        dataclasses.add(
+                            (file_name, module_path, attr_name, attr),
+                        )
             except Exception as e:
                 error_msg = f"Failed to import module {module_path}: {e!s}"
                 raise RuntimeError(error_msg) from e

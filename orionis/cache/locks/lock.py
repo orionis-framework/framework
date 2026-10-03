@@ -2,15 +2,19 @@ from __future__ import annotations
 import asyncio
 import uuid
 from typing import TYPE_CHECKING, Any, Self
+from weakref import WeakValueDictionary
 from aiocache.lock import RedLock
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.cache.stores.file import FileCacheBackend
 
 if TYPE_CHECKING:
     import types
+    from pathlib import Path
 
-# Per-key asyncio locks for the file-based backend (process-scoped).
-_FILE_LOCKS: dict[str, asyncio.Lock] = {}
+# Share active file-cache locks within each event loop and storage directory.
+_FILE_LOCKS: WeakValueDictionary[
+    tuple[asyncio.AbstractEventLoop, Path, str], asyncio.Lock,
+] = WeakValueDictionary()
 
 # Default lease applied when no timeout is given, matching the Redis branch.
 _DEFAULT_LEASE: float = 10
@@ -58,7 +62,13 @@ class CacheLock:
             This ``CacheLock`` instance.
         """
         if isinstance(self._backend, FileCacheBackend):
-            lock = _FILE_LOCKS.setdefault(self._key, asyncio.Lock())
+            identity = (
+                asyncio.get_running_loop(), self._backend.lockNamespace, self._key,
+            )
+            lock = _FILE_LOCKS.get(identity)
+            if lock is None:
+                lock = asyncio.Lock()
+                _FILE_LOCKS[identity] = lock
             if self._timeout is not None:
                 await asyncio.wait_for(lock.acquire(), timeout=self._timeout)
             else:
@@ -127,6 +137,7 @@ class CacheLock:
         if isinstance(self._backend, FileCacheBackend):
             if isinstance(self._impl, asyncio.Lock):
                 self._impl.release()
+                self._impl = None
         elif isinstance(self._backend, DatabaseCacheBackend):
             if self._owner is not None:
                 await self._backend.releaseLock(self._key, self._owner)

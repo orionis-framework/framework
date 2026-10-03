@@ -15,6 +15,7 @@ if _TYPE_CHECKING:
     from orionis.support.facades.mail import Mail
     from orionis.support.facades.queue import Queue
     from orionis.support.facades.reactor import Reactor
+    from orionis.support.facades.realtime import Realtime
     from orionis.support.facades.router import Route
     from orionis.support.facades.schedule import Schedule
     from orionis.support.facades.schema import Schema
@@ -37,6 +38,7 @@ __all__ = [
     "Mail",
     "Queue",
     "Reactor",
+    "Realtime",
     "Route",
     "Schedule",
     "Schema",
@@ -60,6 +62,7 @@ _EXPORTS = {
     "Mail": ("orionis.support.facades.mail", "Mail"),
     "Queue": ("orionis.support.facades.queue", "Queue"),
     "Reactor": ("orionis.support.facades.reactor", "Reactor"),
+    "Realtime": ("orionis.support.facades.realtime", "Realtime"),
     "Route": ("orionis.support.facades.router", "Route"),
     "Schedule": ("orionis.support.facades.schedule", "Schedule"),
     "Schema": ("orionis.support.facades.schema", "Schema"),

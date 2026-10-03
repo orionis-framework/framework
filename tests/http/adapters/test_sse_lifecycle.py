@@ -47,7 +47,13 @@ class _GeneratorState:
     )
 
     def __init__(self) -> None:
-        """Create controls that distinguish producing from finalization."""
+        """Create controls that distinguish producing from finalization.
+
+        Returns
+        -------
+        None
+            Initialize producer and cleanup synchronization events.
+        """
         self.idle = asyncio.Event()
         self.waiting = asyncio.Event()
         self.cleanup_started = asyncio.Event()
@@ -119,7 +125,13 @@ class _BlockingStartWire(_Wire):
     __slots__ = ("release_start", "starting")
 
     def __init__(self) -> None:
-        """Initialize the ordinary wire plus a header send boundary."""
+        """Initialize the ordinary wire plus a header send boundary.
+
+        Returns
+        -------
+        None
+            Initialize the response-start synchronization events.
+        """
         super().__init__()
         self.starting = asyncio.Event()
         self.release_start = asyncio.Event()
@@ -147,24 +159,48 @@ class TestSSELifecycle(TestCase):
     """Cover cancellation races at generator and transport lifetime boundaries."""
 
     def assertNoTasks(self) -> None:
-        """Ensure every temporary SSE sender and watcher has been joined."""
+        """Ensure every temporary SSE sender and watcher has been joined.
+
+        Returns
+        -------
+        None
+            Assert that no named SSE tasks remain active.
+        """
         self.assertEqual([
             task.get_name() for task in asyncio.all_tasks()
             if task.get_name().startswith("orionis.sse.")
         ], [])
 
     async def testDisconnectWinsWhenBothTasksFinishInTheSameTurn(self) -> None:
-        """Do not report successful delivery after an earlier disconnect."""
+        """Do not report successful delivery after an earlier disconnect.
+
+        Returns
+        -------
+        None
+            Verify disconnect ordering wins when both tasks finish together.
+        """
         release = asyncio.Event()
         order = []
 
         async def sending() -> None:
-            """Complete only after the disconnect has been observed."""
+            """Complete only after the disconnect has been observed.
+
+            Returns
+            -------
+            None
+                Record send completion after the disconnect signal.
+            """
             await release.wait()
             order.append("send")
 
         async def disconnected() -> None:
-            """Record disconnection and let the producer finish in this turn."""
+            """Record disconnection and let the producer finish in this turn.
+
+            Returns
+            -------
+            None
+                Signal the sender after recording disconnection.
+            """
             order.append("disconnect")
             release.set()
 
@@ -174,17 +210,35 @@ class TestSSELifecycle(TestCase):
         self.assertNoTasks()
 
     async def testDeliveryWinsWhenDisconnectFollowsCompletion(self) -> None:
-        """Keep successful delivery when disconnect follows the final body."""
+        """Keep successful delivery when disconnect follows the final body.
+
+        Returns
+        -------
+        None
+            Verify completed delivery wins over a later disconnect.
+        """
         release = asyncio.Event()
         order = []
 
         async def sending() -> None:
-            """Complete delivery before the disconnect becomes observable."""
+            """Complete delivery before the disconnect becomes observable.
+
+            Returns
+            -------
+            None
+                Record completion and release the disconnect watcher.
+            """
             order.append("send")
             release.set()
 
         async def disconnected() -> None:
-            """Observe disconnect after the response has already completed."""
+            """Observe disconnect after the response has already completed.
+
+            Returns
+            -------
+            None
+                Record disconnection after the sender releases the gate.
+            """
             await release.wait()
             order.append("disconnect")
 
@@ -194,7 +248,13 @@ class TestSSELifecycle(TestCase):
         self.assertNoTasks()
 
     async def testDisconnectJoinsSuspendedAsyncGeneratorFinally(self) -> None:
-        """Keep finalization owned after disconnect interrupts an idle producer."""
+        """Keep finalization owned after disconnect interrupts an idle producer.
+
+        Returns
+        -------
+        None
+            Verify disconnect waits for the producer's asynchronous finalizer.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -223,7 +283,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testRepeatedCancellationJoinsAsyncGeneratorFinally(self) -> None:
-        """Propagate request cancellation after a real generator finishes cleanup."""
+        """Propagate request cancellation after a real generator finishes cleanup.
+
+        Returns
+        -------
+        None
+            Verify repeated cancellation does not interrupt generator cleanup.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -254,7 +320,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testProducerCanShieldNaturalFinalizationFromDisconnect(self) -> None:
-        """Join application-protected cleanup already entered during exhaustion."""
+        """Join application-protected cleanup already entered during exhaustion.
+
+        Returns
+        -------
+        None
+            Verify disconnect joins cleanup protected by the producer.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -283,7 +355,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testProducerCancellationPropagatesAndSkipsBackground(self) -> None:
-        """Treat a producer's own CancelledError as request cancellation."""
+        """Treat a producer's own CancelledError as request cancellation.
+
+        Returns
+        -------
+        None
+            Verify producer cancellation propagates and background work is skipped.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -299,7 +377,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testWatcherCancellationPropagatesAndClosesIdleProducer(self) -> None:
-        """Do not classify spontaneous watcher cancellation as normal disconnect."""
+        """Do not classify spontaneous watcher cancellation as normal disconnect.
+
+        Returns
+        -------
+        None
+            Verify watcher cancellation propagates after producer cleanup.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -316,7 +400,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testWatcherCancellationAtCompletionStillSkipsBackground(self) -> None:
-        """Preserve spontaneous watcher cancellation even if delivery just ended."""
+        """Preserve spontaneous watcher cancellation even if delivery just ended.
+
+        Returns
+        -------
+        None
+            Verify watcher cancellation suppresses background work at completion.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -330,7 +420,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testSimultaneousProducerAndWatcherErrorsArePreserved(self) -> None:
-        """Retain both real failures if notification fails in the same turn."""
+        """Retain both real failures if notification fails in the same turn.
+
+        Returns
+        -------
+        None
+            Verify simultaneous producer and watcher errors are both preserved.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -349,7 +445,13 @@ class TestSSELifecycle(TestCase):
                 self.assertNoTasks()
 
     async def testInvalidAsgiReceiveMessageClosesProducerAndRaises(self) -> None:
-        """Reject unrelated ASGI message types without consuming more events."""
+        """Reject unrelated ASGI message types without consuming more events.
+
+        Returns
+        -------
+        None
+            Verify invalid input raises and closes the producer without sending.
+        """
         wire = _Wire()
         wire.requests.append({"type": "websocket.disconnect", "code": 1000})
         source = _Producer(wire.history)
@@ -366,7 +468,13 @@ class TestSSELifecycle(TestCase):
         self.assertNoTasks()
 
     async def testCancellationDuringAsgiStartClosesUnstartedSource(self) -> None:
-        """Close the owned source if cancellation interrupts sending headers."""
+        """Close the owned source if cancellation interrupts sending headers.
+
+        Returns
+        -------
+        None
+            Verify cancellation closes the source before iteration begins.
+        """
         wire = _BlockingStartWire()
         source = _Producer(wire.history)
         response = EventStreamResponse(

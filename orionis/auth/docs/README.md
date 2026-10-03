@@ -236,6 +236,14 @@ inject a guest context before resolution. Authentication publishes a new context
 Bound contexts become anonymous after replacement, scope closure, or access from
 another scope. Do not retain them in a singleton.
 
+Framework lifecycles that open independent invocation scopes copy the built-in
+context with its internal `_fork()` operation while the connection scope is
+current, then bind that new context in the invocation scope. Identity and
+credential restrictions are preserved; scope ownership, locks and cached
+authorization snapshots are not shared. Permissions resolve lazily again in
+each invocation. Forking a stale context cannot restore its identity. Custom
+authentication contexts must arrange equivalent explicit scope propagation.
+
 One request-local lock serializes guard resolution, login, logout and current
 token revocation. Repeating a guard reuses its context, including guest results;
 another guard cannot silently replace an authenticated identity. Detached tasks

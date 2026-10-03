@@ -5,7 +5,7 @@ from orionis.foundation.config.filesystems.entitites.disks import Disks
 from orionis.foundation.config.filesystems.enums.disk_name import DiskName
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid disk names for O(1) membership checks
+# Define the supported filesystem disk names.
 _DISK_NAMES: frozenset[str] = frozenset(DiskName._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

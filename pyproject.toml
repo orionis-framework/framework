@@ -7,7 +7,6 @@ where = ["."]
 exclude = [
     "app*",
     "bootstrap*",
-    "benchmarks*",
     "config*",
     "database*",
     "docs*",

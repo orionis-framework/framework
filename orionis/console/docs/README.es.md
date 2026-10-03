@@ -116,7 +116,7 @@ reactor (script)
 | `fluent/task.py` | `Task`, el constructor tipo cron que usa `Schedule.command()`. |
 | `output/` | `Console`, `Executor`, `HelpCommand`, `HTTPRequestPrinter`, `VarDumper`. |
 | `templates/` | Plantillas `.stub` que usan los comandos `make:*`. |
-| `tasks/schedule.py` | `Schedule` junto con la función de módulo `_executeScheduledCommand`. |
+| `tasks/schedule.py` | `Schedule` junto con la función de módulo `_execute_scheduled_command`. |
 | `tasks/store.py` | `ScheduleStore`: construye los almacenes de trabajos Redis / SQLAlchemy. |
 
 ### Decisiones de diseño
@@ -142,7 +142,7 @@ reactor (script)
   que `self.info(...)`, `self.table(...)` o `self.progressBar` están disponibles
   dentro de `handle()` sin cableado adicional.
 - **Callable de módulo en el planificador.** Los trabajos de APScheduler se
-  registran con la función de módulo `_executeScheduledCommand`, nunca con un
+  registran con la función de módulo `_execute_scheduled_command`, nunca con un
   método ligado, para que un almacén persistente pueda serializar el trabajo como
   una referencia `module:function`.
 - **Comando de servidor de un solo proceso.** `ServerCommand` implementa
@@ -606,7 +606,7 @@ async def wait(self) -> None: ...
   `TypeError`. Pasar `None` conserva el valor actual.
 - `wait()` bloquea hasta que ese evento de apagado se activa.
 - El callable del trabajo es la corrutina de módulo
-  `_executeScheduledCommand(signature, args)`, que despacha a través de la
+  `_execute_scheduled_command(signature, args)`, que despacha a través de la
   fachada `Reactor`.
 
 ### `Task` (constructor fluido)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.http.routes.contracts.fluent import IFluentRoute
+from orionis.http.routes.enums.protocols import RouteProtocol
 from orionis.http.routes.functions import (
     flatten_middleware,
     normalize_path,
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.http.middleware import BaseMiddleware
     from orionis.http.routes.types import MiddlewareInput, RouteAction
+    from orionis.realtime.hub import Hub
 
 class FluentRoute(IFluentRoute):
 
@@ -104,6 +106,8 @@ class FluentRoute(IFluentRoute):
         self.__kind: str = "web"
         self.__public: bool | None = None
         self.__view: str | None = view
+        self.__hub: type[Hub] | None = None
+        self.__hub_protocol: str | None = None
 
         # A view route is rendered by the kernel and has no Python handler.
         if view is not None:
@@ -161,6 +165,47 @@ class FluentRoute(IFluentRoute):
         _callable, _handler = parse_action([controller, handler])
         self.__class = _callable
         self.__handler = _handler
+        self.__callable_handler = None
+        self.__view = None
+        self.__hub = None
+        self.__hub_protocol = None
+        return self
+
+    def _hub(self, hub: type[Hub], protocol: str) -> Self:
+        """
+        Set the Hub class and its fixed connection codec.
+
+        Parameters
+        ----------
+        hub : type[Hub]
+            Concrete Hub subclass resolved through the application container.
+        protocol : str
+            Realtime codec name: ``json`` or ``msgpack``.
+
+        Returns
+        -------
+        Self
+            This connection route with an explicit Hub action.
+
+        Raises
+        ------
+        TypeError
+            If the class does not inherit from Hub.
+        ValueError
+            If the route is HTTP or the codec is unsupported.
+        """
+        from orionis.realtime.hub import Hub  # noqa: PLC0415
+
+        if not isinstance(hub, type) or not issubclass(hub, Hub):
+            error_msg = "Hub routes require a Hub subclass"
+            raise TypeError(error_msg)
+        if self.__method != "WEBSOCKET" or protocol not in ("json", "msgpack"):
+            error_msg = "Hub routes require WebSocket and a json or msgpack codec"
+            raise ValueError(error_msg)
+        self.__hub = hub
+        self.__hub_protocol = protocol
+        self.__class = None
+        self.__handler = None
         self.__callable_handler = None
         self.__view = None
         return self
@@ -348,7 +393,7 @@ class FluentRoute(IFluentRoute):
         dict
             Dictionary with keys: id, method, path, class, handler,
             callable_handler, view, name, middleware, without_middleware,
-            kind, and public.
+            kind, public, protocol, hub, and hub_protocol.
 
         Raises
         ------
@@ -359,6 +404,7 @@ class FluentRoute(IFluentRoute):
             self.__view is None
             and self.__callable_handler is None
             and self.__class is None
+            and self.__hub is None
         ):
             error_msg = (
                 f"Route {self.__method} '{self.__path}' has no action. "
@@ -368,11 +414,17 @@ class FluentRoute(IFluentRoute):
         return {
             "id": self.__id,
             "method": self.__method,
+            "protocol": (
+                RouteProtocol.WEBSOCKET
+                if self.__method == "WEBSOCKET" else RouteProtocol.HTTP
+            ),
             "path": self.__path,
             "class": self.__class,
             "handler": self.__handler,
             "callable_handler": self.__callable_handler,
             "view": self.__view,
+            "hub": self.__hub,
+            "hub_protocol": self.__hub_protocol,
             "name": self.__name,
             "middleware": self.__middleware,
             "without_middleware": self.__without_middleware,

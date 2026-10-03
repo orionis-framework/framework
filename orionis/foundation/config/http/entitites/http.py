@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
 from orionis.foundation.config.http.entitites.cors import Cors
 from orionis.foundation.config.http.entitites.csrf import HTTPCsrf
 from orionis.foundation.config.http.entitites.proxies import (
@@ -11,6 +12,7 @@ from orionis.foundation.config.http.entitites.rate_limit import (
 from orionis.foundation.config.http.entitites.security import (
     HTTPSecurity,
 )
+from orionis.foundation.config.http.entitites.websocket import HTTPWebSocket
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -31,6 +33,22 @@ class HTTP(BaseEntity):
         metadata={
             "description": "Monitor client disconnects during handler execution.",
             "default": False,
+        },
+    )
+
+    body_limits: HTTPBodyLimits | dict = field(
+        default_factory=HTTPBodyLimits,
+        metadata={
+            "description": "Request body, multipart and concurrency budgets.",
+            "default": lambda: HTTPBodyLimits().toDict(),
+        },
+    )
+
+    websocket: HTTPWebSocket | dict = field(
+        default_factory=HTTPWebSocket,
+        metadata={
+            "description": "WebSocket connection and incoming message budgets.",
+            "default": lambda: HTTPWebSocket().toDict(),
         },
     )
 
@@ -93,6 +111,16 @@ class HTTP(BaseEntity):
         super().__post_init__()
         if not isinstance(self.monitor_disconnects, bool):
             error_msg = "monitor_disconnects must be a bool."
+            raise TypeError(error_msg)
+        if isinstance(self.body_limits, dict):
+            object.__setattr__(self, "body_limits", HTTPBodyLimits(**self.body_limits))
+        elif not isinstance(self.body_limits, HTTPBodyLimits):
+            error_msg = "body_limits must be an HTTPBodyLimits instance or dict."
+            raise TypeError(error_msg)
+        if isinstance(self.websocket, dict):
+            object.__setattr__(self, "websocket", HTTPWebSocket(**self.websocket))
+        elif not isinstance(self.websocket, HTTPWebSocket):
+            error_msg = "websocket must be an HTTPWebSocket instance or dict."
             raise TypeError(error_msg)
         self.__validateProxies()
         self.__validateSecurity()

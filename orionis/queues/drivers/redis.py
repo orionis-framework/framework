@@ -140,6 +140,7 @@ class RedisQueueDriver(IQueueDriver):
             port=settings.port,
             db=settings.db,
             password=settings.password,
+            protocol=2,
         )
 
     def _keys(self, queue: str) -> tuple[str, ...]:

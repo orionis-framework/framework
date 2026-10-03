@@ -632,7 +632,7 @@ class Console(IConsole):
             f"{ANSIColors.DEFAULT.value} ",
         ).upper()
 
-        # Return True for 'Y' or 'YES'; frozenset gives O(1) lookup vs O(n) list
+        # Accept affirmative responses in either short or full form.
         return default if not response else response in {"Y", "YES"}
 
     def secret(self, question: str) -> str:

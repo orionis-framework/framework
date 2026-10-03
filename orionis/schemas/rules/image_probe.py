@@ -27,7 +27,7 @@ _JPEG_SEGMENT = 9
 # Mask isolating the 14-bit dimensions stored in WebP bitstreams.
 _WEBP_MASK = 0x3FFF
 
-def _probePng(data: bytes) -> tuple[str, int, int] | None:
+def _probe_png(data: bytes) -> tuple[str, int, int] | None:
     """
     Read the dimensions stored in a PNG ``IHDR`` chunk.
 
@@ -46,7 +46,7 @@ def _probePng(data: bytes) -> tuple[str, int, int] | None:
     width, height = struct.unpack(">II", data[16:24])
     return ("png", width, height)
 
-def _probeGif(data: bytes) -> tuple[str, int, int] | None:
+def _probe_gif(data: bytes) -> tuple[str, int, int] | None:
     """
     Read the dimensions stored in a GIF logical screen descriptor.
 
@@ -65,7 +65,7 @@ def _probeGif(data: bytes) -> tuple[str, int, int] | None:
     width, height = struct.unpack("<HH", data[6:10])
     return ("gif", width, height)
 
-def _probeBmp(data: bytes) -> tuple[str, int, int] | None:
+def _probe_bmp(data: bytes) -> tuple[str, int, int] | None:
     """
     Read the dimensions stored in a BMP information header.
 
@@ -85,7 +85,7 @@ def _probeBmp(data: bytes) -> tuple[str, int, int] | None:
     # Bottom-up bitmaps store a negative height.
     return ("bmp", abs(width), abs(height))
 
-def _probeWebp(data: bytes) -> tuple[str, int, int] | None:
+def _probe_webp(data: bytes) -> tuple[str, int, int] | None:
     """
     Read the dimensions of the lossy, lossless or extended WebP bitstream.
 
@@ -120,7 +120,7 @@ def _probeWebp(data: bytes) -> tuple[str, int, int] | None:
 
     return ("webp", width, height)
 
-def _probeJpeg(data: bytes) -> tuple[str, int, int] | None:
+def _probe_jpeg(data: bytes) -> tuple[str, int, int] | None:
     """
     Walk the JPEG segments until a start-of-frame marker is found.
 
@@ -161,7 +161,7 @@ def _probeJpeg(data: bytes) -> tuple[str, int, int] | None:
     return None
 
 # Probes are ordered by signature cost; each one rejects foreign formats first.
-_PROBES = (_probePng, _probeJpeg, _probeGif, _probeBmp, _probeWebp)
+_PROBES = (_probe_png, _probe_jpeg, _probe_gif, _probe_bmp, _probe_webp)
 
 def probe_image(data: bytes) -> tuple[str, int, int] | None:
     """

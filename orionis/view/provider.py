@@ -146,5 +146,5 @@ class ViewServiceProvider(ServiceProvider):
         for _extension in _extensions:
             _env.addExtension(_extension)
 
-        # Pin the facade for direct attribute access without DI overhead
+        # Store the view facade on the provider.
         await ViewFacade.pin()

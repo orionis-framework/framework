@@ -177,7 +177,7 @@ class MetaCompiler:
                 )
                 raise MetadataConflictError(msg)
 
-        # Length range + value checks (single lookup per type)
+        # Validate length constraints and allowed values.
         min_len = seen.get(MinLength)
         max_len = seen.get(MaxLength)
         if (
@@ -244,8 +244,7 @@ class MetaCompiler:
         msgspec.Meta
             The fully configured field constraint descriptor.
         """
-        # Localize the dict.get method to reduce attribute look-up
-        # overhead in this hot path.
+        # Read field constraints from the compiled metadata.
         _s = seen.get
         gt_m    = _s(GreaterThan)
         ge_m    = _s(GreaterThanOrEqual)

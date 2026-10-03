@@ -109,6 +109,28 @@ class AuthenticationContext(IAuthenticationContext):
             raise AuthException(error_msg)
         self.__scope = scope
 
+    def _fork(self) -> AuthenticationContext:
+        """
+        Copy the current identity into a fresh, independently scoped context.
+
+        Framework lifecycles call this while the owning scope is current, then
+        bind the returned context inside their new scope. Authorization remains
+        lazy and is resolved independently; neither a cached permission snapshot
+        nor the source scope or lock is retained. A stale context yields a guest.
+
+        Returns
+        -------
+        AuthenticationContext
+            Unbound context carrying the current identity and credential limits.
+        """
+        return AuthenticationContext(
+            identity=self.identity,
+            guard=self.__guard,
+            abilities=self.__abilities,
+            repository=self.__repository,
+            credential_id=self.__credential_id,
+        )
+
     def __isCurrent(self) -> bool:
         """
         Report whether this context still belongs to a live request.

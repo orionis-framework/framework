@@ -39,7 +39,7 @@ class ReflectionCallable(IReflectionCallable):
         None
             This method does not return a value.
         """
-        # Validate using concrete types; faster than inspect.isfunction/ismethod
+        # Accept Python functions and bound methods.
         if not (
             isinstance(fn, (types.FunctionType, types.MethodType))
             or (callable(fn) and hasattr(fn, "__code__"))
@@ -205,7 +205,7 @@ class ReflectionCallable(IReflectionCallable):
             If the source code cannot be obtained due to an OSError or if the
             callable is built-in without accessible source.
         """
-        # Single-lookup cache read with sentinel; avoids a second dict access on hit
+        # Return the stored reflection value when present.
         _cache = self._cache
         cached = _cache.get("source_code", _UNSET)
         if cached is not _UNSET:
@@ -232,7 +232,7 @@ class ReflectionCallable(IReflectionCallable):
         TypeError
             If the callable is built-in or its file cannot be determined.
         """
-        # Single-lookup cache read with sentinel; avoids a second dict access on hit
+        # Return the stored reflection value when present.
         _cache = self._cache
         cached = _cache.get("file", _UNSET)
         if cached is not _UNSET:
@@ -251,7 +251,7 @@ class ReflectionCallable(IReflectionCallable):
             The signature object representing the callable's parameters,
             default values, and type annotations.
         """
-        # Single-lookup cache read with sentinel; avoids a second dict access on hit
+        # Return the stored reflection value when present.
         _cache = self._cache
         cached = _cache.get("signature", _UNSET)
         if cached is not _UNSET:
@@ -274,7 +274,7 @@ class ReflectionCallable(IReflectionCallable):
             A structure that holds the resolved and unresolved dependencies
             derived from the callable's parameter annotations.
         """
-        # Single-lookup cache read with sentinel; avoids a second dict access on hit
+        # Return the stored reflection value when present.
         _cache = self._cache
         cached = _cache.get("dependencies", _UNSET)
         if cached is not _UNSET:

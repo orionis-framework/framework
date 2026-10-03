@@ -79,6 +79,11 @@ class _Producer:
     async def aclose(self) -> None:
         """Record cleanup and optionally suspend or fail during closure.
 
+        Returns
+        -------
+        None
+            Record closure after the optional gate is released.
+
         Raises
         ------
         Exception
@@ -101,7 +106,13 @@ class _Wire:
     )
 
     def __init__(self) -> None:
-        """Expose only the actual ASGI and RSGI HTTP stream operations."""
+        """Expose only the actual ASGI and RSGI HTTP stream operations.
+
+        Returns
+        -------
+        None
+            Initialize transport state and synchronization controls.
+        """
         self.block_send = None
         self.chunks = []
         self.disconnected = asyncio.Event()
@@ -129,6 +140,11 @@ class _Wire:
         ------
         ConnectionError
             If the requested stage matches the configured failure stage.
+
+        Returns
+        -------
+        None
+            Leave the transport unchanged when the stage does not match.
         """
         if self.error_stage == stage:
             raise self.error
@@ -177,6 +193,11 @@ class _Wire:
         ------
         BaseException
             A configured receive failure, including cancellation.
+
+        Returns
+        -------
+        None
+            Finish after the test signals client disconnection.
         """
         self.watching.set()
         try:
@@ -247,7 +268,13 @@ class _Wire:
         self.history.append("send")
 
     async def background(self) -> None:
-        """Record successful delivery's associated background work."""
+        """Record successful delivery's associated background work.
+
+        Returns
+        -------
+        None
+            Append the background completion marker to the history.
+        """
         self.history.append("background")
 
     client_disconnect = clientDisconnect
@@ -286,14 +313,26 @@ class TestSSETransport(TestCase):
             await RSGIResponseAdapter().send(request, response, wire)
 
     def assertNoTasks(self) -> None:
-        """Ensure every temporary SSE task has been joined."""
+        """Ensure every temporary SSE task has been joined.
+
+        Returns
+        -------
+        None
+            Assert that no named SSE tasks remain active.
+        """
         self.assertEqual([
             task.get_name() for task in asyncio.all_tasks()
             if task.get_name().startswith("orionis.sse.")
         ], [])
 
     async def testNormalDeliveryHeadersFramingAndBackground(self) -> None:
-        """Send each event and close before background work on both protocols."""
+        """Send each event and close before background work on both protocols.
+
+        Returns
+        -------
+        None
+            Verify response metadata, framing, cleanup order, and background work.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -321,7 +360,13 @@ class TestSSETransport(TestCase):
                 self.assertNoTasks()
 
     async def testDisconnectStopsIdleProducerAndSkipsBackground(self) -> None:
-        """Detect disconnect while the next event is indefinitely suspended."""
+        """Detect disconnect while the next event is indefinitely suspended.
+
+        Returns
+        -------
+        None
+            Verify disconnect stops production and suppresses background work.
+        """
         for name in ("asgi", "rsgi"):
             with self.subTest(protocol=name):
                 wire = _Wire()
@@ -343,7 +388,13 @@ class TestSSETransport(TestCase):
                 self.assertNoTasks()
 
     async def testTransportBackpressureAndDisconnectDuringSend(self) -> None:
-        """Stop a blocked send without requesting another producer item."""
+        """Stop a blocked send without requesting another producer item.
+
+        Returns
+        -------
+        None
+            Verify disconnect cancels a blocked send without prefetching.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             wire.block_send = asyncio.Event()
@@ -363,7 +414,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testFailuresPropagateAndAlwaysClose(self) -> None:
-        """Preserve producer, send, receive and close errors without background."""
+        """Preserve producer, send, receive and close errors without background.
+
+        Returns
+        -------
+        None
+            Verify each configured failure propagates after source cleanup.
+        """
         for name in ("asgi", "rsgi"):
             stages = ("start", "body", "producer", "close", "receive")
             if name == "asgi":
@@ -393,7 +450,13 @@ class TestSSETransport(TestCase):
                     self.assertNoTasks()
 
     async def testCancellationPropagatesAfterCleanup(self) -> None:
-        """Cancel a request while its producer waits and join both tasks."""
+        """Cancel a request while its producer waits and join both tasks.
+
+        Returns
+        -------
+        None
+            Verify cancellation propagates after producer and watcher cleanup.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             source = _Producer(wire.history)
@@ -413,7 +476,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testRepeatedCancellationWaitsForAsyncCleanup(self) -> None:
-        """Do not orphan cleanup if the request is cancelled more than once."""
+        """Do not orphan cleanup if the request is cancelled more than once.
+
+        Returns
+        -------
+        None
+            Verify repeated cancellation waits for the asynchronous close.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             source = _Producer(wire.history)
@@ -437,7 +506,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testDisconnectDuringNormalCleanupWaitsForClose(self) -> None:
-        """Finish an asynchronous close interrupted by the disconnect watcher."""
+        """Finish an asynchronous close interrupted by the disconnect watcher.
+
+        Returns
+        -------
+        None
+            Verify disconnect joins normal asynchronous source cleanup.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             source = _Producer(wire.history)
@@ -459,7 +534,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testHeadNeverStartsAsyncGenerator(self) -> None:
-        """Send headers and an empty body without entering a generator."""
+        """Send headers and an empty body without entering a generator.
+
+        Returns
+        -------
+        None
+            Verify HEAD sends no events and does not start the source generator.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             started = []
@@ -492,7 +573,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testDisconnectDoesNotHideCleanupFailure(self) -> None:
-        """Propagate a real close failure even if disconnect cancels cleanup."""
+        """Propagate a real close failure even if disconnect cancels cleanup.
+
+        Returns
+        -------
+        None
+            Verify cleanup failure propagates instead of being hidden by disconnect.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             source = _Producer(wire.history)
@@ -516,7 +603,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testHeadClosesUnstartedSourceOnSuccessOrFailure(self) -> None:
-        """Close owned custom sources on HEAD even if headers fail to send."""
+        """Close owned custom sources on HEAD even if headers fail to send.
+
+        Returns
+        -------
+        None
+            Verify HEAD closes the unstarted source on both response outcomes.
+        """
         for name in ("asgi", "rsgi"):
             for stage in (None, "start"):
                 wire = _Wire()
@@ -532,7 +625,13 @@ class TestSSETransport(TestCase):
                 self.assertEqual(source.closed, 1)
 
     async def testAsgiDrainsUnreadBodyBeforeDisconnect(self) -> None:
-        """Treat HTTP request chunks as input, never as disconnect messages."""
+        """Treat HTTP request chunks as input, never as disconnect messages.
+
+        Returns
+        -------
+        None
+            Verify request-body messages are drained before watching disconnect.
+        """
         wire = _Wire()
         wire.requests.extend((
             {"type": "http.request", "body": b"a", "more_body": True},
@@ -553,7 +652,13 @@ class TestSSETransport(TestCase):
         self.assertNoTasks()
 
     async def testOrdinaryStreamsDoNotObserveDisconnect(self) -> None:
-        """Keep normal streams on their existing transport path."""
+        """Keep normal streams on their existing transport path.
+
+        Returns
+        -------
+        None
+            Verify ordinary streaming responses do not start a disconnect watcher.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             await self.deliver(name, wire, StreamingResponse([b"ordinary"]))
@@ -562,7 +667,13 @@ class TestSSETransport(TestCase):
             self.assertNoTasks()
 
     async def testOrdinaryStreamHeaderFailureClosesItsIterator(self) -> None:
-        """Keep ownership deterministic when opening a normal stream fails."""
+        """Keep ownership deterministic when opening a normal stream fails.
+
+        Returns
+        -------
+        None
+            Verify a source closes when sending ordinary stream headers fails.
+        """
         for name in ("asgi", "rsgi"):
             wire = _Wire()
             wire.error_stage = "start"
@@ -579,7 +690,13 @@ class TestSSETransport(TestCase):
             self.assertNotIn("background", wire.history)
 
     async def testHeaderSerializationFailureClosesUnstartedSource(self) -> None:
-        """Close owned SSE sources if header serialization fails before sending."""
+        """Close owned SSE sources if header serialization fails before sending.
+
+        Returns
+        -------
+        None
+            Verify invalid headers close the unstarted source for GET and HEAD.
+        """
         for name in ("asgi", "rsgi"):
             for method in ("GET", "HEAD"):
                 with self.subTest(protocol=name, method=method):
@@ -599,7 +716,13 @@ class TestSSETransport(TestCase):
                     self.assertNoTasks()
 
     async def testAsgiHeaderEncodingFailureClosesUnstartedSource(self) -> None:
-        """Release the event source when a header cannot be encoded as Latin-1."""
+        """Release the event source when a header cannot be encoded as Latin-1.
+
+        Returns
+        -------
+        None
+            Verify header encoding failure closes the source before iteration.
+        """
         wire = _Wire()
         source = _Producer(wire.history)
         response = EventStreamResponse(

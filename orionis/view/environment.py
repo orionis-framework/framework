@@ -70,6 +70,19 @@ class ViewEnvironment(IViewEnvironment):
         )
 
         def load_default(name: str) -> tuple[str, str | None, Callable] | None:
+            """
+            Load a packaged framework page by its reserved name.
+
+            Parameters
+            ----------
+            name : str
+                Requested template name.
+
+            Returns
+            -------
+            tuple[str, str | None, Callable] | None
+                Template source metadata for a packaged page, if present.
+            """
             if name.startswith(_default_prefix):
                 return _default_loader.get_source(
                     self._jinja_env, name.removeprefix(_default_prefix),
@@ -81,6 +94,19 @@ class ViewEnvironment(IViewEnvironment):
         ])
 
         def autoescape(name: str | None) -> bool:
+            """
+            Choose HTML escaping for the requested template.
+
+            Parameters
+            ----------
+            name : str | None
+                Requested template name.
+
+            Returns
+            -------
+            bool
+                Whether Jinja2 escapes rendered expressions.
+            """
             return bool(name and name.startswith(_default_prefix)) or _config.autoescape
 
         # Optional bytecode cache for production deployments

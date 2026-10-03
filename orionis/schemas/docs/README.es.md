@@ -108,6 +108,20 @@ Existen dos caminos distintos:
 | `meta/` | Marcadores base: `ValidationMetadata`, `ConstraintMetadata`, `DocumentMetadata`. |
 | `rules/` | 37 reglas incorporadas + los auxiliares `measure`, `temporal` e `image_probe`. |
 
+### Política de importación y construcción
+
+`orionis.schemas.__init__` y `orionis.schemas.rules.__init__` cargan las
+exportaciones públicas en el primer acceso y almacenan cada clase resuelta.
+Importar el paquete de reglas no carga ninguna implementación; importar `Email`
+carga solo su módulo. Los inicializadores vacíos de `contracts`, `entities` y
+`meta` siguen vacíos. El inicializador de una sola exportación en `exceptions`
+sigue siendo eager.
+
+La creación de una clase de esquema compila de inmediato los metadatos y
+prepara los planes de validación anidados, incluidos los tipos `Annotated` y
+las uniones. Así, la construcción del plan ocurre antes de validar instancias.
+Las reglas inicializan de inmediato sus parámetros necesarios.
+
 ## Referencia de API
 
 ### `Schema` — clase base (`orionis.schemas.schema`)

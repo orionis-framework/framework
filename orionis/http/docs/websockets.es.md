@@ -7,17 +7,22 @@ existentes. Se admiten funciones, `[Controller, "method"]` y controladores
 invocables. GET y WebSocket pueden compartir una ruta; WebSocket no aparece en
 `Allow`/`OPTIONS` HTTP ni ejecuta el fallback HTTP.
 
+WebSocket raw no depende de `orionis.realtime`. `WebSocket` administra estado y
+concurrencia; `IWebSocketTransport` lo separa de `ASGIWebSocketTransport` y
+`RSGIWebSocketTransport`, responsables de normalizar los eventos del servidor.
+Un transporte propio puede implementar ese mismo contrato.
+
 ```python
-from orionis.http import WebSocket, WebSocketDisconnected
+from orionis.http import WebSocket
 from orionis.support.facades.router import Route
 
 async def echo(socket: WebSocket, room: int) -> None:
     await socket.accept()
-    try:
-        while True:
-            await socket.send(await socket.receive())
-    except WebSocketDisconnected:
-        return
+    async for message in socket:
+        if message.isText():
+            await socket.sendText(message.text)
+        elif message.isBytes():
+            await socket.sendBytes(message.bytes)
 
 Route.websocket("/rooms/{room:int}", echo).name("rooms.socket")
 ```
@@ -62,17 +67,40 @@ WebSocket en una ruta produce un error durante compilación.
 |---|---|
 | `path`, `headers` | Metadatos del handshake. |
 | `state` | `SimpleNamespace` mutable exclusivo de esta conexión. |
+| `connectionState` | `CONNECTING`, `CONNECTED`, `CLOSING` o `CLOSED`. |
 | `routeParams()` | Parámetros convertidos y mutables exclusivos de esta conexión. |
 | `accepted`, `closed` | Estado explícito del handshake y cierre. |
-| `await accept()` | Acepta una vez; enviar/recibir antes produce `RuntimeError`. |
-| `await receive()` | Devuelve `str` o `bytes`; admite un receptor concurrente. |
+| `await accept(*, subprotocol=None, headers=None)` | Acepta una vez con las opciones admitidas por el servidor. |
+| `await receive()` | Devuelve un `WebSocketMessage` inmutable, incluido el evento terminal una sola vez. |
+| `await receiveText()` / `receiveBytes()` | Devuelve el tipo esperado; otro tipo produce `TypeError`. |
+| `await sendText(data)` / `sendBytes(data)` | Envía el tipo explícito y espera la contrapresión de red. |
 | `await send(data)` | Envía texto/binario y espera al transporte; envío/cierre se serializan. |
 | `await receiveJson()` / `sendJson(data)` | Deserialización/serialización JSON con msgspec. |
 | `await reject(status_code=403)` | Rechaza antes de aceptar; repetir es inocuo. |
 | `await close(code=1000, reason="")` | Cierra o rechaza si no estaba aceptado; repetir es inocuo. |
+| `supportsCloseDetails` | Indica soporte de código/motivo personalizado en el frame de cierre. |
+| `async for message in socket` | Itera mensajes de datos hasta desconexión. |
 
-La desconexión produce `WebSocketDisconnected(code, reason)` cuando el protocolo
-ofrece esos datos y el kernel la trata como finalización normal. Otros errores
+`WebSocketMessage`, `WebSocketMessageType` y `WebSocketState` se exportan desde
+`orionis.http`. El mensaje es un registro frozen, slots y keyword-only con
+`type`, `data`, `code` y `reason`. Conserva el payload original sin copiarlo.
+Permite `isText()`, `isBytes()`, `isDisconnect()`, `.text` y `.bytes`; los accesores
+tipados rechazan tipos distintos. `receive()` entrega la desconexión una sola
+vez; las operaciones posteriores producen `WebSocketDisconnected`. Los helpers
+tipados también lanzan esa excepción al recibir la desconexión, conservando los
+datos disponibles. La iteración termina normalmente.
+
+Enviar o recibir requiere aceptación completada. Dos lectores simultáneos
+producen `RuntimeError`; no existe una cola de lectores. Envíos, aceptación y
+cierre comparten un lock y esperan directamente al servidor. Cancelar un lector
+libera el lock y permite otra lectura. Cancelar un escritor mientras espera el
+lock afecta únicamente a ese caller. Cancelar un envío de red activo o la
+aceptación deja `CLOSING`: no se conoce si la entrega terminó y el propietario
+debe cerrar la conexión. La cancelación siempre se propaga. Cerrar varias veces
+no genera frames duplicados, incluso si falló un cierre previo. Los errores del
+servidor distintos de desconexiones explícitas permanecen visibles.
+
+El kernel trata la desconexión como finalización normal. Otros errores
 se propagan al servidor después de cerrar ASGI con código 1011. Retorno,
 excepción y cancelación cierran la conexión y liberan el scope y su cupo.
 La desconexión se observa al enviar/recibir; un handler inactivo debe conservar
@@ -99,19 +127,31 @@ servidor: configura también sus límites de frames/mensajes y conexiones, pues
 estos checks no limitan buffers internos del servidor. No se mantiene una cola
 de salida de aplicación; cada envío se espera.
 
-ASGI transmite códigos/motivos de cierre. RSGI Granian expone `close(status)`
+ASGI permite seleccionar un subprotocolo ofrecido por el cliente. Los headers
+de aceptación requieren `asgi.spec_version >= 2.1`; sin versión se asume 2.0.
+Se normalizan a minúsculas y rechazan CR/LF, pseudo-headers y
+`sec-websocket-protocol`; para este último se usa `subprotocol`. Solicitar
+headers en un servidor anterior produce `NotImplementedError` antes del
+handshake. El motivo del cierre se envía desde 2.3; versiones anteriores reciben
+el código. Se conserva el motivo de desconexión cuando el servidor lo entrega.
+
+RSGI Granian expone `close(status)`
 para rechazar el handshake HTTP y cerrar la conexión de forma predeterminada;
 no expone códigos/motivos del frame de cierre WebSocket. Solicitar un cierre
 personalizado en RSGI produce `NotImplementedError`. Mensajes RSGI excesivos se
 cierran por esa API y reportan 1009 localmente. Un rechazo ASGI devuelve HTTP
 403 salvo que el servidor anuncie la extensión `websocket.http.response`, que
 permite el status solicitado. RSGI sí admite el status HTTP de rechazo.
-La API compartida no expone negociación de subprotocolos ni headers de
-aceptación personalizados: `accept()` RSGI no recibe esos parámetros.
+Granian 2.8.4 tiene `accept()` sin argumentos: solicitar subprotocolo o headers
+no vacíos produce `NotImplementedError` antes de aceptar. Sus mensajes kind
+0/1/2 se normalizan a desconexión/binario/texto. El cierre carece de código y
+motivo del peer, representados por 1006/`None`. `ProtocolClosed` y errores de red
+se convierten en `WebSocketDisconnected` con su causa original; `ProtocolError`
+se propaga como error del servidor.
 
 Las diferencias corresponden a las fuentes primarias
 [especificación ASGI](https://asgi.readthedocs.io/en/latest/specs/www.html) y
-[especificación RSGI Granian](https://github.com/emmett-framework/granian/blob/master/docs/spec/RSGI.md).
+[especificación RSGI Granian](https://github.com/emmett-framework/granian/blob/v2.8.4/docs/spec/RSGI.md).
 
 `StreamingResponse`/`response.stream(...)` ya transmitían iterables async/sync
 por chunks en ASGI y RSGI sin materializar el body. Los adapters cierran
@@ -126,9 +166,21 @@ dependen de Granian.
 `tests/http/test_websocket.py` prueba estados, texto/binario/JSON, desconexión,
 límites UTF-8, DI real, aislamiento scoped, controladores, autorización,
 continuaciones, admisión, Origin y limpieza ante fallo/cancelación. Las pruebas
-foundation verifican dispatch ASGI/RSGI sin monitores HTTP. El runner
-`python -m benchmarks.runtime_load --seconds 0.1 --concurrency 1 --scenarios plain`
-también ejecuta probes TCP reales contra Granian ASGI/RSGI: HTTP 101 y digest
-de aceptación, eco de texto/binario enmascarado y frame de cierre del servidor.
-Guarda `websocket_probe` en los resultados. Es evidencia de integración del
-protocolo; no certifica throughput WebSocket ni soak de larga duración.
+foundation verifican dispatch ASGI/RSGI sin monitores HTTP.
+`test_websocket_transport.py` agrega barreras deterministas y excepciones reales
+de Granian: serialización, contrapresión, cancelación, mensajes inmutables,
+negociación, capacidades no admitidas y carreras de cierre/recepción.
+`test_websocket_shutdown.py` verifica la espera de tasks y limpieza de scopes
+durante shutdown.
+
+Comando ejecutado: `.venv/Scripts/python.exe reactor test --start-dir=tests/http
+--file-pattern=test_websocket*.py --verbosity=0`: **47 pruebas aprobadas**,
+incluidos códigos de estado y shutdown. Los módulos de producción raw pasan
+Ruff y Pyright focalizados con cero diagnósticos. Se inspeccionaron directamente
+las firmas instaladas y los stubs de Granian 2.8.4. Son pruebas con dobles de
+protocolo; no certifican throughput ni duración prolongada.
+
+Migración: el constructor administrado por el kernel recibe `(transport,
+adapter, *, params=None, max_message_size=1048576)`. Un handler que esperaba
+`str`/`bytes` desde `receive()` debe elegir `receiveText()`/`receiveBytes()` o
+consultar `message.data`. Se conserva `send(str | bytes)`.

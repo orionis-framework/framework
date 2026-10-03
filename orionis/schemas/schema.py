@@ -131,7 +131,7 @@ class SchemaMeta(_StructMeta):
         Callable[[int], dict[str, object]]
             Return the wrapped annotation callback.
         """
-        # Cache compiler class in local scope for faster access.
+        # Bind the metadata compiler for schema construction.
         _meta_compiler = MetaCompiler
 
         # Cache validation metadata type for isinstance checks.
@@ -143,17 +143,29 @@ class SchemaMeta(_StructMeta):
         # Cache map from metadata class to msgspec key.
         _constraint_keys = _CONSTRAINT_MSGSPEC_KEYS
 
-        # Cache typing.get_origin to reduce global lookups.
+        # Bind the generic type origin helper.
         _get_origin = get_origin
 
-        # Cache typing.get_args to reduce global lookups.
+        # Bind the generic type argument helper.
         _get_args = get_args
 
         # Cache Annotated marker type for identity checks.
         _annotated_type = Annotated
 
         def _annotate(fmt: int) -> dict[str, object]:
+            """
+            Resolve schema field annotations for a requested format.
 
+            Parameters
+            ----------
+            fmt : int
+                Annotation evaluation format.
+
+            Returns
+            -------
+            dict[str, object]
+                Resolved schema field annotations.
+            """
             # Resolve deferred annotations for the given format.
             annotations: dict[str, object] = original_func(fmt)
 
@@ -266,13 +278,13 @@ class SchemaMeta(_StructMeta):
         # Initialize the output mapping.
         result: dict[str, list[object]] = {}
 
-        # Cache Meta type to reduce repeated lookups.
+        # Bind the metadata annotation type.
         _msgspec_meta = msgspec.Meta
 
-        # Cache get_origin to reduce global lookups.
+        # Bind the generic type origin helper.
         _get_origin = get_origin
 
-        # Cache get_args to reduce global lookups.
+        # Bind the generic type argument helper.
         _get_args = get_args
 
         # Iterate through all struct fields.

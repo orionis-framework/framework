@@ -54,7 +54,7 @@ jobs:
 
       - name: 🖥️ Run Tests Console [tests/console]
         run: |
-          uv run python -B reactor test --start-dir="tests/console" --verbosity=1 --fail-fast=1
+          uv run python -B reactor test --start-dir="tests/console" --verbosity=2 --fail-fast=1
 
       - name: 🧩 Run Tests Container [tests/container]
         run: |
@@ -65,7 +65,10 @@ jobs:
           uv run python -B reactor test --start-dir="tests/database" --verbosity=1 --fail-fast=1
 
       - name: Run Durable Queue Tests
-        run: uv run python -B reactor test --start-dir="tests/queues" --verbosity=1 --fail-fast=1
+        run: uv run python -B reactor test --start-dir="tests/queues" --verbosity=2 --fail-fast=1
+
+      - name: Run Realtime Tests
+        run: uv run python -B reactor test --start-dir="tests/realtime" --verbosity=1 --fail-fast=1
 
       - name: 🔐 Run Tests Encrypter [tests/encrypter]
         run: |

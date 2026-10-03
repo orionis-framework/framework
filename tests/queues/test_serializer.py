@@ -7,7 +7,6 @@ from orionis.queues.job import BaseJob
 from orionis.queues.serializer import JobSerializer
 from orionis.test import TestCase
 
-
 class StateJob(BaseJob):
     """Retain persistent state without constructing service dependencies."""
 
@@ -40,7 +39,6 @@ class StateJob(BaseJob):
             message = "Negative identity."
             raise ValueError(message)
 
-
 class InheritedStateJob(StateJob):
     """Retain inherited fields alongside a single declared slot."""
 
@@ -48,7 +46,6 @@ class InheritedStateJob(StateJob):
 
     label: str
     category: ClassVar[str] = "inherited"
-
 
 class UndeclaredJob(BaseJob):
     """Expose undeclared fields to test explicit serialization requirements."""
@@ -65,6 +62,13 @@ class UndeclaredJob(BaseJob):
         """
         self.__dict__.clear()
 
+class AnnotatedJob(UndeclaredJob):
+    """Declare persistent fields stored in an inherited instance dictionary."""
+
+    __slots__ = ()
+
+    data: str
+    user_id: int
 
 class BlockingJob(BaseJob):
     """Expose a synchronous handler rejected by the async registry."""
@@ -81,7 +85,6 @@ class BlockingJob(BaseJob):
         """
         message = "Synchronous jobs are not supported."
         raise RuntimeError(message)
-
 
 class TestJobSerializer(TestCase):
     def testRoundTripPersistentFields(self) -> None:
@@ -211,6 +214,28 @@ class TestJobSerializer(TestCase):
         undeclared.service = object()
         with self.assertRaises(QueuePayloadError):
             serializer.encode(undeclared)
+
+    def testRejectIncomparableInstanceFields(self) -> None:
+        """Reject extra fields even when a declared field is also missing.
+
+        Returns
+        -------
+        None
+            Verify field validation uses inclusion rather than strict ordering.
+        """
+        serializer = JobSerializer()
+        original = AnnotatedJob()
+        original.user_id = 7
+        original.data = "saved"
+        identity, payload = serializer.encode(original)
+        restored = serializer.decode(identity, payload)
+        self.assertEqual(restored.__dict__, original.__dict__)
+        del original.data
+        original.service = None
+        with self.assertRaisesRegex(
+            QueuePayloadError, "Declare all persistent job fields",
+        ):
+            serializer.encode(original)
 
     def testRejectBlockingHandlerAndAbstractJob(self) -> None:
         """Require concrete asynchronous job handlers.

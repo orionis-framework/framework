@@ -12,6 +12,7 @@ database/*.sqlite
 # Orionis utilities
 # ========================
 *.ps1
+PUBLISH.ps1
 
 # ========================
 # Python

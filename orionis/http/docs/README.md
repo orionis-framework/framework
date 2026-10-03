@@ -292,6 +292,8 @@ The Python files, including package initializers, are listed below. Definitions 
 | [`sse.py`](../sse.py) | `ServerSentEvent`, internal `_encode_data` and `_EventStreamIterator`. |
 | [`validation.py`](../validation.py) | `_url_origin`, `_is_local_reference`, `validation_response`, `previous_url` |
 | [`websocket.py`](../websocket.py) | `WebSocketDisconnected`, `WebSocket` |
+| [`websocket_message.py`](../websocket_message.py) | `WebSocketMessage`, `WebSocketMessageType`, `WebSocketState` |
+| [`adapters/websocket/`](../adapters/websocket/) | `IWebSocketTransport`, `ASGIWebSocketTransport`, `RSGIWebSocketTransport` |
 | [`websocket_middleware.py`](../websocket_middleware.py) | `WebSocketNext`, `WebSocketMiddleware` |
 | [`default/assets/favicon.ico`](../default/assets/favicon.ico) | Bundled response asset/template. |
 | [`default/assets/robots.txt`](../default/assets/robots.txt) | Bundled response asset/template. |

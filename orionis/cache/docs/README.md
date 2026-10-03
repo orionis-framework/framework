@@ -328,7 +328,7 @@ class DatabaseCacheBackend:
 `_ensureSchema()` creates both tables on first use, guarded by an
 `asyncio.Lock` and a `_ready` flag (double-checked).
 
-Schema built by `_buildEntriesTable(table)` and `_buildLocksTable(table)`:
+Schema built by `_build_entries_table(table)` and `_build_locks_table(table)`:
 
 | Table | Columns |
 |---|---|

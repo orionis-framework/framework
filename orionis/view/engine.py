@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from threading import Lock
 from typing import Any
 import jinja2
 from orionis.view.contracts.engine import IViewEngine
@@ -7,11 +9,10 @@ from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundExc
 # Template extension appended when the identifier carries no extension
 _DEFAULT_EXT: str = ".html"
 
-# Memoised template identifier to loader path mapping; the set of template
-# names an application renders is bounded and stable at runtime.
-# Lock-free on purpose: entries are pure functions of their key, so a racing
-# writer can only store the value another thread would have computed.
-_PATH_CACHE: dict[str, str] = {}
+# Store recently normalized template identifiers and their loader paths.
+_PATH_CACHE: OrderedDict[str, str] = OrderedDict()
+_PATH_CACHE_MAX = 1024
+_PATH_CACHE_LOCK = Lock()
 
 class Jinja2Engine(IViewEngine):
     """
@@ -126,5 +127,12 @@ class Jinja2Engine(IViewEngine):
         # Append default extension only when none is present
         if "." not in _path.rsplit("/", 1)[-1]:
             _path += _DEFAULT_EXT
-        _PATH_CACHE[template] = _path
-        return _path
+        # Insert a new path and discard the oldest entry when full.
+        with _PATH_CACHE_LOCK:
+            cached = _PATH_CACHE.get(template)
+            if cached is not None:
+                return cached
+            if len(_PATH_CACHE) >= _PATH_CACHE_MAX:
+                _PATH_CACHE.popitem(last=False)
+            _PATH_CACHE[template] = _path
+            return _path

@@ -1128,7 +1128,7 @@ class TestApplicationAsync(IsolatedAsyncioTestCase):
         application = _new_application()
         application.build = _AsyncCall()
         self.assertIsNone(
-            await application({"type": "websocket"}, _AsyncCall(), _AsyncCall()),
+            await application({"type": "custom.protocol"}, _AsyncCall(), _AsyncCall()),
         )
         self.assertIsNone(
             await application.__rsgi__(SimpleNamespace(proto="websocket"), None),

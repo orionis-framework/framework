@@ -30,6 +30,8 @@ class _Payload(msgspec.Struct, gc=False):
     tag: str | None
     cipher: str
 
+_PAYLOAD_DECODER = _msjson.Decoder(_Payload)
+
 class Encrypter(IEncrypter):
 
     # ruff: noqa: TC001
@@ -91,9 +93,9 @@ class Encrypter(IEncrypter):
             error_msg = f"Key must be {self.AES_256_KEY_SIZE} bytes for AES-256"
             raise ValueError(error_msg)
 
-        # Precompute mode flag to avoid repeated substring scans
+        # Select the cipher mode configured for this instance.
         self._is_gcm: bool = "GCM" in self.cipher
-        # Cache AESGCM instance to avoid per-call key schedule overhead
+        # Prepare the authenticated cipher for GCM payloads.
         self._aesgcm: AESGCM | None = AESGCM(self.key) if self._is_gcm else None
 
     def encrypt(
@@ -138,7 +140,7 @@ class Encrypter(IEncrypter):
             raise ValueError(error_msg) from e
 
         try:
-            # Choose encryption method based on precomputed mode flag
+            # Encrypt with the configured cipher mode.
             if self._is_gcm:
                 return self.__encryptGCM(data)
             return self.__encryptCBC(data)
@@ -215,7 +217,7 @@ class Encrypter(IEncrypter):
         """
         try:
             raw = base64.b64decode(payload)
-            return _msjson.decode(raw, type=_Payload)
+            return _PAYLOAD_DECODER.decode(raw)
         except (msgspec.DecodeError, base64.binascii.Error) as e:
             error_msg = f"Invalid payload: {e}"
             raise ValueError(error_msg) from e
@@ -577,7 +579,7 @@ class Encrypter(IEncrypter):
                 error_msg = "Tag required for GCM decryption"
                 raise ValueError(error_msg)
 
-            # Use cached AESGCM instance (key schedule computed once in __init__)
+            # Decrypt and authenticate the GCM payload.
             return self._aesgcm.decrypt(iv, value + tag, None)
 
         except ValueError:

@@ -108,6 +108,19 @@ Two distinct paths exist:
 | `meta/` | Marker bases: `ValidationMetadata`, `ConstraintMetadata`, `DocumentMetadata`. |
 | `rules/` | 37 built-in rules + the `measure`, `temporal` and `image_probe` helpers. |
 
+### Import and construction policy
+
+`orionis.schemas.__init__` and `orionis.schemas.rules.__init__` load public
+exports on first access and cache each resolved class. Importing the rule
+package alone loads no rule implementation; importing `Email` loads only its
+module. The empty `contracts`, `entities`, and `meta` initializers remain empty.
+The one-export `exceptions` initializer remains eager.
+
+Schema class creation eagerly compiles metadata and warms nested validation
+plans, including schemas inside `Annotated` and union types. This keeps
+reflection and plan construction outside normal instance validation. Rule
+instances retain eager initialization of their required parameters.
+
 ## API reference
 
 ### `Schema` — base class (`orionis.schemas.schema`)

@@ -1,16 +1,13 @@
 from __future__ import annotations
-import sys
 from typing import TYPE_CHECKING
+from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.contracts.body_stream import IBodyStream
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
-# Sentinel value used when no body-size limit is configured.
-_NO_LIMIT: int = sys.maxsize
-
-class PayloadTooLargeException(Exception):
+class PayloadTooLargeException(ValueError):
     """Raise when the request body exceeds the configured size limit."""
 
 class BodyStream(IBodyStream):
@@ -35,6 +32,7 @@ class BodyStream(IBodyStream):
         "__body",
         "__consumed",
         "__is_rsgi",
+        "__max_buffer_size",
         "__max_size",
         "__receive",
     )
@@ -43,7 +41,9 @@ class BodyStream(IBodyStream):
         self,
         interface: Interface,
         receive_or_protocol: object,
-        max_body_size: int | None = None,
+        max_body_size: int | None = HTTPBodyLimits.max_body_size,
+        *,
+        max_buffer_size: int | None = HTTPBodyLimits.max_buffer_size,
     ) -> None:
         """
         Initialize a BodyStream for the given transport interface.
@@ -55,8 +55,11 @@ class BodyStream(IBodyStream):
         receive_or_protocol : object
             ASGI receive callable or RSGI ``HTTPProtocol`` instance.
         max_body_size : int | None, optional
-            Maximum allowed body size in bytes.  ``None`` means no
-            limit is enforced.
+            Maximum allowed body size in bytes (default 16 MiB). An explicit
+            ``None`` disables the transport limit for a manually built stream.
+        max_buffer_size : int | None, optional
+            Maximum bytes buffered by read() (default 2 MiB). An explicit
+            ``None`` disables this limit for a manually built stream.
 
         Returns
         -------
@@ -68,10 +71,18 @@ class BodyStream(IBodyStream):
         self.__consumed: bool = False
         # Record which transport provides the body chunks.
         self.__is_rsgi: bool = interface is Interface.RSGI
-        # Represent an unlimited body size with sys.maxsize.
-        self.__max_size: int = (
-            max_body_size if max_body_size is not None else _NO_LIMIT
-        )
+        for name, value in (
+            ("max_body_size", max_body_size), ("max_buffer_size", max_buffer_size),
+        ):
+            if value is not None:
+                if not isinstance(value, int) or isinstance(value, bool):
+                    error_msg = f"{name} must be an integer or None."
+                    raise TypeError(error_msg)
+                if value < 0:
+                    error_msg = f"{name} must not be negative."
+                    raise ValueError(error_msg)
+        self.__max_size = max_body_size
+        self.__max_buffer_size = max_buffer_size
         # Store the receive callable or RSGI protocol reference.
         self.__receive = receive_or_protocol
 
@@ -143,7 +154,7 @@ class BodyStream(IBodyStream):
                 if not chunk:
                     continue
                 total += len(chunk)
-                if total > max_size:
+                if max_size is not None and total > max_size:
                     error_msg = "Request body too large"
                     raise PayloadTooLargeException(error_msg)
                 yield chunk
@@ -155,7 +166,7 @@ class BodyStream(IBodyStream):
             chunk = message.get("body", b"")
             if chunk:
                 total += len(chunk)
-                if total > max_size:
+                if max_size is not None and total > max_size:
                     error_msg = "Request body too large"
                     raise PayloadTooLargeException(error_msg)
                 yield chunk
@@ -180,7 +191,7 @@ class BodyStream(IBodyStream):
             If the stream was consumed by a streaming consumer
             without having been buffered first.
         PayloadTooLargeException
-            If the body exceeds ``max_body_size``.
+            If the body exceeds ``max_body_size`` or ``max_buffer_size``.
         """
         # Return the cached buffer immediately if already read.
         body = self.__body
@@ -188,8 +199,14 @@ class BodyStream(IBodyStream):
             return body
 
         # Collect the transport chunks into the complete body buffer.
-        chunks: list[bytes] = []
+        buffer = bytearray()
         async for chunk in self.stream():
-            chunks.append(chunk)  # noqa: PERF401
-        self.__body = b"".join(chunks)
+            if (
+                self.__max_buffer_size is not None
+                and len(buffer) + len(chunk) > self.__max_buffer_size
+            ):
+                error_msg = "Request body exceeds the buffering limit"
+                raise PayloadTooLargeException(error_msg)
+            buffer.extend(chunk)
+        self.__body = bytes(buffer)
         return self.__body

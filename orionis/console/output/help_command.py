@@ -158,7 +158,7 @@ class HelpCommand(IHelpCommand):
         # Parse the actions to extract structured command information
         parsed_data = HelpCommand.parseActions(actions)
 
-        # Cache sub-dicts as locals: each key lookup is LOAD_FAST vs dict hash
+        # Read the parsed positional, optional, and subcommand groups.
         positionals = parsed_data["positionals"]
         optionals = parsed_data["optionals"]
         subcommands = parsed_data["subcommands"]

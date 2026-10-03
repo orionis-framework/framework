@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Callable  # noqa: TC003 - Runtime test reflection.
 from threading import BoundedSemaphore
 from types import SimpleNamespace
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar, cast
 from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager  # noqa: TC001
 from orionis.container.context.scope import get_current_scope
@@ -10,7 +10,8 @@ from orionis.foundation.config.http import HTTP, HTTPWebSocket
 from orionis.http import WebSocket, WebSocketDisconnected, WebSocketMiddleware
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.adapters.request.rsgi import RSGITransportAdapter
-from orionis.http.enums.interfaces import Interface
+from orionis.http.adapters.websocket.asgi import ASGIWebSocketTransport
+from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.route_compiler import RouteCompiler
@@ -21,6 +22,10 @@ from orionis.test import TestCase
 from tests.http.test_kernel import (
     _StubApp, _StubRsgiHeaders, boot_kernel, make_asgi_scope,
 )
+
+if TYPE_CHECKING:
+    from granian._granian import RSGIWebsocketProtocol
+    from granian.rsgi import Scope
 
 class _ASGIPeer:
     """Model one server connection with queued events and recorded output."""
@@ -44,6 +49,7 @@ class _ASGIPeer:
         """
         self.scope = make_asgi_scope(path)
         self.scope["type"] = "websocket"
+        self.scope["asgi"] = {"spec_version": "2.5"}
         self.scope.pop("method")
         if denial:
             self.scope["extensions"] = {"websocket.http.response": {}}
@@ -99,8 +105,8 @@ class _ASGIPeer:
             Connection using this peer's ASGI scope and callbacks.
         """
         return WebSocket(
-            Interface.ASGI, ASGITransportAdapter(self.scope), self.receive,
-            self.send, max_message_size=max_message_size,
+            ASGIWebSocketTransport(self.scope, self.receive, self.send),
+            ASGITransportAdapter(self.scope), max_message_size=max_message_size,
         )
 
 class _RSGIPeer:
@@ -210,7 +216,8 @@ class _RSGIPeer:
             Connection using this peer's RSGI scope and protocol.
         """
         return WebSocket(
-            Interface.RSGI, RSGITransportAdapter(self.scope), self,
+            RSGIWebSocketTransport(cast("RSGIWebsocketProtocol", self)),
+            RSGITransportAdapter(cast("Scope", self.scope)),
             max_message_size=max_message_size,
         )
 
@@ -288,8 +295,8 @@ class TestWebSocketTransport(TestCase):
         peer.events.put_nowait({"type": "websocket.receive", "text": ""})
         peer.events.put_nowait({"type": "websocket.receive", "bytes": b"data"})
         peer.events.put_nowait({"type": "websocket.receive", "text": '{"ok":true}'})
-        self.assertEqual(await socket.receive(), "")
-        self.assertEqual(await socket.receive(), b"data")
+        self.assertEqual((await socket.receive()).text, "")
+        self.assertEqual((await socket.receive()).bytes, b"data")
         self.assertEqual(await socket.receiveJson(), {"ok": True})
         await socket.sendJson({"ok": True})
         await socket.send(b"binary")
@@ -298,11 +305,9 @@ class TestWebSocketTransport(TestCase):
         peer.events.put_nowait({
             "type": "websocket.disconnect", "code": 1001, "reason": "left",
         })
-        with self.assertRaises(WebSocketDisconnected) as caught:
-            await socket.receive()
-        self.assertEqual(
-            (caught.exception.code, caught.exception.reason), (1001, "left"),
-        )
+        message = await socket.receive()
+        self.assertTrue(message.isDisconnect())
+        self.assertEqual((message.code, message.reason), (1001, "left"))
         self.assertTrue(socket.closed)
         await socket.close()
         self.assertEqual(len(peer.sent), 3)
@@ -320,8 +325,8 @@ class TestWebSocketTransport(TestCase):
         await socket.accept()
         peer.events.put_nowait(SimpleNamespace(kind=2, data="text"))
         peer.events.put_nowait(SimpleNamespace(kind=1, data=b"binary"))
-        self.assertEqual(await socket.receive(), "text")
-        self.assertEqual(await socket.receive(), b"binary")
+        self.assertEqual((await socket.receive()).text, "text")
+        self.assertEqual((await socket.receive()).bytes, b"binary")
         await socket.send("text")
         await socket.send(b"binary")
         self.assertEqual(peer.sent, ["text", b"binary"])
@@ -439,7 +444,7 @@ class TestWebSocketTransport(TestCase):
             with self.assertRaises(RuntimeError):
                 await socket.receive()
             peer.events.put_nowait({"type": "websocket.receive", "text": "first"})
-            self.assertEqual(await pending, "first")
+            self.assertEqual((await pending).text, "first")
         finally:
             pending.cancel()
             await socket.close()
@@ -475,7 +480,7 @@ class TestWebSocketTransport(TestCase):
         """
         peer = _ASGIPeer()
         socket = peer.socket()
-        await socket._connectEvent()
+        await cast("ASGIWebSocketTransport", socket._transport)._connectEvent()
         await asyncio.wait_for(socket.close(), timeout=1)
         self.assertTrue(socket.closed)
 
@@ -690,7 +695,7 @@ async def echo_handler(socket: WebSocket, room: int = 0) -> None:
         Send the room ID and received message as JSON.
     """
     await socket.accept()
-    await socket.sendJson({"room": room, "message": await socket.receive()})
+    await socket.sendJson({"room": room, "message": (await socket.receive()).data})
 
 async def scoped_handler(
     socket: WebSocket, dependency: _ScopedDependency, **_params: object,

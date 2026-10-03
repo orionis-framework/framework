@@ -115,7 +115,7 @@ reactor (script)
 | `fluent/task.py` | `Task`, the cron-like builder used by `Schedule.command()`. |
 | `output/` | `Console`, `Executor`, `HelpCommand`, `HTTPRequestPrinter`, `VarDumper`. |
 | `templates/` | `.stub` templates used by the `make:*` commands. |
-| `tasks/schedule.py` | `Schedule` plus the module level `_executeScheduledCommand`. |
+| `tasks/schedule.py` | `Schedule` plus the module level `_execute_scheduled_command`. |
 | `tasks/store.py` | `ScheduleStore`: builds the Redis / SQLAlchemy job stores. |
 
 ### Design decisions
@@ -138,7 +138,7 @@ reactor (script)
   `self.info(...)`, `self.table(...)` or `self.progressBar` are available inside
   `handle()` without extra wiring.
 - **Module level scheduler callable.** APScheduler jobs are registered with the
-  module level function `_executeScheduledCommand`, never a bound method, so a
+  module level function `_execute_scheduled_command`, never a bound method, so a
   persistent job store can serialize the job as a `module:function` reference.
 - **Single process server command.** `ServerCommand` implements `__new__` with a
   class level `RLock`, so `serve` is a singleton inside the process.
@@ -595,7 +595,7 @@ async def wait(self) -> None: ...
   passing `None` keeps the current value.
 - `wait()` blocks until that shutdown event is set.
 - The job callable is the module level coroutine
-  `_executeScheduledCommand(signature, args)`, which dispatches through the
+  `_execute_scheduled_command(signature, args)`, which dispatches through the
   `Reactor` facade.
 
 ### `Task` (fluent builder)

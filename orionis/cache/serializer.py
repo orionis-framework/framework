@@ -127,7 +127,7 @@ def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
     error_msg = f"Unsupported type for serialization: {t}"
     raise TypeError(error_msg)
 
-# Mapping of exact types to their encoder functions, for O(1) dispatch via type lookup.
+# Map supported types to their encoder functions.
 _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
     str: _identity,
     int: _identity,
@@ -483,7 +483,7 @@ class Serializer:
             The deserialized Python object, or None if the file does not exist or is
             empty.
         """
-        # EAFP: one syscall instead of exists() + stat() + open()
+        # Read the file and handle a missing path below.
         try:
             content = file_path.read_bytes()
         except OSError:

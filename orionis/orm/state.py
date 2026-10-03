@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import Any
 
-# Sentinel distinguishing "attribute absent from the original snapshot"
-# from any legitimate stored value, including None, in a single lookup.
+# Distinguish an absent original attribute from stored values, including None.
 _UNSET: Any = object()
 
 class StateMixin:

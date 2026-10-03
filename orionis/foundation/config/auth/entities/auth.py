@@ -8,7 +8,7 @@ from orionis.foundation.config.auth.entities.tokens import Tokens
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid guard names for O(1) membership checks
+# Define the supported authentication guard names.
 _GUARD_NAMES: frozenset[str] = frozenset(Guards._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

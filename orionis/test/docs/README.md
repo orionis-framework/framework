@@ -239,8 +239,9 @@ returns `self`, so calls can be chained:
 
 **`discover() -> unittest.TestSuite`**
 
-1. Inserts `app.basePath.absolute().as_posix()` at position 0 of `sys.path` if
-   not already present, so the top-level package is importable.
+1. Inserts `app.basePath.resolve().as_posix()` at position 0 of `sys.path` if
+   not already present. The project root and discovery directory use canonical
+   paths, including expanded Windows short names and resolved symbolic links.
 2. Resolves the start directory with `Path(self.__start_dir).resolve()` — a
    relative value is resolved against the **current working directory**, not
    against `basePath`.
@@ -250,9 +251,9 @@ returns `self`, so calls can be chained:
    `__init__.py` (something `unittest.discover()` skips).
 5. For each file matching `file_pattern`, derives the dotted module name from
    its path relative to the top-level directory and calls
-   `loader.loadTestsFromName(module_name)` inside
-   `contextlib.suppress(Exception)`: an unimportable file (syntax error,
-   missing dependency, and so on) is silently skipped and discovery continues.
+   `loader.loadTestsFromName(module_name)`. Import failures recorded by the
+   loader remain in the suite even when they do not match `method_pattern`;
+   other exceptions, including syntax errors, propagate to the caller.
 6. Flattens nested suites with the private recursive generator
    `__extractTests` and adds only the cases whose `_testMethodName` matches
    `method_pattern`.

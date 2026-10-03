@@ -1,8 +1,10 @@
+import asyncio
 import importlib
+import logging
 from contextlib import suppress
 from operator import attrgetter
 from threading import BoundedSemaphore
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 import msgspec
 from orionis.auth.middleware.resolve_identity import (
     ResolveSessionIdentityMiddleware,
@@ -21,6 +23,8 @@ from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.adapters.request.rsgi import RSGITransportAdapter
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
 from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
+from orionis.http.adapters.websocket.asgi import ASGIWebSocketTransport
+from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.enums.interfaces import Interface
@@ -36,6 +40,7 @@ from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import Request
 from orionis.http.responses import JSONResponse, Response
 from orionis.http.routes.enums.route_types import RouteType
+from orionis.http.routes.enums.protocols import RouteProtocol
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.loader import RouteLoader
@@ -47,17 +52,21 @@ from orionis.support.facades.view import View
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
+    from granian._granian import RSGIWebsocketProtocol
     from granian.rsgi import HTTPProtocol, Scope, WebsocketProtocol
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.routes.contracts.loader import IRouteLoader
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
+    from orionis.realtime.runtime import HubRuntime
 
 # Handler return types that are serialized as JSON.
 _JSON_RESPONSE_TYPES: tuple[type, ...] = (dict, msgspec.Struct)
 
 # Kernel context identifier reused across all request scopes.
 _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
+_LOGGER = logging.getLogger(__name__)
+_SHUTDOWN_TIMEOUT = 5.0
 
 class _MiddlewareNext[T]:
     """Hold one request-local continuation that can be consumed only once."""
@@ -213,6 +222,7 @@ class KernelHTTP(IKernelHTTP):
         "__fallback",
         "__fn_dispatch",
         "__health_path",
+        "__hub_dispatch",
         "__middleware_cache",
         "__printer_enabled",
         "__proxies",
@@ -228,6 +238,7 @@ class KernelHTTP(IKernelHTTP):
         "__web_middleware",
         "__websocket_config",
         "__websocket_slots",
+        "__websocket_tasks",
     )
 
     def __init__(
@@ -260,6 +271,7 @@ class KernelHTTP(IKernelHTTP):
         self.__websocket_slots = BoundedSemaphore(
             self.__websocket_config.max_connections,
         )
+        self.__websocket_tasks: set[asyncio.Task] = set()
         # Associate each route middleware stack with its instances.
         self.__middleware_cache: dict[tuple, tuple] = {}
 
@@ -328,6 +340,13 @@ class KernelHTTP(IKernelHTTP):
             else None
         )
 
+        if any(
+            route.protocol is RouteProtocol.WEBSOCKET
+            for route in self.__routes.allRoutes()
+        ):
+            self.__app.on(
+                Lifespan.SHUTDOWN, self.__shutdownWebSockets, runtime=Runtime.HTTP,
+            )
         self.__boot = True
 
     def __routeResolve(
@@ -374,6 +393,7 @@ class KernelHTTP(IKernelHTTP):
         fn_dispatch: dict[int, object] = {}
         cls_dispatch: dict[int, tuple[type, str]] = {}
         view_dispatch: dict[int, str] = {}
+        hub_dispatch: dict[int, HubRuntime] = {}
         module_cache: dict[str, object] = {}
 
         # Walk every registered route once and store fully resolved callables.
@@ -392,7 +412,19 @@ class KernelHTTP(IKernelHTTP):
                 module = importlib.import_module(module_name)
                 module_cache[module_name] = module
 
-            if route.type is RouteType.FUNCTION:
+            if route.type is RouteType.HUB:
+                # Realtime is imported only when a Hub route needs its runtime.
+                realtime = importlib.import_module("orionis.realtime.runtime")
+                contracts = importlib.import_module(
+                    "orionis.realtime.contracts.manager",
+                )
+
+                hub = attrgetter(action["class"])(module)
+                hub_dispatch[route_id] = realtime.HubRuntime(
+                    self.__app, await self.__app.make(contracts.IConnectionManager),
+                    hub, route.hub_protocol or "json",
+                )
+            elif route.type is RouteType.FUNCTION:
                 function = attrgetter(action["function"])(module)
                 callable_plan(function)
                 fn_dispatch[route_id] = function
@@ -405,6 +437,7 @@ class KernelHTTP(IKernelHTTP):
         self.__fn_dispatch: dict[int, object] = fn_dispatch
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
         self.__view_dispatch: dict[int, str] = view_dispatch
+        self.__hub_dispatch = hub_dispatch
 
     def __defaultMiddleware(
         self,
@@ -968,6 +1001,10 @@ class KernelHTTP(IKernelHTTP):
             method = adapter.method()
             path = adapter.path()
 
+            # The internal connection dispatch key is never an HTTP verb.
+            if method == "WEBSOCKET":
+                raise RouteNotFound
+
             # Return an Allow header response for OPTIONS introspection requests.
             if method == "OPTIONS":
                 allowed_methods = self.__routes.options(path)
@@ -982,6 +1019,8 @@ class KernelHTTP(IKernelHTTP):
 
             # Resolve the route and construct the fully typed request object.
             resolved_route = self.__routes.resolve(method=method, path=path)
+            if resolved_route.route.protocol is not RouteProtocol.HTTP:
+                raise RouteNotFound
             request = Request(
                 interface=interface,
                 adapter=adapter,
@@ -1141,6 +1180,10 @@ class KernelHTTP(IKernelHTTP):
             If the handler returns an HTTP response or another value.
         """
         route_id = id(resolved_route.route)
+        hub = self.__hub_dispatch.get(route_id)
+        if hub is not None:
+            await hub.serve(socket)
+            return
         function = self.__fn_dispatch.get(route_id)
         if function is not None:
             result = await self.__app.invoke(function, **socket.routeParams())
@@ -1178,13 +1221,27 @@ class KernelHTTP(IKernelHTTP):
         None
             Await the connection pipeline and always release admission.
         """
+        transport = (
+            ASGIWebSocketTransport(
+                adapter.getScope(),
+                cast("Callable[[], Awaitable[dict]]", receive_or_protocol),
+                cast("Callable[[dict], Awaitable[None]]", send),
+            )
+            if interface is Interface.ASGI
+            else RSGIWebSocketTransport(
+                cast("RSGIWebsocketProtocol", receive_or_protocol),
+            )
+        )
         socket = WebSocket(
-            interface, adapter, receive_or_protocol, send,
+            transport, adapter,
             max_message_size=self.__websocket_config.max_message_size,
         )
         if not self.__websocket_slots.acquire(blocking=False):
             await socket.reject(status_code=503)
             return
+        task = asyncio.current_task()
+        if task is not None:
+            self.__websocket_tasks.add(task)
         try:
             async with self.__app.beginScope() as connection_context:
                 connection_context.set("kernel", _KERNEL_CONTEXT)
@@ -1194,16 +1251,39 @@ class KernelHTTP(IKernelHTTP):
                 except WebSocketDisconnected:
                     pass
                 except Exception:
-                    if socket.accepted and interface is Interface.ASGI:
+                    # Application exception strings may contain credentials.
+                    _LOGGER.error("WebSocket handler failed")  # noqa: TRY400
+                    if socket.accepted:
                         # Cleanup failure must not replace the handler's error.
                         with suppress(Exception):
-                            await socket.close(code=1011)
+                            await socket.close(
+                                code=1011 if socket.supportsCloseDetails else 1000,
+                            )
                     raise
                 finally:
                     if not socket.closed:
                         await socket.close()
         finally:
             self.__websocket_slots.release()
+            if task is not None:
+                self.__websocket_tasks.discard(task)
+
+    async def __shutdownWebSockets(self) -> None:
+        """Cancel connection lifetimes within the existing shutdown lifecycle.
+
+        Returns
+        -------
+        None
+            Await cooperative cleanup for at most five seconds.
+        """
+        tasks = self.__websocket_tasks - {asyncio.current_task()}
+        if not tasks:
+            return
+        for task in tasks:
+            task.cancel()
+        _, pending = await asyncio.wait(tasks, timeout=_SHUTDOWN_TIMEOUT)
+        if pending:
+            _LOGGER.warning("WebSocket handlers exceeded shutdown cleanup deadline")
 
     async def __processWebSocket(
         self, adapter: TransportAdapter, socket: WebSocket,

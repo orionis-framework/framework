@@ -83,9 +83,7 @@ class AuthenticationContext(IAuthenticationContext):
         self.__snapshot: IAuthorizationSnapshot | None = None
         self.__scope: ScopeManager | None = None
 
-        # Guests resolve to the shared empty snapshot, so they never need
-        # a lock nor a database round trip.
-        self.__lock = asyncio.Lock() if identity is not None else None
+        self.__lock: asyncio.Lock | None = None
 
     def _bindToScope(self, scope: ScopeManager) -> None:
         """
@@ -233,10 +231,13 @@ class AuthenticationContext(IAuthenticationContext):
 
         identity = self.__identity
         repository = self.__repository
-        lock = self.__lock
-        if identity is None or repository is None or lock is None:
+        if identity is None or repository is None:
             self.__snapshot = EMPTY_SNAPSHOT
             return EMPTY_SNAPSHOT
+
+        lock = self.__lock
+        if lock is None:
+            lock = self.__lock = asyncio.Lock()
 
         async with lock:
             # Re-check inside the lock: another coroutine of this request

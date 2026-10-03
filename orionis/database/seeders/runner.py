@@ -30,6 +30,14 @@ class _ClaimFailed(Exception):
     __slots__ = ("error",)
 
     def __init__(self, error: QueryException) -> None:
+        """
+        Retain the query error that prevented a seeder claim.
+
+        Parameters
+        ----------
+        error : QueryException
+            Query failure that prevented the claim.
+        """
         self.error = error
         super().__init__(str(error))
 

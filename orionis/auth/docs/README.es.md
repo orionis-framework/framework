@@ -238,6 +238,14 @@ inyectar un contexto invitado antes de resolver identidad. Autenticar publica un
 contexto nuevo. Las referencias vinculadas quedan como invitado tras reemplazo,
 cierre del scope o acceso desde otro scope. No deben retenerse en singletons.
 
+Los ciclos de vida que abren scopes independientes de invocación copian el
+contexto integrado mediante `_fork()` mientras el scope de conexión sigue siendo
+el actual, y vinculan el nuevo contexto al scope de invocación. Conservan la
+identidad y restricciones de credencial sin compartir scope, locks ni snapshots
+de autorización. Cada invocación resuelve permisos de forma diferida otra vez.
+Copiar un contexto obsoleto no restaura su identidad. Los contextos personalizados
+deben preparar una propagación explícita equivalente entre scopes.
+
 Un lock por petición serializa resolución, login, logout y revocación del token
 actual. Repetir un guard reutiliza su contexto, incluidos invitados; otro guard
 no puede sustituir silenciosamente una identidad autenticada. Las tareas que

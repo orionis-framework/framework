@@ -22,6 +22,7 @@ class FluentRoute(IFluentRoute):
         "DELETE",
         "PATCH",
         "QUERY",
+        "WEBSOCKET",
     })
 
     def __init__(

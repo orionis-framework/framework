@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import fnmatch
 import json
 import os
@@ -210,6 +209,11 @@ class TestingEngine(ITestingEngine):
         -------
         unittest.TestSuite
             Test suite containing filtered test cases.
+
+        Raises
+        ------
+        Exception
+            If a test module raises an exception outside loader error handling.
         """
         # Ensure top-level directory is importable.
         top_level_dir: str = self.__base_path.absolute().as_posix()
@@ -231,16 +235,18 @@ class TestingEngine(ITestingEngine):
                 filepath = Path(dirpath) / filename
                 rel = os.path.relpath(filepath.with_suffix(""), top_level_dir)
                 module_name: str = rel.replace(os.sep, ".").replace("/", ".")
-                # Any exception is possible when importing an arbitrary module
-                # (SyntaxError, ImportError, NameError, …), so suppress broadly.
-                with contextlib.suppress(Exception):
-                    tests = loader.loadTestsFromName(module_name)
-                    for test_case in self.__extractTests(tests):
-                        method_name = getattr(test_case, "_testMethodName", None)
-                        if method_name and fnmatch.fnmatch(
-                            method_name, self.__method_pattern,
-                        ):
-                            filtered_suite.addTest(test_case)
+                errors_before = len(loader.errors)
+                tests = loader.loadTestsFromName(module_name)
+                # Preserve loader failures regardless of the method filter.
+                if len(loader.errors) != errors_before:
+                    filtered_suite.addTests(tests)
+                    continue
+                for test_case in self.__extractTests(tests):
+                    method_name = getattr(test_case, "_testMethodName", None)
+                    if method_name and fnmatch.fnmatch(
+                        method_name, self.__method_pattern,
+                    ):
+                        filtered_suite.addTest(test_case)
 
         return filtered_suite
 

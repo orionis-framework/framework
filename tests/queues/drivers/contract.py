@@ -4,7 +4,6 @@ import msgspec
 from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.exceptions import QueueConfigurationError
 
-
 def make_envelope(queue: str = "default") -> JobEnvelope:
     """Build a valid envelope for driver contract tests.
 
@@ -24,11 +23,25 @@ def make_envelope(queue: str = "default") -> JobEnvelope:
         max_tries=3, timeout=1.0, backoff=(0.0,),
     )
 
-
 class DurableDriverContract:
     """Exercise identical persistence and lease behavior for durable drivers."""
 
     __slots__ = ()
+
+    async def _advanceTime(self, seconds: float) -> None:
+        """Wait for a real backend deadline unless a controlled clock is used.
+
+        Parameters
+        ----------
+        seconds : float
+            Duration added to the backend's notion of current time.
+
+        Returns
+        -------
+        None
+            Make delayed work or leases eligible for the next assertion.
+        """
+        await asyncio.sleep(seconds)
 
     async def testPushReserveDelete(self) -> None:
         """Round-trip one envelope through a complete reservation.
@@ -65,7 +78,7 @@ class DurableDriverContract:
         await self._driver.push(envelope, delay=0.08)
         self.assertIsNone(await self._driver.reserve(("default",), 60.0))
         self.assertEqual(await self._driver.size("default"), 1)
-        await asyncio.sleep(0.12)
+        await self._advanceTime(0.12)
         self.assertEqual(
             (await self._driver.reserve(("default",), 60.0)).id, envelope.id,
         )
@@ -83,7 +96,7 @@ class DurableDriverContract:
         self.assertTrue(await self._driver.release(reserved, delay=0.08))
         self.assertFalse(await self._driver.release(reserved))
         self.assertIsNone(await self._driver.reserve(("default",), 60.0))
-        await asyncio.sleep(0.12)
+        await self._advanceTime(0.12)
         next_reservation = await self._driver.reserve(("default",), 60.0)
         self.assertEqual(next_reservation.attempts, 2)
         self.assertNotEqual(next_reservation.token, reserved.token)
@@ -101,7 +114,7 @@ class DurableDriverContract:
         envelope = make_envelope()
         await self._driver.push(envelope)
         expired = await self._driver.reserve(("default",), 0.05)
-        await asyncio.sleep(0.08)
+        await self._advanceTime(0.08)
         self.assertFalse(await self._driver.delete(expired))
         self.assertFalse(await self._driver.release(expired))
         reserved = await self._driver.reserve(("default",), 60.0)

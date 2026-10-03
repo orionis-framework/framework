@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
+from orionis.http.routes.enums.protocols import RouteProtocol
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -12,16 +13,20 @@ if TYPE_CHECKING:
 @dataclass(slots=True, frozen=True)
 class CompiledRoute:
     """
-    Represent a runtime-ready compiled HTTP route.
+    Represent a runtime-ready compiled HTTP or WebSocket route.
 
     Attributes
     ----------
     path : str
         The original route path, e.g. ``'/users/{id:int}'``.
     method : str
-        HTTP method in uppercase, e.g. ``'GET'``.
+        HTTP method in uppercase, or the reserved ``'WEBSOCKET'`` table key.
     type : RouteType
         How the handler will be resolved at dispatch time.
+    protocol : RouteProtocol
+        Transport used for this route, independently of the action type.
+    hub_protocol : str | None
+        Realtime codec name for Hub actions; None for ordinary routes.
     action : dict
         Resolved handler descriptor containing ``module`` and either
         ``function`` (for functions) or ``class`` + ``method``
@@ -68,3 +73,5 @@ class CompiledRoute:
     middleware: list = field(default_factory=list)
     without_middleware: set = field(default_factory=set)
     compiled_middlewares: tuple = field(default_factory=tuple)
+    protocol: RouteProtocol = RouteProtocol.HTTP
+    hub_protocol: str | None = None

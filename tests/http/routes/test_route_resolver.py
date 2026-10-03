@@ -377,6 +377,41 @@ class TestRouteResolverBehavior(TestCase):
         with self.assertRaises(RouteNotFound):
             RouteResolver(compile_router(router)).resolve("GET", "/items/" + "9" * 5000)
 
+    def testConversionFailureAllowsLaterDynamicRoute(self) -> None:
+        """Resolve a later matching route when a converter rejects the path.
+
+        Returns
+        -------
+        None
+            Assertions verify route fallback and result caching.
+        """
+        router = make_router()
+        router.get("/items/{value:int}", route_handler).name("number")
+        router.get("/items/{value:str}", route_handler).name("text")
+        resolver = RouteResolver(compile_router(router))
+        path = "/items/" + "9" * 5000
+        result = resolver.resolve("GET", path)
+        self.assertEqual(result.route.name, "text")
+        self.assertEqual(result.params, {"value": "9" * 5000})
+        self.assertIs(resolver.resolve("GET", path), result)
+
+    def testHotCacheSharesCapacityAcrossMethods(self) -> None:
+        """Evict the oldest result regardless of its HTTP method.
+
+        Returns
+        -------
+        None
+            Assertions verify the bounded cache across method namespaces.
+        """
+        router = make_router()
+        router.get("/items/{id:int}", route_handler)
+        router.post("/items/{id:int}", route_handler)
+        resolver = RouteResolver(compile_router(router), hot_cache_size=1)
+        first = resolver.resolve("GET", "/items/1")
+        second = resolver.resolve("POST", "/items/1")
+        self.assertIs(resolver.resolve("POST", "/items/1"), second)
+        self.assertIsNot(resolver.resolve("GET", "/items/1"), first)
+
     def testIntrospectionDoesNotExposeTheStoredRouteCollection(self) -> None:
         """Allow callers to modify allRoutes output without changing dispatch.
 

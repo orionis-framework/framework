@@ -87,21 +87,24 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     Returns
     -------
     InvocationPlan
-        Constructor parameters shared by all instances of the class.
+        Shared constructor parameters with resolvable class-local types restored.
     """
     ReflectionConcrete(target)
     signature = _cached_resolved_signature(constructor)
     annotations = getattr(constructor, "__annotations__", {})
-    if not any(
-        isinstance(value, str)
+    unresolved_names = tuple(
+        name
         for name, value in annotations.items()
         if name != "return"
-    ):
+        and isinstance(value, str)
+        and (argument := signature.ordered.get(name)) is not None
+        and argument.module_name == "typing"
+        and argument.type is str
+    )
+    if not unresolved_names:
         return InvocationPlan(tuple(signature.ordered.values()), is_async=False)
 
-    # The generic dependency reflector retains string annotations. Resolve
-    # constructor hints in the declaring module and target class namespace.
-    # Keep unresolved hints on the existing reflector path for compatibility.
+    # Resolve remaining class-local references in the constructor namespace.
     raw_signature = inspect.signature(constructor)
     module = inspect.getmodule(constructor)
     globalns = vars(module) if module is not None else {}
@@ -112,25 +115,33 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     for parameter in raw_signature.parameters.values():
         hint = parameter.annotation
         updated = parameter
+        dependency = signature.ordered.get(parameter.name)
         if (
             isinstance(hint, str)
             and parameter.default is inspect.Parameter.empty
+            and dependency is not None
+            and dependency.module_name != "typing"
+            and isinstance(dependency.type, type)
         ):
-            probe = type("_ConstructorHint", (), {
-                "__annotations__": {"value": hint},
-            })
-            try:
-                resolved = get_type_hints(
-                    probe,
-                    globalns=globalns,
-                    localns=localns,
-                )["value"]
-            except (AttributeError, NameError, SyntaxError, TypeError):
-                pass
-            else:
-                if isinstance(resolved, type):
-                    updated = parameter.replace(annotation=resolved)
-                    changed = True
+            updated = parameter.replace(annotation=dependency.type)
+        if parameter.name not in unresolved_names:
+            parameters.append(updated)
+            continue
+        probe = type("_ConstructorHint", (), {
+            "__annotations__": {"value": hint},
+        })
+        try:
+            resolved = get_type_hints(
+                probe,
+                globalns=globalns,
+                localns=localns,
+            )["value"]
+        except (AttributeError, NameError, SyntaxError, TypeError):
+            parameters.append(updated)
+            continue
+        if isinstance(resolved, type):
+            updated = parameter.replace(annotation=resolved)
+            changed = True
         parameters.append(updated)
 
     if changed:

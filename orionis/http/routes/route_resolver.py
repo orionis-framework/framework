@@ -527,6 +527,7 @@ class RouteResolver(IRouteResolver):
         ----------
         method : str
             HTTP method, matched case-insensitively; HEAD uses the GET table.
+            ``WEBSOCKET`` selects the isolated connection route table.
         path : str
             Request path to normalize before lookup.
 
@@ -541,7 +542,7 @@ class RouteResolver(IRouteResolver):
         RouteNotFound
             If no route can be resolved and no other method matches the path.
         MethodNotAllowed
-            If no route is resolved and another method has a matching path.
+            If no HTTP route is resolved and another HTTP method matches.
         """
         canonical = _METHOD_MAP.get(method)
         if canonical is None:
@@ -591,6 +592,8 @@ class RouteResolver(IRouteResolver):
         RouteNotFound
             If no method has a static or regex match for the path.
         """
+        if method == "WEBSOCKET":
+            raise RouteNotFound(path)
         if path in self._global_static or any(
             _path_allowed_for_method(tables[0], tables[1], path, depth)
             for other, tables in self._tables.items()

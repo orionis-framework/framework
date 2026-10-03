@@ -215,8 +215,8 @@ class TestingEngine(ITestingEngine):
         Exception
             If a test module raises an exception outside loader error handling.
         """
-        # Ensure top-level directory is importable.
-        top_level_dir: str = self.__base_path.absolute().as_posix()
+        # Resolve the project root before deriving module names from test paths.
+        top_level_dir: str = self.__base_path.resolve().as_posix()
         if top_level_dir not in sys.path:
             sys.path.insert(0, top_level_dir)
 

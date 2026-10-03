@@ -6,7 +6,7 @@ from orionis.foundation.config.hashing.entities.bcrypt import Bcrypt
 from orionis.foundation.config.hashing.enums import Drivers
 from orionis.support.entities.base import BaseEntity
 
-# Pre-computed frozenset of valid driver names for O(1) membership checks
+# Define the supported hashing driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 
 @dataclass(frozen=True, kw_only=True)

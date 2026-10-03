@@ -1,7 +1,9 @@
 from __future__ import annotations
 import asyncio
 import tempfile
+import threading
 from pathlib import Path
+from unittest.mock import patch
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.test import TestCase
 
@@ -594,6 +596,55 @@ class TestFileCacheBackendConcurrency(TestCase):
         """
         await asyncio.gather(*(self._backend.increment("hits") for _ in range(25)))
         self.assertEqual(await self._backend.get("hits"), 25)
+
+    async def testConcurrentIncrementsAcrossBackendsDoNotLoseUpdates(self) -> None:
+        """Apply every increment from backends sharing one directory."""
+        other = FileCacheBackend(self._path)
+        backends = (self._backend, other)
+
+        await asyncio.gather(
+            *(backends[index % 2].increment("shared") for index in range(60)),
+        )
+
+        self.assertEqual(await self._backend.get("shared"), 60)
+
+    async def testClearWaitsForStagedWriteBeforeRemovingTemp(self) -> None:
+        """Keep an active staging file until its write completes."""
+        staged = threading.Event()
+        resume = threading.Event()
+        original = FileCacheBackend._FileCacheBackend__replaceSync
+
+        def staged_replace(backend: FileCacheBackend, tmp: Path, file: Path) -> None:
+            """Hold the staged write until the clear operation starts.
+
+            Parameters
+            ----------
+            backend : FileCacheBackend
+                Backend publishing the cache entry.
+            tmp : Path
+                Staged file awaiting publication.
+            file : Path
+                Final cache entry path.
+            """
+            staged.set()
+            if not resume.wait(timeout=5):
+                msg = "The staged writer was not released."
+                raise TimeoutError(msg)
+            original(backend, tmp, file)
+
+        with patch.object(
+            FileCacheBackend, "_FileCacheBackend__replaceSync", staged_replace,
+        ):
+            writer = asyncio.create_task(self._backend.set("staged", "value"))
+            self.assertTrue(await asyncio.to_thread(staged.wait, 2))
+            clear = asyncio.create_task(self._backend.clear())
+            await asyncio.sleep(0.05)
+            cleared_while_staged = clear.done()
+            resume.set()
+            results = await asyncio.gather(writer, clear, return_exceptions=True)
+
+        self.assertFalse(cleared_while_staged)
+        self.assertEqual(results, [True, True])
 
     async def testIncrementPreservesTheExistingExpiry(self) -> None:
         """Keep the original TTL when a counter is incremented.

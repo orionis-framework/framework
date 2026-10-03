@@ -19,6 +19,10 @@ class FrozenSample:
     value: int = 1
 
 
+class InheritedFrozen(FrozenSample):
+    pass
+
+
 @dataclass
 class MutableSample:
     value: int = 2
@@ -72,6 +76,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
             (package / "module_a.py").write_text("", encoding="utf-8")
             result = ModuleInspector.discoverModules(base, base)
         self.assertIsInstance(result, set)
+        self.assertIn("mypkg", result)
         self.assertIn("mypkg.module_a", result)
 
     def testSkipsDirectoriesNamedLikeModules(self) -> None:
@@ -96,9 +101,9 @@ class TestModuleInspectorDiscoverModules(TestCase):
             result = ModuleInspector.discoverModules(base, base)
         self.assertEqual(result, set())
 
-    def testSkipsFilesLocatedAtTheBasePathRoot(self) -> None:
+    def testFindsFilesLocatedAtTheBasePathRoot(self) -> None:
         """
-        Assert that files whose package path collapses to empty are skipped.
+        Find importable modules located directly under the base directory.
 
         Returns
         -------
@@ -109,11 +114,11 @@ class TestModuleInspectorDiscoverModules(TestCase):
             base = Path(tmp)
             (base / "root_module.py").write_text("", encoding="utf-8")
             result = ModuleInspector.discoverModules(base, base)
-        self.assertEqual(result, set())
+        self.assertEqual(result, {"root_module"})
 
-    def testStripsVirtualEnvironmentSegments(self) -> None:
+    def testSkipsVirtualEnvironmentDirectories(self) -> None:
         """
-        Assert that virtualenv and site-packages segments are removed.
+        Exclude modules nested inside virtual environments.
 
         Returns
         -------
@@ -126,7 +131,72 @@ class TestModuleInspectorDiscoverModules(TestCase):
             nested.mkdir(parents=True)
             (nested / "thing.py").write_text("", encoding="utf-8")
             result = ModuleInspector.discoverModules(base, base)
-        self.assertEqual(result, {"vendor.thing"})
+        self.assertEqual(result, set())
+
+    def testPreservesPackageNamesContainingEnv(self) -> None:
+        """Preserve valid package names containing environment substrings.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            package = base / "environment"
+            package.mkdir()
+            (package / "service.py").write_text("", encoding="utf-8")
+            result = ModuleInspector.discoverModules(base, base)
+        self.assertIn("environment.service", result)
+
+    def testPreservesNonVirtualEnvPackage(self) -> None:
+        """Discover a package named env when it is not a virtual environment.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            package = base / "env"
+            package.mkdir()
+            (package / "worker.py").write_text("", encoding="utf-8")
+            result = ModuleInspector.discoverModules(base, base)
+        self.assertIn("env.worker", result)
+
+    def testSkipsVirtualEnvironmentWithConfig(self) -> None:
+        """Skip a virtual environment marked by its configuration file.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            virtualenv = base / "venv"
+            virtualenv.mkdir()
+            (virtualenv / "pyvenv.cfg").write_text("", encoding="utf-8")
+            (virtualenv / "helper.py").write_text("", encoding="utf-8")
+            result = ModuleInspector.discoverModules(base, base)
+        self.assertNotIn("venv.helper", result)
+
+    def testRejectsTargetOutsideBase(self) -> None:
+        """Reject directories whose files cannot form base-relative modules.
+
+        Returns
+        -------
+        None
+            Raises AssertionError on failure.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "base"
+            target = Path(tmp) / "other"
+            base.mkdir()
+            target.mkdir()
+            with self.assertRaises(ValueError):
+                ModuleInspector.discoverModules(base, target)
 
 # ---------------------------------------------------------------------------
 # loadClass

@@ -11,7 +11,8 @@ Queue is a core provider. Orionis already includes `msgspec`, the asynchronous
 Redis client, and its database abstractions. Configure a reachable database or
 Redis server when selecting a durable connection. Start the application runtime
 before using facades; `Application.create()` alone does not run async provider
-boot. Reactor and HTTP application startup perform that boot automatically.
+boot. Custom scripts can use `await app.boot()`; Reactor and HTTP application
+startup perform that boot automatically. See the [readiness contract](../../foundation/docs/README.md#explicit-readiness-and-headless-startup).
 
 Core defaults live in `orionis/foundation/config/queue`. `Queue`, `Connections`,
 `Sync`, `Database`, `Redis`, `Failed`, and `Worker` are frozen, keyword-only,
@@ -119,6 +120,10 @@ Redis follows the cache connection pattern: configure `endpoint`, `port`, `db`,
 and `password` separately. No URL field or `QUEUE_REDIS_URL` variable is used.
 Ports must be integers from 1 to 65535, database indexes must be nonnegative
 integers, and passwords must be strings or `None`. Booleans are not numbers.
+Owned clients explicitly use RESP2 instead of relying on redis-py's protocol
+default. The multiprocess certification probe passed against Redis 5.0.14.1 on
+Windows, including lease expiration and fenced acknowledgements. This does not
+certify Redis persistence, failover or other deployment versions.
 
 The previous alpha configuration (`async`, `brokers`, ordering `strategy`,
 `visibility_timeout`, and `retry_delay`) has been replaced. Update application

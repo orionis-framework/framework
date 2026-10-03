@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
 from orionis.http.adapters.response.files import complete_file_read, open_file
 from orionis.http.adapters.response.ranges import parse_range
-from orionis.http.responses import FileResponse, Response
+from orionis.http.adapters.response.streams import close_stream, send_until_disconnect
+from orionis.http.responses import EventStreamResponse, FileResponse, Response
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Awaitable, Callable
+    from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
     from pathlib import Path
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
@@ -35,8 +36,9 @@ class ASGIResponseAdapter(ResponseAdapter):
         response : Response
             Response object to be sent back to the client.
         _receive : Callable[..., Awaitable[dict]]
-            Awaitable callable to receive ASGI messages (reserved for
-            future use, e.g. request body reading by handlers).
+            Receive callable observed for disconnects during event streams.
+            Handlers must consume required request body data before returning
+            an event stream, which owns receive during response delivery.
         send : Callable[..., Awaitable[None]]
             Awaitable callable to send ASGI messages.
 
@@ -44,6 +46,11 @@ class ASGIResponseAdapter(ResponseAdapter):
         -------
         None
             Sends the response via ASGI protocol and returns nothing.
+
+        Raises
+        ------
+        BaseException
+            Propagate metadata or delivery failures after closing an owned SSE source.
         """
         # Identify the server software via the Server header.
         response.setHeader("server", "Orionis ASGI")
@@ -53,26 +60,15 @@ class ASGIResponseAdapter(ResponseAdapter):
         method: str = adapter.method()
 
         # Encode the response headers for ASGI messages.
-        headers: list[tuple[bytes, bytes]] = response.getRawHeaders()
+        try:
+            headers: list[tuple[bytes, bytes]] = response.getRawHeaders()
+        except BaseException as failure:
+            await close_stream(response.getStream(), failure)
+            raise
 
         # HEAD requests must receive an empty body.
         if method == "HEAD":
-            self.__ensureContentLength(headers, response)
-            await send({
-                "type": self.RESPONSE_START,
-                "status": status,
-                "headers": headers,
-            })
-            await send({
-                "type": self.RESPONSE_BODY,
-                "body": b"",
-                "more_body": False,
-            })
-            if (
-                response.background is not None
-                or type(response).runBackground is not Response.runBackground
-            ):
-                await response.runBackground()
+            await self.__sendHead(response, status, headers, send)
             return
 
         # Select the requested file interval or the response stream.
@@ -101,28 +97,21 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         # Send the selected stream one chunk at a time.
         if stream is not None:
-            await send({
-                "type": self.RESPONSE_START,
-                "status": status,
-                "headers": headers,
-            })
-            iterator = aiter(stream)
-            try:
-                async for chunk in iterator:
-                    await send({
-                        "type": self.RESPONSE_BODY,
-                        "body": chunk,
-                        "more_body": True,
-                    })
-            finally:
-                close = getattr(iterator, "aclose", None)
-                if close is not None:
-                    await close()
-            await send({
-                "type": self.RESPONSE_BODY,
-                "body": b"",
-                "more_body": False,
-            })
+            if isinstance(response, EventStreamResponse):
+                event_stream = response.getStream()
+                try:
+                    completed = await send_until_disconnect(
+                        self.__sendStream(event_stream, status, headers, send),
+                        self.__waitDisconnect(_receive),
+                    )
+                finally:
+                    # Also cover cancellation before the sender task starts.
+                    # The event stream wrapper makes repeated close a no-op.
+                    await event_stream.aclose()
+                if not completed:
+                    return
+            else:
+                await self.__sendStream(aiter(stream), status, headers, send)
             if (
                 response.background is not None
                 or type(response).runBackground is not Response.runBackground
@@ -140,6 +129,126 @@ class ASGIResponseAdapter(ResponseAdapter):
             or type(response).runBackground is not Response.runBackground
         ):
             await response.runBackground()
+
+    async def __sendHead(
+        self,
+        response: Response,
+        status: int,
+        headers: list[tuple[bytes, bytes]],
+        send: Callable[..., Awaitable[None]],
+    ) -> None:
+        """
+        Send HEAD framing without starting an event producer.
+
+        Parameters
+        ----------
+        response : Response
+            Response whose metadata is sent.
+        status : int
+            Response status code.
+        headers : list[tuple[bytes, bytes]]
+            Encoded response headers.
+        send : Callable[..., Awaitable[None]]
+            ASGI response writer.
+
+        Returns
+        -------
+        None
+            Close an unstarted event stream, then run successful background work.
+        """
+        self.__ensureContentLength(headers, response)
+        try:
+            await send({
+                "type": self.RESPONSE_START,
+                "status": status,
+                "headers": headers,
+            })
+            await send({
+                "type": self.RESPONSE_BODY,
+                "body": b"",
+                "more_body": False,
+            })
+        finally:
+            if isinstance(response, EventStreamResponse):
+                await response.getStream().aclose()
+        if (
+            response.background is not None
+            or type(response).runBackground is not Response.runBackground
+        ):
+            await response.runBackground()
+
+    async def __waitDisconnect(
+        self, receive: Callable[..., Awaitable[dict]],
+    ) -> None:
+        """
+        Wait for disconnect, draining unconsumed request messages.
+
+        Parameters
+        ----------
+        receive : Callable[..., Awaitable[dict]]
+            ASGI receive channel, owned by the response after handler return.
+
+        Returns
+        -------
+        None
+            Return only when the client disconnects.
+
+        Raises
+        ------
+        RuntimeError
+            If the HTTP channel produces an unexpected message type.
+        """
+        while True:
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                return
+            if message["type"] != "http.request":
+                error_msg = "Unexpected ASGI message during event stream"
+                raise RuntimeError(error_msg)
+
+    async def __sendStream(
+        self,
+        iterator: AsyncIterator[bytes],
+        status: int,
+        headers: list[tuple[bytes, bytes]],
+        send: Callable[..., Awaitable[None]],
+    ) -> None:
+        """
+        Send and close a stream with transport backpressure.
+
+        Parameters
+        ----------
+        iterator : AsyncIterator[bytes]
+            Owned iterator to close even if sending headers fails.
+        status : int
+            Response status code.
+        headers : list[tuple[bytes, bytes]]
+            Encoded response headers.
+        send : Callable[..., Awaitable[None]]
+            ASGI response writer.
+
+        Returns
+        -------
+        None
+            Finish the body only after iteration and cleanup succeed.
+        """
+        failure = None
+        try:
+            await send({
+                "type": self.RESPONSE_START, "status": status, "headers": headers,
+            })
+            async for chunk in iterator:
+                await send({
+                    "type": self.RESPONSE_BODY, "body": chunk, "more_body": True,
+                })
+        except BaseException as exc:
+            failure = exc
+            raise
+        finally:
+            await close_stream(iterator, failure)
+        await send({
+            "type": self.RESPONSE_BODY, "body": b"", "more_body": False,
+        })
 
     def __ensureContentLength(
         self,

@@ -22,6 +22,9 @@ if _TYPE_CHECKING:
     from orionis.http.sse import ServerSentEvent
     from orionis.http.types import HttpResponse
     from orionis.http.websocket import WebSocket, WebSocketDisconnected
+    from orionis.http.websocket_message import (
+        WebSocketMessage, WebSocketMessageType, WebSocketState,
+    )
     from orionis.http.websocket_middleware import WebSocketMiddleware, WebSocketNext
 
 __all__ = [
@@ -42,8 +45,11 @@ __all__ = [
     "StreamingResponse",
     "WebSocket",
     "WebSocketDisconnected",
+    "WebSocketMessage",
+    "WebSocketMessageType",
     "WebSocketMiddleware",
     "WebSocketNext",
+    "WebSocketState",
     "response",
 ]
 
@@ -65,6 +71,9 @@ _EXPORTS = {
     "StreamingResponse": ("orionis.http.responses", "StreamingResponse"),
     "WebSocket": ("orionis.http.websocket", "WebSocket"),
     "WebSocketDisconnected": ("orionis.http.websocket", "WebSocketDisconnected"),
+    "WebSocketMessage": ("orionis.http.websocket_message", "WebSocketMessage"),
+    "WebSocketMessageType": ("orionis.http.websocket_message", "WebSocketMessageType"),
+    "WebSocketState": ("orionis.http.websocket_message", "WebSocketState"),
     "WebSocketMiddleware": (
         "orionis.http.websocket_middleware", "WebSocketMiddleware",
     ),

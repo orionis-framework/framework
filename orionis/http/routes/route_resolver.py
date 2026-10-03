@@ -28,6 +28,7 @@ _METHOD_MAP: dict[str, str] = {
     "PATCH": "PATCH",
     "QUERY": "QUERY",
     "OPTIONS": "OPTIONS",
+    "WEBSOCKET": "WEBSOCKET",
 }
 
 ParamConverter = Callable[[str], object]
@@ -498,7 +499,8 @@ class RouteResolver(IRouteResolver):
                 path: ResolvedRoute(route=route, params={})
                 for path, route in bucket["static"].items()
             }
-            static_paths.update(static)
+            if method != "WEBSOCKET":
+                static_paths.update(static)
             grouped: dict[int, list[CompiledRoute]] = {}
             for route in bucket["dynamic"]:
                 grouped.setdefault(route.segment_count, []).append(route)
@@ -591,7 +593,8 @@ class RouteResolver(IRouteResolver):
         """
         if path in self._global_static or any(
             _path_allowed_for_method(tables[0], tables[1], path, depth)
-            for other, tables in self._tables.items() if other != method
+            for other, tables in self._tables.items()
+            if other not in {method, "WEBSOCKET"}
         ):
             raise MethodNotAllowed(path)
         raise RouteNotFound(path)
@@ -670,7 +673,8 @@ class RouteResolver(IRouteResolver):
         depth = path.count("/") if path != "/" else 0
         allowed = [
             method for method, tables in self._tables.items()
-            if _path_allowed_for_method(tables[0], tables[1], path, depth)
+            if method != "WEBSOCKET"
+            and _path_allowed_for_method(tables[0], tables[1], path, depth)
         ]
         if "GET" in allowed and "HEAD" not in allowed:
             allowed.append("HEAD")

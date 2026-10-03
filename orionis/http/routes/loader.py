@@ -160,7 +160,11 @@ class RouteLoader(IRouteLoader):
         # ── Cache hit ────────────────────────────────────────────────────────
         if self.__use_cache and self.__persistence:
             cached = self.__persistence.get()
-            if cached and cached.get("version") == RouteCache.VERSION:
+            if (
+                cached
+                and type(cached.get("version")) is int
+                and cached["version"] == RouteCache.VERSION
+            ):
                 self.__routes, self.__fallback = self.__cache.fromCache(cached)
                 self.__loaded = True
                 return

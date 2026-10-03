@@ -16,7 +16,6 @@ from orionis.console.fluent.command import Command as FluentCommand
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
-from orionis.introspection.modules.reflection import ReflectionModule
 from orionis.support.types.sentinel import MISSING as _MISSING
 
 # Define the sentinel type and command signature pattern.
@@ -191,7 +190,7 @@ class Loader(ILoader):
         self.__fluent_commands.append(f_command)
 
         # Return the newly created command for further configuration
-        return self.__fluent_commands[-1]
+        return f_command
 
     async def __loadCoreCommands(self) -> None:
         """
@@ -240,15 +239,14 @@ class Loader(ILoader):
 
         # Iterate through all module names discovered in the commands directory
         for module_name in modules:
-            # Reflect the module to access its classes
-            rf_module = ReflectionModule(module_name)
-            classes = rf_module.getClasses()
+            module = importlib.import_module(module_name)
 
-            # Iterate through all classes found in the current module
-            for obj in classes.values():
-                # Check if the class is a valid command class
+            # Register command classes defined by the current module.
+            for obj in vars(module).values():
                 if (
-                    issubclass(obj, BaseCommand)
+                    isinstance(obj, type)
+                    and obj.__module__ == module_name
+                    and issubclass(obj, BaseCommand)
                     and obj is not BaseCommand
                     and obj is not IBaseCommand
                 ):
@@ -408,17 +406,18 @@ class Loader(ILoader):
         TypeError
             If the 'timestamps' attribute exists but is not a boolean.
         """
-        # Check if the command class has a 'timestamps' attribute
-        if not hasattr(obj, "timestamps"):
+        # Read the declared timestamp setting.
+        timestamps = getattr(obj, "timestamps", _MISSING)
+        if timestamps is _MISSING:
             return False
 
         # Ensure the 'timestamps' attribute is a boolean
-        if not isinstance(obj.timestamps, bool):
+        if not isinstance(timestamps, bool):
             error_msg = f"Command class {obj.__name__} 'timestamps' must be a boolean."
             raise TypeError(error_msg)
 
         # Return the value of the 'timestamps' attribute
-        return obj.timestamps
+        return timestamps
 
     def __getDescription(
         self,
@@ -493,13 +492,10 @@ class Loader(ILoader):
             If the 'inputs' method does not return a list or contains non-
             Argument instances.
         """
-        # If the command class does not have an 'arguments' attribute,
-        # return an empty list
-        if not hasattr(obj, "arguments"):
+        # Read the declared arguments.
+        inputs: list[Argument] = getattr(obj, "arguments", _MISSING)
+        if inputs is _MISSING:
             return []
-
-        # Retrieve argument definitions directly (hasattr already checked above)
-        inputs: list[Argument] = obj.arguments
 
         # Ensure inputs is a list
         if not isinstance(inputs, list):
@@ -587,12 +583,20 @@ class Loader(ILoader):
         # Restore callable type from module-qualified string.
         type_str = d.get("type_")
         if type_str is not None:
-            module_name, _, qualname = type_str.rpartition(".")
-            try:
-                mod = importlib.import_module(module_name)
-                d["type_"] = getattr(mod, qualname)
-            except ImportError, AttributeError:
-                d["type_"] = None
+            parts = type_str.split(".")
+            d["type_"] = None
+            for index in range(len(parts) - 1, 0, -1):
+                try:
+                    resolved = importlib.import_module(".".join(parts[:index]))
+                except ImportError:
+                    continue
+                try:
+                    for attribute in parts[index:]:
+                        resolved = getattr(resolved, attribute)
+                except AttributeError:
+                    continue
+                d["type_"] = resolved
+                break
 
         # Restore MISSING sentinel from string marker.
         if d.get("const") == "__MISSING__":

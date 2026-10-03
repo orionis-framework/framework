@@ -242,7 +242,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with class names as keys and class objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("classes")
         if _cached is not None:
@@ -269,7 +269,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with class names as keys and class objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("public_classes")
         if _cached is not None:
@@ -294,7 +294,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with class names as keys and class objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("protected_classes")
         if _cached is not None:
@@ -320,7 +320,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with class names as keys and class objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("private_classes")
         if _cached is not None:
@@ -366,7 +366,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with constant names as keys and their values as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("constants")
         if _cached is not None:
@@ -393,7 +393,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with constant names as keys and their values as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("public_constants")
         if _cached is not None:
@@ -418,7 +418,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with constant names as keys and their values as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("protected_constants")
         if _cached is not None:
@@ -444,7 +444,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with constant names as keys and their values as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("private_constants")
         if _cached is not None:
@@ -470,7 +470,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with function names as keys and function objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("functions")
         if _cached is not None:
@@ -498,7 +498,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("public_functions")
         if _cached is not None:
@@ -523,7 +523,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("public_sync_functions")
         if _cached is not None:
@@ -549,7 +549,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("public_async_functions")
         if _cached is not None:
@@ -575,7 +575,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping protected function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("protected_functions")
         if _cached is not None:
@@ -601,7 +601,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("protected_sync_functions")
         if _cached is not None:
@@ -627,7 +627,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("protected_async_functions")
         if _cached is not None:
@@ -653,7 +653,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping function names to function objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("private_functions")
         if _cached is not None:
@@ -679,7 +679,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with function names as keys and function objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("private_sync_functions")
         if _cached is not None:
@@ -701,7 +701,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary with function names as keys and function objects as values.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("private_async_functions")
         if _cached is not None:
@@ -723,7 +723,7 @@ class ReflectionModule(IReflectionModule):
         dict
             Dictionary mapping import names to module objects.
         """
-        # Return cached result using a single dict lookup instead of two dunder calls
+        # Return the cached reflection result when available.
         _cache = self.__memory_cache
         _cached = _cache.get("imports")
         if _cached is not None:
@@ -746,7 +746,7 @@ class ReflectionModule(IReflectionModule):
         str
             The absolute file path of the module.
         """
-        # Return cached path to avoid repeated inspect.getfile() introspection calls
+        # Resolve and cache the reflected module's file path.
         _cache = self.__memory_cache
         _cached = _cache.get("_file")
         if _cached is not None:

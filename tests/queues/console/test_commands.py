@@ -467,16 +467,33 @@ import signal
 from tests.queues.console.test_commands import _Worker
 from orionis.console.commands.queue._signals import WorkerSignals
 
-async def probe():
+class SignalWorker(_Worker):
+    """Expose an explicit notification when the signal handler runs."""
+
+    __slots__ = ("stopped_event",)
+
+    def __init__(self) -> None:
+        """Create the worker and its shutdown notification."""
+        super().__init__()
+        self.stopped_event = asyncio.Event()
+
+    def stop(self) -> None:
+        """Notify the probe after requesting graceful shutdown."""
+        super().stop()
+        self.stopped_event.set()
+
+async def probe() -> None:
     """Verify graceful signal delivery on the main event loop."""
-    worker = _Worker()
+    worker = SignalWorker()
     original = {
         signum: signal.getsignal(signum)
         for signum in (signal.SIGINT, signal.SIGTERM)
     }
     with WorkerSignals(worker):
         signal.raise_signal(signal.SIGTERM)
-        await asyncio.sleep(0)
+        # Unix signal callbacks arrive through the event loop's self-pipe.
+        # Wait for actual delivery rather than assuming one loop turn is enough.
+        await asyncio.wait_for(worker.stopped_event.wait(), timeout=5)
         assert worker.stopped
     for signum, handler in original.items():
         assert signal.getsignal(signum) is handler
@@ -487,5 +504,11 @@ asyncio.run(probe())
             sys.executable, "-X", "utf8", "-c", script,
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
         )
-        output, errors = await process.communicate()
+        try:
+            async with asyncio.timeout(15):
+                output, errors = await process.communicate()
+        finally:
+            if process.returncode is None:
+                process.kill()
+                await process.wait()
         self.assertEqual(process.returncode, 0, (output + errors).decode("utf-8"))

@@ -227,7 +227,7 @@ class Worker(IWorker):
             await self.execute(reserved)
             self._processed += 1
 
-    def _validate_reservation(
+    def _validateReservation(
         self,
         reserved: ReservedJob,
         envelope: JobEnvelope,

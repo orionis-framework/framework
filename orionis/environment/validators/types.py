@@ -95,7 +95,8 @@ class __ValidateTypes:
 
         # Process type hint if provided and not None
         if type_hint is not None:
-            # Cached normalization — O(1) after first call per unique type_hint
+
+            # Normalize the type hint through the shared cache.
             return _normalize_type_hint(type_hint)
 
         # Use inferred type if no type hint provided

@@ -2,12 +2,14 @@ from __future__ import annotations
 import inspect
 import tempfile
 from pathlib import Path
+from types import ModuleType
 from typing import ClassVar
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.core.contracts.loader import ILoader
 from orionis.console.core.loader import Loader
+from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.test import TestCase
 
 class MockCommand(BaseCommand):
@@ -52,6 +54,18 @@ class MockCommand(BaseCommand):
         return "mock handled"
 
 class TestLoader(TestCase):
+    class NestedArgumentType:
+        """Represent a nested callable argument type."""
+
+        def __init__(self, value: str) -> None:
+            """Store the converted argument value.
+
+            Parameters
+            ----------
+            value : str
+                Value to store.
+            """
+            self.value = value
 
     def setUp(self) -> None:
         """Set up test fixtures.
@@ -755,6 +769,50 @@ class TestLoader(TestCase):
         self.assertIsInstance(arguments, list)
         self.assertEqual(len(arguments), 1)
         self.assertIsInstance(arguments[0], dict)
+
+    def testArgumentRoundTripResolvesNestedType(self) -> None:
+        """Restore a callable nested within an importable class."""
+        loader = Loader(self.mock_app)
+        argument = Argument(
+            name_or_flags="--nested",
+            type_=self.NestedArgumentType,
+        )
+
+        encoded = loader._Loader__argToDict(argument)
+        decoded = loader._Loader__argFromDict(encoded)
+
+        self.assertIs(decoded.type_, self.NestedArgumentType)
+
+    async def testCustomDiscoveryIgnoresImportedCommands(self) -> None:
+        """Register only command classes defined in the discovered module."""
+        module_name = "app.console.commands.sample"
+        local_command = type(
+            "LocalCommand",
+            (BaseCommand,),
+            {"__module__": module_name, "signature": "test:local"},
+        )
+        module = ModuleType(module_name)
+        module.ImportedCommand = MockCommand
+        module.LocalCommand = local_command
+        loader = Loader(self.mock_app)
+
+        with (
+            patch.object(
+                ModuleInspector,
+                "discoverModules",
+                return_value=[module_name],
+            ),
+            patch(
+                "orionis.console.core.loader.importlib.import_module",
+                return_value=module,
+            ),
+        ):
+            await loader._Loader__loadCustomCommands()
+
+        self.assertEqual(
+            set(loader._Loader__metadata),
+            {"test:local"},
+        )
 
     def testGetArgumentsInvalidType(self) -> None:
         """

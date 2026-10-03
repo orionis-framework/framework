@@ -615,7 +615,7 @@ class ReflectionConcrete(IReflectionConcrete):
         str
             The module name concatenated with the class name, separated by a dot.
         """
-        # Return cached result to avoid repeated string concatenation on each call
+        # Return the stored qualified class name when available.
         _cache = self._cache
         if "module_with_class_name" in _cache:
             return _cache["module_with_class_name"]
@@ -673,7 +673,7 @@ class ReflectionConcrete(IReflectionConcrete):
                 _cache["source_code"] = src
                 return src
 
-            # Compute cache key once to avoid redundant f-string construction
+            # Identify the source code entry for this method.
             cache_key = f"source_code_{method}"
             cached = _cache.get(cache_key)
             if cached is not None:
@@ -1002,7 +1002,7 @@ class ReflectionConcrete(IReflectionConcrete):
         bool
             True if the method exists in the class, otherwise False.
         """
-        # Use a frozenset for O(1) membership test instead of an O(n) list scan
+        # Check the classified method names.
         _cache = self._cache
         if "methods_set" not in _cache:
             self._scanClass()

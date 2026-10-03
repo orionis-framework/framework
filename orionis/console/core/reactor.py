@@ -2,7 +2,6 @@ import argparse
 import operator
 import sys
 from typing import Any
-
 from orionis.console.base.contracts.command import IBaseCommand
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.loader import Loader
@@ -16,7 +15,6 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
 from orionis.support.performance.counter import PerformanceCounter
 from orionis.support.types.sentinel import MISSING
-
 
 class Reactor(IReactor):
 
@@ -239,7 +237,7 @@ class Reactor(IReactor):
             })
 
         # Return the sorted list of command information by signature
-        # operator.itemgetter runs at C level, faster than a Python lambda
+        # Sort command metadata by its signature.
         self.__cache_info = sorted(commands_info, key=operator.itemgetter("signature"))
         return self.__cache_info
 
@@ -310,7 +308,7 @@ class Reactor(IReactor):
 
                 # Determine if timestamps should be logged based
                 # on command settings and help flags
-                # Evaluate (args or []) once to avoid creating two temporary lists
+                # Use an empty argument sequence when none was provided.
                 _safe_args = args or []
                 timestamps = (
                     command.timestamps and

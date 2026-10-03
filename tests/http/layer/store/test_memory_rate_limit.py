@@ -1,5 +1,7 @@
 from __future__ import annotations
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from orionis.http.layer.store import memory_rate_limit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
 from orionis.test import TestCase
@@ -19,7 +21,7 @@ class _Clock:
         Returns
         -------
         None
-            Completes the operation described above.
+            Store the initial controlled timestamp.
         """
         self.now = now
 
@@ -29,9 +31,37 @@ class _Clock:
         Returns
         -------
         float
-            Value produced by the helper.
+            Current controlled monotonic timestamp.
         """
         return self.now
+
+def _thread_attempts(store: MemoryRateLimitStore, barrier: Barrier) -> int:
+    """Submit requests from an independent event loop in a worker thread.
+
+    Parameters
+    ----------
+    store : MemoryRateLimitStore
+        Shared store receiving the attempts.
+    barrier : Barrier
+        Synchronize this worker with the other threads.
+
+    Returns
+    -------
+    int
+        Number of attempts accepted by this worker.
+    """
+    async def run() -> int:
+        """Count the attempts accepted by this worker.
+
+        Returns
+        -------
+        int
+            Number of accepted attempts.
+        """
+        return sum([await store.hit("shared", 17, 60) for _ in range(100)])
+
+    barrier.wait(timeout=10)
+    return asyncio.run(run())
 
 class TestMemoryRateLimitStore(TestCase):
     """Exercise quotas and incremental reclamation of inactive clients."""
@@ -53,7 +83,7 @@ class TestMemoryRateLimitStore(TestCase):
             Returns
             -------
             float
-                Value produced by the helper.
+                Timestamp assigned to the next attempt.
             """
             return next(timestamps)
 
@@ -144,3 +174,91 @@ class TestMemoryRateLimitStore(TestCase):
         self.assertFalse(await store.hit("client", 0, 60))
         self.assertFalse(store._MemoryRateLimitStore__storage)
         self.assertFalse(store._MemoryRateLimitStore__keys)
+
+    async def testRejectsNewClientsAtCapacityWithoutResettingExistingQuotas(
+        self,
+    ) -> None:
+        """Bound retained clients and preserve active clients' accepted history.
+
+        Returns
+        -------
+        None
+            Verify excess clients cannot evict active quotas.
+        """
+        store = MemoryRateLimitStore(max_keys=2)
+        self.assertTrue(await store.hit("one", 2, 60))
+        self.assertTrue(await store.hit("two", 2, 60))
+        for index in range(1000):
+            self.assertFalse(await store.hit(f"new-{index}", 2, 60))
+        self.assertTrue(await store.hit("one", 2, 60))
+        self.assertFalse(await store.hit("one", 2, 60))
+        self.assertEqual(set(store._MemoryRateLimitStore__storage), {"one", "two"})
+
+    async def testBoundsTotalAcceptedTimestampsAcrossClients(self) -> None:
+        """Reject additions when aggregate timestamp capacity is reached.
+
+        Returns
+        -------
+        None
+            Verify the store bounds accepted timestamps across clients.
+        """
+        store = MemoryRateLimitStore(max_events=3)
+        self.assertTrue(await store.hit("one", 100, 60))
+        self.assertTrue(await store.hit("two", 100, 60))
+        self.assertTrue(await store.hit("one", 100, 60))
+        self.assertFalse(await store.hit("two", 100, 60))
+        self.assertFalse(await store.hit("new", 100, 60))
+        self.assertEqual(store._MemoryRateLimitStore__total_events, 3)
+        self.assertEqual(len(store._MemoryRateLimitStore__storage), 2)
+
+    async def testReusesCapacityAtExpirationBoundary(self) -> None:
+        """Release client and timestamp capacity when a quota expires.
+
+        Returns
+        -------
+        None
+            Verify expired quotas free both configured capacity limits.
+        """
+        store = MemoryRateLimitStore(max_keys=1, max_events=1)
+        clock = _Clock()
+        with replace_attribute(memory_rate_limit, "monotonic", clock):
+            self.assertTrue(await store.hit("old", 10, 10))
+            self.assertFalse(await store.hit("new", 10, 10))
+            clock.now = 10
+            self.assertTrue(await store.hit("new", 10, 10))
+        self.assertEqual(set(store._MemoryRateLimitStore__storage), {"new"})
+        self.assertEqual(store._MemoryRateLimitStore__total_events, 1)
+
+    async def testConcurrentThreadsAndEventLoopsRespectSharedQuota(self) -> None:
+        """Share one store among independent worker-thread event loops.
+
+        Returns
+        -------
+        None
+            Verify threads collectively observe one quota and event count.
+        """
+        store = MemoryRateLimitStore()
+        barrier = Barrier(8)
+        loop = asyncio.get_running_loop()
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = await asyncio.gather(*(
+                loop.run_in_executor(executor, _thread_attempts, store, barrier)
+                for _ in range(8)
+            ))
+        self.assertEqual(sum(results), 17)
+        self.assertEqual(store._MemoryRateLimitStore__total_events, 17)
+
+    def testRejectsInvalidCapacity(self) -> None:
+        """Require finite, positive integer store capacities.
+
+        Returns
+        -------
+        None
+            Verify invalid values are rejected for each capacity setting.
+        """
+        for value in (0, -1, True, 1.5):
+            for name in ("max_keys", "max_events"):
+                with self.subTest(name=name, value=value), self.assertRaises(
+                    (TypeError, ValueError),
+                ):
+                    MemoryRateLimitStore(**{name: value})

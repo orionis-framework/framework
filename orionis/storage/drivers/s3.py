@@ -409,6 +409,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _read() -> bytes:
+            """
+            Read the requested object from storage.
+
+            Returns
+            -------
+            bytes
+                Complete object content.
+            """
             client = self.__client()
             try:
                 body = client.get_object(
@@ -451,6 +459,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _open() -> Any:
+            """
+            Open a stream for the requested object.
+
+            Returns
+            -------
+            Any
+                Readable object stream.
+            """
             client = self.__client()
             try:
                 return client.get_object(
@@ -488,6 +504,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _exists() -> bool:
+            """
+            Check whether the requested object exists.
+
+            Returns
+            -------
+            bool
+                Whether the object exists.
+            """
             try:
                 self.__headSync(normalized)
             except StorageFileNotFoundException:
@@ -528,6 +552,14 @@ class S3StorageDriver(IStorageDriver):
         )
 
         def _write() -> None:
+            """
+            Write the supplied content to storage.
+
+            Returns
+            -------
+            None
+                Completes after writing the object.
+            """
             client = self.__client()
             client.put_object(
                 Bucket=self._bucket,
@@ -569,6 +601,14 @@ class S3StorageDriver(IStorageDriver):
         buffer = await self.__spool(stream)
 
         def _upload() -> None:
+            """
+            Upload the supplied local file to storage.
+
+            Returns
+            -------
+            None
+                Completes after uploading the file.
+            """
             client = self.__client()
             client.upload_fileobj(
                 buffer,
@@ -599,6 +639,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _delete() -> bool:
+            """
+            Delete the requested object from storage.
+
+            Returns
+            -------
+            bool
+                Whether an object was deleted.
+            """
             try:
                 self.__headSync(normalized)
             except StorageFileNotFoundException:
@@ -634,6 +682,14 @@ class S3StorageDriver(IStorageDriver):
         destination = normalizeFilePath(target)
 
         def _copy() -> None:
+            """
+            Copy the requested object to another key.
+
+            Returns
+            -------
+            None
+                Completes after copying the object.
+            """
             client = self.__client()
             try:
                 client.copy_object(
@@ -805,6 +861,14 @@ class S3StorageDriver(IStorageDriver):
         acl = self.__aclFor(visibility)
 
         def _apply() -> None:
+            """
+            Apply visibility to the requested object.
+
+            Returns
+            -------
+            None
+                Completes after updating visibility.
+            """
             client = self.__client()
             try:
                 client.put_object_acl(
@@ -846,6 +910,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _hash() -> str:
+            """
+            Calculate the hash of the requested object.
+
+            Returns
+            -------
+            str
+                Content digest for the object.
+            """
             try:
                 hasher = hashlib.new(algorithm, usedforsecurity=False)
             except ValueError as exc:
@@ -895,6 +967,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _info() -> FileInfo:
+            """
+            Read metadata for the requested object.
+
+            Returns
+            -------
+            FileInfo
+                Object metadata.
+            """
             head = self.__headSync(normalized)
             try:
                 visibility = self.__visibilitySync(normalized)
@@ -964,6 +1044,14 @@ class S3StorageDriver(IStorageDriver):
         prefix = f"{normalized}/" if normalized else ""
 
         def _purge() -> bool:
+            """
+            Delete objects beneath the requested directory.
+
+            Returns
+            -------
+            bool
+                Whether any object was deleted.
+            """
             keys = self.__listKeysSync(prefix)
             if not keys:
                 return False
@@ -998,6 +1086,14 @@ class S3StorageDriver(IStorageDriver):
             return True
 
         def _exists() -> bool:
+            """
+            Check whether the requested object exists.
+
+            Returns
+            -------
+            bool
+                Whether the object exists.
+            """
             response = self.__client().list_objects_v2(
                 Bucket=self._bucket,
                 Prefix=f"{normalized}/",
@@ -1102,6 +1198,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _sign() -> str:
+            """
+            Create a signed URL for the requested object.
+
+            Returns
+            -------
+            str
+                Temporary URL for the object.
+            """
             return self.__client().generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self._bucket, "Key": normalized},
@@ -1135,6 +1239,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
 
         def _download() -> Path:
+            """
+            Download the requested object to a local path.
+
+            Returns
+            -------
+            Path
+                Destination of the downloaded object.
+            """
             target = resolveDownloadTarget(normalized, destination)
             client = self.__client()
             try:
@@ -1177,6 +1289,14 @@ class S3StorageDriver(IStorageDriver):
         assertBinaryMode(mode)
 
         def opener() -> BinaryIO:
+            """
+            Open the binary stream backing this object.
+
+            Returns
+            -------
+            BinaryIO
+                Stream handle for reading or writing.
+            """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
                 max_size=_SPOOL_THRESHOLD,
             )
@@ -1187,6 +1307,19 @@ class S3StorageDriver(IStorageDriver):
             return buffer
 
         def flush(handle: BinaryIO) -> None:
+            """
+            Persist the writable stream content to storage.
+
+            Parameters
+            ----------
+            handle : BinaryIO
+                Buffered stream being closed.
+
+            Returns
+            -------
+            None
+                Completes after writing the content.
+            """
             # Persist the buffered content back to S3 on close.
             handle.seek(0)
             self.__client().upload_fileobj(

@@ -223,8 +223,14 @@ class TestResponseTransport(TestCase):
             with replace_attribute(Path, "open", delayed_open):
                 task = asyncio.create_task(consume())
                 await opened.wait()
-                task.cancel()
-                release.set()
+                try:
+                    for _ in range(2):
+                        task.cancel()
+                        await asyncio.sleep(0)
+                    self.assertFalse(task.done())
+                    self.assertFalse(handles[0].closed)
+                finally:
+                    release.set()
                 with self.assertRaises(asyncio.CancelledError):
                     await task
             self.assertTrue(handles[0].closed)
@@ -497,10 +503,15 @@ class TestResponseTransport(TestCase):
             with replace_attribute(Path, "open", delayed_open):
                 task = asyncio.create_task(consume())
                 await started.wait()
-                task.cancel()
-                await asyncio.sleep(0)
-                self.assertFalse(task.done())
-                release.set()
+                try:
+                    for _ in range(2):
+                        task.cancel()
+                        await asyncio.sleep(0)
+                    self.assertFalse(task.done())
+                    self.assertEqual(close_states, [])
+                    self.assertFalse(finished.is_set())
+                finally:
+                    release.set()
                 with self.assertRaises(asyncio.CancelledError):
                     await task
             self.assertEqual(close_states, [True])

@@ -217,7 +217,7 @@ class TestLazyImports(TestCase):
             [(provider.__module__, provider.__name__) for provider in CORE_PROVIDERS],
             list(CORE_PROVIDER_METADATA),
         )
-        self.assertEqual(len(CORE_PROVIDERS), 18)
+        self.assertEqual(len(CORE_PROVIDERS), 19)
 
     def testConfigurationMappingsHaveIndependentNestedDefaults(self) -> None:
         """Keep configuration edits isolated from subsequent application defaults.

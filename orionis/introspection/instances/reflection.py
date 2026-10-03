@@ -10,7 +10,6 @@ from orionis.introspection.instances.contracts.reflection import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
     from orionis.introspection.dependencies.entities.signature import (
         Signature,
     )
@@ -48,7 +47,7 @@ class ReflectionInstance(IReflectionInstance):
             )
             raise TypeError(error_msg)
 
-        # Retrieve the class once to avoid repeated attribute chain traversal
+        # Read the reflected instance's class metadata.
         cls = instance.__class__
         module: str = cls.__module__
 
@@ -64,7 +63,7 @@ class ReflectionInstance(IReflectionInstance):
             error_msg = "Cannot reflect on instances from '__main__'."
             raise ValueError(error_msg)
 
-        # Store instance and pre-computed class metadata for fast repeated access
+        # Store the instance and its class metadata.
         self._instance: Any = instance
         self._cls: type = cls
         self._class_name: str = cls.__name__
@@ -396,7 +395,7 @@ class ReflectionInstance(IReflectionInstance):
             elif isinstance(attr, types.FunctionType):
                 self._classifyFunctionEntry(name, attr, acc)
 
-        # Build the combined method list and fast-lookup set
+        # Combine all classified method names.
         all_methods: list[str] = [
             *acc["pub_m"], *acc["prot_m"], *acc["priv_m"],
             *acc["pub_cls_m"], *acc["prot_cls_m"], *acc["priv_cls_m"],
@@ -951,7 +950,7 @@ class ReflectionInstance(IReflectionInstance):
         if "_methods_set" not in cache:
             self._scanClassMembers()
 
-        # Use the frozenset for O(1) membership testing
+        # Check whether the method name was classified.
         return name in cache["_methods_set"]
 
     def setMethod(self, name: str, method: Callable) -> bool:

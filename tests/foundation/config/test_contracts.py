@@ -216,14 +216,20 @@ class TestConfigurationContracts(ConfigurationTestCase):
         from orionis.foundation.application import Application
 
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "api.py"
+            root = Path(directory)
+            nested = root / "nested"
+            nested.mkdir()
+            path = root / "api.py"
             path.write_text("\n", encoding="utf-8")
             app = Application()
             resolve = app._Application__resolveAndValidateRoutingFiles
-            self.assertEqual(
-                resolve(str(path), {"orionis.support.facades.router"}),
-                [path],
-            )
+            expected_path = path.resolve()
+            for route_path in (path, nested / ".." / "api.py"):
+                with self.subTest(path=str(route_path)):
+                    self.assertEqual(
+                        resolve(str(route_path), {"orionis.support.facades.router"}),
+                        [expected_path],
+                    )
             path.write_text("value = 1\n", encoding="utf-8")
             with self.assertRaises(TypeError):
                 resolve(str(path), {"orionis.support.facades.router"})

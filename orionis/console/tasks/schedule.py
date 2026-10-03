@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         Scheduler as ConfigScheduler,
     )
 
-async def _executeScheduledCommand(
+async def _execute_scheduled_command(
     signature: str,
     args: list[str] | None = None,
 ) -> int:
@@ -59,8 +59,10 @@ async def _executeScheduledCommand(
     unpicklable objects such as a ``mappingproxy``. Resolving the reactor
     through the ``Reactor`` facade avoids that entirely.
     """
-    # Delegate to the pinned reactor facade, resolved dynamically at call time
     return await Reactor.call(signature, args or [])
+
+# Preserve the callable path stored by earlier persistent scheduler entries.
+globals()["_executeScheduledCommand"] = _execute_scheduled_command
 
 class Schedule(ISchedule):
 
@@ -168,7 +170,7 @@ class Schedule(ISchedule):
         None
             This method updates the internal tasks dictionary in place.
         """
-        # Cache locals to avoid repeated attribute lookups in the loop
+        # Read defaults shared by every fluent task.
         available = self.__available_command_signatures
         tasks = self.__tasks
         default_random_delay = self.__config.jitter
@@ -205,7 +207,6 @@ class Schedule(ISchedule):
         # Validate that all fluent tasks have valid signatures and load their entities
         await self.__validateAndLoadFluentTasks()
 
-        # Build and return via comprehension (C-level loop in CPython)
         return [
             {
                 "signature": signature,
@@ -274,7 +275,7 @@ class Schedule(ISchedule):
             This method does not return a value. It triggers the appropriate
             listener for the event.
         """
-        # Cache event code to avoid repeated attribute lookup
+        # Select the listener registered for this event code.
         code = event.code
         listener = self.__scheduler_listeners.get(code)
         if listener is None:
@@ -296,7 +297,8 @@ class Schedule(ISchedule):
             return
 
         # Handle asynchronous listeners using an async wrapper
-        async def _asyncListenerWrapper() -> None:
+        async def _async_listener_wrapper() -> None:
+            """Invoke the scheduler listener and handle its failure."""
             try:
                 await listener(event_entity)
             except Exception as e:
@@ -304,7 +306,7 @@ class Schedule(ISchedule):
                 await self.__handleListenerException(e)
 
         # Schedule the async listener wrapper as a managed task
-        self.__createManagedTask(_asyncListenerWrapper())
+        self.__createManagedTask(_async_listener_wrapper())
 
     def _dispatchTaskEventListener(
         self,
@@ -324,7 +326,7 @@ class Schedule(ISchedule):
             This method does not return a value. It triggers the appropriate
             listener for the event.
         """
-        # Extract the job signature from the event (single attribute lookup)
+        # Read the job signature from the event.
         signature = getattr(event, "job_id", None)
         if not signature:
             return
@@ -344,7 +346,7 @@ class Schedule(ISchedule):
         if listener_for_signature is None:
             return
 
-        # Cache event code to avoid repeated attribute lookup
+        # Select the listener registered for this event code.
         code = event.code
         listener = listener_for_signature.get(code)
         if listener is None:
@@ -372,7 +374,8 @@ class Schedule(ISchedule):
             return
 
         # Handle asynchronous listeners using an async wrapper
-        async def _asyncListenerWrapper() -> None:
+        async def _async_listener_wrapper() -> None:
+            """Invoke the task listener and handle its failure."""
             try:
                 await listener(event_entity)
             except Exception as e:
@@ -380,7 +383,7 @@ class Schedule(ISchedule):
                 await self.__handleListenerException(e)
 
         # Schedule the async listener wrapper as a managed task
-        self.__createManagedTask(_asyncListenerWrapper())
+        self.__createManagedTask(_async_listener_wrapper())
 
     def __createManagedTask(
         self,
@@ -401,7 +404,7 @@ class Schedule(ISchedule):
             the created asyncio task.
         """
         # Create and track the async task, ensuring cleanup on completion
-        # Bind discard directly — avoids lambda allocation and closure overhead
+        # Remove completed tasks from the pending set.
         pending = self.__pending_listener_tasks
         task = asyncio.create_task(coroutine)
         pending.add(task)
@@ -527,11 +530,11 @@ class Schedule(ISchedule):
             ),
         )
 
-        # Cache locals to avoid repeated LOAD_ATTR in the loop
+        # Read dependencies shared by every scheduled job.
         scheduler = self.__scheduler
         tasks_listeners = self.__tasks_listeners
         running_tasks = self.__running_tasks
-        reactor_call = _executeScheduledCommand
+        reactor_call = _execute_scheduled_command
 
         # Register all jobs from the loaded task entities
         for task_entity in self.__tasks.values():
@@ -1129,7 +1132,6 @@ class Schedule(ISchedule):
             await asyncio.gather(*pending, return_exceptions=True)
 
         # Execute scheduler shutdown without blocking the main thread
-        # functools.partial avoids lambda allocation and closure overhead
         await loop.run_in_executor(
             None,
             functools.partial(self.__scheduler.shutdown, wait=True),

@@ -21,6 +21,10 @@ _EXPECTED_EXPORTS: tuple[str, ...] = (
     "ResponseFactory",
     "ResponseTemplate",
     "StreamingResponse",
+    "WebSocket",
+    "WebSocketDisconnected",
+    "WebSocketMiddleware",
+    "WebSocketNext",
     "response",
 )
 

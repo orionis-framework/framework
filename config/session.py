@@ -37,6 +37,24 @@ class BootstrapSession(Session):
     )
 
     # ----------------------------------------------------------------------------------
+    # track_previous_url : bool, optional
+    # --- Remember successful navigation URLs in the session.
+    # --- Defaults to True.
+    # ----------------------------------------------------------------------------------
+    track_previous_url: bool = field(
+        default_factory=lambda: Env.get("SESSION_TRACK_PREVIOUS_URL", True),
+    )
+
+    # ----------------------------------------------------------------------------------
+    # renewal_interval : int, optional
+    # --- Set the minimum seconds between unchanged session renewals.
+    # --- Defaults to 0.
+    # ----------------------------------------------------------------------------------
+    renewal_interval: int = field(
+        default_factory=lambda: Env.get("SESSION_RENEWAL_INTERVAL", 0),
+    )
+
+    # ----------------------------------------------------------------------------------
     # files : str | None, optional
     # --- Path to session files (file driver).
     # --- Defaults to 'storage/framework/sessions'.

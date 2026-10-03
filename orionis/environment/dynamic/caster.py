@@ -12,7 +12,7 @@ class EnvironmentCaster(IEnvironmentCaster):
     # EnvironmentValueType enum for fast membership checks.
     OPTIONS: ClassVar[frozenset[str]] = frozenset(e.value for e in EnvironmentValueType)
 
-    # Use __slots__ to prevent dynamic attribute creation and reduce memory overhead
+    # Restrict instances to the declared attributes.
     __slots__ = ("_EnvironmentCaster__type_hint", "_EnvironmentCaster__value_raw")
 
     @staticmethod

@@ -18,6 +18,10 @@ _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("mail", "orionis.foundation.config.mail.entities.mail", "Mail"),
     ("queue", "orionis.foundation.config.queue.entities.queue", "Queue"),
     (
+        "realtime", "orionis.foundation.config.realtime.entities.realtime",
+        "RealtimeConfig",
+    ),
+    (
         "scheduler",
         "orionis.foundation.config.scheduler.entities.scheduler",
         "Scheduler",

@@ -760,8 +760,10 @@ class TestLoggerDefaultChannel(TestCase):
         second = Logger(_make_app(self._tmp.name))
         try:
             first.info("first instance")
+            previous_handler = first.getLogger().handlers[0]
             second.info("second instance")
             self.assertEqual(len(second.getLogger().handlers), 1)
+            self.assertIsNone(previous_handler.stream)
         finally:
             first.close()
             second.close()

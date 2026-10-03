@@ -13,8 +13,9 @@ _DIGEST_LENGTH: int = 8
 
 class OrionisBytecodeCache(FileSystemBytecodeCache):
 
-    def get_cache_key(self, name: str, filename: str | None = None) -> str: # noqa: ARG002
-        """Convert a template name into a human-readable cache key.
+    def getCacheKey(self, name: str, filename: str | None = None) -> str: # noqa: ARG002
+        """
+        Convert a template name into a human-readable cache key.
 
         Flattening separators and dropping the extension is a lossy
         transformation, so distinct templates such as ``mail/welcome.html``
@@ -44,7 +45,10 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
         ).hexdigest()[:_DIGEST_LENGTH]
         return f"{key}.{digest}"
 
-    def _get_cache_filename(self, bucket: Bucket) -> str:
+    # Expose the key builder through Jinja2's method name.
+    get_cache_key = getCacheKey
+
+    def _getCacheFilename(self, bucket: Bucket) -> str:
         """
         Return the absolute path to the cache file for *bucket*.
 
@@ -60,3 +64,6 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
             ``<cache_dir>/<template_name>.<digest>.cache``.
         """
         return str(Path(self.directory) / f"{bucket.key}.cache")
+
+    # Expose the filename builder through Jinja2's method name.
+    _get_cache_filename = _getCacheFilename

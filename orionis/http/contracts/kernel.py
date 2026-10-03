@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from granian.rsgi import HTTPProtocol, Scope
+    from granian.rsgi import HTTPProtocol, Scope, WebsocketProtocol
 
 class IKernelHTTP(ABC):
 
@@ -26,7 +26,7 @@ class IKernelHTTP(ABC):
     async def handleRSGI(
         self,
         scope: Scope,
-        protocol: HTTPProtocol,
+        protocol: HTTPProtocol | WebsocketProtocol,
     ) -> object | None:
         """
         Handle an incoming RSGI HTTP request end-to-end.

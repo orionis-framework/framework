@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from collections.abc import Set as AbstractSet
 from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
+from orionis.http.websocket_middleware import WebSocketMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -90,7 +91,7 @@ def strip_regex_anchors(pattern: str) -> str:
 
 def flatten_middleware(
     *middleware: MiddlewareInput,
-) -> list[type[BaseMiddleware]]:
+) -> list[type[BaseMiddleware | WebSocketMiddleware]]:
     """
     Flatten and validate middleware arguments into a plain list.
 
@@ -104,21 +105,21 @@ def flatten_middleware(
 
     Parameters
     ----------
-    *middleware : type[BaseMiddleware] | list | tuple | set | frozenset
+    *middleware : type | list | tuple | set | frozenset
         Middleware classes or containers of middleware classes.
 
     Returns
     -------
-    list[type[BaseMiddleware]]
+    list[type[BaseMiddleware | WebSocketMiddleware]]
         Flat list of validated middleware classes, in the order
         they were provided.
 
     Raises
     ------
     TypeError
-        If any entry is not a ``BaseMiddleware`` subclass.
+        If an entry is neither HTTP nor WebSocket middleware.
     """
-    flat: list[type[BaseMiddleware]] = []
+    flat: list[type[BaseMiddleware | WebSocketMiddleware]] = []
     for entry in middleware:
         items = (
             entry
@@ -127,9 +128,12 @@ def flatten_middleware(
         )
         validated = []
         for m in items:
-            if not isinstance(m, type) or not issubclass(m, BaseMiddleware):
+            if not isinstance(m, type) or not issubclass(
+                m, (BaseMiddleware, WebSocketMiddleware),
+            ):
                 error_msg = (
-                    "All middleware must be subclasses of BaseMiddleware"
+                    "All middleware must subclass BaseMiddleware "
+                    "or WebSocketMiddleware"
                 )
                 raise TypeError(error_msg)
             validated.append(m)
@@ -140,13 +144,15 @@ def flatten_middleware(
     return flat
 
 
-def _middleware_key(middleware: type[BaseMiddleware]) -> tuple[str, str]:
+def _middleware_key(
+    middleware: type[BaseMiddleware | WebSocketMiddleware],
+) -> tuple[str, str]:
     """
     Return a stable ordering key for middleware supplied in sets.
 
     Parameters
     ----------
-    middleware : type[BaseMiddleware]
+    middleware : type[BaseMiddleware | WebSocketMiddleware]
         Middleware class to order consistently when using unordered containers.
 
     Returns

@@ -101,7 +101,7 @@ class TestQueueManager(TestCase):
         self.assertEqual(await pending, dispatch_id)
         self.assertEqual(len(self.state.events), 1)
         self.assertEqual(self.state.events[0][:3], (8, "emails", 1))
-        self.assertNotIn(JobContext, self.app.getCurrentScope())
+        self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
         self.assertIsInstance(await self.manager.connection(), SyncQueueDriver)
 
     async def testSyncFailurePreservesAndPropagatesOriginalException(self) -> None:

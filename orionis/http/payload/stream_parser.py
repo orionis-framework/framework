@@ -1,7 +1,10 @@
 from __future__ import annotations
 from asyncio import CancelledError, create_task, shield, to_thread
 from contextlib import suppress
+from sys import getsizeof
 from typing import TYPE_CHECKING
+from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
+from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.payload.contracts.stream_parser import IMultipartStreamParser
 from orionis.http.payload.form_data import FormData
 from orionis.http.payload.part import MultipartPart
@@ -18,6 +21,8 @@ _DELIMITER_INVALID: int = -2
 
 # Byte values for RFC 2046 protocol characters.
 _BYTE_DASH: int = ord("-")
+_MAX_BOUNDARY_SIZE = 70
+_CHUNK_SIZE = 64 * 1024
 
 async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
@@ -34,13 +39,24 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     -------
     T
         The result returned by the function.
+
+    Raises
+    ------
+    CancelledError
+        After the worker finishes, preserving the first cancellation even if
+        further cancellations arrive while waiting for safe resource cleanup.
     """
     task = create_task(to_thread(function, *args))
     try:
         return await shield(task)
     except CancelledError:
-        with suppress(CancelledError):
-            await task
+        while not task.done():
+            # Worker errors cannot replace an already pending cancellation.
+            with suppress(CancelledError, Exception):
+                await shield(task)
+        # Retrieve worker failures without replacing the original cancellation.
+        with suppress(Exception, CancelledError):
+            task.result()
         raise
 
 
@@ -52,16 +68,24 @@ class MultipartStreamParser(IMultipartStreamParser):
         "_currentPart",
         "_eof",
         "_headerSearch",
+        "_memorySize",
         "_paddingEnd",
         "_paddingStart",
+        "_partMemorySize",
+        "_pendingChunk",
+        "_pendingOffset",
+        "_totalSize",
         "boundary",
         "buffer",
         "current_part_size",
         "fields_count",
         "files_count",
+        "max_body_size",
+        "max_field_size",
         "max_fields",
         "max_files",
         "max_header_size",
+        "max_memory_size",
         "max_part_size",
         "memory_threshold",
         "stream",
@@ -72,11 +96,14 @@ class MultipartStreamParser(IMultipartStreamParser):
         stream: AsyncIterable[bytes],
         boundary: bytes,
         *,
-        max_files: int = 1000,
-        max_fields: int = 1000,
-        max_part_size: int = 1024 * 1024 * 10,
-        memory_threshold: int = 1024 * 1024,
-        max_header_size: int = 64 * 1024,
+        max_files: int = HTTPBodyLimits.max_files,
+        max_fields: int = HTTPBodyLimits.max_fields,
+        max_part_size: int = HTTPBodyLimits.max_part_size,
+        memory_threshold: int = HTTPBodyLimits.memory_threshold,
+        max_header_size: int = HTTPBodyLimits.max_header_size,
+        max_body_size: int = HTTPBodyLimits.max_body_size,
+        max_field_size: int = HTTPBodyLimits.max_field_size,
+        max_memory_size: int = HTTPBodyLimits.max_memory_size,
     ) -> None:
         """
         Initialize a new ``MultipartStreamParser`` instance.
@@ -88,16 +115,23 @@ class MultipartStreamParser(IMultipartStreamParser):
         boundary : bytes
             Raw multipart boundary token (without leading ``--``).
         max_files : int, optional
-            Maximum number of file parts accepted (default 1 000).
+            Maximum number of file parts accepted (default 32).
         max_fields : int, optional
-            Maximum number of field parts accepted (default 1 000).
+            Maximum number of field parts accepted (default 128).
         max_part_size : int, optional
             Maximum byte size of a single part (default 10 MiB).
         memory_threshold : int, optional
-            Bytes before a file part spills to disk (default 1 MiB).
+            Bytes before a file part spills to disk (default 256 KiB).
 
         max_header_size : int, optional
-            Maximum byte size of the MIME headers for each part (default 64 KiB).
+            Maximum byte size of the MIME headers for each part (default 16 KiB).
+        max_body_size : int, optional
+            Maximum transport bytes, including preamble and epilogue (16 MiB).
+        max_field_size : int, optional
+            Maximum raw bytes of a single text field (default 1 MiB).
+        max_memory_size : int, optional
+            Retained field/file memory budget (default 8 MiB), excluding
+            transport buffers, object metadata and temporary copies.
 
         Returns
         -------
@@ -106,6 +140,15 @@ class MultipartStreamParser(IMultipartStreamParser):
         if not boundary:
             error_msg = "Missing multipart boundary"
             raise ValueError(error_msg)
+        if len(boundary) > _MAX_BOUNDARY_SIZE or b"\r" in boundary or b"\n" in boundary:
+            error_msg = "Invalid multipart boundary"
+            raise ValueError(error_msg)
+        limits = HTTPBodyLimits(
+            max_body_size=max_body_size, max_files=max_files, max_fields=max_fields,
+            max_part_size=max_part_size, memory_threshold=memory_threshold,
+            max_header_size=max_header_size, max_field_size=max_field_size,
+            max_memory_size=max_memory_size,
+        )
         # Store the async stream for deferred consumption.
         self.stream = stream
         # Build the RFC 2046 delimiter (boundary prefixed with "--").
@@ -118,10 +161,18 @@ class MultipartStreamParser(IMultipartStreamParser):
         self.max_header_size = max_header_size
         self.max_part_size = max_part_size
         self.memory_threshold = memory_threshold
+        self.max_body_size = limits.max_body_size
+        self.max_field_size = limits.max_field_size
+        self.max_memory_size = limits.max_memory_size
         # Initialize runtime counters to zero.
         self.files_count = 0
         self.fields_count = 0
         self.current_part_size = 0
+        self._totalSize = 0
+        self._memorySize = 0
+        self._partMemorySize = 0
+        self._pendingChunk = b""
+        self._pendingOffset = 0
         self._atStart = True
         self._eof = False
         self._headerSearch = 0
@@ -176,7 +227,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         self._paddingEnd = end
         if end - start > self.max_header_size:
             error_msg = "Multipart boundary line exceeds maximum"
-            raise ValueError(error_msg)
+            raise PayloadTooLargeException(error_msg)
         if buf.startswith(b"\r\n", end):
             return end + 2
         if closing and self._eof and end == len(buf):
@@ -227,7 +278,17 @@ class MultipartStreamParser(IMultipartStreamParser):
         size = self.current_part_size + length
         if size > self.max_part_size:
             error_msg = "Part size exceeds maximum"
-            raise ValueError(error_msg)
+            raise PayloadTooLargeException(error_msg)
+        if not part.is_file and size > self.max_field_size:
+            error_msg = "Multipart field size exceeds maximum"
+            raise PayloadTooLargeException(error_msg)
+        part_memory = (
+            0 if part.is_file and part.data.requiresDiskWrite(length) else size
+        )
+        memory_size = self._memorySize - self._partMemorySize + part_memory
+        if memory_size > self.max_memory_size:
+            error_msg = "Multipart memory budget exceeded"
+            raise PayloadTooLargeException(error_msg)
         if length:
             with memoryview(self.buffer)[:length] as chunk:
                 if part.is_file and part.data.requiresDiskWrite(length):
@@ -235,6 +296,8 @@ class MultipartStreamParser(IMultipartStreamParser):
                 else:
                     part.write(chunk)
         self.current_part_size = size
+        self._memorySize = memory_size
+        self._partMemorySize = part_memory
 
     def _newPart(self, header_end: int) -> MultipartPart:
         """
@@ -263,18 +326,19 @@ class MultipartStreamParser(IMultipartStreamParser):
             if part.is_file:
                 if self.files_count >= self.max_files:
                     error_msg = "Too many files"
-                    raise ValueError(error_msg)
+                    raise PayloadTooLargeException(error_msg)
                 self.files_count += 1
             else:
                 if self.fields_count >= self.max_fields:
                     error_msg = "Too many fields"
-                    raise ValueError(error_msg)
+                    raise PayloadTooLargeException(error_msg)
                 self.fields_count += 1
         except BaseException:
             if part.is_file:
                 part.data.close()
             raise
         self.current_part_size = 0
+        self._partMemorySize = 0
         return part
 
     def _searchBoundary(self, body_marker: bytes) -> int:
@@ -330,12 +394,12 @@ class MultipartStreamParser(IMultipartStreamParser):
         if header_end == -1:
             if len(buf) > self.max_header_size + 3:
                 error_msg = "Multipart headers exceed maximum"
-                raise ValueError(error_msg)
+                raise PayloadTooLargeException(error_msg)
             self._headerSearch = max(0, len(buf) - 3)
             return None
         if header_end > self.max_header_size:
             error_msg = "Multipart headers exceed maximum"
-            raise ValueError(error_msg)
+            raise PayloadTooLargeException(error_msg)
         part = self._newPart(header_end)
         self._currentPart = part
         self._discardPrefix(header_end + 4)
@@ -357,12 +421,28 @@ class MultipartStreamParser(IMultipartStreamParser):
         """
         encoding = part.headers.get("content-transfer-encoding", "").strip().lower()
         if (
+            part.is_file and encoding in ("base64", "quoted-printable")
+            and self._memorySize + 2 * part.data.size > self.max_memory_size
+        ):
+            error_msg = "Multipart transfer decoding exceeds memory budget"
+            raise PayloadTooLargeException(error_msg)
+        if (
             part.is_file
             and encoding in ("base64", "quoted-printable")
             and part.data.requiresDiskWrite()
         ):
-            return await complete_in_thread(part.finalize)
-        return part.finalize()
+            value = await complete_in_thread(part.finalize)
+        else:
+            value = part.finalize()
+        retained = (
+            (0 if value.requiresDiskWrite() else value.size) # NOSONAR
+            if part.is_file else getsizeof(value)
+        )
+        if self._memorySize + (0 if part.is_file else retained) > self.max_memory_size:
+            error_msg = "Multipart decoded field exceeds memory budget"
+            raise PayloadTooLargeException(error_msg)
+        self._memorySize += retained - self._partMemorySize
+        return value
 
     async def _receiveChunk(self, stream: AsyncIterator[bytes]) -> bool:
         """
@@ -380,12 +460,23 @@ class MultipartStreamParser(IMultipartStreamParser):
         """
         if self._eof:
             return False
-        try:
-            chunk = await anext(stream)
-        except StopAsyncIteration:
-            self._eof = True
-        else:
+        if self._pendingOffset == len(self._pendingChunk):
+            self._pendingChunk = b""
+            self._pendingOffset = 0
+            try:
+                chunk = await anext(stream)
+            except StopAsyncIteration:
+                self._eof = True
+                return True
+            self._totalSize += len(chunk)
+            if self._totalSize > self.max_body_size:
+                error_msg = "Multipart request body exceeds maximum"
+                raise PayloadTooLargeException(error_msg)
+            self._pendingChunk = chunk
+        end = min(self._pendingOffset + _CHUNK_SIZE, len(self._pendingChunk))
+        with memoryview(self._pendingChunk)[self._pendingOffset:end] as chunk:
             self.buffer.extend(chunk)
+        self._pendingOffset = end
         return True
 
     async def _consumeBody(
@@ -512,6 +603,10 @@ class MultipartStreamParser(IMultipartStreamParser):
                 if not should_continue:
                     break
                 if state == _STATE_FINISHED:
+                    # Count trailing epilogue bytes without retaining them.
+                    self.buffer.clear()
+                    while await self._receiveChunk(stream):
+                        self.buffer.clear()
                     return FormData(form_items)
         error_msg = "Incomplete multipart body"
         raise ValueError(error_msg)

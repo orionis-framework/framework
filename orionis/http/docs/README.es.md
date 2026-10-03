@@ -3,6 +3,9 @@
 El despacho WebSocket, DI/middleware por conexión, validación de Origin, límites
 y evidencia de integración se documentan en [WebSockets](websockets.es.md).
 
+Server-Sent Events, formato de eventos, desconexión y ciclo de vida del streaming
+se documentan en [SSE](sse.es.md).
+
 > Peticiones, rutas, middleware, parseo de payload y respuestas HTTP para aplicaciones ASGI/RSGI.
 
 ## Tabla de contenidos
@@ -24,6 +27,8 @@ y evidencia de integración se documentan en [WebSockets](websockets.es.md).
 - [JSONResponse](#api-006)
 - [RedirectResponse](#api-007)
 - [StreamingResponse](#api-008)
+- [ServerSentEvent](#api-110)
+- [EventStreamResponse](#api-111)
 - [FileResponse](#api-009)
 - [ResponseFactory](#api-010)
 - [BaseMiddleware](#api-011)
@@ -136,9 +141,10 @@ La raíz del paquete exporta los siguientes nombres; las demás API de esta refe
 
 ```python
 from orionis.http import (
-    BaseMiddleware, FileResponse, HTMLResponse, HttpResponse, JSONResponse,
+    BaseMiddleware, EventStreamResponse, FileResponse, HTMLResponse,
+    HttpResponse, JSONResponse,
     NextCallable, PlainTextResponse, RedirectResponse, Request, Response,
-    ResponseFactory, ResponseTemplate, StreamingResponse, response,
+    ResponseFactory, ResponseTemplate, ServerSentEvent, StreamingResponse, response,
     WebSocket, WebSocketDisconnected, WebSocketMiddleware, WebSocketNext,
 )
 ```
@@ -166,14 +172,14 @@ from orionis.http import (
 
 ### Inventario de fuentes
 
-A continuación se enumeran los 112 archivos Python, incluidos los inicializadores de paquetes. Las definiciones con guion bajo inicial son internas; la referencia incluye métodos públicos propios y dunders seleccionados de ciclo de vida/mapping. Los métodos heredados se documentan en su clase de definición. El inventario incluye también recursos de respuesta no escritos en Python.
+A continuación se enumeran los archivos Python, incluidos los inicializadores de paquetes. Las definiciones con guion bajo inicial son internas; la referencia incluye métodos públicos propios y dunders seleccionados de ciclo de vida/mapping. Los métodos heredados se documentan en su clase de definición. El inventario incluye también recursos de respuesta no escritos en Python.
 
 <details>
 <summary>Desplegar inventario completo de archivos</summary>
 
 | Archivo | Definiciones / exports del paquete |
 |---|---|
-| [`__init__.py`](../__init__.py) | `BaseMiddleware`, `FileResponse`, `HTMLResponse`, `HttpResponse`, `JSONResponse`, `NextCallable`, `PlainTextResponse`, `RedirectResponse`, `Request`, `Response`, `ResponseFactory`, `ResponseTemplate`, `StreamingResponse`, `WebSocket`, `WebSocketDisconnected`, `WebSocketMiddleware`, `WebSocketNext`, `response` |
+| [`__init__.py`](../__init__.py) | `BaseMiddleware`, `EventStreamResponse`, `FileResponse`, `HTMLResponse`, `HttpResponse`, `JSONResponse`, `NextCallable`, `PlainTextResponse`, `RedirectResponse`, `Request`, `Response`, `ResponseFactory`, `ResponseTemplate`, `ServerSentEvent`, `StreamingResponse`, `WebSocket`, `WebSocketDisconnected`, `WebSocketMiddleware`, `WebSocketNext`, `response` |
 | [`adapters/__init__.py`](../adapters/__init__.py) | Sin definiciones locales de clases/funciones. |
 | [`adapters/request/__init__.py`](../adapters/request/__init__.py) | Sin definiciones locales de clases/funciones. |
 | [`adapters/request/asgi.py`](../adapters/request/asgi.py) | `ASGITransportAdapter` |
@@ -187,6 +193,7 @@ A continuación se enumeran los 112 archivos Python, incluidos los inicializador
 | [`adapters/response/files.py`](../adapters/response/files.py) | `open_file`, `complete_file_read` |
 | [`adapters/response/ranges.py`](../adapters/response/ranges.py) | `parse_range` |
 | [`adapters/response/rsgi.py`](../adapters/response/rsgi.py) | `RSGIResponseAdapter` |
+| [`adapters/response/streams.py`](../adapters/response/streams.py) | Helpers internos del ciclo de vida de streaming: `close_stream`, `_finish_cancelled_cleanup`, `await_cleanup`, `_raise_task_errors`, `_cancel_tasks`, `_record_completion`, `send_until_disconnect`. |
 | [`base/__init__.py`](../base/__init__.py) | `BaseController` |
 | [`base/controller.py`](../base/controller.py) | `BaseController` |
 | [`contracts/__init__.py`](../contracts/__init__.py) | Sin definiciones locales de clases/funciones. |
@@ -250,7 +257,7 @@ A continuación se enumeran los 112 archivos Python, incluidos los inicializador
 | [`payload/stream_parser.py`](../payload/stream_parser.py) | `complete_in_thread`, `MultipartStreamParser` |
 | [`payload/uploaded_file.py`](../payload/uploaded_file.py) | `UploadedFile` |
 | [`request.py`](../request.py) | `UnsupportedMediaTypeException`, `Request` |
-| [`responses.py`](../responses.py) | `Response`, `ResponseTemplate`, `HTMLResponse`, `PlainTextResponse`, `JSONResponse`, `RedirectResponse`, `StreamingResponse`, `FileResponse` |
+| [`responses.py`](../responses.py) | `Response`, `ResponseTemplate`, `HTMLResponse`, `PlainTextResponse`, `JSONResponse`, `RedirectResponse`, `StreamingResponse`, `EventStreamResponse`, `FileResponse` |
 | [`routes/__init__.py`](../routes/__init__.py) | Sin definiciones locales de clases/funciones. |
 | [`routes/auth.py`](../routes/auth.py) | `build_auth_routes` |
 | [`routes/contracts/__init__.py`](../routes/contracts/__init__.py) | Sin definiciones locales de clases/funciones. |
@@ -282,6 +289,7 @@ A continuación se enumeran los 112 archivos Python, incluidos los inicializador
 | [`routes/router.py`](../routes/router.py) | `Router` |
 | [`routes/types.py`](../routes/types.py) | `RouteAction`, `MiddlewareInput` |
 | [`types.py`](../types.py) | `HttpResponse` |
+| [`sse.py`](../sse.py) | `ServerSentEvent`, `_encode_data` y `_EventStreamIterator` internos. |
 | [`validation.py`](../validation.py) | `_url_origin`, `_is_local_reference`, `validation_response`, `previous_url` |
 | [`websocket.py`](../websocket.py) | `WebSocketDisconnected`, `WebSocket` |
 | [`websocket_middleware.py`](../websocket_middleware.py) | `WebSocketNext`, `WebSocketMiddleware` |
@@ -1277,6 +1285,59 @@ Acepta AsyncIterable o Iterable; en otro caso TypeError. La envoltura síncrona 
 
 Tipo de retorno declarado: `None`.
 
+<a id="api-110"></a>
+
+### ServerSentEvent
+
+[`orionis.http.sse.ServerSentEvent`](../sse.py)
+
+```python
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ServerSentEvent:
+    data: str | None = None
+    event: str | None = None
+    id: str | None = None
+    retry: int | None = None
+    comment: str | None = None
+
+    def encode(self) -> bytes: ...
+```
+
+Evento SSE inmutable con campos por nombre. `encode()` produce UTF-8 y una línea
+vacía de terminación, normalizando CRLF/CR en datos y comentarios multilínea.
+Los campos de texto requieren `str` o `None`; `event` e `id` rechazan CR/LF, e
+`id` también rechaza NUL. `retry` requiere un entero no negativo que no sea
+`bool`. Los tipos incorrectos producen `TypeError`; los valores inválidos,
+`ValueError` al construir. La serialización JSON es explícita. Consulta
+[formato y ejemplos SSE](sse.es.md).
+
+<a id="api-111"></a>
+
+### EventStreamResponse
+
+[`orionis.http.responses.EventStreamResponse`](../responses.py)
+
+```python
+class EventStreamResponse(StreamingResponse):
+    def __init__(
+        self,
+        content: AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str],
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+    ) -> None: ...
+```
+
+Codifica cada evento de forma diferida; un `str` producido se convierte en evento
+data. Los elementos no admitidos producen `TypeError` durante la iteración.
+Usa `text/event-stream` UTF-8, `Cache-Control: no-cache` y
+`X-Accel-Buffering: no` por defecto, conservando valores explícitos. Omite
+`Content-Length`. Hereda validación y métodos fluent de Response. Ambos
+adaptadores observan desconexiones para este tipo y cierran su iterador antes
+de abandonar el scope HTTP existente. `HEAD` nunca inicia el productor. Las
+tareas de fondo requieren finalización exitosa; desconexión, error o cancelación
+las omiten. Consulta [ciclo de vida y despliegue SSE](sse.es.md).
+
 <a id="api-009"></a>
 
 ### FileResponse
@@ -1472,6 +1533,20 @@ Construye y devuelve StreamingResponse con estos argumentos; los parámetros, ef
 | `background` | `BackgroundTask \| None` | BackgroundTask que se espera al llamar runBackground(). |
 
 Tipo de retorno declarado: `StreamingResponse`.
+
+```python
+def eventStream(
+    self,
+    content: AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str],
+    status_code: HTTPStatus | int = 200,
+    headers: Mapping[str, str] | None = None,
+    background: BackgroundTask | None = None,
+) -> EventStreamResponse:
+```
+
+Construye `EventStreamResponse` con el contenido, estado, headers y tarea de
+fondo proporcionados. La validación y la iteración son las de su constructor.
+Es el único método de factoría SSE; consulta [SSE](sse.es.md).
 
 ```python
 def file(
@@ -6553,9 +6628,16 @@ class ASGIResponseAdapter(ResponseAdapter):
 
 `ResponseAdapter` sin estado con `__slots__ = ()`, `RESPONSE_START = "http.response.start"` y `RESPONSE_BODY = "http.response.body"`.
 
-Parámetros de `send`: `adapter: TransportAdapter` aporta método y header de rango; `response: Response` aporta estado, headers, cuerpo/stream y tareas de fondo; `_receive: Callable[..., Awaitable[dict]]` se acepta pero no se usa; `send: Callable[..., Awaitable[None]]` recibe diccionarios de mensajes ASGI. Al esperarlo devuelve `None`.
+Parámetros de `send`: `adapter: TransportAdapter` aporta método y header de rango; `response: Response` aporta estado, headers, cuerpo/stream y tareas de fondo; `_receive: Callable[..., Awaitable[dict]]` observa desconexiones para `EventStreamResponse`; `send: Callable[..., Awaitable[None]]` recibe diccionarios de mensajes ASGI. Al esperarlo devuelve `None`.
 
 Sobrescribe el header `server` de la respuesta con `Orionis ASGI`. Un `HEAD` exacto envía el inicio y un cuerpo final vacío, añadiendo content length al envío para archivo o cuerpo en memoria cuando falta. En HEAD no recorre el stream ni procesa rangos. Otras peticiones envían bytes en memoria, o inicio/chunks con `more_body=True` y un cuerpo final vacío. Si el iterador tiene `aclose()`, lo espera en `finally`.
+
+Para `EventStreamResponse`, un watcher temporal espera `http.disconnect` y
+descarta mensajes restantes del cuerpo de la petición. Una desconexión temprana
+cancela la entrega y omite las tareas de fondo. El cleanup espera ambas tareas;
+la cancelación y los errores se propagan. SSE omite siempre `Content-Length` en
+la salida. Lee cualquier cuerpo necesario antes de retornar SSE; consulta
+[cierre y desconexión SSE](sse.es.md#desconexión-cancelación-y-cierre).
 
 Para `FileResponse`, un único rango válido cambia el estado enviado a 206 y reemplaza los headers enviados `content-length`, `content-range` y `accept-ranges`; no cambia a 206 el estado del objeto respuesta. El iterador privado de rango lee `[start, end)` en chunks de hasta `64 * 1024`, delega apertura/lectura/cierre al ejecutor del loop activo y cierra el archivo en `finally`. Rangos inválidos/no satisfacibles usan el envío completo; no se genera un 416.
 
@@ -6583,6 +6665,13 @@ class RSGIResponseAdapter(ResponseAdapter):
 Sobrescribe `server` con `Orionis RSGI`, obtiene pares de headers de cadenas y usa `protocol.response_empty` para HEAD exacto (añadiendo content length de archivo/cuerpo en memoria cuando falta), `response_file_range(206, ..., start, end)` para rango de archivo válido, `response_file` para otros archivos, `response_stream` y `transport.send_bytes` esperado para streams, y `response_bytes`/`response_empty` para cuerpos no vacíos/vacíos. Procesa archivos antes que streams. El final del rango es exclusivo; rangos inválidos envían el archivo completo. Headers/estado de rango cambian los argumentos enviados, no el estado del objeto respuesta.
 
 Los streams se cierran mediante `aclose()` esperado en `finally` cuando existe. Cada ruta exitosa espera después `response.runBackground()`; se propagan errores del protocolo/stream/cierre/tareas de fondo y un fallo previo omite las tareas de fondo. Granian realiza el envío de archivos; este adaptador no hace lecturas de archivo mediante el ejecutor de Python. Modifica el header server de la respuesta y realiza I/O del protocolo.
+
+Para `EventStreamResponse`, también observa el awaitable soportado
+`protocol.client_disconnect()` de Granian. Desconectar detiene el stream y omite
+tareas de fondo; al terminar la entrega cancela y espera el watcher porque la
+conexión keep-alive puede sobrevivir a una respuesta. SSE siempre omite
+`Content-Length` en la salida. Consulta
+[ciclo de vida del transporte SSE](sse.es.md#desconexión-cancelación-y-cierre).
 
 <a id="api-096"></a>
 

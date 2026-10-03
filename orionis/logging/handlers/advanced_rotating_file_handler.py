@@ -73,13 +73,14 @@ class AdvancedRotatingFileHandler(Handler):
         # Ensure thread safety for file operations.
         self._lock = Lock()
 
-        # Cache to avoid repeated path resolution.
+        # Store resolved paths for recent suffixes.
         self._path_cache: dict[str, str] = {}
         self._cache_monotonic_expiry: float = 0.0
 
-        # Precompile cleanup pattern once; path_template is immutable after init.
-        _basename = path_template.rsplit("/", 1)[-1].replace("{suffix}", r".*")
-        self._cleanup_pattern: re.Pattern = re.compile(_basename)
+        # Match rotated files belonging to this path template.
+        basename = Path(path_template).name
+        escaped = re.escape(basename).replace(re.escape("{suffix}"), ".*")
+        self._cleanup_pattern: re.Pattern = re.compile(rf"{escaped}(?:\.gz)?\Z")
 
         if not self.delay:
             self._ensureStream()
@@ -98,14 +99,14 @@ class AdvancedRotatingFileHandler(Handler):
         str
             The fully resolved file path as a string.
         """
-        # Fast cache check using monotonic clock — no datetime/tz overhead
+        # Return a path whose cache entry has not expired.
         cache_key: str = f"{self.path_template}:{suffix}"
         now_mono: float = time.monotonic()
 
         if now_mono < self._cache_monotonic_expiry and cache_key in self._path_cache:
             return self._path_cache[cache_key]
 
-        # Prevent unbounded growth for chunked rotation (unique suffix per chunk)
+        # Clear old suffix paths when the cache exceeds its size limit.
         if len(self._path_cache) > 50:  # noqa: PLR2004
             self._path_cache.clear()
 
@@ -188,7 +189,6 @@ class AdvancedRotatingFileHandler(Handler):
         None
             This method does not return a value.
         """
-        # Reuse two Path objects instead of five temporaries
         src = Path(file_path)
         dst = src.with_suffix(src.suffix + ".gz")
         try:
@@ -274,12 +274,13 @@ class AdvancedRotatingFileHandler(Handler):
             self.current_suffix = current_suffix
             self.current_path = self._resolvePath(current_suffix)
 
-            # Single Path object avoids duplicate construction
             _p = Path(self.current_path)
             self.file_size = _p.stat().st_size if _p.exists() else 0
 
-            # Reuse the already-constructed _p for opening
-            self.stream = _p.open("a", encoding=self.encoding, buffering=1)
+            # Open the current file for appended log lines.
+            self.stream = _p.open(
+                "a", encoding=self.encoding, buffering=1, newline="\n",
+            )
 
     def emit(self, record: LogRecord) -> None:
         """
@@ -296,16 +297,17 @@ class AdvancedRotatingFileHandler(Handler):
             This method does not return a value.
         """
         try:
-            # Format outside the lock to reduce contention under concurrency
+            # Format the record before acquiring the stream lock.
             msg: str = self.format(record)
             line: str = msg + "\n"
+            written_bytes = len(line.encode(self.encoding))
             with self._lock:
                 # Ensure the stream is ready and rotate if needed
                 self._ensureStream()
 
                 if self.stream:
                     self.stream.write(line)
-                    self.file_size += len(msg) + 1
+                    self.file_size += written_bytes
 
         except OSError:
 

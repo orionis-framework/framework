@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import jinja2
 from orionis.test import TestCase
 from orionis.view import engine as engine_module
@@ -197,6 +198,32 @@ class TestJinja2EngineNormalisePath(TestCase):
             engine_module._PATH_CACHE["users.index"],
             "users/index.html",
         )
+
+    def testNormalisePathCacheHasABoundedSize(self) -> None:
+        """Discard the oldest template name after the cache reaches its limit.
+
+        Returns
+        -------
+        None
+            Assertions verify the bound and retention of recent names.
+        """
+        for index in range(engine_module._PATH_CACHE_MAX + 1):
+            Jinja2Engine._normalisePath(f"template{index}")
+
+        self.assertEqual(len(engine_module._PATH_CACHE), engine_module._PATH_CACHE_MAX)
+        self.assertNotIn("template0", engine_module._PATH_CACHE)
+        self.assertIn(f"template{engine_module._PATH_CACHE_MAX}",
+                      engine_module._PATH_CACHE)
+
+    def testNormalisePathCacheHandlesConcurrentMisses(self) -> None:
+        """Keep cache insertion and eviction valid across concurrent misses."""
+        templates = [f"concurrent{index}" for index in range(2048)]
+
+        with ThreadPoolExecutor(max_workers=16) as workers:
+            paths = list(workers.map(Jinja2Engine._normalisePath, templates))
+
+        self.assertEqual(paths, [f"{name}.html" for name in templates])
+        self.assertEqual(len(engine_module._PATH_CACHE), engine_module._PATH_CACHE_MAX)
 
 class TestJinja2EngineRender(TestCase):
 

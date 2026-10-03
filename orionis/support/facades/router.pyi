@@ -1,11 +1,20 @@
 from collections.abc import Sequence
 from orionis.container.contracts.facade import IFacade
-from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.group import RouteGroup
 from orionis.http.routes.types import MiddlewareInput, RouteAction
+from orionis.realtime.hub import Hub
 
-class Route(IRouter, IFacade):
+class Route(IFacade):
+
+    @classmethod
+    def hub(
+        cls,
+        path: str,
+        hub: type[Hub],
+        *,
+        protocol: str = "json",
+    ) -> FluentRoute: ...
 
     @classmethod
     def websocket(

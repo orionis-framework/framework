@@ -7,6 +7,12 @@ from orionis.foundation.config.http import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHTTP(HTTP):
+
+    # Enable request cancellation when the client disconnects.
+    monitor_disconnects: bool = field(
+        default_factory=lambda: Env.get("HTTP_MONITOR_DISCONNECTS", False),
+    )
+
     # ----------------------------------------------------------------------------------
     # proxies : HTTPProxies | dict, optional
     # --- Trusted reverse proxies allowed to supply forwarding headers.

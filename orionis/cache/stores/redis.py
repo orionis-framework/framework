@@ -33,4 +33,5 @@ def build(
         db=int(db),
         password=password or None,
         serializer=MsgspecSerializer(),
+        connection_pool_kwargs={"protocol": 2},
     )

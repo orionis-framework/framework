@@ -13,7 +13,7 @@ if TYPE_CHECKING:
         Signature,
     )
 
-# Module-level coroutine-check callable to avoid repeated attribute lookups
+# Store the coroutine function predicate used by reflection.
 _ISCORO: Callable[..., bool] = inspect.iscoroutinefunction
 
 # Dunder attributes built into the language, excluded from user-defined detection

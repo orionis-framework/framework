@@ -114,8 +114,7 @@ class ValidationErrorParser:
         """
         text = str(error)
 
-        # Split "<message> - at `$<path>`" with plain string scans instead of a
-        # backtracking regex, which also avoids allocating a match object.
+        # Separate the validation message from its field path.
         marker = text.rfind(_PATH_MARKER)
         if (
             marker > 0
@@ -239,8 +238,7 @@ class ValidationErrorParser:
         tuple[type, str]
             ``(leaf_schema_class, leaf_field_name)`` pair.
         """
-        # Fast path for simple field names without nesting:
-        # avoids unnecessary splitting and lookups.
+        # Handle field names without nested segments.
         if "." not in field_path:
             return schema, field_path
 

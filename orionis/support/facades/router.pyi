@@ -78,4 +78,8 @@ class Route(IRouter, IFacade):
         middleware: MiddlewareInput | None = None,
         without_middleware: MiddlewareInput | None = None,
         routes: Sequence[FluentRoute | RouteGroup] | None = None,
+        public: bool | None = None,
     ) -> RouteGroup: ...
+
+    @classmethod
+    def export(cls) -> dict: ...

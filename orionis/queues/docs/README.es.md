@@ -11,7 +11,9 @@ Queue es un provider core. Orionis ya incluye `msgspec`, el cliente Redis
 asíncrono y sus abstracciones de base de datos. Configura una base de datos o
 servidor Redis accesible para utilizar una conexión durable. Las facades necesitan
 que arranque el runtime: `Application.create()` por sí solo no ejecuta el boot
-asíncrono de providers. Reactor y el arranque HTTP lo realizan automáticamente.
+asíncrono de providers. Los scripts propios pueden usar `await app.boot()`;
+Reactor y el arranque HTTP lo realizan automáticamente. Ver los
+[estados de readiness](../../foundation/docs/README.es.md#estados-explicitos-y-arranque-sin-servidor).
 
 Los valores predeterminados viven en `orionis/foundation/config/queue`. `Queue`,
 `Connections`, `Sync`, `Database`, `Redis`, `Failed` y `Worker` son dataclasses
@@ -121,6 +123,11 @@ Redis sigue el patrón de caché: configura `endpoint`, `port`, `db` y `password
 por separado. No utiliza un campo URL ni la variable `QUEUE_REDIS_URL`. El puerto
 debe ser un entero entre 1 y 65535, el índice de BD un entero no negativo y la
 contraseña un string o `None`. Los booleanos no se admiten como valores numéricos.
+Los clientes propios usan RESP2 explícitamente, sin depender del protocolo
+predeterminado de redis-py. La comprobación de certificación multiproceso pasó
+con Redis 5.0.14.1 en Windows, incluida la expiración de reservas y la protección
+frente a confirmaciones antiguas. No certifica persistencia, failover ni otras
+versiones de despliegue.
 
 La configuración alpha anterior (`async`, `brokers`, `strategy`,
 `visibility_timeout` y `retry_delay`) fue sustituida. Actualiza la configuración

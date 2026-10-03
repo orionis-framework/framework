@@ -2,7 +2,7 @@ from __future__ import annotations
 import functools
 import inspect
 from types import MethodType
-from typing import Any
+from typing import Any, get_type_hints
 import msgspec
 from orionis.introspection.dependencies.contracts.reflection import (
     IReflectDependencies,
@@ -12,7 +12,7 @@ from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )
 
-_SKIP_NAMES: frozenset[str] = frozenset({"self", "cls", "args", "kwargs"})
+_SKIP_NAMES: frozenset[str] = frozenset({"self", "cls"})
 _SKIP_KINDS: frozenset[int] = frozenset({
     inspect.Parameter.VAR_POSITIONAL,
     inspect.Parameter.VAR_KEYWORD,
@@ -41,6 +41,86 @@ def _get_signature(target: Any) -> inspect.Signature:
         Cached signature object for the provided target.
     """
     return inspect.signature(target)
+
+def _resolve_parameter_hint(
+    annotation: str,
+    globalns: dict[str, Any],
+) -> object:
+    """
+    Resolve one string hint independently of other unavailable references.
+
+    Parameters
+    ----------
+    annotation : str
+        Parameter annotation requiring evaluation.
+    globalns : dict[str, Any]
+        Namespace of the callable's defining module.
+
+    Returns
+    -------
+    object
+        Resolved annotation, or None if the reference cannot be evaluated.
+    """
+    probe = type("_ParameterHint", (), {"__annotations__": {"value": annotation}})
+    try:
+        return get_type_hints(probe, globalns=globalns)["value"]
+    except (AttributeError, NameError, SyntaxError, TypeError):
+        return None
+
+def _resolve_future_annotations(
+    target: Any,
+    signature: inspect.Signature,
+) -> inspect.Signature:
+    """
+    Resolve available string annotations in a callable signature.
+
+    Parameters
+    ----------
+    target : Any
+        Callable declaring the annotations.
+    signature : inspect.Signature
+        Signature whose parameters may contain string annotations.
+
+    Returns
+    -------
+    inspect.Signature
+        Signature with available types substituted and defaults preserved.
+    """
+    parameters = tuple(signature.parameters.values())
+    if not any(
+        isinstance(parameter.annotation, str)
+        and parameter.default is _PARAM_EMPTY
+        for parameter in parameters
+    ):
+        return signature
+
+    module = inspect.getmodule(target)
+    globalns = vars(module) if module is not None else {}
+    try:
+        hints = get_type_hints(target, globalns=globalns)
+    except (AttributeError, NameError, SyntaxError, TypeError):
+        hints = None
+
+    changed = False
+    updated_parameters = []
+    for parameter in parameters:
+        hint = parameter.annotation
+        if not isinstance(hint, str) or parameter.default is not _PARAM_EMPTY:
+            updated_parameters.append(parameter)
+            continue
+        if hints is None:
+            resolved = _resolve_parameter_hint(hint, globalns)
+        else:
+            resolved = hints.get(parameter.name)
+        if isinstance(resolved, type):
+            updated = parameter.replace(annotation=resolved)
+            changed = True
+        else:
+            updated = parameter
+        updated_parameters.append(updated)
+    if changed:
+        return signature.replace(parameters=updated_parameters)
+    return signature
 
 def _resolve_annotation(annotation: Any) -> tuple[str, str, Any]:
     """
@@ -132,7 +212,7 @@ def _build_dependencies(signature: inspect.Signature) -> Signature:  # NOSONAR
             ordered[param_name] = arg
             continue
 
-        # Has a type annotation — resolve module/name/type once.
+        # Describe the type declared by an annotated parameter.
         ann_module, ann_name, ann_type = _resolve_annotation(annotation)
         is_str_ann = isinstance(annotation, str)
 
@@ -218,7 +298,7 @@ def _cached_resolved_signature(target: Any, *, bound: bool = False) -> Signature
     except (ValueError, TypeError) as e:
         error_msg = f"Unable to inspect signature of {target}: {e!s}"
         raise ValueError(error_msg) from e
-    return _build_dependencies(sig)
+    return _build_dependencies(_resolve_future_annotations(target, sig))
 
 def _get_resolved_signature(target: Any) -> Signature:
     """

@@ -25,6 +25,7 @@ class _JobMetadata:
 
     job_type: type[BaseJob]
     names: tuple[str, ...]
+    name_set: frozenset[str]
     annotations: dict[str, object]
 
 def _validate_annotation(annotation: object) -> bool:
@@ -76,20 +77,21 @@ def _pack_value(value: object, depth: int = 0) -> object:
     if depth > _MAX_STATE_DEPTH:
         message = "Job state exceeds the maximum nesting depth."
         raise QueuePayloadError(message)
-    if type(value) in _SCALAR_TYPES:
-        if isinstance(value, float) and not math.isfinite(value):
+    value_type = type(value)
+    if value_type in _SCALAR_TYPES:
+        if value_type is float and not math.isfinite(value):
             message = "Job state cannot contain nonfinite numbers."
             raise QueuePayloadError(message)
         return value
-    if type(value) in {list, tuple}:
+    if value_type is list or value_type is tuple:
         sequence = cast("list[object] | tuple[object, ...]", value)
         items = [_pack_value(item, depth + 1) for item in sequence]
-        if isinstance(value, tuple):
+        if value_type is tuple:
             return msgspec.msgpack.Ext(
                 _TUPLE_EXTENSION, msgspec.msgpack.encode(items),
             )
         return items
-    if type(value) is dict:
+    if value_type is dict:
         mapping = cast("dict[object, object]", value)
         if any(type(key) is not str for key in mapping):
             message = "Job state dictionaries require string keys."
@@ -98,6 +100,51 @@ def _pack_value(value: object, depth: int = 0) -> object:
             key: _pack_value(item, depth + 1) for key, item in mapping.items()
         }
     message = f"Job state cannot serialize objects of type {type(value).__name__}."
+    raise QueuePayloadError(message)
+
+def _validate_unpacked_value(value: object, depth: int = 0) -> None:
+    """
+    Validate decoded primitive state without rebuilding its containers.
+
+    Parameters
+    ----------
+    value : object
+        Decoded field value or nested item.
+    depth : int, optional
+        Current nesting level.
+
+    Returns
+    -------
+    None
+        Accept supported state without copying decoded containers.
+
+    Raises
+    ------
+    QueuePayloadError
+        If state exceeds the depth limit or contains unsupported values.
+    """
+    if depth > _MAX_STATE_DEPTH:
+        message = "Job state exceeds the maximum nesting depth."
+        raise QueuePayloadError(message)
+    value_type = type(value)
+    if value_type in _SCALAR_TYPES:
+        if value_type is float and not math.isfinite(value):
+            message = "Job state cannot contain nonfinite numbers."
+            raise QueuePayloadError(message)
+        return
+    if value_type is list or value_type is tuple:
+        sequence = cast("list[object] | tuple[object, ...]", value)
+        for item in sequence:
+            _validate_unpacked_value(item, depth + 1)
+        return
+    if value_type is dict:
+        for key, item in value.items():
+            if type(key) is not str:
+                message = "Job state dictionaries require string keys."
+                raise QueuePayloadError(message)
+            _validate_unpacked_value(item, depth + 1)
+        return
+    message = f"Job state cannot serialize objects of type {value_type.__name__}."
     raise QueuePayloadError(message)
 
 def _unpack_extension(code: int, data: memoryview) -> tuple[object, ...]:
@@ -190,13 +237,13 @@ def _job_metadata(job_type: type[BaseJob]) -> _JobMetadata:
     if any(not _validate_annotation(value) for value in annotations.values()):
         message = "Job field annotations must describe primitive persistent data."
         raise QueueConfigurationError(message)
-    return _JobMetadata(job_type, tuple(names), annotations)
+    return _JobMetadata(job_type, tuple(names), frozenset(names), annotations)
 
 
 class JobSerializer(IJobSerializer):
     """Serialize explicit job state through a registry of application-trusted types."""
 
-    __slots__ = ("_decoder", "_encoder", "_registry", "_state_decoder")
+    __slots__ = ("_decoder", "_encoder", "_registry", "_state_decoder", "_types")
 
     def __init__(self) -> None:
         """
@@ -208,6 +255,7 @@ class JobSerializer(IJobSerializer):
             Retain codecs without importing application job modules.
         """
         self._registry: dict[str, _JobMetadata] = {}
+        self._types: dict[type[BaseJob], tuple[str, _JobMetadata]] = {}
         self._encoder = msgspec.json.Encoder()
         self._decoder = msgspec.json.Decoder(JobEnvelope)
         self._state_decoder = msgspec.msgpack.Decoder(ext_hook=_unpack_extension)
@@ -226,10 +274,13 @@ class JobSerializer(IJobSerializer):
         None
             Cache metadata once for the stable identity.
         """
+        if not isinstance(job_type, type) or not issubclass(job_type, BaseJob):
+            message = "Register an importable concrete BaseJob with an async handle()."
+            raise QueueConfigurationError(message)
+        if job_type in self._types:
+            return
         if (
-            not isinstance(job_type, type)
-            or not issubclass(job_type, BaseJob)
-            or inspect.isabstract(job_type)
+            inspect.isabstract(job_type)
             or not inspect.iscoroutinefunction(job_type.handle)
             or "<locals>" in job_type.__qualname__
         ):
@@ -241,8 +292,11 @@ class JobSerializer(IJobSerializer):
             if existing.job_type is not job_type:
                 message = f"Job identity [{identity}] is already registered."
                 raise QueueConfigurationError(message)
+            self._types[job_type] = (identity, existing)
             return
-        self._registry[identity] = _job_metadata(job_type)
+        metadata = _job_metadata(job_type)
+        self._registry[identity] = metadata
+        self._types[job_type] = (identity, metadata)
 
     def encode(self, job: BaseJob) -> tuple[str, bytes]:
         """
@@ -257,12 +311,20 @@ class JobSerializer(IJobSerializer):
         -------
         tuple[str, bytes]
             Stable identity and primitive MessagePack payload.
+
+        Raises
+        ------
+        QueuePayloadError
+            If state is undeclared, unsupported, or exceeds the payload limit.
         """
-        self.register(type(job))
-        identity = f"{type(job).__module__}:{type(job).__qualname__}"
-        metadata = self._registry[identity]
+        job_type = type(job)
+        entry = self._types.get(job_type)
+        if entry is None:
+            self.register(job_type)
+            entry = self._types[job_type]
+        identity, metadata = entry
         instance_fields = getattr(job, "__dict__", {})
-        if set(instance_fields) - set(metadata.names):
+        if instance_fields and not metadata.name_set.issuperset(instance_fields):
             message = "Declare all persistent job fields with slots or annotations."
             raise QueuePayloadError(message)
         try:
@@ -298,10 +360,10 @@ class JobSerializer(IJobSerializer):
         self._checkSize(payload)
         try:
             values = self._state_decoder.decode(payload)
-            if type(values) is not dict or set(values) != set(metadata.names):
+            if type(values) is not dict or values.keys() != metadata.name_set:
                 message = "Job payload fields do not match the registered class."
                 raise QueuePayloadError(message)
-            _pack_value(values)
+            _validate_unpacked_value(values)
             self._validateFields(metadata, values)
             job = object.__new__(metadata.job_type)
             for name in metadata.names:

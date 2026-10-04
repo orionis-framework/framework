@@ -13,6 +13,7 @@ if _TYPE_CHECKING:
     from orionis.support.facades.lang import Lang
     from orionis.support.facades.logger import Log
     from orionis.support.facades.mail import Mail
+    from orionis.support.facades.mcp import Mcp
     from orionis.support.facades.queue import Queue
     from orionis.support.facades.reactor import Reactor
     from orionis.support.facades.realtime import Realtime
@@ -36,6 +37,7 @@ __all__ = [
     "Lang",
     "Log",
     "Mail",
+    "Mcp",
     "Queue",
     "Reactor",
     "Realtime",
@@ -60,6 +62,7 @@ _EXPORTS = {
     "Lang": ("orionis.support.facades.lang", "Lang"),
     "Log": ("orionis.support.facades.logger", "Log"),
     "Mail": ("orionis.support.facades.mail", "Mail"),
+    "Mcp": ("orionis.support.facades.mcp", "Mcp"),
     "Queue": ("orionis.support.facades.queue", "Queue"),
     "Reactor": ("orionis.support.facades.reactor", "Reactor"),
     "Realtime": ("orionis.support.facades.realtime", "Realtime"),

@@ -1,0 +1,13 @@
+from orionis.mcp import McpResponse, Resource
+
+
+class {{ class_name }}(Resource):
+    """Serve a resource chosen explicitly by the application."""
+
+    uri = "docs://example/resource"
+    description = "Application documentation."
+    mime_type = "text/plain"
+
+    async def handle(self) -> McpResponse:
+        """Read authorized application data without inferring filesystem paths."""
+        return McpResponse.resource(self.uri, "Resource content.", self.mime_type)

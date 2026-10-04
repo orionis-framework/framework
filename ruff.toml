@@ -19,6 +19,10 @@ exclude = [
 ]
 
 [lint.per-file-ignores]
+# These public wire models intentionally retain the official MCP property names.
+"orionis/mcp/protocol/requests.py" = ["N815"]
+"orionis/mcp/protocol/content.py" = ["N815"]
+"orionis/mcp/protocol/results.py" = ["N815"]
 "**/__init__.py" = [
     "E501",
 ]

@@ -3,6 +3,7 @@ import re
 from functools import lru_cache
 from http.cookies import CookieError, SimpleCookie
 from math import isfinite
+from urllib.parse import urlsplit
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
@@ -344,4 +345,49 @@ def validate_driver(value: object, expected: Drivers) -> None:
     validate_string(value, "driver")
     if value != expected:
         message = f"'driver' must be '{expected}' for this queue connection."
+        raise ValueError(message)
+
+
+def validate_http_origin(origin: str) -> None:
+    """Require an explicit serialized HTTP(S) origin without wildcards.
+
+    Parameters
+    ----------
+    origin : str
+        One trusted browser origin from configuration.
+
+    Returns
+    -------
+    None
+        Accept the validated origin without changing its spelling.
+
+    Raises
+    ------
+    TypeError
+        If the configured origin is not a string.
+    ValueError
+        If its syntax could permit ambiguous or unrestricted matching.
+    """
+    if not isinstance(origin, str):
+        message = "allowed_origins entries must be strings"
+        raise TypeError(message)
+    if not origin or not origin.isascii() or any(
+        char.isspace() or not char.isprintable() or char in "*\\" for char in origin
+    ):
+        message = "allowed_origins entries must be explicit ASCII HTTP(S) origins"
+        raise ValueError(message)
+    parsed = urlsplit(origin)
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path
+        or "?" in origin
+        or "#" in origin
+    ):
+        message = "allowed_origins entries must contain only scheme and authority"
+        raise ValueError(message)
+    if parsed.port == 0 or parsed.netloc.endswith(":"):
+        message = "allowed_origins entries must use a valid nonzero port"
         raise ValueError(message)

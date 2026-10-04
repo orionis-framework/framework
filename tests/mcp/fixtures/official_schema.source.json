@@ -1,0 +1,10 @@
+{
+  "protocolVersion": "2026-07-28",
+  "repository": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+  "commit": "75db1e987cbbba6d170315dc99d0dfc440754aef",
+  "path": "schema/2026-07-28/schema.json",
+  "source": "https://raw.githubusercontent.com/modelcontextprotocol/modelcontextprotocol/75db1e987cbbba6d170315dc99d0dfc440754aef/schema/2026-07-28/schema.json",
+  "sha256": "6995b6ed8d0c9ac6e24a186b2de718ef6801de46393ecd911663942c9a36fcd6",
+  "license": "official_schema.LICENSE",
+  "usage": "Unmodified official protocol schema, test oracle only; never imported by the framework runtime."
+}

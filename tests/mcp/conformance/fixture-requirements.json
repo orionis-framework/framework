@@ -1,0 +1,298 @@
+{
+  "protocolVersion": "2026-07-28",
+  "conformancePackage": "@modelcontextprotocol/conformance@0.2.0-alpha.12",
+  "sourceCommit": "c37eec888e1c6ff140af79987a40008548b7cc5f",
+  "requirementSet": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/requirements/2026-07-28.yaml",
+  "requiredServerScenarios": 37,
+  "scenarios": [
+    {
+      "name": "server-stateless",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/stateless.ts",
+      "fixtures": [
+        "test_missing_capability",
+        "test_streaming_elicitation",
+        "test_logging_tool",
+        "test_trigger_tool_change",
+        "test_trigger_prompt_change"
+      ],
+      "behavior": "Exercise per-request metadata, exact modern headers, discover, unknown-method errors, missing-client-capability errors, streaming/log opt-in, subscriptions acknowledgments/filtering, and list-change notifications. Provide the diagnostic tools listed here."
+    },
+    {
+      "name": "completion-complete",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/utils.ts",
+      "fixtures": [
+        "test_prompt_with_arguments"
+      ],
+      "behavior": "Complete arg1 of test_prompt_with_arguments for value par; declare completions. Empty completion values are supported by the referee."
+    },
+    {
+      "name": "tools-list",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [],
+      "behavior": "Advertise deterministic ordered tool definitions with name, description, and valid object inputSchema."
+    },
+    {
+      "name": "tools-call-simple-text",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test_simple_text"
+      ],
+      "behavior": "Return nonempty text content."
+    },
+    {
+      "name": "tools-call-image",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test_image_content"
+      ],
+      "behavior": "Return base64 PNG image content, preferably a minimal valid fixture image."
+    },
+    {
+      "name": "tools-call-audio",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test_audio_content"
+      ],
+      "behavior": "Return base64 WAV audio content."
+    },
+    {
+      "name": "tools-call-embedded-resource",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test://embedded-resource",
+        "test_embedded_resource"
+      ],
+      "behavior": "Return embedded text resource at test://embedded-resource."
+    },
+    {
+      "name": "tools-call-mixed-content",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test://mixed-content-resource",
+        "test_multiple_content_types"
+      ],
+      "behavior": "Return text, image, and embedded JSON resource in one result."
+    },
+    {
+      "name": "tools-call-error",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test_error_handling"
+      ],
+      "behavior": "Raise an application tool error; translate it to a result with isError=true and text content."
+    },
+    {
+      "name": "tools-call-with-progress",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/tools.ts",
+      "fixtures": [
+        "test_tool_with_progress"
+      ],
+      "behavior": "With request progressToken emit progress 0, 50, 100 with total 100, approximately 50ms apart, then final text. Without token emit no progress."
+    },
+    {
+      "name": "server-sse-multiple-streams",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/sse-multiple-streams.ts",
+      "fixtures": [],
+      "behavior": "Accept concurrent POST requests; each response belongs to its own request and may use JSON or its own SSE stream. Revision selection avoids stateful sessions."
+    },
+    {
+      "name": "resources-list",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/resources.ts",
+      "fixtures": [],
+      "behavior": "List direct resources separately from templates; expose name, URI and description."
+    },
+    {
+      "name": "resources-read-text",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/resources.ts",
+      "fixtures": [
+        "test://static-text"
+      ],
+      "behavior": "Read test://static-text as text/plain with nonempty text."
+    },
+    {
+      "name": "resources-read-binary",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/resources.ts",
+      "fixtures": [
+        "test://static-binary"
+      ],
+      "behavior": "Read test://static-binary as image/png with base64 blob."
+    },
+    {
+      "name": "resources-templates-read",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/resources.ts",
+      "fixtures": [
+        "test://template/123/data",
+        "test://template/{id}/data"
+      ],
+      "behavior": "Expand test://template/{id}/data; read id=123 and return JSON text containing id, templateTest=true, and data."
+    },
+    {
+      "name": "sep-2164-resource-not-found",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/resources.ts",
+      "fixtures": [
+        "test://nonexistent-resource-for-conformance-testing"
+      ],
+      "behavior": "Unknown URI returns -32602 with error.data.uri; never return empty contents as success."
+    },
+    {
+      "name": "prompts-list",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/prompts.ts",
+      "fixtures": [],
+      "behavior": "List named prompts with descriptions and declared arguments."
+    },
+    {
+      "name": "prompts-get-simple",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/prompts.ts",
+      "fixtures": [
+        "test_simple_prompt"
+      ],
+      "behavior": "Return at least one user text message."
+    },
+    {
+      "name": "prompts-get-with-args",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/prompts.ts",
+      "fixtures": [
+        "test_prompt_with_arguments"
+      ],
+      "behavior": "Require arg1 and arg2 string arguments and include their values in prompt text."
+    },
+    {
+      "name": "prompts-get-embedded-resource",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/prompts.ts",
+      "fixtures": [
+        "test_prompt_with_embedded_resource"
+      ],
+      "behavior": "Use resourceUri argument for embedded text resource plus a user text message."
+    },
+    {
+      "name": "prompts-get-with-image",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/prompts.ts",
+      "fixtures": [
+        "test_prompt_with_image"
+      ],
+      "behavior": "Return a user PNG image message and user text message."
+    },
+    {
+      "name": "dns-rebinding-protection",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/dns-rebinding.ts",
+      "fixtures": [],
+      "behavior": "Run on a loopback HTTP URL. Reject hostile Host/Origin with HTTP 4xx; accept configured loopback origins. No browser CORS assumption."
+    },
+    {
+      "name": "caching",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/caching.ts",
+      "fixtures": [],
+      "behavior": "Include integer ttlMs >= 0 and cacheScope public/private on all five list/read result shapes."
+    },
+    {
+      "name": "input-required-result-basic-elicitation",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_elicitation"
+      ],
+      "behavior": "First round request elicitation/create under inputRequests.user_name with required string name. Retry consumes inputResponses.user_name; complete using received name."
+    },
+    {
+      "name": "input-required-result-basic-sampling",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_sampling"
+      ],
+      "behavior": "First round request sampling/createMessage under capital_question, maxTokens=100. Retry completes using its response text."
+    },
+    {
+      "name": "input-required-result-basic-list-roots",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_list_roots"
+      ],
+      "behavior": "First round request roots/list under client_roots. Retry completes using supplied roots."
+    },
+    {
+      "name": "input-required-result-request-state",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_request_state"
+      ],
+      "behavior": "Issue elicitation/create under confirm with required boolean ok plus opaque requestState. Validate echoed state and include state-ok in final text."
+    },
+    {
+      "name": "input-required-result-multiple-input-requests",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_multiple_inputs"
+      ],
+      "behavior": "Request user_name elicitation, greeting sampling, and client_roots roots/list together plus opaque state. Complete after all responses return."
+    },
+    {
+      "name": "input-required-result-multi-round",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_multi_round"
+      ],
+      "behavior": "Round 1 elicitation step1 asks string name. Round 2 elicitation step2 asks string color with changed opaque state. Round 3 completes."
+    },
+    {
+      "name": "input-required-result-missing-input-response",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_elicitation"
+      ],
+      "behavior": "Missing/wrong response keys re-request missing user_name information; do not treat as successful completion."
+    },
+    {
+      "name": "input-required-result-non-tool-request",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_prompt"
+      ],
+      "behavior": "prompts/get may return input_required asking user_context elicitation for string context, then a complete GetPromptResult."
+    },
+    {
+      "name": "input-required-result-result-type",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_elicitation"
+      ],
+      "behavior": "InputRequiredResult explicitly includes resultType=input_required."
+    },
+    {
+      "name": "input-required-result-unsupported-methods",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [],
+      "behavior": "Never return input_required on methods outside tools/call, resources/read, prompts/get. Tasks are not enabled."
+    },
+    {
+      "name": "input-required-result-tampered-state",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_tampered_state"
+      ],
+      "behavior": "Issue integrity-protected state then reject modified state with JSON-RPC invalid-params error; never keep a continuation session."
+    },
+    {
+      "name": "input-required-result-capability-check",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_capabilities"
+      ],
+      "behavior": "Emit input requests only for capabilities supplied in request metadata. Sampling-only client must never receive elicitation input request."
+    },
+    {
+      "name": "input-required-result-ignore-extra-params",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_elicitation"
+      ],
+      "behavior": "Ignore unrecognized extra input-response keys when the requested user_name response is valid."
+    },
+    {
+      "name": "input-required-result-validate-input",
+      "source": "https://github.com/modelcontextprotocol/conformance/blob/c37eec888e1c6ff140af79987a40008548b7cc5f/src/scenarios/server/input-required-result.ts",
+      "fixtures": [
+        "test_input_required_result_elicitation"
+      ],
+      "behavior": "Malformed inputResponses yields a protocol error or new input_required result, never successful completion."
+    }
+  ]
+}

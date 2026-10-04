@@ -1,0 +1,266 @@
+{
+  "verifiedDate": "2026-10-03",
+  "command": "python -B .github/scripts/run_tests.py --continue-on-error --verbosity 1",
+  "wrapperExitCode": 0,
+  "logSha256": "c42fa0a4cc85cd34279172dcc4c175823d9558cbcdfda9d48d8f5e3a7c4eca27",
+  "groups": [
+    {
+      "suite": "tests/aio",
+      "total": 48,
+      "passed": 48,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/auth",
+      "total": 359,
+      "passed": 359,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/background",
+      "total": 77,
+      "passed": 77,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/cache",
+      "total": 210,
+      "passed": 210,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/console",
+      "total": 1245,
+      "passed": 1245,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/container",
+      "total": 253,
+      "passed": 253,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/database",
+      "total": 243,
+      "passed": 243,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/encrypter",
+      "total": 61,
+      "passed": 61,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/environment",
+      "total": 210,
+      "passed": 210,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/failure",
+      "total": 91,
+      "passed": 91,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/foundation",
+      "total": 169,
+      "passed": 169,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/hashing",
+      "total": 180,
+      "passed": 180,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/http",
+      "total": 900,
+      "passed": 900,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/introspection",
+      "total": 1022,
+      "passed": 1022,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/localization",
+      "total": 148,
+      "passed": 148,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/logging",
+      "total": 178,
+      "passed": 178,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/mail",
+      "total": 193,
+      "passed": 193,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/mcp",
+      "total": 133,
+      "passed": 133,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/metadata",
+      "total": 38,
+      "passed": 38,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/orm",
+      "total": 481,
+      "passed": 481,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/queues",
+      "total": 129,
+      "passed": 129,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/realtime",
+      "total": 77,
+      "passed": 77,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/schemas",
+      "total": 439,
+      "passed": 439,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/session",
+      "total": 256,
+      "passed": 256,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/storage",
+      "total": 245,
+      "passed": 245,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/support",
+      "total": 958,
+      "passed": 958,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/test",
+      "total": 169,
+      "passed": 169,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "tests/view",
+      "total": 207,
+      "passed": 207,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "Root [tests/test_example.py]",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "total": 8721,
+    "passed": 8721,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0
+  },
+  "scope": "Entire discovered repository suite; MCP contained 133 tests at this run. Later audit regressions are recorded separately after native Reactor verification.",
+  "postAuditMcp": {
+    "command": "python -B reactor test --start-dir=tests/mcp --verbosity=1 --fail-fast=1",
+    "exitCode": 0,
+    "counts": {
+      "total": 137,
+      "passed": 137,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+    },
+    "logSha256": "b304e9fc29dbd858d28a9a487027f7df58ea52bca8397f4de0a500f30f75bc40",
+    "scope": "Final complete native MCP suite, including four post-audit regressions added after the full framework run."
+  },
+  "staticChecks": {
+    "ruff": "All changed Python/pyi files and reactor passed repository policy.",
+    "pyright": "orionis/mcp, MCP CLI commands, STDIO boundary, MCP configuration, endpoint policy contract and facade: 0 errors, 0 warnings."
+  },
+  "windowsEncoding": "PYTHONIOENCODING=utf-8 when redirecting Reactor console output. The full framework runner sets it automatically."
+}

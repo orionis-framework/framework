@@ -6,7 +6,8 @@ storage/framework/*
 storage/logs/*
 storage/mail/*
 database/*.sqlite
-/docs
+/docs/*
+!/docs/mcp/
 
 # ========================
 # Orionis utilities

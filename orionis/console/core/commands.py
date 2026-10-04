@@ -17,6 +17,11 @@ from orionis.console.commands.make.http_schema_rule import MakeHttpSchemaRule
 from orionis.console.commands.make.mail import MakeMail
 from orionis.console.commands.make.job import MakeJob
 from orionis.console.commands.make.model import MakeModel
+from orionis.console.commands.make.mcp import (
+    MakeMcpPrompt, MakeMcpResource, MakeMcpServer, MakeMcpTool,
+)
+from orionis.console.commands.mcp.list import McpListCommand
+from orionis.console.commands.mcp.start import McpStartCommand
 from orionis.console.commands.make.provider import MakeProvider
 from orionis.console.commands.make.service import MakeService
 from orionis.console.commands.make.test import MakeTest
@@ -81,6 +86,12 @@ def get_core_commands_mapping() -> tuple:
         MakeContract,
         MakeService,
         MakeModel,
+        MakeMcpServer,
+        MakeMcpTool,
+        MakeMcpResource,
+        MakeMcpPrompt,
+        McpStartCommand,
+        McpListCommand,
         MakeFactory,
         MakeMail,
         MakeJob,

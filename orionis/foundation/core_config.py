@@ -16,6 +16,7 @@ _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("http", "orionis.foundation.config.http.entitites.http", "HTTP"),
     ("logging", "orionis.foundation.config.logging.entities.logging", "Logging"),
     ("mail", "orionis.foundation.config.mail.entities.mail", "Mail"),
+    ("mcp", "orionis.foundation.config.mcp.entities.mcp", "McpConfig"),
     ("queue", "orionis.foundation.config.queue.entities.queue", "Queue"),
     (
         "realtime", "orionis.foundation.config.realtime.entities.realtime",

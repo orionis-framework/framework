@@ -1,0 +1,19 @@
+from orionis.mcp import McpResponse, Tool
+from orionis.schemas import Schema
+
+
+class {{ class_name }}Input(Schema):
+    """Arguments controlled by the MCP client."""
+
+    message: str
+
+
+class {{ class_name }}(Tool[{{ class_name }}Input]):
+    """Describe the work performed by this tool."""
+
+    description = "Echo the provided message."
+    input = {{ class_name }}Input
+
+    async def handle(self, payload: {{ class_name }}Input) -> McpResponse:
+        """Use validated client arguments and explicitly injected dependencies."""
+        return McpResponse.text(payload.message)

@@ -26,6 +26,7 @@ from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.adapters.websocket.asgi import ASGIWebSocketTransport
 from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
 from orionis.http.contracts.kernel import IKernelHTTP
+from orionis.http.contracts.endpoint_policy import IHttpEndpointPolicy
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.enums.interfaces import Interface
 from orionis.http.enums.status import HTTPStatus
@@ -44,6 +45,7 @@ from orionis.http.routes.enums.protocols import RouteProtocol
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.loader import RouteLoader
+from orionis.http.routes.functions import normalize_request_path
 from orionis.http.routes.route_resolver import RouteResolver
 from orionis.http.validation import validation_response
 from orionis.http.websocket import WebSocket, WebSocketDisconnected
@@ -219,6 +221,7 @@ class KernelHTTP(IKernelHTTP):
         "__cls_dispatch",
         "__cors",
         "__default_responses",
+        "__endpoint_policies",
         "__fallback",
         "__fn_dispatch",
         "__health_path",
@@ -274,6 +277,14 @@ class KernelHTTP(IKernelHTTP):
         self.__websocket_tasks: set[asyncio.Task] = set()
         # Associate each route middleware stack with its instances.
         self.__middleware_cache: dict[tuple, tuple] = {}
+        self.__endpoint_policies: dict[str, IHttpEndpointPolicy] = {}
+
+    def disconnectPaths(self) -> frozenset[str]:
+        """Expose compiled endpoint opt-ins to the application transport wrapper."""
+        return frozenset(
+            path for path, policy in self.__endpoint_policies.items()
+            if policy.monitor_disconnects
+        )
 
     async def boot(self) -> None:
         """
@@ -395,6 +406,7 @@ class KernelHTTP(IKernelHTTP):
         view_dispatch: dict[int, str] = {}
         hub_dispatch: dict[int, HubRuntime] = {}
         module_cache: dict[str, object] = {}
+        policy_instances: dict[type[IHttpEndpointPolicy], IHttpEndpointPolicy] = {}
 
         # Walk every registered route once and store fully resolved callables.
         for route in self.__routes.allRoutes():
@@ -433,6 +445,23 @@ class KernelHTTP(IKernelHTTP):
                 method = action["method"]
                 warm_controller_plan(controller, method)
                 cls_dispatch[route_id] = (controller, method)
+                policy_type = getattr(controller, "http_protocol_policy", None)
+                if policy_type is not None and route.protocol is RouteProtocol.HTTP:
+                    if (
+                        route.regex is not None
+                        or not isinstance(policy_type, type)
+                        or not issubclass(policy_type, IHttpEndpointPolicy)
+                    ):
+                        error_msg = (
+                            "HTTP endpoint policies require a static path "
+                            "and policy class"
+                        )
+                        raise TypeError(error_msg)
+                    policy = policy_instances.get(policy_type)
+                    if policy is None:
+                        policy = await self.__app.build(policy_type)
+                        policy_instances[policy_type] = policy
+                    self.__endpoint_policies[route.path] = policy
 
         self.__fn_dispatch: dict[int, object] = fn_dispatch
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
@@ -511,6 +540,7 @@ class KernelHTTP(IKernelHTTP):
         adapter: RSGITransportAdapter,
         response: Response,
         protocol: HTTPProtocol,
+        policy: IHttpEndpointPolicy | None = None,
     ) -> None:
         """
         Send an RSGI HTTP response through the transport adapter.
@@ -531,6 +561,8 @@ class KernelHTTP(IKernelHTTP):
         -------
         None
         """
+        if policy is not None:
+            response = await policy.response(response)
         self.__cors.after(adapter, response)
         # Log request details only when the debug printer is active.
         if self.__printer_enabled:
@@ -543,6 +575,7 @@ class KernelHTTP(IKernelHTTP):
         response: Response,
         receive: object,
         send: object,
+        policy: IHttpEndpointPolicy | None = None,
     ) -> None:
         """
         Send ASGI HTTP response through transport adapter.
@@ -565,6 +598,8 @@ class KernelHTTP(IKernelHTTP):
         -------
         None
         """
+        if policy is not None:
+            response = await policy.response(response)
         self.__cors.after(adapter, response)
         # Log request details only when the debug printer is active.
         if self.__printer_enabled:
@@ -876,6 +911,7 @@ class KernelHTTP(IKernelHTTP):
         self,
         exc: Exception,
         request: object,
+        policy: IHttpEndpointPolicy | None = None,
     ) -> Response:
         """
         Translate a caught exception into an HTTP response.
@@ -893,6 +929,8 @@ class KernelHTTP(IKernelHTTP):
         Response
             Appropriate HTTP response for the given exception type.
         """
+        if policy is not None:
+            return await policy.exception(exc, request)
         if isinstance(exc, PayloadTooLargeException):
             return await self.__default_responses.error(
                 status_code=413,
@@ -956,6 +994,7 @@ class KernelHTTP(IKernelHTTP):
         adapter: TransportAdapter,
         receive_or_protocol: object,
         request_context: object,
+        policy: IHttpEndpointPolicy | None = None,
     ) -> Response:
         """
         Build the HTTP response for this request.
@@ -1035,7 +1074,7 @@ class KernelHTTP(IKernelHTTP):
 
         except Exception as e:  # noqa: BLE001
             # Delegate all exceptions to the unified exception handler.
-            return await self.__handleException(e, request)
+            return await self.__handleException(e, request, policy)
 
     async def handleRSGI(
         self,
@@ -1062,19 +1101,24 @@ class KernelHTTP(IKernelHTTP):
             return await self.__handleWebSocket(
                 Interface.RSGI, adapter, protocol,
             )
+        policy = self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+        if policy is not None and (response := policy.before(adapter)) is not None:
+            return await self.__rsgiResponse(adapter, response, protocol, policy)
         if not self.__request_slots.acquire(blocking=False):
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
-            return await self.__rsgiResponse(adapter, response, protocol)
+            return await self.__rsgiResponse(adapter, response, protocol, policy)
         try:
             async with self.__app.beginScope() as request_context:
                 try:
                     response = await self.__processRequest(
-                        Interface.RSGI, adapter, protocol, request_context,
+                        Interface.RSGI, adapter, protocol, request_context, policy,
                     )
-                    return await self.__rsgiResponse(adapter, response, protocol)
+                    return await self.__rsgiResponse(
+                        adapter, response, protocol, policy,
+                    )
                 finally:
                     request = request_context[Request]
                     if isinstance(request, Request):
@@ -1110,19 +1154,24 @@ class KernelHTTP(IKernelHTTP):
             return await self.__handleWebSocket(
                 Interface.ASGI, adapter, receive, send,
             )
+        policy = self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+        if policy is not None and (response := policy.before(adapter)) is not None:
+            return await self.__asgiResponse(adapter, response, receive, send, policy)
         if not self.__request_slots.acquire(blocking=False):
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
-            return await self.__asgiResponse(adapter, response, receive, send)
+            return await self.__asgiResponse(adapter, response, receive, send, policy)
         try:
             async with self.__app.beginScope() as request_context:
                 try:
                     response = await self.__processRequest(
-                        Interface.ASGI, adapter, receive, request_context,
+                        Interface.ASGI, adapter, receive, request_context, policy,
                     )
-                    return await self.__asgiResponse(adapter, response, receive, send)
+                    return await self.__asgiResponse(
+                        adapter, response, receive, send, policy,
+                    )
                 finally:
                     request = request_context[Request]
                     if isinstance(request, Request):

@@ -1,0 +1,12 @@
+from orionis.mcp import Server
+
+
+class {{ class_name }}(Server):
+    """Expose application tools, resources and prompts through MCP."""
+
+    name = "{{ class_name }}"
+    version = "1.0.0"
+    instructions = "Describe the capabilities of this server."
+    tools = ()
+    resources = ()
+    prompts = ()

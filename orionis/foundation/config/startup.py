@@ -9,6 +9,7 @@ from orionis.foundation.config.hashing.entities.hashing import Hashing
 from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.logging.entities.logging import Logging
 from orionis.foundation.config.mail.entities.mail import Mail
+from orionis.foundation.config.mcp.entities.mcp import McpConfig
 from orionis.foundation.config.queue.entities.queue import Queue
 from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
 from orionis.foundation.config.scheduler.entities.scheduler import Scheduler
@@ -27,6 +28,7 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
     ("http", HTTP),
     ("logging", Logging),
     ("mail", Mail),
+    ("mcp", McpConfig),
     ("queue", Queue),
     ("realtime", RealtimeConfig),
     ("session", Session),
@@ -73,6 +75,8 @@ class Configuration(BaseEntity):
         Session configuration settings.
     testing : Testing | dict, optional
         Testing configuration settings.
+    mcp : McpConfig | dict, optional
+        MCP protocol limits and trusted browser origins.
 
     Raises
     ------
@@ -90,6 +94,14 @@ class Configuration(BaseEntity):
         metadata={
             "description": "Application configuration settings.",
             "default": lambda: App().toDict(),
+        },
+    )
+
+    mcp: McpConfig | dict = field(
+        default_factory=McpConfig,
+        metadata={
+            "description": "MCP protocol limits and trusted browser origins.",
+            "default": lambda: McpConfig().toDict(),
         },
     )
 

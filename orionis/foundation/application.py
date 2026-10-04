@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any, Self
 from orionis.cache import FileBasedCache
 from orionis.console.base.contracts.scheduler import IBaseScheduler
 from orionis.console.contracts.kernel import IKernelCLI
+from orionis.console.stdio import protocol_stdio
 from orionis.container.container import Container
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
@@ -32,6 +33,7 @@ from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.layer.contracts.middleware import IBaseMiddleware
+from orionis.http.routes.functions import normalize_request_path
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.metadata.framework import PYTHON_REQUIRES
 from orionis.support.facades.datetime import DateTime
@@ -351,8 +353,9 @@ class Application(Container, IApplication):
         Handle an HTTP request using the configured disconnect policy.
 
         Direct dispatch uses the server task and receive callable. When
-        ``http.monitor_disconnects`` is enabled, a receive dispatcher cancels
-        the kernel on disconnect and buffers incoming body messages.
+        ``http.monitor_disconnects`` or a compiled endpoint policy enables
+        monitoring, a receive dispatcher cancels the kernel on disconnect
+        and buffers incoming body messages.
         At most nine body messages are retained outside the kernel: eight
         in the queue and one waiting to enter it. Disconnect detection
         pauses while the queue is full.
@@ -377,7 +380,13 @@ class Application(Container, IApplication):
             await self.__initializeHttpKernel("asgi")
             handler = self.__kernel_http_asgi
 
-        if not self.__http_disconnect_monitoring or scope.get("type") == "websocket":
+        monitoring = self.__http_disconnect_monitoring
+        if not monitoring and self.__http_disconnect_paths:
+            monitoring = (
+                normalize_request_path(scope.get("path", ""))
+                in self.__http_disconnect_paths
+            )
+        if not monitoring or scope.get("type") == "websocket":
             return await handler(scope, receive, send)
 
         loop = asyncio.get_running_loop()
@@ -474,8 +483,9 @@ class Application(Container, IApplication):
         Handle HTTP requests using the KernelHTTP in RSGI mode.
 
         Direct dispatch executes in the server task. When
-        ``http.monitor_disconnects`` is enabled, a watcher requests cancellation
-        when the client disconnects. The watcher is joined before returning.
+        ``http.monitor_disconnects`` or a compiled endpoint policy enables
+        monitoring, a watcher requests cancellation when the client disconnects.
+        The watcher is joined before returning.
 
         Parameters
         ----------
@@ -503,7 +513,12 @@ class Application(Container, IApplication):
             await self.__initializeHttpKernel("rsgi")
             handler = self.__kernel_http_rsgi
 
-        if not self.__http_disconnect_monitoring or scope.proto == "ws":
+        monitoring = self.__http_disconnect_monitoring
+        if not monitoring and self.__http_disconnect_paths:
+            monitoring = (
+                normalize_request_path(scope.path) in self.__http_disconnect_paths
+            )
+        if not monitoring or scope.proto == "ws":
             return await handler(scope, protocol)
 
         loop = asyncio.get_running_loop()
@@ -536,6 +551,7 @@ class Application(Container, IApplication):
                 return
             self.config("app.interface", interface)
             kernel = await self.__loadHTTPKernel()
+            self.__http_disconnect_paths = kernel.disconnectPaths()
             asgi_handler = kernel.handleASGI
             rsgi_handler = kernel.handleRSGI
             self.__kernel_http_asgi = asgi_handler
@@ -641,22 +657,17 @@ class Application(Container, IApplication):
         TypeError
             If the CLI kernel does not have a handle method.
         """
-        # Initialize the CLI kernel before starting command lifecycle hooks.
-        if self.__kernel_cli is None:
-            await self.__initializeCliKernel()
+        with protocol_stdio(args):
+            # Reserve protocol output before providers or lifecycle hooks execute.
+            if self.__kernel_cli is None:
+                await self.__initializeCliKernel()
 
-        # Trigger startup lifecycle event before each command execution
-        await self.__onStartup(runtime=Runtime.CLI)
-
-        try:
-            # Execute the kernel's handle method with provided arguments
-            response = await self.__kernel_cli(args or [])
-        finally:
-            # Always trigger shutdown after each command, paired with the startup above
-            await self.__onShutdown(runtime=Runtime.CLI)
-
-        # Return the response code from the CLI kernel
-        return response
+            await self.__onStartup(runtime=Runtime.CLI)
+            try:
+                response = await self.__kernel_cli(args or [])
+            finally:
+                await self.__onShutdown(runtime=Runtime.CLI)
+            return response
 
     async def __initializeCliKernel(self) -> None:
         """
@@ -945,6 +956,7 @@ class Application(Container, IApplication):
             self.__kernel_http_rsgi: Callable | None = None
             self.__kernel_http_asgi: Callable | None = None
             self.__http_disconnect_monitoring: bool = False
+            self.__http_disconnect_paths: frozenset[str] = frozenset()
             self.__kernel_http_lock = asyncio.Lock()
             self.__kernel_cli_lock = asyncio.Lock()
 
@@ -1867,6 +1879,7 @@ class Application(Container, IApplication):
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
         health: str | None = None,
+        ai: str | list[str] | None = None,
     ) -> Self:
         """
         Configure routing files for API, web, console, and health endpoints.
@@ -1881,6 +1894,8 @@ class Application(Container, IApplication):
             Path or list of paths to console routing files.
         health : str | None
             Path to the health check route.
+        ai : str | list[str] | None
+            MCP registration files loaded before HTTP or CLI startup.
 
         Returns
         -------
@@ -1919,6 +1934,10 @@ class Application(Container, IApplication):
             console,
             {"orionis.support.facades.reactor"},
         )
+        ai_routers = self.__resolveAndValidateRoutingFiles(
+            ai,
+            {"orionis.support.facades.mcp"},
+        )
 
         # Validate health route type
         if health is not None and not isinstance(health, str):
@@ -1932,6 +1951,7 @@ class Application(Container, IApplication):
             "api": api_routers,
             "web": web_routers,
             "console": console_routers,
+            "ai": ai_routers,
             "health": health,
         }
 
@@ -2252,6 +2272,25 @@ class Application(Container, IApplication):
         self.__bootstrap["config"]["auth"] = auth_config
 
         # Return the application instance for method chaining
+        return self
+
+    def withConfigMcp(self, **mcp_config: object) -> Self:
+        """Configure validated MCP limits and the explicit Origin allowlist.
+
+        Parameters
+        ----------
+        **mcp_config : object
+            Fields accepted by the native McpConfig entity.
+
+        Returns
+        -------
+        Self
+            The application for further configuration.
+        """
+        if self.__is_compiled:
+            return self
+        self.__assertConfigMutable()
+        self.__bootstrap["config"]["mcp"] = mcp_config
         return self
 
     def withConfigCache(
@@ -3078,14 +3117,14 @@ class Application(Container, IApplication):
         """
         Retrieve routing file paths from configuration.
 
-        Only 'api', 'web', and 'console' routing types are supported.
+        The 'api', 'web', 'console', and 'ai' routing types are supported.
         The health-check route is exposed through the ``routeHealthCheck``
         property and is not accessible via this method.
 
         Parameters
         ----------
         key : str | None, optional
-            Routing type to retrieve: 'api', 'web', or 'console'.
+            Routing type to retrieve: 'api', 'web', 'console', or 'ai'.
             If None, returns the complete routing configuration dictionary.
 
         Returns
@@ -3125,7 +3164,7 @@ class Application(Container, IApplication):
             return FreezeThaw.thaw(routing)
 
         # Validate key exists in valid routing types
-        if key not in {"api", "web", "console"}:
+        if key not in {"api", "web", "console", "ai"}:
             return None
 
         # Thaw before returning: freeze converts lists→tuples; callers expect list[Path]

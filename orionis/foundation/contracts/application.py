@@ -294,6 +294,7 @@ class IApplication(IContainer, ABC):
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
         health: str | None = None,
+        ai: str | list[str] | None = None,
     ) -> Self:
         """
         Configure routing paths for the application.
@@ -308,6 +309,8 @@ class IApplication(IContainer, ABC):
             Path(s) to console routing files.
         health : str | None, optional
             Path to health check route.
+        ai : str | list[str] | None, optional
+            MCP registration files loaded for HTTP and CLI runtimes.
 
         Returns
         -------
@@ -446,6 +449,21 @@ class IApplication(IContainer, ABC):
         -------
         Self
             The current Application instance for method chaining.
+        """
+
+    @abstractmethod
+    def withConfigMcp(self, **mcp_config: object) -> Self:
+        """Configure MCP protocol limits and the explicit Origin allowlist.
+
+        Parameters
+        ----------
+        **mcp_config : object
+            Fields accepted by the native McpConfig entity.
+
+        Returns
+        -------
+        Self
+            The application for further configuration.
         """
 
     @abstractmethod

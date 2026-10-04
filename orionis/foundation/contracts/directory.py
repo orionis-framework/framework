@@ -389,3 +389,53 @@ class IDirectory(ABC):
         Path
             The configured tests directory.
         """
+
+    @abstractmethod
+    def appMcp(self) -> Path:
+        """Return the MCP application directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """
+
+    @abstractmethod
+    def appMcpServers(self) -> Path:
+        """Return the MCP server declarations directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """
+
+    @abstractmethod
+    def appMcpTools(self) -> Path:
+        """Return the MCP tool declarations directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """
+
+    @abstractmethod
+    def appMcpResources(self) -> Path:
+        """Return the MCP resource declarations directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """
+
+    @abstractmethod
+    def appMcpPrompts(self) -> Path:
+        """Return the MCP prompt declarations directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """

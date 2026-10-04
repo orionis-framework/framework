@@ -1,0 +1,49 @@
+Verified 2026-10-03 against MCP 2026-07-28.
+
+Official @modelcontextprotocol/conformance 0.2.0-alpha.12:
+  Native Orionis Application + Granian ASGI and RSGI, independent loopback endpoints.
+  --requirements 2026-07-28; no known-failure baseline or suppressed checks.
+  37 of 37 required server scenarios passed, including all 14 MRTR scenarios.
+  Required check records per interface: 120 SUCCESS, 1 INFO, 0 WARNING, 0 FAILURE.
+  INFO: one scenario accepted ordinary JSON responses because SSE is optional
+  for those particular requests. Dedicated progress and subscription checks ran.
+  Official process exit code: 0.
+
+The referee also ran 13 unscored extension/pending scenarios. Eleven contained
+failures (36 individual FAILURE records): Tasks extensions and diagnostic
+fixtures for pending JSON Schema/custom-header probes. These are preserved in
+verification.json; they were not omitted or promoted to passing requirements.
+The framework does not advertise the Tasks extension.
+
+Official Inspector 2.9.0, explicitly selecting the modern protocol era:
+  HTTP: 8 of 8 CLI probes passed.
+  STDIO: 8 of 8 CLI probes passed through the native mcp:start command.
+  Probes: tools/list, tools/call text, tools/call progress, resources/list,
+  resources/read text, resources/read binary, prompts/list, prompts/get.
+  Every CLI process returned exit code 0.
+
+verification.json preserves every official check identifier, status, timestamp,
+unscored error, pinned source revision, official schema checksum and Inspector
+probe result. The schema snapshot is a test oracle only, never a runtime import.
+
+Reproduction commands and temporary-only tool installation are in README.md.
+run_conformance.py and run_inspector.py reject unexpected tool versions.
+
+Full repository regression run:
+  python -B .github/scripts/run_tests.py --continue-on-error --verbosity 1
+  Wrapper exit code 0; 29 isolated groups; 8,721/8,721 passed.
+  No failures, errors or skipped tests. This run contained 133 MCP tests.
+  framework-suites.json preserves every group total and the complete log hash.
+  After four additional audit regressions were added, the complete native MCP
+  suite was rerun: 137/137 passed, exit code 0, with no skipped tests.
+  Ruff passed for all changed Python/pyi files and reactor. Focused Pyright checks
+  of MCP and its native integration returned 0 errors and 0 warnings.
+  On Windows, set PYTHONIOENCODING=utf-8 when redirecting native Reactor output.
+  The full repository runner sets this environment variable automatically.
+
+Interoperability limits:
+  Official TypeScript ecosystem interoperability was exercised through the
+  actual official conformance referee and Inspector processes. Interoperability
+  with the official Python MCP client was not tested; a compatible modern Python
+  client was not validated during this work.
+  No performance benchmark or comparative throughput claim was made.

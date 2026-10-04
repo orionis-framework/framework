@@ -9,6 +9,10 @@ class IKernelHTTP(ABC):
 
     __slots__ = ()
 
+    def disconnectPaths(self) -> frozenset[str]:
+        """Return static protocol endpoints requiring proactive cancellation."""
+        return frozenset()
+
     @abstractmethod
     async def boot(self) -> None:
         """

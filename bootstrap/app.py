@@ -32,6 +32,7 @@ app.withRouting(
     console="routes/console.py",
     web="routes/web.py",
     api="routes/api.py",
+    ai="routes/ai.py",
     health="/up",
 )
 

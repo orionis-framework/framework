@@ -37,6 +37,40 @@ Visit the [official documentation](https://docs.orionis-framework.com/) for
 guides and reference material. You can also explore the [project website](https://orionis-framework.com/)
 or find the package on [PyPI](https://pypi.org/project/orionis/).
 
+## Native MCP servers
+
+Expose application services through MCP **2026-07-28** using the existing Orionis
+container, schemas, authentication and HTTP pipeline. The same server declaration
+supports Streamable HTTP through ASGI/RSGI and local STDIO:
+
+```python
+# routes/ai.py
+from orionis.mcp import McpResponse, Server, Tool
+from orionis.support.facades.mcp import Mcp
+
+
+class StatusTool(Tool):
+    async def handle(self) -> McpResponse:
+        return McpResponse.text("ready")
+
+
+class StatusServer(Server):
+    name = "Status"
+    tools = (StatusTool,)
+
+
+Mcp.web("/mcp/status", StatusServer)
+Mcp.local("status", StatusServer)
+```
+
+Configure `app.withRouting(ai="routes/ai.py")` before `app.create()`. Start the
+local server with `python reactor mcp:start status`. Every request declares its
+version and capabilities; no initialization session is required.
+
+Read the [MCP guide](docs/mcp/README.md) or [guía en español](docs/mcp/README.es.md)
+for typed tools, resources, prompts, HTTP headers, security, subscriptions and
+verification commands.
+
 ## Repositories
 
 - [Framework Core](https://github.com/orionis-framework/framework) — source code for the framework.

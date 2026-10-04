@@ -161,6 +161,56 @@ class Directory(IDirectory):
         """
         return self._path("app_models")
 
+    def appMcp(self) -> Path:
+        """Return the MCP application directory.
+
+        Returns
+        -------
+        Path
+            The configured application directory.
+        """
+        return self._path("app_mcp")
+
+    def appMcpServers(self) -> Path:
+        """Return the MCP server declaration directory.
+
+        Returns
+        -------
+        Path
+            The configured MCP declarations directory.
+        """
+        return self._path("app_mcp_servers")
+
+    def appMcpTools(self) -> Path:
+        """Return the MCP tool declaration directory.
+
+        Returns
+        -------
+        Path
+            The configured MCP declarations directory.
+        """
+        return self._path("app_mcp_tools")
+
+    def appMcpResources(self) -> Path:
+        """Return the MCP resource declaration directory.
+
+        Returns
+        -------
+        Path
+            The configured MCP declarations directory.
+        """
+        return self._path("app_mcp_resources")
+
+    def appMcpPrompts(self) -> Path:
+        """Return the MCP prompt declaration directory.
+
+        Returns
+        -------
+        Path
+            The configured MCP declarations directory.
+        """
+        return self._path("app_mcp_prompts")
+
     def appProviders(self) -> Path:
         """Return the application providers directory.
 

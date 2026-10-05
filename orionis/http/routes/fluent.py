@@ -131,7 +131,14 @@ class FluentRoute(IFluentRoute):
 
     @property
     def path(self) -> str:
-        """Return the current canonical path, including inherited prefixes."""
+        """
+        Return the current canonical path, including inherited prefixes.
+
+        Returns
+        -------
+        str
+            The current canonical path, including inherited prefixes.
+        """
         return self.__path
 
     @property

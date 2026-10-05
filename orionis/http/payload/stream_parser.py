@@ -188,6 +188,11 @@ class MultipartStreamParser(IMultipartStreamParser):
         ----------
         length : int
             Number of leading bytes to remove from the buffer.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         if not length:
             return
@@ -274,6 +279,11 @@ class MultipartStreamParser(IMultipartStreamParser):
             Current multipart part being populated.
         length : int
             Number of bytes to append from the current buffer.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         size = self.current_part_size + length
         if size > self.max_part_size:

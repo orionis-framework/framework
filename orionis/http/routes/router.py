@@ -491,7 +491,8 @@ class Router(IRouter):
         routes: Sequence[FluentRoute | RouteGroup] | None = None,
         public: bool | None = None,
     ) -> RouteGroup:
-        """Compose a group and return its flattened membership for nesting.
+        """
+        Compose a group and return its flattened membership for nesting.
 
         Parameters
         ----------
@@ -553,7 +554,13 @@ class Router(IRouter):
     def __groupMembers(
         routes: Sequence[FluentRoute | RouteGroup] | None,
     ) -> tuple[FluentRoute, ...]:
-        """Validate and flatten membership without mutating any routes.
+        """
+        Validate and flatten membership without mutating any routes.
+
+        Parameters
+        ----------
+        routes : Sequence[FluentRoute | RouteGroup] | None
+            Value supplied for ``routes``.
 
         Returns
         -------

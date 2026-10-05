@@ -8,6 +8,21 @@ protocol integration evidence are documented in [WebSockets](websockets.md).
 Server-Sent Events, event framing, disconnect handling and streaming lifecycle
 are documented in [SSE](sse.md).
 
+## Route files and middleware ownership
+
+`Application.withRouting` accepts `web`, `api`, `console`, `ai` and the optional
+keyword-only `websocket` route file. The application declares these in
+`bootstrap/app.py`; `routes/websocket.py` is the dedicated WebSocket/Hub surface.
+Existing registrations in web/API files remain supported. WebSocket files use
+the web profile; HTTP, WebSocket and Hub protocol metadata still decide dispatch.
+Cold loading imports web, API and WebSocket files once; a valid route cache skips
+these imports. AI registrations retain their provider-owned HTTP/CLI lifecycle.
+
+Each middleware layer receives its own single-use continuation. The pipeline
+itself can also start only once. Duplicate, concurrent and post-failure calls
+remain rejected without a second depth-based guard. No request-specific state
+is stored on shared middleware instances by the pipeline.
+
 ## Table of contents
 
 - [Functional overview](#functional-overview)

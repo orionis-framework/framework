@@ -1,12 +1,10 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
-
     from orionis.http.routes.entities.compiled_route import CompiledRoute
 
 _EMPTY_PARAMS = MappingProxyType({})
@@ -29,7 +27,14 @@ class ResolvedRoute:
     params: Mapping[str, Any]
 
     def __post_init__(self) -> None:
-        """Freeze parameters so cached results can be shared across requests."""
+        """
+        Freeze parameters so cached results can be shared across requests.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         params = MappingProxyType(dict(self.params)) if self.params else _EMPTY_PARAMS
         object.__setattr__(self, "params", params)
 
@@ -39,10 +44,18 @@ class ResolvedRoute:
         route: CompiledRoute,
         params: dict[str, Any],
     ) -> ResolvedRoute:
-        """Freeze a parameter dict exclusively owned by the route resolver.
+        """
+        Freeze a parameter dict exclusively owned by the route resolver.
 
         Callers must discard all mutable references to the supplied dict.
         The public constructor continues to copy externally owned mappings.
+
+        Parameters
+        ----------
+        route : CompiledRoute
+            Value supplied for ``route``.
+        params : dict[str, Any]
+            Parameters decoded for the requested operation.
 
         Returns
         -------

@@ -49,7 +49,14 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
         If the waiting task is cancelled after the file opens.
     """
     def open_and_seek() -> BinaryIO:
-        """Open the requested file and position it at the starting offset."""
+        """
+        Open the requested file and position it at the starting offset.
+
+        Returns
+        -------
+        BinaryIO
+            Result of the operation described above.
+        """
         file = path.open("rb")
         try:
             if start:

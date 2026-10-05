@@ -53,6 +53,8 @@ __all__ = [
     "response",
 ]
 
+_WEBSOCKET_MESSAGE_MODULE = "orionis.http.websocket_message"
+
 _EXPORTS = {
     "BaseMiddleware": ("orionis.http.middleware", "BaseMiddleware"),
     "EventStreamResponse": ("orionis.http.responses", "EventStreamResponse"), # NOSONAR
@@ -71,9 +73,9 @@ _EXPORTS = {
     "StreamingResponse": ("orionis.http.responses", "StreamingResponse"),
     "WebSocket": ("orionis.http.websocket", "WebSocket"),
     "WebSocketDisconnected": ("orionis.http.websocket", "WebSocketDisconnected"),
-    "WebSocketMessage": ("orionis.http.websocket_message", "WebSocketMessage"),
-    "WebSocketMessageType": ("orionis.http.websocket_message", "WebSocketMessageType"),
-    "WebSocketState": ("orionis.http.websocket_message", "WebSocketState"),
+    "WebSocketMessage": (_WEBSOCKET_MESSAGE_MODULE, "WebSocketMessage"),
+    "WebSocketMessageType": (_WEBSOCKET_MESSAGE_MODULE, "WebSocketMessageType"),
+    "WebSocketState": (_WEBSOCKET_MESSAGE_MODULE, "WebSocketState"),
     "WebSocketMiddleware": (
         "orionis.http.websocket_middleware", "WebSocketMiddleware",
     ),

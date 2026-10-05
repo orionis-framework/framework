@@ -6,6 +6,21 @@ y evidencia de integración se documentan en [WebSockets](websockets.es.md).
 Server-Sent Events, formato de eventos, desconexión y ciclo de vida del streaming
 se documentan en [SSE](sse.es.md).
 
+## Archivos de rutas y estado del middleware
+
+`Application.withRouting` admite `web`, `api`, `console`, `ai` y el nuevo parametro
+opcional keyword-only `websocket`. La aplicacion los declara en `bootstrap/app.py`;
+`routes/websocket.py` aloja las rutas WebSocket/Hub. Las declaraciones existentes
+en web/API siguen funcionando. El archivo WebSocket usa el perfil web; los
+metadatos de protocolo siguen determinando el despacho HTTP, WebSocket o Hub.
+La carga fria importa web, API y WebSocket una sola vez; una cache valida omite
+estos imports. El provider AI conserva su ciclo de registro para HTTP y CLI.
+
+Cada capa de middleware tiene una continuacion de un solo uso. El pipeline tambien
+se inicia una sola vez. Se rechazan llamadas duplicadas, concurrentes o posteriores
+a un fallo sin una segunda guarda por profundidad. El pipeline no guarda estado
+de la peticion en instancias compartidas de middleware.
+
 > Peticiones, rutas, middleware, parseo de payload y respuestas HTTP para aplicaciones ASGI/RSGI.
 
 ## Tabla de contenidos

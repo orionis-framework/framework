@@ -47,6 +47,9 @@ class RegisterController(BaseController):
         payload : RegisterSchema
             Incoming request carrying the submitted account data.
 
+        request : Request
+            Current request and its trusted execution context.
+
         Returns
         -------
         HttpResponse

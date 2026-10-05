@@ -59,6 +59,7 @@ if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.routes.contracts.loader import IRouteLoader
+    from orionis.http.routes.entities.compiled_route import CompiledRoute
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
     from orionis.realtime.runtime import HubRuntime
 
@@ -125,7 +126,7 @@ class _MiddlewarePipeline[T]:
     """
 
     __slots__ = (
-        "_called_mask",
+        "_called",
         "_instances",
         "_n",
         "_request",
@@ -163,22 +164,26 @@ class _MiddlewarePipeline[T]:
         self._terminal = terminal
         self._terminal_args = terminal_args
         self._n = len(instances)
-        self._called_mask = 0
+        self._called = False
 
     async def __call__(self) -> T:
         """
-        Advance to the next middleware layer or invoke the terminal handler.
+        Start the middleware stack once for this request.
 
         Returns
         -------
-        Response
-            HTTP response produced by the next layer or the terminal.
+        T
+            Result produced by the middleware stack or terminal.
 
         Raises
         ------
         RuntimeError
-            When ``next()`` is invoked more than once in the same layer.
+            If this pipeline has already started.
         """
+        if self._called:
+            error_msg = "next() has already been called in this middleware layer."
+            raise RuntimeError(error_msg)
+        self._called = True
         return await self.__advance(0)
 
     async def __advance(self, depth: int) -> T:
@@ -192,16 +197,9 @@ class _MiddlewarePipeline[T]:
 
         Returns
         -------
-        Response
-            Response returned by this middleware and its descendants.
+        T
+            Result returned by this middleware and its descendants.
         """
-        bit = 1 << depth
-        # Guard against double invocation of next() from the same layer.
-        if self._called_mask & bit:
-            error_msg = "next() has already been called in this middleware layer."
-            raise RuntimeError(error_msg)
-        self._called_mask |= bit
-        # The terminal also consumes its continuation exactly once.
         if depth >= self._n:
             return await self._terminal(*self._terminal_args)
         continuation = _MiddlewareNext(self.__advance, (depth + 1,))
@@ -280,7 +278,14 @@ class KernelHTTP(IKernelHTTP):
         self.__endpoint_policies: dict[str, IHttpEndpointPolicy] = {}
 
     def disconnectPaths(self) -> frozenset[str]:
-        """Expose compiled endpoint opt-ins to the application transport wrapper."""
+        """
+        Expose compiled endpoint opt-ins to the application transport wrapper.
+
+        Returns
+        -------
+        frozenset[str]
+            Result of the operation described above.
+        """
         return frozenset(
             path for path, policy in self.__endpoint_policies.items()
             if policy.monitor_disconnects
@@ -445,28 +450,58 @@ class KernelHTTP(IKernelHTTP):
                 method = action["method"]
                 warm_controller_plan(controller, method)
                 cls_dispatch[route_id] = (controller, method)
-                policy_type = getattr(controller, "http_protocol_policy", None)
-                if policy_type is not None and route.protocol is RouteProtocol.HTTP:
-                    if (
-                        route.regex is not None
-                        or not isinstance(policy_type, type)
-                        or not issubclass(policy_type, IHttpEndpointPolicy)
-                    ):
-                        error_msg = (
-                            "HTTP endpoint policies require a static path "
-                            "and policy class"
-                        )
-                        raise TypeError(error_msg)
-                    policy = policy_instances.get(policy_type)
-                    if policy is None:
-                        policy = await self.__app.build(policy_type)
-                        policy_instances[policy_type] = policy
-                    self.__endpoint_policies[route.path] = policy
+                await self.__preloadEndpointPolicy(controller, route, policy_instances)
 
         self.__fn_dispatch: dict[int, object] = fn_dispatch
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
         self.__view_dispatch: dict[int, str] = view_dispatch
         self.__hub_dispatch = hub_dispatch
+
+    async def __preloadEndpointPolicy(
+        self,
+        controller: type,
+        route: CompiledRoute,
+        policy_instances: dict[type[IHttpEndpointPolicy], IHttpEndpointPolicy],
+    ) -> None:
+        """
+        Bind one validated policy instance to a static HTTP endpoint.
+
+        Parameters
+        ----------
+        controller : type
+            Controller declaring an optional HTTP protocol policy.
+        route : CompiledRoute
+            Compiled route associated with the controller.
+        policy_instances : dict[type[IHttpEndpointPolicy], IHttpEndpointPolicy]
+            Policy instances already constructed during this kernel boot.
+
+        Returns
+        -------
+        None
+            The endpoint uses the shared policy instance for its policy type.
+
+        Raises
+        ------
+        TypeError
+            If a policy is not a policy class or the route is dynamic.
+        """
+        policy_type = getattr(controller, "http_protocol_policy", None)
+        if policy_type is None or route.protocol is not RouteProtocol.HTTP:
+            return
+        if (
+            route.regex is not None
+            or not isinstance(policy_type, type)
+            or not issubclass(policy_type, IHttpEndpointPolicy)
+        ):
+            error_msg = (
+                "HTTP endpoint policies require a static path and policy class"
+            )
+            raise TypeError(error_msg)
+        policy = policy_instances.get(policy_type)
+        if policy is None:
+            policy = await self.__app.build(policy_type)
+            policy_instances[policy_type] = policy
+        self.__endpoint_policies[route.path] = policy
 
     def __defaultMiddleware(
         self,
@@ -487,6 +522,9 @@ class KernelHTTP(IKernelHTTP):
             HTTP configuration dictionary with middleware settings.
         default_responses : IDefaultResponses
             Default response handler for middleware rejections.
+
+        under_maintenance : bool
+            Value supplied for ``under_maintenance``.
 
         Returns
         -------
@@ -557,6 +595,9 @@ class KernelHTTP(IKernelHTTP):
         protocol : HTTPProtocol
             RSGI HTTP protocol version indicator.
 
+        policy : IHttpEndpointPolicy | None
+            Value supplied for ``policy``.
+
         Returns
         -------
         None
@@ -593,6 +634,9 @@ class KernelHTTP(IKernelHTTP):
             ASGI receive callable for reading request body.
         send : object
             ASGI send callable for sending response.
+
+        policy : IHttpEndpointPolicy | None
+            Value supplied for ``policy``.
 
         Returns
         -------
@@ -924,6 +968,9 @@ class KernelHTTP(IKernelHTTP):
             Current request object (may be the raw transport adapter for
             pre-routing errors).
 
+        policy : IHttpEndpointPolicy | None
+            Value supplied for ``policy``.
+
         Returns
         -------
         Response
@@ -1013,6 +1060,9 @@ class KernelHTTP(IKernelHTTP):
             ASGI receive callable or RSGI HTTPProtocol instance.
         request_context : object
             Active DI request scope for per-request bindings.
+
+        policy : IHttpEndpointPolicy | None
+            Value supplied for ``policy``.
 
         Returns
         -------

@@ -30,6 +30,10 @@ class LoginController(BaseController):
         application : IApplication
             Application instance used to read the ``auth`` configuration.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         # Cache the destination used after a valid session login.
         self.redirect_to: str = (

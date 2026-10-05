@@ -24,6 +24,18 @@ def _validate_literal(fragment: str, path: str) -> None:
     """
     Reject unmatched braces and malformed parameter declarations.
 
+    Parameters
+    ----------
+    fragment : str
+        Value supplied for ``fragment``.
+    path : str
+        Value supplied for ``path``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+
     Raises
     ------
     ValueError
@@ -36,6 +48,16 @@ def _validate_literal(fragment: str, path: str) -> None:
 def _action_name(handler: Callable | type) -> str:
     """
     Return an importable handler name for boot-time dispatch and caching.
+
+    Parameters
+    ----------
+    handler : Callable | type
+        Value supplied for ``handler``.
+
+    Returns
+    -------
+    str
+        An importable handler name for boot-time dispatch and caching.
 
     Raises
     ------
@@ -52,6 +74,18 @@ def _action_name(handler: Callable | type) -> str:
 def _register_name(names: dict[str, str], route: dict) -> None:
     """
     Require one unambiguous URL template per route name.
+
+    Parameters
+    ----------
+    names : dict[str, str]
+        Value supplied for ``names``.
+    route : dict
+        Value supplied for ``route``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
 
     Raises
     ------
@@ -205,6 +239,9 @@ class RouteCompiler(IRouteCompiler):
         ----------
         route : dict
             Raw route dictionary from the router export.
+
+        app_middleware : list[type] | None
+            Value supplied for ``app_middleware``.
 
         Returns
         -------

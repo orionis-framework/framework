@@ -176,6 +176,7 @@ class RouteLoader(IRouteLoader):
                 self.__importFluentRoutes(kind)
         finally:
             self.__router._setKind("web")
+        self.__importFluentRoutes("websocket")
 
         exported = self.__router.export()
         self.__routes, self.__fallback = self.__compiler.compile(

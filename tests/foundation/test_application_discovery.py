@@ -1,12 +1,12 @@
 from __future__ import annotations
 import sys
-import unittest
 from abc import abstractmethod
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.application import Application
+from orionis.test import TestCase
 
 def make_application() -> Application:
     """Create an isolated application with initialized container state.
@@ -34,7 +34,7 @@ def abstract_registration(_self: ServiceProvider) -> None:
         Leaves registration to concrete implementations.
     """
 
-class TestApplicationDiscovery(unittest.TestCase):
+class TestApplicationDiscovery(TestCase):
     """Verify module ownership and provider availability during startup."""
 
     def testDiscoverProvidersRegistersEachOwnedClassOnce(self) -> None:
@@ -130,6 +130,3 @@ class TestApplicationDiscovery(unittest.TestCase):
         overrides["app"]["settings"]["items"].append(2)
 
         self.assertEqual(app.config("app.settings.items"), [1])
-
-if __name__ == "__main__":
-    unittest.main()

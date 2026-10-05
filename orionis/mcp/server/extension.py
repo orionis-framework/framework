@@ -1,9 +1,5 @@
-"""Small explicit extension points, with no built-in optional extensions."""
-
 from dataclasses import dataclass, field
 from types import MappingProxyType
-
-
 from orionis.mcp.context import freeze_json
 from orionis.mcp.protocol.metavalidation import validate_meta_key
 from typing import TYPE_CHECKING
@@ -11,7 +7,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import msgspec
     from collections.abc import Callable, Mapping
-
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class McpExtension:
@@ -24,7 +19,14 @@ class McpExtension:
     schema_hook: Callable[[dict[str, object]], None] | None = None
 
     def __post_init__(self) -> None:
-        """Detach declarations so a compiled server cannot change accidentally."""
+        """
+        Detach declarations so a compiled server cannot change accidentally.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         validate_meta_key(self.identifier, extension=True)
         object.__setattr__(self, "capabilities", freeze_json(self.capabilities))
         object.__setattr__(self, "methods", MappingProxyType(dict(self.methods)))

@@ -3,6 +3,30 @@
 Manual en ingles: [README.md](README.md).
 Muestras medidas: [benchmark-results.json](benchmark-results.json).
 
+## Defaults De Entorno Compartidos
+
+El rate limiter HTTP construye su URL con `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB` y
+`REDIS_PASSWORD` cuando falta `RATE_LIMIT_REDIS_URL`. Codifica las credenciales y
+delimita IPv6. Cache, colas y scheduler conservan sus campos y namespaces propios;
+el host ausente del scheduler tambien es `127.0.0.1`. Un override de servicio gana
+sin leer ni validar los defaults compartidos que no usa.
+
+`config/mcp.py` expone las 14 opciones MCP. Sus factories leen
+`MCP_<NOMBRE_DEL_CAMPO>` al crear cada entidad; bytes de peticion y concurrencia
+admiten fallback a sus limites HTTP. La entidad WebSocket del core lee el entorno
+igual que la plantilla. Se comparten los origenes CORS explicitos si no hay un
+override del protocolo; sus comodines no conceden acceso implicito a WebSocket/MCP.
+Un override vacio conserva su significado y tiene prioridad.
+
+La plantilla de entorno declara una sola `DB_DATABASE` y no anula con vacios los
+defaults de cache, correo, scheduler y base de datos. Una prueba en un subproceso
+aislado construye las 16 configuraciones reales desde esa plantilla; no certifica
+conectividad ni credenciales de servicios externos.
+
+`withRouting(..., *, websocket=None)` separa WebSocket sin cambiar los parametros
+posicionales existentes. El inspector lee cada archivo una vez y admite archivos
+opcionales vacios mediante `allow_empty`.
+
 ## Estados Explicitos Y Arranque Sin Servidor
 
 `create()` conserva su comportamiento síncrono de configuración y registro.

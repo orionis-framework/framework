@@ -1,19 +1,20 @@
-"""Verify response normalization inputs and native content shapes."""
-
-import unittest
-
 import msgspec
-
-from orionis.mcp.responses import McpResponse
-from orionis.mcp.protocol.results import CallToolResult
 from orionis.mcp.protocol.metadata import ContentAnnotations
+from orionis.mcp.protocol.results import CallToolResult
+from orionis.mcp.responses import McpResponse
+from orionis.test import TestCase
 
-
-class TestResponses(unittest.TestCase):
+class TestResponses(TestCase):
     """Preserve JSON scalar/null values and base64 binary contents."""
 
     def test_structured_json_values(self):
-        """Arrays, scalars and null are valid modern structured content."""
+        """Arrays, scalars and null are valid modern structured content.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for value in (None, False, 0, [], {}, "ok", [1, 2]):
             response = McpResponse.structured(value)
             wire = msgspec.json.decode(
@@ -29,7 +30,13 @@ class TestResponses(unittest.TestCase):
             self.assertEqual(wire["resultType"], "complete")
 
     def test_content_factories(self):
-        """Images, audio and blobs use protocol-defined shapes."""
+        """Images, audio and blobs use protocol-defined shapes.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         responses = (
             McpResponse.image(b"abc", "image/png"),
             McpResponse.audio(b"abc", "audio/wav"),
@@ -48,12 +55,24 @@ class TestResponses(unittest.TestCase):
         self.assertEqual(values[2]["resource"]["blob"], "YWJj")
 
     def test_progress_rejects_nonfinite_values(self):
-        """Do not emit NaN as an invalid JSON number."""
+        """Do not emit NaN as an invalid JSON number.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         with self.assertRaises(ValueError):
             McpResponse.progress(float("nan"))
 
     def test_metadata_and_annotations(self):
-        """Keep result and content metadata separate while preserving hints."""
+        """Keep result and content metadata separate while preserving hints.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         response = (
             McpResponse.text("example")
             .withMeta({"example.com/result": True})
@@ -69,7 +88,13 @@ class TestResponses(unittest.TestCase):
                 factory({"io.modelcontextprotocol/serverInfo": {"name": "forged"}})
 
     def test_structured_rejects_values_that_json_would_coerce(self):
-        """Never silently turn NaN into null or serialize arbitrary Python objects."""
+        """Never silently turn NaN into null or serialize arbitrary Python objects.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for value in (float("nan"), float("inf"), {1: "key"}, b"binary"):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 McpResponse.structured(value)

@@ -1,7 +1,3 @@
-"""Validate wire invariants at both untrusted-input and application-output edges."""
-
-import unittest
-
 import msgspec
 
 from orionis.mcp.context import McpRequest
@@ -26,13 +22,26 @@ from orionis.mcp.protocol.results import (
     ReadResourceResult,
 )
 from orionis.mcp.protocol.validation import validate_result
+from orionis.test import TestCase
 
-
-class TestMetadata(unittest.TestCase):
+class TestMetadata(TestCase):
     """Check native request decoders preserve extensibility with strict known fields."""
 
     def decode(self, capabilities, **meta: object):
-        """Decode real bytes through the production protocol entry point."""
+        """Decode real bytes through the production protocol entry point.
+
+        Parameters
+        ----------
+        capabilities : object
+            Value supplied for ``capabilities``.
+        **meta : object
+            Value supplied for ``meta``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``decode``.
+        """
         return decode_params(
             decode_envelope(
                 msgspec.json.encode(
@@ -53,7 +62,13 @@ class TestMetadata(unittest.TestCase):
         )
 
     def test_nested_capabilities_and_client_information(self):
-        """Reject malformed known settings without closing unknown capability names."""
+        """Reject malformed known settings without closing unknown capability names.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for capabilities in (
             {"elicitation": {"form": True}},
             {"sampling": {"tools": []}},
@@ -81,7 +96,13 @@ class TestMetadata(unittest.TestCase):
             )
 
     def test_metadata_names_reserved_policy_and_valid_trace_context(self):
-        """Accept namespaced metadata and the documented OpenTelemetry conventions."""
+        """Accept namespaced metadata and the documented OpenTelemetry conventions.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         metadata = {
             "traceparent": "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01",
             "tracestate": "vendor=value,other=second",
@@ -91,14 +112,21 @@ class TestMetadata(unittest.TestCase):
         self.decode({}, **metadata)
         with self.assertRaises(ValueError):
             validate_metadata(
-                {"io.modelcontextprotocol/serverInfo": {}}, allow_reserved=False,
+                {"io.modelcontextprotocol/serverInfo": {}},
+                allow_reserved=False,
             )
         for bad in ("bad key", "9example/abc", "org.example/-bad", "extra/slash/key"):
             with self.subTest(key=bad), self.assertRaises(McpInvalidParams):
                 self.decode({}, **{bad: 1})
 
     def test_invalid_trace_context(self):
-        """Reject malformed and zero trace IDs or duplicate tracestate vendors."""
+        """Reject malformed and zero trace IDs or duplicate tracestate vendors.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for meta in (
             {"traceparent": "00-" + "0" * 32 + "-" + "1" * 16 + "-01"},
             {"traceparent": "ff-" + "1" * 32 + "-" + "1" * 16 + "-01"},
@@ -109,12 +137,17 @@ class TestMetadata(unittest.TestCase):
             with self.subTest(meta=meta), self.assertRaises(McpInvalidParams):
                 self.decode({}, **meta)
 
-
-class TestOutputValidation(unittest.TestCase):
+class TestOutputValidation(TestCase):
     """A typed Struct constructor must not bypass protocol validation."""
 
     def test_valid_content_variants_and_explicit_null(self):
-        """Preserve valid embedded resources, prompt messages, and JSON null output."""
+        """Preserve valid embedded resources, prompt messages, and JSON null output.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         content = (
             TextContent(text="ok"),
             ImageContent(data="YQ==", mimeType="image/png"),
@@ -123,7 +156,8 @@ class TestOutputValidation(unittest.TestCase):
             {"type": "audio", "data": "YQ==", "mimeType": "audio/wav"},
         )
         validate_result(
-            CallToolResult(content=content, structuredContent=None), "tools/call",
+            CallToolResult(content=content, structuredContent=None),
+            "tools/call",
         )
         validate_result(
             GetPromptResult(
@@ -144,7 +178,13 @@ class TestOutputValidation(unittest.TestCase):
         )
 
     def test_invalid_direct_struct_values(self):
-        """Reject malformed content before the final JSON writer can serialize it."""
+        """Reject malformed content before the final JSON writer can serialize it.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         invalid = (
             TextContent(text=42),
             ImageContent(data="not base64!", mimeType="image/png"),
@@ -154,14 +194,20 @@ class TestOutputValidation(unittest.TestCase):
             {"type": "resource_link", "name": "x", "uri": "test:x", "size": -1},
         )
         for content in invalid:
-            with (
+            with ( # NOSONAR
                 self.subTest(content=content),
                 self.assertRaises((ValueError, TypeError)),
             ):
                 validate_result(CallToolResult(content=(content,)), "tools/call")
 
     def test_result_tags_method_roles_and_cache_hints(self):
-        """Enforce the result discriminator and the requested result family."""
+        """Enforce the result discriminator and the requested result family.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         cases = (
             (CallToolResult(content=(), resultType="unknown"), "tools/call"),
             (CallToolResult(content=()), "resources/read"),
@@ -195,12 +241,24 @@ class TestOutputValidation(unittest.TestCase):
                 validate_result(result, method)
         validate_result(CompleteResult(), "subscriptions/listen")
 
-
-class TestMultiRoundTrip(unittest.TestCase):
+class TestMultiRoundTrip(TestCase):
     """Exercise explicit MRTR request and response forms, including wire-only legacy."""
 
     def request(self, capabilities=None, method="tools/call"):
-        """Represent one independent modern request."""
+        """Represent one independent modern request.
+
+        Parameters
+        ----------
+        capabilities : object
+            Value supplied for ``capabilities``.
+        method : object
+            Value supplied for ``method``.
+
+        Returns
+        -------
+        McpRequest
+            Return the result produced by ``request``.
+        """
         return McpRequest(
             id=1,
             method=method,
@@ -210,14 +268,33 @@ class TestMultiRoundTrip(unittest.TestCase):
         )
 
     def result(self, method, params=msgspec.UNSET):
-        """Build an embedded request without a JSON-RPC ID or envelope."""
+        """Build an embedded request without a JSON-RPC ID or envelope.
+
+        Parameters
+        ----------
+        method : object
+            Value supplied for ``method``.
+        params : object
+            Value supplied for ``params``.
+
+        Returns
+        -------
+        InputRequiredResult
+            Return the result produced by ``result``.
+        """
         item = {"method": method}
         if params is not msgspec.UNSET:
             item["params"] = params
         return InputRequiredResult(inputRequests={"question": item})
 
     def test_requires_declared_capability_and_eligible_method(self):
-        """Form support is evaluated against this call's capabilities only."""
+        """Form support is evaluated against this call's capabilities only.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         result = self.result(
             "elicitation/create",
             {
@@ -225,26 +302,33 @@ class TestMultiRoundTrip(unittest.TestCase):
                 "requestedSchema": {"type": "object", "properties": {}},
             },
         )
-        with self.assertRaises(McpProtocolException) as caught:
+        with self.assertRaises(McpProtocolException) as caught: # NOSONAR
             validate_input_required(result, self.request())
         self.assertEqual(caught.exception.code, -32021)
         validate_input_required(result, self.request({"elicitation": {}}))
-        with self.assertRaises(McpInvalidParams):
+        with self.assertRaises(McpInvalidParams): # NOSONAR
             validate_input_required(
-                result, self.request({"elicitation": {}}, "tools/list"),
+                result,
+                self.request({"elicitation": {}}, "tools/list"),
             )
-        with self.assertRaises(McpInvalidParams):
+        with self.assertRaises(McpInvalidParams): # NOSONAR
             validate_input_required(InputRequiredResult(), self.request())
 
     def test_form_schemas_reject_nesting_and_invalid_enumerations(self):
-        """Only the protocol's primitive and string enum form fields are allowed."""
+        """Only the protocol's primitive and string enum form fields are allowed.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for field in (
             {"type": "object", "properties": {}},
             {"type": "array", "items": {"type": "integer"}},
             {"type": "string", "minLength": -1},
             {"type": "boolean", "default": "true"},
         ):
-            with self.subTest(field=field), self.assertRaises(McpInvalidParams):
+            with self.subTest(field=field), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
                 validate_input_required(
                     self.result(
                         "elicitation/create",
@@ -278,7 +362,13 @@ class TestMultiRoundTrip(unittest.TestCase):
         )
 
     def test_wire_only_roots_and_sampling(self):
-        """Support correct embedded shapes without introducing old session APIs."""
+        """Support correct embedded shapes without introducing old session APIs.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         validate_input_required(self.result("roots/list"), self.request({"roots": {}}))
         sampling = {
             "messages": [
@@ -293,7 +383,7 @@ class TestMultiRoundTrip(unittest.TestCase):
             "maxTokens": 10,
             "tools": [],
         }
-        with self.assertRaises(McpProtocolException):
+        with self.assertRaises(McpProtocolException): # NOSONAR
             validate_input_required(
                 self.result("sampling/createMessage", sampling),
                 self.request({"sampling": {}}),
@@ -304,7 +394,13 @@ class TestMultiRoundTrip(unittest.TestCase):
         )
 
     def test_exact_client_input_response_union(self):
-        """Accept explicit result variants and reject errors or nested form values."""
+        """Accept explicit result variants and reject errors or nested form values.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         validate_input_responses(
             {
                 "form": {"action": "accept", "content": {"colors": ["red"], "age": 20}},

@@ -1,5 +1,4 @@
 from __future__ import annotations
-import unittest
 from dataclasses import replace
 from datetime import datetime
 from importlib import import_module
@@ -15,6 +14,7 @@ from orionis.orm.exceptions import MassAssignmentException
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import String
 from orionis.support.facades.schema import Schema as SchemaFacade
+from orionis.test import TestCase
 
 _TABLE_COLUMNS = {
     "scheduler_tasks": ("id", "next_run_time", "job_state"),
@@ -39,7 +39,7 @@ _TABLE_COLUMNS = {
     ),
 }
 
-class TestApplicationSchemas(unittest.IsolatedAsyncioTestCase):
+class TestApplicationSchemas(TestCase):
     """Exercise application migrations against a private physical database."""
 
     async def asyncSetUp(self) -> None:

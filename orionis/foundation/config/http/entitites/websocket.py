@@ -1,5 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from orionis.environment import Env
+from orionis.foundation.config.environment import http_origins
 from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
@@ -18,9 +20,15 @@ class HTTPWebSocket(BaseEntity):
         A wildcard explicitly allows every origin.
     """
 
-    max_connections: int = 128
-    max_message_size: int = 1024 * 1024
-    allow_origins: tuple[str, ...] = field(default_factory=tuple)
+    max_connections: int = field(
+        default_factory=lambda: Env.get("WEBSOCKET_MAX_CONNECTIONS", 128),
+    )
+    max_message_size: int = field(
+        default_factory=lambda: Env.get("WEBSOCKET_MAX_MESSAGE_SIZE", 1024 * 1024),
+    )
+    allow_origins: tuple[str, ...] = field(
+        default_factory=lambda: http_origins("WEBSOCKET_ALLOW_ORIGINS"),
+    )
 
     def __post_init__(self) -> None:
         """

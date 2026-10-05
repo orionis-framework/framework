@@ -300,7 +300,7 @@ each request. Cache hints default to `ttlMs=0`, `cacheScope="private"`; setting
 Provider boot → compile immutable registry + schemas + DI/header plans
 HTTP router → native middleware/scope → HTTP transport ┐
 STDIO reader → bounded tasks + fresh native scope      ├→ dispatcher → primitive
-Existing app → McpTestClient + fresh native scope      ┘
+TestCase.mcp → existing app + fresh native scope      ┘
 Response bytes / owned iterator → native JSON/SSE or serialized STDIO writer
 ```
 
@@ -310,36 +310,39 @@ kernel does not import MCP or route requests through a second router. HTTP route
 cache metadata still points to the stable native MCP controller.
 
 ```python
-from orionis.mcp.testing import McpTestClient
+from orionis.test import TestCase
 
-client = McpTestClient(app, WeatherServer)
-response = await client.tool("weather", {"location": "Bogotá"})
-response.assertOk()
-response.assertTextContains("Bogotá")
+class TestWeather(TestCase):
+    async def testWeather(self) -> None:
+        """Verify the weather tool through the native test runner.
+
+        Returns
+        -------
+        None
+            Check the successful tool response and its text.
+        """
+        client = await self.mcp(WeatherServer)
+        response = await client.tool("weather", {"location": "Bogotá"})
+        response.assertOk()
+        response.assertTextContains("Bogotá")
 ```
 
 Use `client.stream(...)` for subscriptions and cancellation; `request(...)` collects
-finite exchanges. This client exercises encoded protocol input/output through the
-same dispatcher and supplied application. Native HTTP adapter, routing, headers,
-Origin and middleware behavior have separate integration tests.
+finite exchanges. The helper uses the application already booted by `reactor test`;
+pass `app=` for an isolated container or `config=` for explicit client limits.
+Close streams when stopping early, for example with `contextlib.aclosing`.
+The client exercises encoded input/output through the native dispatcher. HTTP
+adapter, routing, headers, Origin and middleware have separate integration tests.
 
 ```text
-python -m unittest discover -s tests/mcp -t .
+python reactor test --start-dir=tests/mcp --verbosity=1
+python reactor test --start-dir=tests/test --verbosity=1
 python reactor test --start-dir=tests/http --verbosity=0
 ```
 
-See [external verification](../../tests/mcp/conformance/README.md) for the pinned
-official conformance suite, independent dated-schema oracle and Inspector's
-explicit modern protocol mode. The required frozen 2026-07-28 suite passes all
-37 scenarios on real Granian ASGI and RSGI, including 14 MRTR scenarios. Optional or
-pending extension probes
-are reported separately; passing required checks does not claim support for those
-extensions. Run the documented commands against the current checkout to reproduce
-the results.
-
-Recorded outcomes and reproducible tool provenance are in the
-[verification report](../../tests/mcp/conformance/verification.txt) and its
-[JSON artifact](../../tests/mcp/conformance/verification.json).
+External conformance and Inspector checks require separate tooling and fixtures.
+The repository's test tree contains native Orionis test modules; it does not
+bundle those runners, schema snapshots or generated verification reports.
 
 Protocol decisions follow the [dated official specification](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/75db1e987cbbba6d170315dc99d0dfc440754aef/docs/specification/2026-07-28)
 and its [dated schema](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/75db1e987cbbba6d170315dc99d0dfc440754aef/schema/2026-07-28).

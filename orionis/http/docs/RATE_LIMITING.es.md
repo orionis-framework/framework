@@ -95,10 +95,14 @@ real, dos clientes independientes con 100 intentos concurrentes, tres procesos
 separados compartiendo una cuota, expiración, recreación del store y tipos de
 clave incompatibles:
 
+Estas pruebas se descubren normalmente y se omiten de forma explícita cuando
+`ORIONIS_HTTP_REDIS_URL` no está definida. Un servidor configurado que no esté
+disponible sigue produciendo un fallo.
+
 ```powershell
 $env:PYTHONIOENCODING = "utf-8"
 $env:ORIONIS_HTTP_REDIS_URL = "redis://127.0.0.1:6379/0"
-.\.venv\Scripts\python.exe reactor test --start-dir="tests/http/layer/store" --file-pattern="redis_rate_limit_integration.py" --verbosity=1
+.\.venv\Scripts\python.exe reactor test --start-dir="tests/http/layer/store" --file-pattern="test_redis_rate_limit_integration.py" --verbosity=1
 ```
 
 Estas comprobaciones se ejecutaron en Windows, Python 3.14 y Redis 5.0.14.1.

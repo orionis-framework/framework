@@ -1,0 +1,1672 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html" class="internal-link" title="This class"><wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cleanupOldFiles" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanupOldFiles">_cleanup<wbr></wbr>Old<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compressFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._compressFile">_compress<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ensureStream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">_ensure<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resolvePath" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">_resolve<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_rotateFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">_rotate<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_shouldRotate" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._shouldRotate">_should<wbr></wbr>Rotate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#emit" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">emit</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_monotonic_expiry" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cache_monotonic_expiry">_cache<wbr></wbr>_monotonic<wbr></wbr>_expiry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cleanup_pattern" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanup_pattern">_cleanup<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lock" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._lock">_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_path_cache" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._path_cache">_path<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_root" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.app_root">app<wbr></wbr>_root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#backup_count" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.backup_count">backup<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compress_rotated" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.compress_rotated">compress<wbr></wbr>_rotated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_path" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_path">current<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_suffix" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_suffix">current<wbr></wbr>_suffix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delay" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.delay">delay</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encoding" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#file_size" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.file_size">file<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_bytes" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.max_bytes">max<wbr></wbr>_bytes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path_template" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.path_template">path<wbr></wbr>_template</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.stream">stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#suffix_resolver" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.suffix_resolver">suffix<wbr></wbr>_resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.logging.handlers.advanced_rotating_file_handler.html" class="internal-link" title="The parent of this class">advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12253"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler"><wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cleanupOldFiles" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanupOldFiles">_cleanup<wbr></wbr>Old<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compressFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._compressFile">_compress<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ensureStream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">_ensure<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resolvePath" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">_resolve<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_rotateFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">_rotate<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_shouldRotate" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._shouldRotate">_should<wbr></wbr>Rotate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#emit" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">emit</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_monotonic_expiry" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cache_monotonic_expiry">_cache<wbr></wbr>_monotonic<wbr></wbr>_expiry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cleanup_pattern" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanup_pattern">_cleanup<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lock" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._lock">_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_path_cache" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._path_cache">_path<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_root" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.app_root">app<wbr></wbr>_root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#backup_count" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.backup_count">backup<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compress_rotated" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.compress_rotated">compress<wbr></wbr>_rotated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_path" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_path">current<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_suffix" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_suffix">current<wbr></wbr>_suffix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delay" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.delay">delay</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encoding" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#file_size" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.file_size">file<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_bytes" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.max_bytes">max<wbr></wbr>_bytes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path_template" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.path_template">path<wbr></wbr>_template</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.stream">stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#suffix_resolver" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.suffix_resolver">suffix<wbr></wbr>_resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.logging.html" class="internal-link" title="orionis.logging">logging</a></code><wbr></wbr>.<code><a href="orionis.logging.handlers.html" class="internal-link" title="orionis.logging.handlers">handlers</a></code><wbr></wbr>.<code><a href="orionis.logging.handlers.advanced_rotating_file_handler.html" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler">advanced_rotating_file_handler</a></code><wbr></wbr>.<code><a href="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler">AdvancedRotatingFileHandler</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AdvancedRotatingFileHandler</span>(<a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">AdvancedRotatingFileHandler(path_template, suffix_resolver, max_bytes, backup_count, ...)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1175">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">__init__</a></code></td>
+    <td>Initialize the advanced rotating file handler.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_cleanupOldFiles" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanupOldFiles">_cleanup<wbr></wbr>Old<wbr></wbr>Files</a></code></td>
+    <td>Remove old log files exceeding the backup count.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_compressFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._compressFile">_compress<wbr></wbr>File</a></code></td>
+    <td>Compress the specified file using gzip.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_ensureStream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">_ensure<wbr></wbr>Stream</a></code></td>
+    <td>Ensure the stream is available and up to date.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_resolvePath" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">_resolve<wbr></wbr>Path</a></code></td>
+    <td>Resolve the full path by replacing the {suffix} placeholder.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_rotateFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">_rotate<wbr></wbr>File</a></code></td>
+    <td>Rotate the current log file if needed.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_shouldRotate" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._shouldRotate">_should<wbr></wbr>Rotate</a></code></td>
+    <td>Determine whether the log file should be rotated.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#close" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">close</a></code></td>
+    <td>Close the handler and release resources.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#emit" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">emit</a></code></td>
+    <td>Emit a log record.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_cache_monotonic_expiry" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cache_monotonic_expiry">_cache<wbr></wbr>_monotonic<wbr></wbr>_expiry</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_cleanup_pattern" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanup_pattern">_cleanup<wbr></wbr>_pattern</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_lock" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._lock">_lock</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_path_cache" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._path_cache">_path<wbr></wbr>_cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#app_root" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.app_root">app<wbr></wbr>_root</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#backup_count" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.backup_count">backup<wbr></wbr>_count</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#compress_rotated" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.compress_rotated">compress<wbr></wbr>_rotated</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#current_path" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_path">current<wbr></wbr>_path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#current_suffix" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_suffix">current<wbr></wbr>_suffix</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#delay" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.delay">delay</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#encoding" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.encoding">encoding</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#file_size" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.file_size">file<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_bytes" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.max_bytes">max<wbr></wbr>_bytes</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#path_template" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.path_template">path<wbr></wbr>_template</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.stream">stream</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#suffix_resolver" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.suffix_resolver">suffix<wbr></wbr>_resolver</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">suffix_resolver: <code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html" class="internal-link" title="orionis.logging.contracts.suffix_resolver.SuffixResolver">SuffixResolver</a></code>, </span><span class="rst-sig-param">max_bytes: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">backup_count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 5, </span><span class="rst-sig-param">encoding: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">utf-8</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a>, </span><span class="rst-sig-param">compress_rotated: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">.</span><span class="rst-variable-quote">'</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the advanced rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Path template containing the {suffix} placeholder.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">suffix<wbr></wbr>_resolver:</span><code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html" class="internal-link" title="orionis.logging.contracts.suffix_resolver.SuffixResolver">SuffixResolver</a></code></td><td class="fieldArgDesc">Resolver for determining the suffix for rotation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_bytes:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Maximum file size in bytes before rotation (for chunked rotation).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">backup<wbr></wbr>_count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum number of backup files to retain.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">encoding:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">File encoding.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, delay file opening until the first log record.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">compress<wbr></wbr>_rotated:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, compress rotated files using gzip.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Application root directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanupOldFiles">
+    
+  </a>
+  <a name="_cleanupOldFiles">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_cleanupOldFiles</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L205">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cleanupOldFiles" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanupOldFiles">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove old log files exceeding the backup count.</p>
+<p>This method deletes log files that exceed the configured backup count,
+including compressed versions if present.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._compressFile">
+    
+  </a>
+  <a name="_compressFile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_compressFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">file_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L178">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_compressFile" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._compressFile">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compress the specified file using gzip.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">file<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Path to the file to compress.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">
+    
+  </a>
+  <a name="_ensureStream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_ensureStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L253">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_ensureStream" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Ensure the stream is available and up to date.</p>
+<p>Checks if log rotation is needed and opens a new stream if required.
+Updates the current suffix and file size accordingly.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">
+    
+  </a>
+  <a name="_resolvePath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolvePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">suffix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L88">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_resolvePath" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the full path by replacing the {suffix} placeholder.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">suffix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Suffix to use for replacing {suffix}.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The fully resolved file path as a string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">
+    
+  </a>
+  <a name="_rotateFile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_rotateFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L150">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_rotateFile" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Rotate the current log file if needed.</p>
+<p>This method closes the current stream, compresses the rotated file if
+enabled, cleans up old log files, and resets the handler's state.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._shouldRotate">
+    
+  </a>
+  <a name="_shouldRotate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_shouldRotate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">current_suffix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L128">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_shouldRotate" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._shouldRotate">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Determine whether the log file should be rotated.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_suffix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The suffix already resolved by the caller, avoiding a redundant
+getSuffix() call (C1).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the file should be rotated, otherwise False.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">
+    
+  </a>
+  <a name="close">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L317">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#close" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Close the handler and release resources.</p>
+<p>Closes the underlying stream if open and releases any resources held by
+the handler. Ensures thread safety during the close operation.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">
+    
+  </a>
+  <a name="emit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">emit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">LogRecord</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L285">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#emit" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Emit a log record.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">LogRecord</a></code></td><td class="fieldArgDesc">The log record to emit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cache_monotonic_expiry">
+    
+  </a>
+  <a name="_cache_monotonic_expiry">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_cache_monotonic_expiry</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L78">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cache_monotonic_expiry" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cache_monotonic_expiry">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanup_pattern">
+    
+  </a>
+  <a name="_cleanup_pattern">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_cleanup_pattern</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L83">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cleanup_pattern" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._cleanup_pattern">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._lock">
+    
+  </a>
+  <a name="_lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_lock</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L74">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_lock" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._path_cache">
+    
+  </a>
+  <a name="_path_cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_path_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L77">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_path_cache" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._path_cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.app_root">
+    
+  </a>
+  <a name="app_root">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_root</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L66">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_root" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.app_root">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.backup_count">
+    
+  </a>
+  <a name="backup_count">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">backup_count</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L62">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#backup_count" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.backup_count">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.compress_rotated">
+    
+  </a>
+  <a name="compress_rotated">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">compress_rotated</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L65">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#compress_rotated" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.compress_rotated">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_path">
+    
+  </a>
+  <a name="current_path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">current_path</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L69">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#current_path" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_suffix">
+    
+  </a>
+  <a name="current_suffix">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">current_suffix</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L70">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#current_suffix" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.current_suffix">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.delay">
+    
+  </a>
+  <a name="delay">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">delay</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#delay" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.delay">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.encoding">
+    
+  </a>
+  <a name="encoding">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">encoding</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#encoding" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.encoding">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.file_size">
+    
+  </a>
+  <a name="file_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">file_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L71">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#file_size" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.file_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.max_bytes">
+    
+  </a>
+  <a name="max_bytes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_bytes</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_bytes" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.max_bytes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.path_template">
+    
+  </a>
+  <a name="path_template">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">path_template</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L59">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#path_template" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.path_template">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.stream">
+    
+  </a>
+  <a name="stream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stream</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L68">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stream" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.stream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.suffix_resolver">
+    
+  </a>
+  <a name="suffix_resolver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">suffix_resolver</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/advanced_rotating_file_handler.py#L60">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#suffix_resolver" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.suffix_resolver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

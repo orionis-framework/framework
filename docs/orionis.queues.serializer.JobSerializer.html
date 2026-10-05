@@ -1,0 +1,1292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.queues.serializer.JobSerializer</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.queues.serializer.JobSerializer.html" class="internal-link" title="This class"><wbr></wbr>Job<wbr></wbr>Serializer</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_checkSize" class="internal-link" title="orionis.queues.serializer.JobSerializer._checkSize">_check<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateFields" class="internal-link" title="orionis.queues.serializer.JobSerializer._validateFields">_validate<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#decode" class="internal-link" title="orionis.queues.serializer.JobSerializer.decode">decode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#decodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.decodeEnvelope">decode<wbr></wbr>Envelope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encode" class="internal-link" title="orionis.queues.serializer.JobSerializer.encode">encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.encodeEnvelope">encode<wbr></wbr>Envelope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#register" class="internal-link" title="orionis.queues.serializer.JobSerializer.register">register</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._decoder">_decoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._encoder">_encoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_registry" class="internal-link" title="orionis.queues.serializer.JobSerializer._registry">_registry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_state_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._state_decoder">_state<wbr></wbr>_decoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_types" class="internal-link" title="orionis.queues.serializer.JobSerializer._types">_types</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.queues.serializer.html" class="internal-link" title="The parent of this class">serializer</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24096"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId24096">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_<wbr></wbr>Job<wbr></wbr>Metadata</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer._JobMetadata.html#annotations" class="internal-link" title="orionis.queues.serializer._JobMetadata.annotations">annotations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer._JobMetadata.html#job_type" class="internal-link" title="orionis.queues.serializer._JobMetadata.job_type">job<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer._JobMetadata.html#name_set" class="internal-link" title="orionis.queues.serializer._JobMetadata.name_set">name<wbr></wbr>_set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer._JobMetadata.html#names" class="internal-link" title="orionis.queues.serializer._JobMetadata.names">names</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24097"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.queues.serializer.JobSerializer.html" class="internal-link" title="orionis.queues.serializer.JobSerializer"><wbr></wbr>Job<wbr></wbr>Serializer</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_checkSize" class="internal-link" title="orionis.queues.serializer.JobSerializer._checkSize">_check<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateFields" class="internal-link" title="orionis.queues.serializer.JobSerializer._validateFields">_validate<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#decode" class="internal-link" title="orionis.queues.serializer.JobSerializer.decode">decode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#decodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.decodeEnvelope">decode<wbr></wbr>Envelope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encode" class="internal-link" title="orionis.queues.serializer.JobSerializer.encode">encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.encodeEnvelope">encode<wbr></wbr>Envelope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#register" class="internal-link" title="orionis.queues.serializer.JobSerializer.register">register</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._decoder">_decoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._encoder">_encoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_registry" class="internal-link" title="orionis.queues.serializer.JobSerializer._registry">_registry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_state_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._state_decoder">_state<wbr></wbr>_decoder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_types" class="internal-link" title="orionis.queues.serializer.JobSerializer._types">_types</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_collect_job_fields" class="internal-link" title="orionis.queues.serializer._collect_job_fields">_collect<wbr></wbr>_job<wbr></wbr>_fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_job_metadata" class="internal-link" title="orionis.queues.serializer._job_metadata">_job<wbr></wbr>_metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_pack_value" class="internal-link" title="orionis.queues.serializer._pack_value">_pack<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_unpack_extension" class="internal-link" title="orionis.queues.serializer._unpack_extension">_unpack<wbr></wbr>_extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_validate_annotation" class="internal-link" title="orionis.queues.serializer._validate_annotation">_validate<wbr></wbr>_annotation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_validate_unpacked_value" class="internal-link" title="orionis.queues.serializer._validate_unpacked_value">_validate<wbr></wbr>_unpacked<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_MAX_PAYLOAD_BYTES" class="internal-link" title="orionis.queues.serializer._MAX_PAYLOAD_BYTES">_MAX<wbr></wbr>_PAYLOAD<wbr></wbr>_BYTES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_MAX_STATE_DEPTH" class="internal-link" title="orionis.queues.serializer._MAX_STATE_DEPTH">_MAX<wbr></wbr>_STATE<wbr></wbr>_DEPTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_OPTIONS" class="internal-link" title="orionis.queues.serializer._OPTIONS">_OPTIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_SCALAR_TYPES" class="internal-link" title="orionis.queues.serializer._SCALAR_TYPES">_SCALAR<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.serializer.html#_TUPLE_EXTENSION" class="internal-link" title="orionis.queues.serializer._TUPLE_EXTENSION">_TUPLE<wbr></wbr>_EXTENSION</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.queues.html" class="internal-link" title="orionis.queues">queues</a></code><wbr></wbr>.<code><a href="orionis.queues.serializer.html" class="internal-link" title="orionis.queues.serializer">serializer</a></code><wbr></wbr>.<code><a href="orionis.queues.serializer.JobSerializer.html" class="internal-link" title="orionis.queues.serializer.JobSerializer">JobSerializer</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">JobSerializer</span>(<a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L243" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">JobSerializer()</a></code></p><p><a href="classIndex.html#orionis.queues.serializer.JobSerializer">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Serialize explicit job state through a registry of application-trusted types.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1659">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">__init__</a></code></td>
+    <td>Initialize reusable codecs and an empty trusted registry.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_checkSize" class="internal-link" title="orionis.queues.serializer.JobSerializer._checkSize">_check<wbr></wbr>Size</a></code></td>
+    <td>Reject oversized or nonbinary wire data before decoding.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_validateFields" class="internal-link" title="orionis.queues.serializer.JobSerializer._validateFields">_validate<wbr></wbr>Fields</a></code></td>
+    <td>Validate annotated fields without accepting arbitrary application types.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#decode" class="internal-link" title="orionis.queues.serializer.JobSerializer.decode">decode</a></code></td>
+    <td>Restore primitive fields for a registered identity without running init.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#decodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.decodeEnvelope">decode<wbr></wbr>Envelope</a></code></td>
+    <td>Validate untrusted envelope JSON without resolving its job type.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#encode" class="internal-link" title="orionis.queues.serializer.JobSerializer.encode">encode</a></code></td>
+    <td>Serialize declared fields while rejecting service and undeclared state.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#encodeEnvelope" class="internal-link" title="orionis.queues.serializer.JobSerializer.encodeEnvelope">encode<wbr></wbr>Envelope</a></code></td>
+    <td>Encode the immutable envelope as explicit versioned JSON.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#register" class="internal-link" title="orionis.queues.serializer.JobSerializer.register">register</a></code></td>
+    <td>Register a concrete async job class supplied by trusted application code.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._decoder">_decoder</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_encoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._encoder">_encoder</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_registry" class="internal-link" title="orionis.queues.serializer.JobSerializer._registry">_registry</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_state_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._state_decoder">_state<wbr></wbr>_decoder</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_types" class="internal-link" title="orionis.queues.serializer.JobSerializer._types">_types</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L248">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.queues.serializer.JobSerializer.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize reusable codecs and an empty trusted registry.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain codecs without importing application job modules.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._checkSize">
+    
+  </a>
+  <a name="_checkSize">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_checkSize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L399">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_checkSize" title="orionis.queues.serializer.JobSerializer._checkSize">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject oversized or nonbinary wire data before decoding.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Serialized job or envelope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Enforce the wire-size limit.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._validateFields">
+    
+  </a>
+  <a name="_validateFields">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateFields</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">metadata: <code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L376">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validateFields" title="orionis.queues.serializer.JobSerializer._validateFields">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate annotated fields without accepting arbitrary application types.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a></code></td><td class="fieldArgDesc">Trusted persistent field constraints.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Restored or declared primitive state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate field types without invoking job constructors.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.decode">
+    
+  </a>
+  <a name="decode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">decode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code>BaseJob</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L340">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#decode" title="orionis.queues.serializer.JobSerializer.decode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#decode" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.decode</a></code></div>
+    <div><p>Restore primitive fields for a registered identity without running init.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable trusted identity, never an instruction to import a module.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Untrusted MessagePack state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Reconstructed job awaiting scoped DI invocation.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.decodeEnvelope">
+    
+  </a>
+  <a name="decodeEnvelope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">decodeEnvelope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code>JobEnvelope</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L435">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#decodeEnvelope" title="orionis.queues.serializer.JobSerializer.decodeEnvelope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#decodeEnvelope" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.decodeEnvelope</a></code></div>
+    <div><p>Validate untrusted envelope JSON without resolving its job type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Stored wire data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable options ready for registry-based state decoding.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.encode">
+    
+  </a>
+  <a name="encode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">encode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L301">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#encode" title="orionis.queues.serializer.JobSerializer.encode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#encode" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.encode</a></code></div>
+    <div><p>Serialize declared fields while rejecting service and undeclared state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Trusted application job instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Stable identity and primitive MessagePack payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link" title="orionis.queues.exceptions.QueuePayloadError">QueuePayloadError</a></code></td><td>If state is undeclared, unsupported, or exceeds the payload limit.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.encodeEnvelope">
+    
+  </a>
+  <a name="encodeEnvelope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">encodeEnvelope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L417">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#encodeEnvelope" title="orionis.queues.serializer.JobSerializer.encodeEnvelope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#encodeEnvelope" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.encodeEnvelope</a></code></div>
+    <div><p>Encode the immutable envelope as explicit versioned JSON.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Validated execution data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">JSON suitable for native binary database or Redis storage.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.register">
+    
+  </a>
+  <a name="register">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseJob]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L263">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#register" title="orionis.queues.serializer.JobSerializer.register">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#register" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.register</a></code></div>
+    <div><p>Register a concrete async job class supplied by trusted application code.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a>]</code></td><td class="fieldArgDesc">Class imported by application bootstrap or dispatched locally.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Cache metadata once for the stable identity.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L246">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.queues.serializer.JobSerializer.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#__slots__" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._decoder">
+    
+  </a>
+  <a name="_decoder">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_decoder</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L260">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_decoder" title="orionis.queues.serializer.JobSerializer._decoder">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._encoder">
+    
+  </a>
+  <a name="_encoder">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_encoder</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L259">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_encoder" title="orionis.queues.serializer.JobSerializer._encoder">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._registry">
+    
+  </a>
+  <a name="_registry">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_registry</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L257">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_registry" title="orionis.queues.serializer.JobSerializer._registry">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._state_decoder">
+    
+  </a>
+  <a name="_state_decoder">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_state_decoder</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L261">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_state_decoder" title="orionis.queues.serializer.JobSerializer._state_decoder">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.serializer.JobSerializer._types">
+    
+  </a>
+  <a name="_types">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_types</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseJob], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/serializer.py#L258">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_types" title="orionis.queues.serializer.JobSerializer._types">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

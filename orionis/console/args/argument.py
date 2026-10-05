@@ -40,7 +40,7 @@ class Argument(BaseEntity):
         Constant value used by actions like 'store_const'.
     default : Any, optional
         Default value if the argument is not provided.
-    type_ : Callable[[str], Any] | None, optional
+    ``type_`` : Callable[[str], Any] | None, optional
         Function used to convert the argument value.
     choices : Iterable[Any] | None, optional
         Allowed values for the argument.

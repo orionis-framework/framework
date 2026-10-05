@@ -1,7 +1,6 @@
 import json
 import subprocess
 import sys
-import unittest
 from orionis.storage.drivers.functions import (
     assert_binary_mode,
     derive_directories,
@@ -10,8 +9,9 @@ from orionis.storage.drivers.functions import (
     resolve_download_target,
 )
 from orionis.storage.paths import normalize_file_path, normalize_path
+from orionis.test import TestCase
 
-class TestStorageImportPolicy(unittest.TestCase):
+class TestStorageImportPolicy(TestCase):
     """Exercise public imports in isolated interpreter processes."""
 
     def testColdPackageDoesNotLoadDriverImplementations(self) -> None:
@@ -87,6 +87,3 @@ class TestStorageImportPolicy(unittest.TestCase):
         for old, new in aliases:
             self.assertIs(old, new)
             self.assertRegex(new.__name__, r"^[a-z][a-z0-9_]*$")
-
-if __name__ == "__main__":
-    unittest.main()

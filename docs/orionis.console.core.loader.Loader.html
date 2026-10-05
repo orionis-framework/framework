@@ -1,0 +1,1949 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.console.core.loader.Loader</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.console.core.loader.Loader.html" class="internal-link" title="This class"><wbr></wbr>Loader</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__argFromDict" class="internal-link" title="orionis.console.core.loader.Loader.__argFromDict">__arg<wbr></wbr>From<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__argToDict" class="internal-link" title="orionis.console.core.loader.Loader.__argToDict">__arg<wbr></wbr>To<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildArgumentParser" class="internal-link" title="orionis.console.core.loader.Loader.__buildArgumentParser">__build<wbr></wbr>Argument<wbr></wbr>Parser</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildCommand" class="internal-link" title="orionis.console.core.loader.Loader.__buildCommand">__build<wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getArguments" class="internal-link" title="orionis.console.core.loader.Loader.__getArguments">__get<wbr></wbr>Arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getCachePersistence" class="internal-link" title="orionis.console.core.loader.Loader.__getCachePersistence">__get<wbr></wbr>Cache<wbr></wbr>Persistence</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getDescription" class="internal-link" title="orionis.console.core.loader.Loader.__getDescription">__get<wbr></wbr>Description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getSignature" class="internal-link" title="orionis.console.core.loader.Loader.__getSignature">__get<wbr></wbr>Signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getTimestamps" class="internal-link" title="orionis.console.core.loader.Loader.__getTimestamps">__get<wbr></wbr>Timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__importFluentCommandRoutes" class="internal-link" title="orionis.console.core.loader.Loader.__importFluentCommandRoutes">__import<wbr></wbr>Fluent<wbr></wbr>Command<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.core.loader.Loader.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__load" class="internal-link" title="orionis.console.core.loader.Loader.__load">__load</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadCoreCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCoreCommands">__load<wbr></wbr>Core<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadCustomCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCustomCommands">__load<wbr></wbr>Custom<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadFluentCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadFluentCommands">__load<wbr></wbr>Fluent<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadMetadata" class="internal-link" title="orionis.console.core.loader.Loader.__loadMetadata">__load<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addFluentCommand" class="internal-link" title="orionis.console.core.loader.Loader.addFluentCommand">add<wbr></wbr>Fluent<wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#all" class="internal-link" title="orionis.console.core.loader.Loader.all">all</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.console.core.loader.Loader.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#load" class="internal-link" title="orionis.console.core.loader.Loader.load">load</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__all_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__all_loaded">__all<wbr></wbr>_loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__app" class="internal-link" title="orionis.console.core.loader.Loader.__app">__app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__commands" class="internal-link" title="orionis.console.core.loader.Loader.__commands">__commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__fluent_commands" class="internal-link" title="orionis.console.core.loader.Loader.__fluent_commands">__fluent<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__imported_modules" class="internal-link" title="orionis.console.core.loader.Loader.__imported_modules">__imported<wbr></wbr>_modules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__metadata" class="internal-link" title="orionis.console.core.loader.Loader.__metadata">__metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__metadata_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__metadata_loaded">__metadata<wbr></wbr>_loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__persistence" class="internal-link" title="orionis.console.core.loader.Loader.__persistence">__persistence</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__use_cache" class="internal-link" title="orionis.console.core.loader.Loader.__use_cache">__use<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.core.loader.html" class="internal-link" title="The parent of this class">loader</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3479"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.core.loader.Loader.html" class="internal-link" title="orionis.console.core.loader.Loader"><wbr></wbr>Loader</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__argFromDict" class="internal-link" title="orionis.console.core.loader.Loader.__argFromDict">__arg<wbr></wbr>From<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__argToDict" class="internal-link" title="orionis.console.core.loader.Loader.__argToDict">__arg<wbr></wbr>To<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildArgumentParser" class="internal-link" title="orionis.console.core.loader.Loader.__buildArgumentParser">__build<wbr></wbr>Argument<wbr></wbr>Parser</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildCommand" class="internal-link" title="orionis.console.core.loader.Loader.__buildCommand">__build<wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getArguments" class="internal-link" title="orionis.console.core.loader.Loader.__getArguments">__get<wbr></wbr>Arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getCachePersistence" class="internal-link" title="orionis.console.core.loader.Loader.__getCachePersistence">__get<wbr></wbr>Cache<wbr></wbr>Persistence</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getDescription" class="internal-link" title="orionis.console.core.loader.Loader.__getDescription">__get<wbr></wbr>Description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getSignature" class="internal-link" title="orionis.console.core.loader.Loader.__getSignature">__get<wbr></wbr>Signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getTimestamps" class="internal-link" title="orionis.console.core.loader.Loader.__getTimestamps">__get<wbr></wbr>Timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__importFluentCommandRoutes" class="internal-link" title="orionis.console.core.loader.Loader.__importFluentCommandRoutes">__import<wbr></wbr>Fluent<wbr></wbr>Command<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.core.loader.Loader.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__load" class="internal-link" title="orionis.console.core.loader.Loader.__load">__load</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadCoreCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCoreCommands">__load<wbr></wbr>Core<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadCustomCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCustomCommands">__load<wbr></wbr>Custom<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadFluentCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadFluentCommands">__load<wbr></wbr>Fluent<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__loadMetadata" class="internal-link" title="orionis.console.core.loader.Loader.__loadMetadata">__load<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addFluentCommand" class="internal-link" title="orionis.console.core.loader.Loader.addFluentCommand">add<wbr></wbr>Fluent<wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#all" class="internal-link" title="orionis.console.core.loader.Loader.all">all</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.console.core.loader.Loader.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#load" class="internal-link" title="orionis.console.core.loader.Loader.load">load</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__all_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__all_loaded">__all<wbr></wbr>_loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__app" class="internal-link" title="orionis.console.core.loader.Loader.__app">__app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__commands" class="internal-link" title="orionis.console.core.loader.Loader.__commands">__commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__fluent_commands" class="internal-link" title="orionis.console.core.loader.Loader.__fluent_commands">__fluent<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__imported_modules" class="internal-link" title="orionis.console.core.loader.Loader.__imported_modules">__imported<wbr></wbr>_modules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__metadata" class="internal-link" title="orionis.console.core.loader.Loader.__metadata">__metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__metadata_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__metadata_loaded">__metadata<wbr></wbr>_loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__persistence" class="internal-link" title="orionis.console.core.loader.Loader.__persistence">__persistence</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__use_cache" class="internal-link" title="orionis.console.core.loader.Loader.__use_cache">__use<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.loader.html#_CORE_COMMANDS_PATH" class="internal-link" title="orionis.console.core.loader._CORE_COMMANDS_PATH">_CORE<wbr></wbr>_COMMANDS<wbr></wbr>_PATH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.loader.html#_MISSING_TYPE" class="internal-link" title="orionis.console.core.loader._MISSING_TYPE">_MISSING<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.loader.html#_SIGNATURE_RE" class="internal-link" title="orionis.console.core.loader._SIGNATURE_RE">_SIGNATURE<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.core.html" class="internal-link" title="orionis.console.core">core</a></code><wbr></wbr>.<code><a href="orionis.console.core.loader.html" class="internal-link" title="orionis.console.core.loader">loader</a></code><wbr></wbr>.<code><a href="orionis.console.core.loader.Loader.html" class="internal-link" title="orionis.console.core.loader.Loader">Loader</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Loader</span>(<a href="orionis.console.core.contracts.loader.ILoader.html" class="internal-link" title="orionis.console.core.contracts.loader.ILoader">ILoader</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L28" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.core.loader.Loader.__init__">Loader(app)</a></code></p><p><a href="classIndex.html#orionis.console.core.loader.Loader">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id340">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__argFromDict" class="internal-link" title="orionis.console.core.loader.Loader.__argFromDict">__arg<wbr></wbr>From<wbr></wbr>Dict</a></code></td>
+    <td>Reconstruct an Argument instance from a serialized dictionary.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__argToDict" class="internal-link" title="orionis.console.core.loader.Loader.__argToDict">__arg<wbr></wbr>To<wbr></wbr>Dict</a></code></td>
+    <td>Convert an Argument instance to a JSON-compatible dictionary.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__buildArgumentParser" class="internal-link" title="orionis.console.core.loader.Loader.__buildArgumentParser">__build<wbr></wbr>Argument<wbr></wbr>Parser</a></code></td>
+    <td>Construct and configure an ArgumentParser for a command class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__buildCommand" class="internal-link" title="orionis.console.core.loader.Loader.__buildCommand">__build<wbr></wbr>Command</a></code></td>
+    <td>Build a Command instance from metadata.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getArguments" class="internal-link" title="orionis.console.core.loader.Loader.__getArguments">__get<wbr></wbr>Arguments</a></code></td>
+    <td>Retrieve and validate Argument inputs for a command class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getCachePersistence" class="internal-link" title="orionis.console.core.loader.Loader.__getCachePersistence">__get<wbr></wbr>Cache<wbr></wbr>Persistence</a></code></td>
+    <td>Get the persistence mechanism for command caching.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getDescription" class="internal-link" title="orionis.console.core.loader.Loader.__getDescription">__get<wbr></wbr>Description</a></code></td>
+    <td>Retrieve and validate the 'description' attribute of a command class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getSignature" class="internal-link" title="orionis.console.core.loader.Loader.__getSignature">__get<wbr></wbr>Signature</a></code></td>
+    <td>Validate and return the 'signature' attribute of a command class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getTimestamps" class="internal-link" title="orionis.console.core.loader.Loader.__getTimestamps">__get<wbr></wbr>Timestamps</a></code></td>
+    <td>Retrieve the 'timestamps' attribute from a command class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__importFluentCommandRoutes" class="internal-link" title="orionis.console.core.loader.Loader.__importFluentCommandRoutes">__import<wbr></wbr>Fluent<wbr></wbr>Command<wbr></wbr>Routes</a></code></td>
+    <td>Import fluent command route modules from application routing paths.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.console.core.loader.Loader.__init__">__init__</a></code></td>
+    <td>Initialize the Loader instance.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__load" class="internal-link" title="orionis.console.core.loader.Loader.__load">__load</a></code></td>
+    <td>Load command classes from metadata and populate the commands dictionary.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__loadCoreCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCoreCommands">__load<wbr></wbr>Core<wbr></wbr>Commands</a></code></td>
+    <td>Load and register core command classes provided by the Orionis framework.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__loadCustomCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadCustomCommands">__load<wbr></wbr>Custom<wbr></wbr>Commands</a></code></td>
+    <td>Load custom command classes from the commands directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__loadFluentCommands" class="internal-link" title="orionis.console.core.loader.Loader.__loadFluentCommands">__load<wbr></wbr>Fluent<wbr></wbr>Commands</a></code></td>
+    <td>Register commands defined via the fluent interface.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__loadMetadata" class="internal-link" title="orionis.console.core.loader.Loader.__loadMetadata">__load<wbr></wbr>Metadata</a></code></td>
+    <td>Load command metadata from cache or discover commands.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#addFluentCommand" class="internal-link" title="orionis.console.core.loader.Loader.addFluentCommand">add<wbr></wbr>Fluent<wbr></wbr>Command</a></code></td>
+    <td>Define a new command using the fluent interface.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#all" class="internal-link" title="orionis.console.core.loader.Loader.all">all</a></code></td>
+    <td>Return all loaded commands.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#get" class="internal-link" title="orionis.console.core.loader.Loader.get">get</a></code></td>
+    <td>Retrieve a command instance by its signature.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#load" class="internal-link" title="orionis.console.core.loader.Loader.load">load</a></code></td>
+    <td>Load all command classes and their metadata.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__all_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__all_loaded">__all<wbr></wbr>_loaded</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__app" class="internal-link" title="orionis.console.core.loader.Loader.__app">__app</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__commands" class="internal-link" title="orionis.console.core.loader.Loader.__commands">__commands</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__fluent_commands" class="internal-link" title="orionis.console.core.loader.Loader.__fluent_commands">__fluent<wbr></wbr>_commands</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__imported_modules" class="internal-link" title="orionis.console.core.loader.Loader.__imported_modules">__imported<wbr></wbr>_modules</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__metadata" class="internal-link" title="orionis.console.core.loader.Loader.__metadata">__metadata</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__metadata_loaded" class="internal-link" title="orionis.console.core.loader.Loader.__metadata_loaded">__metadata<wbr></wbr>_loaded</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__persistence" class="internal-link" title="orionis.console.core.loader.Loader.__persistence">__persistence</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__use_cache" class="internal-link" title="orionis.console.core.loader.Loader.__use_cache">__use<wbr></wbr>_cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__argFromDict">
+    
+  </a>
+  <a name="__argFromDict">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__argFromDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">d: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code>Argument</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L563">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__argFromDict" title="orionis.console.core.loader.Loader.__argFromDict">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reconstruct an Argument instance from a serialized dictionary.</p>
+<p>Deserialize argument metadata by restoring callable types, MISSING
+sentinels, and tuple metavar from their serialized representations.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">d:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dictionary produced by __argToDict containing serialized argument
+properties.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.console.Argument.html" class="internal-link" title="orionis.console.Argument">Argument</a></code></td><td class="fieldArgDesc">A reconstructed Argument instance with restored properties.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__argToDict">
+    
+  </a>
+  <a name="__argToDict">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__argToDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">arg: <code>Argument</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L518">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__argToDict" title="orionis.console.core.loader.Loader.__argToDict">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert an Argument instance to a JSON-compatible dictionary.</p>
+<p>Serialize argument metadata including name, action, type, and other
+properties into a dictionary suitable for caching or transport.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arg:</span><code><a href="orionis.console.Argument.html" class="internal-link" title="orionis.console.Argument">Argument</a></code></td><td class="fieldArgDesc">The Argument instance to serialize.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">A dictionary with serialized argument properties.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__buildArgumentParser">
+    
+  </a>
+  <a name="__buildArgumentParser">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildArgumentParser</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">description: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" class="intersphinx-link">argparse.ArgumentParser</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L613">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__buildArgumentParser" title="orionis.console.core.loader.Loader.__buildArgumentParser">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Construct and configure an ArgumentParser for a command class.</p>
+<p>Build an ArgumentParser using the provided Argument options. Returns
+the parser if arguments exist, otherwise returns None.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code></td><td class="fieldArgDesc">List of Argument option dictionaries.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Command signature.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">description:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Command description.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>argparse.ArgumentParser | None</code></td><td class="fieldArgDesc">ArgumentParser instance configured with the command's arguments, or None
+if no arguments are present.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__buildCommand">
+    
+  </a>
+  <a name="__buildCommand">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildCommand</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">meta: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code>Command</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L662">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__buildCommand" title="orionis.console.core.loader.Loader.__buildCommand">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a Command instance from metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">meta:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Metadata dictionary containing command information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Command</code></td><td class="fieldArgDesc">The constructed Command instance.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__getArguments">
+    
+  </a>
+  <a name="__getArguments">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getArguments</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">obj: <code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L471">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getArguments" title="orionis.console.core.loader.Loader.__getArguments">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve and validate Argument inputs for a command class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></td><td class="fieldArgDesc">Command class instance to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">List of Argument instances as dictionaries. Returns an empty list
+if no inputs are present.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the 'inputs' method does not return a list or contains non-
+Argument instances.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__getCachePersistence">
+    
+  </a>
+  <a name="__getCachePersistence">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getCachePersistence</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>IFileBasedCache | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L58">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getCachePersistence" title="orionis.console.core.loader.Loader.__getCachePersistence">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Get the persistence mechanism for command caching.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>FileBasedCache | None</code></td><td class="fieldArgDesc">FileBasedCache instance for command caching, or None if no cache
+configuration is available.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__getDescription">
+    
+  </a>
+  <a name="__getDescription">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getDescription</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">obj: <code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L422">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getDescription" title="orionis.console.core.loader.Loader.__getDescription">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve and validate the 'description' attribute of a command class.</p>
+<p>Ensure the command class has a non-empty string 'description' attribute.
+If missing, set a default description. Raise an error if the attribute
+is not a string or is empty.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></td><td class="fieldArgDesc">Command class instance to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The validated and stripped description string.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the 'description' attribute is empty.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the 'description' attribute is not a string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__getSignature">
+    
+  </a>
+  <a name="__getSignature">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getSignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">obj: <code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L331">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getSignature" title="orionis.console.core.loader.Loader.__getSignature">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate and return the 'signature' attribute of a command class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></td><td class="fieldArgDesc">Command class instance to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The validated signature string.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the class lacks a 'signature' attribute, if the signature is empty,
+or if the signature does not match the required pattern.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the 'signature' attribute is not a string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__getTimestamps">
+    
+  </a>
+  <a name="__getTimestamps">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getTimestamps</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">obj: <code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L386">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getTimestamps" title="orionis.console.core.loader.Loader.__getTimestamps">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve the 'timestamps' attribute from a command class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a></code></td><td class="fieldArgDesc">Command class instance to inspect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the 'timestamps' attribute exists and is a boolean, otherwise
+False.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the 'timestamps' attribute exists but is not a boolean.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__importFluentCommandRoutes">
+    
+  </a>
+  <a name="__importFluentCommandRoutes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__importFluentCommandRoutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L264">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__importFluentCommandRoutes" title="orionis.console.core.loader.Loader.__importFluentCommandRoutes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Import fluent command route modules from application routing paths.</p>
+<p>Load and import all route modules defined in the application's console
+routing configuration. Convert file paths to module names and import
+them to register fluent commands.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Imports route modules without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.console.core.loader.Loader.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the Loader instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">The application instance providing configuration and paths.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initializes internal state and sets up command caching.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__load">
+    
+  </a>
+  <a name="__load">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__load</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L730">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__load" title="orionis.console.core.loader.Loader.__load">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Load command classes from metadata and populate the commands dictionary.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code>str | None</code></td><td class="fieldArgDesc">The unique signature of the command to load, or None to load all.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method populates the internal commands dictionary and does not
+return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__loadCoreCommands">
+    
+  </a>
+  <a name="__loadCoreCommands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__loadCoreCommands</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L195">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__loadCoreCommands" title="orionis.console.core.loader.Loader.__loadCoreCommands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Load and register core command classes provided by the Orionis framework.</p>
+<p>Discover and register core command classes bundled with the Orionis framework.
+Validate required attributes for each command and add them to the internal
+registry.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Registers core commands internally for later lookup and execution.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__loadCustomCommands">
+    
+  </a>
+  <a name="__loadCustomCommands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__loadCustomCommands</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L221">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__loadCustomCommands" title="orionis.console.core.loader.Loader.__loadCustomCommands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Load custom command classes from the commands directory.</p>
+<p>Walk through the commands directory, import Python modules, and register
+command classes that inherit from BaseCommand. Sanitize module paths and
+validate command structure before registration.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Registers command classes internally in the reactor's command registry.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__loadFluentCommands">
+    
+  </a>
+  <a name="__loadFluentCommands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__loadFluentCommands</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L295">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__loadFluentCommands" title="orionis.console.core.loader.Loader.__loadFluentCommands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Register commands defined via the fluent interface.</p>
+<p>Discover and register all commands created using the fluent API. Validate
+their structure and metadata before adding them to the internal registry.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Registers fluent commands internally for later lookup and execution.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__loadMetadata">
+    
+  </a>
+  <a name="__loadMetadata">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__loadMetadata</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L698">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__loadMetadata" title="orionis.console.core.loader.Loader.__loadMetadata">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Load command metadata from cache or discover commands.</p>
+<p>Loads metadata from cache if available and caching is enabled. If no cached
+metadata exists, discovers all command types and optionally saves to cache.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Populates the internal metadata dictionary.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.addFluentCommand">
+    
+  </a>
+  <a name="addFluentCommand">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">addFluentCommand</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="orionis.console.fluent.contracts.command.ICommand.html" class="internal-link" title="orionis.console.fluent.contracts.command.ICommand">ICommand</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L137">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#addFluentCommand" title="orionis.console.core.loader.Loader.addFluentCommand">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.console.core.contracts.loader.ILoader.html#addFluentCommand" class="internal-link">orionis.console.core.contracts.loader.ILoader.addFluentCommand</a></code></div>
+    <div><p>Define a new command using the fluent interface.</p>
+<p>Create a command with the given signature and handler. The handler must be
+a list containing the class and optionally the method name. Validate input
+types and conventions. Return the created ICommand instance.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique identifier for the command.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handler:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">List containing the class and optionally the method name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.console.fluent.contracts.command.ICommand.html" class="internal-link" title="orionis.console.fluent.contracts.command.ICommand">ICommand</a></code></td><td class="fieldArgDesc">The created FluentCommand instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the signature is not a string or the handler is not a valid list.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the signature does not meet naming conventions.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.all">
+    
+  </a>
+  <a name="all">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Command]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L107">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#all" title="orionis.console.core.loader.Loader.all">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.console.core.contracts.loader.ILoader.html#all" class="internal-link">orionis.console.core.contracts.loader.ILoader.all</a></code></div>
+    <div><p>Return all loaded commands.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Command]</code></td><td class="fieldArgDesc">A dictionary mapping command signatures to Command instances.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.get">
+    
+  </a>
+  <a name="get">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Command | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L89">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#get" title="orionis.console.core.loader.Loader.get">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.console.core.contracts.loader.ILoader.html#get" class="internal-link">orionis.console.core.contracts.loader.ILoader.get</a></code></div>
+    <div><p>Retrieve a command instance by its signature.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The unique signature identifying the command.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Command | None</code></td><td class="fieldArgDesc">The Command instance if found, otherwise None.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.core.loader.Loader.load">
+    
+  </a>
+  <a name="load">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">load</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L120">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#load" title="orionis.console.core.loader.Loader.load">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.console.core.contracts.loader.ILoader.html#load" class="internal-link">orionis.console.core.contracts.loader.ILoader.load</a></code></div>
+    <div><p>Load all command classes and their metadata.</p>
+<p>This method loads command metadata from cache if available, otherwise
+discovers core commands, custom commands, and fluent commands. It then
+builds Command instances for each command and populates the internal
+commands dictionary.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method populates the internal commands dictionary and does not
+return a value.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__all_loaded">
+    
+  </a>
+  <a name="__all_loaded">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__all_loaded</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L51">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__all_loaded" title="orionis.console.core.loader.Loader.__all_loaded">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__app">
+    
+  </a>
+  <a name="__app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__app</span>: <code>IApplication</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__app" title="orionis.console.core.loader.Loader.__app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__commands">
+    
+  </a>
+  <a name="__commands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__commands</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Command]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__commands" title="orionis.console.core.loader.Loader.__commands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__fluent_commands">
+    
+  </a>
+  <a name="__fluent_commands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__fluent_commands</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.console.fluent.contracts.command.ICommand.html" class="internal-link" title="orionis.console.fluent.contracts.command.ICommand">ICommand</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L46">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__fluent_commands" title="orionis.console.core.loader.Loader.__fluent_commands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__imported_modules">
+    
+  </a>
+  <a name="__imported_modules">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__imported_modules</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L49">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__imported_modules" title="orionis.console.core.loader.Loader.__imported_modules">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__metadata">
+    
+  </a>
+  <a name="__metadata">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__metadata</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__metadata" title="orionis.console.core.loader.Loader.__metadata">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__metadata_loaded">
+    
+  </a>
+  <a name="__metadata_loaded">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__metadata_loaded</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L52">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__metadata_loaded" title="orionis.console.core.loader.Loader.__metadata_loaded">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__persistence">
+    
+  </a>
+  <a name="__persistence">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__persistence</span>: <code>IFileBasedCache | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L56">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__persistence" title="orionis.console.core.loader.Loader.__persistence">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.core.loader.Loader.__use_cache">
+    
+  </a>
+  <a name="__use_cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__use_cache</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/core/loader.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__use_cache" title="orionis.console.core.loader.Loader.__use_cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

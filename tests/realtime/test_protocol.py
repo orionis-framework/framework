@@ -9,7 +9,6 @@ from orionis.realtime.protocol import (
 )
 from orionis.test import TestCase
 
-
 def _frame(payload: object, protocol: str = "json") -> WebSocketMessage:
     """
     Encode one envelope using the frame kind required by its codec.
@@ -34,7 +33,6 @@ def _frame(payload: object, protocol: str = "json") -> WebSocketMessage:
     return WebSocketMessage(
         type=WebSocketMessageType.BYTES, data=msgspec.msgpack.encode(payload),
     )
-
 
 class TestHubProtocol(TestCase):
     """Validate version-one envelopes independently of networking and RPC."""
@@ -301,7 +299,6 @@ class TestHubProtocol(TestCase):
         for limit in (0, -1, True):
             with self.subTest(limit=limit), self.assertRaises(ValueError):
                 HubProtocol(max_message_size=limit)
-
 
 class TestRealtimeConfiguration(TestCase):
     """Validate immutable positive and finite realtime limits."""

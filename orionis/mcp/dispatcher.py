@@ -1,15 +1,11 @@
-"""The common stateless dispatcher used by HTTP, STDIO and in-process tests."""
-
 import asyncio
 import base64
 from collections.abc import AsyncIterator, Mapping
 from dataclasses import dataclass, replace
 import inspect
 from typing import TYPE_CHECKING, Literal, cast
-
 import msgspec
-
-from orionis.mcp.context import McpRequest, mutable_json
+from orionis.mcp.context import McpRequest
 from orionis.mcp.exceptions import (
     McpAuthorizationException,
     McpInvalidParams,
@@ -82,7 +78,15 @@ if TYPE_CHECKING:
 type TransportName = Literal["http", "stdio", "test"]
 _CURSOR_FIELDS = 2
 _MAX_COMPLETIONS = 100
-
+_DISCOVER_METHOD = "server/discover"
+_TOOL_METHOD = "tools/call"
+_PROMPT_METHOD = "prompts/get"
+_INTERNAL_ERROR = "Internal error"
+_RESULT_TYPES = {
+    _TOOL_METHOD: CallToolResult,
+    "resources/read": ReadResourceResult,
+    _PROMPT_METHOD: GetPromptResult,
+}
 
 @dataclass(frozen=True, slots=True)
 class DispatchResult:
@@ -93,14 +97,22 @@ class DispatchResult:
 
     @property
     def streaming(self) -> bool:
-        """Indicate whether the transport must preserve the request scope."""
-        return not isinstance(self.body, bytes)
+        """
+        Indicate whether the transport must preserve the request scope.
 
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
+        return not isinstance(self.body, bytes)
 
 class McpDispatcher:
     """Perform no connection negotiation and retain no request or identity."""
 
-    __slots__ = ("_extensions", "app", "bus", "config", "server")
+    __slots__ = (
+        "_extensions", "_list_sources", "_server_id", "app", "bus", "config", "server",
+    )
 
     def __init__(
         self,
@@ -109,7 +121,25 @@ class McpDispatcher:
         config: McpConfig,
         event_bus: IMcpEventBus,
     ) -> None:
-        """Share immutable definitions and bounded worker services."""
+        """
+        Share immutable definitions and bounded worker services.
+
+        Parameters
+        ----------
+        app : IContainer
+            Application container supplying configuration and dependencies.
+        compiled : CompiledMcpServer
+            Precompiled metadata shared by request executions.
+        config : McpConfig
+            Validated configuration controlling this component.
+        event_bus : IMcpEventBus
+            Subscription service delivering server changes.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self.app = app
         self.server = compiled
         self.config = config
@@ -119,18 +149,43 @@ class McpDispatcher:
             for extension in compiled.extensions
             for method, handler in extension.methods.items()
         }
+        self._server_id = (
+            f"{compiled.definition.__module__}.{compiled.definition.__qualname__}"
+        )
+        self._list_sources = {
+            "tools/list": (compiled.tools.values(), ListToolsResult, "tools"),
+            "resources/list": (
+                compiled.resources.values(), ListResourcesResult, "resources",
+            ),
+            "resources/templates/list": (
+                compiled.templates, ListResourceTemplatesResult, "resourceTemplates",
+            ),
+            "prompts/list": (compiled.prompts.values(), ListPromptsResult, "prompts"),
+        }
 
     def decode(self, envelope: JsonRpcRequest) -> RequestParams:
-        """Validate core metadata before an extension's precompiled decoder."""
+        """
+        Validate core metadata before an extension's precompiled decoder.
+
+        Parameters
+        ----------
+        envelope : JsonRpcRequest
+            Value supplied for ``envelope``.
+
+        Returns
+        -------
+        RequestParams
+            Result of the operation described above.
+        """
         extension = self._extensions.get(envelope.method)
         if extension is None:
             return decode_params(envelope)
-        decode_params(msgspec.structs.replace(envelope, method="server/discover"))
+        core_params = decode_params(
+            msgspec.structs.replace(envelope, method=_DISCOVER_METHOD),
+        )
         decoder = extension[0].decoders.get(envelope.method)
         if decoder is None:
-            return decode_params(
-                msgspec.structs.replace(envelope, method="server/discover"),
-            )
+            return core_params
         try:
             params = decoder.decode(envelope.params)
         except msgspec.DecodeError as exc:
@@ -147,7 +202,23 @@ class McpDispatcher:
         transport: TransportName = "test",
         native_request: Request | None = None,
     ) -> DispatchResult:
-        """Decode one message; transports supply their own framing and scope."""
+        """
+        Decode one message; transports supply their own framing and scope.
+
+        Parameters
+        ----------
+        data : bytes
+            Value supplied for ``data``.
+        transport : TransportName
+            Value supplied for ``transport``.
+        native_request : Request | None
+            Value supplied for ``native_request``.
+
+        Returns
+        -------
+        DispatchResult
+            Result of the operation described above.
+        """
         envelope = None
         try:
             if len(data) > self.config.max_request_size:
@@ -176,7 +247,25 @@ class McpDispatcher:
         transport: TransportName = "test",
         native_request: Request | None = None,
     ) -> DispatchResult:
-        """Execute the same availability, authorization and DI on every transport."""
+        """
+        Execute the same availability, authorization and DI on every transport.
+
+        Parameters
+        ----------
+        envelope : JsonRpcRequest
+            Value supplied for ``envelope``.
+        params : RequestParams
+            Parameters decoded for the requested operation.
+        transport : TransportName
+            Value supplied for ``transport``.
+        native_request : Request | None
+            Value supplied for ``native_request``.
+
+        Returns
+        -------
+        DispatchResult
+            Result of the operation described above.
+        """
         if envelope.id is msgspec.UNSET:
             return DispatchResult(b"", 202)
         try:
@@ -194,7 +283,7 @@ class McpDispatcher:
             return DispatchResult(encode_error(exc, envelope.id), exc.status)
         except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
             await self._report(exc)
-            error = McpProtocolException(-32603, "Internal error", status=500)
+            error = McpProtocolException(-32603, _INTERNAL_ERROR, status=500)
             return DispatchResult(encode_error(error, envelope.id), error.status)
 
     def _request(
@@ -204,7 +293,25 @@ class McpDispatcher:
         transport: TransportName,
         native: Request | None,
     ) -> McpRequest:
-        """Create context from typed parameters, never from connection history."""
+        """
+        Create context from typed parameters, never from connection history.
+
+        Parameters
+        ----------
+        envelope : JsonRpcRequest
+            Value supplied for ``envelope``.
+        params : RequestParams
+            Parameters decoded for the requested operation.
+        transport : TransportName
+            Value supplied for ``transport``.
+        native : Request | None
+            Value supplied for ``native``.
+
+        Returns
+        -------
+        McpRequest
+            Result of the operation described above.
+        """
         retry = isinstance(params, InputResponseParams)
         responses = params.inputResponses if retry else msgspec.UNSET
         arguments = (
@@ -223,18 +330,29 @@ class McpDispatcher:
             request_state=params.requestState if retry else msgspec.UNSET,
             transport=transport,
             native_request=native,
-            server_id=(
-                f"{self.server.definition.__module__}."
-                f"{self.server.definition.__qualname__}"
-            ),
+            server_id=self._server_id,
         )
 
     async def _execute(self, request: McpRequest, params: RequestParams) -> object:
-        """Route known core methods without reflection or dynamic imports."""
+        """
+        Route known core methods without reflection or dynamic imports.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        params : RequestParams
+            Parameters decoded for the requested operation.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         method = request.method
         if method in self._extensions:
             return await self._extension(request, params)
-        if method == "server/discover":
+        if method == _DISCOVER_METHOD:
             return DiscoverResult(
                 supportedVersions=SUPPORTED_VERSIONS,
                 capabilities=self.server.capabilities_wire,
@@ -266,7 +384,21 @@ class McpDispatcher:
         return await self._invoke(primitive, request)
 
     async def _extension(self, request: McpRequest, params: RequestParams) -> object:
-        """Run an explicitly negotiated extension without implicit capabilities."""
+        """
+        Run an explicitly negotiated extension without implicit capabilities.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        params : RequestParams
+            Parameters decoded for the requested operation.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         extension, handler = self._extensions[request.method]
         supported = request.client_capabilities.get("extensions", {})
         if not isinstance(supported, Mapping) or extension.identifier not in supported:
@@ -285,7 +417,21 @@ class McpDispatcher:
         request: McpRequest,
         uri: str,
     ) -> tuple[CompiledPrimitive | None, McpRequest]:
-        """Prefer exact URI lookup before compiled RFC 6570 template matchers."""
+        """
+        Prefer exact URI lookup before compiled RFC 6570 template matchers.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        uri : str
+            Value supplied for ``uri``.
+
+        Returns
+        -------
+        tuple[CompiledPrimitive | None, McpRequest]
+            Result of the operation described above.
+        """
         try:
             validate_uri(uri)
         except ValueError as exc:
@@ -313,7 +459,23 @@ class McpDispatcher:
         *,
         listing: bool = False,
     ) -> object | None:
-        """Resolve fresh handlers and enforce both independent access hooks."""
+        """
+        Resolve fresh handlers and enforce both independent access hooks.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest
+            Current request and its trusted execution context.
+        listing : bool
+            Value supplied for ``listing``.
+
+        Returns
+        -------
+        object | None
+            Result of the operation described above.
+        """
         if primitive.synthetic:
             return primitive
         instance = await self.app.build(primitive.definition)
@@ -341,14 +503,28 @@ class McpDispatcher:
         primitive: CompiledPrimitive,
         request: McpRequest,
     ) -> object:
-        """Share one execution path between direct and catalog calls."""
+        """
+        Share one execution path between direct and catalog calls.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         self.app.instance(McpRequest, request, override=True)
         instance = await self._access(primitive, request)
         validate_input_responses(request.input_responses)
         try:
             payload = (
-                validate_payload(primitive, mutable_json(request.arguments))
-                if request.method == "tools/call"
+                validate_payload(primitive, request.arguments)
+                if request.method == _TOOL_METHOD
                 else msgspec.UNSET
             )
         except ValueError, TypeError, ValidationException:
@@ -358,7 +534,7 @@ class McpDispatcher:
             )
         if primitive.synthetic:
             return await self._catalog(primitive, request)
-        if request.method == "prompts/get":
+        if request.method == _PROMPT_METHOD:
             validate_prompt_arguments(primitive, request.arguments)
         try:
             if primitive.handler is None:
@@ -381,12 +557,12 @@ class McpDispatcher:
             raise
         except Exception as exc:
             await self._report(exc)
-            if request.method == "tools/call":
+            if request.method == _TOOL_METHOD:
                 return CallToolResult(
                     content=(TextContent(text="Tool execution failed"),),
                     isError=True,
                 )
-            raise McpProtocolException(-32603, "Internal error", status=500) from exc
+            raise McpProtocolException(-32603, _INTERNAL_ERROR, status=500) from exc
 
     def _normalize(
         self,
@@ -394,16 +570,28 @@ class McpDispatcher:
         request: McpRequest,
         result: object,
     ) -> object:
-        """Convert developer responses into the method's exact result type."""
+        """
+        Convert developer responses into the method's exact result type.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest
+            Current request and its trusted execution context.
+        result : object
+            Value supplied for ``result``.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         if isinstance(result, InputRequiredResult):
             validate_input_required(result, request)
             validate_result(result, request.method)
             return result
-        expected = {
-            "tools/call": CallToolResult,
-            "resources/read": ReadResourceResult,
-            "prompts/get": GetPromptResult,
-        }[request.method]
+        expected = _RESULT_TYPES[request.method]
         if isinstance(result, expected):
             if isinstance(result, CallToolResult) and result.isError is not True:
                 validate_output(primitive, result.structuredContent)
@@ -414,9 +602,9 @@ class McpDispatcher:
             validate_result(result, request.method)
             return result
         responses = response_items(result)
-        if request.method == "tools/call":
+        if request.method == _TOOL_METHOD:
             normalized = tool_result(primitive, responses)
-        elif request.method == "prompts/get":
+        elif request.method == _PROMPT_METHOD:
             normalized = prompt_result(primitive.description, responses)
         else:
             normalized = resource_result(
@@ -431,7 +619,23 @@ class McpDispatcher:
         request: McpRequest,
         source: AsyncIterator[object],
     ) -> AsyncIterator[bytes]:
-        """Pull notifications with transport backpressure and close on cancellation."""
+        """
+        Pull notifications with transport backpressure and close on cancellation.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest
+            Current request and its trusted execution context.
+        source : AsyncIterator[object]
+            Source whose values or lifecycle are consumed by this operation.
+
+        Yields
+        ------
+        bytes
+            Each item produced by the documented iteration.
+        """
         responses = []
         used = 0
         previous = float("-inf")
@@ -463,40 +667,34 @@ class McpDispatcher:
             yield encode_error(exc, request.id)
         except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
             await self._report(exc)
-            if request.method == "tools/call":
+            if request.method == _TOOL_METHOD:
                 yield self._encode(request, CallToolResult(
                     content=(TextContent(text="Tool execution failed"),), isError=True,
                 ))
             else:
                 yield encode_error(
-                    McpProtocolException(-32603, "Internal error"), request.id,
+                    McpProtocolException(-32603, _INTERNAL_ERROR), request.id,
                 )
         finally:
-            close = getattr(source, "aclose", None)
-            if close is not None:
-                await close()
+            await _close(source)
 
     async def _list(self, request: McpRequest, params: PaginatedParams) -> object:
-        """Build a bounded deterministic page after request-specific access checks."""
-        sources = {
-            "tools/list": (self.server.tools.values(), ListToolsResult, "tools"),
-            "resources/list": (
-                self.server.resources.values(),
-                ListResourcesResult,
-                "resources",
-            ),
-            "resources/templates/list": (
-                self.server.templates,
-                ListResourceTemplatesResult,
-                "resourceTemplates",
-            ),
-            "prompts/list": (
-                self.server.prompts.values(),
-                ListPromptsResult,
-                "prompts",
-            ),
-        }
-        values, result_type, field = sources[request.method]
+        """
+        Build a bounded deterministic page after request-specific access checks.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        params : PaginatedParams
+            Parameters decoded for the requested operation.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
+        values, result_type, field = self._list_sources[request.method]
         after = self._cursor(request.method, params.cursor)
         page = []
         last = ""
@@ -522,7 +720,21 @@ class McpDispatcher:
 
     @staticmethod
     def _cursor(method: str, cursor: str | msgspec.UnsetType) -> str:
-        """Decode a cursor without retaining any server-side pagination state."""
+        """
+        Decode a cursor without retaining any server-side pagination state.
+
+        Parameters
+        ----------
+        method : str
+            Value supplied for ``method``.
+        cursor : str | msgspec.UnsetType
+            Value supplied for ``cursor``.
+
+        Returns
+        -------
+        str
+            Result of the operation described above.
+        """
         if cursor is msgspec.UNSET:
             return ""
         try:
@@ -547,7 +759,21 @@ class McpDispatcher:
         primitive: CompiledPrimitive | None = None,
         request: McpRequest | None = None,
     ) -> CacheOptions:
-        """Never share retry results or default request-dependent content publicly."""
+        """
+        Never share retry results or default request-dependent content publicly.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive | None
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest | None
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        CacheOptions
+            Result of the operation described above.
+        """
         cache = primitive.cache if primitive is not None else self.server.cache
         if request is not None and (
             "inputResponses" in request.params
@@ -560,7 +786,23 @@ class McpDispatcher:
         self, request: McpRequest, result: object,
         *, internal_meta: dict[str, object] | None = None,
     ) -> bytes:
-        """Attach precompiled identity and encode the response exactly once."""
+        """
+        Attach precompiled identity and encode the response exactly once.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        result : object
+            Value supplied for ``result``.
+        internal_meta : dict[str, object] | None
+            Value supplied for ``internal_meta``.
+
+        Returns
+        -------
+        bytes
+            Result of the operation described above.
+        """
         if not isinstance(result, (CompleteResult, InputRequiredResult)):
             message = "Invalid server result"
             raise TypeError(message)
@@ -582,7 +824,21 @@ class McpDispatcher:
         request: McpRequest,
         params: CompleteParams,
     ) -> CompleteCompletionResult:
-        """Run completion through the referenced primitive's access policy."""
+        """
+        Run completion through the referenced primitive's access policy.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        params : CompleteParams
+            Parameters decoded for the requested operation.
+
+        Returns
+        -------
+        CompleteCompletionResult
+            Result of the operation described above.
+        """
         if "completions" not in self.server.capabilities:
             raise McpProtocolException(-32601, "Method not found", status=404)
         if isinstance(params.ref, PromptReference):
@@ -595,11 +851,12 @@ class McpDispatcher:
         if primitive is None or primitive.completion is None:
             msg = "Unknown completion reference"
             raise McpInvalidParams(msg)
-        names = (
-            tuple(item.name for item in primitive.prompt_arguments)
-            if isinstance(params.ref, PromptReference)
-            else primitive.matcher.variable_names if primitive.matcher else ()
-        )
+        if isinstance(params.ref, PromptReference):
+            names = tuple(item.name for item in primitive.prompt_arguments)
+        elif primitive.matcher:
+            names = primitive.matcher.variable_names
+        else:
+            names = ()
         if params.argument.name not in names or (
             params.context is not msgspec.UNSET
             and any(name not in names for name in params.context.arguments)
@@ -620,7 +877,21 @@ class McpDispatcher:
         return CompleteCompletionResult(completion=value)
 
     def _supports(self, capability: str, feature: str) -> bool:
-        """Read one static compiled capability hint."""
+        """
+        Read one static compiled capability hint.
+
+        Parameters
+        ----------
+        capability : str
+            Value supplied for ``capability``.
+        feature : str
+            Value supplied for ``feature``.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
         value = self.server.capabilities.get(capability)
         return isinstance(value, Mapping) and value.get(feature) is True
 
@@ -629,7 +900,21 @@ class McpDispatcher:
         request: McpRequest,
         params: ListenParams,
     ) -> AsyncIterator[bytes]:
-        """Accept only supported changes and resource URIs authorized right now."""
+        """
+        Accept only supported changes and resource URIs authorized right now.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        params : ListenParams
+            Parameters decoded for the requested operation.
+
+        Returns
+        -------
+        AsyncIterator[bytes]
+            Result of the operation described above.
+        """
         filters = params.notifications
         if len(filters.resourceSubscriptions) > self.config.max_resource_subscriptions:
             msg = "Too many resource subscriptions"
@@ -638,7 +923,7 @@ class McpDispatcher:
         if self._supports("resources", "subscribe"):
             uris = [
                 uri for uri in dict.fromkeys(filters.resourceSubscriptions)
-                if await self._subscription_resource(request, uri)
+                if await self._subscriptionResource(request, uri)
             ]
         accepted = SubscriptionFilter(
             toolsListChanged=filters.toolsListChanged
@@ -650,10 +935,24 @@ class McpDispatcher:
             resourceSubscriptions=tuple(uris),
         )
         source = OwnedStream(self.bus.listen(self.server.definition, accepted))
-        return OwnedStream(self._subscription_stream(request, accepted, source), source)
+        return OwnedStream(self._subscriptionStream(request, accepted, source), source)
 
-    async def _subscription_resource(self, request: McpRequest, uri: str) -> bool:
-        """Give all admission dependencies the same resource-specific context."""
+    async def _subscriptionResource(self, request: McpRequest, uri: str) -> bool:
+        """
+        Give all admission dependencies the same resource-specific context.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        uri : str
+            Value supplied for ``uri``.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
         primitive, resource_request = self._resource(replace(request, uri=uri), uri)
         if primitive is None:
             return False
@@ -664,13 +963,29 @@ class McpDispatcher:
         finally:
             self.app.instance(McpRequest, request, override=True)
 
-    async def _subscription_stream(
+    async def _subscriptionStream(
         self,
         request: McpRequest,
         filters: SubscriptionFilter,
         source: AsyncIterator[tuple[str, str | None]],
     ) -> AsyncIterator[bytes]:
-        """Acknowledge before events; use SSE comments for idle keepalive."""
+        """
+        Acknowledge before events; use SSE comments for idle keepalive.
+
+        Parameters
+        ----------
+        request : McpRequest
+            Current request and its trusted execution context.
+        filters : SubscriptionFilter
+            Value supplied for ``filters``.
+        source : AsyncIterator[tuple[str, str | None]]
+            Source whose values or lifecycle are consumed by this operation.
+
+        Yields
+        ------
+        bytes
+            Each item produced by the documented iteration.
+        """
         pending = None
         metadata: dict[str, object] = {SUBSCRIPTION_ID: request.id}
         try:
@@ -719,14 +1034,28 @@ class McpDispatcher:
         primitive: CompiledPrimitive,
         request: McpRequest,
     ) -> CallToolResult | InputRequiredResult:
-        """Bound lexical search and reuse the ordinary execution pipeline."""
+        """
+        Bound lexical search and reuse the ordinary execution pipeline.
+
+        Parameters
+        ----------
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        request : McpRequest
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        CallToolResult | InputRequiredResult
+            Result of the operation described above.
+        """
         if primitive.catalog is None:
             raise McpInvalidParams
         catalog = self.server.catalogs[primitive.catalog]
         response = (
-            await self._search_catalog(catalog, request)
+            await self._searchCatalog(catalog, request)
             if primitive.synthetic == "search"
-            else await self._execute_catalog(catalog, request)
+            else await self._executeCatalog(catalog, request)
         )
         if isinstance(response, InputRequiredResult):
             return response
@@ -741,10 +1070,24 @@ class McpDispatcher:
             isError=response.is_error,
         )
 
-    async def _search_catalog(
+    async def _searchCatalog(
         self, catalog: CompiledCatalog, request: McpRequest,
     ) -> McpResponse:
-        """Rank precompiled text deterministically after request-specific checks."""
+        """
+        Rank precompiled text deterministically after request-specific checks.
+
+        Parameters
+        ----------
+        catalog : CompiledCatalog
+            Value supplied for ``catalog``.
+        request : McpRequest
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        McpResponse
+            Result of the operation described above.
+        """
         query = cast("str", request.arguments.get("query", ""))
         terms = query.casefold().split()
         limit = min(
@@ -769,10 +1112,24 @@ class McpDispatcher:
                 break
         return McpResponse.structured({"tools": matches})
 
-    async def _execute_catalog(
+    async def _executeCatalog(
         self, catalog: CompiledCatalog, request: McpRequest,
     ) -> McpResponse | InputRequiredResult:
-        """Execute a bounded batch through the same policy and validation path."""
+        """
+        Execute a bounded batch through the same policy and validation path.
+
+        Parameters
+        ----------
+        catalog : CompiledCatalog
+            Value supplied for ``catalog``.
+        request : McpRequest
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        McpResponse | InputRequiredResult
+            Result of the operation described above.
+        """
         calls = cast("tuple[Mapping[str, object], ...]", request.arguments["calls"])
         if not 0 < len(calls) <= self.config.tool_search_max_calls:
             message = "Invalid catalog call count"
@@ -794,7 +1151,7 @@ class McpDispatcher:
             )
             try:
                 result = await self._invoke(target, nested)
-                result_value = await self._catalog_result(result)
+                result_value = await self._catalogResult(result)
             finally:
                 self.app.instance(McpRequest, request, override=True)
             if result_value.get("resultType") == "input_required":
@@ -816,8 +1173,20 @@ class McpDispatcher:
         return McpResponse.structured({"results": outputs})
 
     @staticmethod
-    async def _catalog_result(result: object) -> dict[str, object]:
-        """Discard intermediate notifications without accumulating their bytes."""
+    async def _catalogResult(result: object) -> dict[str, object]:
+        """
+        Discard intermediate notifications without accumulating their bytes.
+
+        Parameters
+        ----------
+        result : object
+            Value supplied for ``result``.
+
+        Returns
+        -------
+        dict[str, object]
+            Result of the operation described above.
+        """
         if not isinstance(result, AsyncIterator):
             return msgspec.to_builtins(result)
         final = None
@@ -839,7 +1208,19 @@ class McpDispatcher:
         return final
 
     async def _report(self, exception: Exception) -> None:
-        """Use the native reporting hook without invoking HTML/CLI presentation."""
+        """
+        Use the native reporting hook without invoking HTML/CLI presentation.
+
+        Parameters
+        ----------
+        exception : Exception
+            Exception being inspected or reported.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         try:
             get_handler = getattr(self.app, "getExceptionHandler", None)
             if get_handler is None:
@@ -850,9 +1231,20 @@ class McpDispatcher:
             # Reporting must not turn an internal error into a second public failure.
             return
 
-
 async def _close(source: object) -> None:
-    """Close an optionally closable async source without retaining it."""
+    """
+    Close an optionally closable async source without retaining it.
+
+    Parameters
+    ----------
+    source : object
+        Source whose values or lifecycle are consumed by this operation.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     close = getattr(source, "aclose", None)
     if close is not None:
         await close()

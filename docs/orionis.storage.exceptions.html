@@ -1,0 +1,3012 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.storage.exceptions</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.storage.exceptions.html" class="internal-link" title="This module">exceptions</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31991"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.DiskNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.DiskNotFoundException"><wbr></wbr>Disk<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31992"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.DriverNotSupportedException.html" class="internal-link" title="orionis.storage.exceptions.DriverNotSupportedException"><wbr></wbr>Driver<wbr></wbr>Not<wbr></wbr>Supported<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31993"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.MissingStorageDependencyException.html" class="internal-link" title="orionis.storage.exceptions.MissingStorageDependencyException"><wbr></wbr>Missing<wbr></wbr>Storage<wbr></wbr>Dependency<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31994"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.StorageException.html" class="internal-link" title="orionis.storage.exceptions.StorageException"><wbr></wbr>Storage<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31995"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.StorageFileNotFoundException"><wbr></wbr>Storage<wbr></wbr>File<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31996"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link" title="orionis.storage.exceptions.StoragePathException"><wbr></wbr>Storage<wbr></wbr>Path<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31997"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link" title="orionis.storage.exceptions.UnsupportedStorageOperationException"><wbr></wbr>Unsupported<wbr></wbr>Storage<wbr></wbr>Operation<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.storage.html" class="internal-link" title="The parent of this module">storage</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31998"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId31998">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.contracts.html" class="internal-link" title="orionis.storage.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.directory.html" class="internal-link" title="orionis.storage.contracts.directory">directory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.disk.html" class="internal-link" title="orionis.storage.contracts.disk">disk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.driver.html" class="internal-link" title="orionis.storage.contracts.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.file.html" class="internal-link" title="orionis.storage.contracts.file">file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.manager.html" class="internal-link" title="orionis.storage.contracts.manager">manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.stream.html" class="internal-link" title="orionis.storage.contracts.stream">stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.uploaded_file.html" class="internal-link" title="orionis.storage.contracts.uploaded_file">uploaded<wbr></wbr>_file</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IDirectory.html" class="internal-link" title="orionis.storage.contracts.IDirectory"><wbr></wbr>IDirectory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IDisk.html" class="internal-link" title="orionis.storage.contracts.IDisk"><wbr></wbr>IDisk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile"><wbr></wbr>IFile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IStorageDriver.html" class="internal-link" title="orionis.storage.contracts.IStorageDriver"><wbr></wbr>IStorage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IStorageManager.html" class="internal-link" title="orionis.storage.contracts.IStorageManager"><wbr></wbr>IStorage<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream"><wbr></wbr>IStorage<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.contracts.IUploadedFile.html" class="internal-link" title="orionis.storage.contracts.IUploadedFile"><wbr></wbr>IUploaded<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31999"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.directory.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32000"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.disk.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32001"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32001">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.drivers.html" class="internal-link" title="orionis.storage.drivers">drivers</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.azure.html" class="internal-link" title="orionis.storage.drivers.azure">azure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.functions.html" class="internal-link" title="orionis.storage.drivers.functions">functions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.gcs.html" class="internal-link" title="orionis.storage.drivers.gcs">gcs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.local.html" class="internal-link" title="orionis.storage.drivers.local">local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.memory.html" class="internal-link" title="orionis.storage.drivers.memory">memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.s3.html" class="internal-link" title="orionis.storage.drivers.s3">s3</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.AzureStorageDriver.html" class="internal-link" title="orionis.storage.drivers.AzureStorageDriver"><wbr></wbr>Azure<wbr></wbr>Storage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.GoogleStorageDriver.html" class="internal-link" title="orionis.storage.drivers.GoogleStorageDriver"><wbr></wbr>Google<wbr></wbr>Storage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.LocalStorageDriver.html" class="internal-link" title="orionis.storage.drivers.LocalStorageDriver"><wbr></wbr>Local<wbr></wbr>Storage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.MemoryStorageDriver.html" class="internal-link" title="orionis.storage.drivers.MemoryStorageDriver"><wbr></wbr>Memory<wbr></wbr>Storage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.S3StorageDriver.html" class="internal-link" title="orionis.storage.drivers.S3StorageDriver"><wbr></wbr>S3<wbr></wbr>Storage<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.html#__dir__" class="internal-link" title="orionis.storage.drivers.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.html#__getattr__" class="internal-link" title="orionis.storage.drivers.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.drivers.html#_EXPORTS" class="internal-link" title="orionis.storage.drivers._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32002"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32002">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.entities.html" class="internal-link" title="orionis.storage.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.entities.file_info.html" class="internal-link" title="orionis.storage.entities.file_info">file<wbr></wbr>_info</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.entities.FileInfo.html" class="internal-link" title="orionis.storage.entities.FileInfo"><wbr></wbr>File<wbr></wbr>Info</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32003"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32003">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.enums.html" class="internal-link" title="orionis.storage.enums">enums</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.enums.visibility.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.enums.Visibility.html" class="internal-link" title="orionis.storage.enums.Visibility"><wbr></wbr>Visibility</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32004"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.exceptions.html" class="internal-link" title="orionis.storage.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.DiskNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.DiskNotFoundException"><wbr></wbr>Disk<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.DriverNotSupportedException.html" class="internal-link" title="orionis.storage.exceptions.DriverNotSupportedException"><wbr></wbr>Driver<wbr></wbr>Not<wbr></wbr>Supported<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.MissingStorageDependencyException.html" class="internal-link" title="orionis.storage.exceptions.MissingStorageDependencyException"><wbr></wbr>Missing<wbr></wbr>Storage<wbr></wbr>Dependency<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.StorageException.html" class="internal-link" title="orionis.storage.exceptions.StorageException"><wbr></wbr>Storage<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.StorageFileNotFoundException"><wbr></wbr>Storage<wbr></wbr>File<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link" title="orionis.storage.exceptions.StoragePathException"><wbr></wbr>Storage<wbr></wbr>Path<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link" title="orionis.storage.exceptions.UnsupportedStorageOperationException"><wbr></wbr>Unsupported<wbr></wbr>Storage<wbr></wbr>Operation<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32005"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.file.html" class="internal-link" title="orionis.storage.file">file</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32006"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.manager.html" class="internal-link" title="orionis.storage.manager">manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32007"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32007">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.paths.html" class="internal-link" title="orionis.storage.paths">paths</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.paths.html#__getattr__" class="internal-link" title="orionis.storage.paths.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.paths.html#normalize_file_path" class="internal-link" title="orionis.storage.paths.normalize_file_path">normalize<wbr></wbr>_file<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.paths.html#normalize_path" class="internal-link" title="orionis.storage.paths.normalize_path">normalize<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.paths.html#_LEGACY_EXPORTS" class="internal-link" title="orionis.storage.paths._LEGACY_EXPORTS">_LEGACY<wbr></wbr>_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32008"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32008">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.provider.html" class="internal-link" title="orionis.storage.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.provider.StorageProvider.html" class="internal-link" title="orionis.storage.provider.StorageProvider"><wbr></wbr>Storage<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32009"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.stream.html" class="internal-link" title="orionis.storage.stream">stream</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32010"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.uploaded_file.html" class="internal-link" title="orionis.storage.uploaded_file">uploaded<wbr></wbr>_file</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32011"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32011">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.AsyncStream.html" class="internal-link" title="orionis.storage.AsyncStream"><wbr></wbr>Async<wbr></wbr>Stream</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#__aenter__" class="internal-link" title="orionis.storage.AsyncStream.__aenter__">__aenter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#__aexit__" class="internal-link" title="orionis.storage.AsyncStream.__aexit__">__aexit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#__ensureHandle" class="internal-link" title="orionis.storage.AsyncStream.__ensureHandle">__ensure<wbr></wbr>Handle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#__init__" class="internal-link" title="orionis.storage.AsyncStream.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#close" class="internal-link" title="orionis.storage.AsyncStream.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#read" class="internal-link" title="orionis.storage.AsyncStream.read">read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#seek" class="internal-link" title="orionis.storage.AsyncStream.seek">seek</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#write" class="internal-link" title="orionis.storage.AsyncStream.write">write</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#__slots__" class="internal-link" title="orionis.storage.AsyncStream.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#_handle" class="internal-link" title="orionis.storage.AsyncStream._handle">_handle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#_on_close" class="internal-link" title="orionis.storage.AsyncStream._on_close">_on<wbr></wbr>_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.AsyncStream.html#_opener" class="internal-link" title="orionis.storage.AsyncStream._opener">_opener</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32012"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32012">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.Directory.html" class="internal-link" title="orionis.storage.Directory"><wbr></wbr>Directory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#__init__" class="internal-link" title="orionis.storage.Directory.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#allDirectories" class="internal-link" title="orionis.storage.Directory.allDirectories">all<wbr></wbr>Directories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#allFiles" class="internal-link" title="orionis.storage.Directory.allFiles">all<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#create" class="internal-link" title="orionis.storage.Directory.create">create</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#delete" class="internal-link" title="orionis.storage.Directory.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#directories" class="internal-link" title="orionis.storage.Directory.directories">directories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#exists" class="internal-link" title="orionis.storage.Directory.exists">exists</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#files" class="internal-link" title="orionis.storage.Directory.files">files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#path" class="internal-link" title="orionis.storage.Directory.path">path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#__slots__" class="internal-link" title="orionis.storage.Directory.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#_driver" class="internal-link" title="orionis.storage.Directory._driver">_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Directory.html#_path" class="internal-link" title="orionis.storage.Directory._path">_path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32013"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32013">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.Disk.html" class="internal-link" title="orionis.storage.Disk"><wbr></wbr>Disk</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#__init__" class="internal-link" title="orionis.storage.Disk.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#copy" class="internal-link" title="orionis.storage.Disk.copy">copy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#delete" class="internal-link" title="orionis.storage.Disk.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#directory" class="internal-link" title="orionis.storage.Disk.directory">directory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#exists" class="internal-link" title="orionis.storage.Disk.exists">exists</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#file" class="internal-link" title="orionis.storage.Disk.file">file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#move" class="internal-link" title="orionis.storage.Disk.move">move</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#name" class="internal-link" title="orionis.storage.Disk.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#put" class="internal-link" title="orionis.storage.Disk.put">put</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#__slots__" class="internal-link" title="orionis.storage.Disk.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#_driver" class="internal-link" title="orionis.storage.Disk._driver">_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.Disk.html#_name" class="internal-link" title="orionis.storage.Disk._name">_name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32014"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32014">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.File.html" class="internal-link" title="orionis.storage.File"><wbr></wbr>File</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#__init__" class="internal-link" title="orionis.storage.File.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#copyTo" class="internal-link" title="orionis.storage.File.copyTo">copy<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#delete" class="internal-link" title="orionis.storage.File.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#download" class="internal-link" title="orionis.storage.File.download">download</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#exists" class="internal-link" title="orionis.storage.File.exists">exists</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#hash" class="internal-link" title="orionis.storage.File.hash">hash</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#info" class="internal-link" title="orionis.storage.File.info">info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#lastModified" class="internal-link" title="orionis.storage.File.lastModified">last<wbr></wbr>Modified</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#mimeType" class="internal-link" title="orionis.storage.File.mimeType">mime<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#moveTo" class="internal-link" title="orionis.storage.File.moveTo">move<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#open" class="internal-link" title="orionis.storage.File.open">open</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#path" class="internal-link" title="orionis.storage.File.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#read" class="internal-link" title="orionis.storage.File.read">read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#readStream" class="internal-link" title="orionis.storage.File.readStream">read<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#rename" class="internal-link" title="orionis.storage.File.rename">rename</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#setVisibility" class="internal-link" title="orionis.storage.File.setVisibility">set<wbr></wbr>Visibility</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#size" class="internal-link" title="orionis.storage.File.size">size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#temporaryUrl" class="internal-link" title="orionis.storage.File.temporaryUrl">temporary<wbr></wbr>Url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#url" class="internal-link" title="orionis.storage.File.url">url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#visibility" class="internal-link" title="orionis.storage.File.visibility">visibility</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#write" class="internal-link" title="orionis.storage.File.write">write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#writeStream" class="internal-link" title="orionis.storage.File.writeStream">write<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#__slots__" class="internal-link" title="orionis.storage.File.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#_driver" class="internal-link" title="orionis.storage.File._driver">_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.File.html#_path" class="internal-link" title="orionis.storage.File._path">_path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32015"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32015">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.StorageManager.html" class="internal-link" title="orionis.storage.StorageManager"><wbr></wbr>Storage<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#__buildDriver" class="internal-link" title="orionis.storage.StorageManager.__buildDriver">__build<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#__buildLocalDriver" class="internal-link" title="orionis.storage.StorageManager.__buildLocalDriver">__build<wbr></wbr>Local<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#__diskConfig" class="internal-link" title="orionis.storage.StorageManager.__diskConfig">__disk<wbr></wbr>Config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#__init__" class="internal-link" title="orionis.storage.StorageManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#default" class="internal-link" title="orionis.storage.StorageManager.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#disk" class="internal-link" title="orionis.storage.StorageManager.disk">disk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#extend" class="internal-link" title="orionis.storage.StorageManager.extend">extend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#uploaded" class="internal-link" title="orionis.storage.StorageManager.uploaded">uploaded</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#__slots__" class="internal-link" title="orionis.storage.StorageManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_app" class="internal-link" title="orionis.storage.StorageManager._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_base_path" class="internal-link" title="orionis.storage.StorageManager._base_path">_base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_config" class="internal-link" title="orionis.storage.StorageManager._config">_config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_custom" class="internal-link" title="orionis.storage.StorageManager._custom">_custom</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_default" class="internal-link" title="orionis.storage.StorageManager._default">_default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.StorageManager.html#_disks" class="internal-link" title="orionis.storage.StorageManager._disks">_disks</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32016"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId32016">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.storage.UploadedFile.html" class="internal-link" title="orionis.storage.UploadedFile"><wbr></wbr>Uploaded<wbr></wbr>File</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#__init__" class="internal-link" title="orionis.storage.UploadedFile.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#__stream" class="internal-link" title="orionis.storage.UploadedFile.__stream">__stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#copy" class="internal-link" title="orionis.storage.UploadedFile.copy">copy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#extension" class="internal-link" title="orionis.storage.UploadedFile.extension">extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#hashName" class="internal-link" title="orionis.storage.UploadedFile.hashName">hash<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#mimeType" class="internal-link" title="orionis.storage.UploadedFile.mimeType">mime<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#move" class="internal-link" title="orionis.storage.UploadedFile.move">move</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#originalName" class="internal-link" title="orionis.storage.UploadedFile.originalName">original<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#read" class="internal-link" title="orionis.storage.UploadedFile.read">read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#size" class="internal-link" title="orionis.storage.UploadedFile.size">size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#store" class="internal-link" title="orionis.storage.UploadedFile.store">store</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#storeAs" class="internal-link" title="orionis.storage.UploadedFile.storeAs">store<wbr></wbr>As</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#__slots__" class="internal-link" title="orionis.storage.UploadedFile.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#_hash_name" class="internal-link" title="orionis.storage.UploadedFile._hash_name">_hash<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#_manager" class="internal-link" title="orionis.storage.UploadedFile._manager">_manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.UploadedFile.html#_source" class="internal-link" title="orionis.storage.UploadedFile._source">_source</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.html#__dir__" class="internal-link" title="orionis.storage.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.html#__getattr__" class="internal-link" title="orionis.storage.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.storage.html#_EXPORTS" class="internal-link" title="orionis.storage._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.storage.html" class="internal-link" title="orionis.storage">storage</a></code><wbr></wbr>.<code><a href="orionis.storage.exceptions.html" class="internal-link" title="orionis.storage.exceptions">exceptions</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/storage/exceptions.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1924">
+  
+  
+  <tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.DiskNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.DiskNotFoundException"><wbr></wbr>Disk<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a disk is not defined in the filesystems configuration.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.DriverNotSupportedException.html" class="internal-link" title="orionis.storage.exceptions.DriverNotSupportedException"><wbr></wbr>Driver<wbr></wbr>Not<wbr></wbr>Supported<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a disk references a driver without an implementation.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.MissingStorageDependencyException.html" class="internal-link" title="orionis.storage.exceptions.MissingStorageDependencyException"><wbr></wbr>Missing<wbr></wbr>Storage<wbr></wbr>Dependency<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a driver requires an optional package that is not installed.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.StorageException.html" class="internal-link" title="orionis.storage.exceptions.StorageException"><wbr></wbr>Storage<wbr></wbr>Exception</a></code></td>
+    <td>Base exception for all storage-related errors.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link" title="orionis.storage.exceptions.StorageFileNotFoundException"><wbr></wbr>Storage<wbr></wbr>File<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a file does not exist on the target disk.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link" title="orionis.storage.exceptions.StoragePathException"><wbr></wbr>Storage<wbr></wbr>Path<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a storage path is malformed or escapes the disk root.</td>
+  </tr><tr class="exception">
+    
+    <td>Exception</td>
+    <td><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link" title="orionis.storage.exceptions.UnsupportedStorageOperationException"><wbr></wbr>Unsupported<wbr></wbr>Storage<wbr></wbr>Operation<wbr></wbr>Exception</a></code></td>
+    <td>Raised when a driver cannot perform the requested operation.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

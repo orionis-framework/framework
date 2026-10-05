@@ -2,10 +2,10 @@ import asyncio
 from collections import deque
 from pathlib import Path
 from types import SimpleNamespace
-from unittest import IsolatedAsyncioTestCase
 from orionis.foundation.application import Application
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
+from orionis.test import TestCase
 
 def make_application() -> Application:
     """
@@ -108,7 +108,7 @@ class _CliKernel:
         self.args.append(args)
         return 0
 
-class TestApplicationLifecycle(IsolatedAsyncioTestCase):
+class TestApplicationLifecycle(TestCase):
     async def testConcurrentProviderBootWaitsForTheSameProvider(self) -> None:
         """
         Serialize startup and retain provider registration order.

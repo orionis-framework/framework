@@ -67,7 +67,7 @@ def run_suites(
     repo_root: Path,
     suites: Sequence[TestSuite],
     *,
-    verbosity: int = 2,
+    verbosity: int = 1,
     continue_on_error: bool = False,
 ) -> int:
     """
@@ -80,7 +80,7 @@ def run_suites(
     suites : Sequence[TestSuite]
         Suites to execute in the supplied order.
     verbosity : int, optional
-        Reactor output detail, by default 2.
+        Reactor output detail, by default 1.
     continue_on_error : bool, optional
         Run remaining suites after a failure, by default False.
 

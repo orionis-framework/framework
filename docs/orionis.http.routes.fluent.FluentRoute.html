@@ -1,0 +1,1848 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.routes.fluent.FluentRoute</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="This class"><wbr></wbr>Fluent<wbr></wbr>Route</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._hub">_hub</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._kind">_kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#action" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.action">action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#export" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.export">export</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#inheritGroup" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.inheritGroup">inherit<wbr></wbr>Group</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.middleware">middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#prefix" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.public">public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withOutMiddleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.withOutMiddleware">with<wbr></wbr>Out<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ALLOWED_METHODS" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._ALLOWED_METHODS">_ALLOWED<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__callable_handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__callable_handler">__callable<wbr></wbr>_handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__class" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__class">__class</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__handler">__handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub">__hub</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__hub_protocol" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub_protocol">__hub<wbr></wbr>_protocol</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__id">__id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__kind">__kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__method" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__method">__method</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__middleware">__middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__name">__name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__path">__path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__public">__public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__view" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__view">__view</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__without_middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__without_middleware">__without<wbr></wbr>_middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.id">id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.path">path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.routes.fluent.html" class="internal-link" title="The parent of this class">fluent</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10253"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute"><wbr></wbr>Fluent<wbr></wbr>Route</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._hub">_hub</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._kind">_kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#action" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.action">action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#export" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.export">export</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#inheritGroup" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.inheritGroup">inherit<wbr></wbr>Group</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.middleware">middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#prefix" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.public">public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withOutMiddleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.withOutMiddleware">with<wbr></wbr>Out<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ALLOWED_METHODS" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._ALLOWED_METHODS">_ALLOWED<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__callable_handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__callable_handler">__callable<wbr></wbr>_handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__class" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__class">__class</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__handler">__handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub">__hub</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__hub_protocol" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub_protocol">__hub<wbr></wbr>_protocol</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__id">__id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__kind">__kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__method" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__method">__method</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__middleware">__middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__name">__name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__path">__path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__public">__public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__view" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__view">__view</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__without_middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__without_middleware">__without<wbr></wbr>_middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.id">id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.path">path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.routes.html" class="internal-link" title="orionis.http.routes">routes</a></code><wbr></wbr>.<code><a href="orionis.http.routes.fluent.html" class="internal-link" title="orionis.http.routes.fluent">fluent</a></code><wbr></wbr>.<code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FluentRoute</span>(<a href="orionis.http.routes.contracts.fluent.IFluentRoute.html" class="internal-link" title="orionis.http.routes.contracts.fluent.IFluentRoute">IFluentRoute</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__init__">FluentRoute(method, path, action, view)</a></code></p><p><a href="classIndex.html#orionis.http.routes.fluent.FluentRoute">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1050">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__init__">__init__</a></code></td>
+    <td>Initialize a FluentRoute instance.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._hub">_hub</a></code></td>
+    <td>Set the Hub class and its fixed connection codec.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._kind">_kind</a></code></td>
+    <td>Set the kind of the route (e.g., 'web', 'api').</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#action" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.action">action</a></code></td>
+    <td>Set the controller class and handler for the route.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#export" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.export">export</a></code></td>
+    <td>Export a complete route configuration as a plain dictionary.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#inheritGroup" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.inheritGroup">inherit<wbr></wbr>Group</a></code></td>
+    <td>Apply validated group context during registration.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.middleware">middleware</a></code></td>
+    <td>Add middleware to the route.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.name">name</a></code></td>
+    <td>Set the name for the route.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#prefix" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.prefix">prefix</a></code></td>
+    <td>Prepend a path segment to the route's current path.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.public">public</a></code></td>
+    <td>Select a stateless route without automatic session or identity setup.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withOutMiddleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.withOutMiddleware">with<wbr></wbr>Out<wbr></wbr>Middleware</a></code></td>
+    <td>Exclude one or more middleware classes from the route.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_ALLOWED_METHODS" class="internal-link" title="orionis.http.routes.fluent.FluentRoute._ALLOWED_METHODS">_ALLOWED<wbr></wbr>_METHODS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__callable_handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__callable_handler">__callable<wbr></wbr>_handler</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__class" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__class">__class</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__handler" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__handler">__handler</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__hub" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub">__hub</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__hub_protocol" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__hub_protocol">__hub<wbr></wbr>_protocol</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__id">__id</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__kind" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__kind">__kind</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__method" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__method">__method</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__middleware">__middleware</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__name" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__name">__name</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__path">__path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__public" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__public">__public</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__view" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__view">__view</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__without_middleware" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.__without_middleware">__without<wbr></wbr>_middleware</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#id" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.id">id</a></code></td>
+    <td>Return the unique identifier of the route.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#path" class="internal-link" title="orionis.http.routes.fluent.FluentRoute.path">path</a></code></td>
+    <td>Return the current canonical path, including inherited prefixes.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L30">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.http.routes.fluent.FluentRoute.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize a FluentRoute instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method (e.g., 'GET', 'POST').</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Route path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc"><p>Action to execute. Three forms are accepted:</p>
+<ul>
+<li><p class="rst-first"><strong>Invokable controller</strong> - bare class that defines <tt class="rst-docutils rst-literal">__call__</tt>:</p>
+<pre class="rst-literal-block">
+FluentRoute("GET", "/", UserController)
+</pre>
+</li>
+<li><p class="rst-first"><strong>Controller + method</strong> - two-element list:</p>
+<pre class="rst-literal-block">
+FluentRoute("GET", "/", [UserController, "index"])
+</pre>
+</li>
+<li><p class="rst-first"><strong>Callable</strong> - plain function or coroutine function:</p>
+<pre class="rst-literal-block">
+FluentRoute("GET", "/", my_view)
+</pre>
+</li>
+</ul>
+<p>Ignored when <em>view</em> is provided. If omitted or None, set the
+controller and method with <tt class="rst-docutils rst-literal">action()</tt> before exporting.</p>
+</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">view:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Template name rendered directly by the kernel. When given, the
+route carries no Python handler and <em>action</em> is not parsed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The instance is initialized; no value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If method or path is not a string, or a supplied action is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If method is unsupported, view is invalid, or a controller pair
+has an invalid length or names a missing method.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute._hub">
+    
+  </a>
+  <a name="_hub">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_hub</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hub: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub]</code>, </span><span class="rst-sig-param">protocol: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L181">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_hub" title="orionis.http.routes.fluent.FluentRoute._hub">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Set the Hub class and its fixed connection codec.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link" title="orionis.realtime.Hub">Hub</a>]</code></td><td class="fieldArgDesc">Concrete Hub subclass resolved through the application container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Realtime codec name: <tt class="rst-docutils rst-literal">json</tt> or <tt class="rst-docutils rst-literal">msgpack</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This connection route with an explicit Hub action.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the class does not inherit from Hub.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the route is HTTP or the codec is unsupported.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute._kind">
+    
+  </a>
+  <a name="_kind">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_kind</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">kind: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L374">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_kind" title="orionis.http.routes.fluent.FluentRoute._kind">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Set the kind of the route (e.g., 'web', 'api').</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kind:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The kind to set for the route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.action">
+    
+  </a>
+  <a name="action">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">action</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">controller: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L156">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#action" title="orionis.http.routes.fluent.FluentRoute.action">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#action" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.action</a></code></div>
+    <div><p>Set the controller class and handler for the route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">controller:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Controller class to associate with the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handler:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the handler method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.export">
+    
+  </a>
+  <a name="export">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">export</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L394">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#export" title="orionis.http.routes.fluent.FluentRoute.export">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#export" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.export</a></code></div>
+    <div><p>Export a complete route configuration as a plain dictionary.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dictionary with keys: id, method, path, class, handler,
+callable_handler, view, name, middleware, without_middleware,
+kind, public, protocol, hub, and hub_protocol.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the route has neither a view nor an assigned action.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.inheritGroup">
+    
+  </a>
+  <a name="inheritGroup">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">inheritGroup</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">middleware: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware], <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">without_middleware: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware]]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">public: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L339">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#inheritGroup" title="orionis.http.routes.fluent.FluentRoute.inheritGroup">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Apply validated group context during registration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical prefix without a trailing slash, or an empty string.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">middleware:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.http.BaseMiddleware.html" class="internal-link" title="orionis.http.BaseMiddleware">BaseMiddleware</a>], ...]</code></td><td class="fieldArgDesc">Parent middleware, in declaration order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">without<wbr></wbr>_middleware:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.http.BaseMiddleware.html" class="internal-link" title="orionis.http.BaseMiddleware">BaseMiddleware</a>]]</code></td><td class="fieldArgDesc">Exclusions inherited by the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">public:</span><code>bool | None, <em>optional</em></code></td><td class="fieldArgDesc">Parent profile applied only when the route has no explicit profile.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This route with the parent context prepended.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.middleware">
+    
+  </a>
+  <a name="middleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">middleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*middleware: <code>MiddlewareInput</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L272">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#middleware" title="orionis.http.routes.fluent.FluentRoute.middleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#middleware" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.middleware</a></code></div>
+    <div><p>Add middleware to the route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*middleware:</span><code>MiddlewareInput</code></td><td class="fieldArgDesc">One or more middleware classes (not instances) to attach.
+Classes may be passed individually or wrapped in a
+<tt class="rst-docutils rst-literal">list</tt>, <tt class="rst-docutils rst-literal">tuple</tt> or <tt class="rst-docutils rst-literal">set</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.name">
+    
+  </a>
+  <a name="name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">name</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L220">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#name" title="orionis.http.routes.fluent.FluentRoute.name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#name" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.name</a></code></div>
+    <div><p>Set the name for the route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name to assign to the route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.prefix">
+    
+  </a>
+  <a name="prefix">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">prefix</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L316">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#prefix" title="orionis.http.routes.fluent.FluentRoute.prefix">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#prefix" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.prefix</a></code></div>
+    <div><p>Prepend a path segment to the route's current path.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The path prefix to prepend.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.public">
+    
+  </a>
+  <a name="public">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">public</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">enabled: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L243">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#public" title="orionis.http.routes.fluent.FluentRoute.public">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#public" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.public</a></code></div>
+    <div><p>Select a stateless route without automatic session or identity setup.</p>
+<p>Global security, CORS, rate limits, and explicitly attached middleware
+still run. Web session, CSRF, and automatic identity resolution do not.
+Use this profile only for endpoints that do not use cookie credentials.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">enabled:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to opt out of the default web or API context middleware.
+False explicitly retains that context inside a public group.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This route with the requested execution profile.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If enabled is not a boolean.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.withOutMiddleware">
+    
+  </a>
+  <a name="withOutMiddleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withOutMiddleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*middleware: <code>MiddlewareInput</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L294">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withOutMiddleware" title="orionis.http.routes.fluent.FluentRoute.withOutMiddleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#withOutMiddleware" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.withOutMiddleware</a></code></div>
+    <div><p>Exclude one or more middleware classes from the route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*middleware:</span><code>MiddlewareInput</code></td><td class="fieldArgDesc">One or more middleware classes to exclude from this route.
+Classes may be passed individually or wrapped in a
+<tt class="rst-docutils rst-literal">list</tt>, <tt class="rst-docutils rst-literal">tuple</tt> or <tt class="rst-docutils rst-literal">set</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This FluentRoute instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute._ALLOWED_METHODS">
+    
+  </a>
+  <a name="_ALLOWED_METHODS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_ALLOWED_METHODS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_ALLOWED_METHODS" title="orionis.http.routes.fluent.FluentRoute._ALLOWED_METHODS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">GET</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">POST</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">PUT</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">DELETE</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">PATCH</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">QUERY</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">WEBSOCKET</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__callable_handler">
+    
+  </a>
+  <a name="__callable_handler">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__callable_handler</span>: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L102">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__callable_handler" title="orionis.http.routes.fluent.FluentRoute.__callable_handler">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__class">
+    
+  </a>
+  <a name="__class">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__class</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L100">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__class" title="orionis.http.routes.fluent.FluentRoute.__class">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__handler">
+    
+  </a>
+  <a name="__handler">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__handler</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L101">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__handler" title="orionis.http.routes.fluent.FluentRoute.__handler">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__hub">
+    
+  </a>
+  <a name="__hub">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__hub</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L109">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__hub" title="orionis.http.routes.fluent.FluentRoute.__hub">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__hub_protocol">
+    
+  </a>
+  <a name="__hub_protocol">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__hub_protocol</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L110">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__hub_protocol" title="orionis.http.routes.fluent.FluentRoute.__hub_protocol">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__id">
+    
+  </a>
+  <a name="__id">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L99">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__id" title="orionis.http.routes.fluent.FluentRoute.__id">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__kind">
+    
+  </a>
+  <a name="__kind">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__kind</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L106">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__kind" title="orionis.http.routes.fluent.FluentRoute.__kind">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__method">
+    
+  </a>
+  <a name="__method">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__method</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L97">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__method" title="orionis.http.routes.fluent.FluentRoute.__method">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__middleware">
+    
+  </a>
+  <a name="__middleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__middleware</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L104">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__middleware" title="orionis.http.routes.fluent.FluentRoute.__middleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__name">
+    
+  </a>
+  <a name="__name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L103">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__name" title="orionis.http.routes.fluent.FluentRoute.__name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__path">
+    
+  </a>
+  <a name="__path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L98">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__path" title="orionis.http.routes.fluent.FluentRoute.__path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__public">
+    
+  </a>
+  <a name="__public">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__public</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L107">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__public" title="orionis.http.routes.fluent.FluentRoute.__public">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__view">
+    
+  </a>
+  <a name="__view">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__view</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L108">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__view" title="orionis.http.routes.fluent.FluentRoute.__view">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.__without_middleware">
+    
+  </a>
+  <a name="__without_middleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__without_middleware</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L105">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__without_middleware" title="orionis.http.routes.fluent.FluentRoute.__without_middleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.id">
+    
+  </a>
+  <a name="id">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L144">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#id" title="orionis.http.routes.fluent.FluentRoute.id">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.fluent.IFluentRoute.html#id" class="internal-link">orionis.http.routes.contracts.fluent.IFluentRoute.id</a></code></div>
+    <div><p>Return the unique identifier of the route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The unique identifier of the route.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.http.routes.fluent.FluentRoute.path">
+    
+  </a>
+  <a name="path">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/fluent.py#L132">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#path" title="orionis.http.routes.fluent.FluentRoute.path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Return the current canonical path, including inherited prefixes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The current canonical path, including inherited prefixes.</td></tr></table></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

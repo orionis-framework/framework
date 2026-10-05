@@ -114,14 +114,14 @@ $env:PYTHONIOENCODING = 'utf-8'
 .venv/Scripts/python.exe reactor test --start-dir=tests --verbosity=2
 .venv/Scripts/python.exe -m ruff check .
 uv tool run --from pyright pyright --pythonpath .venv/Scripts/python.exe
-.venv/Scripts/python.exe -m tests.realtime.granian_smoke asgi
-.venv/Scripts/python.exe -m tests.realtime.granian_smoke rsgi
+.venv/Scripts/python.exe reactor test --start-dir=tests/realtime --file-pattern=test_integration.py --verbosity=1
 ```
 
-El helper de smoke abre un servidor Granian real en loopback y verifica handshake
-RFC6455, eco Unicode/binario, ready/invoke JSON y MessagePack, RPC al cliente y
-cierre. Su cliente mínimo pertenece exclusivamente a tests y sus procesos se
-liberan al finalizar.
+Los tests de integración ASGI y RSGI abren un servidor Granian real en loopback
+y verifican handshake RFC6455, eco Unicode/binario, ready/invoke JSON y MessagePack,
+RPC al cliente y cierre. El módulo de prueba contiene el cliente mínimo y genera
+la aplicación y las rutas en un directorio temporal. Los procesos se liberan al
+finalizar; no hay módulos auxiliares de aplicación o rutas en la carpeta de tests.
 
 Resultados finales en este checkout, con Python 3.14 y Granian 2.8.4:
 

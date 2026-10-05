@@ -3,13 +3,17 @@ import pkgutil
 from dataclasses import fields, is_dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
+from urllib.parse import unquote, urlsplit
 from config.database import BootstrapDatabase
+from config.http import BootstrapHTTP
 from config.logging import BootstrapLogging
+from config.mcp import BootstrapMcp
 from config.realtime import BootstrapRealtime
 from config.view import BootstrapView
 from orionis.foundation.config.database import ConnectionName, Database
-from orionis.foundation.config.http import Cors
+from orionis.foundation.config.http import Cors, HTTPRateLimit, HTTPWebSocket
 from orionis.foundation.config.logging import Logging
+from orionis.foundation.config.mcp.entities.mcp import McpConfig
 from orionis.foundation.config.realtime import RealtimeConfig
 from orionis.foundation.config.view import View
 from orionis.test import TestCase
@@ -237,6 +241,57 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertFalse(config.auto_reload)
                 self.assertIsNone(config.cache_path)
 
+class TestSharedRedisConfiguration(ConfigurationTestCase):
+    """Keep shared Redis settings consistent without connecting to a server."""
+
+    def testRateLimiterInheritsSharedConnectionSettings(self) -> None:
+        """Use the same host, port, database and credential as other services.
+
+        Returns
+        -------
+        None
+            Core and application rate-limit configuration share one Redis URL.
+        """
+        credential = "test@credential:/?#%"
+        self.environment.values.update({
+            "REDIS_HOST": "cache.example", "REDIS_PORT": 6381,
+            "REDIS_DB": 4, "REDIS_PASSWORD": credential,
+        })
+        for config in (HTTPRateLimit(), BootstrapHTTP().rate_limit):
+            parts = urlsplit(config.rate_limit_redis_url)
+            self.assertEqual(parts.hostname, "cache.example")
+            self.assertEqual(parts.port, 6381)
+            self.assertEqual(parts.path, "/4")
+            self.assertEqual(unquote(parts.password), credential)
+
+    def testServiceOverrideTakesPrecedenceWithoutReadingSharedValues(self) -> None:
+        """Keep an explicit Redis service URL independent of shared defaults.
+
+        Returns
+        -------
+        None
+            A valid service override wins even when unused shared data is invalid.
+        """
+        expected = "rediss://dedicated.example:6380/5"
+        self.environment.values.update(
+            RATE_LIMIT_REDIS_URL=expected, REDIS_PORT="unused",
+        )
+        self.assertEqual(HTTPRateLimit().rate_limit_redis_url, expected)
+        self.assertEqual(BootstrapHTTP().rate_limit.rate_limit_redis_url, expected)
+
+    def testSharedIpv6HostProducesAValidUrl(self) -> None:
+        """Bracket a shared IPv6 address before assembling the Redis URL.
+
+        Returns
+        -------
+        None
+            The resulting authority retains both the address and default port.
+        """
+        self.environment.values["REDIS_HOST"] = "::1"
+        parts = urlsplit(HTTPRateLimit().rate_limit_redis_url)
+        self.assertEqual(parts.hostname, "::1")
+        self.assertEqual(parts.port, 6379)
+
 class TestRealtimeConfigurationEnvironment(ConfigurationTestCase):
     def testDefaultsMatchStaticMetadata(self) -> None:
         """Keep realtime defaults and their descriptive metadata aligned.
@@ -314,3 +369,87 @@ class TestRealtimeConfigurationEnvironment(ConfigurationTestCase):
                         entity=cls.__name__, field=name, value=value,
                     ), self.assertRaises(ValueError):
                         cls()
+
+class TestProtocolEnvironment(ConfigurationTestCase):
+    """Keep protocol defaults environment-backed and their origins explicit."""
+
+    def testEveryMcpBudgetReadsEnvironmentForEachInstance(self) -> None:
+        """Read all MCP budgets lazily while retaining immutable instances.
+
+        Returns
+        -------
+        None
+            Environment changes affect new configurations, not previous ones.
+        """
+        for config_type in (McpConfig, BootstrapMcp):
+            for item in fields(McpConfig):
+                if item.name == "allowed_origins":
+                    continue
+                self.environment.values.clear()
+                default = getattr(config_type(), item.name)
+                key = "MCP_" + item.name.upper()
+                self.environment.values[key] = default + 1
+                first = config_type()
+                self.assertEqual(getattr(first, item.name), default + 1)
+                self.environment.values[key] = default + 2
+                self.assertEqual(getattr(config_type(), item.name), default + 2)
+                self.assertEqual(getattr(first, item.name), default + 1)
+
+    def testMcpInheritsSharedHttpBudgetsUnlessOverridden(self) -> None:
+        """Apply shared HTTP defaults with explicit MCP override precedence.
+
+        Returns
+        -------
+        None
+            Request bytes and concurrent admission can share HTTP environment values.
+        """
+        self.environment.values.update(
+            HTTP_MAX_BODY_SIZE=2048, HTTP_MAX_CONCURRENT_REQUESTS=8,
+        )
+        for config_type in (McpConfig, BootstrapMcp):
+            self.assertEqual(config_type().max_request_size, 2048)
+            self.assertEqual(config_type().max_concurrent_requests, 8)
+        self.environment.values.update(
+            MCP_MAX_REQUEST_SIZE=512, MCP_MAX_CONCURRENT_REQUESTS=2,
+        )
+        self.assertEqual(McpConfig().max_request_size, 512)
+        self.assertEqual(McpConfig().max_concurrent_requests, 2)
+
+    def testSharedOriginsNeverImplicitlyGrantWildcardAccess(self) -> None:
+        """Share explicit origins but retain protocol-specific wildcard policy.
+
+        Returns
+        -------
+        None
+            MCP and WebSocket inherit explicit origins without CORS wildcards.
+        """
+        origins = ["*", "https://*.example.com", "https://client.example"]
+        self.environment.values["CORS_ALLOW_ORIGINS"] = origins
+        expected = ("https://client.example",)
+        self.assertEqual(McpConfig().allowed_origins, expected)
+        self.assertEqual(BootstrapMcp().allowed_origins, expected)
+        self.assertEqual(HTTPWebSocket().allow_origins, expected)
+        self.assertEqual(BootstrapHTTP().websocket.allow_origins, expected)
+        self.environment.values.update(
+            MCP_ALLOWED_ORIGINS=[], WEBSOCKET_ALLOW_ORIGINS=[],
+        )
+        self.assertEqual(McpConfig().allowed_origins, ())
+        self.assertEqual(HTTPWebSocket().allow_origins, ())
+        self.environment.values["CORS_ALLOW_ORIGINS"] = "unused invalid fallback"
+        self.assertEqual(McpConfig().allowed_origins, ())
+        self.assertEqual(HTTPWebSocket().allow_origins, ())
+
+    def testCoreWebSocketConfigurationReadsItsEnvironment(self) -> None:
+        """Apply the same WebSocket budgets in the core and application layers.
+
+        Returns
+        -------
+        None
+            Both layers consume the declared connection and message limits.
+        """
+        self.environment.values.update(
+            WEBSOCKET_MAX_CONNECTIONS=12, WEBSOCKET_MAX_MESSAGE_SIZE=8192,
+        )
+        for config in (HTTPWebSocket(), BootstrapHTTP().websocket):
+            self.assertEqual(config.max_connections, 12)
+            self.assertEqual(config.max_message_size, 8192)

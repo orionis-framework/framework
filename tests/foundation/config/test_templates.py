@@ -1,7 +1,12 @@
 import ast
 import logging
+import os
+import subprocess
+import sys
 from dataclasses import MISSING, fields, is_dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from dotenv.parser import parse_stream
 from config.database import BootstrapDatabase
 from config.http import BootstrapHTTP
 from config.logging import BootstrapLogging
@@ -12,6 +17,68 @@ from tests.foundation.config.test_environment import (
 )
 
 class TestConfigurationTemplates(ConfigurationTestCase):
+    def testExampleEnvironmentDeclaresEachVariableOnce(self) -> None:
+        """Reject duplicated environment keys that silently replace earlier defaults.
+
+        Returns
+        -------
+        None
+            Every parsed example key has one unambiguous declaration.
+        """
+        example = Path(__file__).resolve().parents[3] / ".env.example"
+        with example.open(encoding="utf-8") as stream:
+            keys = [binding.key for binding in parse_stream(stream) if binding.key]
+        self.assertEqual(len(keys), len(set(keys)))
+
+    def testExampleEnvironmentBuildsEveryApplicationConfiguration(self) -> None:
+        """Construct real configuration defaults in an isolated child process.
+
+        Returns
+        -------
+        None
+            The shipped example can initialize every editable configuration module.
+        """
+        root = Path(__file__).resolve().parents[3]
+        script = """
+import importlib
+import json
+import os
+from pathlib import Path
+from dataclasses import is_dataclass
+from dotenv import dotenv_values
+for key in dotenv_values('.env'):
+    os.environ.pop(key, None)
+errors = []
+count = 0
+for path in sorted((Path(os.environ['ORIONIS_AUDIT_ROOT']) / 'config').glob('*.py')):
+    module = importlib.import_module('config.' + path.stem)
+    for value in vars(module).values():
+        if not isinstance(value, type) or not is_dataclass(value):
+            continue
+        if value.__module__ != module.__name__:
+            continue
+        count += 1
+        try:
+            value()
+        except Exception as error:
+            errors.append([module.__name__, type(error).__name__, str(error)])
+print(json.dumps({'configurations': count, 'errors': errors}))
+raise SystemExit(bool(errors) or count == 0)
+"""
+        with TemporaryDirectory() as directory:
+            (Path(directory) / ".env").write_bytes((root / ".env.example").read_bytes())
+            result = subprocess.run(  # noqa: S603
+                [sys.executable, "-B", "-c", script],
+                cwd=directory,
+                env={
+                    **os.environ, "PYTHONPATH": str(root),
+                    "ORIONIS_AUDIT_ROOT": str(root),
+                },
+                capture_output=True, text=True, encoding="utf-8",
+                timeout=30, check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def testEveryApplicationOptionIsDeclaredInItsTemplate(self) -> None:
         """Keep every framework option visible in the editable application layer.
 

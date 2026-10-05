@@ -1,0 +1,3333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mcp.protocol.results</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.mcp.protocol.results.html" class="internal-link" title="This module">results</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14205"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14205">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.CacheableResult.html" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult"><wbr></wbr>Cacheable<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14206"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14206">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.CallToolResult.html" class="internal-link" title="orionis.mcp.protocol.results.CallToolResult"><wbr></wbr>Call<wbr></wbr>Tool<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CallToolResult.html#content" class="internal-link" title="orionis.mcp.protocol.results.CallToolResult.content">content</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14207"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14207">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult"><wbr></wbr>Complete<wbr></wbr>Completion<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html#completion" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult.completion">completion</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14208"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14208">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.CompleteResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult"><wbr></wbr>Complete<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14209"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14209">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.DiscoverResult.html" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult"><wbr></wbr>Discover<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.DiscoverResult.html#capabilities" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult.capabilities">capabilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.DiscoverResult.html#supportedVersions" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult.supportedVersions">supported<wbr></wbr>Versions</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14210"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14210">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.Error.html" class="internal-link" title="orionis.mcp.protocol.results.Error"><wbr></wbr>Error</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Error.html#code" class="internal-link" title="orionis.mcp.protocol.results.Error.code">code</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Error.html#message" class="internal-link" title="orionis.mcp.protocol.results.Error.message">message</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14211"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14211">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ErrorResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ErrorResponse"><wbr></wbr>Error<wbr></wbr>Response</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ErrorResponse.html#error" class="internal-link" title="orionis.mcp.protocol.results.ErrorResponse.error">error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ErrorResponse.html#jsonrpc" class="internal-link" title="orionis.mcp.protocol.results.ErrorResponse.jsonrpc">jsonrpc</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14212"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14212">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.GetPromptResult.html" class="internal-link" title="orionis.mcp.protocol.results.GetPromptResult"><wbr></wbr>Get<wbr></wbr>Prompt<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.GetPromptResult.html#messages" class="internal-link" title="orionis.mcp.protocol.results.GetPromptResult.messages">messages</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14213"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14213">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ListPromptsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListPromptsResult"><wbr></wbr>List<wbr></wbr>Prompts<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListPromptsResult.html#prompts" class="internal-link" title="orionis.mcp.protocol.results.ListPromptsResult.prompts">prompts</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14214"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14214">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ListResourcesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourcesResult"><wbr></wbr>List<wbr></wbr>Resources<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListResourcesResult.html#resources" class="internal-link" title="orionis.mcp.protocol.results.ListResourcesResult.resources">resources</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14215"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14215">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ListResourceTemplatesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourceTemplatesResult"><wbr></wbr>List<wbr></wbr>Resource<wbr></wbr>Templates<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListResourceTemplatesResult.html#resourceTemplates" class="internal-link" title="orionis.mcp.protocol.results.ListResourceTemplatesResult.resourceTemplates">resource<wbr></wbr>Templates</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14216"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14216">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ListToolsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListToolsResult"><wbr></wbr>List<wbr></wbr>Tools<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListToolsResult.html#tools" class="internal-link" title="orionis.mcp.protocol.results.ListToolsResult.tools">tools</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14217"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14217">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.Notification.html" class="internal-link" title="orionis.mcp.protocol.results.Notification"><wbr></wbr>Notification</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Notification.html#jsonrpc" class="internal-link" title="orionis.mcp.protocol.results.Notification.jsonrpc">jsonrpc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Notification.html#method" class="internal-link" title="orionis.mcp.protocol.results.Notification.method">method</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Notification.html#params" class="internal-link" title="orionis.mcp.protocol.results.Notification.params">params</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14218"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14218">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ReadResourceResult.html" class="internal-link" title="orionis.mcp.protocol.results.ReadResourceResult"><wbr></wbr>Read<wbr></wbr>Resource<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ReadResourceResult.html#contents" class="internal-link" title="orionis.mcp.protocol.results.ReadResourceResult.contents">contents</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#cacheScope" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.cacheScope">cache<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html#ttlMs" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult.ttlMs">ttl<wbr></wbr>Ms</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#meta" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.meta">meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html#resultType" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult.resultType">result<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14219"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14219">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.ResultResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse"><wbr></wbr>Result<wbr></wbr>Response</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ResultResponse.html#id" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse.id">id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ResultResponse.html#jsonrpc" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse.jsonrpc">jsonrpc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ResultResponse.html#result" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse.result">result</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.mcp.protocol.html" class="internal-link" title="The parent of this module">protocol</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14220"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14220">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.codecs.html" class="internal-link" title="orionis.mcp.protocol.codecs">codecs</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.codecs.html#decode_envelope" class="internal-link" title="orionis.mcp.protocol.codecs.decode_envelope">decode<wbr></wbr>_envelope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.codecs.html#decode_params" class="internal-link" title="orionis.mcp.protocol.codecs.decode_params">decode<wbr></wbr>_params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.codecs.html#encode_error" class="internal-link" title="orionis.mcp.protocol.codecs.encode_error">encode<wbr></wbr>_error</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.codecs.html#_ENVELOPE" class="internal-link" title="orionis.mcp.protocol.codecs._ENVELOPE">_ENVELOPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.codecs.html#METHOD_DECODERS" class="internal-link" title="orionis.mcp.protocol.codecs.METHOD_DECODERS">METHOD<wbr></wbr>_DECODERS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14221"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14221">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.constants.html" class="internal-link" title="orionis.mcp.protocol.constants">constants</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#CLIENT_CAPABILITIES" class="internal-link" title="orionis.mcp.protocol.constants.CLIENT_CAPABILITIES">CLIENT<wbr></wbr>_CAPABILITIES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#CLIENT_INFO" class="internal-link" title="orionis.mcp.protocol.constants.CLIENT_INFO">CLIENT<wbr></wbr>_INFO</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#LOG_LEVEL" class="internal-link" title="orionis.mcp.protocol.constants.LOG_LEVEL">LOG<wbr></wbr>_LEVEL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#PROTOCOL_VERSION" class="internal-link" title="orionis.mcp.protocol.constants.PROTOCOL_VERSION">PROTOCOL<wbr></wbr>_VERSION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#SERVER_INFO" class="internal-link" title="orionis.mcp.protocol.constants.SERVER_INFO">SERVER<wbr></wbr>_INFO</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#SUBSCRIPTION_ID" class="internal-link" title="orionis.mcp.protocol.constants.SUBSCRIPTION_ID">SUBSCRIPTION<wbr></wbr>_ID</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.constants.html#SUPPORTED_VERSIONS" class="internal-link" title="orionis.mcp.protocol.constants.SUPPORTED_VERSIONS">SUPPORTED<wbr></wbr>_VERSIONS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14222"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14222">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.content.html" class="internal-link" title="orionis.mcp.protocol.content">content</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.Annotations.html" class="internal-link" title="orionis.mcp.protocol.content.Annotations"><wbr></wbr>Annotations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.AudioContent.html" class="internal-link" title="orionis.mcp.protocol.content.AudioContent"><wbr></wbr>Audio<wbr></wbr>Content</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.BlobResourceContents.html" class="internal-link" title="orionis.mcp.protocol.content.BlobResourceContents"><wbr></wbr>Blob<wbr></wbr>Resource<wbr></wbr>Contents</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.Content.html" class="internal-link" title="orionis.mcp.protocol.content.Content"><wbr></wbr>Content</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.EmbeddedResource.html" class="internal-link" title="orionis.mcp.protocol.content.EmbeddedResource"><wbr></wbr>Embedded<wbr></wbr>Resource</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.ImageContent.html" class="internal-link" title="orionis.mcp.protocol.content.ImageContent"><wbr></wbr>Image<wbr></wbr>Content</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.PromptMessage.html" class="internal-link" title="orionis.mcp.protocol.content.PromptMessage"><wbr></wbr>Prompt<wbr></wbr>Message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.ResourceLink.html" class="internal-link" title="orionis.mcp.protocol.content.ResourceLink"><wbr></wbr>Resource<wbr></wbr>Link</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.TextContent.html" class="internal-link" title="orionis.mcp.protocol.content.TextContent"><wbr></wbr>Text<wbr></wbr>Content</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.TextResourceContents.html" class="internal-link" title="orionis.mcp.protocol.content.TextResourceContents"><wbr></wbr>Text<wbr></wbr>Resource<wbr></wbr>Contents</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14223"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14223">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.input_shapes.html" class="internal-link" title="orionis.mcp.protocol.input_shapes">input<wbr></wbr>_shapes</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.EnumItems.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.EnumItems"><wbr></wbr>Enum<wbr></wbr>Items</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.EnumOption.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.EnumOption"><wbr></wbr>Enum<wbr></wbr>Option</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.FormField.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormField"><wbr></wbr>Form<wbr></wbr>Field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.FormRequest.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormRequest"><wbr></wbr>Form<wbr></wbr>Request</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.FormResult.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormResult"><wbr></wbr>Form<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.FormSchema.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormSchema"><wbr></wbr>Form<wbr></wbr>Schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.ModelHint.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.ModelHint"><wbr></wbr>Model<wbr></wbr>Hint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.ModelPreferences.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.ModelPreferences"><wbr></wbr>Model<wbr></wbr>Preferences</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.Root.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.Root"><wbr></wbr>Root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.RootsResult.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.RootsResult"><wbr></wbr>Roots<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.SamplingMessage.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.SamplingMessage"><wbr></wbr>Sampling<wbr></wbr>Message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.SamplingRequest.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.SamplingRequest"><wbr></wbr>Sampling<wbr></wbr>Request</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.SamplingResult.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.SamplingResult"><wbr></wbr>Sampling<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.ToolChoice.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.ToolChoice"><wbr></wbr>Tool<wbr></wbr>Choice</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.ToolResult.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.ToolResult"><wbr></wbr>Tool<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.ToolUse.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.ToolUse"><wbr></wbr>Tool<wbr></wbr>Use</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.UrlRequest.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.UrlRequest"><wbr></wbr>Url<wbr></wbr>Request</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14224"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14224">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.metadata.html" class="internal-link" title="orionis.mcp.protocol.metadata">metadata</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metadata.PrimitiveMetadata.html" class="internal-link" title="orionis.mcp.protocol.metadata.PrimitiveMetadata"><wbr></wbr>Primitive<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metadata.PromptMetadata.html" class="internal-link" title="orionis.mcp.protocol.metadata.PromptMetadata"><wbr></wbr>Prompt<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metadata.ResourceMetadata.html" class="internal-link" title="orionis.mcp.protocol.metadata.ResourceMetadata"><wbr></wbr>Resource<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metadata.ServerInfo.html" class="internal-link" title="orionis.mcp.protocol.metadata.ServerInfo"><wbr></wbr>Server<wbr></wbr>Info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metadata.ToolMetadata.html" class="internal-link" title="orionis.mcp.protocol.metadata.ToolMetadata"><wbr></wbr>Tool<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14225"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14225">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.metavalidation.html" class="internal-link" title="orionis.mcp.protocol.metavalidation">metavalidation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_baggage" class="internal-link" title="orionis.mcp.protocol.metavalidation._baggage">_baggage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_capability_settings" class="internal-link" title="orionis.mcp.protocol.metavalidation._capability_settings">_capability<wbr></wbr>_settings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_trace_parent" class="internal-link" title="orionis.mcp.protocol.metavalidation._trace_parent">_trace<wbr></wbr>_parent</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_trace_state" class="internal-link" title="orionis.mcp.protocol.metavalidation._trace_state">_trace<wbr></wbr>_state</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#validate_client_capabilities" class="internal-link" title="orionis.mcp.protocol.metavalidation.validate_client_capabilities">validate<wbr></wbr>_client<wbr></wbr>_capabilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#validate_implementation" class="internal-link" title="orionis.mcp.protocol.metavalidation.validate_implementation">validate<wbr></wbr>_implementation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#validate_meta_key" class="internal-link" title="orionis.mcp.protocol.metavalidation.validate_meta_key">validate<wbr></wbr>_meta<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#validate_metadata" class="internal-link" title="orionis.mcp.protocol.metavalidation.validate_metadata">validate<wbr></wbr>_metadata</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_LABEL" class="internal-link" title="orionis.mcp.protocol.metavalidation._LABEL">_LABEL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_MAX_TRACE_MEMBERS" class="internal-link" title="orionis.mcp.protocol.metavalidation._MAX_TRACE_MEMBERS">_MAX<wbr></wbr>_TRACE<wbr></wbr>_MEMBERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_MAX_TRACE_VALUE" class="internal-link" title="orionis.mcp.protocol.metavalidation._MAX_TRACE_VALUE">_MAX<wbr></wbr>_TRACE<wbr></wbr>_VALUE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_META_KEY" class="internal-link" title="orionis.mcp.protocol.metavalidation._META_KEY">_META<wbr></wbr>_KEY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_NAME" class="internal-link" title="orionis.mcp.protocol.metavalidation._NAME">_NAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_STATE_KEY" class="internal-link" title="orionis.mcp.protocol.metavalidation._STATE_KEY">_STATE<wbr></wbr>_KEY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_TOKEN" class="internal-link" title="orionis.mcp.protocol.metavalidation._TOKEN">_TOKEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.metavalidation.html#_TRACE_PARENT" class="internal-link" title="orionis.mcp.protocol.metavalidation._TRACE_PARENT">_TRACE<wbr></wbr>_PARENT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14226"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14226">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.mrtr.html" class="internal-link" title="orionis.mcp.protocol.mrtr">mrtr</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_elicitation" class="internal-link" title="orionis.mcp.protocol.mrtr._elicitation">_elicitation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_form_field" class="internal-link" title="orionis.mcp.protocol.mrtr._form_field">_form<wbr></wbr>_field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_input_request" class="internal-link" title="orionis.mcp.protocol.mrtr._input_request">_input<wbr></wbr>_request</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_input_requests" class="internal-link" title="orionis.mcp.protocol.mrtr._input_requests">_input<wbr></wbr>_requests</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_input_response" class="internal-link" title="orionis.mcp.protocol.mrtr._input_response">_input<wbr></wbr>_response</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_require" class="internal-link" title="orionis.mcp.protocol.mrtr._require">_require</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_sampling" class="internal-link" title="orionis.mcp.protocol.mrtr._sampling">_sampling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#_sampling_message" class="internal-link" title="orionis.mcp.protocol.mrtr._sampling_message">_sampling<wbr></wbr>_message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#validate_input_required" class="internal-link" title="orionis.mcp.protocol.mrtr.validate_input_required">validate<wbr></wbr>_input<wbr></wbr>_required</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.mrtr.html#validate_input_responses" class="internal-link" title="orionis.mcp.protocol.mrtr.validate_input_responses">validate<wbr></wbr>_input<wbr></wbr>_responses</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14227"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14227">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.requests.html" class="internal-link" title="orionis.mcp.protocol.requests">requests</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.CallToolParams.html" class="internal-link" title="orionis.mcp.protocol.requests.CallToolParams"><wbr></wbr>Call<wbr></wbr>Tool<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.CancelledParams.html" class="internal-link" title="orionis.mcp.protocol.requests.CancelledParams"><wbr></wbr>Cancelled<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.CompleteParams.html" class="internal-link" title="orionis.mcp.protocol.requests.CompleteParams"><wbr></wbr>Complete<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.CompletionArgument.html" class="internal-link" title="orionis.mcp.protocol.requests.CompletionArgument"><wbr></wbr>Completion<wbr></wbr>Argument</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.CompletionContext.html" class="internal-link" title="orionis.mcp.protocol.requests.CompletionContext"><wbr></wbr>Completion<wbr></wbr>Context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.GetPromptParams.html" class="internal-link" title="orionis.mcp.protocol.requests.GetPromptParams"><wbr></wbr>Get<wbr></wbr>Prompt<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.InputResponseParams.html" class="internal-link" title="orionis.mcp.protocol.requests.InputResponseParams"><wbr></wbr>Input<wbr></wbr>Response<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest"><wbr></wbr>Json<wbr></wbr>Rpc<wbr></wbr>Request</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.ListenParams.html" class="internal-link" title="orionis.mcp.protocol.requests.ListenParams"><wbr></wbr>Listen<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.PaginatedParams.html" class="internal-link" title="orionis.mcp.protocol.requests.PaginatedParams"><wbr></wbr>Paginated<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.PromptReference.html" class="internal-link" title="orionis.mcp.protocol.requests.PromptReference"><wbr></wbr>Prompt<wbr></wbr>Reference</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.ReadResourceParams.html" class="internal-link" title="orionis.mcp.protocol.requests.ReadResourceParams"><wbr></wbr>Read<wbr></wbr>Resource<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.RequestMetadata.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestMetadata"><wbr></wbr>Request<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams"><wbr></wbr>Request<wbr></wbr>Params</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.ResourceTemplateReference.html" class="internal-link" title="orionis.mcp.protocol.requests.ResourceTemplateReference"><wbr></wbr>Resource<wbr></wbr>Template<wbr></wbr>Reference</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.SubscriptionFilter.html" class="internal-link" title="orionis.mcp.protocol.requests.SubscriptionFilter"><wbr></wbr>Subscription<wbr></wbr>Filter</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14228"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.results.html" class="internal-link" title="orionis.mcp.protocol.results">results</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CacheableResult.html" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult"><wbr></wbr>Cacheable<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CallToolResult.html" class="internal-link" title="orionis.mcp.protocol.results.CallToolResult"><wbr></wbr>Call<wbr></wbr>Tool<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult"><wbr></wbr>Complete<wbr></wbr>Completion<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.CompleteResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult"><wbr></wbr>Complete<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.DiscoverResult.html" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult"><wbr></wbr>Discover<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Error.html" class="internal-link" title="orionis.mcp.protocol.results.Error"><wbr></wbr>Error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ErrorResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ErrorResponse"><wbr></wbr>Error<wbr></wbr>Response</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.GetPromptResult.html" class="internal-link" title="orionis.mcp.protocol.results.GetPromptResult"><wbr></wbr>Get<wbr></wbr>Prompt<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListPromptsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListPromptsResult"><wbr></wbr>List<wbr></wbr>Prompts<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListResourcesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourcesResult"><wbr></wbr>List<wbr></wbr>Resources<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListResourceTemplatesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourceTemplatesResult"><wbr></wbr>List<wbr></wbr>Resource<wbr></wbr>Templates<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ListToolsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListToolsResult"><wbr></wbr>List<wbr></wbr>Tools<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.Notification.html" class="internal-link" title="orionis.mcp.protocol.results.Notification"><wbr></wbr>Notification</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ReadResourceResult.html" class="internal-link" title="orionis.mcp.protocol.results.ReadResourceResult"><wbr></wbr>Read<wbr></wbr>Resource<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.results.ResultResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse"><wbr></wbr>Result<wbr></wbr>Response</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14229"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14229">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.protocol.validation.html" class="internal-link" title="orionis.mcp.protocol.validation">validation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_common" class="internal-link" title="orionis.mcp.protocol.validation._common">_common</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_message" class="internal-link" title="orionis.mcp.protocol.validation._message">_message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_object" class="internal-link" title="orionis.mcp.protocol.validation._object">_object</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_result_payload" class="internal-link" title="orionis.mcp.protocol.validation._result_payload">_result<wbr></wbr>_payload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_validate_completion" class="internal-link" title="orionis.mcp.protocol.validation._validate_completion">_validate<wbr></wbr>_completion</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#validate_content" class="internal-link" title="orionis.mcp.protocol.validation.validate_content">validate<wbr></wbr>_content</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#validate_json" class="internal-link" title="orionis.mcp.protocol.validation.validate_json">validate<wbr></wbr>_json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#validate_resource" class="internal-link" title="orionis.mcp.protocol.validation.validate_resource">validate<wbr></wbr>_resource</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#validate_result" class="internal-link" title="orionis.mcp.protocol.validation.validate_result">validate<wbr></wbr>_result</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_CONTENT_TYPES" class="internal-link" title="orionis.mcp.protocol.validation._CONTENT_TYPES">_CONTENT<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_MAX_COMPLETIONS" class="internal-link" title="orionis.mcp.protocol.validation._MAX_COMPLETIONS">_MAX<wbr></wbr>_COMPLETIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.validation.html#_RESULT_TYPES" class="internal-link" title="orionis.mcp.protocol.validation._RESULT_TYPES">_RESULT<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.protocol.html" class="internal-link" title="orionis.mcp.protocol">protocol</a></code><wbr></wbr>.<code><a href="orionis.mcp.protocol.results.html" class="internal-link" title="orionis.mcp.protocol.results">results</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/protocol/results.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1331">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.CacheableResult.html" class="internal-link" title="orionis.mcp.protocol.results.CacheableResult"><wbr></wbr>Cacheable<wbr></wbr>Result</a></code></td>
+    <td>Required, conservative client cache hints.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.CallToolResult.html" class="internal-link" title="orionis.mcp.protocol.results.CallToolResult"><wbr></wbr>Call<wbr></wbr>Tool<wbr></wbr>Result</a></code></td>
+    <td>Content with optional structured output of any JSON type.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult"><wbr></wbr>Complete<wbr></wbr>Completion<wbr></wbr>Result</a></code></td>
+    <td>A completion response.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.CompleteResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteResult"><wbr></wbr>Complete<wbr></wbr>Result</a></code></td>
+    <td>Common fields of completed server results.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.DiscoverResult.html" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult"><wbr></wbr>Discover<wbr></wbr>Result</a></code></td>
+    <td>Self-contained server discovery.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.Error.html" class="internal-link" title="orionis.mcp.protocol.results.Error"><wbr></wbr>Error</a></code></td>
+    <td>A safe protocol error.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ErrorResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ErrorResponse"><wbr></wbr>Error<wbr></wbr>Response</a></code></td>
+    <td>An unidentifiable malformed request has an omitted ID.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.GetPromptResult.html" class="internal-link" title="orionis.mcp.protocol.results.GetPromptResult"><wbr></wbr>Get<wbr></wbr>Prompt<wbr></wbr>Result</a></code></td>
+    <td>User and assistant prompt messages.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ListPromptsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListPromptsResult"><wbr></wbr>List<wbr></wbr>Prompts<wbr></wbr>Result</a></code></td>
+    <td>One deterministic prompt page.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ListResourcesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourcesResult"><wbr></wbr>List<wbr></wbr>Resources<wbr></wbr>Result</a></code></td>
+    <td>One deterministic resource page.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ListResourceTemplatesResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListResourceTemplatesResult"><wbr></wbr>List<wbr></wbr>Resource<wbr></wbr>Templates<wbr></wbr>Result</a></code></td>
+    <td>One deterministic template page.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ListToolsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListToolsResult"><wbr></wbr>List<wbr></wbr>Tools<wbr></wbr>Result</a></code></td>
+    <td>One deterministic tool catalog page.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.Notification.html" class="internal-link" title="orionis.mcp.protocol.results.Notification"><wbr></wbr>Notification</a></code></td>
+    <td>A server notification with no request ID.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ReadResourceResult.html" class="internal-link" title="orionis.mcp.protocol.results.ReadResourceResult"><wbr></wbr>Read<wbr></wbr>Resource<wbr></wbr>Result</a></code></td>
+    <td>Text or blob resource contents.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.protocol.results.ResultResponse.html" class="internal-link" title="orionis.mcp.protocol.results.ResultResponse"><wbr></wbr>Result<wbr></wbr>Response</a></code></td>
+    <td>A response correlated with one client request.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

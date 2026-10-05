@@ -200,6 +200,11 @@ class TestResultProcessor(unittest.TestResult):
             Subtest providing its parameterized identifier.
         err : tuple or None
             Exception details, or None when the subtest passed.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().addSubTest(test, subtest, err)
         if err is None:
@@ -227,6 +232,11 @@ class TestResultProcessor(unittest.TestResult):
             Test marked as an expected failure.
         err : tuple
             Exception details retained for diagnostics.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().addExpectedFailure(test, err)
         result = self.__createTestResult(test, TestStatus.SKIPPED, err)
@@ -241,6 +251,11 @@ class TestResultProcessor(unittest.TestResult):
         ----------
         test : unittest.case.TestCase
             Test that passed despite its expected-failure marker.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().addUnexpectedSuccess(test)
         error = AssertionError(

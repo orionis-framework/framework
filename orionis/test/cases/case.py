@@ -62,6 +62,11 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         ----------
         method_name : str, optional
             Name of the test method to run, by default "runTest".
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().__init__(method_name)
 

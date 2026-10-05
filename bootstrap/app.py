@@ -29,10 +29,11 @@ register_lifespan_callbacks(app)
 
 # Register route files for the different runtime contexts.
 app.withRouting(
+    ai="routes/ai.py",
+    api="routes/api.py",
     console="routes/console.py",
     web="routes/web.py",
-    api="routes/api.py",
-    ai="routes/ai.py",
+    websocket="routes/websocket.py",
     health="/up",
 )
 

@@ -1,12 +1,8 @@
-"""Compile immutable registries, native schemas and binders at application boot."""
-
 import re
 from dataclasses import dataclass, field, replace
 from types import MappingProxyType, get_original_bases
 from typing import Annotated, Literal, get_args, get_origin, TYPE_CHECKING, cast
-
 import msgspec
-
 from orionis.mcp.context import freeze_json, mutable_json
 from orionis.mcp.exceptions import McpInvalidParams
 from orionis.mcp.invoker import McpInvoker
@@ -27,7 +23,9 @@ from orionis.mcp.server.templates import UriMatcher, validate_uri
 from orionis.mcp.transport.headers import HeaderBinding, compile_header_bindings
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterator, Mapping
+
+type _JsonObject = dict[str, object]
 
 _NAME = re.compile(r"[A-Za-z0-9_.-]{1,128}")
 _CORE_METHODS = frozenset(
@@ -47,13 +45,11 @@ _CORE_METHODS = frozenset(
     },
 )
 
-
 class _SearchPayload(msgspec.Struct, forbid_unknown_fields=True):
     """Bounded searchable catalog arguments."""
 
     query: Annotated[str, msgspec.Meta(max_length=4096)] = ""
     limit: Annotated[int, msgspec.Meta(ge=1, le=100)] = 10
-
 
 class _CatalogCall(msgspec.Struct, forbid_unknown_fields=True):
     """An independent catalog invocation, with no Python call kwargs."""
@@ -61,12 +57,10 @@ class _CatalogCall(msgspec.Struct, forbid_unknown_fields=True):
     name: str
     arguments: dict[str, object] = msgspec.field(default_factory=dict)
 
-
 class _ExecutePayload(msgspec.Struct, forbid_unknown_fields=True):
     """Request limits are additionally enforced by the dispatcher configuration."""
 
     calls: Annotated[list[_CatalogCall], msgspec.Meta(min_length=1)]
-
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledPrimitive:
@@ -94,7 +88,6 @@ class CompiledPrimitive:
     catalog: int | None = None
     search_text: str = ""
 
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledCatalog:
     """One hidden catalog and its deterministic boot-time lexical index."""
@@ -103,7 +96,6 @@ class CompiledCatalog:
     search_name: str
     execute_name: str
     index: tuple[tuple[str, str], ...]
-
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledMcpServer:
@@ -123,28 +115,65 @@ class CompiledMcpServer:
     catalog_tools: Mapping[str, CompiledPrimitive]
     catalogs: tuple[CompiledCatalog, ...]
 
-
 def _wire(value: object) -> msgspec.Raw:
-    """Freeze wire metadata into immutable JSON without retaining mutable maps."""
+    """
+    Freeze wire metadata into immutable JSON without retaining mutable maps.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    msgspec.Raw
+        Result of the operation described above.
+    """
     return msgspec.Raw(msgspec.json.encode(value))
 
-
 def _validate_static_metadata(metadata: dict[str, object], kind: type) -> None:
-    """Check declaration constructors once, keeping validation off list hot paths."""
+    """
+    Check declaration constructors once, keeping validation off list hot paths.
+
+    Parameters
+    ----------
+    metadata : dict[str, object]
+        Metadata associated with the current operation.
+    kind : type
+        Value supplied for ``kind``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     expected = {Tool: ToolMetadata, Resource: ResourceMetadata, Prompt: PromptMetadata}
     msgspec.convert(msgspec.to_builtins(metadata), type=expected[kind], strict=True)
     if "_meta" in metadata:
         validate_metadata(metadata["_meta"], allow_reserved=False)
 
-
 def _extend_metadata(
     metadata: dict[str, object], extensions: tuple[McpExtension, ...],
 ) -> dict[str, object]:
-    """Let extensions attach data without changing compiled native contracts."""
+    """
+    Let extensions attach data without changing compiled native contracts.
+
+    Parameters
+    ----------
+    metadata : dict[str, object]
+        Metadata associated with the current operation.
+    extensions : tuple[McpExtension, ...]
+        Value supplied for ``extensions``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     if not extensions:
         return metadata
-    baseline = cast("dict[str, object]", mutable_json(metadata))
-    extended = cast("dict[str, object]", mutable_json(baseline))
+    baseline = cast("_JsonObject", mutable_json(metadata))
+    extended = cast("_JsonObject", mutable_json(baseline))
     for extension in extensions:
         if extension.schema_hook is not None:
             extension.schema_hook(extended)
@@ -160,9 +189,20 @@ def _extend_metadata(
             raise ValueError(message)
     return extended
 
-
 def _name(definition: type[Primitive]) -> str:
-    """Derive readable kebab names while honoring explicit protocol identifiers."""
+    """
+    Derive readable kebab names while honoring explicit protocol identifiers.
+
+    Parameters
+    ----------
+    definition : type[Primitive]
+        Class declaration whose metadata is being inspected.
+
+    Returns
+    -------
+    str
+        Result of the operation described above.
+    """
     if definition.name:
         name = definition.name
     else:
@@ -171,16 +211,29 @@ def _name(definition: type[Primitive]) -> str:
             if stem.endswith(suffix):
                 stem = stem.removesuffix(suffix)
                 break
-        stem = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1-\2", stem)
+        stem = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", "-", stem)
         name = re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", stem).replace("_", "-").lower()
     if not isinstance(name, str) or not _NAME.fullmatch(name):
         message = f"Invalid MCP primitive name {name!r}."
         raise ValueError(message)
     return name
 
-
 def _metadata(definition: type[Primitive], name: str) -> dict[str, object]:
-    """Snapshot common metadata before adding primitive-specific wire fields."""
+    """
+    Snapshot common metadata before adding primitive-specific wire fields.
+
+    Parameters
+    ----------
+    definition : type[Primitive]
+        Class declaration whose metadata is being inspected.
+    name : str
+        Value supplied for ``name``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     metadata: dict[str, object] = {"name": name}
     for key in ("title", "description", "icons"):
         value = getattr(definition, key)
@@ -190,28 +243,67 @@ def _metadata(definition: type[Primitive], name: str) -> dict[str, object]:
         metadata["_meta"] = mutable_json(definition.meta)
     return metadata
 
-
 def _hook(definition: type, method: str) -> McpInvoker | None:
-    """Compile optional per-request checks without resolving a handler instance."""
+    """
+    Compile optional per-request checks without resolving a handler instance.
+
+    Parameters
+    ----------
+    definition : type
+        Class declaration whose metadata is being inspected.
+    method : str
+        Value supplied for ``method``.
+
+    Returns
+    -------
+    McpInvoker | None
+        Result of the operation described above.
+    """
     return (
         McpInvoker.compile(definition, method) if hasattr(definition, method) else None
     )
 
+def _tool_arguments(definition: type[Tool]) -> Iterator[tuple[object, ...]]:
+    """
+    Enumerate generic Tool arguments in method resolution order.
 
-def _tool_types(definition: type[Tool]) -> tuple[object, object]:
-    """Accept explicit declarations or the one/two-parameter Python generic API."""
-    input_type = definition.input
-    output_type = definition.output
+    Parameters
+    ----------
+    definition : type[Tool]
+        Tool declaration whose generic bases are inspected.
+
+    Yields
+    ------
+    tuple[object, ...]
+        Input and output declarations from each Tool generic base.
+    """
     for ancestor in definition.__mro__:
         for base in get_original_bases(ancestor):
             if get_origin(base) is Tool:
-                args = get_args(base)
-                if input_type is None and args and args[0] is not object:
-                    input_type = args[0]
-                if output_type is None and len(args) > 1 and args[1] is not object:
-                    output_type = args[1]
-    return input_type, msgspec.UNSET if output_type is None else output_type
+                yield get_args(base)
 
+def _tool_types(definition: type[Tool]) -> tuple[object, object]:
+    """
+    Resolve explicit or generic input and output declarations.
+
+    Parameters
+    ----------
+    definition : type[Tool]
+        Tool class carrying explicit fields or inherited generic arguments.
+
+    Returns
+    -------
+    tuple[object, object]
+        Input type and output type, with UNSET for an undeclared output.
+    """
+    input_type = definition.input
+    output_type = definition.output
+    for arguments in _tool_arguments(definition):
+        if input_type is None and arguments and arguments[0] is not object:
+            input_type = arguments[0]
+        if output_type is None and len(arguments) > 1 and arguments[1] is not object:
+            output_type = arguments[1]
+    return input_type, msgspec.UNSET if output_type is None else output_type
 
 class _Compiler:
     """Own only boot-time schema caches; discard them after the registry is built."""
@@ -219,13 +311,41 @@ class _Compiler:
     __slots__ = ("cache", "extensions", "schemas")
 
     def __init__(self, extensions: tuple[McpExtension, ...], cache: CacheHint) -> None:
-        """Use a per-compilation cache rather than growing a process-global cache."""
+        """
+        Use a per-compilation cache rather than growing a process-global cache.
+
+        Parameters
+        ----------
+        extensions : tuple[McpExtension, ...]
+            Value supplied for ``extensions``.
+        cache : CacheHint
+            Value supplied for ``cache``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self.schemas: dict[tuple[object, bool], dict[str, object]] = {}
         self.extensions = extensions
         self.cache = cache
 
     def schema(self, annotation: object, *, input_schema: bool) -> dict[str, object]:
-        """Share one schema snapshot per type and direction inside this compilation."""
+        """
+        Share one schema snapshot per type and direction inside this compilation.
+
+        Parameters
+        ----------
+        annotation : object
+            Native type annotation to inspect or validate.
+        input_schema : bool
+            Value supplied for ``input_schema``.
+
+        Returns
+        -------
+        dict[str, object]
+            Result of the operation described above.
+        """
         key = (annotation, input_schema)
         if key not in self.schemas:
             self.schemas[key] = compile_schema(annotation, input_schema=input_schema)
@@ -234,7 +354,21 @@ class _Compiler:
     def primitive(
         self, definition: type[Primitive], kind: type[Primitive],
     ) -> CompiledPrimitive:
-        """Compile one ordinary primitive and all of its immutable handler plans."""
+        """
+        Compile one ordinary primitive and all of its immutable handler plans.
+
+        Parameters
+        ----------
+        definition : type[Primitive]
+            Class declaration whose metadata is being inspected.
+        kind : type[Primitive]
+            Value supplied for ``kind``.
+
+        Returns
+        -------
+        CompiledPrimitive
+            Result of the operation described above.
+        """
         if not isinstance(definition, type) or not issubclass(definition, kind):
             message = f"Server definitions must contain {kind.__name__} classes."
             raise TypeError(message)
@@ -270,11 +404,11 @@ class _Compiler:
             )
         metadata = _extend_metadata(metadata, self.extensions)
         _validate_static_metadata(metadata, kind)
-        return replace(
+        return cast("CompiledPrimitive", replace(
             primitive,
             metadata=_wire(metadata),
             search_text=msgspec.json.encode(metadata).decode("utf-8").lower(),
-        )
+        ))
 
     def _tool(
         self,
@@ -282,7 +416,23 @@ class _Compiler:
         primitive: CompiledPrimitive,
         metadata: dict[str, object],
     ) -> CompiledPrimitive:
-        """Compile typed tool schemas and statically reachable header bindings."""
+        """
+        Compile typed tool schemas and statically reachable header bindings.
+
+        Parameters
+        ----------
+        definition : type[Tool]
+            Class declaration whose metadata is being inspected.
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        metadata : dict[str, object]
+            Metadata associated with the current operation.
+
+        Returns
+        -------
+        CompiledPrimitive
+            Result of the operation described above.
+        """
         input_type, output_type = _tool_types(definition)
         schema = (
             self.schema(input_type, input_schema=True)
@@ -299,7 +449,7 @@ class _Compiler:
             metadata["outputSchema"] = output_schema
         if definition.annotations is not None:
             metadata["annotations"] = definition.annotations
-        return replace(
+        return cast("CompiledPrimitive", replace(
             primitive,
             input_type=input_type,
             output_type=output_type,
@@ -307,7 +457,7 @@ class _Compiler:
             output_schema=_wire(output_schema) if output_schema is not None else None,
             mirrored_headers=compile_header_bindings(schema),
             handler=McpInvoker.compile(definition, "handle", input_type),
-        )
+        ))
 
     @staticmethod
     def _resource(
@@ -315,7 +465,23 @@ class _Compiler:
         primitive: CompiledPrimitive,
         metadata: dict[str, object],
     ) -> CompiledPrimitive:
-        """Compile exact resources and RFC templates with safe inverse matching."""
+        """
+        Compile exact resources and RFC templates with safe inverse matching.
+
+        Parameters
+        ----------
+        definition : type[Resource]
+            Class declaration whose metadata is being inspected.
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        metadata : dict[str, object]
+            Metadata associated with the current operation.
+
+        Returns
+        -------
+        CompiledPrimitive
+            Result of the operation described above.
+        """
         if bool(definition.uri) == bool(definition.uri_template):
             message = "A Resource must declare exactly one URI or URI template."
             raise ValueError(message)
@@ -336,13 +502,13 @@ class _Compiler:
                 message = "Resource size must be a nonnegative integer."
                 raise ValueError(message)
             metadata["size"] = definition.size
-        return replace(
+        return cast("CompiledPrimitive", replace(
             primitive,
             matcher=matcher,
             uri=definition.uri or definition.uri_template,
             mime_type=definition.mime_type,
             handler=McpInvoker.compile(definition, "handle", uri_names=uri_names),
-        )
+        ))
 
     @staticmethod
     def _prompt(
@@ -350,23 +516,55 @@ class _Compiler:
         primitive: CompiledPrimitive,
         metadata: dict[str, object],
     ) -> CompiledPrimitive:
-        """Compile only explicitly named prompt arguments."""
+        """
+        Compile only explicitly named prompt arguments.
+
+        Parameters
+        ----------
+        definition : type[Prompt]
+            Class declaration whose metadata is being inspected.
+        primitive : CompiledPrimitive
+            Compiled tool, resource or prompt declaration.
+        metadata : dict[str, object]
+            Metadata associated with the current operation.
+
+        Returns
+        -------
+        CompiledPrimitive
+            Result of the operation described above.
+        """
         arguments = tuple(definition.arguments)
         names = tuple(item.name for item in arguments)
         if len(set(names)) != len(names) or any(not name for name in names):
             message = "Prompt argument names must be nonempty and unique."
             raise ValueError(message)
         metadata["arguments"] = arguments
-        return replace(
+        return cast("CompiledPrimitive", replace(
             primitive,
             prompt_arguments=arguments,
             handler=McpInvoker.compile(definition, "handle", argument_names=names),
-        )
+        ))
 
     def synthetic(
         self, name: str, kind: Literal["search", "execute"], catalog: int,
     ) -> CompiledPrimitive:
-        """Describe runtime-owned catalog operations using native typed schemas."""
+        """
+        Describe runtime-owned catalog operations using native typed schemas.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+        kind : Literal['search', 'execute']
+            Value supplied for ``kind``.
+        catalog : int
+            Value supplied for ``catalog``.
+
+        Returns
+        -------
+        CompiledPrimitive
+            Result of the operation described above.
+        """
         if not _NAME.fullmatch(name):
             message = "Invalid synthetic catalog tool name."
             raise ValueError(message)
@@ -393,19 +591,45 @@ class _Compiler:
             cache=self.cache,
         )
 
-
 def _insert(
     registry: dict[str, CompiledPrimitive], key: str, primitive: CompiledPrimitive,
 ) -> None:
-    """Reject collisions at boot instead of changing lookup semantics silently."""
+    """
+    Reject collisions at boot instead of changing lookup semantics silently.
+
+    Parameters
+    ----------
+    registry : dict[str, CompiledPrimitive]
+        Value supplied for ``registry``.
+    key : str
+        Value supplied for ``key``.
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if key in registry:
         message = f"Duplicate MCP primitive identifier {key!r}."
         raise ValueError(message)
     registry[key] = primitive
 
-
 def _extensions(definition: type[Server]) -> tuple[McpExtension, ...]:
-    """Reject extension collisions with built-in methods and other extensions."""
+    """
+    Reject extension collisions with built-in methods and other extensions.
+
+    Parameters
+    ----------
+    definition : type[Server]
+        Class declaration whose metadata is being inspected.
+
+    Returns
+    -------
+    tuple[McpExtension, ...]
+        Result of the operation described above.
+    """
     extensions = tuple(definition.extensions)
     identifiers: set[str] = set()
     methods = set(_CORE_METHODS)
@@ -426,11 +650,21 @@ def _extensions(definition: type[Server]) -> tuple[McpExtension, ...]:
         methods.update(extension.methods)
     return cast("tuple[McpExtension, ...]", extensions)
 
-
 def _ordered(registry: dict[str, CompiledPrimitive]) -> dict[str, CompiledPrimitive]:
-    """Keep deterministic name order in the compiled mapping, including URI keys."""
-    return dict(sorted(registry.items(), key=lambda item: item[1].name))
+    """
+    Keep deterministic name order in the compiled mapping, including URI keys.
 
+    Parameters
+    ----------
+    registry : dict[str, CompiledPrimitive]
+        Value supplied for ``registry``.
+
+    Returns
+    -------
+    dict[str, CompiledPrimitive]
+        Result of the operation described above.
+    """
+    return dict(sorted(registry.items(), key=lambda item: item[1].name))
 
 def _tool_registry(
     compiler: _Compiler,
@@ -440,7 +674,21 @@ def _tool_registry(
     dict[str, CompiledPrimitive],
     tuple[CompiledCatalog, ...],
 ]:
-    """Compile visible and hidden tool namespaces with collision checks."""
+    """
+    Compile visible and hidden tool namespaces with collision checks.
+
+    Parameters
+    ----------
+    compiler : _Compiler
+        Value supplied for ``compiler``.
+    entries : tuple[object, ...]
+        Value supplied for ``entries``.
+
+    Returns
+    -------
+    tuple
+        Result of the operation described above.
+    """
     tools: dict[str, CompiledPrimitive] = {}
     hidden: dict[str, CompiledPrimitive] = {}
     catalogs: list[CompiledCatalog] = []
@@ -476,12 +724,25 @@ def _tool_registry(
         raise ValueError(message)
     return _ordered(tools), _ordered(hidden), tuple(catalogs)
 
-
 def _resource_registry(
     compiler: _Compiler,
     entries: tuple[type[Resource], ...],
 ) -> tuple[dict[str, CompiledPrimitive], tuple[CompiledPrimitive, ...]]:
-    """Reject identical URI/template names and automatically detectable ambiguity."""
+    """
+    Reject identical URI/template names and automatically detectable ambiguity.
+
+    Parameters
+    ----------
+    compiler : _Compiler
+        Value supplied for ``compiler``.
+    entries : tuple[type[Resource], ...]
+        Value supplied for ``entries``.
+
+    Returns
+    -------
+    tuple[dict[str, CompiledPrimitive], tuple[CompiledPrimitive, ...]]
+        Result of the operation described above.
+    """
     resources: dict[str, CompiledPrimitive] = {}
     templates: dict[str, CompiledPrimitive] = {}
     names: set[str] = set()
@@ -504,7 +765,6 @@ def _resource_registry(
             _insert(templates, primitive.matcher.template, primitive)
     return _ordered(resources), tuple(_ordered(templates).values())
 
-
 def _capabilities(
     definition: type[Server],
     tools: Mapping[str, CompiledPrimitive],
@@ -512,7 +772,27 @@ def _capabilities(
     prompts: Mapping[str, CompiledPrimitive],
     templates: tuple[CompiledPrimitive, ...],
 ) -> dict[str, object]:
-    """Advertise only the methods and notifications backed by this registry."""
+    """
+    Advertise only the methods and notifications backed by this registry.
+
+    Parameters
+    ----------
+    definition : type[Server]
+        Class declaration whose metadata is being inspected.
+    tools : Mapping[str, CompiledPrimitive]
+        Value supplied for ``tools``.
+    resources : Mapping[str, CompiledPrimitive]
+        Value supplied for ``resources``.
+    prompts : Mapping[str, CompiledPrimitive]
+        Value supplied for ``prompts``.
+    templates : tuple[CompiledPrimitive, ...]
+        Value supplied for ``templates``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     extensions = cast("tuple[McpExtension, ...]", definition.extensions)
     capabilities: dict[str, object] = {}
     for key, collection in (
@@ -523,7 +803,7 @@ def _capabilities(
         if collection:
             capabilities[key] = {"listChanged": definition.list_changed}
     if resources or templates:
-        resource_capability = cast("dict[str, object]", capabilities["resources"])
+        resource_capability = cast("_JsonObject", capabilities["resources"])
         resource_capability["subscribe"] = definition.resource_subscriptions
     if any(
         item.completion is not None
@@ -536,9 +816,20 @@ def _capabilities(
         }
     return capabilities
 
-
 def compile_server(definition: type[Server]) -> CompiledMcpServer:
-    """Compile one definition without resolving services or retaining runtime state."""
+    """
+    Compile one definition without resolving services or retaining runtime state.
+
+    Parameters
+    ----------
+    definition : type[Server]
+        Class declaration whose metadata is being inspected.
+
+    Returns
+    -------
+    CompiledMcpServer
+        Result of the operation described above.
+    """
     if not isinstance(definition, type) or not issubclass(definition, Server):
         message = "MCP servers must be Server subclasses."
         raise TypeError(message)
@@ -584,9 +875,22 @@ def compile_server(definition: type[Server]) -> CompiledMcpServer:
         catalogs=catalogs,
     )
 
-
 def validate_payload(primitive: CompiledPrimitive, arguments: object) -> object:
-    """Validate only the tool's argument object, never the HTTP JSON-RPC envelope."""
+    """
+    Validate only the tool's argument object, never the HTTP JSON-RPC envelope.
+
+    Parameters
+    ----------
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+    arguments : object
+        Arguments supplied for this operation.
+
+    Returns
+    -------
+    object
+        Result of the operation described above.
+    """
     payload = mutable_json(arguments)
     if not isinstance(payload, dict):
         message = "Tool arguments must be an object."
@@ -598,9 +902,22 @@ def validate_payload(primitive: CompiledPrimitive, arguments: object) -> object:
         return msgspec.UNSET
     return convert_payload(payload, primitive.input_type)
 
-
 def validate_output(primitive: CompiledPrimitive, value: object) -> object:
-    """Enforce the advertised native output type before encoding structured data."""
+    """
+    Enforce the advertised native output type before encoding structured data.
+
+    Parameters
+    ----------
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+    value : object
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    object
+        Result of the operation described above.
+    """
     if primitive.output_type is msgspec.UNSET:
         return value
     if value is msgspec.UNSET:
@@ -610,11 +927,24 @@ def validate_output(primitive: CompiledPrimitive, value: object) -> object:
         raise msgspec.ValidationError(message)
     return convert_payload(value, primitive.output_type)
 
-
 def validate_prompt_arguments(
     primitive: CompiledPrimitive, arguments: Mapping[str, object],
 ) -> None:
-    """Check required/unknown argument names and the protocol's string values."""
+    """
+    Check required/unknown argument names and the protocol's string values.
+
+    Parameters
+    ----------
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+    arguments : Mapping[str, object]
+        Arguments supplied for this operation.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     names = {item.name for item in primitive.prompt_arguments}
     if set(arguments) - names or any(
         not isinstance(value, str) for value in arguments.values()

@@ -1,8 +1,8 @@
 import asyncio
 from collections import deque
 from pathlib import Path
-from unittest import IsolatedAsyncioTestCase
 from orionis.foundation.application import Application
+from orionis.test import TestCase
 
 class _HeadlessApplication(Application):
     def create(self) -> Application:
@@ -63,7 +63,7 @@ def make_application() -> _HeadlessApplication:
     app.__init__(Path.cwd())
     return app
 
-class TestApplicationReadiness(IsolatedAsyncioTestCase):
+class TestApplicationReadiness(TestCase):
     async def testHeadlessBootCreatesAndAwaitsProviders(self) -> None:
         """Publish provider readiness only after asynchronous startup finishes.
 

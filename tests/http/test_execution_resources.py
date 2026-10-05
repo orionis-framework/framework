@@ -328,6 +328,67 @@ class TestExecutionResources(TestCase):
         self.assertEqual((await pipeline()).getBody(), b"done")
         self.assertEqual(terminals, [1])
 
+    async def testPipelineCannotRestartDuringOrAfterExecution(self) -> None:
+        """Reject a second pipeline start while retaining the first result.
+
+        Returns
+        -------
+        None
+            Empty and populated stacks execute their terminal exactly once.
+        """
+        entered, release = asyncio.Event(), asyncio.Event()
+        terminals = []
+
+        async def terminal() -> Response:
+            """Wait for release before completing the original invocation.
+
+            Returns
+            -------
+            Response
+                Response belonging to the first invocation.
+            """
+            terminals.append(1)
+            entered.set()
+            await release.wait()
+            return Response(b"done")
+
+        async def middleware(
+            _request: Request,
+            call_next: Callable[[], Awaitable[Response]],
+        ) -> Response:
+            """Forward execution to the terminal continuation.
+
+            Parameters
+            ----------
+            _request : Request
+                Current request.
+            call_next : Callable[[], Awaitable[Response]]
+                Continuation supplied by the pipeline.
+
+            Returns
+            -------
+            Response
+                Response returned by the terminal.
+            """
+            return await call_next()
+
+        for stack in ((), (SimpleNamespace(handle=middleware),)):
+            entered.clear()
+            release.clear()
+            pipeline = kernel_module._MiddlewarePipeline(stack, None, terminal)
+            first = asyncio.create_task(pipeline())
+            await asyncio.wait_for(entered.wait(), timeout=1)
+            try:
+                with self.assertRaises(RuntimeError):
+                    await pipeline()
+            finally:
+                release.set()
+                response = await first
+            self.assertEqual(response.getBody(), b"done")
+            with self.assertRaises(RuntimeError):
+                await pipeline()
+        self.assertEqual(terminals, [1, 1])
+
 class TestPublicRouteProfile(TestCase):
     """Exercise stateless profiles without weakening existing route defaults."""
 

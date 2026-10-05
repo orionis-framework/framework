@@ -1,13 +1,8 @@
-"""Exercise MCP HTTP admission and native response ownership without a server socket."""
-
 import asyncio
 from dataclasses import dataclass, field
 from types import SimpleNamespace
 from typing import Self
-import unittest
-
 import msgspec
-
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
 from orionis.http.enums.interfaces import Interface
@@ -20,7 +15,7 @@ from orionis.mcp.protocol.constants import CLIENT_CAPABILITIES, PROTOCOL_VERSION
 from orionis.mcp.transport import http as module
 from orionis.mcp.transport.headers import compile_header_bindings
 from orionis.mcp.transport.http import McpHttpTransport
-
+from orionis.test import TestCase
 
 class _Input:
     """Expose native ASGI body consumption and an independently signaled disconnect."""
@@ -28,17 +23,35 @@ class _Input:
     __slots__ = ("body", "disconnect", "reads")
 
     def __init__(self, body) -> None:
+        """Initialize the test double.
+
+        Parameters
+        ----------
+        body : object
+            Value supplied for ``body``.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         self.body = body
         self.reads = 0
         self.disconnect = asyncio.Event()
 
     async def __call__(self) -> dict[str, object]:
+        """Handle the ASGI scope using the test transport.
+
+        Returns
+        -------
+        dict[str, object]
+            Return the result produced by ``__call__``.
+        """
         self.reads += 1
         if self.reads == 1:
             return {"type": "http.request", "body": self.body, "more_body": False}
         await self.disconnect.wait()
         return {"type": "http.disconnect"}
-
 
 class _Messages:
     """Own an iterator whose close is observable even without iteration."""
@@ -46,14 +59,40 @@ class _Messages:
     __slots__ = ("closed", "messages", "waiting")
 
     def __init__(self, messages=()) -> None:
+        """Initialize the test double.
+
+        Parameters
+        ----------
+        messages : object
+            Value supplied for ``messages``.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         self.messages = iter(messages)
         self.closed = 0
         self.waiting = asyncio.Event()
 
     def __aiter__(self) -> Self:
+        """Return the asynchronous iterator.
+
+        Returns
+        -------
+        Self
+            Return the result produced by ``__aiter__``.
+        """
         return self
 
     async def __anext__(self) -> bytes:
+        """Return the next asynchronous item.
+
+        Returns
+        -------
+        bytes
+            Return the result produced by ``__anext__``.
+        """
         item = next(self.messages, None)
         if item is None:
             raise StopAsyncIteration
@@ -63,8 +102,14 @@ class _Messages:
         return item
 
     async def aclose(self):
-        self.closed += 1
+        """Close the asynchronous iterator.
 
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
+        self.closed += 1
 
 @dataclass(slots=True)
 class _State:
@@ -75,36 +120,91 @@ class _State:
     )
     calls: int = 0
 
-
 class _Dispatcher:
     """Record only dispatch, leaving envelope and header validation real."""
 
     __slots__ = ("state",)
 
     def __init__(self, app, _compiled, _config, _bus) -> None:
+        """Initialize the test double.
+
+        Parameters
+        ----------
+        app : object
+            Value supplied for ``app``.
+        _compiled : object
+            Value supplied for ``_compiled``.
+        _config : object
+            Value supplied for ``_config``.
+        _bus : object
+            Value supplied for ``_bus``.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         self.state = app
 
     def decode(self, request):
-        """Use real protocol decoders before the deterministic dispatch boundary."""
+        """Use real protocol decoders before the deterministic dispatch boundary.
+
+        Parameters
+        ----------
+        request : object
+            Value supplied for ``request``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``decode``.
+        """
         return decode_params(request)
 
     async def dispatch(self, _request, _params, **_options: object):
+        """Dispatch the decoded request through the test boundary.
+
+        Parameters
+        ----------
+        _request : object
+            Value supplied for ``_request``.
+        _params : object
+            Value supplied for ``_params``.
+        **_options : object
+            Value supplied for ``_options``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``dispatch``.
+        """
         self.state.calls += 1
         return self.state.result
 
-
-class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
+class TestHttpTransport(TestCase):
     """Check failure statuses, no-body rejection and SSE cleanup/backpressure."""
 
     def setUp(self):
-        """Install the explicit dispatch double and transport state."""
+        """Install the explicit dispatch double and transport state.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         self.original = module.McpDispatcher
         module.McpDispatcher = _Dispatcher
         self.state = _State()
         self.compiled = SimpleNamespace(tools={}, catalog_tools={})
 
     def tearDown(self):
-        """Restore the shared production dispatcher."""
+        """Restore the shared production dispatcher.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         module.McpDispatcher = self.original
 
     def request(
@@ -116,7 +216,26 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         body=None,
         headers=None,
     ):
-        """Build a real Request with a bounded native ASGI body reader."""
+        """Build a real Request with a bounded native ASGI body reader.
+
+        Parameters
+        ----------
+        method : object
+            Value supplied for ``method``.
+        rpc : object
+            Value supplied for ``rpc``.
+        extra : object
+            Value supplied for ``extra``.
+        body : object
+            Value supplied for ``body``.
+        headers : object
+            Value supplied for ``headers``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``request``.
+        """
         if body is None:
             body = msgspec.json.encode(
                 {
@@ -149,7 +268,8 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
                 "http_version": "1.1",
                 "headers": [
                     *(
-                        (key, value) for key, value in fields.items()
+                        (key, value)
+                        for key, value in fields.items()
                         if value is not None
                     ),
                     *extra,
@@ -163,22 +283,46 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         )
 
     def transport(self, **options: object):
-        """Create a transport sharing one immutable compiled server reference."""
+        """Create a transport sharing one immutable compiled server reference.
+
+        Parameters
+        ----------
+        **options : object
+            Value supplied for ``options``.
+
+        Returns
+        -------
+        McpHttpTransport
+            Return the result produced by ``transport``.
+        """
         return McpHttpTransport(self.state, self.compiled, McpConfig(**options), None)
 
     async def test_normal_json_is_preencoded_without_double_serialization(self):
-        """Keep protocol bytes intact and do not retain the completed request slot."""
+        """Keep protocol bytes intact and do not retain the completed request slot.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         transport = self.transport()
         request, _, incoming = self.request()
         response = await transport.handle(request)
         self.assertEqual(response.getBody(), b'{"ok":true}')
         self.assertEqual(response.getMediaType(), "application/json")
         self.assertEqual(
-            (incoming.reads, self.state.calls, transport._active), (1, 1, 0),
+            (incoming.reads, self.state.calls, transport._active),
+            (1, 1, 0),
         )
 
     async def test_origins_are_exact_allowlisted_and_checked_before_body(self):
-        """Reject null, duplicate and deceptive suffix origins before I/O."""
+        """Reject null, duplicate and deceptive suffix origins before I/O.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         transport = self.transport(allowed_origins=("https://trusted.example",))
         for extra in (
             ((b"origin", b"null"),),
@@ -195,7 +339,13 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await transport.handle(request)).getStatusCode(), 200)
 
     async def test_method_accept_content_type_and_body_limits(self):
-        """Bound framing failures without invoking protocol handlers."""
+        """Bound framing failures without invoking protocol handlers.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         transport = self.transport(max_request_size=10)
         request, _, _ = self.request()
         self.assertEqual((await transport.handle(request)).getStatusCode(), 413)
@@ -211,7 +361,13 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.state.calls, 0)
 
     async def test_unknown_method_and_legacy_headers_have_distinct_statuses(self):
-        """Run the header gate before method dispatch, preserving unknown-method 404."""
+        """Run the header gate before method dispatch, preserving unknown-method 404.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         transport = self.transport()
         request, _, _ = self.request(rpc="initialize")
         self.assertEqual((await transport.handle(request)).getStatusCode(), 404)
@@ -223,11 +379,18 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         response = await transport.handle(request)
         self.assertEqual(response.getStatusCode(), 400)
         self.assertEqual(
-            msgspec.json.decode(response.getBody())["error"]["code"], -32020,
+            msgspec.json.decode(response.getBody())["error"]["code"],
+            -32020,
         )
 
     async def test_native_sse_frames_heartbeat_and_closes_source(self):
-        """Let the existing ASGI adapter frame, backpressure and close MCP output."""
+        """Let the existing ASGI adapter frame, backpressure and close MCP output.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         source = _Messages((b"", b'{"jsonrpc":"2.0","id":1,"result":{}}'))
         self.state.result = DispatchResult(source)
         transport = self.transport()
@@ -238,6 +401,18 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         sent = []
 
         async def send(message):
+            """Record response messages sent by the transport.
+
+            Parameters
+            ----------
+            message : object
+                Value supplied for ``message``.
+
+            Returns
+            -------
+            None
+                Complete the documented checks or setup without a return value.
+            """
             sent.append(message)
 
         await ASGIResponseAdapter().send(adapter, response, incoming, send)
@@ -247,7 +422,13 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((source.closed, transport._active), (1, 0))
 
     async def test_unstarted_and_disconnected_sse_release_admission(self):
-        """Release subscriptions and slots on unstarted or disconnected streams."""
+        """Release subscriptions and slots on unstarted or disconnected streams.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         transport = self.transport(max_concurrent_requests=1)
         source = _Messages((b"wait",))
         self.state.result = DispatchResult(source)
@@ -263,7 +444,19 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         response = await transport.handle(request)
 
         async def send(_message):
-            return None
+            """Record response messages sent by the transport.
+
+            Parameters
+            ----------
+            _message : object
+                Value supplied for ``_message``.
+
+            Returns
+            -------
+            None
+                Complete the documented checks or setup without a return value.
+            """
+            return
 
         task = asyncio.create_task(
             ASGIResponseAdapter().send(adapter, response, incoming, send),
@@ -274,7 +467,13 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((source.closed, transport._active), (1, 0))
 
     async def test_compiled_tool_headers_gate_dispatch(self):
-        """A valid envelope cannot bypass a tool's compiled mirrored arguments."""
+        """A valid envelope cannot bypass a tool's compiled mirrored arguments.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         primitive = SimpleNamespace(
             mirrored_headers=compile_header_bindings(
                 {
@@ -300,19 +499,23 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
             registry["weather"] = primitive
             for region in ((), ((b"mcp-param-region", b"wrong"),)):
                 request, _, _ = self.request(
-                    rpc="tools/call", body=payload,
+                    rpc="tools/call",
+                    body=payload,
                     extra=((b"mcp-name", b"weather"), *region),
                 )
                 response = await self.transport().handle(request)
                 self.assertEqual(response.getStatusCode(), 400)
                 self.assertEqual(
-                    msgspec.json.decode(response.getBody())["error"]["code"], -32020,
+                    msgspec.json.decode(response.getBody())["error"]["code"],
+                    -32020,
                 )
                 self.assertEqual(self.state.calls, 0)
             request, _, _ = self.request(
-                rpc="tools/call", body=payload,
+                rpc="tools/call",
+                body=payload,
                 extra=(
-                    (b"mcp-name", b"weather"), (b"mcp-param-region", b"us-west1"),
+                    (b"mcp-name", b"weather"),
+                    (b"mcp-param-region", b"us-west1"),
                 ),
             )
             response = await self.transport().handle(request)
@@ -322,7 +525,13 @@ class TestHttpTransport(unittest.IsolatedAsyncioTestCase):
             registry.clear()
 
     async def test_notifications_have_no_response_body_or_dispatch(self):
-        """Honor accepted notification framing without creating a request task."""
+        """Honor accepted notification framing without creating a request task.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request, _, _ = self.request(
             body=b'{"jsonrpc":"2.0","method":"notifications/custom"}',
         )

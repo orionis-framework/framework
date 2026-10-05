@@ -1,0 +1,1461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.payload.uploaded_file.UploadedFile</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.payload.uploaded_file.UploadedFile.html" class="internal-link" title="This class"><wbr></wbr>Uploaded<wbr></wbr>File</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_sanitizeFilename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._sanitizeFilename">_sanitize<wbr></wbr>Filename</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__del__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__del__">__del__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#chunks" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.chunks">chunks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#read" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.read">read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#replace" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.replace">replace</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#requiresDiskWrite" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.requiresDiskWrite">requires<wbr></wbr>Disk<wbr></wbr>Write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#save" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.save">save</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#write" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.write">write</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._extension">_extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_file" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._file">_file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_memory_threshold" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._memory_threshold">_memory<wbr></wbr>_threshold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_rolled" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._rolled">_rolled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._size">_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#content_type" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.content_type">content<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#filename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.filename">filename</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.extension">extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.size">size</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.payload.uploaded_file.html" class="internal-link" title="The parent of this class">uploaded<wbr></wbr>_file</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9921"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.payload.uploaded_file.UploadedFile.html" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile"><wbr></wbr>Uploaded<wbr></wbr>File</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_sanitizeFilename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._sanitizeFilename">_sanitize<wbr></wbr>Filename</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__del__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__del__">__del__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#chunks" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.chunks">chunks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#read" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.read">read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#replace" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.replace">replace</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#requiresDiskWrite" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.requiresDiskWrite">requires<wbr></wbr>Disk<wbr></wbr>Write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#save" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.save">save</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#write" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.write">write</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._extension">_extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_file" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._file">_file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_memory_threshold" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._memory_threshold">_memory<wbr></wbr>_threshold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_rolled" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._rolled">_rolled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._size">_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#content_type" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.content_type">content<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#filename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.filename">filename</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.extension">extension</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.size">size</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.uploaded_file.html#_CHUNK_SIZE" class="internal-link" title="orionis.http.payload.uploaded_file._CHUNK_SIZE">_CHUNK<wbr></wbr>_SIZE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.uploaded_file.html#_DOTFILE_RE" class="internal-link" title="orionis.http.payload.uploaded_file._DOTFILE_RE">_DOTFILE<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.uploaded_file.html#_UNSAFE_FILENAME_RE" class="internal-link" title="orionis.http.payload.uploaded_file._UNSAFE_FILENAME_RE">_UNSAFE<wbr></wbr>_FILENAME<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.payload.html" class="internal-link" title="orionis.http.payload">payload</a></code><wbr></wbr>.<code><a href="orionis.http.payload.uploaded_file.html" class="internal-link" title="orionis.http.payload.uploaded_file">uploaded_file</a></code><wbr></wbr>.<code><a href="orionis.http.payload.uploaded_file.UploadedFile.html" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile">UploadedFile</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">UploadedFile</span>(<a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html" class="internal-link" title="orionis.http.payload.contracts.uploaded_file.IUploadedFile">IUploadedFile</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__init__">UploadedFile(filename, content_type, memory_threshold)</a></code></p><p><a href="classIndex.html#orionis.http.payload.uploaded_file.UploadedFile">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Hold an uploaded file in memory or spill it to a temporary file on disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filename</span></td><td class="fieldArgDesc">Original name of the uploaded file as reported by the client.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content<wbr></wbr>_type</span></td><td class="fieldArgDesc">MIME type declared by the client, or <tt class="rst-docutils rst-literal">None</tt> if absent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory<wbr></wbr>_threshold</span></td><td class="fieldArgDesc">Maximum in-memory bytes before spilling to disk (default 1 MiB).</td></tr></table></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1018">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_sanitizeFilename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._sanitizeFilename">_sanitize<wbr></wbr>Filename</a></code></td>
+    <td>Return a safe version of <em>filename</em> suitable for use on the filesystem.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__del__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__del__">__del__</a></code></td>
+    <td>Release resources when the object is garbage collected.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__init__">__init__</a></code></td>
+    <td>Initialize a new <tt class="rst-docutils rst-literal">UploadedFile</tt> for an incoming multipart part.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#chunks" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.chunks">chunks</a></code></td>
+    <td>Iterate over the file content in fixed-size chunks.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#close" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.close">close</a></code></td>
+    <td>Close the file handle and release all associated resources.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#read" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.read">read</a></code></td>
+    <td>Read the entire file content from the beginning.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#replace" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.replace">replace</a></code></td>
+    <td>Replace the file content with <em>data</em> and update the byte counter.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#requiresDiskWrite" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.requiresDiskWrite">requires<wbr></wbr>Disk<wbr></wbr>Write</a></code></td>
+    <td>Determine whether the next write spills to the backing disk file.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#save" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.save">save</a></code></td>
+    <td>Write the file contents to <em>path</em> on the local filesystem.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#write" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.write">write</a></code></td>
+    <td>Append <em>chunk</em> to the file buffer.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._extension">_extension</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_file" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._file">_file</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_memory_threshold" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._memory_threshold">_memory<wbr></wbr>_threshold</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_rolled" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._rolled">_rolled</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile._size">_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#content_type" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.content_type">content<wbr></wbr>_type</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#filename" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.filename">filename</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#extension" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.extension">extension</a></code></td>
+    <td>Return the file extension derived from <em>filename</em>, in lowercase.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#size" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile.size">size</a></code></td>
+    <td>Return the total number of bytes written so far.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._sanitizeFilename">
+    
+  </a>
+  <a name="_sanitizeFilename">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_sanitizeFilename</span><span class="function-signature">(<span class="rst-sig-param">filename: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L88">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_sanitizeFilename" title="orionis.http.payload.uploaded_file.UploadedFile._sanitizeFilename">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return a safe version of <em>filename</em> suitable for use on the filesystem.</p>
+<p>Strips null bytes, control characters, path separators, and
+Windows-reserved characters. Removes leading dots to prevent
+dotfile or path-traversal attacks. Falls back to <tt class="rst-docutils rst-literal">"upload"</tt>
+when the sanitized result is empty.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filename:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw filename as supplied by the client.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Sanitized filename safe for local persistence.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.__del__">
+    
+  </a>
+  <a name="__del__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__del__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L292">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__del__" title="orionis.http.payload.uploaded_file.UploadedFile.__del__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Release resources when the object is garbage collected.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">filename: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">content_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">memory_threshold: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1024 * 1024</span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.http.payload.uploaded_file.UploadedFile.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize a new <tt class="rst-docutils rst-literal">UploadedFile</tt> for an incoming multipart part.</p>
+<p>The <em>filename</em> is sanitized on ingestion: control characters, path
+separators, and Windows-reserved characters are stripped, and
+path-traversal sequences (leading dots) are removed. If the result
+is empty after sanitization the filename falls back to <tt class="rst-docutils rst-literal">"upload"</tt>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filename:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Original name of the uploaded file as reported by the client.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">MIME type declared by the client, or <tt class="rst-docutils rst-literal">None</tt> if absent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory<wbr></wbr>_threshold:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum in-memory bytes before spilling to disk (default 1 MiB).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.chunks">
+    
+  </a>
+  <a name="chunks">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">chunks</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.uploaded_file.html#_CHUNK_SIZE" class="internal-link" title="orionis.http.payload.uploaded_file._CHUNK_SIZE">_CHUNK_SIZE</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L200">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#chunks" title="orionis.http.payload.uploaded_file.UploadedFile.chunks">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#chunks" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.chunks</a></code></div>
+    <div><p>Iterate over the file content in fixed-size chunks.</p>
+<p>Rewinds the buffer and yields consecutive chunks so large
+uploads can be consumed without loading everything in memory.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum number of bytes per yielded chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Consecutive chunks from the beginning of the content.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.close">
+    
+  </a>
+  <a name="close">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L278">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#close" title="orionis.http.payload.uploaded_file.UploadedFile.close">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#close" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.close</a></code></div>
+    <div><p>Close the file handle and release all associated resources.</p>
+<p><tt class="rst-docutils rst-literal">SpooledTemporaryFile</tt> removes the backing temp file on close
+automatically, so no manual unlink is required.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.read">
+    
+  </a>
+  <a name="read">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L187">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#read" title="orionis.http.payload.uploaded_file.UploadedFile.read">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#read" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.read</a></code></div>
+    <div><p>Read the entire file content from the beginning.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Full file contents.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.replace">
+    
+  </a>
+  <a name="replace">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">replace</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L225">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#replace" title="orionis.http.payload.uploaded_file.UploadedFile.replace">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#replace" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.replace</a></code></div>
+    <div><p>Replace the file content with <em>data</em> and update the byte counter.</p>
+<p>Used internally after <tt class="rst-docutils rst-literal"><span class="pre">Content-Transfer-Encoding</span></tt> decoding
+(base64 or quoted-printable) to write the decoded payload back
+into the spooled buffer.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">New file content that replaces whatever was previously written.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.requiresDiskWrite">
+    
+  </a>
+  <a name="requiresDiskWrite">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">requiresDiskWrite</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L116">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#requiresDiskWrite" title="orionis.http.payload.uploaded_file.UploadedFile.requiresDiskWrite">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Determine whether the next write spills to the backing disk file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Number of bytes that would be written in the next chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the buffer is already rolled over or the next write
+would exceed the in-memory threshold.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.save">
+    
+  </a>
+  <a name="save">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">save</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L251">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#save" title="orionis.http.payload.uploaded_file.UploadedFile.save">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#save" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.save</a></code></div>
+    <div><p>Write the file contents to <em>path</em> on the local filesystem.</p>
+<p>Streams the data in <tt class="rst-docutils rst-literal">_CHUNK_SIZE</tt> (64 KiB) chunks so that large
+uploads are never loaded entirely into memory.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Destination path for the saved file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.write">
+    
+  </a>
+  <a name="write">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">chunk: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" class="intersphinx-link">bytearray</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" class="intersphinx-link">memoryview</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L136">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#write" title="orionis.http.payload.uploaded_file.UploadedFile.write">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#write" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.write</a></code></div>
+    <div><p>Append <em>chunk</em> to the file buffer.</p>
+<p>Seek to the end before writing, including after a partial read.
+<tt class="rst-docutils rst-literal">SpooledTemporaryFile</tt> spills to a real temp file on disk
+automatically once <em>memory_threshold</em> bytes are exceeded.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">chunk:</span><code>bytes | bytearray | memoryview</code></td><td class="fieldArgDesc">Raw bytes to append.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L37">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.http.payload.uploaded_file.UploadedFile.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#__slots__" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._extension">
+    
+  </a>
+  <a name="_extension">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_extension</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L86">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_extension" title="orionis.http.payload.uploaded_file.UploadedFile._extension">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._file">
+    
+  </a>
+  <a name="_file">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_file</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_file" title="orionis.http.payload.uploaded_file.UploadedFile._file">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._memory_threshold">
+    
+  </a>
+  <a name="_memory_threshold">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_memory_threshold</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L78">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_memory_threshold" title="orionis.http.payload.uploaded_file.UploadedFile._memory_threshold">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._rolled">
+    
+  </a>
+  <a name="_rolled">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_rolled</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L79">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_rolled" title="orionis.http.payload.uploaded_file.UploadedFile._rolled">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile._size">
+    
+  </a>
+  <a name="_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L77">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_size" title="orionis.http.payload.uploaded_file.UploadedFile._size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.content_type">
+    
+  </a>
+  <a name="content_type">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">content_type</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L76">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#content_type" title="orionis.http.payload.uploaded_file.UploadedFile.content_type">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.filename">
+    
+  </a>
+  <a name="filename">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">filename</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L75">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#filename" title="orionis.http.payload.uploaded_file.UploadedFile.filename">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.extension">
+    
+  </a>
+  <a name="extension">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">extension</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L173">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#extension" title="orionis.http.payload.uploaded_file.UploadedFile.extension">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#extension" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.extension</a></code></div>
+    <div><p>Return the file extension derived from <em>filename</em>, in lowercase.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Lowercase suffix including the leading dot (e.g. <tt class="rst-docutils rst-literal">".png"</tt>).
+Empty string if the filename has no extension.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.http.payload.uploaded_file.UploadedFile.size">
+    
+  </a>
+  <a name="size">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/uploaded_file.py#L161">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#size" title="orionis.http.payload.uploaded_file.UploadedFile.size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.uploaded_file.IUploadedFile.html#size" class="internal-link">orionis.http.payload.contracts.uploaded_file.IUploadedFile.size</a></code></div>
+    <div><p>Return the total number of bytes written so far.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Cumulative byte count across all <tt class="rst-docutils rst-literal">write</tt> calls.</td></tr></table></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

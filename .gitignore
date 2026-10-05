@@ -6,13 +6,13 @@ storage/framework/*
 storage/logs/*
 storage/mail/*
 database/*.sqlite
-/docs/*
-!/docs/mcp/
+/.docs-build-*/
 
 # ========================
 # Orionis utilities
 # ========================
 *.ps1
+DOCS.ps1
 PUBLISH.ps1
 
 # ========================

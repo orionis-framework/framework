@@ -1,9 +1,9 @@
 import json
 import subprocess
 import sys
-import unittest
+from orionis.test import TestCase
 
-class TestRulesImportPolicy(unittest.TestCase):
+class TestRulesImportPolicy(TestCase):
     """Exercise schema rule imports in isolated interpreters."""
 
     def testColdPackageDoesNotLoadRules(self) -> None:
@@ -58,6 +58,3 @@ class TestRulesImportPolicy(unittest.TestCase):
         result = json.loads(completed.stdout)
         self.assertTrue(result["same"])
         self.assertEqual(result["loaded"], ["orionis.schemas.rules.email"])
-
-if __name__ == "__main__":
-    unittest.main()

@@ -1,0 +1,1377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.config.startup.Configuration</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.config.startup.Configuration.html" class="internal-link" title="This class"><wbr></wbr>Configuration</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.startup.Configuration.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.config.startup.Configuration.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#auth" class="internal-link" title="orionis.foundation.config.startup.Configuration.auth">auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.foundation.config.startup.Configuration.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.startup.Configuration.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#filesystems" class="internal-link" title="orionis.foundation.config.startup.Configuration.filesystems">filesystems</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hashing" class="internal-link" title="orionis.foundation.config.startup.Configuration.hashing">hashing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#http" class="internal-link" title="orionis.foundation.config.startup.Configuration.http">http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#logging" class="internal-link" title="orionis.foundation.config.startup.Configuration.logging">logging</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mail" class="internal-link" title="orionis.foundation.config.startup.Configuration.mail">mail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mcp" class="internal-link" title="orionis.foundation.config.startup.Configuration.mcp">mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#queue" class="internal-link" title="orionis.foundation.config.startup.Configuration.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#realtime" class="internal-link" title="orionis.foundation.config.startup.Configuration.realtime">realtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#scheduler" class="internal-link" title="orionis.foundation.config.startup.Configuration.scheduler">scheduler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#session" class="internal-link" title="orionis.foundation.config.startup.Configuration.session">session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#testing" class="internal-link" title="orionis.foundation.config.startup.Configuration.testing">testing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#view" class="internal-link" title="orionis.foundation.config.startup.Configuration.view">view</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.foundation.config.startup.html" class="internal-link" title="The parent of this class">startup</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8486"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.startup.Configuration.html" class="internal-link" title="orionis.foundation.config.startup.Configuration"><wbr></wbr>Configuration</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.startup.Configuration.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.config.startup.Configuration.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#auth" class="internal-link" title="orionis.foundation.config.startup.Configuration.auth">auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.foundation.config.startup.Configuration.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.startup.Configuration.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#filesystems" class="internal-link" title="orionis.foundation.config.startup.Configuration.filesystems">filesystems</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hashing" class="internal-link" title="orionis.foundation.config.startup.Configuration.hashing">hashing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#http" class="internal-link" title="orionis.foundation.config.startup.Configuration.http">http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#logging" class="internal-link" title="orionis.foundation.config.startup.Configuration.logging">logging</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mail" class="internal-link" title="orionis.foundation.config.startup.Configuration.mail">mail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mcp" class="internal-link" title="orionis.foundation.config.startup.Configuration.mcp">mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#queue" class="internal-link" title="orionis.foundation.config.startup.Configuration.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#realtime" class="internal-link" title="orionis.foundation.config.startup.Configuration.realtime">realtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#scheduler" class="internal-link" title="orionis.foundation.config.startup.Configuration.scheduler">scheduler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#session" class="internal-link" title="orionis.foundation.config.startup.Configuration.session">session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#testing" class="internal-link" title="orionis.foundation.config.startup.Configuration.testing">testing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#view" class="internal-link" title="orionis.foundation.config.startup.Configuration.view">view</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.startup.html#_SECTION_MAP" class="internal-link" title="orionis.foundation.config.startup._SECTION_MAP">_SECTION<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.startup.html" class="internal-link" title="orionis.foundation.config.startup">startup</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.startup.Configuration.html" class="internal-link" title="orionis.foundation.config.startup.Configuration">Configuration</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Configuration</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L41" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.startup.Configuration">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Represent the main configuration for Orionis Framework startup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app</span></td><td class="fieldArgDesc">Application configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth</span></td><td class="fieldArgDesc">Authentication configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache</span></td><td class="fieldArgDesc">Cache configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">database</span></td><td class="fieldArgDesc">Database configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filesystems</span></td><td class="fieldArgDesc">Filesystem configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">logging</span></td><td class="fieldArgDesc">Logging configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mail</span></td><td class="fieldArgDesc">Mail configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hashing</span></td><td class="fieldArgDesc">Password hashing configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scheduler</span></td><td class="fieldArgDesc">Scheduled task configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">view</span></td><td class="fieldArgDesc">Template rendering configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">http</span></td><td class="fieldArgDesc">HTTP configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue</span></td><td class="fieldArgDesc">Queue configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">realtime</span></td><td class="fieldArgDesc">Realtime invocation, message and broadcast limits.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session</span></td><td class="fieldArgDesc">Session configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">testing</span></td><td class="fieldArgDesc">Testing configuration settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mcp</span></td><td class="fieldArgDesc">MCP protocol limits and trusted browser origins.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class does not return a value upon instantiation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any configuration section is initialized with an invalid type.</td></tr></table></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id824">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.startup.Configuration.__post_init__">__post<wbr></wbr>_init__</a></code></td>
+    <td>Validate and convert configuration attributes to their entity types.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app" class="internal-link" title="orionis.foundation.config.startup.Configuration.app">app</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#auth" class="internal-link" title="orionis.foundation.config.startup.Configuration.auth">auth</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#cache" class="internal-link" title="orionis.foundation.config.startup.Configuration.cache">cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database" class="internal-link" title="orionis.foundation.config.startup.Configuration.database">database</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#filesystems" class="internal-link" title="orionis.foundation.config.startup.Configuration.filesystems">filesystems</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#hashing" class="internal-link" title="orionis.foundation.config.startup.Configuration.hashing">hashing</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#http" class="internal-link" title="orionis.foundation.config.startup.Configuration.http">http</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#logging" class="internal-link" title="orionis.foundation.config.startup.Configuration.logging">logging</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#mail" class="internal-link" title="orionis.foundation.config.startup.Configuration.mail">mail</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#mcp" class="internal-link" title="orionis.foundation.config.startup.Configuration.mcp">mcp</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#queue" class="internal-link" title="orionis.foundation.config.startup.Configuration.queue">queue</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#realtime" class="internal-link" title="orionis.foundation.config.startup.Configuration.realtime">realtime</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#scheduler" class="internal-link" title="orionis.foundation.config.startup.Configuration.scheduler">scheduler</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#session" class="internal-link" title="orionis.foundation.config.startup.Configuration.session">session</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#testing" class="internal-link" title="orionis.foundation.config.startup.Configuration.testing">testing</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#view" class="internal-link" title="orionis.foundation.config.startup.Configuration.view">view</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
+            </p>
+            <table class="children sortable" id="id825">
+  
+  
+  <tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code></td>
+    <td>Retrieve field definitions and normalized types cached by class.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code></td>
+    <td>Describe field names, normalized types, defaults, and metadata.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code></td>
+    <td>Convert the dataclass instance to a recursively copied dictionary.</td>
+  </tr><tr class="baseclassvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+            
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.__post_init__">
+    
+  </a>
+  <a name="__post_init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L220">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__post_init__" title="orionis.foundation.config.startup.Configuration.__post_init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
+    <div><p>Validate and convert configuration attributes to their entity types.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.app">
+    
+  </a>
+  <a name="app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app</span>: <code>App | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L92">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app" title="orionis.foundation.config.startup.Configuration.app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.auth">
+    
+  </a>
+  <a name="auth">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">auth</span>: <code>Auth | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L108">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#auth" title="orionis.foundation.config.startup.Configuration.auth">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.cache">
+    
+  </a>
+  <a name="cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cache</span>: <code>Cache | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L116">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cache" title="orionis.foundation.config.startup.Configuration.cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.database">
+    
+  </a>
+  <a name="database">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database</span>: <code>Database | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L124">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database" title="orionis.foundation.config.startup.Configuration.database">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.filesystems">
+    
+  </a>
+  <a name="filesystems">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">filesystems</span>: <code>Filesystems | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L132">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#filesystems" title="orionis.foundation.config.startup.Configuration.filesystems">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.hashing">
+    
+  </a>
+  <a name="hashing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">hashing</span>: <code>Hashing | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L196">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#hashing" title="orionis.foundation.config.startup.Configuration.hashing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.http">
+    
+  </a>
+  <a name="http">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">http</span>: <code>HTTP | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L140">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#http" title="orionis.foundation.config.startup.Configuration.http">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.logging">
+    
+  </a>
+  <a name="logging">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">logging</span>: <code>Logging | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L148">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#logging" title="orionis.foundation.config.startup.Configuration.logging">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.mail">
+    
+  </a>
+  <a name="mail">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">mail</span>: <code>Mail | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L156">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#mail" title="orionis.foundation.config.startup.Configuration.mail">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.mcp">
+    
+  </a>
+  <a name="mcp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">mcp</span>: <code>McpConfig | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L100">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#mcp" title="orionis.foundation.config.startup.Configuration.mcp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.queue">
+    
+  </a>
+  <a name="queue">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">queue</span>: <code>Queue | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L164">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#queue" title="orionis.foundation.config.startup.Configuration.queue">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.realtime">
+    
+  </a>
+  <a name="realtime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">realtime</span>: <code>RealtimeConfig | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L172">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#realtime" title="orionis.foundation.config.startup.Configuration.realtime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.scheduler">
+    
+  </a>
+  <a name="scheduler">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">scheduler</span>: <code>Scheduler | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L204">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#scheduler" title="orionis.foundation.config.startup.Configuration.scheduler">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.session">
+    
+  </a>
+  <a name="session">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">session</span>: <code>Session | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L180">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#session" title="orionis.foundation.config.startup.Configuration.session">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.testing">
+    
+  </a>
+  <a name="testing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">testing</span>: <code>Testing | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L188">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#testing" title="orionis.foundation.config.startup.Configuration.testing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.startup.Configuration.view">
+    
+  </a>
+  <a name="view">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">view</span>: <code>View | dict, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/startup.py#L212">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#view" title="orionis.foundation.config.startup.Configuration.view">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

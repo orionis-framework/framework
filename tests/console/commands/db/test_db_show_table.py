@@ -1,11 +1,11 @@
 import argparse
-from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.db._inspection import DatabaseInspector
 from orionis.console.commands.db.show import DbShowCommand
 from orionis.console.commands.db.table import DbTableCommand
 from orionis.database.connection import Connection
 from orionis.database.exceptions import QueryException
+from orionis.test import TestCase
 
 class _Manager:
     """Provide two isolated in-memory connections to the commands."""
@@ -190,7 +190,7 @@ class _FailingMetadataConnection:
         """
         raise self.failure
 
-class TestDbShowTableCommands(IsolatedAsyncioTestCase):
+class TestDbShowTableCommands(TestCase):
     """Validate real catalog inspection and named connection selection."""
 
     async def asyncSetUp(self) -> None:

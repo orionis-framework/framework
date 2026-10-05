@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.console.commands.support.optimize_clear.OptimizeClearCommand</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.html" class="internal-link" title="This class"><wbr></wbr>Optimize<wbr></wbr>Clear<wbr></wbr>Command</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearBuildArtifacts" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBuildArtifacts">__clear<wbr></wbr>Build<wbr></wbr>Artifacts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearBytecode" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBytecode">__clear<wbr></wbr>Bytecode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearCompiledCaches" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearCompiledCaches">__clear<wbr></wbr>Compiled<wbr></wbr>Caches</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__removePath" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__removePath">__remove<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__reportCleanup" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__reportCleanup">__report<wbr></wbr>Cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#handle" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.handle">handle</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#description" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.description">description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#signature" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.signature">signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.timestamps">timestamps</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.commands.support.optimize_clear.html" class="internal-link" title="The parent of this class">optimize<wbr></wbr>_clear</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3353"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.html" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand"><wbr></wbr>Optimize<wbr></wbr>Clear<wbr></wbr>Command</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearBuildArtifacts" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBuildArtifacts">__clear<wbr></wbr>Build<wbr></wbr>Artifacts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearBytecode" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBytecode">__clear<wbr></wbr>Bytecode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__clearCompiledCaches" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearCompiledCaches">__clear<wbr></wbr>Compiled<wbr></wbr>Caches</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__removePath" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__removePath">__remove<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__reportCleanup" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__reportCleanup">__report<wbr></wbr>Cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#handle" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.handle">handle</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#description" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.description">description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#signature" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.signature">signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.timestamps">timestamps</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_ACTIVE_VENV_BASENAME" class="internal-link" title="orionis.console.commands.support.optimize_clear._ACTIVE_VENV_BASENAME">_ACTIVE<wbr></wbr>_VENV<wbr></wbr>_BASENAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_BUILD_DIR_NAMES" class="internal-link" title="orionis.console.commands.support.optimize_clear._BUILD_DIR_NAMES">_BUILD<wbr></wbr>_DIR<wbr></wbr>_NAMES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_BYTECODE_SUFFIXES" class="internal-link" title="orionis.console.commands.support.optimize_clear._BYTECODE_SUFFIXES">_BYTECODE<wbr></wbr>_SUFFIXES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_COMPILED_CACHE_FILES" class="internal-link" title="orionis.console.commands.support.optimize_clear._COMPILED_CACHE_FILES">_COMPILED<wbr></wbr>_CACHE<wbr></wbr>_FILES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_VENV_DIR_NAMES" class="internal-link" title="orionis.console.commands.support.optimize_clear._VENV_DIR_NAMES">_VENV<wbr></wbr>_DIR<wbr></wbr>_NAMES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.optimize_clear.html#_SKIP_DIRS" class="internal-link" title="orionis.console.commands.support.optimize_clear._SKIP_DIRS">_SKIP<wbr></wbr>_DIRS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.commands.html" class="internal-link" title="orionis.console.commands">commands</a></code><wbr></wbr>.<code><a href="orionis.console.commands.support.html" class="internal-link" title="orionis.console.commands.support">support</a></code><wbr></wbr>.<code><a href="orionis.console.commands.support.optimize_clear.html" class="internal-link" title="orionis.console.commands.support.optimize_clear">optimize_clear</a></code><wbr></wbr>.<code><a href="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.html" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand">OptimizeClearCommand</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">OptimizeClearCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L31" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.support.optimize_clear.OptimizeClearCommand">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Remove generated optimization artifacts from the application.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id318">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__clearBuildArtifacts" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBuildArtifacts">__clear<wbr></wbr>Build<wbr></wbr>Artifacts</a></code></td>
+    <td>Remove top-level build output and package metadata directories.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__clearBytecode" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBytecode">__clear<wbr></wbr>Bytecode</a></code></td>
+    <td>Remove bytecode directories and standalone bytecode files.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__clearCompiledCaches" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearCompiledCaches">__clear<wbr></wbr>Compiled<wbr></wbr>Caches</a></code></td>
+    <td>Remove framework-owned compiled state cache files.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__removePath" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__removePath">__remove<wbr></wbr>Path</a></code></td>
+    <td>Remove one file, directory, or symbolic link and record failures.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__reportCleanup" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__reportCleanup">__report<wbr></wbr>Cleanup</a></code></td>
+    <td>Write a cleanup summary and any filesystem errors to the console.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#handle" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.handle">handle</a></code></td>
+    <td>Clear generated bytecode, build artifacts, and compiled caches.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#description" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.description">description</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#signature" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.signature">signature</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.timestamps">timestamps</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBuildArtifacts">
+    
+  </a>
+  <a name="__clearBuildArtifacts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__clearBuildArtifacts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">base_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L127">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__clearBuildArtifacts" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBuildArtifacts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove top-level build output and package metadata directories.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Application root containing generated build artifacts.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Number of removed paths and filesystem errors encountered.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBytecode">
+    
+  </a>
+  <a name="__clearBytecode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__clearBytecode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">base_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L88">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__clearBytecode" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearBytecode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove bytecode directories and standalone bytecode files.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Root directory walked while virtual environments are excluded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Number of removed paths and filesystem errors encountered.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearCompiledCaches">
+    
+  </a>
+  <a name="__clearCompiledCaches">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__clearCompiledCaches</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L152">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__clearCompiledCaches" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__clearCompiledCaches">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove framework-owned compiled state cache files.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application providing the configured compiled cache path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Number of removed cache files and filesystem errors encountered.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__removePath">
+    
+  </a>
+  <a name="__removePath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__removePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">errors: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L181">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__removePath" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__removePath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove one file, directory, or symbolic link and record failures.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Filesystem path to remove.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">List updated with a description when removal fails.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether an existing path was removed successfully.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__reportCleanup">
+    
+  </a>
+  <a name="__reportCleanup">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__reportCleanup</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">console: <code>Console</code>, </span><span class="rst-sig-param">label: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">removed_count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">errors: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L210">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__reportCleanup" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.__reportCleanup">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Write a cleanup summary and any filesystem errors to the console.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Console used to display the summary and errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">label:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the cleanup group.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">removed<wbr></wbr>_count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of paths successfully removed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Filesystem errors encountered by the cleanup group.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Write the cleanup details to the console.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.handle">
+    
+  </a>
+  <a name="handle">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">console: <code>Console</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L43">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#handle" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.handle">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Clear generated bytecode, build artifacts, and compiled caches.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application providing the project and cache paths.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Console used to report cleanup results and failures.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero when every cleanup succeeds; one when a path cannot be removed.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.description">
+    
+  </a>
+  <a name="description">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L38">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#description" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.description">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.signature">
+    
+  </a>
+  <a name="signature">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L37">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#signature" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.signature">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.timestamps">
+    
+  </a>
+  <a name="timestamps">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/commands/support/optimize_clear.py#L36">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#timestamps" title="orionis.console.commands.support.optimize_clear.OptimizeClearCommand.timestamps">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

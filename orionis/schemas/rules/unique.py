@@ -28,10 +28,10 @@ class Unique(Rule):
     """
     Ensure a value is not already stored in a database column.
 
-    The rule pipeline is synchronous while the ORM is async-only, so the
-    lookup is bridged with :meth:`orionis.aio.loop.Loop.runSync`. The
-    calling thread blocks until the query resolves, which is why the check
-    is scoped to a single row probe.
+    Asynchronous schema validation awaits the current connection and preserves
+    its transaction. Explicit synchronous validation bridges through
+    :meth:`orionis.aio.loop.Loop.runSync` and blocks the calling thread. A
+    synchronous call made inside an event loop uses an isolated connection.
     """
 
     # ruff: noqa: ARG002
@@ -120,6 +120,33 @@ class Unique(Rule):
             return not Loop.runSync(self.__existsIsolated(plan))
 
         return not Loop.runSync(self.__existsShared(plan))
+
+    async def enforceAsync(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> bool:
+        """
+        Check uniqueness on the current loop and its active transaction.
+
+        Parameters
+        ----------
+        field : str
+            Field name associated with the value.
+        value : object
+            Value searched for in the configured column.
+        instance : object
+            Schema instance owning the field.
+
+        Returns
+        -------
+        bool
+            Whether no conflicting row is visible to the current connection.
+        """
+        if value is None:
+            return True
+        return not await self.__existsShared(self.__plan(value))
 
     def __plan(self, value: object) -> SelectPlan:
         """

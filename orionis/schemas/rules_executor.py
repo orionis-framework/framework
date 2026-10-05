@@ -1,19 +1,24 @@
 from __future__ import annotations
-from typing import Annotated, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import operator
 import types
 import msgspec.structs
 from orionis.schemas.rule import Rule
 from orionis.schemas.meta.validation import ValidationMetadata
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 # Cache of validation plans for schema types. Keys are schema classes;
 # values are tuples of field validation plans as returned by _build_plan().
 # Populated on demand by _build_plan and warmed at class creation time.
 _PLAN_CACHE: dict[type, tuple] = {}
+_ASYNC_PLAN_CACHE: dict[type, tuple | None] = {}
 
 # Alias for faster local access in hot path.
 # Avoids global dict lookup on every nested validation call.
 _cache_get = _PLAN_CACHE.get
+_async_cache_get = _ASYNC_PLAN_CACHE.get
 
 # Shared empty mapping returned for schemas without Orionis metadata.
 # Reused instead of allocating a fresh dict on every plan build.
@@ -50,8 +55,7 @@ def _type_contains_nested(tp: object) -> bool:
     return isinstance(tp, type) and "__orionis_meta__" in tp.__dict__
 
 def _warm_child_plan(tp: object) -> None:
-    """
-    Eagerly populate ``_PLAN_CACHE`` for any nested Orionis schema type.
+    """Eagerly populate ``_PLAN_CACHE`` for any nested Orionis schema type.
 
     Called from ``_build_plan`` so that the first real validation call for a
     nested field always hits the cache instead of triggering a cold build.
@@ -61,6 +65,11 @@ def _warm_child_plan(tp: object) -> None:
     tp : object
         Field type annotation, potentially an ``Annotated`` type, ``Union``
         or bare class.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
     """
     # Fast path for common case: a non-generic schema type.
     origin = get_origin(tp)
@@ -83,6 +92,85 @@ def _warm_child_plan(tp: object) -> None:
     ):
         _build_plan(tp)
 
+def _field_rules(
+    klass: type, field_name: str, items: Iterable[object],
+) -> tuple[Rule, ...]:
+    """
+    Select executable rules from a field's validated metadata.
+
+    Parameters
+    ----------
+    klass : type
+        Schema owning the field.
+    field_name : str
+        Name used in metadata error messages.
+    items : Iterable[object]
+        Declared rule and documentation metadata.
+
+    Returns
+    -------
+    tuple[Rule, ...]
+        Rules in their declaration order.
+
+    Raises
+    ------
+    TypeError
+        If an item is neither a rule nor supported metadata.
+    """
+    rules = []
+    for item in items:
+        if isinstance(item, Rule):
+            rules.append(item)
+        elif not isinstance(item, ValidationMetadata):
+            message = (
+                f"Field '{field_name}' on '{klass.__name__}': "
+                f"'{type(item).__name__}' is not a valid custom rule. "
+                "Custom rules must subclass 'orionis.schemas.rule.Rule'."
+            )
+            raise TypeError(message)
+    return tuple(rules)
+
+def _async_validators(validators: tuple) -> tuple:
+    """
+    Bind native asynchronous rule overrides once for a validation plan.
+
+    Parameters
+    ----------
+    validators : tuple
+        Synchronous bound Rule.validate methods.
+
+    Returns
+    -------
+    tuple
+        Pairs of bound validators and whether their result must be awaited.
+    """
+    result = []
+    for validate in validators:
+        rule = validate.__self__
+        asynchronous = type(rule).enforceAsync is not Rule.enforceAsync
+        result.append((rule.validateAsync if asynchronous else validate, asynchronous))
+    return tuple(result)
+
+def _type_uses_async(field_type: object) -> bool:
+    """
+    Inspect warmed nested schemas for native asynchronous rules.
+
+    Parameters
+    ----------
+    field_type : object
+        Field annotation, possibly an Annotated type or union.
+
+    Returns
+    -------
+    bool
+        Whether a nested schema requires asynchronous validation.
+    """
+    origin = get_origin(field_type)
+    if origin is Annotated:
+        return _type_uses_async(get_args(field_type)[0])
+    if origin is Union or origin is types.UnionType:
+        return any(_type_uses_async(member) for member in get_args(field_type))
+    return isinstance(field_type, type) and bool(_async_cache_get(field_type))
 
 def _build_plan(klass: type) -> tuple:
     """
@@ -109,66 +197,34 @@ def _build_plan(klass: type) -> tuple:
         Raised when field metadata contains an object that is neither a
         ``Rule`` instance nor supported validation metadata.
     """
-    # Read per-field Orionis metadata attached to the schema class.
     orionis_meta: dict[str, list[object]] = getattr(
         klass, "__orionis_meta__", _EMPTY_META,
     )
-
-    # Collect compiled plan entries for fields that require work at runtime.
     plan: list = []
-
-    # Iterate over declared msgspec fields in definition order.
-    for f in msgspec.structs.fields(klass):
-
-        # Retrieve validation metadata for the current field.
-        field_items = orionis_meta.get(f.name, ())
-
-        # Keep only executable custom rules for this field.
-        rules: list[Rule] = []
-        for item in field_items:
-            if isinstance(item, Rule):
-                rules.append(item)
-            elif isinstance(item, ValidationMetadata):
-                # Ignore non-executable validation metadata entries.
-                continue
-            else:
-                # Fail fast on unsupported metadata objects.
-                msg = (
-                    f"Field '{f.name}' on '{klass.__name__}': "
-                    f"'{type(item).__name__}' is not a valid custom rule. "
-                    f"Custom rules must subclass "
-                    f"'orionis.schemas.rule.Rule'."
-                )
-                raise TypeError(msg)
-
-        # Detect whether the field type contains a nested Orionis schema.
-        is_nested = _type_contains_nested(f.type)
-
-        # Store only fields that have rule checks or nested-schema traversal.
+    async_plan: list = []
+    requires_async = False
+    for field in msgspec.structs.fields(klass):
+        rules = _field_rules(klass, field.name, orionis_meta.get(field.name, ()))
+        is_nested = _type_contains_nested(field.type)
         if rules or is_nested:
-
-            # Precompile attribute access to reduce per-instance overhead.
-            getter = operator.attrgetter(f.name)
-
-            # Pre-bind rule callables for fast execution in the hot path.
-            validators = tuple(r.validate for r in rules)
-
-            # Precompute dotted prefix used when building nested paths.
-            field_name_dot = f.name + "."
-            plan.append((f.name, field_name_dot, getter, validators, is_nested))
-
-            # Warm child schema plans to avoid recursive cache misses later.
+            getter = operator.attrgetter(field.name)
+            validators = tuple(rule.validate for rule in rules)
+            async_validators = _async_validators(validators)
+            field_name_dot = field.name + "."
+            plan.append((field.name, field_name_dot, getter, validators, is_nested))
+            async_plan.append((
+                field.name, field_name_dot, getter, async_validators, is_nested,
+            ))
             if is_nested:
-                _warm_child_plan(f.type)
-
-    # Store the plan as an immutable tuple to
-    # avoid accidental mutation and to save memory.
+                _warm_child_plan(field.type)
+            requires_async = (
+                requires_async
+                or any(asynchronous for _, asynchronous in async_validators)
+                or _type_uses_async(field.type)
+            )
     result = tuple(plan)
-
-    # Cache the plan for this class so that future validations can skip the build step.
     _PLAN_CACHE[klass] = result
-
-    # Return the plan for use in the current validation call.
+    _ASYNC_PLAN_CACHE[klass] = tuple(async_plan) if requires_async else None
     return result
 
 def _collect_nested(
@@ -197,6 +253,8 @@ def _collect_nested(
     child_klass = type(value)
     child_plan = _cache_get(child_klass)
     if child_plan is None:
+        if "__orionis_meta__" not in child_klass.__dict__:
+            return
         child_plan = _build_plan(child_klass)
 
     # Skip schemas that declare neither rules nor further nesting.
@@ -263,3 +321,100 @@ def _collect_with_plan(
             # Keep going so sibling rules and fields are reported too.
             if failure is not None:
                 append(failure)
+
+async def _collect_async_rules(
+    validators: tuple,
+    field: str,
+    value: object,
+    instance: object,
+    failures: list,
+) -> None:
+    """
+    Run preclassified rule callables in declaration order.
+
+    Parameters
+    ----------
+    validators : tuple
+        Pairs of bound validators and their asynchronous flags.
+    field : str
+        Fully qualified field path.
+    value : object
+        Converted field value.
+    instance : object
+        Schema instance or namespace of successfully converted fields.
+    failures : list
+        Accumulator for validation failures.
+
+    Returns
+    -------
+    None
+        Every rule result has been collected without parallel database access.
+    """
+    for validate, asynchronous in validators:
+        failure = (
+            await validate(field, value, instance)
+            if asynchronous else validate(field, value, instance)
+        )
+        if failure is not None:
+            failures.append(failure)
+
+async def _collect_async_nested(value: object, prefix: str, failures: list) -> None:
+    """
+    Validate a nested schema while preserving non-schema union members.
+
+    Parameters
+    ----------
+    value : object
+        Converted nested value.
+    prefix : str
+        Dot-terminated field path.
+    failures : list
+        Accumulator for validation failures.
+
+    Returns
+    -------
+    None
+        Nested rules have completed, or the value required no schema traversal.
+    """
+    child_type = type(value)
+    plan = _cache_get(child_type)
+    if plan is None:
+        if "__orionis_meta__" not in child_type.__dict__:
+            return
+        plan = _build_plan(child_type)
+    async_plan = _async_cache_get(child_type)
+    if async_plan:
+        await _collect_with_async_plan(async_plan, value, prefix, failures)
+    elif plan:
+        _collect_with_plan(plan, value, prefix, failures)
+
+async def _collect_with_async_plan(
+    plan: tuple, instance: object, prefix: str, failures: list,
+) -> None:
+    """
+    Execute a plan containing native asynchronous rules or nested schemas.
+
+    Parameters
+    ----------
+    plan : tuple
+        Precompiled asynchronous field plan.
+    instance : object
+        Converted schema instance.
+    prefix : str
+        Dot-terminated prefix for nested paths.
+    failures : list
+        Accumulator for all failures in declaration order.
+
+    Returns
+    -------
+    None
+        Synchronous and asynchronous rule results have been collected.
+    """
+    for field, field_dot, getter, validators, nested in plan:
+        value = getter(instance)
+        if nested and value is not None:
+            await _collect_async_nested(value, prefix + field_dot, failures)
+        if validators:
+            await _collect_async_rules(
+                validators, prefix + field, value, instance, failures,
+            )

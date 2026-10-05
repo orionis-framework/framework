@@ -7,9 +7,12 @@ import msgspec.structs
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exception_parser import ValidationErrorParser
 from orionis.schemas.rules_executor import (
+    _async_validators,
     _build_plan as _build_rule_plan,
     _cache_get as _rule_plan_get,
-    _collect_with_plan,
+    _collect_async_nested,
+    _collect_async_rules,
+    _collect_nested,
 )
 
 # Bind the msgspec conversion entry point.
@@ -19,6 +22,7 @@ _ValidationError = msgspec.ValidationError
 # Cache: schema type -> tuple of
 # (encode_name, field_type, required, nested, rules).
 _FIELD_PLAN_CACHE: dict[type, tuple] = {}
+_ASYNC_FIELD_PLAN_CACHE: dict[type, tuple] = {}
 
 # Bind the field plan lookup.
 _plan_get = _FIELD_PLAN_CACHE.get
@@ -93,6 +97,29 @@ def _field_plan(schema: type) -> tuple:
         for f in msgspec.structs.fields(schema)
     )
     _FIELD_PLAN_CACHE[schema] = plan
+    return plan
+
+def _async_field_plan(schema: type) -> tuple:
+    """
+    Reuse conversion metadata with preclassified asynchronous validators.
+
+    Parameters
+    ----------
+    schema : type
+        Schema whose payload failed whole-object conversion.
+
+    Returns
+    -------
+    tuple
+        Cached field conversion plans with await flags for their rule callables.
+    """
+    plan = _ASYNC_FIELD_PLAN_CACHE.get(schema)
+    if plan is None:
+        plan = tuple(
+            (name, field_type, required, nested, _async_validators(rules))
+            for name, field_type, required, nested, rules in _field_plan(schema)
+        )
+        _ASYNC_FIELD_PLAN_CACHE[schema] = plan
     return plan
 
 class FailureCollector:
@@ -254,11 +281,7 @@ class FailureCollector:
 
             # Nested schemas converted fine, so their own rules run as usual.
             if nested is not None and value is not None:
-                child_plan = _rule_plan_get(type(value))
-                if child_plan is None:
-                    child_plan = _build_rule_plan(type(value))
-                if child_plan:
-                    _collect_with_plan(child_plan, value, path + ".", failures)
+                _collect_nested(value, path + ".", failures)
 
             for validate in rules:
                 failure = validate(path, value, instance)
@@ -302,4 +325,161 @@ class FailureCollector:
             if nested_failures:
                 return nested_failures
 
+        return [ValidationErrorParser.parseAt(error, root, path)]
+
+    @classmethod
+    async def collectAsync(
+        cls,
+        payload: object,
+        schema: type,
+        error: msgspec.ValidationError,
+    ) -> tuple[ValidationFailure, ...]:
+        """
+        Collect conversion failures together with asynchronous rule failures.
+
+        Parameters
+        ----------
+        payload : object
+            Raw input rejected by whole-object conversion.
+        schema : type
+            Target schema class.
+        error : msgspec.ValidationError
+            Original conversion failure.
+
+        Returns
+        -------
+        tuple[ValidationFailure, ...]
+            Conversion and rule failures in the same order as synchronous checks.
+        """
+        failures: list[ValidationFailure] = []
+        blamed = False
+        if isinstance(payload, Mapping):
+            blamed = await cls._collectAsync(payload, schema, schema, "", failures)
+        if not blamed:
+            failures.insert(0, ValidationErrorParser.parse(error, schema))
+        return tuple(failures)
+
+    @classmethod
+    async def _collectAsync(
+        cls,
+        payload: Mapping,
+        schema: type,
+        root: type,
+        base: str,
+        failures: list[ValidationFailure],
+    ) -> bool:
+        """
+        Convert fields before awaiting rules that inspect their valid siblings.
+
+        Parameters
+        ----------
+        payload : Mapping
+            Values supplied for the current schema.
+        schema : type
+            Schema whose fields are being converted.
+        root : type
+            Root schema used to resolve custom error messages.
+        base : str
+            Dot-terminated path prefix.
+        failures : list[ValidationFailure]
+            Accumulator for conversion and rule failures.
+
+        Returns
+        -------
+        bool
+            Whether a declared field explains the original conversion failure.
+        """
+        blamed = False
+        converted_values: dict[str, object] = {}
+        pending: list[tuple[str, object, tuple, type | None]] = []
+        for name, field_type, required, nested, rules in _async_field_plan(schema):
+            if name not in payload:
+                if required:
+                    blamed = True
+                    failures.append(ValidationFailure(
+                        field=base + name, rule="missing",
+                        message=f"Object missing required field `{name}`",
+                    ))
+                continue
+            value = payload[name]
+            try:
+                converted = _convert(value, type=field_type)
+            except _ValidationError as exc:
+                blamed = True
+                failures.extend(await cls._blameAsync(
+                    exc, value, nested, root, base + name,
+                ))
+                continue
+            converted_values[name] = converted
+            if rules or nested is not None:
+                pending.append((base + name, converted, rules, nested))
+        if pending:
+            await cls._enforceAsync(pending, converted_values, failures)
+        return blamed
+
+    @staticmethod
+    async def _enforceAsync(
+        pending: list[tuple[str, object, tuple, type | None]],
+        converted_values: dict[str, object],
+        failures: list[ValidationFailure],
+    ) -> None:
+        """
+        Await custom rules only for fields that converted successfully.
+
+        Parameters
+        ----------
+        pending : list[tuple[str, object, tuple, type | None]]
+            Qualified paths, values, rules and nested schema declarations.
+        converted_values : dict[str, object]
+            Valid field values available to cross-field rules.
+        failures : list[ValidationFailure]
+            Accumulator for rule failures.
+
+        Returns
+        -------
+        None
+            Every applicable rule has completed in declaration order.
+        """
+        instance = types.SimpleNamespace(**converted_values)
+        for path, value, rules, nested in pending:
+            if nested is not None and value is not None:
+                await _collect_async_nested(value, path + ".", failures)
+            if rules:
+                await _collect_async_rules(rules, path, value, instance, failures)
+
+    @classmethod
+    async def _blameAsync(
+        cls,
+        error: msgspec.ValidationError,
+        value: object,
+        nested: type | None,
+        root: type,
+        path: str,
+    ) -> list[ValidationFailure]:
+        """
+        Describe a rejected value, awaiting valid fields of nested schemas.
+
+        Parameters
+        ----------
+        error : msgspec.ValidationError
+            Error raised by the field conversion.
+        value : object
+            Rejected input value.
+        nested : type | None
+            Nested schema declared for the field.
+        root : type
+            Root schema used to resolve error messages.
+        path : str
+            Fully qualified field path.
+
+        Returns
+        -------
+        list[ValidationFailure]
+            Nested failures or the parsed field conversion error.
+        """
+        if nested is not None and isinstance(value, Mapping):
+            nested_failures: list[ValidationFailure] = []
+            await cls._collectAsync(value, nested, root, path + ".", nested_failures)
+            if nested_failures:
+                return nested_failures
         return [ValidationErrorParser.parseAt(error, root, path)]

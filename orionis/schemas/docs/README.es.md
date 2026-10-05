@@ -47,7 +47,7 @@ decodificado, datos de formulario) en una instancia del esquema, reportando
 
 - **`orionis.container`** — `Container.__resolveSchemaArgument` lee el cuerpo de
   la petición actual (`await request.data()`) y llama a
-  `Schema.validate(data, argument.type)` cuando un parámetro del handler está
+  `await Schema.validateAsync(data, argument.type)` cuando un parámetro del handler está
   anotado con una subclase de `msgspec.Struct` (`Argument.is_schema`, resuelto
   por `orionis.introspection`). Eso es lo que hace que los parámetros de un
   controlador se validen automáticamente.
@@ -86,6 +86,31 @@ Existen dos caminos distintos:
   personalizadas sobre los valores que convirtieron bien. Una regla asociada a
   un campo cuyo propio valor falló la conversión **no** se ejecuta (no hay valor
   que inspeccionar); una regla cuyo campo hermano falló **sí** se ejecuta.
+
+### Validacion asincrona
+
+`await Schema.validateAsync(payload, schema)` conserva la conversion y el reporte
+multi-error de `Schema.validate`. El contenedor usa esta entrada para los esquemas
+inyectados de la peticion. Los esquemas simples mantienen una sola conversion de
+msgspec; sus reglas sincronas se ejecutan directamente, sin saltos a un executor.
+
+La definicion del esquema compila planes adicionales solo cuando hacen falta
+reglas asincronas, incluidos esquemas anidados y alternativas de uniones.
+`Unique.enforceAsync` espera la conexion y transaccion actuales de la aplicacion,
+sin crear un engine aislado. `ActiveUrl.enforceAsync` delega DNS al executor del
+resolver del event loop. La cancelacion se propaga. Las reglas de un esquema se
+ejecutan en orden: una transaccion puede tener una sola conexion no concurrente.
+
+Las reglas personalizadas con E/S pueden implementar
+`enforceAsync(field, value, instance) -> bool` ademas del `enforce` sincrono.
+`Rule.validateAsync` produce los mismos fallos. El validador sincrono conserva su
+comportamiento bloqueante para E/S y no debe usarse desde handlers asincronos que
+necesiten esas reglas. Esto incluye los helpers sincronos de payloads MCP.
+
+Los campos validos ejecutan sus reglas asincronas aunque un hermano falle en la
+conversion. Una alternativa escalar de una union no se inspecciona como struct.
+La validacion de unicidad no es atomica: conservar una restriccion UNIQUE real
+para impedir duplicados entre escritores concurrentes.
 
 ### Mapa de archivos
 

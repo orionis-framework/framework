@@ -1,3 +1,4 @@
+import asyncio
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
 
@@ -54,6 +55,36 @@ class Rule(IRule):
         error_msg = "Subclasses must implement the enforce method."
         raise NotImplementedError(error_msg)
 
+    async def enforceAsync(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> bool:
+        """
+        Run an explicitly asynchronous rule check without blocking the loop.
+
+        Parameters
+        ----------
+        field : str
+            Field name associated with the value.
+        value : object
+            Current field value to validate.
+        instance : object
+            Schema instance owning the field value.
+
+        Returns
+        -------
+        bool
+            Whether the synchronous rule accepts the value in a worker thread.
+
+        Notes
+        -----
+        Rules with native asynchronous I/O should override this method. Schema
+        plans call ordinary synchronous rules directly, without using a worker.
+        """
+        return await asyncio.to_thread(self.enforce, field, value, instance)
+
     def validate(
         self,
         field: str,
@@ -86,4 +117,32 @@ class Rule(IRule):
             )
 
         # If validation passes, return None to indicate success.
+        return None
+
+    async def validateAsync(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> ValidationFailure | None:
+        """Await the rule and describe an invalid field value.
+
+        Parameters
+        ----------
+        field : str
+            Field name associated with the value.
+        value : object
+            Current field value to validate.
+        instance : object
+            Schema instance owning the field value.
+
+        Returns
+        -------
+        ValidationFailure | None
+            Failure details when validation fails, otherwise None.
+        """
+        if not await self.enforceAsync(field, value, instance):
+            return ValidationFailure(
+                field=field, rule=self._code, message=self._message,
+            )
         return None

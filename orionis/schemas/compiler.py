@@ -136,6 +136,11 @@ class MetaCompiler:
         seen : dict[type[ValidationMetadata], ValidationMetadata]
             The indexed metadata mapping produced by ``_index``.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         MetadataConflictError

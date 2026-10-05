@@ -47,7 +47,7 @@ instead of stopping at the first one.
 
 - **`orionis.container`** — `Container.__resolveSchemaArgument` reads the body
   of the current request (`await request.data()`) and calls
-  `Schema.validate(data, argument.type)` whenever a handler parameter is
+  `await Schema.validateAsync(data, argument.type)` whenever a handler parameter is
   annotated with a `msgspec.Struct` subclass (`Argument.is_schema`, resolved by
   `orionis.introspection`). This is what makes controller parameters validated
   automatically.
@@ -86,6 +86,31 @@ Two distinct paths exist:
   that converted cleanly. A rule attached to a field whose own value failed
   conversion is **not** executed (there is no value to inspect); a rule whose
   sibling failed conversion **is** executed.
+
+### Asynchronous validation
+
+`await Schema.validateAsync(payload, schema)` preserves the conversion and
+multi-error behavior of `Schema.validate`. The container uses this entry point
+for injected request schemas. Plain schemas still use one `msgspec.convert`;
+synchronous rules run directly, without executor work or per-rule await checks.
+
+Schema creation compiles separate plans only for schemas that need native
+asynchronous rules, including nested schemas and union alternatives.
+`Unique.enforceAsync` awaits the application's current connection and transaction;
+it does not open an isolated engine. `ActiveUrl.enforceAsync` delegates DNS to the
+event loop's resolver executor. Cancellation propagates. Checks remain sequential
+inside one schema because a transaction can own one non-concurrent connection.
+
+Custom I/O rules can override `enforceAsync(field, value, instance) -> bool` in
+addition to their synchronous `enforce`. `Rule.validateAsync` builds the same
+failure representation. The existing synchronous validator remains blocking for
+I/O rules and must not be called from an asynchronous handler that needs them.
+This also applies to application code invoking synchronous MCP payload helpers.
+
+Successful fields still run their asynchronous rules when a sibling fails type
+conversion. Scalar alternatives of a schema union are not treated as structs.
+Uniqueness validation is a preflight check, not atomic enforcement: retain the
+database UNIQUE constraint to handle concurrent writers.
 
 ### File map
 

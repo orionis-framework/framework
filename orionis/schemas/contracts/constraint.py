@@ -20,6 +20,11 @@ class IRule(ABC):
         message : str | None, optional
             Custom message used for validation failures. If ``None``, default
             messages are used.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
 
     @abstractmethod

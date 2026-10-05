@@ -56,6 +56,7 @@ _ASGI_BODY_QUEUE_SIZE = 8
 _CWD = Path.cwd()
 _CONFIG_KEY_CACHE_SIZE = 256
 _MAINTENANCE_REFRESH_NS = 100_000_000
+_ROUTER_FACADE_MODULE = "orionis.support.facades.router"
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
@@ -1873,16 +1874,18 @@ class Application(Container, IApplication):
 
     # --- Routing Configuration and Validation ---
 
-    def withRouting(
+    def withRouting(  # noqa: PLR0913
         self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
         health: str | None = None,
         ai: str | list[str] | None = None,
+        *,
+        websocket: str | list[str] | None = None,
     ) -> Self:
         """
-        Configure routing files for API, web, console, and health endpoints.
+        Configure separate routing files for each application protocol.
 
         Parameters
         ----------
@@ -1896,6 +1899,8 @@ class Application(Container, IApplication):
             Path to the health check route.
         ai : str | list[str] | None
             MCP registration files loaded before HTTP or CLI startup.
+        websocket : str | list[str] | None
+            WebSocket and Hub route files using the web middleware profile.
 
         Returns
         -------
@@ -1920,13 +1925,13 @@ class Application(Container, IApplication):
         # Resolve and validate API routing files
         api_routers = self.__resolveAndValidateRoutingFiles(
             api,
-            {"orionis.support.facades.router"},
+            {_ROUTER_FACADE_MODULE},
         )
 
         # Resolve and validate web routing files
         web_routers = self.__resolveAndValidateRoutingFiles(
             web,
-            {"orionis.support.facades.router"},
+            {_ROUTER_FACADE_MODULE},
         )
 
         # Resolve and validate console routing files
@@ -1937,6 +1942,10 @@ class Application(Container, IApplication):
         ai_routers = self.__resolveAndValidateRoutingFiles(
             ai,
             {"orionis.support.facades.mcp"},
+        )
+        websocket_routers = self.__resolveAndValidateRoutingFiles(
+            websocket,
+            {_ROUTER_FACADE_MODULE},
         )
 
         # Validate health route type
@@ -1952,6 +1961,7 @@ class Application(Container, IApplication):
             "web": web_routers,
             "console": console_routers,
             "ai": ai_routers,
+            "websocket": websocket_routers,
             "health": health,
         }
 
@@ -2009,11 +2019,10 @@ class Application(Container, IApplication):
                 raise FileNotFoundError(error_msg)
 
             # Check if the file contains required routing imports
-            if file_path.read_text(
-                encoding="utf-8",
-            ).strip() and not ModuleInspector.fileImportsAny(
+            if not ModuleInspector.fileImportsAny(
                 file_path,
                 required_imports,
+                allow_empty=True,
             ):
                 error_msg = (
                     f"The file '{path}' does not contain valid routing definitions."
@@ -3117,14 +3126,14 @@ class Application(Container, IApplication):
         """
         Retrieve routing file paths from configuration.
 
-        The 'api', 'web', 'console', and 'ai' routing types are supported.
+        The 'api', 'web', 'console', 'ai', and 'websocket' types are supported.
         The health-check route is exposed through the ``routeHealthCheck``
         property and is not accessible via this method.
 
         Parameters
         ----------
         key : str | None, optional
-            Routing type to retrieve: 'api', 'web', 'console', or 'ai'.
+            Routing type: 'api', 'web', 'console', 'ai', or 'websocket'.
             If None, returns the complete routing configuration dictionary.
 
         Returns
@@ -3164,7 +3173,7 @@ class Application(Container, IApplication):
             return FreezeThaw.thaw(routing)
 
         # Validate key exists in valid routing types
-        if key not in {"api", "web", "console", "ai"}:
+        if key not in {"api", "web", "console", "ai", "websocket"}:
             return None
 
         # Thaw before returning: freeze converts lists→tuples; callers expect list[Path]

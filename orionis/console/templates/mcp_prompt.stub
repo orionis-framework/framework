@@ -1,11 +1,17 @@
 from orionis.mcp import McpResponse, Prompt
 
-
 class {{ class_name }}(Prompt):
     """Return application-defined messages for an MCP prompt."""
 
     description = "An application prompt."
 
     async def handle(self) -> McpResponse:
-        """Build the messages for this prompt."""
+        """
+        Build the messages for this prompt.
+
+        Returns
+        -------
+        McpResponse
+            Messages returned to the MCP client.
+        """
         return McpResponse.text("Describe what the user should ask.")

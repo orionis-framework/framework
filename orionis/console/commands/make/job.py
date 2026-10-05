@@ -1,6 +1,5 @@
 from orionis.console.commands.make._base import MakeStubCommand
 
-
 class MakeJob(MakeStubCommand):
     """Generate a serializable application job."""
 

@@ -3,12 +3,14 @@ from asyncio import to_thread
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
-from orionis.console.core.contracts.reactor import IReactor  # noqa: TC001
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.console.core.contracts.reactor import IReactor
+from orionis.foundation.contracts.application import IApplication
 
 _SIGNATURE_RE: re.Pattern[str] = re.compile(
     r"[a-z][a-z0-9]*(?::[a-z][a-z0-9]*(?:-[a-z0-9]+)*)?",
 )
+
+# ruff: noqa: TC001
 
 class MakeConsoleCommand(MakeStubCommand):
     """Generate a custom command for the Orionis CLI."""

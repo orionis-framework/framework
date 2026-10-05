@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from types import FrameType
     from orionis.queues.contracts.worker import IWorker
 
-
 def _stop_worker(worker: IWorker, _signal: int, _frame: FrameType | None) -> None:
-    """Request graceful draining after a process termination signal.
+    """
+    Request graceful draining after a process termination signal.
 
     Parameters
     ----------
@@ -21,9 +21,13 @@ def _stop_worker(worker: IWorker, _signal: int, _frame: FrameType | None) -> Non
         Delivered process signal.
     _frame : FrameType | None
         Interrupted interpreter frame.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
     """
     worker.stop()
-
 
 class WorkerSignals:
     """Install temporary worker shutdown handlers on the main thread."""
@@ -31,19 +35,32 @@ class WorkerSignals:
     __slots__ = ("_handlers", "_loop", "_worker")
 
     def __init__(self, worker: IWorker) -> None:
-        """Store the worker and currently running event loop.
+        """
+        Store the worker and currently running event loop.
 
         Parameters
         ----------
         worker : IWorker
             Worker receiving graceful shutdown requests.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._worker = worker
         self._loop = asyncio.get_running_loop()
         self._handlers: dict[int, object] = {}
 
     def __enter__(self) -> None:
-        """Install portable signal callbacks without replacing thread handlers."""
+        """
+        Install portable signal callbacks without replacing thread handlers.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if current_thread() is not main_thread():
             return
         for signum in (signal.SIGINT, signal.SIGTERM):
@@ -54,12 +71,18 @@ class WorkerSignals:
                 signal.signal(signum, partial(_stop_worker, self._worker))
 
     def __exit__(self, *_exception: object) -> None:
-        """Restore the application's previous signal handlers.
+        """
+        Restore the application's previous signal handlers.
 
         Parameters
         ----------
         _exception : object
             Exception details from the context manager.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         for signum, handler in self._handlers.items():
             with suppress(NotImplementedError):

@@ -2,7 +2,6 @@ from orionis.console.base.command import BaseCommand
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
 
-
 class QueueFailedCommand(BaseCommand):
     """List persistent failed jobs and their original exceptions."""
 
@@ -13,7 +12,8 @@ class QueueFailedCommand(BaseCommand):
     description: str = "List failed queue jobs."
 
     async def handle(self, manager: IQueueManager) -> int:
-        """Display job identifiers, routing, attempts, and exceptions.
+        """
+        Display job identifiers, routing, attempts, and exceptions.
 
         Parameters
         ----------

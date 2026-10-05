@@ -10,7 +10,6 @@ from orionis.foundation.contracts.application import IApplication
 
 _REPLACE_ATTEMPTS = 6
 
-
 class MaintenanceModeCommand(BaseCommand):
     """Write a runtime-visible maintenance state for HTTP workers."""
 

@@ -1,8 +1,6 @@
 from typing import ClassVar
-
 from orionis.logging.contracts.logger import ILogger
 from orionis.queues import BaseJob
-
 
 class {{class_name}}(BaseJob):
     """Log processing of the stored record identifier."""
@@ -15,7 +13,8 @@ class {{class_name}}(BaseJob):
     backoff: ClassVar[tuple[float, ...]] = (1.0, 5.0)
 
     def __init__(self, record_id: int) -> None:
-        """Store the persistent record identifier.
+        """
+        Store the persistent record identifier.
 
         Parameters
         ----------
@@ -25,7 +24,8 @@ class {{class_name}}(BaseJob):
         self.record_id = record_id
 
     async def handle(self, logger: ILogger) -> None:
-        """Log the record identifier through an injected application service.
+        """
+        Log the record identifier through an injected application service.
 
         Parameters
         ----------

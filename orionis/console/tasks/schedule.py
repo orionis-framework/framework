@@ -298,7 +298,14 @@ class Schedule(ISchedule):
 
         # Handle asynchronous listeners using an async wrapper
         async def _async_listener_wrapper() -> None:
-            """Invoke the scheduler listener and handle its failure."""
+            """
+            Invoke the scheduler listener and handle its failure.
+
+            Returns
+            -------
+            None
+                Complete the documented operation without returning a value.
+            """
             try:
                 await listener(event_entity)
             except Exception as e:
@@ -375,7 +382,14 @@ class Schedule(ISchedule):
 
         # Handle asynchronous listeners using an async wrapper
         async def _async_listener_wrapper() -> None:
-            """Invoke the task listener and handle its failure."""
+            """
+            Invoke the task listener and handle its failure.
+
+            Returns
+            -------
+            None
+                Complete the documented operation without returning a value.
+            """
             try:
                 await listener(event_entity)
             except Exception as e:

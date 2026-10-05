@@ -1,6 +1,7 @@
 from orionis.console.base.command import BaseCommand
-from orionis.mcp.contracts.manager import IMcpManager  # noqa: TC001 - Command DI.
+from orionis.mcp.contracts.manager import IMcpManager
 
+# ruff: noqa: TC001
 
 class McpListCommand(BaseCommand):
     """Describe registered servers without opening their transports."""
@@ -9,8 +10,20 @@ class McpListCommand(BaseCommand):
     signature = "mcp:list"
     description = "List registered HTTP and local MCP servers."
 
-    async def handle(self, manager: IMcpManager) -> None:  # pyright: ignore[reportIncompatibleMethodOverride] - Native command DI.
-        """Show each transport, address and server declaration."""
+    async def handle(self, manager: IMcpManager) -> None:
+        """
+        Show each transport, address and server declaration.
+
+        Parameters
+        ----------
+        manager : IMcpManager
+            Value supplied for ``manager``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         rows = [
             (transport, address, f"{server.__module__}.{server.__qualname__}")
             for transport, address, server in manager.servers()

@@ -1185,6 +1185,11 @@ class ITask(ABC):
         specified interval in hours, using any configured start and end dates,
         and random delay (jitter) if set.
 
+        Parameters
+        ----------
+        hours : int
+            Value supplied for ``hours``.
+
         Returns
         -------
         bool
@@ -1743,6 +1748,11 @@ class ITask(ABC):
         the specified interval in days, using any configured start and end dates, and
         random delay (jitter) if set.
 
+        Parameters
+        ----------
+        days : int
+            Value supplied for ``days``.
+
         Returns
         -------
         bool
@@ -2052,6 +2062,14 @@ class ITask(ABC):
         Validates input ranges for hour, minute, and second. Sets up a CronTrigger for
         Mondays at the specified time. Stores a description of the schedule.
 
+        Parameters
+        ----------
+        hour : int
+            Value supplied for ``hour``.
+        minute : int
+            Value supplied for ``minute``.
+        second : int
+            Value supplied for ``second``.
 
         Returns
         -------

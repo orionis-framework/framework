@@ -1,6 +1,5 @@
 from orionis.mcp import Server
 
-
 class {{ class_name }}(Server):
     """Expose application tools, resources and prompts through MCP."""
 

@@ -32,7 +32,7 @@ def format_bytes(size: int | None) -> str:
 class DbShowCommand(MigrationCommand):
     """Render connection details and a table summary."""
 
-    # ruff: noqa: TC001
+    # ruff: noqa: TC001, E501
 
     timestamps: bool = False
     signature: str = "db:show"
@@ -90,10 +90,7 @@ class DbShowCommand(MigrationCommand):
                 ["Driver", inspector.driver],
                 ["Database", str(inspector.config.get("database") or "N/A")],
                 ["Size", format_bytes(size)],
-                [
-                    "Open connections",
-                    str(connections) if connections is not None else "N/A",
-                ],
+                ["Open connections", str(connections) if connections is not None else "N/A"],
                 ["Tables", str(len(tables))],
                 ["Views", str(view_count)],
                 ["Materialized views", str(materialized_count)],

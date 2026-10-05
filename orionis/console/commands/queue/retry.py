@@ -1,10 +1,8 @@
 from typing import ClassVar
-
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
-
 
 class QueueRetryCommand(BaseCommand):
     """Redispatch one failed job through its original connection."""
@@ -19,7 +17,8 @@ class QueueRetryCommand(BaseCommand):
     ]
 
     async def handle(self, manager: IQueueManager) -> int:
-        """Restore one failed payload with its preserved job identifier.
+        """
+        Restore one failed payload with its preserved job identifier.
 
         Parameters
         ----------

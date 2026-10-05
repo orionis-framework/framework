@@ -27,6 +27,11 @@ class DatabaseInspector:
             Manager that resolves database configurations and connections.
         name : str | None, optional
             Named connection, or the configured default.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self.name = name or manager.getDefaultName()
         self.config = manager.configFor(self.name)

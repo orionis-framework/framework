@@ -53,7 +53,6 @@ def _parse_name(name: str) -> tuple[tuple[str, ...], str]:
         raise ValueError(error_msg)
     return modules, class_name
 
-
 class MakeFactory(MakeStubCommand):
     """Generate an explicitly imported factory for an application model."""
 

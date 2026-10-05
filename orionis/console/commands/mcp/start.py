@@ -2,8 +2,9 @@ import sys
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
-from orionis.mcp.contracts.manager import IMcpManager  # noqa: TC001 - Command DI.
+from orionis.mcp.contracts.manager import IMcpManager
 
+# ruff: noqa: TC001
 
 class McpStartCommand(BaseCommand):
     """Run one explicitly registered local MCP server."""
@@ -18,8 +19,20 @@ class McpStartCommand(BaseCommand):
         ),
     ]
 
-    async def handle(self, manager: IMcpManager) -> int:  # pyright: ignore[reportIncompatibleMethodOverride] - Native command DI.
-        """Preserve protocol-only STDOUT and fail unknown handles without imports."""
+    async def handle(self, manager: IMcpManager) -> int:
+        """
+        Preserve protocol-only STDOUT and fail unknown handles without imports.
+
+        Parameters
+        ----------
+        manager : IMcpManager
+            Value supplied for ``manager``.
+
+        Returns
+        -------
+        int
+            Result of the operation described above.
+        """
         name = self.getArgument("name")
         if not isinstance(name, str):
             sys.stderr.write("An MCP local server handle is required.\n")

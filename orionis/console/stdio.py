@@ -1,5 +1,3 @@
-"""Reserve STDOUT before an MCP command boots application services."""
-
 import sys
 from contextlib import contextmanager, redirect_stdout
 from contextvars import ContextVar
@@ -7,24 +5,40 @@ from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Generator, Sequence
 
 _PROTOCOL_STDOUT: ContextVar[BinaryIO | None] = ContextVar(
     "orionis_protocol_stdout", default=None,
 )
 
-
 def protocol_stdout() -> BinaryIO | None:
-    """Return the original protocol writer while diagnostic stdout is redirected."""
+    """
+    Return the original protocol writer while diagnostic stdout is redirected.
+
+    Returns
+    -------
+    BinaryIO | None
+        The original protocol writer while diagnostic stdout is redirected.
+    """
     return _PROTOCOL_STDOUT.get()
 
-
 @contextmanager
-def protocol_stdio(arguments: Sequence[str] | None) -> Iterator[None]:
-    """Route MCP bootstrap, command, and shutdown diagnostics to STDERR.
+def protocol_stdio(arguments: Sequence[str] | None) -> Generator[None]:
+    """
+    Route MCP bootstrap, command, and shutdown diagnostics to STDERR.
 
     Nested application entry points retain the first binary protocol writer.
     Ordinary Reactor commands keep their existing output behavior.
+
+    Parameters
+    ----------
+    arguments : Sequence[str] | None
+        Arguments supplied for this operation.
+
+    Yields
+    ------
+    None
+        Yield control to the caller with the appropriate stdout routing.
     """
     arguments = arguments or ()
     offset = int(bool(arguments and Path(arguments[0]).stem == "reactor"))

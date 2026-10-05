@@ -29,6 +29,11 @@ class DatabaseWiper:
         ----------
         inspector : DatabaseInspector
             Inspector for the target database connection.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._inspector = inspector
 
@@ -118,6 +123,11 @@ class DatabaseWiper:
             Names of views to drop.
         tables : list[str]
             Names of tables to drop.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         connection = self._inspector.connection
         # MySQL DDL commits implicitly, but the framework transaction keeps
@@ -150,6 +160,11 @@ class DatabaseWiper:
         ----------
         views : list[str]
             Materialized view names to remove.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         for name in views:
             quoted = self._inspector.quoteIdentifier(name)
@@ -168,6 +183,11 @@ class DatabaseWiper:
         ----------
         domains : list[str]
             Domain names to remove.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         for name in domains:
             quoted = self._inspector.quoteIdentifier(name)
@@ -190,6 +210,11 @@ class DatabaseWiper:
             View names to remove.
         cascade : bool, optional
             Whether to cascade dependent objects when supported by the database.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         driver = self._inspector.driver
         for name in views:
@@ -217,6 +242,11 @@ class DatabaseWiper:
             Table names to remove.
         cascade : bool, optional
             Whether to cascade dependent objects when supported by the database.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         driver = self._inspector.driver
         for name in tables:
@@ -244,6 +274,11 @@ class DatabaseWiper:
             Type names to remove.
         cascade : bool, optional
             Whether to cascade dependent objects when supported by the database.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         driver = self._inspector.driver
         for name in types:
@@ -437,6 +472,11 @@ class DatabaseWiper:
         ----------
         views : list[str]
             View names to remove.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         if not views:
             return
@@ -474,6 +514,11 @@ class DatabaseWiper:
         ----------
         tables : list[str]
             Table names to prepare.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         if not tables:
             return
@@ -503,6 +548,11 @@ class DatabaseWiper:
         ----------
         tables : list[str]
             Table names whose keys are removed.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         if not tables:
             return

@@ -1,10 +1,8 @@
 from typing import ClassVar
-
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
-
 
 class QueueClearCommand(BaseCommand):
     """Clear every pending state from one logical queue."""
@@ -20,7 +18,8 @@ class QueueClearCommand(BaseCommand):
     ]
 
     async def handle(self, manager: IQueueManager) -> int:
-        """Remove the selected queue's jobs and report the count.
+        """
+        Remove the selected queue's jobs and report the count.
 
         Parameters
         ----------

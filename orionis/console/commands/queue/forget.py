@@ -1,10 +1,8 @@
 from typing import ClassVar
-
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
-
 
 class QueueForgetCommand(BaseCommand):
     """Remove one failed job record."""
@@ -19,7 +17,8 @@ class QueueForgetCommand(BaseCommand):
     ]
 
     async def handle(self, manager: IQueueManager) -> int:
-        """Delete the selected failure record and report missing identifiers.
+        """
+        Delete the selected failure record and report missing identifiers.
 
         Parameters
         ----------

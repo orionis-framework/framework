@@ -28,7 +28,6 @@ _BUILD_DIR_NAMES: tuple[str, ...] = ("build", "dist")
 _COMPILED_CACHE_FILES: tuple[str, ...] = ("config", "commands", "routes")
 _BYTECODE_SUFFIXES: frozenset[str] = frozenset({".pyc", ".pyo"})
 
-
 class OptimizeClearCommand(BaseCommand):
     """Remove generated optimization artifacts from the application."""
 

@@ -1,12 +1,10 @@
 from orionis.mcp import McpResponse, Tool
 from orionis.schemas import Schema
 
-
 class {{ class_name }}Input(Schema):
     """Arguments controlled by the MCP client."""
 
     message: str
-
 
 class {{ class_name }}(Tool[{{ class_name }}Input]):
     """Describe the work performed by this tool."""
@@ -15,5 +13,17 @@ class {{ class_name }}(Tool[{{ class_name }}Input]):
     input = {{ class_name }}Input
 
     async def handle(self, payload: {{ class_name }}Input) -> McpResponse:
-        """Use validated client arguments and explicitly injected dependencies."""
+        """
+        Process the validated input message.
+
+        Parameters
+        ----------
+        payload : {{ class_name }}Input
+            Validated arguments supplied by the MCP client.
+
+        Returns
+        -------
+        McpResponse
+            Text response containing the input message.
+        """
         return McpResponse.text(payload.message)

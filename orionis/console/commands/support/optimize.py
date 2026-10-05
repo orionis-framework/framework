@@ -26,7 +26,6 @@ _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
 if _ACTIVE_VENV_BASENAME:
     _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 
-
 class OptimizeCommand(BaseCommand):
     """Compile application Python source files into optimized bytecode."""
 

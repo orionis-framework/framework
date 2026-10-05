@@ -41,8 +41,7 @@ class Task(ITask):
         kwargs: dict | None = None,
         purpose: str | None = None,
     ) -> None:
-        """
-        Initialize the Task instance.
+        """Initialize the Task instance.
 
         Set up the initial state of the Task, including its signature, arguments,
         purpose, and optional attributes such as random delay, start and end dates,
@@ -57,6 +56,9 @@ class Task(ITask):
             List of arguments for the task. Defaults to an empty list if None.
         purpose : str or None, optional
             Human-readable description or purpose of the task.
+
+        kwargs : dict | None
+            Value supplied for ``kwargs``.
 
         Returns
         -------
@@ -1753,6 +1755,11 @@ class Task(ITask):
         specified interval in hours, using any configured start and end dates,
         and random delay (jitter) if set.
 
+        Parameters
+        ----------
+        hours : int
+            Value supplied for ``hours``.
+
         Returns
         -------
         bool
@@ -2458,6 +2465,11 @@ class Task(ITask):
         the specified interval in days, using any configured start and end dates, and
         random delay (jitter) if set.
 
+        Parameters
+        ----------
+        days : int
+            Value supplied for ``days``.
+
         Returns
         -------
         bool
@@ -2840,6 +2852,15 @@ class Task(ITask):
 
         Validates input ranges for hour, minute, and second. Sets up a CronTrigger for
         Mondays at the specified time. Stores a description of the schedule.
+
+        Parameters
+        ----------
+        hour : int
+            Value supplied for ``hour``.
+        minute : int
+            Value supplied for ``minute``.
+        second : int
+            Value supplied for ``second``.
 
         Returns
         -------

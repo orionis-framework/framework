@@ -1,12 +1,10 @@
 from typing import ClassVar
-
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.commands.queue._signals import WorkerSignals
 from orionis.console.enums.actions import ArgumentAction
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
-
 
 class QueueWorkCommand(BaseCommand):
     """Run an asynchronous worker over prioritized logical queues."""
@@ -30,7 +28,8 @@ class QueueWorkCommand(BaseCommand):
     ]
 
     async def handle(self, manager: IQueueManager) -> int:
-        """Consume jobs until shutdown or a requested stopping condition.
+        """
+        Consume jobs until shutdown or a requested stopping condition.
 
         Parameters
         ----------

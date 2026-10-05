@@ -1,0 +1,1786 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.queues.worker.Worker</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.queues.worker.Worker.html" class="internal-link" title="This class"><wbr></wbr>Worker</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_consume" class="internal-link" title="orionis.queues.worker.Worker._consume">_consume</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finish" class="internal-link" title="orionis.queues.worker.Worker._finish">_finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_releaseCancelled" class="internal-link" title="orionis.queues.worker.Worker._releaseCancelled">_release<wbr></wbr>Cancelled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateReservation" class="internal-link" title="orionis.queues.worker.Worker._validateReservation">_validate<wbr></wbr>Reservation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#execute" class="internal-link" title="orionis.queues.worker.Worker.execute">execute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#run" class="internal-link" title="orionis.queues.worker.Worker.run">run</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stop" class="internal-link" title="orionis.queues.worker.Worker.stop">stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.worker.Worker.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.queues.worker.Worker._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_concurrency" class="internal-link" title="orionis.queues.worker.Worker._concurrency">_concurrency</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_connection" class="internal-link" title="orionis.queues.worker.Worker._connection">_connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_driver" class="internal-link" title="orionis.queues.worker.Worker._driver">_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_failed" class="internal-link" title="orionis.queues.worker.Worker._failed">_failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_failed_resolver" class="internal-link" title="orionis.queues.worker.Worker._failed_resolver">_failed<wbr></wbr>_resolver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_processed" class="internal-link" title="orionis.queues.worker.Worker._processed">_processed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_queues" class="internal-link" title="orionis.queues.worker.Worker._queues">_queues</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_retry_after" class="internal-link" title="orionis.queues.worker.Worker._retry_after">_retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_running" class="internal-link" title="orionis.queues.worker.Worker._running">_running</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_serializer" class="internal-link" title="orionis.queues.worker.Worker._serializer">_serializer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_sleep" class="internal-link" title="orionis.queues.worker.Worker._sleep">_sleep</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_started" class="internal-link" title="orionis.queues.worker.Worker._started">_started</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_stop" class="internal-link" title="orionis.queues.worker.Worker._stop">_stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.queues.worker.html" class="internal-link" title="The parent of this class">worker</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24140"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.queues.worker.Worker.html" class="internal-link" title="orionis.queues.worker.Worker"><wbr></wbr>Worker</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_consume" class="internal-link" title="orionis.queues.worker.Worker._consume">_consume</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finish" class="internal-link" title="orionis.queues.worker.Worker._finish">_finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_releaseCancelled" class="internal-link" title="orionis.queues.worker.Worker._releaseCancelled">_release<wbr></wbr>Cancelled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateReservation" class="internal-link" title="orionis.queues.worker.Worker._validateReservation">_validate<wbr></wbr>Reservation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#execute" class="internal-link" title="orionis.queues.worker.Worker.execute">execute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#run" class="internal-link" title="orionis.queues.worker.Worker.run">run</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stop" class="internal-link" title="orionis.queues.worker.Worker.stop">stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.worker.Worker.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.queues.worker.Worker._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_concurrency" class="internal-link" title="orionis.queues.worker.Worker._concurrency">_concurrency</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_connection" class="internal-link" title="orionis.queues.worker.Worker._connection">_connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_driver" class="internal-link" title="orionis.queues.worker.Worker._driver">_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_failed" class="internal-link" title="orionis.queues.worker.Worker._failed">_failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_failed_resolver" class="internal-link" title="orionis.queues.worker.Worker._failed_resolver">_failed<wbr></wbr>_resolver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_processed" class="internal-link" title="orionis.queues.worker.Worker._processed">_processed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_queues" class="internal-link" title="orionis.queues.worker.Worker._queues">_queues</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_retry_after" class="internal-link" title="orionis.queues.worker.Worker._retry_after">_retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_running" class="internal-link" title="orionis.queues.worker.Worker._running">_running</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_serializer" class="internal-link" title="orionis.queues.worker.Worker._serializer">_serializer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_sleep" class="internal-link" title="orionis.queues.worker.Worker._sleep">_sleep</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_started" class="internal-link" title="orionis.queues.worker.Worker._started">_started</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_stop" class="internal-link" title="orionis.queues.worker.Worker._stop">_stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24141"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId24141">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link" title="orionis.queues.worker.WorkerOptions"><wbr></wbr>Worker<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#__post_init__" class="internal-link" title="orionis.queues.worker.WorkerOptions.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#concurrency" class="internal-link" title="orionis.queues.worker.WorkerOptions.concurrency">concurrency</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#connection" class="internal-link" title="orionis.queues.worker.WorkerOptions.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#queues" class="internal-link" title="orionis.queues.worker.WorkerOptions.queues">queues</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#retry_after" class="internal-link" title="orionis.queues.worker.WorkerOptions.retry_after">retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.WorkerOptions.html#sleep" class="internal-link" title="orionis.queues.worker.WorkerOptions.sleep">sleep</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.html#_LOGGER" class="internal-link" title="orionis.queues.worker._LOGGER">_LOGGER</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.queues.html" class="internal-link" title="orionis.queues">queues</a></code><wbr></wbr>.<code><a href="orionis.queues.worker.html" class="internal-link" title="orionis.queues.worker">worker</a></code><wbr></wbr>.<code><a href="orionis.queues.worker.Worker.html" class="internal-link" title="orionis.queues.worker.Worker">Worker</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Worker</span>(<a href="orionis.queues.contracts.worker.IWorker.html" class="internal-link" title="orionis.queues.contracts.worker.IWorker">IWorker</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L61" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">Worker(app, driver, serializer, options, ...)</a></code></p><p><a href="classIndex.html#orionis.queues.worker.Worker">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Consume leased jobs through isolated Orionis dependency scopes.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1662">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">__init__</a></code></td>
+    <td>Initialize worker settings without opening backend connections.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_consume" class="internal-link" title="orionis.queues.worker.Worker._consume">_consume</a></code></td>
+    <td>Consume reservations within the shared job budget.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code></td>
+    <td>Record a terminal failure before deleting the owned reservation.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_finish" class="internal-link" title="orionis.queues.worker.Worker._finish">_finish</a></code></td>
+    <td>Acknowledge unfinished work or propagate an immediate job failure.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code></td>
+    <td>Choose a retry release or terminal failure from the job's retry policy.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_releaseCancelled" class="internal-link" title="orionis.queues.worker.Worker._releaseCancelled">_release<wbr></wbr>Cancelled</a></code></td>
+    <td>Release a cancelled reservation without replacing its cancellation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_validateReservation" class="internal-link" title="orionis.queues.worker.Worker._validateReservation">_validate<wbr></wbr>Reservation</a></code></td>
+    <td>Validate reservation routing, timeout and retry eligibility.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#execute" class="internal-link" title="orionis.queues.worker.Worker.execute">execute</a></code></td>
+    <td>Execute a reserved job with isolated DI and lease-aware completion.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#run" class="internal-link" title="orionis.queues.worker.Worker.run">run</a></code></td>
+    <td>Consume jobs concurrently until a stopping condition is reached.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#stop" class="internal-link" title="orionis.queues.worker.Worker.stop">stop</a></code></td>
+    <td>Request a graceful stop without waiting for active jobs.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.worker.Worker.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_app" class="internal-link" title="orionis.queues.worker.Worker._app">_app</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_concurrency" class="internal-link" title="orionis.queues.worker.Worker._concurrency">_concurrency</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_connection" class="internal-link" title="orionis.queues.worker.Worker._connection">_connection</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_driver" class="internal-link" title="orionis.queues.worker.Worker._driver">_driver</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_failed" class="internal-link" title="orionis.queues.worker.Worker._failed">_failed</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_failed_resolver" class="internal-link" title="orionis.queues.worker.Worker._failed_resolver">_failed<wbr></wbr>_resolver</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_processed" class="internal-link" title="orionis.queues.worker.Worker._processed">_processed</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_queues" class="internal-link" title="orionis.queues.worker.Worker._queues">_queues</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_retry_after" class="internal-link" title="orionis.queues.worker.Worker._retry_after">_retry<wbr></wbr>_after</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_running" class="internal-link" title="orionis.queues.worker.Worker._running">_running</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_serializer" class="internal-link" title="orionis.queues.worker.Worker._serializer">_serializer</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_sleep" class="internal-link" title="orionis.queues.worker.Worker._sleep">_sleep</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_started" class="internal-link" title="orionis.queues.worker.Worker._started">_started</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_stop" class="internal-link" title="orionis.queues.worker.Worker._stop">_stop</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">driver: <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>, </span><span class="rst-sig-param">serializer: <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code>, </span><span class="rst-sig-param">options: <code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link" title="orionis.queues.worker.WorkerOptions">WorkerOptions</a></code>, </span><span class="rst-sig-param">failed: <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a> | FailedResolver | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.queues.worker.Worker.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize worker settings without opening backend connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application container used to create an isolated scope per job.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code></td><td class="fieldArgDesc">Backend used to reserve, release and acknowledge jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code></td><td class="fieldArgDesc">Serializer used to restore envelopes and registered jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">options:</span><code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link" title="orionis.queues.worker.WorkerOptions">WorkerOptions</a></code></td><td class="fieldArgDesc">Validated connection, queues, concurrency, lease and poll settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed:</span><code>IFailedJobRepository | FailedResolver | None, <em>optional</em></code></td><td class="fieldArgDesc">Failure repository or async resolver invoked on terminal failure.
+If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be recorded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store dependencies and initialize counters and stop state.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._consume">
+    
+  </a>
+  <a name="_consume">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_consume</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">stop_when_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>, </span><span class="rst-sig-param">max_jobs: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L187">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_consume" title="orionis.queues.worker.Worker._consume">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Consume reservations within the shared job budget.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">End this consumer when the backend has no ready job.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None</code></td><td class="fieldArgDesc">Shared reservation limit, or <tt class="rst-docutils rst-literal">None</tt> to run without a job limit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Process reserved jobs and update the shared counters.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If reservation or execution raises an unhandled error.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._fail">
+    
+  </a>
+  <a name="_fail">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_fail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L442">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_fail" title="orionis.queues.worker.Worker._fail">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Record a terminal failure before deleting the owned reservation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Reservation whose lease must still be valid before recording failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Original job exception stored in the failure repository.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> if deletion succeeds; <tt class="rst-docutils rst-literal">False</tt> if the lease is expired or lost.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If no failed-job repository can be resolved.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If repository resolution, failure recording or job deletion fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._finish">
+    
+  </a>
+  <a name="_finish">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>JobContext</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_finish" title="orionis.queues.worker.Worker._finish">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Acknowledge unfinished work or propagate an immediate job failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.queues.JobContext.html" class="internal-link" title="orionis.queues.JobContext">JobContext</a></code></td><td class="fieldArgDesc">Lifecycle state containing the reservation's explicit transitions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Raise a recorded failure when immediate execution requires propagation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Delete unfinished work or preserve an existing lifecycle transition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If deletion fails or a recorded failure must be propagated.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._handleFailure">
+    
+  </a>
+  <a name="_handleFailure">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_handleFailure</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L391">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_handleFailure" title="orionis.queues.worker.Worker._handleFailure">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Choose a retry release or terminal failure from the job's retry policy.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Current reservation used to release or record the failed attempt.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code>JobEnvelope | None</code></td><td class="fieldArgDesc">Decoded retry policy, or <tt class="rst-docutils rst-literal">None</tt> if the envelope is unavailable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Original error used to determine retry eligibility and record failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Disable retries so immediate execution records a terminal failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt a delayed retry release or terminal failure recording.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If a terminal failure has no available failed-job repository.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If the backend or failure repository cannot complete the transition.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._releaseCancelled">
+    
+  </a>
+  <a name="_releaseCancelled">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_releaseCancelled</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L345">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_releaseCancelled" title="orionis.queues.worker.Worker._releaseCancelled">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Release a cancelled reservation without replacing its cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Reservation whose execution was interrupted before completion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt lease release and log backend errors without re-raising them.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._validateReservation">
+    
+  </a>
+  <a name="_validateReservation">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateReservation</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L230">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validateReservation" title="orionis.queues.worker.Worker._validateReservation">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate reservation routing, timeout and retry eligibility.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Backend reservation containing routing metadata and attempt count.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Decoded dispatch metadata and retry policy to match and enforce.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Accept a reservation that matches its envelope and retry limits.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link" title="orionis.queues.exceptions.QueuePayloadError">QueuePayloadError</a></code></td><td>If routing metadata differs or the attempt count is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If the timeout is missing or not shorter than worker <tt class="rst-docutils rst-literal">retry_after</tt>.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueRetryError.html" class="internal-link" title="orionis.queues.exceptions.QueueRetryError">QueueRetryError</a></code></td><td>If attempts exceed <tt class="rst-docutils rst-literal">max_tries</tt> or the retry deadline has expired.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker.execute">
+    
+  </a>
+  <a name="execute">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L277">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#execute" title="orionis.queues.worker.Worker.execute">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#execute" class="internal-link">orionis.queues.contracts.worker.IWorker.execute</a></code></div>
+    <div><p>Execute a reserved job with isolated DI and lease-aware completion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Backend reservation containing the payload, attempt count and lease.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Propagate execution errors and bypass automatic retries when true.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt acknowledgement, retry release or terminal failure recording.
+Skip expired reservations without executing their jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If cancelled, after attempting to release unfinished work.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If execution or completion fails and <tt class="rst-docutils rst-literal">raise_errors</tt> is true.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker.run">
+    
+  </a>
+  <a name="run">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">stop_when_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">max_jobs: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L134">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#run" title="orionis.queues.worker.Worker.run">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#run" class="internal-link">orionis.queues.contracts.worker.IWorker.run</a></code></div>
+    <div><p>Consume jobs concurrently until a stopping condition is reached.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Stop each consumer when no job is ready, even if delayed jobs remain.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Limit reservations across all consumers; <tt class="rst-docutils rst-literal">None</tt> means no limit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of processed reservations, including retried or failed jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If already running or a supplied job limit is not a positive integer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If cancelled, after in-flight consumers finish.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If a consumer fails, after the remaining consumers finish.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker.stop">
+    
+  </a>
+  <a name="stop">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">stop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L123">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stop" title="orionis.queues.worker.Worker.stop">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#stop" class="internal-link">orionis.queues.contracts.worker.IWorker.stop</a></code></div>
+    <div><p>Request a graceful stop without waiting for active jobs.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set the stop event; active consumers complete their current work.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.queues.worker.Worker.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.queues.worker.Worker.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#__slots__" class="internal-link">orionis.queues.contracts.worker.IWorker.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._app">
+    
+  </a>
+  <a name="_app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_app</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L108">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_app" title="orionis.queues.worker.Worker._app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._concurrency">
+    
+  </a>
+  <a name="_concurrency">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_concurrency</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L113">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_concurrency" title="orionis.queues.worker.Worker._concurrency">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._connection">
+    
+  </a>
+  <a name="_connection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_connection</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L111">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_connection" title="orionis.queues.worker.Worker._connection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._driver">
+    
+  </a>
+  <a name="_driver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_driver</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L109">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_driver" title="orionis.queues.worker.Worker._driver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._failed">
+    
+  </a>
+  <a name="_failed">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_failed</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L116">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_failed" title="orionis.queues.worker.Worker._failed">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._failed_resolver">
+    
+  </a>
+  <a name="_failed_resolver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_failed_resolver</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L117">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_failed_resolver" title="orionis.queues.worker.Worker._failed_resolver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._processed">
+    
+  </a>
+  <a name="_processed">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_processed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L121">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_processed" title="orionis.queues.worker.Worker._processed">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._queues">
+    
+  </a>
+  <a name="_queues">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_queues</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L112">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_queues" title="orionis.queues.worker.Worker._queues">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._retry_after">
+    
+  </a>
+  <a name="_retry_after">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_retry_after</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L114">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_retry_after" title="orionis.queues.worker.Worker._retry_after">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._running">
+    
+  </a>
+  <a name="_running">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_running</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L119">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_running" title="orionis.queues.worker.Worker._running">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._serializer">
+    
+  </a>
+  <a name="_serializer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_serializer</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L110">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_serializer" title="orionis.queues.worker.Worker._serializer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._sleep">
+    
+  </a>
+  <a name="_sleep">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_sleep</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L115">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_sleep" title="orionis.queues.worker.Worker._sleep">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._started">
+    
+  </a>
+  <a name="_started">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_started</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L120">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_started" title="orionis.queues.worker.Worker._started">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.worker.Worker._stop">
+    
+  </a>
+  <a name="_stop">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_stop</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/worker.py#L118">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_stop" title="orionis.queues.worker.Worker._stop">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

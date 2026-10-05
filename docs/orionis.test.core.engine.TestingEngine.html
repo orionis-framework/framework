@@ -1,0 +1,1451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.test.core.engine.TestingEngine</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.test.core.engine.TestingEngine.html" class="internal-link" title="This class"><wbr></wbr>Testing<wbr></wbr>Engine</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__extractTests" class="internal-link" title="orionis.test.core.engine.TestingEngine.__extractTests">__extract<wbr></wbr>Tests</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.test.core.engine.TestingEngine.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__saveCache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__saveCache">__save<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#discover" class="internal-link" title="orionis.test.core.engine.TestingEngine.discover">discover</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#run" class="internal-link" title="orionis.test.core.engine.TestingEngine.run">run</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setFailFast" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFailFast">set<wbr></wbr>Fail<wbr></wbr>Fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setFilePattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFilePattern">set<wbr></wbr>File<wbr></wbr>Pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setMethodPattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setMethodPattern">set<wbr></wbr>Method<wbr></wbr>Pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setStartDir" class="internal-link" title="orionis.test.core.engine.TestingEngine.setStartDir">set<wbr></wbr>Start<wbr></wbr>Dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setVerbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.setVerbosity">set<wbr></wbr>Verbosity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withoutPanel" class="internal-link" title="orionis.test.core.engine.TestingEngine.withoutPanel">without<wbr></wbr>Panel</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__base_path" class="internal-link" title="orionis.test.core.engine.TestingEngine.__base_path">__base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__cache_folder" class="internal-link" title="orionis.test.core.engine.TestingEngine.__cache_folder">__cache<wbr></wbr>_folder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__fail_fast" class="internal-link" title="orionis.test.core.engine.TestingEngine.__fail_fast">__fail<wbr></wbr>_fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__file_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__file_pattern">__file<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__json_cache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__json_cache">__json<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__method_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__method_pattern">__method<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__start_dir" class="internal-link" title="orionis.test.core.engine.TestingEngine.__start_dir">__start<wbr></wbr>_dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__verbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.__verbosity">__verbosity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__with_panel" class="internal-link" title="orionis.test.core.engine.TestingEngine.__with_panel">__with<wbr></wbr>_panel</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.test.core.engine.html" class="internal-link" title="The parent of this class">engine</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId34721"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.test.core.engine.TestingEngine.html" class="internal-link" title="orionis.test.core.engine.TestingEngine"><wbr></wbr>Testing<wbr></wbr>Engine</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__extractTests" class="internal-link" title="orionis.test.core.engine.TestingEngine.__extractTests">__extract<wbr></wbr>Tests</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.test.core.engine.TestingEngine.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__saveCache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__saveCache">__save<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#discover" class="internal-link" title="orionis.test.core.engine.TestingEngine.discover">discover</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#run" class="internal-link" title="orionis.test.core.engine.TestingEngine.run">run</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setFailFast" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFailFast">set<wbr></wbr>Fail<wbr></wbr>Fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setFilePattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFilePattern">set<wbr></wbr>File<wbr></wbr>Pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setMethodPattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setMethodPattern">set<wbr></wbr>Method<wbr></wbr>Pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setStartDir" class="internal-link" title="orionis.test.core.engine.TestingEngine.setStartDir">set<wbr></wbr>Start<wbr></wbr>Dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setVerbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.setVerbosity">set<wbr></wbr>Verbosity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withoutPanel" class="internal-link" title="orionis.test.core.engine.TestingEngine.withoutPanel">without<wbr></wbr>Panel</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__base_path" class="internal-link" title="orionis.test.core.engine.TestingEngine.__base_path">__base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__cache_folder" class="internal-link" title="orionis.test.core.engine.TestingEngine.__cache_folder">__cache<wbr></wbr>_folder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__fail_fast" class="internal-link" title="orionis.test.core.engine.TestingEngine.__fail_fast">__fail<wbr></wbr>_fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__file_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__file_pattern">__file<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__json_cache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__json_cache">__json<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__method_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__method_pattern">__method<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__start_dir" class="internal-link" title="orionis.test.core.engine.TestingEngine.__start_dir">__start<wbr></wbr>_dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__verbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.__verbosity">__verbosity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__with_panel" class="internal-link" title="orionis.test.core.engine.TestingEngine.__with_panel">__with<wbr></wbr>_panel</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.test.core.engine.html#_DEFAULT_FILE_PATTERN" class="internal-link" title="orionis.test.core.engine._DEFAULT_FILE_PATTERN">_DEFAULT<wbr></wbr>_FILE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.test.core.engine.html#_DEFAULT_METHOD_PATTERN" class="internal-link" title="orionis.test.core.engine._DEFAULT_METHOD_PATTERN">_DEFAULT<wbr></wbr>_METHOD<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.test.core.engine.html#_DEFAULT_START_DIR" class="internal-link" title="orionis.test.core.engine._DEFAULT_START_DIR">_DEFAULT<wbr></wbr>_START<wbr></wbr>_DIR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.test.core.engine.html#_DEFAULT_VERBOSITY" class="internal-link" title="orionis.test.core.engine._DEFAULT_VERBOSITY">_DEFAULT<wbr></wbr>_VERBOSITY</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.test.html" class="internal-link" title="orionis.test">test</a></code><wbr></wbr>.<code><a href="orionis.test.core.html" class="internal-link" title="orionis.test.core">core</a></code><wbr></wbr>.<code><a href="orionis.test.core.engine.html" class="internal-link" title="orionis.test.core.engine">engine</a></code><wbr></wbr>.<code><a href="orionis.test.core.engine.TestingEngine.html" class="internal-link" title="orionis.test.core.engine.TestingEngine">TestingEngine</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestingEngine</span>(<a href="orionis.test.contracts.engine.ITestingEngine.html" class="internal-link" title="orionis.test.contracts.engine.ITestingEngine">ITestingEngine</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L27" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.test.core.engine.TestingEngine.__init__">TestingEngine(app)</a></code></p><p><a href="classIndex.html#orionis.test.core.engine.TestingEngine">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id2041">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__extractTests" class="internal-link" title="orionis.test.core.engine.TestingEngine.__extractTests">__extract<wbr></wbr>Tests</a></code></td>
+    <td>Extract individual test cases from a test suite recursively.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.test.core.engine.TestingEngine.__init__">__init__</a></code></td>
+    <td>Initialize the TestingEngine with application configuration.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__saveCache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__saveCache">__save<wbr></wbr>Cache</a></code></td>
+    <td>Save test results to a JSON cache file asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#discover" class="internal-link" title="orionis.test.core.engine.TestingEngine.discover">discover</a></code></td>
+    <td>Discover and filter tests using configuration parameters.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#run" class="internal-link" title="orionis.test.core.engine.TestingEngine.run">run</a></code></td>
+    <td>Run the discovered test suite asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setFailFast" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFailFast">set<wbr></wbr>Fail<wbr></wbr>Fast</a></code></td>
+    <td>Set the fail-fast behavior for the testing engine.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setFilePattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setFilePattern">set<wbr></wbr>File<wbr></wbr>Pattern</a></code></td>
+    <td>Set the file pattern for test file discovery.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setMethodPattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.setMethodPattern">set<wbr></wbr>Method<wbr></wbr>Pattern</a></code></td>
+    <td>Set the method pattern for test method discovery.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setStartDir" class="internal-link" title="orionis.test.core.engine.TestingEngine.setStartDir">set<wbr></wbr>Start<wbr></wbr>Dir</a></code></td>
+    <td>Set the start directory for test discovery.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setVerbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.setVerbosity">set<wbr></wbr>Verbosity</a></code></td>
+    <td>Set the verbosity level for the testing engine.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withoutPanel" class="internal-link" title="orionis.test.core.engine.TestingEngine.withoutPanel">without<wbr></wbr>Panel</a></code></td>
+    <td>Disable the start panel display for the testing engine.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__base_path" class="internal-link" title="orionis.test.core.engine.TestingEngine.__base_path">__base<wbr></wbr>_path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__cache_folder" class="internal-link" title="orionis.test.core.engine.TestingEngine.__cache_folder">__cache<wbr></wbr>_folder</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__fail_fast" class="internal-link" title="orionis.test.core.engine.TestingEngine.__fail_fast">__fail<wbr></wbr>_fast</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__file_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__file_pattern">__file<wbr></wbr>_pattern</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__json_cache" class="internal-link" title="orionis.test.core.engine.TestingEngine.__json_cache">__json<wbr></wbr>_cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__method_pattern" class="internal-link" title="orionis.test.core.engine.TestingEngine.__method_pattern">__method<wbr></wbr>_pattern</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__start_dir" class="internal-link" title="orionis.test.core.engine.TestingEngine.__start_dir">__start<wbr></wbr>_dir</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__verbosity" class="internal-link" title="orionis.test.core.engine.TestingEngine.__verbosity">__verbosity</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__with_panel" class="internal-link" title="orionis.test.core.engine.TestingEngine.__with_panel">__with<wbr></wbr>_panel</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__extractTests">
+    
+  </a>
+  <a name="__extractTests">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__extractTests</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test_suite: <code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestSuite" class="intersphinx-link">unittest.TestSuite</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a>[<wbr></wbr><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L181">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__extractTests" title="orionis.test.core.engine.TestingEngine.__extractTests">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Extract individual test cases from a test suite recursively.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test<wbr></wbr>_suite:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestSuite" class="intersphinx-link">unittest.TestSuite</a></code></td><td class="fieldArgDesc">Test suite to extract test cases from.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a>[<a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Generator yielding individual test cases.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.test.core.engine.TestingEngine.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the TestingEngine with application configuration.</p>
+<p>Every <tt class="rst-docutils rst-literal">testing.*</tt> key that is absent from the application
+configuration resolves to None and is replaced by the default declared
+in <tt class="rst-docutils rst-literal">orionis.foundation.config.testing.Testing</tt>, so discovery never
+receives a missing value.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application instance providing configuration values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__saveCache">
+    
+  </a>
+  <a name="__saveCache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__saveCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">results: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L253">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__saveCache" title="orionis.test.core.engine.TestingEngine.__saveCache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Save test results to a JSON cache file asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">results:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code></td><td class="fieldArgDesc">List of test results to save.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.discover">
+    
+  </a>
+  <a name="discover">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">discover</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestSuite" class="intersphinx-link">unittest.TestSuite</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L204">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#discover" title="orionis.test.core.engine.TestingEngine.discover">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#discover" class="internal-link">orionis.test.contracts.engine.ITestingEngine.discover</a></code></div>
+    <div><p>Discover and filter tests using configuration parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestSuite" class="intersphinx-link">unittest.TestSuite</a></code></td><td class="fieldArgDesc">Test suite containing filtered test cases.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If a test module raises an exception outside loader error handling.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.run">
+    
+  </a>
+  <a name="run">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L288">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#run" title="orionis.test.core.engine.TestingEngine.run">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#run" class="internal-link">orionis.test.contracts.engine.ITestingEngine.run</a></code></div>
+    <div><p>Run the discovered test suite asynchronously.</p>
+<p>Discovers the tests, builds a runner carrying the configured verbosity,
+and executes them using a thread pool to avoid blocking. Saves results
+to cache if enabled.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code></td><td class="fieldArgDesc">List of TestResult objects containing test execution outcomes.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.setFailFast">
+    
+  </a>
+  <a name="setFailFast">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setFailFast</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">fail_fast: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L96">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setFailFast" title="orionis.test.core.engine.TestingEngine.setFailFast">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#setFailFast" class="internal-link">orionis.test.contracts.engine.ITestingEngine.setFailFast</a></code></div>
+    <div><p>Set the fail-fast behavior for the testing engine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fail<wbr></wbr>_fast:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to stop on first failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.setFilePattern">
+    
+  </a>
+  <a name="setFilePattern">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setFilePattern</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">file_pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L130">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setFilePattern" title="orionis.test.core.engine.TestingEngine.setFilePattern">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#setFilePattern" class="internal-link">orionis.test.contracts.engine.ITestingEngine.setFilePattern</a></code></div>
+    <div><p>Set the file pattern for test file discovery.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">file<wbr></wbr>_pattern:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Pattern to match test files.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.setMethodPattern">
+    
+  </a>
+  <a name="setMethodPattern">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setMethodPattern</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method_pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L147">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setMethodPattern" title="orionis.test.core.engine.TestingEngine.setMethodPattern">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#setMethodPattern" class="internal-link">orionis.test.contracts.engine.ITestingEngine.setMethodPattern</a></code></div>
+    <div><p>Set the method pattern for test method discovery.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method<wbr></wbr>_pattern:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Pattern to match test methods.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.setStartDir">
+    
+  </a>
+  <a name="setStartDir">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setStartDir</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">start_dir: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L113">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setStartDir" title="orionis.test.core.engine.TestingEngine.setStartDir">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#setStartDir" class="internal-link">orionis.test.contracts.engine.ITestingEngine.setStartDir</a></code></div>
+    <div><p>Set the start directory for test discovery.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start<wbr></wbr>_dir:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Directory to start test discovery from.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.setVerbosity">
+    
+  </a>
+  <a name="setVerbosity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setVerbosity</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">verbosity: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L79">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setVerbosity" title="orionis.test.core.engine.TestingEngine.setVerbosity">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#setVerbosity" class="internal-link">orionis.test.contracts.engine.ITestingEngine.setVerbosity</a></code></div>
+    <div><p>Set the verbosity level for the testing engine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">verbosity:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Verbosity level to set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.withoutPanel">
+    
+  </a>
+  <a name="withoutPanel">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withoutPanel</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L169">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withoutPanel" title="orionis.test.core.engine.TestingEngine.withoutPanel">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.test.contracts.engine.ITestingEngine.html#withoutPanel" class="internal-link">orionis.test.contracts.engine.ITestingEngine.withoutPanel</a></code></div>
+    <div><p>Disable the start panel display for the testing engine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">Returns self for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__base_path">
+    
+  </a>
+  <a name="__base_path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__base_path</span>: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L57">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__base_path" title="orionis.test.core.engine.TestingEngine.__base_path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__cache_folder">
+    
+  </a>
+  <a name="__cache_folder">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__cache_folder</span>: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L74">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__cache_folder" title="orionis.test.core.engine.TestingEngine.__cache_folder">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__fail_fast">
+    
+  </a>
+  <a name="__fail_fast">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__fail_fast</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__fail_fast" title="orionis.test.core.engine.TestingEngine.__fail_fast">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__file_pattern">
+    
+  </a>
+  <a name="__file_pattern">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__file_pattern</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L67">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__file_pattern" title="orionis.test.core.engine.TestingEngine.__file_pattern">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__json_cache">
+    
+  </a>
+  <a name="__json_cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__json_cache</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L73">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__json_cache" title="orionis.test.core.engine.TestingEngine.__json_cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__method_pattern">
+    
+  </a>
+  <a name="__method_pattern">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__method_pattern</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L70">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__method_pattern" title="orionis.test.core.engine.TestingEngine.__method_pattern">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__start_dir">
+    
+  </a>
+  <a name="__start_dir">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__start_dir</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__start_dir" title="orionis.test.core.engine.TestingEngine.__start_dir">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__verbosity">
+    
+  </a>
+  <a name="__verbosity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__verbosity</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L58">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__verbosity" title="orionis.test.core.engine.TestingEngine.__verbosity">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.test.core.engine.TestingEngine.__with_panel">
+    
+  </a>
+  <a name="__with_panel">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__with_panel</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/test/core/engine.py#L77">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__with_panel" title="orionis.test.core.engine.TestingEngine.__with_panel">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -7,11 +7,10 @@ from orionis.queues.drivers.database import DatabaseQueueDriver
 from orionis.queues.failed.repository import DatabaseFailedJobRepository
 from orionis.queues.exceptions import QueueConfigurationError
 from orionis.test import TestCase
-from tests.queues.drivers.contract import make_envelope
+from tests.queues.drivers.test_database import make_envelope
 
 if TYPE_CHECKING:
     from orionis.queues.entities.failed_job import FailedJob
-
 
 class TestDatabaseFailedJobRepository(TestCase):
     """Verify durable failure diagnostics and idempotent failure persistence."""

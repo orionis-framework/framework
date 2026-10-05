@@ -1,10 +1,6 @@
-"""Validation of open protocol metadata and known capability fields."""
-
 import re
 from collections.abc import Mapping
-
 import msgspec
-
 from orionis.mcp.protocol.metadata import ServerInfo
 
 _LABEL = r"[A-Za-z](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
@@ -21,18 +17,44 @@ _TOKEN = re.compile(r"[!#$%&'*+.^_`|~0-9A-Za-z-]+\Z")
 _MAX_TRACE_MEMBERS = 32
 _MAX_TRACE_VALUE = 256
 
-
 def validate_meta_key(key: str, *, extension: bool = False) -> None:
-    """Check the specification's prefix and name grammar."""
+    """
+    Check the specification's prefix and name grammar.
+
+    Parameters
+    ----------
+    key : str
+        Value supplied for ``key``.
+    extension : bool
+        Value supplied for ``extension``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if not isinstance(key, str) or not _META_KEY.fullmatch(key) or (
         extension and "/" not in key
     ):
         message = "Invalid MCP metadata key"
         raise ValueError(message)
 
-
 def validate_metadata(metadata: object, *, allow_reserved: bool = True) -> None:
-    """Preserve unknown metadata while validating its names and trace formats."""
+    """
+    Preserve unknown metadata while validating its names and trace formats.
+
+    Parameters
+    ----------
+    metadata : object
+        Metadata associated with the current operation.
+    allow_reserved : bool
+        Value supplied for ``allow_reserved``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if not isinstance(metadata, Mapping):
         message = "MCP metadata must be an object"
         raise TypeError(message)
@@ -55,9 +77,20 @@ def validate_metadata(metadata: object, *, allow_reserved: bool = True) -> None:
                 message = f"Invalid W3C {key} metadata"
                 raise ValueError(message)
 
-
 def validate_client_capabilities(capabilities: Mapping[str, object]) -> None:
-    """Validate known capabilities without closing the protocol's open set."""
+    """
+    Validate known capabilities without closing the protocol's open set.
+
+    Parameters
+    ----------
+    capabilities : Mapping[str, object]
+        Value supplied for ``capabilities``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     for key, children in (
         ("elicitation", ("form", "url")),
         ("sampling", ("context", "tools")),
@@ -71,21 +104,70 @@ def validate_client_capabilities(capabilities: Mapping[str, object]) -> None:
         if not isinstance(value, Mapping):
             message = "Client capability must be an object"
             raise TypeError(message)
-        for name in (value if key in ("experimental", "extensions") else children):
-            if name in value and not isinstance(value[name], Mapping):
-                message = "Client capability settings must be an object"
-                raise ValueError(message)
-            if key == "extensions":
-                validate_meta_key(name, extension=True)
+        _capability_settings(key, value, children)
 
+def _capability_settings(
+    key: str, value: Mapping[str, object], children: tuple[str, ...],
+) -> None:
+    """
+    Validate the nested settings of a known client capability.
+
+    Parameters
+    ----------
+    key : str
+        Capability name.
+    value : Mapping[str, object]
+        Settings advertised by the client.
+    children : tuple[str, ...]
+        Known child settings for closed capability names.
+
+    Returns
+    -------
+    None
+        Nested settings and extension names have been checked.
+
+    Raises
+    ------
+    ValueError
+        If a setting is not a mapping or an extension name is invalid.
+    """
+    for name in (value if key in ("experimental", "extensions") else children):
+        if name in value and not isinstance(value[name], Mapping):
+            message = "Client capability settings must be an object"
+            raise ValueError(message)
+        if key == "extensions":
+            validate_meta_key(name, extension=True)
 
 def validate_implementation(value: object) -> None:
-    """Check the standard client/server implementation record."""
+    """
+    Check the standard client/server implementation record.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     msgspec.convert(value, type=ServerInfo, strict=True)
 
-
 def _trace_parent(value: str) -> bool:
-    """Accept W3C version zero and forward-compatible future versions."""
+    """
+    Accept W3C version zero and forward-compatible future versions.
+
+    Parameters
+    ----------
+    value : str
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    bool
+        Result of the operation described above.
+    """
     match = _TRACE_PARENT.fullmatch(value)
     if match is None:
         return False
@@ -97,9 +179,20 @@ def _trace_parent(value: str) -> bool:
         and (not suffix if version == "00" else not suffix or suffix.startswith("-"))
     )
 
-
 def _trace_state(value: str) -> bool:
-    """Check ordered tracestate members, including unique vendor keys."""
+    """
+    Check ordered tracestate members, including unique vendor keys.
+
+    Parameters
+    ----------
+    value : str
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    bool
+        Result of the operation described above.
+    """
     members = value.split(",")
     if len(members) > _MAX_TRACE_MEMBERS:
         return False
@@ -116,9 +209,20 @@ def _trace_state(value: str) -> bool:
         seen.add(key)
     return True
 
-
 def _baggage(value: str) -> bool:
-    """Check W3C baggage grammar without interpreting application values."""
+    """
+    Check W3C baggage grammar without interpreting application values.
+
+    Parameters
+    ----------
+    value : str
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    bool
+        Result of the operation described above.
+    """
     if not value:
         return True
     for member in value.split(","):

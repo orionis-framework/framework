@@ -19,12 +19,10 @@ from orionis.test import TestCase
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
-
 class _ProviderHub(Hub):
     """Supply an empty namespace without mutating any live registry entries."""
 
     __slots__ = ()
-
 
 class _RealtimeConsumer:
     """Request the registry through ordinary constructor injection."""
@@ -46,7 +44,6 @@ class _RealtimeConsumer:
             Store the injected registry for identity assertions.
         """
         self.manager = manager
-
 
 class _ConfigApp:
     """Record provider registration without replacing global application state."""
@@ -131,7 +128,6 @@ class _ConfigApp:
         """
         self.singletons.append((abstract, concrete))
 
-
 class TestRealtimeProvider(TestCase):
     """Check eager core wiring and immutable configuration registration."""
 
@@ -184,7 +180,6 @@ class TestRealtimeProvider(TestCase):
             RealtimeProvider(cast("IApplication", invalid)).register()
         self.assertEqual(invalid.instances, {})
         self.assertEqual(invalid.singletons, [])
-
 
 class TestRealtimeFacade(TestCase):
     """Use the already booted application's facade without mutating its pin."""

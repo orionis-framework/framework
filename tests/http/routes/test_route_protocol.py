@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from orionis.http.websocket import WebSocket
     from orionis.http.websocket_middleware import WebSocketNext
 
-
 class _SocketMiddleware(WebSocketMiddleware):
     """Provide importable connection middleware for route cache coverage."""
 
@@ -44,7 +43,6 @@ class _SocketMiddleware(WebSocketMiddleware):
         """
         del socket
         await call_next()
-
 
 class TestRouteProtocol(TestCase):
     """Verify protocol isolation through compilation, resolution and caching."""

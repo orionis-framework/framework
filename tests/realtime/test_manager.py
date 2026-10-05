@@ -15,18 +15,15 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.http.websocket import WebSocket
 
-
 class _Chat(Hub):
     """Provide an isolated Hub namespace for registry tests."""
 
     __slots__ = ()
 
-
 class _OtherChat(Hub):
     """Provide a distinct Hub sharing the same group names."""
 
     __slots__ = ()
-
 
 class _Codec(HubProtocol):
     """Count serializations while preserving the production wire encoding."""
@@ -67,7 +64,6 @@ class _Codec(HubProtocol):
         self.encodes += 1
         return super().encode(message)
 
-
 class _SendTracker:
     """Observe simultaneous sends while retaining deterministic backpressure."""
 
@@ -92,7 +88,6 @@ class _SendTracker:
         self.peak = 0
         self.started = asyncio.Event()
         self.release = asyncio.Event()
-
 
 class _Connection:
     """Record delivery without introducing background tasks or pending futures."""
@@ -202,7 +197,6 @@ class _Connection:
         """
         self.invoked.append((target, args, timeout))
         return {"source": self.context.connection_id}
-
 
 class TestConnectionManager(TestCase):
     """Exercise registry ownership, bounded delivery and cleanup invariants."""

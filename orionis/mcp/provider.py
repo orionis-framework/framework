@@ -10,14 +10,20 @@ from orionis.mcp.subscriptions.event_bus import InMemoryMcpEventBus
 from orionis.support.facades.mcp import Mcp
 from orionis.support.facades.router import Route
 
-
 class McpProvider(ServiceProvider):
     """Register one manager and load declarations before either runtime starts."""
 
     __slots__ = ("_routes_loaded",)
 
     def register(self) -> None:
-        """Bind validated configuration and bounded services without performing I/O."""
+        """
+        Bind validated configuration and bounded services without performing I/O.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         configured = self.app.config("mcp") or {}
         config = (
             configured if isinstance(configured, McpConfig)
@@ -35,7 +41,14 @@ class McpProvider(ServiceProvider):
         self._routes_loaded = False
 
     async def boot(self) -> None:
-        """Load AI registrations for HTTP and CLI, including warm HTTP route caches."""
+        """
+        Load AI registrations for HTTP and CLI, including warm HTTP route caches.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         await Route.pin()
         await Mcp.pin()
         if not self._routes_loaded:

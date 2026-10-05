@@ -18,10 +18,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable, MutableMapping
     from orionis.realtime.metadata import RemoteMethod
 
-
 class _Service:
     """Provide an injectable dependency unrelated to client payloads."""
-
 
 class _Payload(Schema):
     """Require both a typed value and an existing Orionis custom rule."""
@@ -29,18 +27,15 @@ class _Payload(Schema):
     count: int
     password: Annotated[str, StrongPassword()]
 
-
 class _Envelope(msgspec.Struct):
     """Contain Orionis schemas inside an ordinary Struct."""
 
     values: list[_Payload]
 
-
 class _SchemaCollection(Schema):
     """Contain schema collections requiring explicit traversal."""
 
     values: list[_Payload]
-
 
 class _MethodsHub(Hub):
     """Exercise dispatch, schemas, defaults and container parameters together."""
@@ -165,7 +160,6 @@ class _MethodsHub(Hub):
             Local helper result.
         """
         return "private to application"
-
 
 class TestRemoteMetadata(TestCase):
     """Verify that client data never becomes executable metadata or DI input."""

@@ -247,6 +247,44 @@ class TestStub(TestCase):
             self.assertFalse((output / "nested" / "example.py.py").exists())
             self.assertIn("class Example", target.read_text(encoding="utf-8"))
 
+    def testCreateResolvesTheBaseBeforeMakingThePathRelative(self) -> None:
+        """Resolve an equivalent base path before computing the generated path.
+
+        Returns
+        -------
+        None
+            Assertions verify that base path aliases do not reject valid files.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            (root / "alias").mkdir()
+            generated = Stub("service", "example").create(
+                root / "app",
+                relative_to=root / "alias" / "..",
+            )
+
+            self.assertEqual(generated, str(Path("app") / "example.py"))
+            self.assertTrue((root / generated).is_file())
+
+    def testCreateResolvesTheDestinationBeforeMakingThePathRelative(self) -> None:
+        """Resolve an equivalent destination before computing its relative path.
+
+        Returns
+        -------
+        None
+            Assertions verify the returned path contains no unresolved aliases.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            (root / "alias").mkdir()
+            generated = Stub("service", "example").create(
+                root / "alias" / ".." / "app",
+                relative_to=root,
+            )
+
+            self.assertEqual(generated, str(Path("app") / "example.py"))
+            self.assertTrue((root / generated).is_file())
+
     def testCreateUsesRequestedTemplateExtension(self) -> None:
         """Use the caller-selected extension after removing input suffixes.
 

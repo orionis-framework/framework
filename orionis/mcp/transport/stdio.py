@@ -1,15 +1,10 @@
-"""Concurrent newline-delimited MCP requests over isolated, bounded standard I/O."""
-
 from __future__ import annotations
-
 import asyncio
 from contextlib import redirect_stdout
 from functools import partial
 import sys
 from typing import TYPE_CHECKING, Protocol
-
 import msgspec
-
 from orionis.http.adapters.response.streams import await_cleanup
 from orionis.console.stdio import protocol_stdout
 from orionis.mcp.dispatcher import McpDispatcher
@@ -26,22 +21,38 @@ if TYPE_CHECKING:
     from orionis.mcp.protocol.requests import JsonRpcRequest
     from orionis.mcp.server.compiler import CompiledMcpServer
 
-
 class LineReader(Protocol):
     """Provide one bounded input frame or empty bytes at EOF."""
 
     async def readline(self) -> bytes:
-        """Read one newline-delimited wire message."""
-        ...
+        """
+        Read one newline-delimited wire message.
 
+        Returns
+        -------
+        bytes
+            Result of the operation described above.
+        """
+        ...
 
 class LineWriter(Protocol):
     """Write a complete message with backpressure."""
 
     async def write(self, data: bytes) -> None:
-        """Deliver a complete frame, including its terminating newline."""
-        ...
+        """
+        Deliver a complete frame, including its terminating newline.
 
+        Parameters
+        ----------
+        data : bytes
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
+        ...
 
 class McpStdioTransport:
     """Keep the reader available while bounded request tasks execute independently."""
@@ -65,7 +76,25 @@ class McpStdioTransport:
         config: McpConfig,
         bus: IMcpEventBus,
     ) -> None:
-        """Prepare request-local task ownership without touching process streams."""
+        """
+        Prepare request-local task ownership without touching process streams.
+
+        Parameters
+        ----------
+        app : IApplication
+            Application container supplying configuration and dependencies.
+        compiled : CompiledMcpServer
+            Precompiled metadata shared by request executions.
+        config : McpConfig
+            Validated configuration controlling this component.
+        bus : IMcpEventBus
+            Value supplied for ``bus``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._app = app
         self._config = config
         self._dispatcher = McpDispatcher(app, compiled, config, bus)
@@ -77,7 +106,21 @@ class McpStdioTransport:
         self._running = False
 
     async def _write(self, writer: LineWriter, data: bytes) -> None:
-        """Serialize frames and suppress output after EOF or owner shutdown."""
+        """
+        Serialize frames and suppress output after EOF or owner shutdown.
+
+        Parameters
+        ----------
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+        data : bytes
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if not data or self._closing:
             return
         async with self._lock:
@@ -85,7 +128,21 @@ class McpStdioTransport:
                 await writer.write(data + b"\n")
 
     async def _stream(self, writer: LineWriter, source: AsyncIterator[bytes]) -> None:
-        """Preserve backpressure and close an owned producer on all exits."""
+        """
+        Preserve backpressure and close an owned producer on all exits.
+
+        Parameters
+        ----------
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+        source : AsyncIterator[bytes]
+            Source whose values or lifecycle are consumed by this operation.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         try:
             async for data in source:
                 await self._write(writer, data)
@@ -95,7 +152,21 @@ class McpStdioTransport:
                 await await_cleanup(asyncio.ensure_future(close()))
 
     async def _invoke(self, request: JsonRpcRequest, writer: LineWriter) -> None:
-        """Execute one call in its own DI scope, sanitizing only application errors."""
+        """
+        Execute one call in its own DI scope, sanitizing only application errors.
+
+        Parameters
+        ----------
+        request : JsonRpcRequest
+            Current request and its trusted execution context.
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         try:
             async with self._app.beginScope():
                 params = self._dispatcher.decode(request)
@@ -110,7 +181,21 @@ class McpStdioTransport:
             await self._write(writer, encode_error(exc, request.id))
 
     def _done(self, request_id: str | int, task: asyncio.Task[None]) -> None:
-        """Remove completed task ownership and notify the reader of I/O failures."""
+        """
+        Remove completed task ownership and notify the reader of I/O failures.
+
+        Parameters
+        ----------
+        request_id : str | int
+            Value supplied for ``request_id``.
+        task : asyncio.Task[None]
+            Value supplied for ``task``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if self._active.get(request_id) is task:
             del self._active[request_id]
         if not task.cancelled() and (failure := task.exception()) is not None:
@@ -118,7 +203,19 @@ class McpStdioTransport:
             self._failed.set()
 
     def _cancel(self, request: JsonRpcRequest) -> None:
-        """Ignore malformed, unknown and already completed cancellation messages."""
+        """
+        Ignore malformed, unknown and already completed cancellation messages.
+
+        Parameters
+        ----------
+        request : JsonRpcRequest
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if request.method != "notifications/cancelled":
             return
         try:
@@ -130,7 +227,21 @@ class McpStdioTransport:
             task.cancel()
 
     async def _accept(self, data: bytes, writer: LineWriter) -> None:
-        """Validate framing and admission before allocating any request task."""
+        """
+        Stop queued output without joining a potentially blocked OS writer.
+
+        Parameters
+        ----------
+        data : bytes
+            Value supplied for ``data``.
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         request_id = msgspec.UNSET
         try:
             if len(data) > self._config.max_request_size:
@@ -154,8 +265,22 @@ class McpStdioTransport:
         except McpProtocolException as exc:
             await self._write(writer, encode_error(exc, request_id))
 
-    async def _read_loop(self, reader: LineReader, writer: LineWriter) -> None:
-        """Race each cancellable read against a failed request's transport I/O."""
+    async def _readLoop(self, reader: LineReader, writer: LineWriter) -> None:
+        """
+        Race each cancellable read against a failed request's transport I/O.
+
+        Parameters
+        ----------
+        reader : LineReader
+            Input stream supplying bounded messages.
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         failed = asyncio.create_task(self._failed.wait())
         reading: asyncio.Task[bytes] | None = None
         try:
@@ -183,7 +308,21 @@ class McpStdioTransport:
                 )
 
     async def run(self, reader: LineReader, writer: LineWriter) -> None:
-        """Run until EOF, joining all owned request cleanup before returning."""
+        """
+        Run until EOF, joining all owned request cleanup before returning.
+
+        Parameters
+        ----------
+        reader : LineReader
+            Input stream supplying bounded messages.
+        writer : LineWriter
+            Output stream receiving complete messages with backpressure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if self._running:
             message = "The STDIO transport is already running"
             raise RuntimeError(message)
@@ -192,7 +331,7 @@ class McpStdioTransport:
         self._failure = None
         self._failed.clear()
         try:
-            await self._read_loop(reader, writer)
+            await self._readLoop(reader, writer)
         finally:
             self._closing = True
             tasks = tuple(self._active.values())
@@ -206,8 +345,15 @@ class McpStdioTransport:
                 self._active.clear()
                 self._running = False
 
-    async def run_standard_streams(self) -> None:
-        """Bind portable daemon-backed streams and keep application prints on stderr."""
+    async def runStandardStreams(self) -> None:
+        """
+        Bind portable daemon-backed streams and keep application prints on stderr.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         reader = StandardReader(sys.stdin.buffer, self._config.max_request_size)
         writer = StandardWriter(protocol_stdout() or sys.stdout.buffer)
         try:

@@ -1,10 +1,6 @@
-"""Normalize developer responses into protocol-specific completed results."""
-
 import math
 from typing import TYPE_CHECKING, TypedDict, Literal, cast
-
 import msgspec
-
 from orionis.mcp.protocol.content import (
     EmbeddedResource,
     PromptMessage,
@@ -23,14 +19,24 @@ if TYPE_CHECKING:
     from orionis.mcp.context import McpRequest
     from orionis.mcp.server.compiler import CompiledPrimitive
 
-
 class CacheOptions(TypedDict):
     ttlMs: int
     cacheScope: Literal["private", "public"]
 
-
 def response_items(result: object) -> tuple[McpResponse, ...]:
-    """Accept explicit content responses and reject accidental arbitrary objects."""
+    """
+    Accept explicit content responses and reject accidental arbitrary objects.
+
+    Parameters
+    ----------
+    result : object
+        Value supplied for ``result``.
+
+    Returns
+    -------
+    tuple[McpResponse, ...]
+        Result of the operation described above.
+    """
     if isinstance(result, McpResponse):
         responses = (result,)
     elif isinstance(result, (list, tuple)):
@@ -46,12 +52,25 @@ def response_items(result: object) -> tuple[McpResponse, ...]:
         raise TypeError(message)
     return responses
 
-
 def tool_result(
     primitive: CompiledPrimitive,
     responses: tuple[McpResponse, ...],
 ) -> CallToolResult:
-    """Validate structured output before publishing a successful result."""
+    """
+    Validate structured output before publishing a successful result.
+
+    Parameters
+    ----------
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+    responses : tuple[McpResponse, ...]
+        Value supplied for ``responses``.
+
+    Returns
+    -------
+    CallToolResult
+        Result of the operation described above.
+    """
     values = [
         item.structured_content
         for item in responses
@@ -71,12 +90,25 @@ def tool_result(
         meta=_metadata(responses),
     )
 
-
 def prompt_result(
     description: str,
     responses: tuple[McpResponse, ...],
 ) -> GetPromptResult:
-    """Preserve role and individual content-block boundaries."""
+    """
+    Preserve role and individual content-block boundaries.
+
+    Parameters
+    ----------
+    description : str
+        Value supplied for ``description``.
+    responses : tuple[McpResponse, ...]
+        Value supplied for ``responses``.
+
+    Returns
+    -------
+    GetPromptResult
+        Result of the operation described above.
+    """
     return GetPromptResult(
         messages=tuple(
             PromptMessage(role=item.role, content=part)
@@ -87,14 +119,31 @@ def prompt_result(
         meta=_metadata(responses),
     )
 
-
 def resource_result(
     primitive: CompiledPrimitive,
     request: McpRequest,
     responses: tuple[McpResponse, ...],
     cache: CacheOptions,
 ) -> ReadResourceResult:
-    """Use only text/blob contents permitted by resources/read."""
+    """
+    Use only text/blob contents permitted by resources/read.
+
+    Parameters
+    ----------
+    primitive : CompiledPrimitive
+        Compiled tool, resource or prompt declaration.
+    request : McpRequest
+        Current request and its trusted execution context.
+    responses : tuple[McpResponse, ...]
+        Value supplied for ``responses``.
+    cache : CacheOptions
+        Value supplied for ``cache``.
+
+    Returns
+    -------
+    ReadResourceResult
+        Result of the operation described above.
+    """
     contents = []
     for item in responses:
         for part in item.content:
@@ -115,9 +164,20 @@ def resource_result(
         contents=tuple(contents), meta=_metadata(responses), **cache,
     )
 
-
 def _metadata(responses: tuple[McpResponse, ...]) -> dict[str, object]:
-    """Merge response metadata while rejecting conflicting result values."""
+    """
+    Merge response metadata while rejecting conflicting result values.
+
+    Parameters
+    ----------
+    responses : tuple[McpResponse, ...]
+        Value supplied for ``responses``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     metadata = {}
     for response in responses:
         for key, value in response.meta.items():
@@ -127,13 +187,28 @@ def _metadata(responses: tuple[McpResponse, ...]) -> dict[str, object]:
             metadata[key] = value
     return metadata
 
-
 def progress_params(
     update: Progress,
     token: str | int,
     previous: float,
 ) -> dict[str, object]:
-    """Enforce monotonic progress and retain the caller's correlation token."""
+    """
+    Enforce monotonic progress and retain the caller's correlation token.
+
+    Parameters
+    ----------
+    update : Progress
+        Value supplied for ``update``.
+    token : str | int
+        Value supplied for ``token``.
+    previous : float
+        Value supplied for ``previous``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     for value in (update.current, update.total):
         if value is not None and (
             type(value) not in (int, float) or not math.isfinite(value)

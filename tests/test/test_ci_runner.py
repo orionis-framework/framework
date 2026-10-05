@@ -172,12 +172,12 @@ class TestSharedCiRunner(TestCase):
         self.assertEqual(len(self.processes.calls), 3)
 
     def testSuccessfulSuitesUseTheActivePythonAndRepository(self) -> None:
-        """Pass explicit subprocess arguments and a UTF-8 environment."""
+        """Pass default verbosity, active Python, repository and UTF-8 settings."""
         self.assertEqual(self._runSuites(), 0)
         self.assertEqual(len(self.processes.calls), 3)
         command, cwd, environment, check = self.processes.calls[0]
         self.assertEqual(command[:4], [sys.executable, "-B", "reactor", "test"])
-        self.assertIn("--verbosity=2", command)
+        self.assertIn("--verbosity=1", command)
         self.assertIn("--fail-fast=1", command)
         self.assertEqual(cwd, self.repo)
         self.assertEqual(environment["PYTHONIOENCODING"], "utf-8")
@@ -196,6 +196,13 @@ class TestSharedCiRunner(TestCase):
         self.assertIn("tests/realtime", output)
         self.assertIn("Root [tests/test_example.py]", output)
         self.assertEqual(self.processes.calls, [])
+
+    def testCliUsesDetailedOutputByDefault(self) -> None:
+        """Pass verbosity two to every suite when the CLI option is omitted."""
+        self.assertEqual(self._main([]), 0)
+        self.assertTrue(self.processes.calls)
+        for command, _, _, _ in self.processes.calls:
+            self.assertIn("--verbosity=2", command)
 
     def testCliAppliesContinueAndVerbosityToAllDiscoveredSuites(self) -> None:
         """Forward CLI settings while returning an earlier module failure."""

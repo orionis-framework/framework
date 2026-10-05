@@ -7,11 +7,10 @@ class SQLServerCharset(Enum):
     Availability depends on the installed driver and platform. Narrow SQLCHAR
     data follows the process locale; SQLWCHAR data uses UTF-16LE.
 
-    Attributes
-    ----------
-    UTF8, CP437, CP850, CP874, CP932, CP936, CP949, CP950, CP1250-CP1258,
-    ISO_8859_1-ISO_8859_9, ISO_8859_13, ISO_8859_15 : str
-        Names of the documented ODBC client encodings.
+    Members name the documented ODBC client encodings: ``UTF8``, ``CP437``,
+    ``CP850``, ``CP874``, ``CP932``, ``CP936``, ``CP949``, ``CP950``,
+    ``CP1250`` through ``CP1258``, ``ISO_8859_1`` through ``ISO_8859_9``,
+    ``ISO_8859_13``, and ``ISO_8859_15``.
     """
 
     UTF8 = "UTF-8"

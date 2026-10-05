@@ -30,6 +30,7 @@ from orionis.mail.enums.status import MailStatus
 from orionis.storage.contracts.manager import IStorageManager
 from orionis.support.facades.mail import Mail
 from orionis.test import TestCase
+from tests.mail.test_composer import create_mail_views
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -643,7 +644,7 @@ async def main(runtime: str) -> None:
     Returns
     -------
     None
-        Completes the operation described above.
+        Create temporary views and exercise the selected public runtime.
     """
     smtplib.SMTP = forbid_smtp
     smtplib.SMTP_SSL = forbid_smtp
@@ -667,10 +668,11 @@ async def main(runtime: str) -> None:
         },
     )
     app.create()
+    view_path = await asyncio.to_thread(create_mail_views, Path.cwd())
     app.config(
         "view",
         {
-            "paths": [str(Path(__file__).parent / "fixtures")],
+            "paths": [str(view_path)],
             "cache_path": None,
             "autoescape": True,
         },

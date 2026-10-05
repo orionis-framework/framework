@@ -1,0 +1,1832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.support.performance.PerformanceCounter</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="This class"><wbr></wbr>Performance<wbr></wbr>Counter</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__aenter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aenter__">__aenter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__aexit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aexit__">__aexit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__enter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__exit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#aelapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.aelapsedTime">aelapsed<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMicroseconds">aget<wbr></wbr>Microseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMilliseconds">aget<wbr></wbr>Milliseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMinutes">aget<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetSeconds">aget<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#arestart" class="internal-link" title="orionis.support.performance.PerformanceCounter.arestart">arestart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#astart" class="internal-link" title="orionis.support.performance.PerformanceCounter.astart">astart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#astop" class="internal-link" title="orionis.support.performance.PerformanceCounter.astop">astop</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#elapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.elapsedTime">elapsed<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMicroseconds">get<wbr></wbr>Microseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMilliseconds">get<wbr></wbr>Milliseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMinutes">get<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getSeconds">get<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#restart" class="internal-link" title="orionis.support.performance.PerformanceCounter.restart">restart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#start" class="internal-link" title="orionis.support.performance.PerformanceCounter.start">start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stop" class="internal-link" title="orionis.support.performance.PerformanceCounter.stop">stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_diff_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._diff_time">_diff<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_async_mode" class="internal-link" title="orionis.support.performance.PerformanceCounter._is_async_mode">_is<wbr></wbr>_async<wbr></wbr>_mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_start_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._start_time">_start<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.support.performance.html" class="internal-link" title="The parent of this class">performance</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId34453"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId34453">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.support.performance.contracts.html" class="internal-link" title="orionis.support.performance.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.performance.contracts.counter.html" class="internal-link" title="orionis.support.performance.contracts.counter">counter</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId34454"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId34454">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.support.performance.counter.html" class="internal-link" title="orionis.support.performance.counter">counter</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.performance.counter.html#_ERR_NOT_MEASURED" class="internal-link" title="orionis.support.performance.counter._ERR_NOT_MEASURED">_ERR<wbr></wbr>_NOT<wbr></wbr>_MEASURED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.performance.counter.html#_ERR_NOT_STARTED" class="internal-link" title="orionis.support.performance.counter._ERR_NOT_STARTED">_ERR<wbr></wbr>_NOT<wbr></wbr>_STARTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.performance.counter.html#_ERR_USE_ASTOP" class="internal-link" title="orionis.support.performance.counter._ERR_USE_ASTOP">_ERR<wbr></wbr>_USE<wbr></wbr>_ASTOP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.performance.counter.html#_ERR_USE_STOP" class="internal-link" title="orionis.support.performance.counter._ERR_USE_STOP">_ERR<wbr></wbr>_USE<wbr></wbr>_STOP</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId34455"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter"><wbr></wbr>Performance<wbr></wbr>Counter</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__aenter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aenter__">__aenter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__aexit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aexit__">__aexit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__enter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__exit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#aelapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.aelapsedTime">aelapsed<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMicroseconds">aget<wbr></wbr>Microseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMilliseconds">aget<wbr></wbr>Milliseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMinutes">aget<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#agetSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetSeconds">aget<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#arestart" class="internal-link" title="orionis.support.performance.PerformanceCounter.arestart">arestart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#astart" class="internal-link" title="orionis.support.performance.PerformanceCounter.astart">astart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#astop" class="internal-link" title="orionis.support.performance.PerformanceCounter.astop">astop</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#elapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.elapsedTime">elapsed<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMicroseconds">get<wbr></wbr>Microseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMilliseconds">get<wbr></wbr>Milliseconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMinutes">get<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getSeconds">get<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#restart" class="internal-link" title="orionis.support.performance.PerformanceCounter.restart">restart</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#start" class="internal-link" title="orionis.support.performance.PerformanceCounter.start">start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stop" class="internal-link" title="orionis.support.performance.PerformanceCounter.stop">stop</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_diff_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._diff_time">_diff<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_async_mode" class="internal-link" title="orionis.support.performance.PerformanceCounter._is_async_mode">_is<wbr></wbr>_async<wbr></wbr>_mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_start_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._start_time">_start<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.support.html" class="internal-link" title="orionis.support">support</a></code><wbr></wbr>.<code><a href="orionis.support.performance.html" class="internal-link" title="orionis.support.performance">performance</a></code><wbr></wbr>.<code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PerformanceCounter</span>(<a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html" class="internal-link" title="orionis.support.performance.contracts.counter.IPerformanceCounter">IPerformanceCounter</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__init__">PerformanceCounter()</a></code></p><p><a href="classIndex.html#orionis.support.performance.PerformanceCounter">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id2000">
+  
+  
+  <tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__aenter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aenter__">__aenter__</a></code></td>
+    <td>Enter the async context manager and start the counter asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__aexit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__aexit__">__aexit__</a></code></td>
+    <td>Exit the async context manager and stop the counter asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__enter__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__enter__">__enter__</a></code></td>
+    <td>Enter the context manager and start the counter.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__exit__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__exit__">__exit__</a></code></td>
+    <td>Exit the context manager and stop the counter.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__init__">__init__</a></code></td>
+    <td>Initialize the PerformanceCounter instance.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#aelapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.aelapsedTime">aelapsed<wbr></wbr>Time</a></code></td>
+    <td>Return the elapsed time in seconds asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#agetMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMicroseconds">aget<wbr></wbr>Microseconds</a></code></td>
+    <td>Return the elapsed time in microseconds asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#agetMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMilliseconds">aget<wbr></wbr>Milliseconds</a></code></td>
+    <td>Return the elapsed time in milliseconds asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#agetMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetMinutes">aget<wbr></wbr>Minutes</a></code></td>
+    <td>Return the elapsed time in minutes asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#agetSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.agetSeconds">aget<wbr></wbr>Seconds</a></code></td>
+    <td>Return the elapsed time in seconds asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#arestart" class="internal-link" title="orionis.support.performance.PerformanceCounter.arestart">arestart</a></code></td>
+    <td>Restart the performance counter asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#astart" class="internal-link" title="orionis.support.performance.PerformanceCounter.astart">astart</a></code></td>
+    <td>Start the performance counter asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#astop" class="internal-link" title="orionis.support.performance.PerformanceCounter.astop">astop</a></code></td>
+    <td>Stop the performance counter asynchronously.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#elapsedTime" class="internal-link" title="orionis.support.performance.PerformanceCounter.elapsedTime">elapsed<wbr></wbr>Time</a></code></td>
+    <td>Return the elapsed time in seconds between the last start and stop calls.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getMicroseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMicroseconds">get<wbr></wbr>Microseconds</a></code></td>
+    <td>Return the elapsed time in microseconds.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getMilliseconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMilliseconds">get<wbr></wbr>Milliseconds</a></code></td>
+    <td>Return the elapsed time in milliseconds.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getMinutes" class="internal-link" title="orionis.support.performance.PerformanceCounter.getMinutes">get<wbr></wbr>Minutes</a></code></td>
+    <td>Return the elapsed time in minutes.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getSeconds" class="internal-link" title="orionis.support.performance.PerformanceCounter.getSeconds">get<wbr></wbr>Seconds</a></code></td>
+    <td>Return the elapsed time in seconds.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#restart" class="internal-link" title="orionis.support.performance.PerformanceCounter.restart">restart</a></code></td>
+    <td>Restart the performance counter.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#start" class="internal-link" title="orionis.support.performance.PerformanceCounter.start">start</a></code></td>
+    <td>Start the performance counter.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#stop" class="internal-link" title="orionis.support.performance.PerformanceCounter.stop">stop</a></code></td>
+    <td>Stop the performance counter and compute elapsed time.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.support.performance.PerformanceCounter.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_diff_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._diff_time">_diff<wbr></wbr>_time</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_is_async_mode" class="internal-link" title="orionis.support.performance.PerformanceCounter._is_async_mode">_is<wbr></wbr>_async<wbr></wbr>_mode</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_start_time" class="internal-link" title="orionis.support.performance.PerformanceCounter._start_time">_start<wbr></wbr>_time</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__aenter__">
+    
+  </a>
+  <a name="__aenter__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Self</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__aenter__" title="orionis.support.performance.PerformanceCounter.__aenter__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Enter the async context manager and start the counter asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance of the performance counter.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__aexit__">
+    
+  </a>
+  <a name="__aexit__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc_val: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc_tb: <code>TracebackType | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L377">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__aexit__" title="orionis.support.performance.PerformanceCounter.__aexit__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Exit the async context manager and stop the counter asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception type if raised, else None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_val:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception value if raised, else None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_tb:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Traceback object if exception occurred, else None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__enter__">
+    
+  </a>
+  <a name="__enter__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__enter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Self</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L327">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__enter__" title="orionis.support.performance.PerformanceCounter.__enter__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Enter the context manager and start the counter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance of the performance counter.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__exit__">
+    
+  </a>
+  <a name="__exit__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__exit__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc_val: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc_tb: <code>TracebackType | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L339">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__exit__" title="orionis.support.performance.PerformanceCounter.__exit__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Exit the context manager and stop the counter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception type if raised, else None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_val:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception value if raised, else None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_tb:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Traceback object if exception occurred, else None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.support.performance.PerformanceCounter.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the PerformanceCounter instance.</p>
+<p>Initializes internal attributes for tracking start, end, and elapsed time.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This constructor does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.aelapsedTime">
+    
+  </a>
+  <a name="aelapsedTime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">aelapsedTime</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L147">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#aelapsedTime" title="orionis.support.performance.PerformanceCounter.aelapsedTime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#aelapsedTime" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.aelapsedTime</a></code></div>
+    <div><p>Return the elapsed time in seconds asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in seconds as a float.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the counter has not been started and stopped properly.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.agetMicroseconds">
+    
+  </a>
+  <a name="agetMicroseconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">agetMicroseconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L184">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#agetMicroseconds" title="orionis.support.performance.PerformanceCounter.agetMicroseconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#agetMicroseconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.agetMicroseconds</a></code></div>
+    <div><p>Return the elapsed time in microseconds asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in microseconds as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.agetMilliseconds">
+    
+  </a>
+  <a name="agetMilliseconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">agetMilliseconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L216">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#agetMilliseconds" title="orionis.support.performance.PerformanceCounter.agetMilliseconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#agetMilliseconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.agetMilliseconds</a></code></div>
+    <div><p>Return the elapsed time in milliseconds asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in milliseconds as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.agetMinutes">
+    
+  </a>
+  <a name="agetMinutes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">agetMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L276">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#agetMinutes" title="orionis.support.performance.PerformanceCounter.agetMinutes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#agetMinutes" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.agetMinutes</a></code></div>
+    <div><p>Return the elapsed time in minutes asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in minutes as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.agetSeconds">
+    
+  </a>
+  <a name="agetSeconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">agetSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L246">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#agetSeconds" title="orionis.support.performance.PerformanceCounter.agetSeconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#agetSeconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.agetSeconds</a></code></div>
+    <div><p>Return the elapsed time in seconds asynchronously.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in seconds as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.arestart">
+    
+  </a>
+  <a name="arestart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">arestart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L309">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#arestart" title="orionis.support.performance.PerformanceCounter.arestart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#arestart" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.arestart</a></code></div>
+    <div><p>Restart the performance counter asynchronously.</p>
+<p>Resets internal timing attributes and starts the counter again in async
+mode.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.astart">
+    
+  </a>
+  <a name="astart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">astart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L54">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#astart" title="orionis.support.performance.PerformanceCounter.astart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#astart" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.astart</a></code></div>
+    <div><p>Start the performance counter asynchronously.</p>
+<p>Records the current high-resolution time for an asynchronous measurement.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">The current instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.astop">
+    
+  </a>
+  <a name="astop">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">astop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L100">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#astop" title="orionis.support.performance.PerformanceCounter.astop">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#astop" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.astop</a></code></div>
+    <div><p>Stop the performance counter asynchronously.</p>
+<p>Records the current high-resolution time as the end time and computes the
+elapsed time since <code><a href="#astart" class="internal-link" title="orionis.support.performance.PerformanceCounter.astart">astart()</a></code> was called.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance for method chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If called after synchronous start.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.elapsedTime">
+    
+  </a>
+  <a name="elapsedTime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">elapsedTime</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L127">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#elapsedTime" title="orionis.support.performance.PerformanceCounter.elapsedTime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#elapsedTime" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.elapsedTime</a></code></div>
+    <div><p>Return the elapsed time in seconds between the last start and stop calls.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in seconds as a float.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the counter has not been started and stopped properly.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.getMicroseconds">
+    
+  </a>
+  <a name="getMicroseconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getMicroseconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L167">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getMicroseconds" title="orionis.support.performance.PerformanceCounter.getMicroseconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#getMicroseconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.getMicroseconds</a></code></div>
+    <div><p>Return the elapsed time in microseconds.</p>
+<p>Converts the elapsed time in seconds to microseconds.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in microseconds.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.getMilliseconds">
+    
+  </a>
+  <a name="getMilliseconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getMilliseconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L199">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getMilliseconds" title="orionis.support.performance.PerformanceCounter.getMilliseconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#getMilliseconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.getMilliseconds</a></code></div>
+    <div><p>Return the elapsed time in milliseconds.</p>
+<p>Converts the elapsed time in seconds to milliseconds.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in milliseconds as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.getMinutes">
+    
+  </a>
+  <a name="getMinutes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L261">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getMinutes" title="orionis.support.performance.PerformanceCounter.getMinutes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#getMinutes" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.getMinutes</a></code></div>
+    <div><p>Return the elapsed time in minutes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in minutes as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.getSeconds">
+    
+  </a>
+  <a name="getSeconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L231">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getSeconds" title="orionis.support.performance.PerformanceCounter.getSeconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#getSeconds" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.getSeconds</a></code></div>
+    <div><p>Return the elapsed time in seconds.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Elapsed time in seconds as a float.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.restart">
+    
+  </a>
+  <a name="restart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">restart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L291">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#restart" title="orionis.support.performance.PerformanceCounter.restart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#restart" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.restart</a></code></div>
+    <div><p>Restart the performance counter.</p>
+<p>Resets internal timing attributes and starts the counter again. Useful for
+measuring a new interval without creating a new instance.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.start">
+    
+  </a>
+  <a name="start">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">start</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L37">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#start" title="orionis.support.performance.PerformanceCounter.start">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#start" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.start</a></code></div>
+    <div><p>Start the performance counter.</p>
+<p>Records the current high-resolution time as the start time.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">This instance for method chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.stop">
+    
+  </a>
+  <a name="stop">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">stop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L71">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stop" title="orionis.support.performance.PerformanceCounter.stop">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#stop" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.stop</a></code></div>
+    <div><p>Stop the performance counter and compute elapsed time.</p>
+<p>Records the current high-resolution time as the end time and computes the
+elapsed time since <code><a href="#start" class="internal-link" title="orionis.support.performance.PerformanceCounter.start">start()</a></code> was called.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.performance.PerformanceCounter.html" class="internal-link" title="orionis.support.performance.PerformanceCounter">PerformanceCounter</a></code></td><td class="fieldArgDesc">The current instance for method chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If called after asynchronous start.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If called before start.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.support.performance.PerformanceCounter.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.performance.contracts.counter.IPerformanceCounter.html#__slots__" class="internal-link">orionis.support.performance.contracts.counter.IPerformanceCounter.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter._diff_time">
+    
+  </a>
+  <a name="_diff_time">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_diff_time</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_diff_time" title="orionis.support.performance.PerformanceCounter._diff_time">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter._is_async_mode">
+    
+  </a>
+  <a name="_is_async_mode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_is_async_mode</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L35">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_is_async_mode" title="orionis.support.performance.PerformanceCounter._is_async_mode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.support.performance.PerformanceCounter._start_time">
+    
+  </a>
+  <a name="_start_time">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_start_time</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/support/performance/counter.py#L33">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_start_time" title="orionis.support.performance.PerformanceCounter._start_time">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

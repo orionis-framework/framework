@@ -4,12 +4,17 @@ import functools
 import re
 import unittest
 from contextvars import ContextVar
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from orionis.support.facades.application import Application
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from typing import Any
+    from orionis.container.contracts.container import IContainer
+    from orionis.mcp.config import McpConfig
+    from orionis.mcp.server.compiler import CompiledMcpServer
+    from orionis.mcp.server.primitives import Server
+    from orionis.test.clients.mcp import McpTestClient
 
 # Lifecycle hooks that must never be wrapped regardless of naming pattern.
 _LIFECYCLE_HOOKS: frozenset[str] = frozenset({
@@ -81,6 +86,43 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
             original = object.__getattribute__(self, method_name)
             if callable(original):
                 object.__setattr__(self, method_name, self._resolveTest(original))
+
+    async def mcp(
+        self,
+        server: type[Server] | CompiledMcpServer,
+        config: McpConfig | None = None,
+        *,
+        app: IContainer | None = None,
+    ) -> McpTestClient:
+        """
+        Create an MCP client using the test runner's application.
+
+        Parameters
+        ----------
+        server : type[Server] | CompiledMcpServer
+            Server declaration or compiled snapshot to exercise.
+        config : McpConfig | None, optional
+            Client limits; use MCP defaults when omitted.
+        app : IContainer | None, optional
+            Explicit container for isolated tests; otherwise use the application
+            already booted by the Orionis test runner.
+
+        Returns
+        -------
+        McpTestClient
+            In-process client with independent request scopes and event state.
+
+        Raises
+        ------
+        RuntimeError
+            If no container is supplied and the application is not booted.
+        """
+        from orionis.test.clients.mcp import McpTestClient  # noqa: PLC0415
+
+        container = app if app is not None else cast(
+            "IContainer", await Application.resolve(),
+        )
+        return McpTestClient(container, server, config)
 
     def _setupAsyncioRunner(self) -> None:
         """

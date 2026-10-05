@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.default.contracts.responses.IDefaultResponses</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="This class"><wbr></wbr>IDefault<wbr></wbr>Responses</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#asset" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.asset">asset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#error" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.error">error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#favicon" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.favicon">favicon</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#health" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.health">health</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#robotsTxt" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.robotsTxt">robots<wbr></wbr>Txt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#sitemapXml" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.sitemapXml">sitemap<wbr></wbr>Xml</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.default.contracts.responses.html" class="internal-link" title="The parent of this class">responses</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9253"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses"><wbr></wbr>IDefault<wbr></wbr>Responses</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#asset" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.asset">asset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#error" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.error">error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#favicon" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.favicon">favicon</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#health" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.health">health</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#robotsTxt" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.robotsTxt">robots<wbr></wbr>Txt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#sitemapXml" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.sitemapXml">sitemap<wbr></wbr>Xml</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.default.html" class="internal-link" title="orionis.http.default">default</a></code><wbr></wbr>.<code><a href="orionis.http.default.contracts.html" class="internal-link" title="orionis.http.default.contracts">contracts</a></code><wbr></wbr>.<code><a href="orionis.http.default.contracts.responses.html" class="internal-link" title="orionis.http.default.contracts.responses">responses</a></code><wbr></wbr>.<code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses">IDefaultResponses</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IDefaultResponses</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L15" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></p><p><a href="classIndex.html#orionis.http.default.contracts.responses.IDefaultResponses">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id924">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#asset" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.asset">asset</a></code></td>
+    <td>Return an allowlisted framework asset, or a 404 response.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#error" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.error">error</a></code></td>
+    <td>Return an error page or JSON response for the specified status code.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#exception" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.exception">exception</a></code></td>
+    <td>Render an exception page with request and traceback details.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#favicon" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.favicon">favicon</a></code></td>
+    <td>Return the favicon file response or a 404 response if not found.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#health" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.health">health</a></code></td>
+    <td>Render the application health state as an HTML or JSON response.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#robotsTxt" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.robotsTxt">robots<wbr></wbr>Txt</a></code></td>
+    <td>Return the robots.txt file or a 404 response if not found.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#sitemapXml" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.sitemapXml">sitemap<wbr></wbr>Xml</a></code></td>
+    <td>Return the public sitemap.xml file, or a 404 response when absent.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.asset">
+    
+  </a>
+  <a name="asset">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">asset</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>FileResponse | Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L150">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#asset" title="orionis.http.default.contracts.responses.IDefaultResponses.asset">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Return an allowlisted framework asset, or a 404 response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Asset path relative to the framework's public asset prefix.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.FileResponse.html" class="internal-link" title="orionis.http.FileResponse">FileResponse</a> or <a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Packaged static file when allowed and present, otherwise a 404.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.error">
+    
+  </a>
+  <a name="error">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">error</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">status_code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | HTTPStatus</code>, </span><span class="rst-sig-param">content: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">expects_json: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>HTMLResponse | JSONResponse</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#error" title="orionis.http.default.contracts.responses.IDefaultResponses.error">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Return an error page or JSON response for the specified status code.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status<wbr></wbr>_code:</span><code>int | HTTPStatus</code></td><td class="fieldArgDesc">Integer HTTP status between 100 and 599. Unlisted codes use
+an <tt class="rst-docutils rst-literal">HTTP &lt;code&gt;</tt> label on the HTML page.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code>str | dict</code></td><td class="fieldArgDesc">Content of the error to display. A str is used as the message;
+a dict is serialised directly into the JSON payload or extracted
+via its <tt class="rst-docutils rst-literal">message</tt> key for HTML rendering. The HTML description
+is escaped text; JSON preserves the supplied values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expects<wbr></wbr>_json:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">If True, returns a JSON response; otherwise, returns HTML.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Additional headers to include in the response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.HTMLResponse.html" class="internal-link" title="orionis.http.HTMLResponse">HTMLResponse</a> or <a href="orionis.http.JSONResponse.html" class="internal-link" title="orionis.http.JSONResponse">JSONResponse</a></code></td><td class="fieldArgDesc">HTMLResponse with rendered error page, or JSONResponse if
+expects_json is True.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If status_code is not an integer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If status_code is outside the range 100 to 599.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.exception">
+    
+  </a>
+  <a name="exception">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exception</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">status_code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | HTTPStatus</code> = HTTPStatus.INTERNAL_SERVER_ERROR</span>) -&gt; <code>HTMLResponse</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L122">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#exception" title="orionis.http.default.contracts.responses.IDefaultResponses.exception">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Render an exception page with request and traceback details.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Path of the request that caused the exception.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method of the request that caused the exception.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Exception instance to be rendered.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status<wbr></wbr>_code:</span><code>int | HTTPStatus, <em>optional</em></code></td><td class="fieldArgDesc">HTTP status code for the response. Defaults to 500.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.HTMLResponse.html" class="internal-link" title="orionis.http.HTMLResponse">HTMLResponse</a></code></td><td class="fieldArgDesc">Rendered exception page as an HTMLResponse with the given status code.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.favicon">
+    
+  </a>
+  <a name="favicon">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">favicon</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>FileResponse | Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L19">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#favicon" title="orionis.http.default.contracts.responses.IDefaultResponses.favicon">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Return the favicon file response or a 404 response if not found.</p>
+<p>Searches for a favicon in the public storage directory using common
+favicon file names and content types. If not found, attempts to use
+the framework's internal fallback favicon. Caches the result for
+subsequent calls.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.FileResponse.html" class="internal-link" title="orionis.http.FileResponse">FileResponse</a> or <a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">A FileResponse containing the favicon if found, otherwise a
+Response with status 404.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.health">
+    
+  </a>
+  <a name="health">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">health</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>HTMLResponse | JSONResponse</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#health" title="orionis.http.default.contracts.responses.IDefaultResponses.health">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Render the application health state as an HTML or JSON response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">The HTTP request object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.HTMLResponse.html" class="internal-link" title="orionis.http.HTMLResponse">HTMLResponse</a> or <a href="orionis.http.JSONResponse.html" class="internal-link" title="orionis.http.JSONResponse">JSONResponse</a></code></td><td class="fieldArgDesc">HTMLResponse with the state page content or JSONResponse with the
+application status. Status is 200 if healthy, 503 if under
+maintenance.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.robotsTxt">
+    
+  </a>
+  <a name="robotsTxt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">robotsTxt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>FileResponse | Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L36">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#robotsTxt" title="orionis.http.default.contracts.responses.IDefaultResponses.robotsTxt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Return the robots.txt file or a 404 response if not found.</p>
+<p>Search for a robots.txt file in the public storage directory. If not
+found, check for a fallback file. Cache the result for future calls.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.FileResponse.html" class="internal-link" title="orionis.http.FileResponse">FileResponse</a> or <a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">FileResponse with robots.txt if found, otherwise Response with 404.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.sitemapXml">
+    
+  </a>
+  <a name="sitemapXml">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sitemapXml</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>FileResponse | Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#sitemapXml" title="orionis.http.default.contracts.responses.IDefaultResponses.sitemapXml">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p>Return the public sitemap.xml file, or a 404 response when absent.</p>
+<p>Retain the selected path and read its current metadata for each response.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.FileResponse.html" class="internal-link" title="orionis.http.FileResponse">FileResponse</a> or <a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">FileResponse with sitemap.xml if found, otherwise Response with status 404.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.http.default.contracts.responses.IDefaultResponses.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/default/contracts/responses.py#L17">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.http.default.contracts.responses.IDefaultResponses.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.default.responses.DefaultResponses.html" class="internal-link">orionis.http.default.responses.DefaultResponses</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -1,22 +1,30 @@
-"""Check HTTP metadata against real protocol decoding and native header storage."""
-
 import base64
-import unittest
-
 import msgspec
-
 from orionis.http.payload.estructures.headers import Headers
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.protocol.codecs import decode_envelope, decode_params
 from orionis.mcp.protocol.constants import CLIENT_CAPABILITIES, PROTOCOL_VERSION
 from orionis.mcp.transport.headers import compile_header_bindings, validate_headers
+from orionis.test import TestCase
 
-
-class TestHeaders(unittest.TestCase):
+class TestHeaders(TestCase):
     """Cover header ambiguity, encoded names and compiled parameter extraction."""
 
     def request(self, method="tools/call", **params: object):
-        """Create protocol bytes with mandatory metadata and an explicit request ID."""
+        """Create protocol bytes with mandatory metadata and an explicit request ID.
+
+        Parameters
+        ----------
+        method : object
+            Value supplied for ``method``.
+        **params : object
+            Value supplied for ``params``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``request``.
+        """
         return decode_envelope(
             msgspec.json.encode(
                 {
@@ -35,7 +43,22 @@ class TestHeaders(unittest.TestCase):
         )
 
     def headers(self, method="tools/call", name="weather", extra=()):
-        """Preserve original pairs so duplicate headers reach validation."""
+        """Preserve original pairs so duplicate headers reach validation.
+
+        Parameters
+        ----------
+        method : object
+            Value supplied for ``method``.
+        name : object
+            Value supplied for ``name``.
+        extra : object
+            Value supplied for ``extra``.
+
+        Returns
+        -------
+        Headers
+            Return the result produced by ``headers``.
+        """
         return Headers(
             [
                 ("MCP-Protocol-Version", "2026-07-28"),
@@ -46,19 +69,52 @@ class TestHeaders(unittest.TestCase):
         )
 
     def encoded(self, value):
-        """Construct the specification's case-sensitive UTF-8 sentinel."""
+        """Construct the specification's case-sensitive UTF-8 sentinel.
+
+        Parameters
+        ----------
+        value : object
+            Value supplied for ``value``.
+
+        Returns
+        -------
+        object
+            Return the result produced by ``encoded``.
+        """
         return "=?base64?" + base64.b64encode(value.encode()).decode() + "?="
 
     def assertMismatch(self, headers, request, bindings=()):
-        """Check the exact JSON-RPC and HTTP header-validation error pair."""
+        """Check the exact JSON-RPC and HTTP header-validation error pair.
+
+        Parameters
+        ----------
+        headers : object
+            Value supplied for ``headers``.
+        request : object
+            Value supplied for ``request``.
+        bindings : object
+            Value supplied for ``bindings``.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         with self.assertRaises(McpProtocolException) as caught:
             validate_headers(headers, request, bindings=bindings)
         self.assertEqual(
-            (caught.exception.code, caught.exception.status), (-32020, 400),
+            (caught.exception.code, caught.exception.status),
+            (-32020, 400),
         )
 
     def test_standard_headers_match_typed_and_raw_parameters(self):
-        """Known typed params and unknown raw methods share the same header gate."""
+        """Known typed params and unknown raw methods share the same header gate.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for method, params, name in (
             ("tools/call", {"name": "weather"}, "weather"),
             ("prompts/get", {"name": "weather"}, "weather"),
@@ -67,7 +123,9 @@ class TestHeaders(unittest.TestCase):
         ):
             request = self.request(method, **params)
             validate_headers(
-                self.headers(method, name), request, decode_params(request),
+                self.headers(method, name),
+                request,
+                decode_params(request),
             )
             validate_headers(self.headers(method, name), request)
         request = self.request("unknown")
@@ -77,7 +135,13 @@ class TestHeaders(unittest.TestCase):
         self.assertEqual(caught.exception.status, 404)
 
     def test_required_mismatch_and_duplicate_headers(self):
-        """Reject missing metadata and disagreeing or repeated singleton headers."""
+        """Reject missing metadata and disagreeing or repeated singleton headers.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request = self.request(name="weather")
         pairs = list(self.headers())
         for index in range(len(pairs)):
@@ -86,11 +150,18 @@ class TestHeaders(unittest.TestCase):
             changed[index] = (pairs[index][0], "different")
             self.assertMismatch(Headers(changed), request)
             self.assertMismatch(
-                Headers([*pairs, (pairs[index][0].upper(), pairs[index][1])]), request,
+                Headers([*pairs, (pairs[index][0].upper(), pairs[index][1])]),
+                request,
             )
 
     def test_header_name_case_and_value_case_are_distinct(self):
-        """Normalize field names without case folding method or name values."""
+        """Normalize field names without case folding method or name values.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request = self.request(name="weather")
         validate_headers(
             Headers([(key.swapcase(), value) for key, value in self.headers()]),
@@ -100,23 +171,47 @@ class TestHeaders(unittest.TestCase):
         self.assertMismatch(self.headers(method="TOOLS/CALL"), request)
 
     def test_legacy_missing_headers_fail_before_unknown_method(self):
-        """A header-less initialize receives the modern header validation error."""
+        """A header-less initialize receives the modern header validation error.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request = decode_envelope(b'{"jsonrpc":"2.0","id":1,"method":"initialize"}')
         self.assertMismatch(Headers([]), request)
 
     def test_missing_body_metadata_is_invalid_params_when_headers_exist(self):
-        """Honor the official stateless conformance error classification."""
+        """Honor the official stateless conformance error classification.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for params in ({}, {"_meta": {}}, {"_meta": {PROTOCOL_VERSION: None}}):
-            request = decode_envelope(msgspec.json.encode({
-                "jsonrpc": "2.0", "id": 1, "method": "server/discover",
-                "params": params,
-            }))
-            with self.assertRaises(McpProtocolException) as caught:
+            request = decode_envelope(
+                msgspec.json.encode(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "server/discover",
+                        "params": params,
+                    },
+                ),
+            )
+            with self.assertRaises(McpProtocolException) as caught: # NOSONAR
                 validate_headers(self.headers("server/discover", None), request)
             self.assertEqual(caught.exception.code, -32602)
 
     def test_unsupported_matching_version_is_left_to_protocol(self):
-        """Do not misclassify a matching unsupported version as a header mismatch."""
+        """Do not misclassify a matching unsupported version as a header mismatch.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request = self.request(
             "server/discover",
             _meta={
@@ -138,14 +233,26 @@ class TestHeaders(unittest.TestCase):
         self.assertEqual(caught.exception.code, -32022)
 
     def test_unicode_whitespace_and_sentinel_name_encoding(self):
-        """Decode UTF-8 names and literals that would otherwise resemble sentinels."""
+        """Decode UTF-8 names and literals that would otherwise resemble sentinels.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for name in ("Café 世界", " padded ", "line1\nline2", "=?base64?literal?="):
             request = self.request(name=name)
             validate_headers(self.headers(name=self.encoded(name)), request)
             self.assertMismatch(self.headers(name=name), request)
 
     def test_malformed_encoded_values_and_unsafe_raw_values(self):
-        """Reject invalid Base64, invalid UTF-8, controls and outer whitespace."""
+        """Reject invalid Base64, invalid UTF-8, controls and outer whitespace.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         request = self.request(name="weather")
         for value in (
             "=?base64?%%%?=",
@@ -159,7 +266,13 @@ class TestHeaders(unittest.TestCase):
             self.assertMismatch(self.headers(name=value), request)
 
     def test_static_nested_paths_are_compiled_without_dotted_key_expansion(self):
-        """Nested properties and literal dotted properties resolve independently."""
+        """Nested properties and literal dotted properties resolve independently.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         schema = {
             "type": "object",
             "properties": {
@@ -193,7 +306,13 @@ class TestHeaders(unittest.TestCase):
         )
 
     def test_schema_rejects_unreachable_annotations_and_duplicate_names(self):
-        """Fail malformed catalog metadata at compilation rather than first call."""
+        """Fail malformed catalog metadata at compilation rather than first call.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         annotated = {"type": "string", "x-mcp-header": "Region"}
         for schema in (
             annotated,
@@ -212,7 +331,13 @@ class TestHeaders(unittest.TestCase):
                 compile_header_bindings(schema)
 
     def test_schema_rejects_invalid_names_and_nonprimitive_types(self):
-        """Token syntax and primitive restrictions cover CRLF and nullable unions."""
+        """Token syntax and primitive restrictions cover CRLF and nullable unions.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         for name in ("", "two words", "name:colon", "line\r\n", 1):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 compile_header_bindings(
@@ -239,7 +364,13 @@ class TestHeaders(unittest.TestCase):
                 )
 
     def test_optional_missing_null_and_extra_recognized_headers(self):
-        """Omit absent or null values and reject injected recognized headers."""
+        """Omit absent or null values and reject injected recognized headers.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         bindings = compile_header_bindings(
             {
                 "properties": {
@@ -272,7 +403,13 @@ class TestHeaders(unittest.TestCase):
         )
 
     def test_parameter_string_boolean_and_numeric_comparisons(self):
-        """Require strict primitive kinds while comparing integers numerically."""
+        """Require strict primitive kinds while comparing integers numerically.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         cases = (
             ("string", "Hello 世界", self.encoded("Hello 世界")),
             ("boolean", True, "true"),
@@ -300,7 +437,13 @@ class TestHeaders(unittest.TestCase):
             )
 
     def test_parameter_type_range_and_header_disagreement_are_rejected(self):
-        """Reject coercion, unsafe integers and values different from the body."""
+        """Reject coercion, unsafe integers and values different from the body.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         cases = (
             ("boolean", 1, "true"),
             ("boolean", True, "True"),
@@ -327,11 +470,19 @@ class TestHeaders(unittest.TestCase):
             )
             request = self.request(name="weather", arguments={"value": value})
             self.assertMismatch(
-                self.headers(extra=(("mcp-param-value", header),)), request, bindings,
+                self.headers(extra=(("mcp-param-value", header),)),
+                request,
+                bindings,
             )
 
     def test_notification_headers_are_not_request_metadata(self):
-        """The revision does not prescribe request metadata for notification POSTs."""
+        """The revision does not prescribe request metadata for notification POSTs.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         notification = decode_envelope(
             b'{"jsonrpc":"2.0","method":"notifications/cancelled"}',
         )

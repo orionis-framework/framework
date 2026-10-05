@@ -1,0 +1,3658 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.database.schema.Column</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.database.schema.Column.html" class="internal-link" title="This class"><wbr></wbr>Column</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bigInteger" class="internal-link" title="orionis.database.schema.Column.bigInteger">big<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#boolean" class="internal-link" title="orionis.database.schema.Column.boolean">boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#date" class="internal-link" title="orionis.database.schema.Column.date">date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#dateTime" class="internal-link" title="orionis.database.schema.Column.dateTime">date<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#double" class="internal-link" title="orionis.database.schema.Column.double">double</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#enum" class="internal-link" title="orionis.database.schema.Column.enum">enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#float" class="internal-link" title="orionis.database.schema.Column.float">float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#id" class="internal-link" title="orionis.database.schema.Column.id">id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#integer" class="internal-link" title="orionis.database.schema.Column.integer">integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#interval" class="internal-link" title="orionis.database.schema.Column.interval">interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#largeBinary" class="internal-link" title="orionis.database.schema.Column.largeBinary">large<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#matchType" class="internal-link" title="orionis.database.schema.Column.matchType">match<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#numeric" class="internal-link" title="orionis.database.schema.Column.numeric">numeric</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#numericCommon" class="internal-link" title="orionis.database.schema.Column.numericCommon">numeric<wbr></wbr>Common</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#pickleType" class="internal-link" title="orionis.database.schema.Column.pickleType">pickle<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schemaType" class="internal-link" title="orionis.database.schema.Column.schemaType">schema<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#smallInteger" class="internal-link" title="orionis.database.schema.Column.smallInteger">small<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictArray" class="internal-link" title="orionis.database.schema.Column.strictArray">strict<wbr></wbr>Array</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBigInt" class="internal-link" title="orionis.database.schema.Column.strictBigInt">strict<wbr></wbr>Big<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBinary" class="internal-link" title="orionis.database.schema.Column.strictBinary">strict<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBlob" class="internal-link" title="orionis.database.schema.Column.strictBlob">strict<wbr></wbr>Blob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictChar" class="internal-link" title="orionis.database.schema.Column.strictChar">strict<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictClob" class="internal-link" title="orionis.database.schema.Column.strictClob">strict<wbr></wbr>Clob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictDecimal" class="internal-link" title="orionis.database.schema.Column.strictDecimal">strict<wbr></wbr>Decimal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictDoublePrecision" class="internal-link" title="orionis.database.schema.Column.strictDoublePrecision">strict<wbr></wbr>Double<wbr></wbr>Precision</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictInt" class="internal-link" title="orionis.database.schema.Column.strictInt">strict<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictJson" class="internal-link" title="orionis.database.schema.Column.strictJson">strict<wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictNChar" class="internal-link" title="orionis.database.schema.Column.strictNChar">strict<wbr></wbr>NChar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictNVarChar" class="internal-link" title="orionis.database.schema.Column.strictNVarChar">strict<wbr></wbr>NVar<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictReal" class="internal-link" title="orionis.database.schema.Column.strictReal">strict<wbr></wbr>Real</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictSmallInt" class="internal-link" title="orionis.database.schema.Column.strictSmallInt">strict<wbr></wbr>Small<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictTimestamp" class="internal-link" title="orionis.database.schema.Column.strictTimestamp">strict<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictVarBinary" class="internal-link" title="orionis.database.schema.Column.strictVarBinary">strict<wbr></wbr>Var<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictVarChar" class="internal-link" title="orionis.database.schema.Column.strictVarChar">strict<wbr></wbr>Var<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#string" class="internal-link" title="orionis.database.schema.Column.string">string</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#text" class="internal-link" title="orionis.database.schema.Column.text">text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#time" class="internal-link" title="orionis.database.schema.Column.time">time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#unicode" class="internal-link" title="orionis.database.schema.Column.unicode">unicode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#unicodeText" class="internal-link" title="orionis.database.schema.Column.unicodeText">unicode<wbr></wbr>Text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#uuid" class="internal-link" title="orionis.database.schema.Column.uuid">uuid</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.database.schema.html" class="internal-link" title="The parent of this class">schema</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5095"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.blueprint.html" class="internal-link" title="orionis.database.schema.blueprint">blueprint</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5096"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.column.html" class="internal-link" title="orionis.database.schema.column">column</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5097"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.comment.html" class="internal-link" title="orionis.database.schema.comment">comment</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5098"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5098">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.definition_bucket.html" class="internal-link" title="orionis.database.schema.definition_bucket">definition<wbr></wbr>_bucket</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link" title="orionis.database.schema.definition_bucket.DefinitionBucket"><wbr></wbr>Definition<wbr></wbr>Bucket</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5099"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.definitions.html" class="internal-link" title="orionis.database.schema.definitions">definitions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5100"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.foreign.html" class="internal-link" title="orionis.database.schema.foreign">foreign</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5101"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.index.html" class="internal-link" title="orionis.database.schema.index">index</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5102"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.primary.html" class="internal-link" title="orionis.database.schema.primary">primary</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5103"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5103">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.schema.html" class="internal-link" title="orionis.database.schema.schema">schema</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.schema.Schema.html" class="internal-link" title="orionis.database.schema.schema.Schema"><wbr></wbr>Schema</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5104"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5104">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.table_creation.html" class="internal-link" title="orionis.database.schema.table_creation">table<wbr></wbr>_creation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.table_creation.TableCreation.html" class="internal-link" title="orionis.database.schema.table_creation.TableCreation"><wbr></wbr>Table<wbr></wbr>Creation</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5105"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.timestamp.html" class="internal-link" title="orionis.database.schema.timestamp">timestamp</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5106"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.unique.html" class="internal-link" title="orionis.database.schema.unique">unique</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5107"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5107">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Blueprint.html" class="internal-link" title="orionis.database.schema.Blueprint"><wbr></wbr>Blueprint</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__getattr__" class="internal-link" title="orionis.database.schema.Blueprint.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__init__" class="internal-link" title="orionis.database.schema.Blueprint.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#columns" class="internal-link" title="orionis.database.schema.Blueprint.columns">columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#comment" class="internal-link" title="orionis.database.schema.Blueprint.comment">comment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#definitions" class="internal-link" title="orionis.database.schema.Blueprint.definitions">definitions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#foreignKey" class="internal-link" title="orionis.database.schema.Blueprint.foreignKey">foreign<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#index" class="internal-link" title="orionis.database.schema.Blueprint.index">index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#primaryKey" class="internal-link" title="orionis.database.schema.Blueprint.primaryKey">primary<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#timestamps" class="internal-link" title="orionis.database.schema.Blueprint.timestamps">timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#unique" class="internal-link" title="orionis.database.schema.Blueprint.unique">unique</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__slots__" class="internal-link" title="orionis.database.schema.Blueprint.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__columns" class="internal-link" title="orionis.database.schema.Blueprint.__columns">__columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__constraints" class="internal-link" title="orionis.database.schema.Blueprint.__constraints">__constraints</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html#__factory_cache" class="internal-link" title="orionis.database.schema.Blueprint.__factory_cache">__factory<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5108"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column"><wbr></wbr>Column</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bigInteger" class="internal-link" title="orionis.database.schema.Column.bigInteger">big<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#boolean" class="internal-link" title="orionis.database.schema.Column.boolean">boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#date" class="internal-link" title="orionis.database.schema.Column.date">date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#dateTime" class="internal-link" title="orionis.database.schema.Column.dateTime">date<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#double" class="internal-link" title="orionis.database.schema.Column.double">double</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#enum" class="internal-link" title="orionis.database.schema.Column.enum">enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#float" class="internal-link" title="orionis.database.schema.Column.float">float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#id" class="internal-link" title="orionis.database.schema.Column.id">id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#integer" class="internal-link" title="orionis.database.schema.Column.integer">integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#interval" class="internal-link" title="orionis.database.schema.Column.interval">interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#largeBinary" class="internal-link" title="orionis.database.schema.Column.largeBinary">large<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#matchType" class="internal-link" title="orionis.database.schema.Column.matchType">match<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#numeric" class="internal-link" title="orionis.database.schema.Column.numeric">numeric</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#numericCommon" class="internal-link" title="orionis.database.schema.Column.numericCommon">numeric<wbr></wbr>Common</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#pickleType" class="internal-link" title="orionis.database.schema.Column.pickleType">pickle<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schemaType" class="internal-link" title="orionis.database.schema.Column.schemaType">schema<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#smallInteger" class="internal-link" title="orionis.database.schema.Column.smallInteger">small<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictArray" class="internal-link" title="orionis.database.schema.Column.strictArray">strict<wbr></wbr>Array</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBigInt" class="internal-link" title="orionis.database.schema.Column.strictBigInt">strict<wbr></wbr>Big<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBinary" class="internal-link" title="orionis.database.schema.Column.strictBinary">strict<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictBlob" class="internal-link" title="orionis.database.schema.Column.strictBlob">strict<wbr></wbr>Blob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictChar" class="internal-link" title="orionis.database.schema.Column.strictChar">strict<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictClob" class="internal-link" title="orionis.database.schema.Column.strictClob">strict<wbr></wbr>Clob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictDecimal" class="internal-link" title="orionis.database.schema.Column.strictDecimal">strict<wbr></wbr>Decimal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictDoublePrecision" class="internal-link" title="orionis.database.schema.Column.strictDoublePrecision">strict<wbr></wbr>Double<wbr></wbr>Precision</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictInt" class="internal-link" title="orionis.database.schema.Column.strictInt">strict<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictJson" class="internal-link" title="orionis.database.schema.Column.strictJson">strict<wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictNChar" class="internal-link" title="orionis.database.schema.Column.strictNChar">strict<wbr></wbr>NChar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictNVarChar" class="internal-link" title="orionis.database.schema.Column.strictNVarChar">strict<wbr></wbr>NVar<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictReal" class="internal-link" title="orionis.database.schema.Column.strictReal">strict<wbr></wbr>Real</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictSmallInt" class="internal-link" title="orionis.database.schema.Column.strictSmallInt">strict<wbr></wbr>Small<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictTimestamp" class="internal-link" title="orionis.database.schema.Column.strictTimestamp">strict<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictVarBinary" class="internal-link" title="orionis.database.schema.Column.strictVarBinary">strict<wbr></wbr>Var<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#strictVarChar" class="internal-link" title="orionis.database.schema.Column.strictVarChar">strict<wbr></wbr>Var<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#string" class="internal-link" title="orionis.database.schema.Column.string">string</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#text" class="internal-link" title="orionis.database.schema.Column.text">text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#time" class="internal-link" title="orionis.database.schema.Column.time">time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#unicode" class="internal-link" title="orionis.database.schema.Column.unicode">unicode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#unicodeText" class="internal-link" title="orionis.database.schema.Column.unicodeText">unicode<wbr></wbr>Text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#uuid" class="internal-link" title="orionis.database.schema.Column.uuid">uuid</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5109"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5109">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment"><wbr></wbr>Comment</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Comment.html#__init__" class="internal-link" title="orionis.database.schema.Comment.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Comment.html#text" class="internal-link" title="orionis.database.schema.Comment.text">text</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5110"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5110">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey"><wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.ForeignKey.html#__init__" class="internal-link" title="orionis.database.schema.ForeignKey.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.ForeignKey.html#foreign" class="internal-link" title="orionis.database.schema.ForeignKey.foreign">foreign</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5111"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5111">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index"><wbr></wbr>Index</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Index.html#__init__" class="internal-link" title="orionis.database.schema.Index.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Index.html#constraint" class="internal-link" title="orionis.database.schema.Index.constraint">constraint</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5112"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5112">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey"><wbr></wbr>Primary<wbr></wbr>Key</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.PrimaryKey.html#__init__" class="internal-link" title="orionis.database.schema.PrimaryKey.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.PrimaryKey.html#columns" class="internal-link" title="orionis.database.schema.PrimaryKey.columns">columns</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5113"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5113">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Timestamps.html" class="internal-link" title="orionis.database.schema.Timestamps"><wbr></wbr>Timestamps</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Timestamps.html#__init__" class="internal-link" title="orionis.database.schema.Timestamps.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Timestamps.html#timezone" class="internal-link" title="orionis.database.schema.Timestamps.timezone">timezone</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5114"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5114">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique"><wbr></wbr>Unique</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Unique.html#__init__" class="internal-link" title="orionis.database.schema.Unique.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Unique.html#constraint" class="internal-link" title="orionis.database.schema.Unique.constraint">constraint</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.database.html" class="internal-link" title="orionis.database">database</a></code><wbr></wbr>.<code><a href="orionis.database.schema.html" class="internal-link" title="orionis.database.schema">schema</a></code><wbr></wbr>.<code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column">Column</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Column</span>: <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L16" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.schema.Column">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Create <code><a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition">ColumnDefinition</a></code> builders for schema declarations.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id496">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#bigInteger" class="internal-link" title="orionis.database.schema.Column.bigInteger">big<wbr></wbr>Integer</a></code></td>
+    <td>Build a BIGINT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#boolean" class="internal-link" title="orionis.database.schema.Column.boolean">boolean</a></code></td>
+    <td>Build a boolean column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#date" class="internal-link" title="orionis.database.schema.Column.date">date</a></code></td>
+    <td>Build a DATE column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#dateTime" class="internal-link" title="orionis.database.schema.Column.dateTime">date<wbr></wbr>Time</a></code></td>
+    <td>Build a DATETIME column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#double" class="internal-link" title="orionis.database.schema.Column.double">double</a></code></td>
+    <td>Build a DOUBLE column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#enum" class="internal-link" title="orionis.database.schema.Column.enum">enum</a></code></td>
+    <td>Build a string-backed enumeration column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#float" class="internal-link" title="orionis.database.schema.Column.float">float</a></code></td>
+    <td>Build a FLOAT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#id" class="internal-link" title="orionis.database.schema.Column.id">id</a></code></td>
+    <td>Build a BIGINT primary key column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#integer" class="internal-link" title="orionis.database.schema.Column.integer">integer</a></code></td>
+    <td>Build an INTEGER column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#interval" class="internal-link" title="orionis.database.schema.Column.interval">interval</a></code></td>
+    <td>Build an INTERVAL column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#largeBinary" class="internal-link" title="orionis.database.schema.Column.largeBinary">large<wbr></wbr>Binary</a></code></td>
+    <td>Build a large binary column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#matchType" class="internal-link" title="orionis.database.schema.Column.matchType">match<wbr></wbr>Type</a></code></td>
+    <td>Build a MATCH-operator return-type column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#numeric" class="internal-link" title="orionis.database.schema.Column.numeric">numeric</a></code></td>
+    <td>Build a NUMERIC column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#numericCommon" class="internal-link" title="orionis.database.schema.Column.numericCommon">numeric<wbr></wbr>Common</a></code></td>
+    <td>Build a numeric-common placeholder column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#pickleType" class="internal-link" title="orionis.database.schema.Column.pickleType">pickle<wbr></wbr>Type</a></code></td>
+    <td>Build a pickle-backed column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#schemaType" class="internal-link" title="orionis.database.schema.Column.schemaType">schema<wbr></wbr>Type</a></code></td>
+    <td>Build a schema-level placeholder column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#smallInteger" class="internal-link" title="orionis.database.schema.Column.smallInteger">small<wbr></wbr>Integer</a></code></td>
+    <td>Build a SMALLINT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictArray" class="internal-link" title="orionis.database.schema.Column.strictArray">strict<wbr></wbr>Array</a></code></td>
+    <td>Build a SQL ARRAY column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictBigInt" class="internal-link" title="orionis.database.schema.Column.strictBigInt">strict<wbr></wbr>Big<wbr></wbr>Int</a></code></td>
+    <td>Build a SQL BIGINT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictBinary" class="internal-link" title="orionis.database.schema.Column.strictBinary">strict<wbr></wbr>Binary</a></code></td>
+    <td>Build a SQL BINARY column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictBlob" class="internal-link" title="orionis.database.schema.Column.strictBlob">strict<wbr></wbr>Blob</a></code></td>
+    <td>Build a SQL BLOB column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictChar" class="internal-link" title="orionis.database.schema.Column.strictChar">strict<wbr></wbr>Char</a></code></td>
+    <td>Build a SQL CHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictClob" class="internal-link" title="orionis.database.schema.Column.strictClob">strict<wbr></wbr>Clob</a></code></td>
+    <td>Build an Oracle/Informix CLOB column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictDecimal" class="internal-link" title="orionis.database.schema.Column.strictDecimal">strict<wbr></wbr>Decimal</a></code></td>
+    <td>Build a SQL DECIMAL column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictDoublePrecision" class="internal-link" title="orionis.database.schema.Column.strictDoublePrecision">strict<wbr></wbr>Double<wbr></wbr>Precision</a></code></td>
+    <td>Build a SQL DOUBLE PRECISION column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictInt" class="internal-link" title="orionis.database.schema.Column.strictInt">strict<wbr></wbr>Int</a></code></td>
+    <td>Build a SQL INT column definition, alias of <tt class="rst-docutils rst-literal">INTEGER</tt>.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictJson" class="internal-link" title="orionis.database.schema.Column.strictJson">strict<wbr></wbr>Json</a></code></td>
+    <td>Build a SQL JSON column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictNChar" class="internal-link" title="orionis.database.schema.Column.strictNChar">strict<wbr></wbr>NChar</a></code></td>
+    <td>Build a SQL NCHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictNVarChar" class="internal-link" title="orionis.database.schema.Column.strictNVarChar">strict<wbr></wbr>NVar<wbr></wbr>Char</a></code></td>
+    <td>Build a SQL NVARCHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictReal" class="internal-link" title="orionis.database.schema.Column.strictReal">strict<wbr></wbr>Real</a></code></td>
+    <td>Build a SQL REAL column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictSmallInt" class="internal-link" title="orionis.database.schema.Column.strictSmallInt">strict<wbr></wbr>Small<wbr></wbr>Int</a></code></td>
+    <td>Build a SQL SMALLINT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictTimestamp" class="internal-link" title="orionis.database.schema.Column.strictTimestamp">strict<wbr></wbr>Timestamp</a></code></td>
+    <td>Build a SQL TIMESTAMP column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictVarBinary" class="internal-link" title="orionis.database.schema.Column.strictVarBinary">strict<wbr></wbr>Var<wbr></wbr>Binary</a></code></td>
+    <td>Build a SQL VARBINARY column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#strictVarChar" class="internal-link" title="orionis.database.schema.Column.strictVarChar">strict<wbr></wbr>Var<wbr></wbr>Char</a></code></td>
+    <td>Build a SQL VARCHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#string" class="internal-link" title="orionis.database.schema.Column.string">string</a></code></td>
+    <td>Build a VARCHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#text" class="internal-link" title="orionis.database.schema.Column.text">text</a></code></td>
+    <td>Build a TEXT/CLOB column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#time" class="internal-link" title="orionis.database.schema.Column.time">time</a></code></td>
+    <td>Build a TIME column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#unicode" class="internal-link" title="orionis.database.schema.Column.unicode">unicode</a></code></td>
+    <td>Build an NVARCHAR column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#unicodeText" class="internal-link" title="orionis.database.schema.Column.unicodeText">unicode<wbr></wbr>Text</a></code></td>
+    <td>Build an NCLOB/NTEXT column definition.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#uuid" class="internal-link" title="orionis.database.schema.Column.uuid">uuid</a></code></td>
+    <td>Build a UUID column definition.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.bigInteger">
+    
+  </a>
+  <a name="bigInteger">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">bigInteger</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>BigInteger</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L39">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#bigInteger" title="orionis.database.schema.Column.bigInteger">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a BIGINT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.BigInteger.html" class="internal-link" title="orionis.orm.schema.types.BigInteger">BigInteger</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.boolean">
+    
+  </a>
+  <a name="boolean">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">boolean</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">create_constraint: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">constraint_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Boolean</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L59">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#boolean" title="orionis.database.schema.Column.boolean">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a boolean column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">create<wbr></wbr>_constraint:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">When the boolean is emulated as int/smallint, also create a
+CHECK constraint ensuring 1 or 0 as a value.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">constraint<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Name of the CHECK constraint, when generated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Boolean.html" class="internal-link" title="orionis.orm.schema.types.Boolean">Boolean</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.date">
+    
+  </a>
+  <a name="date">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">date</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Date</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L92">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#date" title="orionis.database.schema.Column.date">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a DATE column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Date.html" class="internal-link" title="orionis.orm.schema.types.Date">Date</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.dateTime">
+    
+  </a>
+  <a name="dateTime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">dateTime</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">timezone: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>DateTime</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L112">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#dateTime" title="orionis.database.schema.Column.dateTime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a DATETIME column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timezone:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the datetime type should enable timezone support, if
+available on the base date/time-holding type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>DateTime</code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.double">
+    
+  </a>
+  <a name="double">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">double</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Double</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L135">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#double" title="orionis.database.schema.Column.double">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a DOUBLE column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are coerced to <tt class="rst-docutils rst-literal">decimal.Decimal</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Double.html" class="internal-link" title="orionis.orm.schema.types.Double">Double</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.enum">
+    
+  </a>
+  <a name="enum">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">enum</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*enums: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">constraint_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">create_constraint: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">native_enum: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">validate_strings: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>Enum</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L171">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#enum" title="orionis.database.schema.Column.enum">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a string-backed enumeration column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*enums:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Allowed string values, at least one is required.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">constraint<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Name of the enumerated database type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">create<wbr></wbr>_constraint:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">When emulating a non-native enum, also build a CHECK
+constraint against the allowed values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">native<wbr></wbr>_enum:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to use the backend's native <tt class="rst-docutils rst-literal">ENUM</tt> type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Custom <tt class="rst-docutils rst-literal">VARCHAR</tt> length for non-native enumerations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">validate<wbr></wbr>_strings:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to validate string literals against allowed values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Enum.html" class="internal-link" title="orionis.orm.schema.types.Enum">Enum</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If no values are provided or any value is not a string.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.float">
+    
+  </a>
+  <a name="float">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">float</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Float</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L224">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#float" title="orionis.database.schema.Column.float">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a FLOAT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are coerced to <tt class="rst-docutils rst-literal">decimal.Decimal</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Float.html" class="internal-link" title="orionis.orm.schema.types.Float">Float</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.id">
+    
+  </a>
+  <a name="id">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">id</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">id</span><span class="rst-variable-quote">'</span></span>) -&gt; <code>BigInteger</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L19">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#id" title="orionis.database.schema.Column.id">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a BIGINT primary key column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Name assigned to the column, defaults to <tt class="rst-docutils rst-literal">"id"</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.BigInteger.html" class="internal-link" title="orionis.orm.schema.types.BigInteger">BigInteger</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.integer">
+    
+  </a>
+  <a name="integer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">integer</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Integer</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L260">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#integer" title="orionis.database.schema.Column.integer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build an INTEGER column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Integer</code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.interval">
+    
+  </a>
+  <a name="interval">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">interval</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">native: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a>, </span><span class="rst-sig-param">second_precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">day_precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Interval</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L280">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#interval" title="orionis.database.schema.Column.interval">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build an INTERVAL column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">native:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to use the backend's native <tt class="rst-docutils rst-literal">INTERVAL</tt> type, when
+supported (PostgreSQL, Oracle Database).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">second<wbr></wbr>_precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Fractional seconds precision for native interval types.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">day<wbr></wbr>_precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Day precision for native interval types.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Interval.html" class="internal-link" title="orionis.orm.schema.types.Interval">Interval</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.largeBinary">
+    
+  </a>
+  <a name="largeBinary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">largeBinary</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>LargeBinary</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L317">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#largeBinary" title="orionis.database.schema.Column.largeBinary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a large binary column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL statements, for those
+binary types that accept a length.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.LargeBinary.html" class="internal-link" title="orionis.orm.schema.types.LargeBinary">LargeBinary</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the length is not a positive integer or None.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.matchType">
+    
+  </a>
+  <a name="matchType">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">matchType</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>MatchType</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L345">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#matchType" title="orionis.database.schema.Column.matchType">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a MATCH-operator return-type column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.MatchType.html" class="internal-link" title="orionis.orm.schema.types.MatchType">MatchType</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.numeric">
+    
+  </a>
+  <a name="numeric">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">numeric</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code>Numeric</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#numeric" title="orionis.database.schema.Column.numeric">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a NUMERIC column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric scale for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are returned as <tt class="rst-docutils rst-literal">decimal.Decimal</tt> objects.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Numeric.html" class="internal-link" title="orionis.orm.schema.types.Numeric">Numeric</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If precision or scale are negative or inconsistent.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.numericCommon">
+    
+  </a>
+  <a name="numericCommon">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">numericCommon</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>NumericCommon</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L410">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#numericCommon" title="orionis.database.schema.Column.numericCommon">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a numeric-common placeholder column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.NumericCommon.html" class="internal-link" title="orionis.orm.schema.types.NumericCommon">NumericCommon</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.pickleType">
+    
+  </a>
+  <a name="pickleType">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">pickleType</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">protocol: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 5, </span><span class="rst-sig-param">pickler: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">impl: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PickleType</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L430">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#pickleType" title="orionis.database.schema.Column.pickleType">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a pickle-backed column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Pickle protocol, defaults to <tt class="rst-docutils rst-literal">pickle.HIGHEST_PROTOCOL</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pickler:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Object exposing pickle-compatible <tt class="rst-docutils rst-literal">dumps</tt>/<tt class="rst-docutils rst-literal">loads</tt> methods.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">impl:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Binary-storing type used in place of the default <tt class="rst-docutils rst-literal">LargeBinary</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.PickleType.html" class="internal-link" title="orionis.orm.schema.types.PickleType">PickleType</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.schemaType">
+    
+  </a>
+  <a name="schemaType">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">schemaType</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">schema_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>SchemaType</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L461">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#schemaType" title="orionis.database.schema.Column.schemaType">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a schema-level placeholder column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Name of the associated schema-level construct.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.SchemaType.html" class="internal-link" title="orionis.orm.schema.types.SchemaType">SchemaType</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.smallInteger">
+    
+  </a>
+  <a name="smallInteger">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">smallInteger</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>SmallInteger</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L483">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#smallInteger" title="orionis.database.schema.Column.smallInteger">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SMALLINT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.SmallInteger.html" class="internal-link" title="orionis.orm.schema.types.SmallInteger">SmallInteger</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictArray">
+    
+  </a>
+  <a name="strictArray">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictArray</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">item_type: <code>ColumnDefinition</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">as_tuple: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">dimensions: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">zero_indexes: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>StrictArray</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L669">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictArray" title="orionis.database.schema.Column.strictArray">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL ARRAY column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">item<wbr></wbr>_type:</span><code><a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition">ColumnDefinition</a></code></td><td class="fieldArgDesc">Column definition of the array elements.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">as<wbr></wbr>_tuple:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether results are converted to tuples instead of lists.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">dimensions:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Fixed number of dimensions, when not <tt class="rst-docutils rst-literal">None</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">zero<wbr></wbr>_indexes:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to convert between zero- and one-based indexes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictArray.html" class="internal-link" title="orionis.orm.schema.types.StrictArray">StrictArray</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictBigInt">
+    
+  </a>
+  <a name="strictBigInt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictBigInt</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>StrictBigInt</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L709">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictBigInt" title="orionis.database.schema.Column.strictBigInt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL BIGINT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictBigInt.html" class="internal-link" title="orionis.orm.schema.types.StrictBigInt">StrictBigInt</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictBinary">
+    
+  </a>
+  <a name="strictBinary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictBinary</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictBinary</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L729">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictBinary" title="orionis.database.schema.Column.strictBinary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL BINARY column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL statements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictBinary.html" class="internal-link" title="orionis.orm.schema.types.StrictBinary">StrictBinary</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictBlob">
+    
+  </a>
+  <a name="strictBlob">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictBlob</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictBlob</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L751">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictBlob" title="orionis.database.schema.Column.strictBlob">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL BLOB column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL statements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictBlob.html" class="internal-link" title="orionis.orm.schema.types.StrictBlob">StrictBlob</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictChar">
+    
+  </a>
+  <a name="strictChar">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictChar</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictChar</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L773">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictChar" title="orionis.database.schema.Column.strictChar">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL CHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictChar.html" class="internal-link" title="orionis.orm.schema.types.StrictChar">StrictChar</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictClob">
+    
+  </a>
+  <a name="strictClob">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictClob</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictClob</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L801">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictClob" title="orionis.database.schema.Column.strictClob">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build an Oracle/Informix CLOB column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictClob.html" class="internal-link" title="orionis.orm.schema.types.StrictClob">StrictClob</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictDecimal">
+    
+  </a>
+  <a name="strictDecimal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictDecimal</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 10, </span><span class="rst-sig-param">scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 2, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code>StrictDecimal</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L829">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictDecimal" title="orionis.database.schema.Column.strictDecimal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL DECIMAL column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric scale for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are returned as <tt class="rst-docutils rst-literal">decimal.Decimal</tt> objects.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictDecimal.html" class="internal-link" title="orionis.orm.schema.types.StrictDecimal">StrictDecimal</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If precision or scale are negative or inconsistent.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictDoublePrecision">
+    
+  </a>
+  <a name="strictDoublePrecision">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictDoublePrecision</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictDoublePrecision</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L874">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictDoublePrecision" title="orionis.database.schema.Column.strictDoublePrecision">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL DOUBLE PRECISION column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are coerced to <tt class="rst-docutils rst-literal">decimal.Decimal</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictDoublePrecision.html" class="internal-link" title="orionis.orm.schema.types.StrictDoublePrecision">StrictDoublePrecision</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictInt">
+    
+  </a>
+  <a name="strictInt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictInt</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>StrictInt</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L910">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictInt" title="orionis.database.schema.Column.strictInt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL INT column definition, alias of <tt class="rst-docutils rst-literal">INTEGER</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictInt.html" class="internal-link" title="orionis.orm.schema.types.StrictInt">StrictInt</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictJson">
+    
+  </a>
+  <a name="strictJson">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictJson</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">none_as_null: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>StrictJson</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L930">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictJson" title="orionis.database.schema.Column.strictJson">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL JSON column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">none<wbr></wbr>_as<wbr></wbr>_null:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">When <tt class="rst-docutils rst-literal">True</tt>, persist Python <tt class="rst-docutils rst-literal">None</tt> as SQL <tt class="rst-docutils rst-literal">NULL</tt> instead
+of the JSON encoding of <tt class="rst-docutils rst-literal">null</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictJson.html" class="internal-link" title="orionis.orm.schema.types.StrictJson">StrictJson</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictNChar">
+    
+  </a>
+  <a name="strictNChar">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictNChar</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictNChar</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L953">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictNChar" title="orionis.database.schema.Column.strictNChar">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL NCHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictNChar.html" class="internal-link" title="orionis.orm.schema.types.StrictNChar">StrictNChar</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictNVarChar">
+    
+  </a>
+  <a name="strictNVarChar">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictNVarChar</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictNVarChar</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L981">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictNVarChar" title="orionis.database.schema.Column.strictNVarChar">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL NVARCHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictNVarChar.html" class="internal-link" title="orionis.orm.schema.types.StrictNVarChar">StrictNVarChar</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictReal">
+    
+  </a>
+  <a name="strictReal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictReal</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">precision: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">asdecimal: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">decimal_return_scale: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictReal</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L1009">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictReal" title="orionis.database.schema.Column.strictReal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL REAL column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">precision:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Numeric precision for use in DDL <tt class="rst-docutils rst-literal">CREATE TABLE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">asdecimal:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are coerced to <tt class="rst-docutils rst-literal">decimal.Decimal</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">decimal<wbr></wbr>_return<wbr></wbr>_scale:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Default scale used when converting floats to decimals.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictReal.html" class="internal-link" title="orionis.orm.schema.types.StrictReal">StrictReal</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictSmallInt">
+    
+  </a>
+  <a name="strictSmallInt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictSmallInt</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>StrictSmallInt</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L1045">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictSmallInt" title="orionis.database.schema.Column.strictSmallInt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL SMALLINT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictSmallInt.html" class="internal-link" title="orionis.orm.schema.types.StrictSmallInt">StrictSmallInt</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictTimestamp">
+    
+  </a>
+  <a name="strictTimestamp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictTimestamp</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">timezone: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>StrictTimestamp</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L1065">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictTimestamp" title="orionis.database.schema.Column.strictTimestamp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL TIMESTAMP column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timezone:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the TIMESTAMP type should enable timezone support,
+if available on the target database.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictTimestamp.html" class="internal-link" title="orionis.orm.schema.types.StrictTimestamp">StrictTimestamp</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictVarBinary">
+    
+  </a>
+  <a name="strictVarBinary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictVarBinary</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictVarBinary</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L1088">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictVarBinary" title="orionis.database.schema.Column.strictVarBinary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL VARBINARY column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL statements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictVarBinary.html" class="internal-link" title="orionis.orm.schema.types.StrictVarBinary">StrictVarBinary</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.strictVarChar">
+    
+  </a>
+  <a name="strictVarChar">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">strictVarChar</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 255, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>StrictVarChar</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L1110">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#strictVarChar" title="orionis.database.schema.Column.strictVarChar">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a SQL VARCHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.StrictVarChar.html" class="internal-link" title="orionis.orm.schema.types.StrictVarChar">StrictVarChar</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.string">
+    
+  </a>
+  <a name="string">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">string</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 255, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>String</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L503">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#string" title="orionis.database.schema.Column.string">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a VARCHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.String.html" class="internal-link" title="orionis.orm.schema.types.String">String</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the length is not a positive integer or None.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.text">
+    
+  </a>
+  <a name="text">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">text</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Text</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L536">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#text" title="orionis.database.schema.Column.text">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a TEXT/CLOB column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Text.html" class="internal-link" title="orionis.orm.schema.types.Text">Text</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.time">
+    
+  </a>
+  <a name="time">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">time</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Time</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L564">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#time" title="orionis.database.schema.Column.time">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a TIME column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Time.html" class="internal-link" title="orionis.orm.schema.types.Time">Time</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.unicode">
+    
+  </a>
+  <a name="unicode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">unicode</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Unicode</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L584">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#unicode" title="orionis.database.schema.Column.unicode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build an NVARCHAR column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.Unicode.html" class="internal-link" title="orionis.orm.schema.types.Unicode">Unicode</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.unicodeText">
+    
+  </a>
+  <a name="unicodeText">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">unicodeText</span><span class="function-signature long-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">collation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>UnicodeText</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L612">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#unicodeText" title="orionis.database.schema.Column.unicodeText">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build an NCLOB/NTEXT column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Length for the column for use in DDL and CAST expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">collation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column-level collation for use in DDL and CAST expressions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.UnicodeText.html" class="internal-link" title="orionis.orm.schema.types.UnicodeText">UnicodeText</a></code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.database.schema.Column.uuid">
+    
+  </a>
+  <a name="uuid">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">uuid</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">as_uuid: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a>, </span><span class="rst-sig-param">native_uuid: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code>Uuid</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/schema/column.py#L640">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#uuid" title="orionis.database.schema.Column.uuid">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a UUID column definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name assigned to the column.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">as<wbr></wbr>_uuid:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether values are interpreted as Python <tt class="rst-docutils rst-literal">uuid.UUID</tt> objects.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">native<wbr></wbr>_uuid:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to use the backend's native UUID-storing type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Uuid</code></td><td class="fieldArgDesc">Column definition ready for schema declarations.</td></tr></table></div>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

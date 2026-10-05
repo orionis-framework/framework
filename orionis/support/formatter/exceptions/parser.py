@@ -18,6 +18,11 @@ class ExceptionParser(IExceptionParser):
         ----------
         exception : Exception
             Exception to be parsed and formatted.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         tb = traceback.TracebackException.from_exception(
             exception, capture_locals=False,

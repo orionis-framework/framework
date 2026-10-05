@@ -1,7 +1,6 @@
 from orionis.container.facades.facade import Facade
 from orionis.mcp.contracts.manager import IMcpManager
 
-
 class Mcp(Facade):
     """Expose the same MCP manager that application services receive through DI."""
 
@@ -9,5 +8,12 @@ class Mcp(Facade):
 
     @classmethod
     def getFacadeAccessor(cls) -> type[IMcpManager]:
-        """Resolve the application-owned MCP manager singleton."""
+        """
+        Resolve the application-owned MCP manager singleton.
+
+        Returns
+        -------
+        type[IMcpManager]
+            Result of the operation described above.
+        """
         return IMcpManager

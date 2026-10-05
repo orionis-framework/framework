@@ -24,6 +24,11 @@ class Singleton(type):
             Base classes of the class being initialized.
         namespace : dict[str, object]
             Attributes defined in the class body.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().__init__(name, bases, namespace)
         type.__setattr__(cls, "_singleton_instance", _MISSING)

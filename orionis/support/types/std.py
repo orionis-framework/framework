@@ -15,6 +15,11 @@ class StdClass(IStdClass):
         ----------
         **kwargs : object
             Keyword arguments forwarded to the parent hook.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         super().__init_subclass__(**kwargs)
         cls.RESERVED = (

@@ -310,7 +310,7 @@ una caché de resultados en el servidor.
 Arranque → registro inmutable + esquemas + planes DI y de cabeceras
 Router HTTP → middleware/scope nativo → transporte HTTP ┐
 Lector STDIO → tareas limitadas + scope nativo nuevo    ├→ dispatcher → primitiva
-Aplicación → McpTestClient + scope nativo nuevo         ┘
+TestCase.mcp → aplicación + scope nativo nuevo         ┘
 Bytes / iterador propio → JSON/SSE nativo o escritor STDIO serializado
 ```
 
@@ -320,36 +320,39 @@ existente. El kernel no importa MCP ni usa un segundo router. La caché de rutas
 continúa apuntando al controlador MCP nativo y estable.
 
 ```python
-from orionis.mcp.testing import McpTestClient
+from orionis.test import TestCase
 
-client = McpTestClient(app, WeatherServer)
-response = await client.tool("weather", {"location": "Bogotá"})
-response.assertOk()
-response.assertTextContains("Bogotá")
+class TestWeather(TestCase):
+    async def testWeather(self) -> None:
+        """Verify the weather tool through the native test runner.
+
+        Returns
+        -------
+        None
+            Check the successful tool response and its text.
+        """
+        client = await self.mcp(WeatherServer)
+        response = await client.tool("weather", {"location": "Bogotá"})
+        response.assertOk()
+        response.assertTextContains("Bogotá")
 ```
 
 Utiliza `client.stream(...)` para suscripciones y cancelaciones; `request(...)`
-recoge intercambios finitos. Este cliente prueba bytes de protocolo con el mismo
-dispatcher y la aplicación suministrada. Los adaptadores HTTP, rutas, cabeceras,
-Origin y middleware tienen pruebas de integración independientes.
+recoge intercambios finitos. El helper usa la aplicación que `reactor test` ya
+arrancó; `app=` permite un contenedor aislado y `config=` fija límites explícitos.
+Cierra los streams al terminar antes de agotar el iterador, por ejemplo con
+`contextlib.aclosing`. El cliente prueba bytes mediante el dispatcher nativo.
+Adaptadores HTTP, rutas, cabeceras, Origin y middleware tienen tests independientes.
 
 ```text
-python -m unittest discover -s tests/mcp -t .
+python reactor test --start-dir=tests/mcp --verbosity=1
+python reactor test --start-dir=tests/test --verbosity=1
 python reactor test --start-dir=tests/http --verbosity=0
 ```
 
-Consulta la [verificación externa](../../tests/mcp/conformance/README.md) para la
-suite oficial fijada, el oráculo independiente del esquema fechado e Inspector
-con modo moderno explícito. Pasan los 37 escenarios obligatorios congelados de
-2026-07-28 con Granian real en ASGI y RSGI, incluidos 14 de MRTR. Las pruebas
-opcionales o pendientes de extensiones se informan por separado: superar los
-requisitos no implica implementar esas
-extensiones. Ejecuta los comandos documentados sobre el checkout actual para
-reproducir los resultados.
-
-Los resultados y la procedencia de las herramientas están en el
-[informe de verificación](../../tests/mcp/conformance/verification.txt) y su
-[artefacto JSON](../../tests/mcp/conformance/verification.json).
+Las comprobaciones externas de conformidad e Inspector requieren herramientas
+y fixtures propias. La carpeta de pruebas contiene módulos nativos de Orionis;
+no incluye esos ejecutores, snapshots de esquemas ni informes generados.
 
 Las decisiones siguen la [especificación oficial fechada](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/75db1e987cbbba6d170315dc99d0dfc440754aef/docs/specification/2026-07-28)
 y su [esquema fechado](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/75db1e987cbbba6d170315dc99d0dfc440754aef/schema/2026-07-28).

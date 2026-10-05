@@ -1,0 +1,1528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.routes.route_resolver.RouteResolver</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.routes.route_resolver.RouteResolver.html" class="internal-link" title="This class"><wbr></wbr>Route<wbr></wbr>Resolver</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__raiseForUnmatchedPath" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__raiseForUnmatchedPath">__raise<wbr></wbr>For<wbr></wbr>Unmatched<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__resolveDynamic" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__resolveDynamic">__resolve<wbr></wbr>Dynamic</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__storeCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__storeCache">__store<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#allRoutes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.allRoutes">all<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.fallback">fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#invalidateCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.invalidateCache">invalidate<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#options" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.options">options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resolve" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.resolve">resolve</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_max" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_max">_cache<wbr></wbr>_max</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_order" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_order">_cache<wbr></wbr>_order</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._fallback">_fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_global_static" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._global_static">_global<wbr></wbr>_static</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._routes">_routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_tables" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._tables">_tables</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.routes.route_resolver.html" class="internal-link" title="The parent of this class">route<wbr></wbr>_resolver</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10428"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId10428">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_<wbr></wbr>Depth<wbr></wbr>Bucket</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html#__init__" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html#__slots__" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html#entries" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.entries">entries</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html#marker_to_entry" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.marker_to_entry">marker<wbr></wbr>_to<wbr></wbr>_entry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html#pattern" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.pattern">pattern</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10429"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId10429">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.routes.route_resolver._PrefixIndex.html" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex">_<wbr></wbr>Prefix<wbr></wbr>Index</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._PrefixIndex.html#branches" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex.branches">branches</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._PrefixIndex.html#fallback" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex.fallback">fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver._PrefixIndex.html#start" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex.start">start</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10430"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.routes.route_resolver.RouteResolver.html" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver"><wbr></wbr>Route<wbr></wbr>Resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__raiseForUnmatchedPath" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__raiseForUnmatchedPath">__raise<wbr></wbr>For<wbr></wbr>Unmatched<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__resolveDynamic" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__resolveDynamic">__resolve<wbr></wbr>Dynamic</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__storeCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__storeCache">__store<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#allRoutes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.allRoutes">all<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.fallback">fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#invalidateCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.invalidateCache">invalidate<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#options" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.options">options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resolve" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.resolve">resolve</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_max" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_max">_cache<wbr></wbr>_max</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cache_order" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_order">_cache<wbr></wbr>_order</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._fallback">_fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_global_static" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._global_static">_global<wbr></wbr>_static</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._routes">_routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_tables" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._tables">_tables</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_build_depth_bucket" class="internal-link" title="orionis.http.routes.route_resolver._build_depth_bucket">_build<wbr></wbr>_depth<wbr></wbr>_bucket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_build_extractors" class="internal-link" title="orionis.http.routes.route_resolver._build_extractors">_build<wbr></wbr>_extractors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_build_matching_bucket" class="internal-link" title="orionis.http.routes.route_resolver._build_matching_bucket">_build<wbr></wbr>_matching<wbr></wbr>_bucket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_build_overlapping_index" class="internal-link" title="orionis.http.routes.route_resolver._build_overlapping_index">_build<wbr></wbr>_overlapping<wbr></wbr>_index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_extract_converter_fallback" class="internal-link" title="orionis.http.routes.route_resolver._extract_converter_fallback">_extract<wbr></wbr>_converter<wbr></wbr>_fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_extract_result" class="internal-link" title="orionis.http.routes.route_resolver._extract_result">_extract<wbr></wbr>_result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_partition_route_segments" class="internal-link" title="orionis.http.routes.route_resolver._partition_route_segments">_partition<wbr></wbr>_route<wbr></wbr>_segments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_path_allowed_for_method" class="internal-link" title="orionis.http.routes.route_resolver._path_allowed_for_method">_path<wbr></wbr>_allowed<wbr></wbr>_for<wbr></wbr>_method</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_select_bucket" class="internal-link" title="orionis.http.routes.route_resolver._select_bucket">_select<wbr></wbr>_bucket</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_GROUP_NAME_RE" class="internal-link" title="orionis.http.routes.route_resolver._GROUP_NAME_RE">_GROUP<wbr></wbr>_NAME<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#_METHOD_MAP" class="internal-link" title="orionis.http.routes.route_resolver._METHOD_MAP">_METHOD<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#BucketEntry" class="internal-link" title="orionis.http.routes.route_resolver.BucketEntry"><wbr></wbr>Bucket<wbr></wbr>Entry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#ParamConverter" class="internal-link" title="orionis.http.routes.route_resolver.ParamConverter"><wbr></wbr>Param<wbr></wbr>Converter</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.routes.html" class="internal-link" title="orionis.http.routes">routes</a></code><wbr></wbr>.<code><a href="orionis.http.routes.route_resolver.html" class="internal-link" title="orionis.http.routes.route_resolver">route_resolver</a></code><wbr></wbr>.<code><a href="orionis.http.routes.route_resolver.RouteResolver.html" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver">RouteResolver</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteResolver</span>(<a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html" class="internal-link" title="orionis.http.routes.contracts.route_resolver.IRouteResolver">IRouteResolver</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L448" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__init__">RouteResolver(routes, hot_cache_size, fallback)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_resolver.RouteResolver">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Resolve compiled routes using static maps and ordered dynamic buckets.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1068">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__init__">__init__</a></code></td>
+    <td>Build lookup tables and the bounded FIFO result cache.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__raiseForUnmatchedPath" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__raiseForUnmatchedPath">__raise<wbr></wbr>For<wbr></wbr>Unmatched<wbr></wbr>Path</a></code></td>
+    <td>Distinguish an unknown path from a path registered for another method.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__resolveDynamic" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__resolveDynamic">__resolve<wbr></wbr>Dynamic</a></code></td>
+    <td>Resolve dynamic candidates and cache a successful conversion.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__storeCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__storeCache">__store<wbr></wbr>Cache</a></code></td>
+    <td>Cache a dynamic result, evicting the oldest entry at capacity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#allRoutes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.allRoutes">all<wbr></wbr>Routes</a></code></td>
+    <td>Return a fresh list of all unique compiled routes.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.fallback">fallback</a></code></td>
+    <td>Return the configured fallback handler metadata.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#invalidateCache" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.invalidateCache">invalidate<wbr></wbr>Cache</a></code></td>
+    <td>Clear all dynamic route results and their FIFO eviction order.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#options" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.options">options</a></code></td>
+    <td>Return the sorted HTTP methods whose routes match a path.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resolve" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.resolve">resolve</a></code></td>
+    <td>Resolve a request method and path using prebuilt dispatch metadata.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_cache_max" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_max">_cache<wbr></wbr>_max</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_cache_order" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._cache_order">_cache<wbr></wbr>_order</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_fallback" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._fallback">_fallback</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_global_static" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._global_static">_global<wbr></wbr>_static</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_routes" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._routes">_routes</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_tables" class="internal-link" title="orionis.http.routes.route_resolver.RouteResolver._tables">_tables</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>, </span><span class="rst-sig-param">hot_cache_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 512, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L456">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.http.routes.route_resolver.RouteResolver.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build lookup tables and the bounded FIFO result cache.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code></td><td class="fieldArgDesc">Compiler output grouped by method and static/dynamic paths.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hot<wbr></wbr>_cache<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum dynamic results cached across all methods; zero disables
+caching. Defaults to 512.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback:</span><code>tuple | None, <em>optional</em></code></td><td class="fieldArgDesc">Fallback handler metadata. None or <tt class="rst-docutils rst-literal">(None, None)</tt> disables the
+fallback. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize route tables, the route inventory, and the FIFO cache.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the cache capacity is a boolean or not an integer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the cache capacity is negative.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.__raiseForUnmatchedPath">
+    
+  </a>
+  <a name="__raiseForUnmatchedPath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__raiseForUnmatchedPath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Never" class="intersphinx-link">Never</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L570">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__raiseForUnmatchedPath" title="orionis.http.routes.route_resolver.RouteResolver.__raiseForUnmatchedPath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Distinguish an unknown path from a path registered for another method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical request method that did not match.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Never" class="intersphinx-link">Never</a></code></td><td class="fieldArgDesc">Always raise a routing exception; never return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed.html" class="internal-link" title="orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed">MethodNotAllowed</a></code></td><td>If another method has a static or regex match for the path.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link" title="orionis.http.routes.exceptions.route_not_found.RouteNotFound">RouteNotFound</a></code></td><td>If no method has a static or regex match for the path.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.__resolveDynamic">
+    
+  </a>
+  <a name="__resolveDynamic">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveDynamic</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">table: <code>DepthTable</code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">method_cache: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L605">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__resolveDynamic" title="orionis.http.routes.route_resolver.RouteResolver.__resolveDynamic">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve dynamic candidates and cache a successful conversion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code>DepthTable</code></td><td class="fieldArgDesc">Dynamic route buckets for the request method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical request method used as part of the cache key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method<wbr></wbr>_cache:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>] | None</code></td><td class="fieldArgDesc">Per-method result cache, or None when caching is disabled.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ResolvedRoute | None</code></td><td class="fieldArgDesc">First matching route with valid parameter conversions, or None if
+no candidate succeeds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link" title="orionis.http.routes.exceptions.route_not_found.RouteNotFound">RouteNotFound</a></code></td><td>If a combined match lacks its identifying route marker.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.__storeCache">
+    
+  </a>
+  <a name="__storeCache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__storeCache</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cache: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>]</code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">result: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L727">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__storeCache" title="orionis.http.routes.route_resolver.RouteResolver.__storeCache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Cache a dynamic result, evicting the oldest entry at capacity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>]</code></td><td class="fieldArgDesc">Cache belonging to the request method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical request method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></td><td class="fieldArgDesc">Immutable route resolution to retain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the result and append its method/path key to the FIFO queue.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.allRoutes">
+    
+  </a>
+  <a name="allRoutes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">allRoutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L702">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#allRoutes" title="orionis.http.routes.route_resolver.RouteResolver.allRoutes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html#allRoutes" class="internal-link">orionis.http.routes.contracts.route_resolver.IRouteResolver.allRoutes</a></code></div>
+    <div><p>Return a fresh list of all unique compiled routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">Routes deduplicated by identity in their original table traversal
+order. The returned list shares the compiled route objects.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.fallback">
+    
+  </a>
+  <a name="fallback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">fallback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L691">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#fallback" title="orionis.http.routes.route_resolver.RouteResolver.fallback">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html#fallback" class="internal-link">orionis.http.routes.contracts.route_resolver.IRouteResolver.fallback</a></code></div>
+    <div><p>Return the configured fallback handler metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None</code></td><td class="fieldArgDesc">Registered handler tuple, or None when no fallback is configured.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.invalidateCache">
+    
+  </a>
+  <a name="invalidateCache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">invalidateCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L714">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#invalidateCache" title="orionis.http.routes.route_resolver.RouteResolver.invalidateCache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html#invalidateCache" class="internal-link">orionis.http.routes.contracts.route_resolver.IRouteResolver.invalidateCache</a></code></div>
+    <div><p>Clear all dynamic route results and their FIFO eviction order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Empty per-method caches and the shared queue, preserving route tables.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.options">
+    
+  </a>
+  <a name="options">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">options</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L657">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#options" title="orionis.http.routes.route_resolver.RouteResolver.options">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html#options" class="internal-link">orionis.http.routes.contracts.route_resolver.IRouteResolver.options</a></code></div>
+    <div><p>Return the sorted HTTP methods whose routes match a path.</p>
+<p>Inspect path patterns without converting parameters.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Request path to normalize before checking registered methods.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Matching methods, adding HEAD for GET and OPTIONS for any match.
+Return GET, HEAD, and OPTIONS for an unmatched path with a fallback,
+or an empty list when no fallback is configured.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.resolve">
+    
+  </a>
+  <a name="resolve">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resolve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L522">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resolve" title="orionis.http.routes.route_resolver.RouteResolver.resolve">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_resolver.IRouteResolver.html#resolve" class="internal-link">orionis.http.routes.contracts.route_resolver.IRouteResolver.resolve</a></code></div>
+    <div><p>Resolve a request method and path using prebuilt dispatch metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method, matched case-insensitively; HEAD uses the GET table.
+<tt class="rst-docutils rst-literal">WEBSOCKET</tt> selects the isolated connection route table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Request path to normalize before lookup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></td><td class="fieldArgDesc">Matched route and immutable, converted parameters. Cached results
+may be reused.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link" title="orionis.http.routes.exceptions.route_not_found.RouteNotFound">RouteNotFound</a></code></td><td>If no route can be resolved and no other method matches the path.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed.html" class="internal-link" title="orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed">MethodNotAllowed</a></code></td><td>If no HTTP route is resolved and another HTTP method matches.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L451">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.http.routes.route_resolver.RouteResolver.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._cache_max">
+    
+  </a>
+  <a name="_cache_max">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_cache_max</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L519">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cache_max" title="orionis.http.routes.route_resolver.RouteResolver._cache_max">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._cache_order">
+    
+  </a>
+  <a name="_cache_order">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_cache_order</span>: <code><a href="https://docs.python.org/3/library/collections.html#collections.deque" class="intersphinx-link">deque</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L518">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cache_order" title="orionis.http.routes.route_resolver.RouteResolver._cache_order">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._fallback">
+    
+  </a>
+  <a name="_fallback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_fallback</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L520">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_fallback" title="orionis.http.routes.route_resolver.RouteResolver._fallback">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._global_static">
+    
+  </a>
+  <a name="_global_static">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_global_static</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L517">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_global_static" title="orionis.http.routes.route_resolver.RouteResolver._global_static">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._routes">
+    
+  </a>
+  <a name="_routes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_routes</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L516">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_routes" title="orionis.http.routes.route_resolver.RouteResolver._routes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.routes.route_resolver.RouteResolver._tables">
+    
+  </a>
+  <a name="_tables">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_tables</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_resolver.py#L494">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_tables" title="orionis.http.routes.route_resolver.RouteResolver._tables">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -3,10 +3,10 @@ import asyncio
 from contextlib import suppress
 from functools import partial
 from types import SimpleNamespace
-from unittest import IsolatedAsyncioTestCase
 from orionis.foundation.application import _ASGI_BODY_QUEUE_SIZE, Application
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.http.contracts.kernel import IKernelHTTP
+from orionis.test import TestCase
 
 class _AsyncCall:
     """Record asynchronous calls and return explicit results or failures."""
@@ -301,7 +301,7 @@ class _CleanupChannel:
             finally:
                 self.cleaned.set()
 
-class TestApplicationAsync(IsolatedAsyncioTestCase):
+class TestApplicationAsync(TestCase):
     """Verify HTTP transport lifetime, backpressure, and kernel initialization."""
 
     def _requestTask(self, application, channel) -> asyncio.Task:

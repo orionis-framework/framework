@@ -32,7 +32,7 @@ class BootstrapScheduler(Scheduler):
             # --- Redis task store.
             # --------------------------------------------------------------------------
             redis=Redis(
-                host=Env.get("REDIS_HOST", "localhost"),
+                host=Env.get("REDIS_HOST", "127.0.0.1"),
                 port=Env.get("REDIS_PORT", 6379),
                 db=Env.get("REDIS_DB", 0),
                 password=Env.get("REDIS_PASSWORD", None),

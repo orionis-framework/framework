@@ -1,0 +1,2764 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.localization.Translator</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.localization.Translator.html" class="internal-link" title="This class"><wbr></wbr>Translator</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__applyReplacements" class="internal-link" title="orionis.localization.Translator.__applyReplacements">__apply<wbr></wbr>Replacements</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__asNumber" class="internal-link" title="orionis.localization.Translator.__asNumber">__as<wbr></wbr>Number</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__assertLocale" class="internal-link" title="orionis.localization.Translator.__assertLocale">__assert<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.localization.Translator.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchesBound" class="internal-link" title="orionis.localization.Translator.__matchesBound">__matches<wbr></wbr>Bound</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchExplicitSegment" class="internal-link" title="orionis.localization.Translator.__matchExplicitSegment">__match<wbr></wbr>Explicit<wbr></wbr>Segment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchPluralSegment" class="internal-link" title="orionis.localization.Translator.__matchPluralSegment">__match<wbr></wbr>Plural<wbr></wbr>Segment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__resolveMissing" class="internal-link" title="orionis.localization.Translator.__resolveMissing">__resolve<wbr></wbr>Missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__stripCondition" class="internal-link" title="orionis.localization.Translator.__stripCondition">__strip<wbr></wbr>Condition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#availableLocales" class="internal-link" title="orionis.localization.Translator.availableLocales">available<wbr></wbr>Locales</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#choice" class="internal-link" title="orionis.localization.Translator.choice">choice</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#flush" class="internal-link" title="orionis.localization.Translator.flush">flush</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#forget" class="internal-link" title="orionis.localization.Translator.forget">forget</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.localization.Translator.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getLocale" class="internal-link" title="orionis.localization.Translator.getLocale">get<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#has" class="internal-link" title="orionis.localization.Translator.has">has</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#missing" class="internal-link" title="orionis.localization.Translator.missing">missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reload" class="internal-link" title="orionis.localization.Translator.reload">reload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setLocale" class="internal-link" title="orionis.localization.Translator.setLocale">set<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.localization.Translator.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fallback" class="internal-link" title="orionis.localization.Translator._fallback">_fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_loader" class="internal-link" title="orionis.localization.Translator._loader">_loader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_locale" class="internal-link" title="orionis.localization.Translator._locale">_locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_missing" class="internal-link" title="orionis.localization.Translator._missing">_missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_repository" class="internal-link" title="orionis.localization.Translator._repository">_repository</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.localization.html" class="internal-link" title="The parent of this class">localization</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12162"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12162">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.contracts.html" class="internal-link" title="orionis.localization.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.loader.html" class="internal-link" title="orionis.localization.contracts.loader">loader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.manager.html" class="internal-link" title="orionis.localization.contracts.manager">manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.repository.html" class="internal-link" title="orionis.localization.contracts.repository">repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.translator.html" class="internal-link" title="orionis.localization.contracts.translator">translator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.ILocalizationManager.html" class="internal-link" title="orionis.localization.contracts.ILocalizationManager"><wbr></wbr>ILocalization<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.ITranslationLoader.html" class="internal-link" title="orionis.localization.contracts.ITranslationLoader"><wbr></wbr>ITranslation<wbr></wbr>Loader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.ITranslationRepository.html" class="internal-link" title="orionis.localization.contracts.ITranslationRepository"><wbr></wbr>ITranslation<wbr></wbr>Repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.contracts.ITranslator.html" class="internal-link" title="orionis.localization.contracts.ITranslator"><wbr></wbr>ITranslator</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12163"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.exceptions.html" class="internal-link" title="orionis.localization.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12164"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.loader.html" class="internal-link" title="orionis.localization.loader">loader</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12165"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.manager.html" class="internal-link" title="orionis.localization.manager">manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12166"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12166">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.provider.html" class="internal-link" title="orionis.localization.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.provider.LocalizationProvider.html" class="internal-link" title="orionis.localization.provider.LocalizationProvider"><wbr></wbr>Localization<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12167"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.repository.html" class="internal-link" title="orionis.localization.repository">repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12168"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12168">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.translator.html" class="internal-link" title="orionis.localization.translator">translator</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.translator.html#_EXACT_PATTERN" class="internal-link" title="orionis.localization.translator._EXACT_PATTERN">_EXACT<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.translator.html#_LOCALE_PATTERN" class="internal-link" title="orionis.localization.translator._LOCALE_PATTERN">_LOCALE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.translator.html#_RANGE_PATTERN" class="internal-link" title="orionis.localization.translator._RANGE_PATTERN">_RANGE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12169"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.types.html" class="internal-link" title="orionis.localization.types">types</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12170"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12170">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.LocalizationManager.html" class="internal-link" title="orionis.localization.LocalizationManager"><wbr></wbr>Localization<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#__buildTranslator" class="internal-link" title="orionis.localization.LocalizationManager.__buildTranslator">__build<wbr></wbr>Translator</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#__init__" class="internal-link" title="orionis.localization.LocalizationManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#translator" class="internal-link" title="orionis.localization.LocalizationManager.translator">translator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#__slots__" class="internal-link" title="orionis.localization.LocalizationManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#_app" class="internal-link" title="orionis.localization.LocalizationManager._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.LocalizationManager.html#_translator" class="internal-link" title="orionis.localization.LocalizationManager._translator">_translator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12171"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12171">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.TranslationLoader.html" class="internal-link" title="orionis.localization.TranslationLoader"><wbr></wbr>Translation<wbr></wbr>Loader</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#__flatten" class="internal-link" title="orionis.localization.TranslationLoader.__flatten">__flatten</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#__init__" class="internal-link" title="orionis.localization.TranslationLoader.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#__readFile" class="internal-link" title="orionis.localization.TranslationLoader.__readFile">__read<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#availableLocales" class="internal-link" title="orionis.localization.TranslationLoader.availableLocales">available<wbr></wbr>Locales</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#load" class="internal-link" title="orionis.localization.TranslationLoader.load">load</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#__slots__" class="internal-link" title="orionis.localization.TranslationLoader.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationLoader.html#_path" class="internal-link" title="orionis.localization.TranslationLoader._path">_path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12172"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12172">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.TranslationRepository.html" class="internal-link" title="orionis.localization.TranslationRepository"><wbr></wbr>Translation<wbr></wbr>Repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#__init__" class="internal-link" title="orionis.localization.TranslationRepository.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#flush" class="internal-link" title="orionis.localization.TranslationRepository.flush">flush</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#forget" class="internal-link" title="orionis.localization.TranslationRepository.forget">forget</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#get" class="internal-link" title="orionis.localization.TranslationRepository.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#has" class="internal-link" title="orionis.localization.TranslationRepository.has">has</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#loadedLocales" class="internal-link" title="orionis.localization.TranslationRepository.loadedLocales">loaded<wbr></wbr>Locales</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#__slots__" class="internal-link" title="orionis.localization.TranslationRepository.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#_cache" class="internal-link" title="orionis.localization.TranslationRepository._cache">_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.TranslationRepository.html#_loader" class="internal-link" title="orionis.localization.TranslationRepository._loader">_loader</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12173"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.Translator.html" class="internal-link" title="orionis.localization.Translator"><wbr></wbr>Translator</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__applyReplacements" class="internal-link" title="orionis.localization.Translator.__applyReplacements">__apply<wbr></wbr>Replacements</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__asNumber" class="internal-link" title="orionis.localization.Translator.__asNumber">__as<wbr></wbr>Number</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__assertLocale" class="internal-link" title="orionis.localization.Translator.__assertLocale">__assert<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.localization.Translator.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchesBound" class="internal-link" title="orionis.localization.Translator.__matchesBound">__matches<wbr></wbr>Bound</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchExplicitSegment" class="internal-link" title="orionis.localization.Translator.__matchExplicitSegment">__match<wbr></wbr>Explicit<wbr></wbr>Segment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__matchPluralSegment" class="internal-link" title="orionis.localization.Translator.__matchPluralSegment">__match<wbr></wbr>Plural<wbr></wbr>Segment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__resolveMissing" class="internal-link" title="orionis.localization.Translator.__resolveMissing">__resolve<wbr></wbr>Missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__stripCondition" class="internal-link" title="orionis.localization.Translator.__stripCondition">__strip<wbr></wbr>Condition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#availableLocales" class="internal-link" title="orionis.localization.Translator.availableLocales">available<wbr></wbr>Locales</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#choice" class="internal-link" title="orionis.localization.Translator.choice">choice</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#flush" class="internal-link" title="orionis.localization.Translator.flush">flush</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#forget" class="internal-link" title="orionis.localization.Translator.forget">forget</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.localization.Translator.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getLocale" class="internal-link" title="orionis.localization.Translator.getLocale">get<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#has" class="internal-link" title="orionis.localization.Translator.has">has</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#missing" class="internal-link" title="orionis.localization.Translator.missing">missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reload" class="internal-link" title="orionis.localization.Translator.reload">reload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setLocale" class="internal-link" title="orionis.localization.Translator.setLocale">set<wbr></wbr>Locale</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.localization.Translator.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fallback" class="internal-link" title="orionis.localization.Translator._fallback">_fallback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_loader" class="internal-link" title="orionis.localization.Translator._loader">_loader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_locale" class="internal-link" title="orionis.localization.Translator._locale">_locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_missing" class="internal-link" title="orionis.localization.Translator._missing">_missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_repository" class="internal-link" title="orionis.localization.Translator._repository">_repository</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12174"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException"><wbr></wbr>Invalid<wbr></wbr>Locale<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12175"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.TranslationException.html" class="internal-link" title="orionis.localization.TranslationException"><wbr></wbr>Translation<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12176"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.TranslationFileNotFoundException.html" class="internal-link" title="orionis.localization.TranslationFileNotFoundException"><wbr></wbr>Translation<wbr></wbr>File<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12177"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.localization.TranslationSyntaxException.html" class="internal-link" title="orionis.localization.TranslationSyntaxException"><wbr></wbr>Translation<wbr></wbr>Syntax<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.localization.html" class="internal-link" title="orionis.localization">localization</a></code><wbr></wbr>.<code><a href="orionis.localization.Translator.html" class="internal-link" title="orionis.localization.Translator">Translator</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Translator</span>(<a href="orionis.localization.contracts.ITranslator.html" class="internal-link" title="orionis.localization.contracts.ITranslator">ITranslator</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L29" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.localization.Translator.__init__">Translator(locale, fallback, loader, repository)</a></code></p><p><a href="classIndex.html#orionis.localization.Translator">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Resolve translation lines for the active locale.</p>
+<p>The translator performs O(1) lookups against the in-memory
+repository, falls back to the configured fallback locale, applies
+style <tt class="rst-docutils rst-literal">:name</tt> parameter replacement, and selects
+pluralized segments through <code><a href="#choice" class="internal-link" title="orionis.localization.Translator.choice">choice</a></code>.</p>
+<div class="rst-admonition rst-admonition-notes">
+<p class="rst-admonition-title rst-first">Notes</p>
+<p class="rst-last">The provider binds a single instance for the whole process and the
+class uses no lock, so <code><a href="#setLocale" class="internal-link" title="orionis.localization.Translator.setLocale">setLocale</a></code>, <code><a href="#missing" class="internal-link" title="orionis.localization.Translator.missing">missing</a></code>,
+<code><a href="#reload" class="internal-link" title="orionis.localization.Translator.reload">reload</a></code>, <code><a href="#forget" class="internal-link" title="orionis.localization.Translator.forget">forget</a></code> and <code><a href="#flush" class="internal-link" title="orionis.localization.Translator.flush">flush</a></code> are global side
+effects visible to every concurrent task. Pass an explicit
+<tt class="rst-docutils rst-literal">locale</tt> to <code><a href="#get" class="internal-link" title="orionis.localization.Translator.get">get</a></code>, <code><a href="#has" class="internal-link" title="orionis.localization.Translator.has">has</a></code> or <code><a href="#choice" class="internal-link" title="orionis.localization.Translator.choice">choice</a></code> to select a
+language for a single call instead.</p>
+</div>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1165">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__applyReplacements" class="internal-link" title="orionis.localization.Translator.__applyReplacements">__apply<wbr></wbr>Replacements</a></code></td>
+    <td>Substitute placeholders into a translation line.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__asNumber" class="internal-link" title="orionis.localization.Translator.__asNumber">__as<wbr></wbr>Number</a></code></td>
+    <td>Parse a plural condition token into a number.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__assertLocale" class="internal-link" title="orionis.localization.Translator.__assertLocale">__assert<wbr></wbr>Locale</a></code></td>
+    <td>Validate a locale code and return it unchanged.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.localization.Translator.__init__">__init__</a></code></td>
+    <td>Initialize the translator with its locales and collaborators.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__matchesBound" class="internal-link" title="orionis.localization.Translator.__matchesBound">__matches<wbr></wbr>Bound</a></code></td>
+    <td>Evaluate one bound of an explicit range condition.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__matchExplicitSegment" class="internal-link" title="orionis.localization.Translator.__matchExplicitSegment">__match<wbr></wbr>Explicit<wbr></wbr>Segment</a></code></td>
+    <td>Select the plural segment whose explicit condition matches.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__matchPluralSegment" class="internal-link" title="orionis.localization.Translator.__matchPluralSegment">__match<wbr></wbr>Plural<wbr></wbr>Segment</a></code></td>
+    <td>Select the plural segment through positional rules.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__resolveMissing" class="internal-link" title="orionis.localization.Translator.__resolveMissing">__resolve<wbr></wbr>Missing</a></code></td>
+    <td>Resolve the line for a missing translation key.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__stripCondition" class="internal-link" title="orionis.localization.Translator.__stripCondition">__strip<wbr></wbr>Condition</a></code></td>
+    <td>Remove a leading explicit condition from a plural segment.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#availableLocales" class="internal-link" title="orionis.localization.Translator.availableLocales">available<wbr></wbr>Locales</a></code></td>
+    <td>Return every locale with at least one translation source.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#choice" class="internal-link" title="orionis.localization.Translator.choice">choice</a></code></td>
+    <td>Retrieve a pluralized translation line based on <em>count</em>.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#flush" class="internal-link" title="orionis.localization.Translator.flush">flush</a></code></td>
+    <td>Discard every cached translation map.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#forget" class="internal-link" title="orionis.localization.Translator.forget">forget</a></code></td>
+    <td>Discard the cached translations for a single locale.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#get" class="internal-link" title="orionis.localization.Translator.get">get</a></code></td>
+    <td>Retrieve the translation line registered under <em>key</em>.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getLocale" class="internal-link" title="orionis.localization.Translator.getLocale">get<wbr></wbr>Locale</a></code></td>
+    <td>Return the active locale.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#has" class="internal-link" title="orionis.localization.Translator.has">has</a></code></td>
+    <td>Determine whether a translation exists for <em>key</em>.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#missing" class="internal-link" title="orionis.localization.Translator.missing">missing</a></code></td>
+    <td>Register a handler invoked when a translation key is missing.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#reload" class="internal-link" title="orionis.localization.Translator.reload">reload</a></code></td>
+    <td>Discard cached translations so they are re-read from disk.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setLocale" class="internal-link" title="orionis.localization.Translator.setLocale">set<wbr></wbr>Locale</a></code></td>
+    <td>Change the active locale at runtime.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.localization.Translator.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_fallback" class="internal-link" title="orionis.localization.Translator._fallback">_fallback</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_loader" class="internal-link" title="orionis.localization.Translator._loader">_loader</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_locale" class="internal-link" title="orionis.localization.Translator._locale">_locale</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_missing" class="internal-link" title="orionis.localization.Translator._missing">_missing</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_repository" class="internal-link" title="orionis.localization.Translator._repository">_repository</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__applyReplacements">
+    
+  </a>
+  <a name="__applyReplacements">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__applyReplacements</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">line: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">replace: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L401">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__applyReplacements" title="orionis.localization.Translator.__applyReplacements">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Substitute placeholders into a translation line.</p>
+<p>Each parameter replaces its <tt class="rst-docutils rst-literal">:key</tt>, <tt class="rst-docutils rst-literal">:Key</tt>, and <tt class="rst-docutils rst-literal">:KEY</tt>
+variants with the raw, capitalized, and uppercased value
+respectively. Longer parameter names are applied first so they
+are never shadowed by shorter prefixes.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">line:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translation line containing the placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">replace:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Mapping of placeholder name to replacement value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Line with every placeholder substituted.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__asNumber">
+    
+  </a>
+  <a name="__asNumber">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__asNumber</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L520">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__asNumber" title="orionis.localization.Translator.__asNumber">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse a plural condition token into a number.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raw:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Condition token extracted from a plural segment.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>float | None</code></td><td class="fieldArgDesc">Numeric value, or <tt class="rst-docutils rst-literal">None</tt> when the token is not numeric.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__assertLocale">
+    
+  </a>
+  <a name="__assertLocale">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__assertLocale</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L353">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__assertLocale" title="orionis.localization.Translator.__assertLocale">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate a locale code and return it unchanged.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The validated locale code.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If the locale is empty, malformed, or unsafe for path use.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">loader: <code>ITranslationLoader</code>, </span><span class="rst-sig-param">repository: <code>ITranslationRepository</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.localization.Translator.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the translator with its locales and collaborators.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Active locale code.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale used when a translation is missing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">loader:</span><code><a href="orionis.localization.contracts.ITranslationLoader.html" class="internal-link" title="orionis.localization.contracts.ITranslationLoader">ITranslationLoader</a></code></td><td class="fieldArgDesc">Loader used to discover the available locales.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">repository:</span><code><a href="orionis.localization.contracts.ITranslationRepository.html" class="internal-link" title="orionis.localization.contracts.ITranslationRepository">ITranslationRepository</a></code></td><td class="fieldArgDesc">In-memory cache resolving translation maps per locale.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If either locale code is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__matchesBound">
+    
+  </a>
+  <a name="__matchesBound">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__matchesBound</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">lower_bound: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L539">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__matchesBound" title="orionis.localization.Translator.__matchesBound">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Evaluate one bound of an explicit range condition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raw:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Bound token, either a number or the <tt class="rst-docutils rst-literal">*</tt> wildcard.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Quantity evaluated against the bound.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lower<wbr></wbr>_bound:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the token is the lower bound of the range.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the count satisfies the bound.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__matchExplicitSegment">
+    
+  </a>
+  <a name="__matchExplicitSegment">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__matchExplicitSegment</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">segments: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L433">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__matchExplicitSegment" title="orionis.localization.Translator.__matchExplicitSegment">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Select the plural segment whose explicit condition matches.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">segments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Plural segments split from the raw translation line.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Quantity evaluated against each condition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Matching segment body, or <tt class="rst-docutils rst-literal">None</tt> when no explicit
+condition applies.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__matchPluralSegment">
+    
+  </a>
+  <a name="__matchPluralSegment">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__matchPluralSegment</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">segments: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L476">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__matchPluralSegment" title="orionis.localization.Translator.__matchPluralSegment">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Select the plural segment through positional rules.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">segments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Plural segments split from the raw translation line.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Quantity used to pick singular or plural form.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Selected segment stripped of any explicit condition.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__resolveMissing">
+    
+  </a>
+  <a name="__resolveMissing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveMissing</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L378">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__resolveMissing" title="orionis.localization.Translator.__resolveMissing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the line for a missing translation key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translation key that produced no match.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale in which the key was requested.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Replacement line provided by the handler, or the key itself.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.__stripCondition">
+    
+  </a>
+  <a name="__stripCondition">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__stripCondition</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">segment: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L498">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__stripCondition" title="orionis.localization.Translator.__stripCondition">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove a leading explicit condition from a plural segment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">segment:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw plural segment possibly prefixed by a condition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Segment body without its condition, trimmed of whitespace.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.availableLocales">
+    
+  </a>
+  <a name="availableLocales">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">availableLocales</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L264">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#availableLocales" title="orionis.localization.Translator.availableLocales">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#availableLocales" class="internal-link">orionis.localization.contracts.ITranslator.availableLocales</a></code></div>
+    <div><p>Return every locale with at least one translation source.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Sorted locale codes discovered in the language path.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.choice">
+    
+  </a>
+  <a name="choice">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">choice</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**replace: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L177">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#choice" title="orionis.localization.Translator.choice">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#choice" class="internal-link">orionis.localization.contracts.ITranslator.choice</a></code></div>
+    <div><p>Retrieve a pluralized translation line based on <em>count</em>.</p>
+<p>Segments are separated by <tt class="rst-docutils rst-literal">|</tt> and may declare explicit
+conditions such as <tt class="rst-docutils rst-literal">{0}</tt>, <tt class="rst-docutils rst-literal">{1}</tt> or ranges <tt class="rst-docutils rst-literal"><span class="pre">[2,*]</span></tt>. When no
+explicit condition matches, the first segment is used for a
+count of one and the second segment otherwise. The <tt class="rst-docutils rst-literal">:count</tt>
+placeholder is always available in the selected segment.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translation key containing the pluralized segments.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Quantity used to select the proper segment. The value is
+used as received: explicit conditions compare it against
+their numeric bounds and the positional rule tests
+<tt class="rst-docutils rst-literal">count == 1</tt>. No coercion or validation is applied, so a
+non-numeric quantity propagates the comparison <tt class="rst-docutils rst-literal">TypeError</tt>
+raised by Python.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Locale to translate into, or <tt class="rst-docutils rst-literal">None</tt> for the active locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**replace:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Placeholder values substituted into the selected segment.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Pluralized and interpolated translation line.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If an explicit locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.flush">
+    
+  </a>
+  <a name="flush">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">flush</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L321">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#flush" title="orionis.localization.Translator.flush">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#flush" class="internal-link">orionis.localization.contracts.ITranslator.flush</a></code></div>
+    <div><p>Discard every cached translation map.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.forget">
+    
+  </a>
+  <a name="forget">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L300">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#forget" title="orionis.localization.Translator.forget">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#forget" class="internal-link">orionis.localization.contracts.ITranslator.forget</a></code></div>
+    <div><p>Discard the cached translations for a single locale.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code whose cache entry must be removed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when an entry was removed, False otherwise.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If the locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.get">
+    
+  </a>
+  <a name="get">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**replace: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L89">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#get" title="orionis.localization.Translator.get">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#get" class="internal-link">orionis.localization.contracts.ITranslator.get</a></code></div>
+    <div><p>Retrieve the translation line registered under <em>key</em>.</p>
+<p>The lookup order is the requested locale first, then the
+fallback locale, and finally the key itself when no translation
+exists. Placeholders in the <tt class="rst-docutils rst-literal">:name</tt> form are substituted with
+the values provided in <em>replace</em>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translation key, either a literal source text or a
+dot-notated grouped key such as <tt class="rst-docutils rst-literal">validation.required</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Locale to translate into, or <tt class="rst-docutils rst-literal">None</tt> for the active locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**replace:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Placeholder values substituted into the resolved line.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translated line, or the key itself when missing.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If an explicit locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.getLocale">
+    
+  </a>
+  <a name="getLocale">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getLocale</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L253">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getLocale" title="orionis.localization.Translator.getLocale">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#getLocale" class="internal-link">orionis.localization.contracts.ITranslator.getLocale</a></code></div>
+    <div><p>Return the active locale.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code currently in use.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.has">
+    
+  </a>
+  <a name="has">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">has</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L139">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#has" title="orionis.localization.Translator.has">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#has" class="internal-link">orionis.localization.contracts.ITranslator.has</a></code></div>
+    <div><p>Determine whether a translation exists for <em>key</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Translation key to check.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Locale to inspect, or <tt class="rst-docutils rst-literal">None</tt> for the active locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the fallback locale is also inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when a translation line is registered for the key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If an explicit locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.missing">
+    
+  </a>
+  <a name="missing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">missing</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">handler: <code>MissingKeyHandler | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L331">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#missing" title="orionis.localization.Translator.missing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#missing" class="internal-link">orionis.localization.contracts.ITranslator.missing</a></code></div>
+    <div><p>Register a handler invoked when a translation key is missing.</p>
+<p>The handler receives the key and the locale, and may return a
+replacement line. When it returns <tt class="rst-docutils rst-literal">None</tt> the key itself is
+used as the translation.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handler:</span><code>MissingKeyHandler | None</code></td><td class="fieldArgDesc">Callable invoked on missing keys, or <tt class="rst-docutils rst-literal">None</tt> to remove the
+current handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.reload">
+    
+  </a>
+  <a name="reload">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">reload</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L277">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#reload" title="orionis.localization.Translator.reload">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#reload" class="internal-link">orionis.localization.contracts.ITranslator.reload</a></code></div>
+    <div><p>Discard cached translations so they are re-read from disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Locale to reload, or <tt class="rst-docutils rst-literal">None</tt> to reload every locale.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If an explicit locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.localization.Translator.setLocale">
+    
+  </a>
+  <a name="setLocale">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setLocale</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L233">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setLocale" title="orionis.localization.Translator.setLocale">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#setLocale" class="internal-link">orionis.localization.contracts.ITranslator.setLocale</a></code></div>
+    <div><p>Change the active locale at runtime.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code to activate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.InvalidLocaleException.html" class="internal-link" title="orionis.localization.InvalidLocaleException">InvalidLocaleException</a></code></td><td>If the locale is malformed.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.localization.Translator.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.localization.Translator.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslator.html#__slots__" class="internal-link">orionis.localization.contracts.ITranslator.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.localization.Translator._fallback">
+    
+  </a>
+  <a name="_fallback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_fallback</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L84">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_fallback" title="orionis.localization.Translator._fallback">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.localization.Translator._loader">
+    
+  </a>
+  <a name="_loader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_loader</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_loader" title="orionis.localization.Translator._loader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.localization.Translator._locale">
+    
+  </a>
+  <a name="_locale">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_locale</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L83">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_locale" title="orionis.localization.Translator._locale">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.localization.Translator._missing">
+    
+  </a>
+  <a name="_missing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_missing</span>: <code>MissingKeyHandler | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L85">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_missing" title="orionis.localization.Translator._missing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.localization.Translator._repository">
+    
+  </a>
+  <a name="_repository">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_repository</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/localization/translator.py#L82">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_repository" title="orionis.localization.Translator._repository">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

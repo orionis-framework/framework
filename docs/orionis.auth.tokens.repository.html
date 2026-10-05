@@ -1,0 +1,1289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.auth.tokens.repository</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.auth.tokens.repository.html" class="internal-link" title="This module">repository</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_as_datetime" class="internal-link" title="orionis.auth.tokens.repository._as_datetime">_as<wbr></wbr>_datetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode_abilities" class="internal-link" title="orionis.auth.tokens.repository._decode_abilities">_decode<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_abilities" class="internal-link" title="orionis.auth.tokens.repository._encode_abilities">_encode<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_expired" class="internal-link" title="orionis.auth.tokens.repository._is_expired">_is<wbr></wbr>_expired</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_normalize_abilities" class="internal-link" title="orionis.auth.tokens.repository._normalize_abilities">_normalize<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_unexpired_tokens" class="internal-link" title="orionis.auth.tokens.repository._unexpired_tokens">_unexpired<wbr></wbr>_tokens</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_utc_now" class="internal-link" title="orionis.auth.tokens.repository._utc_now">_utc<wbr></wbr>_now</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DEFAULT_SECRET_BYTES" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_SECRET_BYTES">_DEFAULT<wbr></wbr>_SECRET<wbr></wbr>_BYTES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DEFAULT_TABLE" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_TABLE">_DEFAULT<wbr></wbr>_TABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_ABILITIES" class="internal-link" title="orionis.auth.tokens.repository._MAX_ABILITIES">_MAX<wbr></wbr>_ABILITIES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_NAME_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_NAME_LENGTH">_MAX<wbr></wbr>_NAME<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_TOKEN_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_TOKEN_LENGTH">_MAX<wbr></wbr>_TOKEN<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TOKEN_COLUMN" class="internal-link" title="orionis.auth.tokens.repository._TOKEN_COLUMN">_TOKEN<wbr></wbr>_COLUMN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.auth.tokens.html" class="internal-link" title="The parent of this module">tokens</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1553"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.tokens.functions.html" class="internal-link" title="orionis.auth.tokens.functions">functions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1554"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.tokens.repository.html" class="internal-link" title="orionis.auth.tokens.repository">repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_as_datetime" class="internal-link" title="orionis.auth.tokens.repository._as_datetime">_as<wbr></wbr>_datetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode_abilities" class="internal-link" title="orionis.auth.tokens.repository._decode_abilities">_decode<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_abilities" class="internal-link" title="orionis.auth.tokens.repository._encode_abilities">_encode<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_expired" class="internal-link" title="orionis.auth.tokens.repository._is_expired">_is<wbr></wbr>_expired</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_normalize_abilities" class="internal-link" title="orionis.auth.tokens.repository._normalize_abilities">_normalize<wbr></wbr>_abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_unexpired_tokens" class="internal-link" title="orionis.auth.tokens.repository._unexpired_tokens">_unexpired<wbr></wbr>_tokens</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_utc_now" class="internal-link" title="orionis.auth.tokens.repository._utc_now">_utc<wbr></wbr>_now</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DEFAULT_SECRET_BYTES" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_SECRET_BYTES">_DEFAULT<wbr></wbr>_SECRET<wbr></wbr>_BYTES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DEFAULT_TABLE" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_TABLE">_DEFAULT<wbr></wbr>_TABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_ABILITIES" class="internal-link" title="orionis.auth.tokens.repository._MAX_ABILITIES">_MAX<wbr></wbr>_ABILITIES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_NAME_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_NAME_LENGTH">_MAX<wbr></wbr>_NAME<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MAX_TOKEN_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_TOKEN_LENGTH">_MAX<wbr></wbr>_TOKEN<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TOKEN_COLUMN" class="internal-link" title="orionis.auth.tokens.repository._TOKEN_COLUMN">_TOKEN<wbr></wbr>_COLUMN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1555"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1555">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.tokens.AccessTokenRepository.html" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository"><wbr></wbr>Access<wbr></wbr>Token<wbr></wbr>Repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__init__" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#create" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.create">create</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#findByPlainText" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.findByPlainText">find<wbr></wbr>By<wbr></wbr>Plain<wbr></wbr>Text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#purgeExpired" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.purgeExpired">purge<wbr></wbr>Expired</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#revoke" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.revoke">revoke</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#revokeAll" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.revokeAll">revoke<wbr></wbr>All</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#touch" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.touch">touch</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__slots__" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__db" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__db">__db</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__expiration" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__expiration">__expiration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__secret_bytes" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__secret_bytes">__secret<wbr></wbr>_bytes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html#__table" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__table">__table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.html#generate_token_secret" class="internal-link" title="orionis.auth.tokens.generate_token_secret">generate<wbr></wbr>_token<wbr></wbr>_secret</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.html#hash_token_secret" class="internal-link" title="orionis.auth.tokens.hash_token_secret">hash<wbr></wbr>_token<wbr></wbr>_secret</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.auth.html" class="internal-link" title="orionis.auth">auth</a></code><wbr></wbr>.<code><a href="orionis.auth.tokens.html" class="internal-link" title="orionis.auth.tokens">tokens</a></code><wbr></wbr>.<code><a href="orionis.auth.tokens.repository.html" class="internal-link" title="orionis.auth.tokens.repository">repository</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id93">
+  
+  
+  <tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_as_datetime" class="internal-link" title="orionis.auth.tokens.repository._as_datetime">_as<wbr></wbr>_datetime</a></code></td>
+    <td>Coerce a stored timestamp into a datetime.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_decode_abilities" class="internal-link" title="orionis.auth.tokens.repository._decode_abilities">_decode<wbr></wbr>_abilities</a></code></td>
+    <td>Deserialise the abilities stored for a token.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_encode_abilities" class="internal-link" title="orionis.auth.tokens.repository._encode_abilities">_encode<wbr></wbr>_abilities</a></code></td>
+    <td>Serialise the abilities of a token for storage.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_is_expired" class="internal-link" title="orionis.auth.tokens.repository._is_expired">_is<wbr></wbr>_expired</a></code></td>
+    <td>Report whether an expiration moment already elapsed.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_normalize_abilities" class="internal-link" title="orionis.auth.tokens.repository._normalize_abilities">_normalize<wbr></wbr>_abilities</a></code></td>
+    <td>Validate credential restrictions without coercing malformed values.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_unexpired_tokens" class="internal-link" title="orionis.auth.tokens.repository._unexpired_tokens">_unexpired<wbr></wbr>_tokens</a></code></td>
+    <td>Group the nullable expiration constraint for token use.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_utc_now" class="internal-link" title="orionis.auth.tokens.repository._utc_now">_utc<wbr></wbr>_now</a></code></td>
+    <td>Return the current UTC moment as a naive datetime.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_DEFAULT_SECRET_BYTES" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_SECRET_BYTES">_DEFAULT<wbr></wbr>_SECRET<wbr></wbr>_BYTES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_DEFAULT_TABLE" class="internal-link" title="orionis.auth.tokens.repository._DEFAULT_TABLE">_DEFAULT<wbr></wbr>_TABLE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_MAX_ABILITIES" class="internal-link" title="orionis.auth.tokens.repository._MAX_ABILITIES">_MAX<wbr></wbr>_ABILITIES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_MAX_NAME_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_NAME_LENGTH">_MAX<wbr></wbr>_NAME<wbr></wbr>_LENGTH</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_MAX_TOKEN_LENGTH" class="internal-link" title="orionis.auth.tokens.repository._MAX_TOKEN_LENGTH">_MAX<wbr></wbr>_TOKEN<wbr></wbr>_LENGTH</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_TOKEN_COLUMN" class="internal-link" title="orionis.auth.tokens.repository._TOKEN_COLUMN">_TOKEN<wbr></wbr>_COLUMN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._as_datetime">
+    
+  </a>
+  <a name="_as_datetime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_as_datetime</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L333">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_as_datetime" title="orionis.auth.tokens.repository._as_datetime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Coerce a stored timestamp into a datetime.</p>
+<p>Queries over a table the builder knows no schema for come back with
+whatever the driver produced, and SQLite hands timestamps back as
+plain strings. Normalising here keeps the expiration check correct on
+every dialect.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Raw value read from a timestamp column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>datetime | None</code></td><td class="fieldArgDesc">Parsed UTC moment without an offset, or <tt class="rst-docutils rst-literal">None</tt> for SQL NULL.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TokenException</code></td><td>If a non-null timestamp is malformed.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._decode_abilities">
+    
+  </a>
+  <a name="_decode_abilities">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_decode_abilities</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L428">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_decode_abilities" title="orionis.auth.tokens.repository._decode_abilities">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Deserialise the abilities stored for a token.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Raw value read from the <tt class="rst-docutils rst-literal">abilities</tt> column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Validated abilities, or <tt class="rst-docutils rst-literal">None</tt> only for a SQL NULL value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TokenException</code></td><td>If the stored payload is not an array of non-empty strings.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._encode_abilities">
+    
+  </a>
+  <a name="_encode_abilities">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_abilities</span><span class="function-signature">(<span class="rst-sig-param">abilities: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L410">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_encode_abilities" title="orionis.auth.tokens.repository._encode_abilities">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Serialise the abilities of a token for storage.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">abilities:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Abilities granted to the token.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Sorted JSON array, or <tt class="rst-docutils rst-literal">None</tt> for an unrestricted token.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._is_expired">
+    
+  </a>
+  <a name="_is_expired">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_is_expired</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L388">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_is_expired" title="orionis.auth.tokens.repository._is_expired">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report whether an expiration moment already elapsed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>datetime | None</code></td><td class="fieldArgDesc">Normalised expiration moment of the token.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the moment is in the past. A missing value means the
+token never expires on its own.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._normalize_abilities">
+    
+  </a>
+  <a name="_normalize_abilities">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_normalize_abilities</span><span class="function-signature">(<span class="rst-sig-param">abilities: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L460">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_normalize_abilities" title="orionis.auth.tokens.repository._normalize_abilities">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate credential restrictions without coercing malformed values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">abilities:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Explicit restrictions, or None for an unrestricted credential.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Deduplicated, validated abilities.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TokenException</code></td><td>If the input is a string or contains invalid ability names.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._unexpired_tokens">
+    
+  </a>
+  <a name="_unexpired_tokens">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_unexpired_tokens</span><span class="function-signature">(<span class="rst-sig-param">query: <code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase">QueryBuilderBase</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L372">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_unexpired_tokens" title="orionis.auth.tokens.repository._unexpired_tokens">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Group the nullable expiration constraint for token use.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">query:</span><code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase">QueryBuilderBase</a></code></td><td class="fieldArgDesc">Nested group assembled by the query builder.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The group accepts only unexpired tokens or SQL NULL deadlines.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.auth.tokens.repository._utc_now">
+    
+  </a>
+  <a name="_utc_now">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_utc_now</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L318">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_utc_now" title="orionis.auth.tokens.repository._utc_now">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the current UTC moment as a naive datetime.</p>
+<p>Token columns are declared without a timezone so every dialect stores
+the same value. Dropping the offset here keeps writes and reads
+symmetric across SQLite, PostgreSQL and MySQL.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">Current UTC moment without timezone information.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._DEFAULT_SECRET_BYTES">
+    
+  </a>
+  <a name="_DEFAULT_SECRET_BYTES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_DEFAULT_SECRET_BYTES</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_DEFAULT_SECRET_BYTES" title="orionis.auth.tokens.repository._DEFAULT_SECRET_BYTES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>40</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._DEFAULT_TABLE">
+    
+  </a>
+  <a name="_DEFAULT_TABLE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_DEFAULT_TABLE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L19">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_DEFAULT_TABLE" title="orionis.auth.tokens.repository._DEFAULT_TABLE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">personal_access_tokens</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._MAX_ABILITIES">
+    
+  </a>
+  <a name="_MAX_ABILITIES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_MAX_ABILITIES</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_MAX_ABILITIES" title="orionis.auth.tokens.repository._MAX_ABILITIES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>256</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._MAX_NAME_LENGTH">
+    
+  </a>
+  <a name="_MAX_NAME_LENGTH">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_MAX_NAME_LENGTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L22">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_MAX_NAME_LENGTH" title="orionis.auth.tokens.repository._MAX_NAME_LENGTH">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>255</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._MAX_TOKEN_LENGTH">
+    
+  </a>
+  <a name="_MAX_TOKEN_LENGTH">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_MAX_TOKEN_LENGTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_MAX_TOKEN_LENGTH" title="orionis.auth.tokens.repository._MAX_TOKEN_LENGTH">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>512</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.auth.tokens.repository._TOKEN_COLUMN">
+    
+  </a>
+  <a name="_TOKEN_COLUMN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_TOKEN_COLUMN</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/tokens/repository.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_TOKEN_COLUMN" title="orionis.auth.tokens.repository._TOKEN_COLUMN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">token</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -384,13 +384,14 @@ ruff check orionis/queues orionis/console/commands/queue tests/queues
 
 The regular suite does not require an external Redis server. Redis transport
 tests use an explicit fake implementing the atomic script contract; executable
-Lua integration is an explicit suite, without silently skipping missing servers:
+Lua integration is discovered normally and explicitly skipped until
+`ORIONIS_QUEUE_REDIS_HOST` is set. Once configured, server errors remain failures:
 
 ```powershell
 $env:ORIONIS_QUEUE_REDIS_HOST = "127.0.0.1"
 $env:ORIONIS_QUEUE_REDIS_PORT = "6379"
 $env:ORIONIS_QUEUE_REDIS_DB = "0"
-python -X utf8 reactor test --start-dir=tests/queues/drivers --file-pattern=redis_integration.py --no-panel
+python -X utf8 reactor test --start-dir=tests/queues/drivers --file-pattern=test_redis_integration.py --no-panel
 ```
 
 The selected host and port must reach a Redis server supporting atomic Lua

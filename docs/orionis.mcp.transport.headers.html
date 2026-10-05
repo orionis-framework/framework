@@ -1,0 +1,2162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mcp.transport.headers</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.mcp.transport.headers.html" class="internal-link" title="This module">headers</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14864"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14864">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding"><wbr></wbr>Header<wbr></wbr>Binding</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.headers.HeaderBinding.html#kind" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding.kind">kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.headers.HeaderBinding.html#name" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.headers.HeaderBinding.html#path" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding.path">path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_argument" class="internal-link" title="orionis.mcp.transport.headers._argument">_argument</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_binding" class="internal-link" title="orionis.mcp.transport.headers._binding">_binding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_contains_annotation" class="internal-link" title="orionis.mcp.transport.headers._contains_annotation">_contains<wbr></wbr>_annotation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode_value" class="internal-link" title="orionis.mcp.transport.headers._decode_value">_decode<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_matches_integer" class="internal-link" title="orionis.mcp.transport.headers._matches_integer">_matches<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_matches_value" class="internal-link" title="orionis.mcp.transport.headers._matches_value">_matches<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_mismatch" class="internal-link" title="orionis.mcp.transport.headers._mismatch">_mismatch</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parameter" class="internal-link" title="orionis.mcp.transport.headers._parameter">_parameter</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_single_header" class="internal-link" title="orionis.mcp.transport.headers._single_header">_single<wbr></wbr>_header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_binding" class="internal-link" title="orionis.mcp.transport.headers._validate_binding">_validate<wbr></wbr>_binding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_standard" class="internal-link" title="orionis.mcp.transport.headers._validate_standard">_validate<wbr></wbr>_standard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_version" class="internal-link" title="orionis.mcp.transport.headers._validate_version">_validate<wbr></wbr>_version</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_walk_properties" class="internal-link" title="orionis.mcp.transport.headers._walk_properties">_walk<wbr></wbr>_properties</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_walk_schema" class="internal-link" title="orionis.mcp.transport.headers._walk_schema">_walk<wbr></wbr>_schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compile_header_bindings" class="internal-link" title="orionis.mcp.transport.headers.compile_header_bindings">compile<wbr></wbr>_header<wbr></wbr>_bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_headers" class="internal-link" title="orionis.mcp.transport.headers.validate_headers">validate<wbr></wbr>_headers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ANNOTATION" class="internal-link" title="orionis.mcp.transport.headers._ANNOTATION">_ANNOTATION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NAMED_METHODS" class="internal-link" title="orionis.mcp.transport.headers._NAMED_METHODS">_NAMED<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NUMBER" class="internal-link" title="orionis.mcp.transport.headers._NUMBER">_NUMBER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_PLAIN" class="internal-link" title="orionis.mcp.transport.headers._PLAIN">_PLAIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_PREFIX" class="internal-link" title="orionis.mcp.transport.headers._PREFIX">_PREFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_SAFE_INTEGER" class="internal-link" title="orionis.mcp.transport.headers._SAFE_INTEGER">_SAFE<wbr></wbr>_INTEGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_SUFFIX" class="internal-link" title="orionis.mcp.transport.headers._SUFFIX">_SUFFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TOKEN" class="internal-link" title="orionis.mcp.transport.headers._TOKEN">_TOKEN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.mcp.transport.html" class="internal-link" title="The parent of this module">transport</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14865"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.headers.html" class="internal-link" title="orionis.mcp.transport.headers">headers</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding"><wbr></wbr>Header<wbr></wbr>Binding</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_argument" class="internal-link" title="orionis.mcp.transport.headers._argument">_argument</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_binding" class="internal-link" title="orionis.mcp.transport.headers._binding">_binding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_contains_annotation" class="internal-link" title="orionis.mcp.transport.headers._contains_annotation">_contains<wbr></wbr>_annotation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode_value" class="internal-link" title="orionis.mcp.transport.headers._decode_value">_decode<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_matches_integer" class="internal-link" title="orionis.mcp.transport.headers._matches_integer">_matches<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_matches_value" class="internal-link" title="orionis.mcp.transport.headers._matches_value">_matches<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_mismatch" class="internal-link" title="orionis.mcp.transport.headers._mismatch">_mismatch</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parameter" class="internal-link" title="orionis.mcp.transport.headers._parameter">_parameter</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_single_header" class="internal-link" title="orionis.mcp.transport.headers._single_header">_single<wbr></wbr>_header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_binding" class="internal-link" title="orionis.mcp.transport.headers._validate_binding">_validate<wbr></wbr>_binding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_standard" class="internal-link" title="orionis.mcp.transport.headers._validate_standard">_validate<wbr></wbr>_standard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validate_version" class="internal-link" title="orionis.mcp.transport.headers._validate_version">_validate<wbr></wbr>_version</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_walk_properties" class="internal-link" title="orionis.mcp.transport.headers._walk_properties">_walk<wbr></wbr>_properties</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_walk_schema" class="internal-link" title="orionis.mcp.transport.headers._walk_schema">_walk<wbr></wbr>_schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compile_header_bindings" class="internal-link" title="orionis.mcp.transport.headers.compile_header_bindings">compile<wbr></wbr>_header<wbr></wbr>_bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_headers" class="internal-link" title="orionis.mcp.transport.headers.validate_headers">validate<wbr></wbr>_headers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ANNOTATION" class="internal-link" title="orionis.mcp.transport.headers._ANNOTATION">_ANNOTATION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NAMED_METHODS" class="internal-link" title="orionis.mcp.transport.headers._NAMED_METHODS">_NAMED<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NUMBER" class="internal-link" title="orionis.mcp.transport.headers._NUMBER">_NUMBER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_PLAIN" class="internal-link" title="orionis.mcp.transport.headers._PLAIN">_PLAIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_PREFIX" class="internal-link" title="orionis.mcp.transport.headers._PREFIX">_PREFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_SAFE_INTEGER" class="internal-link" title="orionis.mcp.transport.headers._SAFE_INTEGER">_SAFE<wbr></wbr>_INTEGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_SUFFIX" class="internal-link" title="orionis.mcp.transport.headers._SUFFIX">_SUFFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TOKEN" class="internal-link" title="orionis.mcp.transport.headers._TOKEN">_TOKEN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14866"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14866">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.http.html" class="internal-link" title="orionis.mcp.transport.http">http</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http._EventFrames.html" class="internal-link" title="orionis.mcp.transport.http._EventFrames">_<wbr></wbr>Event<wbr></wbr>Frames</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http.McpHttpTransport.html" class="internal-link" title="orionis.mcp.transport.http.McpHttpTransport"><wbr></wbr>Mcp<wbr></wbr>Http<wbr></wbr>Transport</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http.html#_accept_quality" class="internal-link" title="orionis.mcp.transport.http._accept_quality">_accept<wbr></wbr>_quality</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http.html#_accepts_both" class="internal-link" title="orionis.mcp.transport.http._accepts_both">_accepts<wbr></wbr>_both</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http.html#_ACCEPT_MEDIA_TYPES" class="internal-link" title="orionis.mcp.transport.http._ACCEPT_MEDIA_TYPES">_ACCEPT<wbr></wbr>_MEDIA<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.http.html#_JSON_MEDIA_TYPE" class="internal-link" title="orionis.mcp.transport.http._JSON_MEDIA_TYPE">_JSON<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14867"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14867">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.policy.html" class="internal-link" title="orionis.mcp.transport.policy">policy</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.McpHttpPolicy.html" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy"><wbr></wbr>Mcp<wbr></wbr>Http<wbr></wbr>Policy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse"><wbr></wbr>Mcp<wbr></wbr>Protocol<wbr></wbr>Response</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_error" class="internal-link" title="orionis.mcp.transport.policy._error">_error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#origin_allowed" class="internal-link" title="orionis.mcp.transport.policy.origin_allowed">origin<wbr></wbr>_allowed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_AUTHENTICATION_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._AUTHENTICATION_HEADERS">_AUTHENTICATION<wbr></wbr>_HEADERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_CLIENT_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._CLIENT_ERROR_START">_CLIENT<wbr></wbr>_ERROR<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_EXCEPTION_STATUS" class="internal-link" title="orionis.mcp.transport.policy._EXCEPTION_STATUS">_EXCEPTION<wbr></wbr>_STATUS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_JSON_MEDIA_TYPE" class="internal-link" title="orionis.mcp.transport.policy._JSON_MEDIA_TYPE">_JSON<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_LOGGER" class="internal-link" title="orionis.mcp.transport.policy._LOGGER">_LOGGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_REDIRECTION_START" class="internal-link" title="orionis.mcp.transport.policy._REDIRECTION_START">_REDIRECTION<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_REPLACED_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._REPLACED_HEADERS">_REPLACED<wbr></wbr>_HEADERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_SERVER_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._SERVER_ERROR_START">_SERVER<wbr></wbr>_ERROR<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14868"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14868">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.standard_io.html" class="internal-link" title="orionis.mcp.transport.standard_io">standard<wbr></wbr>_io</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.standard_io.StandardReader.html" class="internal-link" title="orionis.mcp.transport.standard_io.StandardReader"><wbr></wbr>Standard<wbr></wbr>Reader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.standard_io.StandardWriter.html" class="internal-link" title="orionis.mcp.transport.standard_io.StandardWriter"><wbr></wbr>Standard<wbr></wbr>Writer</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.standard_io.html#_finish_write" class="internal-link" title="orionis.mcp.transport.standard_io._finish_write">_finish<wbr></wbr>_write</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14869"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14869">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.stdio.html" class="internal-link" title="orionis.mcp.transport.stdio">stdio</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.stdio.LineReader.html" class="internal-link" title="orionis.mcp.transport.stdio.LineReader"><wbr></wbr>Line<wbr></wbr>Reader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter"><wbr></wbr>Line<wbr></wbr>Writer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.stdio.McpStdioTransport.html" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport"><wbr></wbr>Mcp<wbr></wbr>Stdio<wbr></wbr>Transport</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.transport.html" class="internal-link" title="orionis.mcp.transport">transport</a></code><wbr></wbr>.<code><a href="orionis.mcp.transport.headers.html" class="internal-link" title="orionis.mcp.transport.headers">headers</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1395">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding"><wbr></wbr>Header<wbr></wbr>Binding</a></code></td>
+    <td>One statically reachable argument mirrored into a lowercase HTTP header.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_argument" class="internal-link" title="orionis.mcp.transport.headers._argument">_argument</a></code></td>
+    <td>Read the exact compiled property path without interpreting dotted keys.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_binding" class="internal-link" title="orionis.mcp.transport.headers._binding">_binding</a></code></td>
+    <td>Validate the name and primitive type at one reachable property.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_contains_annotation" class="internal-link" title="orionis.mcp.transport.headers._contains_annotation">_contains<wbr></wbr>_annotation</a></code></td>
+    <td>Locate annotations even inside unsupported schema constructs.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_decode_value" class="internal-link" title="orionis.mcp.transport.headers._decode_value">_decode<wbr></wbr>_value</a></code></td>
+    <td>Validate ASCII transport syntax and decode the exact Base64 sentinel.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_matches_integer" class="internal-link" title="orionis.mcp.transport.headers._matches_integer">_matches<wbr></wbr>_integer</a></code></td>
+    <td>Compare safe JSON integers numerically, accepting equivalent 42.0 values.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_matches_value" class="internal-link" title="orionis.mcp.transport.headers._matches_value">_matches<wbr></wbr>_value</a></code></td>
+    <td>Compare mirrored parameters without coercing booleans into integers.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_mismatch" class="internal-link" title="orionis.mcp.transport.headers._mismatch">_mismatch</a></code></td>
+    <td>Report the failing header without reflecting untrusted field values.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_parameter" class="internal-link" title="orionis.mcp.transport.headers._parameter">_parameter</a></code></td>
+    <td>Read either decoded protocol structs or an unknown method's raw mapping.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_single_header" class="internal-link" title="orionis.mcp.transport.headers._single_header">_single<wbr></wbr>_header</a></code></td>
+    <td>Require one field occurrence, including case-insensitive duplicates.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_validate_binding" class="internal-link" title="orionis.mcp.transport.headers._validate_binding">_validate<wbr></wbr>_binding</a></code></td>
+    <td>Require mirrored values precisely when their argument is present and non-null.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_validate_standard" class="internal-link" title="orionis.mcp.transport.headers._validate_standard">_validate<wbr></wbr>_standard</a></code></td>
+    <td>Compare one required standard header with its corresponding body field.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_validate_version" class="internal-link" title="orionis.mcp.transport.headers._validate_version">_validate<wbr></wbr>_version</a></code></td>
+    <td>Distinguish invalid body metadata from a missing or disagreeing header.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_walk_properties" class="internal-link" title="orionis.mcp.transport.headers._walk_properties">_walk<wbr></wbr>_properties</a></code></td>
+    <td>Visit named object properties with statically known extraction paths.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_walk_schema" class="internal-link" title="orionis.mcp.transport.headers._walk_schema">_walk<wbr></wbr>_schema</a></code></td>
+    <td>Visit properties chains and reject annotations hidden elsewhere.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#compile_header_bindings" class="internal-link" title="orionis.mcp.transport.headers.compile_header_bindings">compile<wbr></wbr>_header<wbr></wbr>_bindings</a></code></td>
+    <td>Validate tool schema annotations once and freeze extraction paths.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_headers" class="internal-link" title="orionis.mcp.transport.headers.validate_headers">validate<wbr></wbr>_headers</a></code></td>
+    <td>Enforce mirrored request metadata before protocol method dispatch.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_ANNOTATION" class="internal-link" title="orionis.mcp.transport.headers._ANNOTATION">_ANNOTATION</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_NAMED_METHODS" class="internal-link" title="orionis.mcp.transport.headers._NAMED_METHODS">_NAMED<wbr></wbr>_METHODS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_NUMBER" class="internal-link" title="orionis.mcp.transport.headers._NUMBER">_NUMBER</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_PLAIN" class="internal-link" title="orionis.mcp.transport.headers._PLAIN">_PLAIN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_PREFIX" class="internal-link" title="orionis.mcp.transport.headers._PREFIX">_PREFIX</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_SAFE_INTEGER" class="internal-link" title="orionis.mcp.transport.headers._SAFE_INTEGER">_SAFE<wbr></wbr>_INTEGER</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_SUFFIX" class="internal-link" title="orionis.mcp.transport.headers._SUFFIX">_SUFFIX</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_TOKEN" class="internal-link" title="orionis.mcp.transport.headers._TOKEN">_TOKEN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._argument">
+    
+  </a>
+  <a name="_argument">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_argument</span><span class="function-signature">(<span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L262">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_argument" title="orionis.mcp.transport.headers._argument">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read the exact compiled property path without interpreting dotted keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">path</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._binding">
+    
+  </a>
+  <a name="_binding">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_binding</span><span class="function-signature">(<span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L60">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_binding" title="orionis.mcp.transport.headers._binding">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the name and primitive type at one reachable property.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Schema declaration used for conversion and validation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">path</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._contains_annotation">
+    
+  </a>
+  <a name="_contains_annotation">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_contains_annotation</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L38">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_contains_annotation" title="orionis.mcp.transport.headers._contains_annotation">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Locate annotations even inside unsupported schema constructs.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._decode_value">
+    
+  </a>
+  <a name="_decode_value">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_decode_value</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">encoded: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L187">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_decode_value" title="orionis.mcp.transport.headers._decode_value">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate ASCII transport syntax and decode the exact Base64 sentinel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">encoded:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">encoded</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._matches_integer">
+    
+  </a>
+  <a name="_matches_integer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_matches_integer</span><span class="function-signature">(<span class="rst-sig-param">header: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L285">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_matches_integer" title="orionis.mcp.transport.headers._matches_integer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compare safe JSON integers numerically, accepting equivalent 42.0 values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">header:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">header</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._matches_value">
+    
+  </a>
+  <a name="_matches_value">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_matches_value</span><span class="function-signature">(<span class="rst-sig-param">binding: <code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code>, </span><span class="rst-sig-param">header: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L314">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_matches_value" title="orionis.mcp.transport.headers._matches_value">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compare mirrored parameters without coercing booleans into integers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">binding:</span><code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">binding</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">header:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">header</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._mismatch">
+    
+  </a>
+  <a name="_mismatch">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_mismatch</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mcp.exceptions.McpProtocolException.html" class="internal-link" title="orionis.mcp.exceptions.McpProtocolException">McpProtocolException</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L171">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_mismatch" title="orionis.mcp.transport.headers._mismatch">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report the failing header without reflecting untrusted field values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.exceptions.McpProtocolException.html" class="internal-link" title="orionis.mcp.exceptions.McpProtocolException">McpProtocolException</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._parameter">
+    
+  </a>
+  <a name="_parameter">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_parameter</span><span class="function-signature">(<span class="rst-sig-param">params: <code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams">RequestParams</a> | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L242">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_parameter" title="orionis.mcp.transport.headers._parameter">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read either decoded protocol structs or an unknown method's raw mapping.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">params:</span><code>RequestParams | Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Parameters decoded for the requested operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._single_header">
+    
+  </a>
+  <a name="_single_header">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_single_header</span><span class="function-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">encoded: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L217">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_single_header" title="orionis.mcp.transport.headers._single_header">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require one field occurrence, including case-insensitive duplicates.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">encoded:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">encoded</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._validate_binding">
+    
+  </a>
+  <a name="_validate_binding">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_binding</span><span class="function-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">binding: <code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code>, </span><span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L338">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validate_binding" title="orionis.mcp.transport.headers._validate_binding">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require mirrored values precisely when their argument is present and non-null.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">binding:</span><code><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">binding</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._validate_standard">
+    
+  </a>
+  <a name="_validate_standard">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_standard</span><span class="function-signature long-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">expected: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">encoded: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L369">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validate_standard" title="orionis.mcp.transport.headers._validate_standard">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compare one required standard header with its corresponding body field.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">expected</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">encoded:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">encoded</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._validate_version">
+    
+  </a>
+  <a name="_validate_version">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_version</span><span class="function-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L398">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validate_version" title="orionis.mcp.transport.headers._validate_version">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Distinguish invalid body metadata from a missing or disagreeing header.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._walk_properties">
+    
+  </a>
+  <a name="_walk_properties">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_walk_properties</span><span class="function-signature long-signature">(<span class="rst-sig-param">properties: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L121">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_walk_properties" title="orionis.mcp.transport.headers._walk_properties">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Visit named object properties with statically known extraction paths.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">properties:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Named child schemas.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Parent property path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>]</code></td><td class="fieldArgDesc">Accumulator for mirrored header declarations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Valid child mappings have been visited in declaration order.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers._walk_schema">
+    
+  </a>
+  <a name="_walk_schema">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_walk_schema</span><span class="function-signature long-signature">(<span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L86">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_walk_schema" title="orionis.mcp.transport.headers._walk_schema">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Visit properties chains and reject annotations hidden elsewhere.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Schema declaration used for conversion and validation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">path</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>]</code></td><td class="fieldArgDesc">Declared bindings associated with this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers.compile_header_bindings">
+    
+  </a>
+  <a name="compile_header_bindings">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">compile_header_bindings</span><span class="function-signature">(<span class="rst-sig-param">input_schema: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L147">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#compile_header_bindings" title="orionis.mcp.transport.headers.compile_header_bindings">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate tool schema annotations once and freeze extraction paths.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">input<wbr></wbr>_schema:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">input_schema</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>, ...]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.transport.headers.validate_headers">
+    
+  </a>
+  <a name="validate_headers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_headers</span><span class="function-signature long-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">envelope: <code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code>, </span><span class="rst-sig-param">params: <code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams">RequestParams</a> | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> = ()</span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L422">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_headers" title="orionis.mcp.transport.headers.validate_headers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Enforce mirrored request metadata before protocol method dispatch.</p>
+<p>Unknown methods may omit <tt class="rst-docutils rst-literal">params</tt> here to decode only their raw mapping.
+Notifications have no metadata-header requirements in this protocol revision.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">envelope</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">params:</span><code>RequestParams | Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | None</code></td><td class="fieldArgDesc">Parameters decoded for the requested operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.transport.headers.HeaderBinding.html" class="internal-link" title="orionis.mcp.transport.headers.HeaderBinding">HeaderBinding</a>, ...]</code></td><td class="fieldArgDesc">Declared bindings associated with this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._ANNOTATION">
+    
+  </a>
+  <a name="_ANNOTATION">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_ANNOTATION</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L24">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_ANNOTATION" title="orionis.mcp.transport.headers._ANNOTATION">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">x-mcp-header</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._NAMED_METHODS">
+    
+  </a>
+  <a name="_NAMED_METHODS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_NAMED_METHODS</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L27">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_NAMED_METHODS" title="orionis.mcp.transport.headers._NAMED_METHODS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/call</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">resources/read</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">prompts/get</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._NUMBER">
+    
+  </a>
+  <a name="_NUMBER">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_NUMBER</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L22">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_NUMBER" title="orionis.mcp.transport.headers._NUMBER">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>-<span class="rst-re-op">?</span><span class="rst-re-group">(?:</span>0<span class="rst-re-op">|</span><span class="rst-re-group">[</span>1<span class="rst-re-op">-</span>9<span class="rst-re-group">]</span>\d<span class="rst-re-op">*</span><span class="rst-re-group">)</span><span class="rst-re-group">(?:</span>\.\d<span class="rst-re-op">+</span><span class="rst-re-group">)</span><span class="rst-re-op">?</span><span class="rst-re-group">(?:</span><span class="rst-re-group">[</span>eE<span class="rst-re-group">]</span><span class="rst-re-group">[</span>\+-<span class="rst-re-group">]</span><span class="rst-re-op">?</span>\d<span class="rst-re-op">+</span><span class="rst-re-group">)</span><span class="rst-re-op">?</span>\Z<span class="rst-variable-quote">'</span>,
+           <a href="https://docs.python.org/3/library/re.html#re.ASCII" class="intersphinx-link">re.ASCII</a>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._PLAIN">
+    
+  </a>
+  <a name="_PLAIN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_PLAIN</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_PLAIN" title="orionis.mcp.transport.headers._PLAIN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">(?:</span><span class="rst-re-group">[</span>!<span class="rst-re-op">-</span>~<span class="rst-re-group">]</span><span class="rst-re-group">(?:</span><span class="rst-re-group">[</span>\t <span class="rst-re-op">-</span>~<span class="rst-re-group">]</span><span class="rst-re-op">*</span><span class="rst-re-group">[</span>!<span class="rst-re-op">-</span>~<span class="rst-re-group">]</span><span class="rst-re-group">)</span><span class="rst-re-op">?</span><span class="rst-re-group">)</span><span class="rst-re-op">?</span>\Z<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._PREFIX">
+    
+  </a>
+  <a name="_PREFIX">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_PREFIX</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L25">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_PREFIX" title="orionis.mcp.transport.headers._PREFIX">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">=?base64?</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._SAFE_INTEGER">
+    
+  </a>
+  <a name="_SAFE_INTEGER">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_SAFE_INTEGER</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_SAFE_INTEGER" title="orionis.mcp.transport.headers._SAFE_INTEGER">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>9007199254740991</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._SUFFIX">
+    
+  </a>
+  <a name="_SUFFIX">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_SUFFIX</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_SUFFIX" title="orionis.mcp.transport.headers._SUFFIX">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">?=</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.transport.headers._TOKEN">
+    
+  </a>
+  <a name="_TOKEN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_TOKEN</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/headers.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_TOKEN" title="orionis.mcp.transport.headers._TOKEN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>!#\$%&amp;\'\*\+-\.\^_`\|~0<span class="rst-re-op">-</span>9A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z<span class="rst-re-group">]</span><span class="rst-re-op">+</span>\Z<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

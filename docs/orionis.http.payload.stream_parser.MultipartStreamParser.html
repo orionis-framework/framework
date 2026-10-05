@@ -1,0 +1,2537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.payload.stream_parser.MultipartStreamParser</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.payload.stream_parser.MultipartStreamParser.html" class="internal-link" title="This class"><wbr></wbr>Multipart<wbr></wbr>Stream<wbr></wbr>Parser</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_advanceState" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._advanceState">_advance<wbr></wbr>State</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_consumeBody" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._consumeBody">_consume<wbr></wbr>Body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_delimiterEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._delimiterEnd">_delimiter<wbr></wbr>End</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_discardPrefix" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._discardPrefix">_discard<wbr></wbr>Prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_findBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._findBoundary">_find<wbr></wbr>Boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finishPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._finishPart">_finish<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_newPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._newPart">_new<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parseParts" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._parseParts">_parse<wbr></wbr>Parts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_readHeaders" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._readHeaders">_read<wbr></wbr>Headers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_receiveChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._receiveChunk">_receive<wbr></wbr>Chunk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_searchBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._searchBoundary">_search<wbr></wbr>Boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_writePart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._writePart">_write<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parse" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.parse">parse</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_atStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._atStart">_at<wbr></wbr>Start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_currentPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._currentPart">_current<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_eof" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._eof">_eof</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_headerSearch" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._headerSearch">_header<wbr></wbr>Search</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_memorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._memorySize">_memory<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_paddingEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingEnd">_padding<wbr></wbr>End</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_paddingStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingStart">_padding<wbr></wbr>Start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_partMemorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._partMemorySize">_part<wbr></wbr>Memory<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_pendingChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingChunk">_pending<wbr></wbr>Chunk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_pendingOffset" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingOffset">_pending<wbr></wbr>Offset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_totalSize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._totalSize">_total<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#boundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.boundary">boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#buffer" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.buffer">buffer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.current_part_size">current<wbr></wbr>_part<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fields_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.fields_count">fields<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#files_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.files_count">files<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_body_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_body_size">max<wbr></wbr>_body<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_field_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_field_size">max<wbr></wbr>_field<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_fields" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_fields">max<wbr></wbr>_fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_files" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_files">max<wbr></wbr>_files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_header_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_header_size">max<wbr></wbr>_header<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_memory_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_memory_size">max<wbr></wbr>_memory<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_part_size">max<wbr></wbr>_part<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#memory_threshold" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.memory_threshold">memory<wbr></wbr>_threshold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stream" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.stream">stream</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.payload.stream_parser.html" class="internal-link" title="The parent of this class">stream<wbr></wbr>_parser</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9910"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.payload.stream_parser.MultipartStreamParser.html" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser"><wbr></wbr>Multipart<wbr></wbr>Stream<wbr></wbr>Parser</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_advanceState" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._advanceState">_advance<wbr></wbr>State</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_consumeBody" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._consumeBody">_consume<wbr></wbr>Body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_delimiterEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._delimiterEnd">_delimiter<wbr></wbr>End</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_discardPrefix" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._discardPrefix">_discard<wbr></wbr>Prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_findBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._findBoundary">_find<wbr></wbr>Boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finishPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._finishPart">_finish<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_newPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._newPart">_new<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parseParts" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._parseParts">_parse<wbr></wbr>Parts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_readHeaders" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._readHeaders">_read<wbr></wbr>Headers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_receiveChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._receiveChunk">_receive<wbr></wbr>Chunk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_searchBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._searchBoundary">_search<wbr></wbr>Boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_writePart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._writePart">_write<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parse" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.parse">parse</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_atStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._atStart">_at<wbr></wbr>Start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_currentPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._currentPart">_current<wbr></wbr>Part</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_eof" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._eof">_eof</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_headerSearch" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._headerSearch">_header<wbr></wbr>Search</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_memorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._memorySize">_memory<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_paddingEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingEnd">_padding<wbr></wbr>End</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_paddingStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingStart">_padding<wbr></wbr>Start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_partMemorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._partMemorySize">_part<wbr></wbr>Memory<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_pendingChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingChunk">_pending<wbr></wbr>Chunk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_pendingOffset" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingOffset">_pending<wbr></wbr>Offset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_totalSize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._totalSize">_total<wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#boundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.boundary">boundary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#buffer" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.buffer">buffer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#current_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.current_part_size">current<wbr></wbr>_part<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fields_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.fields_count">fields<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#files_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.files_count">files<wbr></wbr>_count</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_body_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_body_size">max<wbr></wbr>_body<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_field_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_field_size">max<wbr></wbr>_field<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_fields" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_fields">max<wbr></wbr>_fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_files" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_files">max<wbr></wbr>_files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_header_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_header_size">max<wbr></wbr>_header<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_memory_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_memory_size">max<wbr></wbr>_memory<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#max_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_part_size">max<wbr></wbr>_part<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#memory_threshold" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.memory_threshold">memory<wbr></wbr>_threshold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stream" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.stream">stream</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#complete_in_thread" class="internal-link" title="orionis.http.payload.stream_parser.complete_in_thread">complete<wbr></wbr>_in<wbr></wbr>_thread</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_BYTE_DASH" class="internal-link" title="orionis.http.payload.stream_parser._BYTE_DASH">_BYTE<wbr></wbr>_DASH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_CHUNK_SIZE" class="internal-link" title="orionis.http.payload.stream_parser._CHUNK_SIZE">_CHUNK<wbr></wbr>_SIZE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_DELIMITER_INVALID" class="internal-link" title="orionis.http.payload.stream_parser._DELIMITER_INVALID">_DELIMITER<wbr></wbr>_INVALID</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_MAX_BOUNDARY_SIZE" class="internal-link" title="orionis.http.payload.stream_parser._MAX_BOUNDARY_SIZE">_MAX<wbr></wbr>_BOUNDARY<wbr></wbr>_SIZE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_STATE_FINISHED" class="internal-link" title="orionis.http.payload.stream_parser._STATE_FINISHED">_STATE<wbr></wbr>_FINISHED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_STATE_READ_BODY" class="internal-link" title="orionis.http.payload.stream_parser._STATE_READ_BODY">_STATE<wbr></wbr>_READ<wbr></wbr>_BODY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_STATE_READ_HEADERS" class="internal-link" title="orionis.http.payload.stream_parser._STATE_READ_HEADERS">_STATE<wbr></wbr>_READ<wbr></wbr>_HEADERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.payload.stream_parser.html#_STATE_SEARCH_BOUNDARY" class="internal-link" title="orionis.http.payload.stream_parser._STATE_SEARCH_BOUNDARY">_STATE<wbr></wbr>_SEARCH<wbr></wbr>_BOUNDARY</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.payload.html" class="internal-link" title="orionis.http.payload">payload</a></code><wbr></wbr>.<code><a href="orionis.http.payload.stream_parser.html" class="internal-link" title="orionis.http.payload.stream_parser">stream_parser</a></code><wbr></wbr>.<code><a href="orionis.http.payload.stream_parser.MultipartStreamParser.html" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser">MultipartStreamParser</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MultipartStreamParser</span>(<a href="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.html" class="internal-link" title="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser">IMultipartStreamParser</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L63" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">MultipartStreamParser(stream, boundary, max_files, max_fields, ...)</a></code></p><p><a href="classIndex.html#orionis.http.payload.stream_parser.MultipartStreamParser">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Parse a multipart byte stream into form fields and uploaded files.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1016">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">__init__</a></code></td>
+    <td>Initialize a new <tt class="rst-docutils rst-literal">MultipartStreamParser</tt> instance.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_advanceState" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._advanceState">_advance<wbr></wbr>State</a></code></td>
+    <td>Advance the parser according to the current state.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_consumeBody" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._consumeBody">_consume<wbr></wbr>Body</a></code></td>
+    <td>Consume a body segment and advance the parser to the next state.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_delimiterEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._delimiterEnd">_delimiter<wbr></wbr>End</a></code></td>
+    <td>Resolve the end of a multipart delimiter line.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_discardPrefix" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._discardPrefix">_discard<wbr></wbr>Prefix</a></code></td>
+    <td>Discard consumed bytes and realign the delimiter padding cursor.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_findBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._findBoundary">_find<wbr></wbr>Boundary</a></code></td>
+    <td>Find a complete multipart delimiter or an incomplete suffix.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_finishPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._finishPart">_finish<wbr></wbr>Part</a></code></td>
+    <td>Finalize a part body or decode transfer-encoded file content.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_newPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._newPart">_new<wbr></wbr>Part</a></code></td>
+    <td>Create a multipart part from the parsed MIME headers.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_parseParts" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._parseParts">_parse<wbr></wbr>Parts</a></code></td>
+    <td>Parse all parts until the multipart stream ends or fails.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_readHeaders" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._readHeaders">_read<wbr></wbr>Headers</a></code></td>
+    <td>Read a complete MIME header block for the next multipart part.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_receiveChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._receiveChunk">_receive<wbr></wbr>Chunk</a></code></td>
+    <td>Read the next chunk from the stream and track end-of-stream.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_searchBoundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._searchBoundary">_search<wbr></wbr>Boundary</a></code></td>
+    <td>Search for the next multipart boundary and decide the parser state.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_writePart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._writePart">_write<wbr></wbr>Part</a></code></td>
+    <td>Write a buffer prefix into the active part and enforce size limits.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#parse" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.parse">parse</a></code></td>
+    <td>Parse the multipart stream and return the collected form data.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_atStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._atStart">_at<wbr></wbr>Start</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_currentPart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._currentPart">_current<wbr></wbr>Part</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_eof" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._eof">_eof</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_headerSearch" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._headerSearch">_header<wbr></wbr>Search</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_memorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._memorySize">_memory<wbr></wbr>Size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_paddingEnd" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingEnd">_padding<wbr></wbr>End</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_paddingStart" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingStart">_padding<wbr></wbr>Start</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_partMemorySize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._partMemorySize">_part<wbr></wbr>Memory<wbr></wbr>Size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_pendingChunk" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingChunk">_pending<wbr></wbr>Chunk</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_pendingOffset" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingOffset">_pending<wbr></wbr>Offset</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_totalSize" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser._totalSize">_total<wbr></wbr>Size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#boundary" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.boundary">boundary</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#buffer" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.buffer">buffer</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#current_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.current_part_size">current<wbr></wbr>_part<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#fields_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.fields_count">fields<wbr></wbr>_count</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#files_count" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.files_count">files<wbr></wbr>_count</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_body_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_body_size">max<wbr></wbr>_body<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_field_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_field_size">max<wbr></wbr>_field<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_fields" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_fields">max<wbr></wbr>_fields</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_files" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_files">max<wbr></wbr>_files</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_header_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_header_size">max<wbr></wbr>_header<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_memory_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_memory_size">max<wbr></wbr>_memory<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#max_part_size" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_part_size">max<wbr></wbr>_part<wbr></wbr>_size</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#memory_threshold" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.memory_threshold">memory<wbr></wbr>_threshold</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stream" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.stream">stream</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-param">boundary: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_files: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_files, </span><span class="rst-sig-param">max_fields: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_fields, </span><span class="rst-sig-param">max_part_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_part_size, </span><span class="rst-sig-param">memory_threshold: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.memory_threshold, </span><span class="rst-sig-param">max_header_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_header_size, </span><span class="rst-sig-param">max_body_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_body_size, </span><span class="rst-sig-param">max_field_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_field_size, </span><span class="rst-sig-param">max_memory_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = HTTPBodyLimits.max_memory_size</span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize a new <tt class="rst-docutils rst-literal">MultipartStreamParser</tt> instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Async byte stream produced by the transport layer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">boundary:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Raw multipart boundary token (without leading <tt class="rst-docutils rst-literal"><span class="pre">--</span></tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_files:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum number of file parts accepted (default 32).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_fields:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum number of field parts accepted (default 128).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_part<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum byte size of a single part (default 10 MiB).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory<wbr></wbr>_threshold:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Bytes before a file part spills to disk (default 256 KiB).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_header<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum byte size of the MIME headers for each part (default 16 KiB).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_body<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum transport bytes, including preamble and epilogue (16 MiB).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_field<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum raw bytes of a single text field (default 1 MiB).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_memory<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Retained field/file memory budget (default 8 MiB), excluding
+transport buffers, object metadata and temporary copies.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._advanceState">
+    
+  </a>
+  <a name="_advanceState">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_advanceState</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">state: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">current_part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">tail_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L534">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_advanceState" title="orionis.http.payload.stream_parser.MultipartStreamParser._advanceState">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Advance the parser according to the current state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">state:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Current parser state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_part:</span><code>MultipartPart | None</code></td><td class="fieldArgDesc">Current part being streamed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">form<wbr></wbr>_items:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Accumulated form values collected so far.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">body<wbr></wbr>_marker:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Boundary marker used to detect body terminations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tail<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Minimum trailing bytes required to recognize an incomplete boundary.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, MultipartPart | None, <a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc">Next state, part pointer, and whether the loop should continue.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._consumeBody">
+    
+  </a>
+  <a name="_consumeBody">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_consumeBody</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">current_part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">tail_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L492">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_consumeBody" title="orionis.http.payload.stream_parser.MultipartStreamParser._consumeBody">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Consume a body segment and advance the parser to the next state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_part:</span><code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></td><td class="fieldArgDesc">Part being read from the incoming multipart stream.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">form<wbr></wbr>_items:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Accumulated form values collected so far.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">body<wbr></wbr>_marker:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Boundary marker used to detect the end of a body section.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tail<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Minimum trailing bytes required to recognize an incomplete boundary.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, MultipartPart | None]</code></td><td class="fieldArgDesc">Parser state and the current part after processing the segment.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._delimiterEnd">
+    
+  </a>
+  <a name="_delimiterEnd">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_delimiterEnd</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L207">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_delimiterEnd" title="orionis.http.payload.stream_parser.MultipartStreamParser._delimiterEnd">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the end of a multipart delimiter line.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Offset where the boundary candidate begins.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">End offset for a complete delimiter, <tt class="rst-docutils rst-literal"><span class="pre">-1</span></tt> for an incomplete one,
+or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an invalid boundary.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._discardPrefix">
+    
+  </a>
+  <a name="_discardPrefix">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_discardPrefix</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L183">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_discardPrefix" title="orionis.http.payload.stream_parser.MultipartStreamParser._discardPrefix">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Discard consumed bytes and realign the delimiter padding cursor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of leading bytes to remove from the buffer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._findBoundary">
+    
+  </a>
+  <a name="_findBoundary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_findBoundary</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L247">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_findBoundary" title="orionis.http.payload.stream_parser.MultipartStreamParser._findBoundary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Find a complete multipart delimiter or an incomplete suffix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">marker:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Boundary sequence to search for in the active buffer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code></td><td class="fieldArgDesc">Pair containing the delimiter start offset and its end offset.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._finishPart">
+    
+  </a>
+  <a name="_finishPart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finishPart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L418">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_finishPart" title="orionis.http.payload.stream_parser.MultipartStreamParser._finishPart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Finalize a part body or decode transfer-encoded file content.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">part:</span><code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></td><td class="fieldArgDesc">Part whose content should be finalized.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Finalized value for the form field or uploaded file.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._newPart">
+    
+  </a>
+  <a name="_newPart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_newPart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">header_end: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L312">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_newPart" title="orionis.http.payload.stream_parser.MultipartStreamParser._newPart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a multipart part from the parsed MIME headers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">header<wbr></wbr>_end:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Offset where the header block ends within the buffer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></td><td class="fieldArgDesc">Initialized multipart part with its metadata and body buffer.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._parseParts">
+    
+  </a>
+  <a name="_parseParts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_parseParts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></span>) -&gt; <code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L584">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_parseParts" title="orionis.http.payload.stream_parser.MultipartStreamParser._parseParts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse all parts until the multipart stream ends or fails.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">form<wbr></wbr>_items:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Accumulated form values collected so far.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code></td><td class="fieldArgDesc">Parsed form data container for all field and file parts.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._readHeaders">
+    
+  </a>
+  <a name="_readHeaders">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_readHeaders</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L393">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_readHeaders" title="orionis.http.payload.stream_parser.MultipartStreamParser._readHeaders">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read a complete MIME header block for the next multipart part.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>MultipartPart | None</code></td><td class="fieldArgDesc">The initialized part when headers are complete, otherwise <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._receiveChunk">
+    
+  </a>
+  <a name="_receiveChunk">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_receiveChunk</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L457">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_receiveChunk" title="orionis.http.payload.stream_parser.MultipartStreamParser._receiveChunk">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read the next chunk from the stream and track end-of-stream.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Async byte stream providing incoming chunks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when more data is available, otherwise <tt class="rst-docutils rst-literal">False</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._searchBoundary">
+    
+  </a>
+  <a name="_searchBoundary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_searchBoundary</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L354">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_searchBoundary" title="orionis.http.payload.stream_parser.MultipartStreamParser._searchBoundary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Search for the next multipart boundary and decide the parser state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">body<wbr></wbr>_marker:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Delimiter sequence used to terminate a body segment.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Next parser state to run.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._writePart">
+    
+  </a>
+  <a name="_writePart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_writePart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L272">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_writePart" title="orionis.http.payload.stream_parser.MultipartStreamParser._writePart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Write a buffer prefix into the active part and enforce size limits.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">part:</span><code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></td><td class="fieldArgDesc">Current multipart part being populated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of bytes to append from the current buffer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.parse">
+    
+  </a>
+  <a name="parse">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">parse</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L624">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#parse" title="orionis.http.payload.stream_parser.MultipartStreamParser.parse">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.html#parse" class="internal-link">orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.parse</a></code></div>
+    <div><p>Parse the multipart stream and return the collected form data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code></td><td class="fieldArgDesc">Container with all parsed field values and uploaded files.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L66">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.http.payload.stream_parser.MultipartStreamParser.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.html#__slots__" class="internal-link">orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._atStart">
+    
+  </a>
+  <a name="_atStart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_atStart</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L176">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_atStart" title="orionis.http.payload.stream_parser.MultipartStreamParser._atStart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._currentPart">
+    
+  </a>
+  <a name="_currentPart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_currentPart</span>: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L181">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_currentPart" title="orionis.http.payload.stream_parser.MultipartStreamParser._currentPart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._eof">
+    
+  </a>
+  <a name="_eof">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_eof</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L177">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_eof" title="orionis.http.payload.stream_parser.MultipartStreamParser._eof">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._headerSearch">
+    
+  </a>
+  <a name="_headerSearch">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_headerSearch</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L178">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_headerSearch" title="orionis.http.payload.stream_parser.MultipartStreamParser._headerSearch">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._memorySize">
+    
+  </a>
+  <a name="_memorySize">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_memorySize</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L172">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_memorySize" title="orionis.http.payload.stream_parser.MultipartStreamParser._memorySize">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._paddingEnd">
+    
+  </a>
+  <a name="_paddingEnd">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_paddingEnd</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L180">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_paddingEnd" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingEnd">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._paddingStart">
+    
+  </a>
+  <a name="_paddingStart">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_paddingStart</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L179">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_paddingStart" title="orionis.http.payload.stream_parser.MultipartStreamParser._paddingStart">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._partMemorySize">
+    
+  </a>
+  <a name="_partMemorySize">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_partMemorySize</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L173">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_partMemorySize" title="orionis.http.payload.stream_parser.MultipartStreamParser._partMemorySize">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._pendingChunk">
+    
+  </a>
+  <a name="_pendingChunk">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_pendingChunk</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L174">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_pendingChunk" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingChunk">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._pendingOffset">
+    
+  </a>
+  <a name="_pendingOffset">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_pendingOffset</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L175">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_pendingOffset" title="orionis.http.payload.stream_parser.MultipartStreamParser._pendingOffset">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser._totalSize">
+    
+  </a>
+  <a name="_totalSize">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_totalSize</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L171">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_totalSize" title="orionis.http.payload.stream_parser.MultipartStreamParser._totalSize">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.boundary">
+    
+  </a>
+  <a name="boundary">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">boundary</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L155">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#boundary" title="orionis.http.payload.stream_parser.MultipartStreamParser.boundary">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.buffer">
+    
+  </a>
+  <a name="buffer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">buffer</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L157">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#buffer" title="orionis.http.payload.stream_parser.MultipartStreamParser.buffer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.current_part_size">
+    
+  </a>
+  <a name="current_part_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">current_part_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L170">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#current_part_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.current_part_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.fields_count">
+    
+  </a>
+  <a name="fields_count">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">fields_count</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L169">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#fields_count" title="orionis.http.payload.stream_parser.MultipartStreamParser.fields_count">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.files_count">
+    
+  </a>
+  <a name="files_count">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">files_count</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L168">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#files_count" title="orionis.http.payload.stream_parser.MultipartStreamParser.files_count">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_body_size">
+    
+  </a>
+  <a name="max_body_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_body_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L164">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_body_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_body_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_field_size">
+    
+  </a>
+  <a name="max_field_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_field_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L165">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_field_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_field_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_fields">
+    
+  </a>
+  <a name="max_fields">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_fields</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L160">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_fields" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_fields">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_files">
+    
+  </a>
+  <a name="max_files">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_files</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L159">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_files" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_files">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_header_size">
+    
+  </a>
+  <a name="max_header_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_header_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L161">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_header_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_header_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_memory_size">
+    
+  </a>
+  <a name="max_memory_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_memory_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L166">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_memory_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_memory_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.max_part_size">
+    
+  </a>
+  <a name="max_part_size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">max_part_size</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L162">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#max_part_size" title="orionis.http.payload.stream_parser.MultipartStreamParser.max_part_size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.memory_threshold">
+    
+  </a>
+  <a name="memory_threshold">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">memory_threshold</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L163">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#memory_threshold" title="orionis.http.payload.stream_parser.MultipartStreamParser.memory_threshold">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.http.payload.stream_parser.MultipartStreamParser.stream">
+    
+  </a>
+  <a name="stream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stream</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/payload/stream_parser.py#L153">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stream" title="orionis.http.payload.stream_parser.MultipartStreamParser.stream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

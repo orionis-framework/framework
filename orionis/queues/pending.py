@@ -25,6 +25,11 @@ class PendingDispatch:
             Manager entry point invoked only when awaited.
         job : BaseJob
             Instance whose declared data will be serialized on submission.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._submit = submit
         self._job: BaseJob | None = job

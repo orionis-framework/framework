@@ -40,6 +40,11 @@ class SyncQueueDriver(IQueueDriver):
             Resolver called only on terminal failure.
         retry_after : float, optional
             Execution lease used by the shared pipeline.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._serializer = serializer
         self._retry_after = retry_after
@@ -119,6 +124,11 @@ class SyncQueueDriver(IQueueDriver):
             Unused immediate reservation.
         delay : float, optional
             Requested retry delay.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
 
         Raises
         ------

@@ -72,6 +72,11 @@ class DatabaseQueueDriver(IQueueDriver):
             Shared framework connection used for queue persistence.
         table : str, optional
             Logical table name, with the connection prefix applied by DB.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._connection = connection
         self._definition = build_jobs_table(table)

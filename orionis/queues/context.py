@@ -41,6 +41,11 @@ class JobContext:
             Logical connection name.
         fail : FailureCallback
             Callback persisting a terminal failure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._driver = driver
         self._reserved = reserved
@@ -125,6 +130,11 @@ class JobContext:
         """
         Reject repeated transitions on a completed context.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         QueueLeaseError
@@ -143,6 +153,11 @@ class JobContext:
         delay : float, optional
             Nonnegative delay in seconds.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         QueueConfigurationError
@@ -160,6 +175,11 @@ class JobContext:
     async def delete(self) -> None:
         """
         Acknowledge the job and remove its reservation.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Raises
         ------
@@ -180,6 +200,11 @@ class JobContext:
         ----------
         exception : Exception
             Original application exception.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Raises
         ------

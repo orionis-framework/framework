@@ -34,6 +34,11 @@ class DatabaseFailedJobRepository(IFailedJobRepository):
             Shared framework connection used for failure persistence.
         table : str, optional
             Logical table name for recorded failures.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._connection = connection
         self._definition = build_failed_jobs_table(table)

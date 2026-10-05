@@ -1,13 +1,9 @@
-"""Check application-produced wire values before sending them to clients."""
-
 import base64
 import math
 from collections.abc import Mapping
 from datetime import datetime
 from typing import cast
-
 import msgspec
-
 from orionis.mcp.protocol.content import (
     AudioContent,
     BlobResourceContents,
@@ -55,9 +51,20 @@ _CONTENT_TYPES = {
 }
 _MAX_COMPLETIONS = 100
 
-
 def validate_json(value: object) -> None:
-    """Reject non-JSON values and nonfinite numbers rather than changing data."""
+    """
+    Reject non-JSON values and nonfinite numbers rather than changing data.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if value is None or type(value) in (str, int, bool):
         return
     if isinstance(value, float) and math.isfinite(value):
@@ -73,9 +80,22 @@ def validate_json(value: object) -> None:
     message = "MCP values must contain finite JSON data"
     raise ValueError(message)
 
-
 def validate_result(result: object, method: str) -> None:
-    """Reject invalid direct Struct construction and method/result mismatches."""
+    """
+    Reject invalid direct Struct construction and method/result mismatches.
+
+    Parameters
+    ----------
+    result : object
+        Value supplied for ``result``.
+    method : str
+        Value supplied for ``method``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     expected = _RESULT_TYPES.get(method)
     if expected is None and isinstance(result, CompleteResult):
         expected = type(result)
@@ -97,9 +117,20 @@ def validate_result(result: object, method: str) -> None:
         raise ValueError(message)
     _result_payload(result)
 
-
 def _result_payload(result: object) -> None:
-    """Check only dynamic application payloads; registry metadata is precompiled."""
+    """
+    Check only dynamic application payloads; registry metadata is precompiled.
+
+    Parameters
+    ----------
+    result : object
+        Value supplied for ``result``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if isinstance(result, CallToolResult):
         for item in result.content:
             validate_content(item)
@@ -112,16 +143,48 @@ def _result_payload(result: object) -> None:
         for item in result.messages:
             _message(item)
     elif isinstance(result, CompleteCompletionResult):
-        completion = result.completion
-        if len(completion.values) > _MAX_COMPLETIONS or (
-            completion.total is not msgspec.UNSET and completion.total < 0
-        ):
-            message = "Invalid completion result"
-            raise ValueError(message)
+        _validate_completion(result)
 
+def _validate_completion(result: CompleteCompletionResult) -> None:
+    """
+    Check completion count and total bounds before serialization.
+
+    Parameters
+    ----------
+    result : CompleteCompletionResult
+        Completion response supplied by the application.
+
+    Returns
+    -------
+    None
+        Completion values and total satisfy the protocol limits.
+
+    Raises
+    ------
+    ValueError
+        If the number of values or declared total is invalid.
+    """
+    completion = result.completion
+    if len(completion.values) > _MAX_COMPLETIONS or (
+        completion.total is not msgspec.UNSET and completion.total < 0
+    ):
+        message = "Invalid completion result"
+        raise ValueError(message)
 
 def _object(value: object) -> dict[str, object]:
-    """Convert a public wire struct without a second JSON serialization."""
+    """
+    Convert a public wire struct without a second JSON serialization.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     value = msgspec.to_builtins(value)
     if not isinstance(value, dict):
         message = "MCP content must be an object"
@@ -129,9 +192,20 @@ def _object(value: object) -> dict[str, object]:
     validate_json(value)
     return value
 
-
 def _common(value: dict[str, object]) -> None:
-    """Validate annotations and metadata shared by content variants."""
+    """
+    Validate annotations and metadata shared by content variants.
+
+    Parameters
+    ----------
+    value : dict[str, object]
+        Value to inspect, transform or validate.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     common = msgspec.convert(value, type=Content, strict=True)
     if common.meta is not msgspec.UNSET:
         validate_metadata(common.meta, allow_reserved=False)
@@ -146,9 +220,20 @@ def _common(value: dict[str, object]) -> None:
         if annotations.lastModified is not msgspec.UNSET:
             datetime.fromisoformat(annotations.lastModified)
 
-
 def validate_content(content: object) -> None:
-    """Validate all five standard MCP content variants."""
+    """
+    Validate all five standard MCP content variants.
+
+    Parameters
+    ----------
+    content : object
+        Value supplied for ``content``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     value = _object(content)
     _common(value)
     kind = value.get("type")
@@ -170,9 +255,20 @@ def validate_content(content: object) -> None:
         for icon in cast("list[object]", value.get("icons", [])):
             msgspec.convert(icon, type=Icon, strict=True)
 
-
 def validate_resource(content: object) -> None:
-    """Check text/blob resource contents and their explicit URI."""
+    """
+    Check text/blob resource contents and their explicit URI.
+
+    Parameters
+    ----------
+    content : object
+        Value supplied for ``content``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     value = _object(content)
     if ("text" in value) == ("blob" in value):
         message = "Resource contents need exactly one of text or blob"
@@ -185,9 +281,20 @@ def validate_resource(content: object) -> None:
     if "_meta" in value:
         validate_metadata(value["_meta"], allow_reserved=False)
 
-
 def _message(message: object) -> None:
-    """Validate a prompt role and its single content block."""
+    """
+    Validate a prompt role and its single content block.
+
+    Parameters
+    ----------
+    message : object
+        Value supplied for ``message``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     value = _object(message)
     if value.get("role") not in ("user", "assistant"):
         error = "Invalid prompt message role"

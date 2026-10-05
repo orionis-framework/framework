@@ -1,0 +1,1207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mail.contracts.IMailManager</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.mail.contracts.IMailManager.html" class="internal-link" title="This class"><wbr></wbr>IMail<wbr></wbr>Manager</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#attach" class="internal-link" title="orionis.mail.contracts.IMailManager.attach">attach</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bcc" class="internal-link" title="orionis.mail.contracts.IMailManager.bcc">bcc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cc" class="internal-link" title="orionis.mail.contracts.IMailManager.cc">cc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extend" class="internal-link" title="orionis.mail.contracts.IMailManager.extend">extend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fromAddress" class="internal-link" title="orionis.mail.contracts.IMailManager.fromAddress">from<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#html" class="internal-link" title="orionis.mail.contracts.IMailManager.html">html</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mailer" class="internal-link" title="orionis.mail.contracts.IMailManager.mailer">mailer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#raw" class="internal-link" title="orionis.mail.contracts.IMailManager.raw">raw</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#replyTo" class="internal-link" title="orionis.mail.contracts.IMailManager.replyTo">reply<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#send" class="internal-link" title="orionis.mail.contracts.IMailManager.send">send</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#subject" class="internal-link" title="orionis.mail.contracts.IMailManager.subject">subject</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.mail.contracts.IMailManager.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mail.contracts.IMailManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.mail.contracts.html" class="internal-link" title="The parent of this class">contracts</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12418"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.contracts.manager.html" class="internal-link" title="orionis.mail.contracts.manager">manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12419"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.contracts.transport.html" class="internal-link" title="orionis.mail.contracts.transport">transport</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12420"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.contracts.IMailManager.html" class="internal-link" title="orionis.mail.contracts.IMailManager"><wbr></wbr>IMail<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#attach" class="internal-link" title="orionis.mail.contracts.IMailManager.attach">attach</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bcc" class="internal-link" title="orionis.mail.contracts.IMailManager.bcc">bcc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cc" class="internal-link" title="orionis.mail.contracts.IMailManager.cc">cc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extend" class="internal-link" title="orionis.mail.contracts.IMailManager.extend">extend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fromAddress" class="internal-link" title="orionis.mail.contracts.IMailManager.fromAddress">from<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#html" class="internal-link" title="orionis.mail.contracts.IMailManager.html">html</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mailer" class="internal-link" title="orionis.mail.contracts.IMailManager.mailer">mailer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#raw" class="internal-link" title="orionis.mail.contracts.IMailManager.raw">raw</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#replyTo" class="internal-link" title="orionis.mail.contracts.IMailManager.replyTo">reply<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#send" class="internal-link" title="orionis.mail.contracts.IMailManager.send">send</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#subject" class="internal-link" title="orionis.mail.contracts.IMailManager.subject">subject</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.mail.contracts.IMailManager.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mail.contracts.IMailManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12421"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12421">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.contracts.IMailTransport.html" class="internal-link" title="orionis.mail.contracts.IMailTransport"><wbr></wbr>IMail<wbr></wbr>Transport</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.contracts.IMailTransport.html#send" class="internal-link" title="orionis.mail.contracts.IMailTransport.send">send</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.contracts.IMailTransport.html#__slots__" class="internal-link" title="orionis.mail.contracts.IMailTransport.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mail.html" class="internal-link" title="orionis.mail">mail</a></code><wbr></wbr>.<code><a href="orionis.mail.contracts.html" class="internal-link" title="orionis.mail.contracts">contracts</a></code><wbr></wbr>.<code><a href="orionis.mail.contracts.IMailManager.html" class="internal-link" title="orionis.mail.contracts.IMailManager">IMailManager</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IMailManager</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L16" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.contracts.IMailManager">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Expose independent composition and centrally configured mail delivery.</p>
+<p>Composition methods are synchronous and always return a new operation.
+Terminal operations are asynchronous and resolve the configured transport
+only after the message has been prepared.</p>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1197">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#attach" class="internal-link" title="orionis.mail.contracts.IMailManager.attach">attach</a></code></td>
+    <td>Start an independent chain with a deferred attachment.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#bcc" class="internal-link" title="orionis.mail.contracts.IMailManager.bcc">bcc</a></code></td>
+    <td>Start an independent chain with hidden recipients.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#cc" class="internal-link" title="orionis.mail.contracts.IMailManager.cc">cc</a></code></td>
+    <td>Start an independent chain with carbon-copy recipients.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#extend" class="internal-link" title="orionis.mail.contracts.IMailManager.extend">extend</a></code></td>
+    <td>Register one sync or async factory for a new driver.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#fromAddress" class="internal-link" title="orionis.mail.contracts.IMailManager.fromAddress">from<wbr></wbr>Address</a></code></td>
+    <td>Start an independent chain with exactly one sender.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#html" class="internal-link" title="orionis.mail.contracts.IMailManager.html">html</a></code></td>
+    <td>Send literal HTML without template interpretation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#mailer" class="internal-link" title="orionis.mail.contracts.IMailManager.mailer">mailer</a></code></td>
+    <td>Start an independent chain selecting a named mailer.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#raw" class="internal-link" title="orionis.mail.contracts.IMailManager.raw">raw</a></code></td>
+    <td>Send literal plain text without template interpretation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#replyTo" class="internal-link" title="orionis.mail.contracts.IMailManager.replyTo">reply<wbr></wbr>To</a></code></td>
+    <td>Start an independent chain with reply destinations.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#send" class="internal-link" title="orionis.mail.contracts.IMailManager.send">send</a></code></td>
+    <td>Send a Mailable, an HTML view, or Content through one pipeline.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#subject" class="internal-link" title="orionis.mail.contracts.IMailManager.subject">subject</a></code></td>
+    <td>Start an independent chain with a literal subject.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#to" class="internal-link" title="orionis.mail.contracts.IMailManager.to">to</a></code></td>
+    <td>Start an independent chain with primary recipients.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.mail.contracts.IMailManager.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.attach">
+    
+  </a>
+  <a name="attach">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">attach</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attachment: <code>Attachment</code></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L188">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#attach" title="orionis.mail.contracts.IMailManager.attach">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with a deferred attachment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attachment:</span><code><a href="orionis.mail.entities.Attachment.html" class="internal-link" title="orionis.mail.entities.Attachment">Attachment</a></code></td><td class="fieldArgDesc">Storage attachment declaration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If the value is not an attachment declaration.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.bcc">
+    
+  </a>
+  <a name="bcc">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">bcc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L121">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#bcc" title="orionis.mail.contracts.IMailManager.bcc">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with hidden recipients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addresses:</span><code>Recipients</code></td><td class="fieldArgDesc">Single mailbox or list/tuple of mailboxes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Display name for a single string mailbox only.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If a mailbox is invalid or combined with an ambiguous name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.cc">
+    
+  </a>
+  <a name="cc">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">cc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L98">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cc" title="orionis.mail.contracts.IMailManager.cc">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with carbon-copy recipients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addresses:</span><code>Recipients</code></td><td class="fieldArgDesc">Single mailbox or list/tuple of mailboxes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Display name for a single string mailbox only.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If a mailbox is invalid or combined with an ambiguous name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.extend">
+    
+  </a>
+  <a name="extend">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">extend</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">factory: <code>TransportFactory</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L318">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#extend" title="orionis.mail.contracts.IMailManager.extend">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Register one sync or async factory for a new driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique transport implementation name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">factory:</span><code>TransportFactory</code></td><td class="fieldArgDesc">Callable receiving the application and the normalized configuration
+and returning an IMailTransport or an awaitable of one.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register lazily without constructing a transport.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailConfigurationException</code></td><td>If the name or factory is invalid or the driver already exists.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.fromAddress">
+    
+  </a>
+  <a name="fromAddress">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">fromAddress</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">address: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | Address</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#fromAddress" title="orionis.mail.contracts.IMailManager.fromAddress">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with exactly one sender.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">address:</span><code>str | Address</code></td><td class="fieldArgDesc">From header and transport sender.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Optional display name, valid only with a string address.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous chain without I/O.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If the mailbox is invalid or a name is supplied twice.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.html">
+    
+  </a>
+  <a name="html">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">html</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">html: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>MailResult</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L291">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#html" title="orionis.mail.contracts.IMailManager.html">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Send literal HTML without template interpretation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">html:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Literal HTML, possibly empty.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">callback:</span><code>MessageCallback | None</code></td><td class="fieldArgDesc">Optional operation-local configurator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Transport outcome.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailException</code></td><td>If configuration, preparation, or transport fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.mailer">
+    
+  </a>
+  <a name="mailer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">mailer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L27">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#mailer" title="orionis.mail.contracts.IMailManager.mailer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain selecting a named mailer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configuration name, not a transport driver name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous chain with lazy transport resolution.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailConfigurationException</code></td><td>If the name is not a non-empty string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.raw">
+    
+  </a>
+  <a name="raw">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">raw</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">text: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>MailResult</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L264">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#raw" title="orionis.mail.contracts.IMailManager.raw">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Send literal plain text without template interpretation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">text:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Literal text, possibly empty.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">callback:</span><code>MessageCallback | None</code></td><td class="fieldArgDesc">Optional operation-local configurator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Transport outcome.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailException</code></td><td>If configuration, preparation, or transport fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.replyTo">
+    
+  </a>
+  <a name="replyTo">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">replyTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L144">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#replyTo" title="orionis.mail.contracts.IMailManager.replyTo">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with reply destinations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addresses:</span><code>Recipients</code></td><td class="fieldArgDesc">Single mailbox or list/tuple of mailboxes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Display name for a single string mailbox only.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If a mailbox is invalid or combined with an ambiguous name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.send">
+    
+  </a>
+  <a name="send">
+    
+  </a>
+  <div class="functionHeader">
+    <div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mailable: <code>Mailable | <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Mailable]</code>, </span><span class="rst-sig-symbol">/</span>) -&gt; <code>MailResult</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">/, </span><span class="rst-sig-param">data: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>MailResult</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">content: <code>Content</code>, </span><span class="rst-sig-symbol">/, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>MailResult</code>:</span></div></div>
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L209">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#send" title="orionis.mail.contracts.IMailManager.send">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Send a Mailable, an HTML view, or Content through one pipeline.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>Mailable | type[<a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a>] | str | Content</code></td><td class="fieldArgDesc">A Mailable instance or class, an HTML view name, or explicit content.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | None</code></td><td class="fieldArgDesc">Explicit view data, allowed only with a string view name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">callback:</span><code>MessageCallback | None</code></td><td class="fieldArgDesc">Sync or async Message configurator, forbidden with a Mailable.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Confirmed acceptance, partial acceptance, or file storage.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailException</code></td><td>If configuration, preparation, or transport fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.subject">
+    
+  </a>
+  <a name="subject">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">subject</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L167">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#subject" title="orionis.mail.contracts.IMailManager.subject">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with a literal subject.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Subject without control characters.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If the subject is not text or contains control characters.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.to">
+    
+  </a>
+  <a name="to">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@abstractmethod<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">to</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>PendingMail</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L75">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#to" title="orionis.mail.contracts.IMailManager.to">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start an independent chain with primary recipients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addresses:</span><code>Recipients</code></td><td class="fieldArgDesc">Single mailbox or list/tuple of mailboxes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Display name for a single string mailbox only.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code></td><td class="fieldArgDesc">A synchronous independent chain.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If a mailbox is invalid or combined with an ambiguous name.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.contracts.IMailManager.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/contracts/manager.py#L25">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.mail.contracts.IMailManager.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

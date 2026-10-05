@@ -1,0 +1,4084 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.enums.HTTPStatus</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.enums.HTTPStatus.html" class="internal-link" title="This class"><wbr></wbr>HTTPStatus</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ACCEPTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ACCEPTED">ACCEPTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ALREADY_REPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ALREADY_REPORTED">ALREADY<wbr></wbr>_REPORTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#BAD_GATEWAY" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_GATEWAY">BAD<wbr></wbr>_GATEWAY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#BAD_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_REQUEST">BAD<wbr></wbr>_REQUEST</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONFLICT" class="internal-link" title="orionis.http.enums.HTTPStatus.CONFLICT">CONFLICT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONTENT_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTENT_TOO_LARGE">CONTENT<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONTINUE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTINUE">CONTINUE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CREATED" class="internal-link" title="orionis.http.enums.HTTPStatus.CREATED">CREATED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#EARLY_HINTS" class="internal-link" title="orionis.http.enums.HTTPStatus.EARLY_HINTS">EARLY<wbr></wbr>_HINTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#EXPECTATION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.EXPECTATION_FAILED">EXPECTATION<wbr></wbr>_FAILED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FAILED_DEPENDENCY" class="internal-link" title="orionis.http.enums.HTTPStatus.FAILED_DEPENDENCY">FAILED<wbr></wbr>_DEPENDENCY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FORBIDDEN" class="internal-link" title="orionis.http.enums.HTTPStatus.FORBIDDEN">FORBIDDEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.FOUND">FOUND</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#GATEWAY_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.GATEWAY_TIMEOUT">GATEWAY<wbr></wbr>_TIMEOUT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#GONE" class="internal-link" title="orionis.http.enums.HTTPStatus.GONE">GONE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#HTTP_VERSION_NOT_SUPPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.HTTP_VERSION_NOT_SUPPORTED">HTTP<wbr></wbr>_VERSION<wbr></wbr>_NOT<wbr></wbr>_SUPPORTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#IM_A_TEAPOT" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_A_TEAPOT">IM<wbr></wbr>_A<wbr></wbr>_TEAPOT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#IM_USED" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_USED">IM<wbr></wbr>_USED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#INSUFFICIENT_STORAGE" class="internal-link" title="orionis.http.enums.HTTPStatus.INSUFFICIENT_STORAGE">INSUFFICIENT<wbr></wbr>_STORAGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#INTERNAL_SERVER_ERROR" class="internal-link" title="orionis.http.enums.HTTPStatus.INTERNAL_SERVER_ERROR">INTERNAL<wbr></wbr>_SERVER<wbr></wbr>_ERROR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LENGTH_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.LENGTH_REQUIRED">LENGTH<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LOCKED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOCKED">LOCKED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LOOP_DETECTED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOOP_DETECTED">LOOP<wbr></wbr>_DETECTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#METHOD_NOT_ALLOWED" class="internal-link" title="orionis.http.enums.HTTPStatus.METHOD_NOT_ALLOWED">METHOD<wbr></wbr>_NOT<wbr></wbr>_ALLOWED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MISDIRECTED_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.MISDIRECTED_REQUEST">MISDIRECTED<wbr></wbr>_REQUEST</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MOVED_PERMANENTLY" class="internal-link" title="orionis.http.enums.HTTPStatus.MOVED_PERMANENTLY">MOVED<wbr></wbr>_PERMANENTLY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MULTI_STATUS" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTI_STATUS">MULTI<wbr></wbr>_STATUS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MULTIPLE_CHOICES" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTIPLE_CHOICES">MULTIPLE<wbr></wbr>_CHOICES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NETWORK_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED">NETWORK<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NO_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.NO_CONTENT">NO<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NON_AUTHORITATIVE_INFORMATION" class="internal-link" title="orionis.http.enums.HTTPStatus.NON_AUTHORITATIVE_INFORMATION">NON<wbr></wbr>_AUTHORITATIVE<wbr></wbr>_INFORMATION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_ACCEPTABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_ACCEPTABLE">NOT<wbr></wbr>_ACCEPTABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_EXTENDED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_EXTENDED">NOT<wbr></wbr>_EXTENDED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_FOUND">NOT<wbr></wbr>_FOUND</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_IMPLEMENTED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_IMPLEMENTED">NOT<wbr></wbr>_IMPLEMENTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_MODIFIED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_MODIFIED">NOT<wbr></wbr>_MODIFIED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#OK" class="internal-link" title="orionis.http.enums.HTTPStatus.OK">OK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PAGE_EXPIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAGE_EXPIRED">PAGE<wbr></wbr>_EXPIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PARTIAL_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.PARTIAL_CONTENT">PARTIAL<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PAYMENT_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAYMENT_REQUIRED">PAYMENT<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PERMANENT_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.PERMANENT_REDIRECT">PERMANENT<wbr></wbr>_REDIRECT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PRECONDITION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_FAILED">PRECONDITION<wbr></wbr>_FAILED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PRECONDITION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_REQUIRED">PRECONDITION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PROCESSING" class="internal-link" title="orionis.http.enums.HTTPStatus.PROCESSING">PROCESSING</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PROXY_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PROXY_AUTHENTICATION_REQUIRED">PROXY<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#RANGE_NOT_SATISFIABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.RANGE_NOT_SATISFIABLE">RANGE<wbr></wbr>_NOT<wbr></wbr>_SATISFIABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#REQUEST_HEADER_FIELDS_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE">REQUEST<wbr></wbr>_HEADER<wbr></wbr>_FIELDS<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#REQUEST_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_TIMEOUT">REQUEST<wbr></wbr>_TIMEOUT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#RESET_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.RESET_CONTENT">RESET<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SEE_OTHER" class="internal-link" title="orionis.http.enums.HTTPStatus.SEE_OTHER">SEE<wbr></wbr>_OTHER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SERVICE_UNAVAILABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.SERVICE_UNAVAILABLE">SERVICE<wbr></wbr>_UNAVAILABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SWITCHING_PROTOCOLS" class="internal-link" title="orionis.http.enums.HTTPStatus.SWITCHING_PROTOCOLS">SWITCHING<wbr></wbr>_PROTOCOLS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TEMPORARY_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.TEMPORARY_REDIRECT">TEMPORARY<wbr></wbr>_REDIRECT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TOO_EARLY" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_EARLY">TOO<wbr></wbr>_EARLY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TOO_MANY_REQUESTS" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_MANY_REQUESTS">TOO<wbr></wbr>_MANY<wbr></wbr>_REQUESTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNAUTHORIZED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAUTHORIZED">UNAUTHORIZED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNAVAILABLE_FOR_LEGAL_REASONS" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS">UNAVAILABLE<wbr></wbr>_FOR<wbr></wbr>_LEGAL<wbr></wbr>_REASONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNPROCESSABLE_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.UNPROCESSABLE_CONTENT">UNPROCESSABLE<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNSUPPORTED_MEDIA_TYPE" class="internal-link" title="orionis.http.enums.HTTPStatus.UNSUPPORTED_MEDIA_TYPE">UNSUPPORTED<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNUSED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNUSED">UNUSED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UPGRADE_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.UPGRADE_REQUIRED">UPGRADE<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#URI_TOO_LONG" class="internal-link" title="orionis.http.enums.HTTPStatus.URI_TOO_LONG">URI<wbr></wbr>_TOO<wbr></wbr>_LONG</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#USE_PROXY" class="internal-link" title="orionis.http.enums.HTTPStatus.USE_PROXY">USE<wbr></wbr>_PROXY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#VARIANT_ALSO_NEGOTIATES" class="internal-link" title="orionis.http.enums.HTTPStatus.VARIANT_ALSO_NEGOTIATES">VARIANT<wbr></wbr>_ALSO<wbr></wbr>_NEGOTIATES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.http.enums.html" class="internal-link" title="The parent of this class">enums</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9376"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.enums.interfaces.html" class="internal-link" title="orionis.http.enums.interfaces">interfaces</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9377"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.enums.status.html" class="internal-link" title="orionis.http.enums.status">status</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9378"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.enums.HTTPStatus.html" class="internal-link" title="orionis.http.enums.HTTPStatus"><wbr></wbr>HTTPStatus</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ACCEPTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ACCEPTED">ACCEPTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ALREADY_REPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ALREADY_REPORTED">ALREADY<wbr></wbr>_REPORTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#BAD_GATEWAY" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_GATEWAY">BAD<wbr></wbr>_GATEWAY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#BAD_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_REQUEST">BAD<wbr></wbr>_REQUEST</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONFLICT" class="internal-link" title="orionis.http.enums.HTTPStatus.CONFLICT">CONFLICT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONTENT_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTENT_TOO_LARGE">CONTENT<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONTINUE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTINUE">CONTINUE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CREATED" class="internal-link" title="orionis.http.enums.HTTPStatus.CREATED">CREATED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#EARLY_HINTS" class="internal-link" title="orionis.http.enums.HTTPStatus.EARLY_HINTS">EARLY<wbr></wbr>_HINTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#EXPECTATION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.EXPECTATION_FAILED">EXPECTATION<wbr></wbr>_FAILED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FAILED_DEPENDENCY" class="internal-link" title="orionis.http.enums.HTTPStatus.FAILED_DEPENDENCY">FAILED<wbr></wbr>_DEPENDENCY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FORBIDDEN" class="internal-link" title="orionis.http.enums.HTTPStatus.FORBIDDEN">FORBIDDEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.FOUND">FOUND</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#GATEWAY_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.GATEWAY_TIMEOUT">GATEWAY<wbr></wbr>_TIMEOUT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#GONE" class="internal-link" title="orionis.http.enums.HTTPStatus.GONE">GONE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#HTTP_VERSION_NOT_SUPPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.HTTP_VERSION_NOT_SUPPORTED">HTTP<wbr></wbr>_VERSION<wbr></wbr>_NOT<wbr></wbr>_SUPPORTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#IM_A_TEAPOT" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_A_TEAPOT">IM<wbr></wbr>_A<wbr></wbr>_TEAPOT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#IM_USED" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_USED">IM<wbr></wbr>_USED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#INSUFFICIENT_STORAGE" class="internal-link" title="orionis.http.enums.HTTPStatus.INSUFFICIENT_STORAGE">INSUFFICIENT<wbr></wbr>_STORAGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#INTERNAL_SERVER_ERROR" class="internal-link" title="orionis.http.enums.HTTPStatus.INTERNAL_SERVER_ERROR">INTERNAL<wbr></wbr>_SERVER<wbr></wbr>_ERROR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LENGTH_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.LENGTH_REQUIRED">LENGTH<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LOCKED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOCKED">LOCKED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#LOOP_DETECTED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOOP_DETECTED">LOOP<wbr></wbr>_DETECTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#METHOD_NOT_ALLOWED" class="internal-link" title="orionis.http.enums.HTTPStatus.METHOD_NOT_ALLOWED">METHOD<wbr></wbr>_NOT<wbr></wbr>_ALLOWED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MISDIRECTED_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.MISDIRECTED_REQUEST">MISDIRECTED<wbr></wbr>_REQUEST</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MOVED_PERMANENTLY" class="internal-link" title="orionis.http.enums.HTTPStatus.MOVED_PERMANENTLY">MOVED<wbr></wbr>_PERMANENTLY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MULTI_STATUS" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTI_STATUS">MULTI<wbr></wbr>_STATUS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#MULTIPLE_CHOICES" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTIPLE_CHOICES">MULTIPLE<wbr></wbr>_CHOICES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NETWORK_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED">NETWORK<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NO_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.NO_CONTENT">NO<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NON_AUTHORITATIVE_INFORMATION" class="internal-link" title="orionis.http.enums.HTTPStatus.NON_AUTHORITATIVE_INFORMATION">NON<wbr></wbr>_AUTHORITATIVE<wbr></wbr>_INFORMATION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_ACCEPTABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_ACCEPTABLE">NOT<wbr></wbr>_ACCEPTABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_EXTENDED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_EXTENDED">NOT<wbr></wbr>_EXTENDED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_FOUND">NOT<wbr></wbr>_FOUND</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_IMPLEMENTED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_IMPLEMENTED">NOT<wbr></wbr>_IMPLEMENTED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#NOT_MODIFIED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_MODIFIED">NOT<wbr></wbr>_MODIFIED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#OK" class="internal-link" title="orionis.http.enums.HTTPStatus.OK">OK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PAGE_EXPIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAGE_EXPIRED">PAGE<wbr></wbr>_EXPIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PARTIAL_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.PARTIAL_CONTENT">PARTIAL<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PAYMENT_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAYMENT_REQUIRED">PAYMENT<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PERMANENT_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.PERMANENT_REDIRECT">PERMANENT<wbr></wbr>_REDIRECT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PRECONDITION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_FAILED">PRECONDITION<wbr></wbr>_FAILED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PRECONDITION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_REQUIRED">PRECONDITION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PROCESSING" class="internal-link" title="orionis.http.enums.HTTPStatus.PROCESSING">PROCESSING</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PROXY_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PROXY_AUTHENTICATION_REQUIRED">PROXY<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#RANGE_NOT_SATISFIABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.RANGE_NOT_SATISFIABLE">RANGE<wbr></wbr>_NOT<wbr></wbr>_SATISFIABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#REQUEST_HEADER_FIELDS_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE">REQUEST<wbr></wbr>_HEADER<wbr></wbr>_FIELDS<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#REQUEST_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_TIMEOUT">REQUEST<wbr></wbr>_TIMEOUT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#RESET_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.RESET_CONTENT">RESET<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SEE_OTHER" class="internal-link" title="orionis.http.enums.HTTPStatus.SEE_OTHER">SEE<wbr></wbr>_OTHER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SERVICE_UNAVAILABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.SERVICE_UNAVAILABLE">SERVICE<wbr></wbr>_UNAVAILABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#SWITCHING_PROTOCOLS" class="internal-link" title="orionis.http.enums.HTTPStatus.SWITCHING_PROTOCOLS">SWITCHING<wbr></wbr>_PROTOCOLS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TEMPORARY_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.TEMPORARY_REDIRECT">TEMPORARY<wbr></wbr>_REDIRECT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TOO_EARLY" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_EARLY">TOO<wbr></wbr>_EARLY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#TOO_MANY_REQUESTS" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_MANY_REQUESTS">TOO<wbr></wbr>_MANY<wbr></wbr>_REQUESTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNAUTHORIZED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAUTHORIZED">UNAUTHORIZED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNAVAILABLE_FOR_LEGAL_REASONS" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS">UNAVAILABLE<wbr></wbr>_FOR<wbr></wbr>_LEGAL<wbr></wbr>_REASONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNPROCESSABLE_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.UNPROCESSABLE_CONTENT">UNPROCESSABLE<wbr></wbr>_CONTENT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNSUPPORTED_MEDIA_TYPE" class="internal-link" title="orionis.http.enums.HTTPStatus.UNSUPPORTED_MEDIA_TYPE">UNSUPPORTED<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UNUSED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNUSED">UNUSED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UPGRADE_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.UPGRADE_REQUIRED">UPGRADE<wbr></wbr>_REQUIRED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#URI_TOO_LONG" class="internal-link" title="orionis.http.enums.HTTPStatus.URI_TOO_LONG">URI<wbr></wbr>_TOO<wbr></wbr>_LONG</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#USE_PROXY" class="internal-link" title="orionis.http.enums.HTTPStatus.USE_PROXY">USE<wbr></wbr>_PROXY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#VARIANT_ALSO_NEGOTIATES" class="internal-link" title="orionis.http.enums.HTTPStatus.VARIANT_ALSO_NEGOTIATES">VARIANT<wbr></wbr>_ALSO<wbr></wbr>_NEGOTIATES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9379"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9379">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.enums.Interface.html" class="internal-link" title="orionis.http.enums.Interface"><wbr></wbr>Interface</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.Interface.html#ASGI" class="internal-link" title="orionis.http.enums.Interface.ASGI">ASGI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.Interface.html#RSGI" class="internal-link" title="orionis.http.enums.Interface.RSGI">RSGI</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9380"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9380">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.enums.WebSocketStatus.html" class="internal-link" title="orionis.http.enums.WebSocketStatus"><wbr></wbr>Web<wbr></wbr>Socket<wbr></wbr>Status</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#ABNORMAL_CLOSURE" class="internal-link" title="orionis.http.enums.WebSocketStatus.ABNORMAL_CLOSURE">ABNORMAL<wbr></wbr>_CLOSURE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#BAD_GATEWAY" class="internal-link" title="orionis.http.enums.WebSocketStatus.BAD_GATEWAY">BAD<wbr></wbr>_GATEWAY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#FORBIDDEN" class="internal-link" title="orionis.http.enums.WebSocketStatus.FORBIDDEN">FORBIDDEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#GOING_AWAY" class="internal-link" title="orionis.http.enums.WebSocketStatus.GOING_AWAY">GOING<wbr></wbr>_AWAY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#INTERNAL_ERROR" class="internal-link" title="orionis.http.enums.WebSocketStatus.INTERNAL_ERROR">INTERNAL<wbr></wbr>_ERROR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#INVALID_FRAME_PAYLOAD_DATA" class="internal-link" title="orionis.http.enums.WebSocketStatus.INVALID_FRAME_PAYLOAD_DATA">INVALID<wbr></wbr>_FRAME<wbr></wbr>_PAYLOAD<wbr></wbr>_DATA</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#MANDATORY_EXT" class="internal-link" title="orionis.http.enums.WebSocketStatus.MANDATORY_EXT">MANDATORY<wbr></wbr>_EXT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#MESSAGE_TOO_BIG" class="internal-link" title="orionis.http.enums.WebSocketStatus.MESSAGE_TOO_BIG">MESSAGE<wbr></wbr>_TOO<wbr></wbr>_BIG</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#NO_STATUS_RCVD" class="internal-link" title="orionis.http.enums.WebSocketStatus.NO_STATUS_RCVD">NO<wbr></wbr>_STATUS<wbr></wbr>_RCVD</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#NORMAL_CLOSURE" class="internal-link" title="orionis.http.enums.WebSocketStatus.NORMAL_CLOSURE">NORMAL<wbr></wbr>_CLOSURE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#POLICY_VIOLATION" class="internal-link" title="orionis.http.enums.WebSocketStatus.POLICY_VIOLATION">POLICY<wbr></wbr>_VIOLATION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#PROTOCOL_ERROR" class="internal-link" title="orionis.http.enums.WebSocketStatus.PROTOCOL_ERROR">PROTOCOL<wbr></wbr>_ERROR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#RESERVED" class="internal-link" title="orionis.http.enums.WebSocketStatus.RESERVED">RESERVED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#SERVICE_RESTART" class="internal-link" title="orionis.http.enums.WebSocketStatus.SERVICE_RESTART">SERVICE<wbr></wbr>_RESTART</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#TIMEOUT" class="internal-link" title="orionis.http.enums.WebSocketStatus.TIMEOUT">TIMEOUT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#TLS_HANDSHAKE" class="internal-link" title="orionis.http.enums.WebSocketStatus.TLS_HANDSHAKE">TLS<wbr></wbr>_HANDSHAKE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#TRY_AGAIN_LATER" class="internal-link" title="orionis.http.enums.WebSocketStatus.TRY_AGAIN_LATER">TRY<wbr></wbr>_AGAIN<wbr></wbr>_LATER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#UNAUTHORIZED" class="internal-link" title="orionis.http.enums.WebSocketStatus.UNAUTHORIZED">UNAUTHORIZED</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.enums.WebSocketStatus.html#UNSUPPORTED_DATA" class="internal-link" title="orionis.http.enums.WebSocketStatus.UNSUPPORTED_DATA">UNSUPPORTED<wbr></wbr>_DATA</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.enums.html" class="internal-link" title="orionis.http.enums">enums</a></code><wbr></wbr>.<code><a href="orionis.http.enums.HTTPStatus.html" class="internal-link" title="orionis.http.enums.HTTPStatus">HTTPStatus</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HTTPStatus</span>(IntEnum): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L3" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.enums.HTTPStatus">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id951">
+  
+  
+  <tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#ACCEPTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ACCEPTED">ACCEPTED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#ALREADY_REPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.ALREADY_REPORTED">ALREADY<wbr></wbr>_REPORTED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#BAD_GATEWAY" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_GATEWAY">BAD<wbr></wbr>_GATEWAY</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#BAD_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.BAD_REQUEST">BAD<wbr></wbr>_REQUEST</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CONFLICT" class="internal-link" title="orionis.http.enums.HTTPStatus.CONFLICT">CONFLICT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CONTENT_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTENT_TOO_LARGE">CONTENT<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CONTINUE" class="internal-link" title="orionis.http.enums.HTTPStatus.CONTINUE">CONTINUE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CREATED" class="internal-link" title="orionis.http.enums.HTTPStatus.CREATED">CREATED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#EARLY_HINTS" class="internal-link" title="orionis.http.enums.HTTPStatus.EARLY_HINTS">EARLY<wbr></wbr>_HINTS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#EXPECTATION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.EXPECTATION_FAILED">EXPECTATION<wbr></wbr>_FAILED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#FAILED_DEPENDENCY" class="internal-link" title="orionis.http.enums.HTTPStatus.FAILED_DEPENDENCY">FAILED<wbr></wbr>_DEPENDENCY</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#FORBIDDEN" class="internal-link" title="orionis.http.enums.HTTPStatus.FORBIDDEN">FORBIDDEN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.FOUND">FOUND</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#GATEWAY_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.GATEWAY_TIMEOUT">GATEWAY<wbr></wbr>_TIMEOUT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#GONE" class="internal-link" title="orionis.http.enums.HTTPStatus.GONE">GONE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#HTTP_VERSION_NOT_SUPPORTED" class="internal-link" title="orionis.http.enums.HTTPStatus.HTTP_VERSION_NOT_SUPPORTED">HTTP<wbr></wbr>_VERSION<wbr></wbr>_NOT<wbr></wbr>_SUPPORTED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#IM_A_TEAPOT" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_A_TEAPOT">IM<wbr></wbr>_A<wbr></wbr>_TEAPOT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#IM_USED" class="internal-link" title="orionis.http.enums.HTTPStatus.IM_USED">IM<wbr></wbr>_USED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#INSUFFICIENT_STORAGE" class="internal-link" title="orionis.http.enums.HTTPStatus.INSUFFICIENT_STORAGE">INSUFFICIENT<wbr></wbr>_STORAGE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#INTERNAL_SERVER_ERROR" class="internal-link" title="orionis.http.enums.HTTPStatus.INTERNAL_SERVER_ERROR">INTERNAL<wbr></wbr>_SERVER<wbr></wbr>_ERROR</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#LENGTH_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.LENGTH_REQUIRED">LENGTH<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#LOCKED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOCKED">LOCKED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#LOOP_DETECTED" class="internal-link" title="orionis.http.enums.HTTPStatus.LOOP_DETECTED">LOOP<wbr></wbr>_DETECTED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#METHOD_NOT_ALLOWED" class="internal-link" title="orionis.http.enums.HTTPStatus.METHOD_NOT_ALLOWED">METHOD<wbr></wbr>_NOT<wbr></wbr>_ALLOWED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#MISDIRECTED_REQUEST" class="internal-link" title="orionis.http.enums.HTTPStatus.MISDIRECTED_REQUEST">MISDIRECTED<wbr></wbr>_REQUEST</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#MOVED_PERMANENTLY" class="internal-link" title="orionis.http.enums.HTTPStatus.MOVED_PERMANENTLY">MOVED<wbr></wbr>_PERMANENTLY</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#MULTI_STATUS" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTI_STATUS">MULTI<wbr></wbr>_STATUS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#MULTIPLE_CHOICES" class="internal-link" title="orionis.http.enums.HTTPStatus.MULTIPLE_CHOICES">MULTIPLE<wbr></wbr>_CHOICES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NETWORK_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED">NETWORK<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NO_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.NO_CONTENT">NO<wbr></wbr>_CONTENT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NON_AUTHORITATIVE_INFORMATION" class="internal-link" title="orionis.http.enums.HTTPStatus.NON_AUTHORITATIVE_INFORMATION">NON<wbr></wbr>_AUTHORITATIVE<wbr></wbr>_INFORMATION</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NOT_ACCEPTABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_ACCEPTABLE">NOT<wbr></wbr>_ACCEPTABLE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NOT_EXTENDED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_EXTENDED">NOT<wbr></wbr>_EXTENDED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NOT_FOUND" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_FOUND">NOT<wbr></wbr>_FOUND</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NOT_IMPLEMENTED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_IMPLEMENTED">NOT<wbr></wbr>_IMPLEMENTED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#NOT_MODIFIED" class="internal-link" title="orionis.http.enums.HTTPStatus.NOT_MODIFIED">NOT<wbr></wbr>_MODIFIED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#OK" class="internal-link" title="orionis.http.enums.HTTPStatus.OK">OK</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PAGE_EXPIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAGE_EXPIRED">PAGE<wbr></wbr>_EXPIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PARTIAL_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.PARTIAL_CONTENT">PARTIAL<wbr></wbr>_CONTENT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PAYMENT_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PAYMENT_REQUIRED">PAYMENT<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PERMANENT_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.PERMANENT_REDIRECT">PERMANENT<wbr></wbr>_REDIRECT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PRECONDITION_FAILED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_FAILED">PRECONDITION<wbr></wbr>_FAILED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PRECONDITION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PRECONDITION_REQUIRED">PRECONDITION<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PROCESSING" class="internal-link" title="orionis.http.enums.HTTPStatus.PROCESSING">PROCESSING</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PROXY_AUTHENTICATION_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.PROXY_AUTHENTICATION_REQUIRED">PROXY<wbr></wbr>_AUTHENTICATION<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#RANGE_NOT_SATISFIABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.RANGE_NOT_SATISFIABLE">RANGE<wbr></wbr>_NOT<wbr></wbr>_SATISFIABLE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#REQUEST_HEADER_FIELDS_TOO_LARGE" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE">REQUEST<wbr></wbr>_HEADER<wbr></wbr>_FIELDS<wbr></wbr>_TOO<wbr></wbr>_LARGE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#REQUEST_TIMEOUT" class="internal-link" title="orionis.http.enums.HTTPStatus.REQUEST_TIMEOUT">REQUEST<wbr></wbr>_TIMEOUT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#RESET_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.RESET_CONTENT">RESET<wbr></wbr>_CONTENT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#SEE_OTHER" class="internal-link" title="orionis.http.enums.HTTPStatus.SEE_OTHER">SEE<wbr></wbr>_OTHER</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#SERVICE_UNAVAILABLE" class="internal-link" title="orionis.http.enums.HTTPStatus.SERVICE_UNAVAILABLE">SERVICE<wbr></wbr>_UNAVAILABLE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#SWITCHING_PROTOCOLS" class="internal-link" title="orionis.http.enums.HTTPStatus.SWITCHING_PROTOCOLS">SWITCHING<wbr></wbr>_PROTOCOLS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#TEMPORARY_REDIRECT" class="internal-link" title="orionis.http.enums.HTTPStatus.TEMPORARY_REDIRECT">TEMPORARY<wbr></wbr>_REDIRECT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#TOO_EARLY" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_EARLY">TOO<wbr></wbr>_EARLY</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#TOO_MANY_REQUESTS" class="internal-link" title="orionis.http.enums.HTTPStatus.TOO_MANY_REQUESTS">TOO<wbr></wbr>_MANY<wbr></wbr>_REQUESTS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UNAUTHORIZED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAUTHORIZED">UNAUTHORIZED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UNAVAILABLE_FOR_LEGAL_REASONS" class="internal-link" title="orionis.http.enums.HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS">UNAVAILABLE<wbr></wbr>_FOR<wbr></wbr>_LEGAL<wbr></wbr>_REASONS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UNPROCESSABLE_CONTENT" class="internal-link" title="orionis.http.enums.HTTPStatus.UNPROCESSABLE_CONTENT">UNPROCESSABLE<wbr></wbr>_CONTENT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UNSUPPORTED_MEDIA_TYPE" class="internal-link" title="orionis.http.enums.HTTPStatus.UNSUPPORTED_MEDIA_TYPE">UNSUPPORTED<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UNUSED" class="internal-link" title="orionis.http.enums.HTTPStatus.UNUSED">UNUSED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UPGRADE_REQUIRED" class="internal-link" title="orionis.http.enums.HTTPStatus.UPGRADE_REQUIRED">UPGRADE<wbr></wbr>_REQUIRED</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#URI_TOO_LONG" class="internal-link" title="orionis.http.enums.HTTPStatus.URI_TOO_LONG">URI<wbr></wbr>_TOO<wbr></wbr>_LONG</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#USE_PROXY" class="internal-link" title="orionis.http.enums.HTTPStatus.USE_PROXY">USE<wbr></wbr>_PROXY</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#VARIANT_ALSO_NEGOTIATES" class="internal-link" title="orionis.http.enums.HTTPStatus.VARIANT_ALSO_NEGOTIATES">VARIANT<wbr></wbr>_ALSO<wbr></wbr>_NEGOTIATES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.ACCEPTED">
+    
+  </a>
+  <a name="ACCEPTED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">ACCEPTED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L10">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#ACCEPTED" title="orionis.http.enums.HTTPStatus.ACCEPTED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>202</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.ALREADY_REPORTED">
+    
+  </a>
+  <a name="ALREADY_REPORTED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">ALREADY_REPORTED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L16">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#ALREADY_REPORTED" title="orionis.http.enums.HTTPStatus.ALREADY_REPORTED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>208</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.BAD_GATEWAY">
+    
+  </a>
+  <a name="BAD_GATEWAY">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">BAD_GATEWAY</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L59">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#BAD_GATEWAY" title="orionis.http.enums.HTTPStatus.BAD_GATEWAY">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>502</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.BAD_REQUEST">
+    
+  </a>
+  <a name="BAD_REQUEST">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">BAD_REQUEST</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L27">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#BAD_REQUEST" title="orionis.http.enums.HTTPStatus.BAD_REQUEST">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>400</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.CONFLICT">
+    
+  </a>
+  <a name="CONFLICT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CONFLICT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L36">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CONFLICT" title="orionis.http.enums.HTTPStatus.CONFLICT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>409</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.CONTENT_TOO_LARGE">
+    
+  </a>
+  <a name="CONTENT_TOO_LARGE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CONTENT_TOO_LARGE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L40">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CONTENT_TOO_LARGE" title="orionis.http.enums.HTTPStatus.CONTENT_TOO_LARGE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>413</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.CONTINUE">
+    
+  </a>
+  <a name="CONTINUE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CONTINUE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L4">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CONTINUE" title="orionis.http.enums.HTTPStatus.CONTINUE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>100</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.CREATED">
+    
+  </a>
+  <a name="CREATED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CREATED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L9">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CREATED" title="orionis.http.enums.HTTPStatus.CREATED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>201</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.EARLY_HINTS">
+    
+  </a>
+  <a name="EARLY_HINTS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">EARLY_HINTS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L7">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#EARLY_HINTS" title="orionis.http.enums.HTTPStatus.EARLY_HINTS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>103</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.EXPECTATION_FAILED">
+    
+  </a>
+  <a name="EXPECTATION_FAILED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">EXPECTATION_FAILED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L44">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#EXPECTATION_FAILED" title="orionis.http.enums.HTTPStatus.EXPECTATION_FAILED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>417</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.FAILED_DEPENDENCY">
+    
+  </a>
+  <a name="FAILED_DEPENDENCY">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">FAILED_DEPENDENCY</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#FAILED_DEPENDENCY" title="orionis.http.enums.HTTPStatus.FAILED_DEPENDENCY">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>424</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.FORBIDDEN">
+    
+  </a>
+  <a name="FORBIDDEN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">FORBIDDEN</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L30">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#FORBIDDEN" title="orionis.http.enums.HTTPStatus.FORBIDDEN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>403</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.FOUND">
+    
+  </a>
+  <a name="FOUND">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">FOUND</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#FOUND" title="orionis.http.enums.HTTPStatus.FOUND">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>302</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.GATEWAY_TIMEOUT">
+    
+  </a>
+  <a name="GATEWAY_TIMEOUT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">GATEWAY_TIMEOUT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#GATEWAY_TIMEOUT" title="orionis.http.enums.HTTPStatus.GATEWAY_TIMEOUT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>504</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.GONE">
+    
+  </a>
+  <a name="GONE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">GONE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L37">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#GONE" title="orionis.http.enums.HTTPStatus.GONE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>410</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.HTTP_VERSION_NOT_SUPPORTED">
+    
+  </a>
+  <a name="HTTP_VERSION_NOT_SUPPORTED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">HTTP_VERSION_NOT_SUPPORTED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L62">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#HTTP_VERSION_NOT_SUPPORTED" title="orionis.http.enums.HTTPStatus.HTTP_VERSION_NOT_SUPPORTED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>505</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.IM_A_TEAPOT">
+    
+  </a>
+  <a name="IM_A_TEAPOT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">IM_A_TEAPOT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L45">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#IM_A_TEAPOT" title="orionis.http.enums.HTTPStatus.IM_A_TEAPOT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>418</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.IM_USED">
+    
+  </a>
+  <a name="IM_USED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">IM_USED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L17">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#IM_USED" title="orionis.http.enums.HTTPStatus.IM_USED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>226</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.INSUFFICIENT_STORAGE">
+    
+  </a>
+  <a name="INSUFFICIENT_STORAGE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">INSUFFICIENT_STORAGE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#INSUFFICIENT_STORAGE" title="orionis.http.enums.HTTPStatus.INSUFFICIENT_STORAGE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>507</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.INTERNAL_SERVER_ERROR">
+    
+  </a>
+  <a name="INTERNAL_SERVER_ERROR">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">INTERNAL_SERVER_ERROR</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L57">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#INTERNAL_SERVER_ERROR" title="orionis.http.enums.HTTPStatus.INTERNAL_SERVER_ERROR">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>500</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.LENGTH_REQUIRED">
+    
+  </a>
+  <a name="LENGTH_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">LENGTH_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L38">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#LENGTH_REQUIRED" title="orionis.http.enums.HTTPStatus.LENGTH_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>411</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.LOCKED">
+    
+  </a>
+  <a name="LOCKED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">LOCKED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L49">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#LOCKED" title="orionis.http.enums.HTTPStatus.LOCKED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>423</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.LOOP_DETECTED">
+    
+  </a>
+  <a name="LOOP_DETECTED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">LOOP_DETECTED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L65">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#LOOP_DETECTED" title="orionis.http.enums.HTTPStatus.LOOP_DETECTED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>508</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.METHOD_NOT_ALLOWED">
+    
+  </a>
+  <a name="METHOD_NOT_ALLOWED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">METHOD_NOT_ALLOWED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L32">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#METHOD_NOT_ALLOWED" title="orionis.http.enums.HTTPStatus.METHOD_NOT_ALLOWED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>405</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.MISDIRECTED_REQUEST">
+    
+  </a>
+  <a name="MISDIRECTED_REQUEST">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">MISDIRECTED_REQUEST</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#MISDIRECTED_REQUEST" title="orionis.http.enums.HTTPStatus.MISDIRECTED_REQUEST">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>421</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.MOVED_PERMANENTLY">
+    
+  </a>
+  <a name="MOVED_PERMANENTLY">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">MOVED_PERMANENTLY</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L19">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#MOVED_PERMANENTLY" title="orionis.http.enums.HTTPStatus.MOVED_PERMANENTLY">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>301</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.MULTI_STATUS">
+    
+  </a>
+  <a name="MULTI_STATUS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">MULTI_STATUS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#MULTI_STATUS" title="orionis.http.enums.HTTPStatus.MULTI_STATUS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>207</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.MULTIPLE_CHOICES">
+    
+  </a>
+  <a name="MULTIPLE_CHOICES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">MULTIPLE_CHOICES</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#MULTIPLE_CHOICES" title="orionis.http.enums.HTTPStatus.MULTIPLE_CHOICES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>300</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED">
+    
+  </a>
+  <a name="NETWORK_AUTHENTICATION_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NETWORK_AUTHENTICATION_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L67">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NETWORK_AUTHENTICATION_REQUIRED" title="orionis.http.enums.HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>511</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NO_CONTENT">
+    
+  </a>
+  <a name="NO_CONTENT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NO_CONTENT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L12">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NO_CONTENT" title="orionis.http.enums.HTTPStatus.NO_CONTENT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>204</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NON_AUTHORITATIVE_INFORMATION">
+    
+  </a>
+  <a name="NON_AUTHORITATIVE_INFORMATION">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NON_AUTHORITATIVE_INFORMATION</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L11">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NON_AUTHORITATIVE_INFORMATION" title="orionis.http.enums.HTTPStatus.NON_AUTHORITATIVE_INFORMATION">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>203</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NOT_ACCEPTABLE">
+    
+  </a>
+  <a name="NOT_ACCEPTABLE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NOT_ACCEPTABLE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L33">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NOT_ACCEPTABLE" title="orionis.http.enums.HTTPStatus.NOT_ACCEPTABLE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>406</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NOT_EXTENDED">
+    
+  </a>
+  <a name="NOT_EXTENDED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NOT_EXTENDED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L66">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NOT_EXTENDED" title="orionis.http.enums.HTTPStatus.NOT_EXTENDED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>510</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NOT_FOUND">
+    
+  </a>
+  <a name="NOT_FOUND">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NOT_FOUND</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NOT_FOUND" title="orionis.http.enums.HTTPStatus.NOT_FOUND">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>404</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NOT_IMPLEMENTED">
+    
+  </a>
+  <a name="NOT_IMPLEMENTED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NOT_IMPLEMENTED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L58">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NOT_IMPLEMENTED" title="orionis.http.enums.HTTPStatus.NOT_IMPLEMENTED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>501</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.NOT_MODIFIED">
+    
+  </a>
+  <a name="NOT_MODIFIED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">NOT_MODIFIED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L22">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#NOT_MODIFIED" title="orionis.http.enums.HTTPStatus.NOT_MODIFIED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>304</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.OK">
+    
+  </a>
+  <a name="OK">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">OK</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L8">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#OK" title="orionis.http.enums.HTTPStatus.OK">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>200</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PAGE_EXPIRED">
+    
+  </a>
+  <a name="PAGE_EXPIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PAGE_EXPIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L46">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PAGE_EXPIRED" title="orionis.http.enums.HTTPStatus.PAGE_EXPIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>419</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PARTIAL_CONTENT">
+    
+  </a>
+  <a name="PARTIAL_CONTENT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PARTIAL_CONTENT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L14">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PARTIAL_CONTENT" title="orionis.http.enums.HTTPStatus.PARTIAL_CONTENT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>206</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PAYMENT_REQUIRED">
+    
+  </a>
+  <a name="PAYMENT_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PAYMENT_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L29">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PAYMENT_REQUIRED" title="orionis.http.enums.HTTPStatus.PAYMENT_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>402</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PERMANENT_REDIRECT">
+    
+  </a>
+  <a name="PERMANENT_REDIRECT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PERMANENT_REDIRECT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PERMANENT_REDIRECT" title="orionis.http.enums.HTTPStatus.PERMANENT_REDIRECT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>308</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PRECONDITION_FAILED">
+    
+  </a>
+  <a name="PRECONDITION_FAILED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PRECONDITION_FAILED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L39">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PRECONDITION_FAILED" title="orionis.http.enums.HTTPStatus.PRECONDITION_FAILED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>412</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PRECONDITION_REQUIRED">
+    
+  </a>
+  <a name="PRECONDITION_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PRECONDITION_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L53">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PRECONDITION_REQUIRED" title="orionis.http.enums.HTTPStatus.PRECONDITION_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>428</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PROCESSING">
+    
+  </a>
+  <a name="PROCESSING">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PROCESSING</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L6">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PROCESSING" title="orionis.http.enums.HTTPStatus.PROCESSING">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>102</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.PROXY_AUTHENTICATION_REQUIRED">
+    
+  </a>
+  <a name="PROXY_AUTHENTICATION_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PROXY_AUTHENTICATION_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PROXY_AUTHENTICATION_REQUIRED" title="orionis.http.enums.HTTPStatus.PROXY_AUTHENTICATION_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>407</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.RANGE_NOT_SATISFIABLE">
+    
+  </a>
+  <a name="RANGE_NOT_SATISFIABLE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">RANGE_NOT_SATISFIABLE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L43">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#RANGE_NOT_SATISFIABLE" title="orionis.http.enums.HTTPStatus.RANGE_NOT_SATISFIABLE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>416</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE">
+    
+  </a>
+  <a name="REQUEST_HEADER_FIELDS_TOO_LARGE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">REQUEST_HEADER_FIELDS_TOO_LARGE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#REQUEST_HEADER_FIELDS_TOO_LARGE" title="orionis.http.enums.HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>431</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.REQUEST_TIMEOUT">
+    
+  </a>
+  <a name="REQUEST_TIMEOUT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">REQUEST_TIMEOUT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L35">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#REQUEST_TIMEOUT" title="orionis.http.enums.HTTPStatus.REQUEST_TIMEOUT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>408</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.RESET_CONTENT">
+    
+  </a>
+  <a name="RESET_CONTENT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">RESET_CONTENT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L13">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#RESET_CONTENT" title="orionis.http.enums.HTTPStatus.RESET_CONTENT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>205</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.SEE_OTHER">
+    
+  </a>
+  <a name="SEE_OTHER">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">SEE_OTHER</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#SEE_OTHER" title="orionis.http.enums.HTTPStatus.SEE_OTHER">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>303</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.SERVICE_UNAVAILABLE">
+    
+  </a>
+  <a name="SERVICE_UNAVAILABLE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">SERVICE_UNAVAILABLE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L60">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#SERVICE_UNAVAILABLE" title="orionis.http.enums.HTTPStatus.SERVICE_UNAVAILABLE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>503</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.SWITCHING_PROTOCOLS">
+    
+  </a>
+  <a name="SWITCHING_PROTOCOLS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">SWITCHING_PROTOCOLS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L5">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#SWITCHING_PROTOCOLS" title="orionis.http.enums.HTTPStatus.SWITCHING_PROTOCOLS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>101</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.TEMPORARY_REDIRECT">
+    
+  </a>
+  <a name="TEMPORARY_REDIRECT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">TEMPORARY_REDIRECT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L25">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#TEMPORARY_REDIRECT" title="orionis.http.enums.HTTPStatus.TEMPORARY_REDIRECT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>307</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.TOO_EARLY">
+    
+  </a>
+  <a name="TOO_EARLY">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">TOO_EARLY</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L51">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#TOO_EARLY" title="orionis.http.enums.HTTPStatus.TOO_EARLY">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>425</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.TOO_MANY_REQUESTS">
+    
+  </a>
+  <a name="TOO_MANY_REQUESTS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">TOO_MANY_REQUESTS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L54">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#TOO_MANY_REQUESTS" title="orionis.http.enums.HTTPStatus.TOO_MANY_REQUESTS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>429</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UNAUTHORIZED">
+    
+  </a>
+  <a name="UNAUTHORIZED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UNAUTHORIZED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L28">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UNAUTHORIZED" title="orionis.http.enums.HTTPStatus.UNAUTHORIZED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>401</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS">
+    
+  </a>
+  <a name="UNAVAILABLE_FOR_LEGAL_REASONS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UNAVAILABLE_FOR_LEGAL_REASONS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L56">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UNAVAILABLE_FOR_LEGAL_REASONS" title="orionis.http.enums.HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>451</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UNPROCESSABLE_CONTENT">
+    
+  </a>
+  <a name="UNPROCESSABLE_CONTENT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UNPROCESSABLE_CONTENT</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UNPROCESSABLE_CONTENT" title="orionis.http.enums.HTTPStatus.UNPROCESSABLE_CONTENT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>422</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UNSUPPORTED_MEDIA_TYPE">
+    
+  </a>
+  <a name="UNSUPPORTED_MEDIA_TYPE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UNSUPPORTED_MEDIA_TYPE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L42">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UNSUPPORTED_MEDIA_TYPE" title="orionis.http.enums.HTTPStatus.UNSUPPORTED_MEDIA_TYPE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>415</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UNUSED">
+    
+  </a>
+  <a name="UNUSED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UNUSED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L24">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UNUSED" title="orionis.http.enums.HTTPStatus.UNUSED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>306</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.UPGRADE_REQUIRED">
+    
+  </a>
+  <a name="UPGRADE_REQUIRED">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UPGRADE_REQUIRED</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L52">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UPGRADE_REQUIRED" title="orionis.http.enums.HTTPStatus.UPGRADE_REQUIRED">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>426</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.URI_TOO_LONG">
+    
+  </a>
+  <a name="URI_TOO_LONG">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">URI_TOO_LONG</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L41">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#URI_TOO_LONG" title="orionis.http.enums.HTTPStatus.URI_TOO_LONG">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>414</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.USE_PROXY">
+    
+  </a>
+  <a name="USE_PROXY">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">USE_PROXY</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#USE_PROXY" title="orionis.http.enums.HTTPStatus.USE_PROXY">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>305</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.http.enums.HTTPStatus.VARIANT_ALSO_NEGOTIATES">
+    
+  </a>
+  <a name="VARIANT_ALSO_NEGOTIATES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">VARIANT_ALSO_NEGOTIATES</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/enums/status.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#VARIANT_ALSO_NEGOTIATES" title="orionis.http.enums.HTTPStatus.VARIANT_ALSO_NEGOTIATES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>506</code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.routes.route_compiler.RouteCompiler</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.routes.route_compiler.RouteCompiler.html" class="internal-link" title="This class"><wbr></wbr>Route<wbr></wbr>Compiler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildAction" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildAction">__build<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildPathRegex" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildPathRegex">__build<wbr></wbr>Path<wbr></wbr>Regex</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__routeMetrics" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeMetrics">__route<wbr></wbr>Metrics</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__routeSignature" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeSignature">__route<wbr></wbr>Signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compilePath" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compilePath">compile<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__compileRoute" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__compileRoute">__compile<wbr></wbr>Route</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compile" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compile">compile</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.routes.route_compiler.html" class="internal-link" title="The parent of this class">route<wbr></wbr>_compiler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10382"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.routes.route_compiler.RouteCompiler.html" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler"><wbr></wbr>Route<wbr></wbr>Compiler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildAction" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildAction">__build<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__buildPathRegex" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildPathRegex">__build<wbr></wbr>Path<wbr></wbr>Regex</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__routeMetrics" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeMetrics">__route<wbr></wbr>Metrics</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__routeSignature" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeSignature">__route<wbr></wbr>Signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compilePath" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compilePath">compile<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__compileRoute" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__compileRoute">__compile<wbr></wbr>Route</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#compile" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compile">compile</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_compiler.html#_action_name" class="internal-link" title="orionis.http.routes.route_compiler._action_name">_action<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_compiler.html#_register_name" class="internal-link" title="orionis.http.routes.route_compiler._register_name">_register<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_compiler.html#_validate_literal" class="internal-link" title="orionis.http.routes.route_compiler._validate_literal">_validate<wbr></wbr>_literal</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_compiler.html#_NAMED_GROUP_RE" class="internal-link" title="orionis.http.routes.route_compiler._NAMED_GROUP_RE">_NAMED<wbr></wbr>_GROUP<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.route_compiler.html#_PARAM_RE" class="internal-link" title="orionis.http.routes.route_compiler._PARAM_RE">_PARAM<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.routes.html" class="internal-link" title="orionis.http.routes">routes</a></code><wbr></wbr>.<code><a href="orionis.http.routes.route_compiler.html" class="internal-link" title="orionis.http.routes.route_compiler">route_compiler</a></code><wbr></wbr>.<code><a href="orionis.http.routes.route_compiler.RouteCompiler.html" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler">RouteCompiler</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteCompiler</span>(<a href="orionis.http.routes.contracts.route_compiler.IRouteCompiler.html" class="internal-link" title="orionis.http.routes.contracts.route_compiler.IRouteCompiler">IRouteCompiler</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L102" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_compiler.RouteCompiler">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1062">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__buildAction" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildAction">__build<wbr></wbr>Action</a></code></td>
+    <td>Resolve the handler type and build the action descriptor for a route.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__buildPathRegex" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__buildPathRegex">__build<wbr></wbr>Path<wbr></wbr>Regex</a></code></td>
+    <td>Compile a route path with placeholders into a regex and converters.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__routeMetrics" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeMetrics">__route<wbr></wbr>Metrics</a></code></td>
+    <td>Compute the segment count and specificity score for a route path.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__routeSignature" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__routeSignature">__route<wbr></wbr>Signature</a></code></td>
+    <td>Build a collision-detection key for a dynamic route.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#compilePath" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compilePath">compile<wbr></wbr>Path</a></code></td>
+    <td>Determine whether a path is static or dynamic and compile its regex.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__compileRoute" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.__compileRoute">__compile<wbr></wbr>Route</a></code></td>
+    <td>Compile a single raw route dict into a <tt class="rst-docutils rst-literal">CompiledRoute</tt>.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#compile" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compile">compile</a></code></td>
+    <td>Compile a list of raw route dicts into a ready-to-dispatch structure.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.__buildAction">
+    
+  </a>
+  <a name="__buildAction">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildAction</span><span class="function-signature">(<span class="rst-sig-param">route: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.http.routes.enums.route_types.RouteType.html" class="internal-link" title="orionis.http.routes.enums.route_types.RouteType">RouteType</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L323">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__buildAction" title="orionis.http.routes.route_compiler.RouteCompiler.__buildAction">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the handler type and build the action descriptor for a route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Raw route dictionary from the router export.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.http.routes.enums.route_types.RouteType.html" class="internal-link" title="orionis.http.routes.enums.route_types.RouteType">RouteType</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code></td><td class="fieldArgDesc">A tuple of the resolved <tt class="rst-docutils rst-literal">RouteType</tt> and an action
+descriptor dict containing the information needed to
+dispatch the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an invokable class does not define <tt class="rst-docutils rst-literal">__call__</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.__buildPathRegex">
+    
+  </a>
+  <a name="__buildPathRegex">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildPathRegex</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L381">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__buildPathRegex" title="orionis.http.routes.route_compiler.RouteCompiler.__buildPathRegex">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile a route path with placeholders into a regex and converters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Route path containing placeholders,
+e.g. <tt class="rst-docutils rst-literal"><span class="pre">'/user/{id:int}'</span></tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]]</code></td><td class="fieldArgDesc">Compiled regex pattern and a dict mapping parameter names
+to their converter callables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an unknown parameter type is encountered in the path.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.__routeMetrics">
+    
+  </a>
+  <a name="__routeMetrics">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__routeMetrics</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L469">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__routeMetrics" title="orionis.http.routes.route_compiler.RouteCompiler.__routeMetrics">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compute the segment count and specificity score for a route path.</p>
+<p>Higher scores are more specific and should be matched first.
+The formula weights static segments heavily so that
+<tt class="rst-docutils rst-literal">/users/me</tt> (score 20) always beats <tt class="rst-docutils rst-literal"><span class="pre">/users/{id}</span></tt>
+(score 9).</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The route path, e.g. <tt class="rst-docutils rst-literal"><span class="pre">'/users/{id}/settings'</span></tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">(segment_count, priority_score)</tt> where the score is
+<tt class="rst-docutils rst-literal">static_segments * 10 - dynamic_segments</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.__routeSignature">
+    
+  </a>
+  <a name="__routeSignature">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__routeSignature</span><span class="function-signature">(<span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">regex: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L440">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__routeSignature" title="orionis.http.routes.route_compiler.RouteCompiler.__routeSignature">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build a collision-detection key for a dynamic route.</p>
+<p>Two routes collide when they match the same set of URLs regardless
+of parameter names, e.g. <tt class="rst-docutils rst-literal"><span class="pre">/users/{id}</span></tt> and <tt class="rst-docutils rst-literal"><span class="pre">/users/{name}</span></tt>
+both produce <tt class="rst-docutils rst-literal"><span class="pre">^/users/(?P&lt;param&gt;[^/]+)$</span></tt>.</p>
+<p>The key normalises every named capture group to the fixed
+placeholder <tt class="rst-docutils rst-literal">param</tt> and prefixes with the HTTP method:</p>
+<pre class="rst-literal-block">
+GET:^/users/(?P&lt;param&gt;[^/]+)$
+</pre>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method in uppercase.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">regex:</span><code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code></td><td class="fieldArgDesc">Compiled route regex.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalised signature string.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.compilePath">
+    
+  </a>
+  <a name="compilePath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">compilePath</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <wbr></wbr><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L200">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#compilePath" title="orionis.http.routes.route_compiler.RouteCompiler.compilePath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_compiler.IRouteCompiler.html#compilePath" class="internal-link">orionis.http.routes.contracts.route_compiler.IRouteCompiler.compilePath</a></code></div>
+    <div><p>Determine whether a path is static or dynamic and compile its regex.</p>
+<p>This method is intentionally public so that <code><a href="orionis.http.routes.route_cache.RouteCache.html" class="internal-link" title="orionis.http.routes.route_cache.RouteCache">RouteCache</a></code>
+can call it during cache deserialisation to reconstruct <tt class="rst-docutils rst-literal">regex</tt>
+and <tt class="rst-docutils rst-literal">converters</tt> without ever persisting callable objects.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The route path, e.g. <tt class="rst-docutils rst-literal"><span class="pre">'/users/{id:int}'</span></tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, re.Pattern | None, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]]</code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">(is_static, regex, converters)</tt> — <tt class="rst-docutils rst-literal">regex</tt> and
+<tt class="rst-docutils rst-literal">converters</tt> are <tt class="rst-docutils rst-literal">None</tt> / empty for static paths.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.__compileRoute">
+    
+  </a>
+  <a name="__compileRoute">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__compileRoute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_middleware: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L230">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__compileRoute" title="orionis.http.routes.route_compiler.RouteCompiler.__compileRoute">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile a single raw route dict into a <tt class="rst-docutils rst-literal">CompiledRoute</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Raw route dictionary from the router export.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_middleware:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>] | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">app_middleware</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">(is_static, compiled_route)</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.routes.route_compiler.RouteCompiler.compile">
+    
+  </a>
+  <a name="compile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">compile</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">app_middleware: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/routes/route_compiler.py#L104">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#compile" title="orionis.http.routes.route_compiler.RouteCompiler.compile">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_compiler.IRouteCompiler.html#compile" class="internal-link">orionis.http.routes.contracts.route_compiler.IRouteCompiler.compile</a></code></div>
+    <div><p>Compile a list of raw route dicts into a ready-to-dispatch structure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code></td><td class="fieldArgDesc">Raw route dicts as returned by <tt class="rst-docutils rst-literal"><span class="pre">Router.export()["routes"]</span></tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback:</span><code>tuple | None</code></td><td class="fieldArgDesc">Raw fallback tuple from <tt class="rst-docutils rst-literal"><span class="pre">Router.export()["fallback"]</span></tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_middleware:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Global middleware classes to prepend to every route's middleware
+stack before route-specific middleware is applied.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], tuple | None]</code></td><td class="fieldArgDesc">A pair <tt class="rst-docutils rst-literal">(compiled_routes, fallback)</tt> where
+<tt class="rst-docutils rst-literal">compiled_routes</tt> maps each HTTP method to
+<tt class="rst-docutils rst-literal">{"static": {path: CompiledRoute},
+"dynamic": [CompiledRoute, <span class="pre">...]}</span></tt>. Dynamic lists are
+sorted descending by <tt class="rst-docutils rst-literal">priority_score</tt> so more-specific
+patterns are matched first.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If two dynamic routes produce the same structural URL
+pattern (collision).</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an invokable class does not define <tt class="rst-docutils rst-literal">__call__</tt>.</td></tr></table></div>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

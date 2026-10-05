@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.queues.drivers.sync.SyncQueueDriver</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.queues.drivers.sync.SyncQueueDriver.html" class="internal-link" title="This class"><wbr></wbr>Sync<wbr></wbr>Queue<wbr></wbr>Driver</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#clear" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delete" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#push" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.push">push</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#release" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.release">release</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reserve" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.reserve">reserve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#size" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.size">size</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_retry_after" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._retry_after">_retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_serializer" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._serializer">_serializer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_worker" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._worker">_worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.queues.drivers.sync.html" class="internal-link" title="The parent of this class">sync</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23805"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.queues.drivers.sync.SyncQueueDriver.html" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver"><wbr></wbr>Sync<wbr></wbr>Queue<wbr></wbr>Driver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#clear" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.close">close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delete" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#push" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.push">push</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#release" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.release">release</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reserve" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.reserve">reserve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#size" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.size">size</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_retry_after" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._retry_after">_retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_serializer" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._serializer">_serializer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_worker" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._worker">_worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.queues.html" class="internal-link" title="orionis.queues">queues</a></code><wbr></wbr>.<code><a href="orionis.queues.drivers.html" class="internal-link" title="orionis.queues.drivers">drivers</a></code><wbr></wbr>.<code><a href="orionis.queues.drivers.sync.html" class="internal-link" title="orionis.queues.drivers.sync">sync</a></code><wbr></wbr>.<code><a href="orionis.queues.drivers.sync.SyncQueueDriver.html" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver">SyncQueueDriver</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SyncQueueDriver</span>(<a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__init__">SyncQueueDriver(app, serializer, connection, failed_resolver, ...)</a></code></p><p><a href="classIndex.html#orionis.queues.drivers.sync.SyncQueueDriver">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Execute one immediate attempt through the shared worker pipeline.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1633">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__init__">__init__</a></code></td>
+    <td>Prepare immediate execution without a durable backend.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#clear" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.clear">clear</a></code></td>
+    <td>Return zero removed jobs for an immediate channel.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#close" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.close">close</a></code></td>
+    <td>Signal the worker to stop without closing application services.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#delete" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.delete">delete</a></code></td>
+    <td>Acknowledge completion of an immediate execution.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#push" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.push">push</a></code></td>
+    <td>Execute the job immediately and propagate its original exception.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#release" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.release">release</a></code></td>
+    <td>Reject persistent retry on an immediate connection.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#reserve" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.reserve">reserve</a></code></td>
+    <td>Return no durable work for an immediate connection.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#size" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.size">size</a></code></td>
+    <td>Return the empty durable size of an immediate channel.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_retry_after" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._retry_after">_retry<wbr></wbr>_after</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_serializer" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._serializer">_serializer</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_worker" class="internal-link" title="orionis.queues.drivers.sync.SyncQueueDriver._worker">_worker</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">serializer: <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">failed_resolver: <code>FailedResolver</code>, </span><span class="rst-sig-param">retry_after: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 90.0</span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.queues.drivers.sync.SyncQueueDriver.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Prepare immediate execution without a durable backend.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Existing application container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code></td><td class="fieldArgDesc">Registered job serializer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical connection name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed<wbr></wbr>_resolver:</span><code>FailedResolver</code></td><td class="fieldArgDesc">Resolver called only on terminal failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">retry<wbr></wbr>_after:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Execution lease used by the shared pipeline.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.clear">
+    
+  </a>
+  <a name="clear">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L176">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#clear" title="orionis.queues.drivers.sync.SyncQueueDriver.clear">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#clear" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.clear</a></code></div>
+    <div><p>Return zero removed jobs for an immediate channel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unused channel name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero, because no jobs are persisted.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.close">
+    
+  </a>
+  <a name="close">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L193">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#close" title="orionis.queues.drivers.sync.SyncQueueDriver.close">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#close" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.close</a></code></div>
+    <div><p>Signal the worker to stop without closing application services.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set the stop signal without waiting for running jobs.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.delete">
+    
+  </a>
+  <a name="delete">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L142">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#delete" title="orionis.queues.drivers.sync.SyncQueueDriver.delete">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#delete" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.delete</a></code></div>
+    <div><p>Acknowledge completion of an immediate execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Unused immediate reservation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Always true for the in-process execution.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.push">
+    
+  </a>
+  <a name="push">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">push</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 0.0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L62">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#push" title="orionis.queues.drivers.sync.SyncQueueDriver.push">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#push" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.push</a></code></div>
+    <div><p>Execute the job immediately and propagate its original exception.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable job payload and execution settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Delay, which must be zero for immediate execution.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Completed dispatch identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueDispatchError.html" class="internal-link" title="orionis.queues.exceptions.QueueDispatchError">QueueDispatchError</a></code></td><td>If delayed execution is requested.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.release">
+    
+  </a>
+  <a name="release">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">release</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 0.0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L117">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#release" title="orionis.queues.drivers.sync.SyncQueueDriver.release">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#release" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.release</a></code></div>
+    <div><p>Reject persistent retry on an immediate connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Unused immediate reservation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Requested retry delay.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueDispatchError.html" class="internal-link" title="orionis.queues.exceptions.QueueDispatchError">QueueDispatchError</a></code></td><td>Always, because immediate jobs have no durable storage.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.reserve">
+    
+  </a>
+  <a name="reserve">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">reserve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">queues: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">retry_after: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>) -&gt; <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#reserve" title="orionis.queues.drivers.sync.SyncQueueDriver.reserve">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#reserve" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.reserve</a></code></div>
+    <div><p>Return no durable work for an immediate connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queues:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Unused channel selection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">retry<wbr></wbr>_after:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Unused lease lifetime.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Immediate jobs are executed during push.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.size">
+    
+  </a>
+  <a name="size">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">size</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L159">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#size" title="orionis.queues.drivers.sync.SyncQueueDriver.size">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#size" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.size</a></code></div>
+    <div><p>Return the empty durable size of an immediate channel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unused channel name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero, because no jobs are persisted.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.queues.drivers.sync.SyncQueueDriver.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#__slots__" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver._retry_after">
+    
+  </a>
+  <a name="_retry_after">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_retry_after</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_retry_after" title="orionis.queues.drivers.sync.SyncQueueDriver._retry_after">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver._serializer">
+    
+  </a>
+  <a name="_serializer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_serializer</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L49">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_serializer" title="orionis.queues.drivers.sync.SyncQueueDriver._serializer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.queues.drivers.sync.SyncQueueDriver._worker">
+    
+  </a>
+  <a name="_worker">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_worker</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/drivers/sync.py#L51">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_worker" title="orionis.queues.drivers.sync.SyncQueueDriver._worker">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

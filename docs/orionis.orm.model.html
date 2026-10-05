@@ -1,0 +1,5576 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.orm.Model</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.orm.Model.html" class="internal-link" title="This class"><wbr></wbr>Model</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_newFromDatabase" class="internal-link" title="orionis.orm.Model._newFromDatabase">_new<wbr></wbr>From<wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addGlobalScope" class="internal-link" title="orionis.orm.Model.addGlobalScope">add<wbr></wbr>Global<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#all" class="internal-link" title="orionis.orm.Model.all">all</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#create" class="internal-link" title="orionis.orm.Model.create">create</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#destroy" class="internal-link" title="orionis.orm.Model.destroy">destroy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#find" class="internal-link" title="orionis.orm.Model.find">find</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#findOrFail" class="internal-link" title="orionis.orm.Model.findOrFail">find<wbr></wbr>Or<wbr></wbr>Fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#first" class="internal-link" title="orionis.orm.Model.first">first</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#firstOrFail" class="internal-link" title="orionis.orm.Model.firstOrFail">first<wbr></wbr>Or<wbr></wbr>Fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#freshTimestamp" class="internal-link" title="orionis.orm.Model.freshTimestamp">fresh<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getConnection" class="internal-link" title="orionis.orm.Model.getConnection">get<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#newUniqueId" class="internal-link" title="orionis.orm.Model.newUniqueId">new<wbr></wbr>Unique<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#query" class="internal-link" title="orionis.orm.Model.query">query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#removeGlobalScope" class="internal-link" title="orionis.orm.Model.removeGlobalScope">remove<wbr></wbr>Global<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getattr__" class="internal-link" title="orionis.orm.Model.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.orm.Model.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repr__" class="internal-link" title="orionis.orm.Model.__repr__">__repr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__setattr__" class="internal-link" title="orionis.orm.Model.__setattr__">__setattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performForceDelete" class="internal-link" title="orionis.orm.Model._performForceDelete">_perform<wbr></wbr>Force<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performInsert" class="internal-link" title="orionis.orm.Model._performInsert">_perform<wbr></wbr>Insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performUpdate" class="internal-link" title="orionis.orm.Model._performUpdate">_perform<wbr></wbr>Update</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_primaryKeyValue" class="internal-link" title="orionis.orm.Model._primaryKeyValue">_primary<wbr></wbr>Key<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delete" class="internal-link" title="orionis.orm.Model.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#save" class="internal-link" title="orionis.orm.Model.save">save</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#update" class="internal-link" title="orionis.orm.Model.update">update</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#flushEvents" class="internal-link" title="orionis.orm.events.EventsMixin.flushEvents">flush<wbr></wbr>Events</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#observe" class="internal-link" title="orionis.orm.events.EventsMixin.observe">observe</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#registerEvent" class="internal-link" title="orionis.orm.events.EventsMixin.registerEvent">register<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#exclude" class="internal-link" title="orionis.orm.attributes.AttributesMixin.exclude">exclude</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#fill" class="internal-link" title="orionis.orm.attributes.AttributesMixin.fill">fill</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#getAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.getAttribute">get<wbr></wbr>Attribute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#hasAccessor" class="internal-link" title="orionis.orm.attributes.AttributesMixin.hasAccessor">has<wbr></wbr>Accessor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#only" class="internal-link" title="orionis.orm.attributes.AttributesMixin.only">only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#serialize" class="internal-link" title="orionis.orm.attributes.AttributesMixin.serialize">serialize</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#setAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.setAttribute">set<wbr></wbr>Attribute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#toDict" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#toJson" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toJson">to<wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#fireEvent" class="internal-link" title="orionis.orm.events.EventsMixin.fireEvent">fire<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#belongsTo" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsTo">belongs<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#belongsToMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsToMany">belongs<wbr></wbr>To<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#getRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.getRelation">get<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#hasMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasMany">has<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#hasOne" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasOne">has<wbr></wbr>One</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#relationLoaded" class="internal-link" title="orionis.orm.relations.RelationsMixin.relationLoaded">relation<wbr></wbr>Loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#setRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.setRelation">set<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#_performSoftDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin._performSoftDelete">_perform<wbr></wbr>Soft<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#forceDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.forceDelete">force<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#restore" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.restore">restore</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#trashed" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.trashed">trashed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CREATED_AT" class="internal-link" title="orionis.orm.Model.CREATED_AT">CREATED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#DELETED_AT" class="internal-link" title="orionis.orm.Model.DELETED_AT">DELETED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UPDATED_AT" class="internal-link" title="orionis.orm.Model.UPDATED_AT">UPDATED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__abstract__" class="internal-link" title="orionis.orm.Model.__abstract__">__abstract__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__meta__" class="internal-link" title="orionis.orm.Model.__meta__">__meta__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.Model.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appends" class="internal-link" title="orionis.orm.Model.appends">appends</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#casts" class="internal-link" title="orionis.orm.Model.casts">casts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.orm.Model.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fillable" class="internal-link" title="orionis.orm.Model.fillable">fillable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#guarded" class="internal-link" title="orionis.orm.Model.guarded">guarded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hidden" class="internal-link" title="orionis.orm.Model.hidden">hidden</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#incrementing" class="internal-link" title="orionis.orm.Model.incrementing">incrementing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#primary_key" class="internal-link" title="orionis.orm.Model.primary_key">primary<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#soft_deletes" class="internal-link" title="orionis.orm.Model.soft_deletes">soft<wbr></wbr>_deletes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.orm.Model.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table_definition" class="internal-link" title="orionis.orm.Model.table_definition">table<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timestamps" class="internal-link" title="orionis.orm.Model.timestamps">timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#uuids" class="internal-link" title="orionis.orm.Model.uuids">uuids</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_changes" class="internal-link" title="orionis.orm.Model._changes">_changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_exists" class="internal-link" title="orionis.orm.Model._exists">_exists</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.orm.html" class="internal-link" title="The parent of this class">orm</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23591"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23591">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.attributes.html" class="internal-link" title="orionis.orm.attributes">attributes</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin"><wbr></wbr>Attributes<wbr></wbr>Mixin</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_cast_bool" class="internal-link" title="orionis.orm.attributes._cast_bool">_cast<wbr></wbr>_bool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_cast_date" class="internal-link" title="orionis.orm.attributes._cast_date">_cast<wbr></wbr>_date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_cast_datetime" class="internal-link" title="orionis.orm.attributes._cast_datetime">_cast<wbr></wbr>_datetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_cast_json" class="internal-link" title="orionis.orm.attributes._cast_json">_cast<wbr></wbr>_json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_cast_uuid" class="internal-link" title="orionis.orm.attributes._cast_uuid">_cast<wbr></wbr>_uuid</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#get_cast_handler" class="internal-link" title="orionis.orm.attributes.get_cast_handler">get<wbr></wbr>_cast<wbr></wbr>_handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#serialize_for_storage" class="internal-link" title="orionis.orm.attributes.serialize_for_storage">serialize<wbr></wbr>_for<wbr></wbr>_storage</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_CAST_HANDLERS" class="internal-link" title="orionis.orm.attributes._CAST_HANDLERS">_CAST<wbr></wbr>_HANDLERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#_TRUTHY_STRINGS" class="internal-link" title="orionis.orm.attributes._TRUTHY_STRINGS">_TRUTHY<wbr></wbr>_STRINGS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23592"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23592">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.collections.html" class="internal-link" title="orionis.orm.collections">collections</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.collections.collection.html" class="internal-link" title="orionis.orm.collections.collection">collection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.collections.paginator.html" class="internal-link" title="orionis.orm.collections.paginator">paginator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.collections.Paginator.html" class="internal-link" title="orionis.orm.collections.Paginator"><wbr></wbr>Paginator</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23593"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23593">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.contracts.html" class="internal-link" title="orionis.orm.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.base_builder.html" class="internal-link" title="orionis.orm.contracts.base_builder">base<wbr></wbr>_builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.belongs_to_many_relation.html" class="internal-link" title="orionis.orm.contracts.belongs_to_many_relation">belongs<wbr></wbr>_to<wbr></wbr>_many<wbr></wbr>_relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.builder.html" class="internal-link" title="orionis.orm.contracts.builder">builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.query_builder.html" class="internal-link" title="orionis.orm.contracts.query_builder">query<wbr></wbr>_builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.raw_builder.html" class="internal-link" title="orionis.orm.contracts.raw_builder">raw<wbr></wbr>_builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.relation.html" class="internal-link" title="orionis.orm.contracts.relation">relation</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.IModelQueryBuilder"><wbr></wbr>IModel<wbr></wbr>Query<wbr></wbr>Builder</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23594"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23594">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.events.html" class="internal-link" title="orionis.orm.events">events</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html" class="internal-link" title="orionis.orm.events.EventsMixin"><wbr></wbr>Events<wbr></wbr>Mixin</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.html#_HALTABLE_EVENTS" class="internal-link" title="orionis.orm.events._HALTABLE_EVENTS">_HALTABLE<wbr></wbr>_EVENTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23595"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23595">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.exceptions.html" class="internal-link" title="orionis.orm.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.InvalidQueryException.html" class="internal-link" title="orionis.orm.exceptions.InvalidQueryException"><wbr></wbr>Invalid<wbr></wbr>Query<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.MassAssignmentException.html" class="internal-link" title="orionis.orm.exceptions.MassAssignmentException"><wbr></wbr>Mass<wbr></wbr>Assignment<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.ModelNotFoundException.html" class="internal-link" title="orionis.orm.exceptions.ModelNotFoundException"><wbr></wbr>Model<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.OrmConfigurationException.html" class="internal-link" title="orionis.orm.exceptions.OrmConfigurationException"><wbr></wbr>Orm<wbr></wbr>Configuration<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.OrmException.html" class="internal-link" title="orionis.orm.exceptions.OrmException"><wbr></wbr>Orm<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.RelationNotFoundException.html" class="internal-link" title="orionis.orm.exceptions.RelationNotFoundException"><wbr></wbr>Relation<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.exceptions.ScopeNotFoundException.html" class="internal-link" title="orionis.orm.exceptions.ScopeNotFoundException"><wbr></wbr>Scope<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23596"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23596">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.factories.html" class="internal-link" title="orionis.orm.factories">factories</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories._attributes.html" class="internal-link" title="orionis.orm.factories._attributes">_attributes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories._faker.html" class="internal-link" title="orionis.orm.factories._faker">_faker</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.exceptions.html" class="internal-link" title="orionis.orm.factories.exceptions">exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.factory.html" class="internal-link" title="orionis.orm.factories.factory">factory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.fake.html" class="internal-link" title="orionis.orm.factories.fake">fake</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.sequence.html" class="internal-link" title="orionis.orm.factories.sequence">sequence</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.Factory.html" class="internal-link" title="orionis.orm.factories.Factory"><wbr></wbr>Factory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.Fake.html" class="internal-link" title="orionis.orm.factories.Fake"><wbr></wbr>Fake</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.OptionalFake.html" class="internal-link" title="orionis.orm.factories.OptionalFake"><wbr></wbr>Optional<wbr></wbr>Fake</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.Sequence.html" class="internal-link" title="orionis.orm.factories.Sequence"><wbr></wbr>Sequence</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.UniqueFake.html" class="internal-link" title="orionis.orm.factories.UniqueFake"><wbr></wbr>Unique<wbr></wbr>Fake</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryConcurrencyException.html" class="internal-link" title="orionis.orm.factories.FactoryConcurrencyException"><wbr></wbr>Factory<wbr></wbr>Concurrency<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryConfigurationException.html" class="internal-link" title="orionis.orm.factories.FactoryConfigurationException"><wbr></wbr>Factory<wbr></wbr>Configuration<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryDefinitionException.html" class="internal-link" title="orionis.orm.factories.FactoryDefinitionException"><wbr></wbr>Factory<wbr></wbr>Definition<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryDependencyException.html" class="internal-link" title="orionis.orm.factories.FactoryDependencyException"><wbr></wbr>Factory<wbr></wbr>Dependency<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryException.html" class="internal-link" title="orionis.orm.factories.FactoryException"><wbr></wbr>Factory<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.factories.FactoryPersistenceException.html" class="internal-link" title="orionis.orm.factories.FactoryPersistenceException"><wbr></wbr>Factory<wbr></wbr>Persistence<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23597"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23597">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.metaclass.html" class="internal-link" title="orionis.orm.metaclass">metaclass</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.ModelMeta.html" class="internal-link" title="orionis.orm.metaclass.ModelMeta"><wbr></wbr>Model<wbr></wbr>Meta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.ModelMetadata.html" class="internal-link" title="orionis.orm.metaclass.ModelMetadata"><wbr></wbr>Model<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#pluralize" class="internal-link" title="orionis.orm.metaclass.pluralize">pluralize</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#snake_case" class="internal-link" title="orionis.orm.metaclass.snake_case">snake<wbr></wbr>_case</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_ACCESSOR_PREFIX" class="internal-link" title="orionis.orm.metaclass._ACCESSOR_PREFIX">_ACCESSOR<wbr></wbr>_PREFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_ACCESSOR_SUFFIX" class="internal-link" title="orionis.orm.metaclass._ACCESSOR_SUFFIX">_ACCESSOR<wbr></wbr>_SUFFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_CAMEL_BOUNDARY" class="internal-link" title="orionis.orm.metaclass._CAMEL_BOUNDARY">_CAMEL<wbr></wbr>_BOUNDARY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_ES_SUFFIXES" class="internal-link" title="orionis.orm.metaclass._ES_SUFFIXES">_ES<wbr></wbr>_SUFFIXES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_FORWARDED_BUILDER_METHODS" class="internal-link" title="orionis.orm.metaclass._FORWARDED_BUILDER_METHODS">_FORWARDED<wbr></wbr>_BUILDER<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_GUARD_ALL" class="internal-link" title="orionis.orm.metaclass._GUARD_ALL">_GUARD<wbr></wbr>_ALL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_MUTATOR_PREFIX" class="internal-link" title="orionis.orm.metaclass._MUTATOR_PREFIX">_MUTATOR<wbr></wbr>_PREFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_SCOPE_PREFIX" class="internal-link" title="orionis.orm.metaclass._SCOPE_PREFIX">_SCOPE<wbr></wbr>_PREFIX</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#_VOWELS" class="internal-link" title="orionis.orm.metaclass._VOWELS">_VOWELS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.metaclass.html#MODEL_EVENTS" class="internal-link" title="orionis.orm.metaclass.MODEL_EVENTS">MODEL<wbr></wbr>_EVENTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23598"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23598">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.model.html" class="internal-link" title="orionis.orm.model">model</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.model.html#_INTERNAL_ATTRIBUTES" class="internal-link" title="orionis.orm.model._INTERNAL_ATTRIBUTES">_INTERNAL<wbr></wbr>_ATTRIBUTES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23599"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23599">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.provider.html" class="internal-link" title="orionis.orm.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.provider.QueryBuilderProvider.html" class="internal-link" title="orionis.orm.provider.QueryBuilderProvider"><wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23600"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23600">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.query.html" class="internal-link" title="orionis.orm.query">query</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.base_builder.html" class="internal-link" title="orionis.orm.query.base_builder">base<wbr></wbr>_builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.builder.html" class="internal-link" title="orionis.orm.query.builder">builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.expressions.html" class="internal-link" title="orionis.orm.query.expressions">expressions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.join_clause.html" class="internal-link" title="orionis.orm.query.join_clause">join<wbr></wbr>_clause</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.raw_builder.html" class="internal-link" title="orionis.orm.query.raw_builder">raw<wbr></wbr>_builder</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.AggregateClause.html" class="internal-link" title="orionis.orm.query.AggregateClause"><wbr></wbr>Aggregate<wbr></wbr>Clause</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.AggregateFunction.html" class="internal-link" title="orionis.orm.query.AggregateFunction"><wbr></wbr>Aggregate<wbr></wbr>Function</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.DeletePlan.html" class="internal-link" title="orionis.orm.query.DeletePlan"><wbr></wbr>Delete<wbr></wbr>Plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.InsertPlan.html" class="internal-link" title="orionis.orm.query.InsertPlan"><wbr></wbr>Insert<wbr></wbr>Plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder"><wbr></wbr>Model<wbr></wbr>Query<wbr></wbr>Builder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.OrderClause.html" class="internal-link" title="orionis.orm.query.OrderClause"><wbr></wbr>Order<wbr></wbr>Clause</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link" title="orionis.orm.query.SelectPlan"><wbr></wbr>Select<wbr></wbr>Plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.SortDirection.html" class="internal-link" title="orionis.orm.query.SortDirection"><wbr></wbr>Sort<wbr></wbr>Direction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.UpdatePlan.html" class="internal-link" title="orionis.orm.query.UpdatePlan"><wbr></wbr>Update<wbr></wbr>Plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.WhereClause.html" class="internal-link" title="orionis.orm.query.WhereClause"><wbr></wbr>Where<wbr></wbr>Clause</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query.WhereType.html" class="internal-link" title="orionis.orm.query.WhereType"><wbr></wbr>Where<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23601"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23601">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.query_builder.html" class="internal-link" title="orionis.orm.query_builder">query<wbr></wbr>_builder</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.query_builder.QueryBuilder.html" class="internal-link" title="orionis.orm.query_builder.QueryBuilder"><wbr></wbr>Query<wbr></wbr>Builder</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23602"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23602">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.relations.html" class="internal-link" title="orionis.orm.relations">relations</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.belongs_to.html" class="internal-link" title="orionis.orm.relations.belongs_to">belongs<wbr></wbr>_to</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.belongs_to_many.html" class="internal-link" title="orionis.orm.relations.belongs_to_many">belongs<wbr></wbr>_to<wbr></wbr>_many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.has_many.html" class="internal-link" title="orionis.orm.relations.has_many">has<wbr></wbr>_many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.has_one.html" class="internal-link" title="orionis.orm.relations.has_one">has<wbr></wbr>_one</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.has_one_or_many.html" class="internal-link" title="orionis.orm.relations.has_one_or_many">has<wbr></wbr>_one<wbr></wbr>_or<wbr></wbr>_many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.mixin.html" class="internal-link" title="orionis.orm.relations.mixin">mixin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.relation.html" class="internal-link" title="orionis.orm.relations.relation">relation</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToManyRelation"><wbr></wbr>Belongs<wbr></wbr>To<wbr></wbr>Many<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.BelongsToRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToRelation"><wbr></wbr>Belongs<wbr></wbr>To<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link" title="orionis.orm.relations.HasManyRelation"><wbr></wbr>Has<wbr></wbr>Many<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.HasOneOrManyRelation.html" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation"><wbr></wbr>Has<wbr></wbr>One<wbr></wbr>Or<wbr></wbr>Many<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link" title="orionis.orm.relations.HasOneRelation"><wbr></wbr>Has<wbr></wbr>One<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation"><wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html" class="internal-link" title="orionis.orm.relations.RelationsMixin"><wbr></wbr>Relations<wbr></wbr>Mixin</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23603"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.resolver.html" class="internal-link" title="orionis.orm.resolver">resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23604"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23604">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.html" class="internal-link" title="orionis.orm.schema">schema</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.column.html" class="internal-link" title="orionis.orm.schema.column">column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.html" class="internal-link" title="orionis.orm.schema.constraints">constraints</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.table.html" class="internal-link" title="orionis.orm.schema.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.html" class="internal-link" title="orionis.orm.schema.types">types</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition"><wbr></wbr>Table<wbr></wbr>Definition</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23605"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23605">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.soft_deletes.html" class="internal-link" title="orionis.orm.soft_deletes">soft<wbr></wbr>_deletes</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin"><wbr></wbr>Soft<wbr></wbr>Deletes<wbr></wbr>Mixin</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23606"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23606">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.state.html" class="internal-link" title="orionis.orm.state">state</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin"><wbr></wbr>State<wbr></wbr>Mixin</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.html#_UNSET" class="internal-link" title="orionis.orm.state._UNSET">_UNSET</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23607"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId23607">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.ConnectionResolver.html" class="internal-link" title="orionis.orm.ConnectionResolver"><wbr></wbr>Connection<wbr></wbr>Resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.ConnectionResolver.html#clear" class="internal-link" title="orionis.orm.ConnectionResolver.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.ConnectionResolver.html#connection" class="internal-link" title="orionis.orm.ConnectionResolver.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.ConnectionResolver.html#manager" class="internal-link" title="orionis.orm.ConnectionResolver.manager">manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.ConnectionResolver.html#setManager" class="internal-link" title="orionis.orm.ConnectionResolver.setManager">set<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.ConnectionResolver.html#_manager" class="internal-link" title="orionis.orm.ConnectionResolver._manager">_manager</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23608"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model"><wbr></wbr>Model</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_newFromDatabase" class="internal-link" title="orionis.orm.Model._newFromDatabase">_new<wbr></wbr>From<wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addGlobalScope" class="internal-link" title="orionis.orm.Model.addGlobalScope">add<wbr></wbr>Global<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#all" class="internal-link" title="orionis.orm.Model.all">all</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#create" class="internal-link" title="orionis.orm.Model.create">create</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#destroy" class="internal-link" title="orionis.orm.Model.destroy">destroy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#find" class="internal-link" title="orionis.orm.Model.find">find</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#findOrFail" class="internal-link" title="orionis.orm.Model.findOrFail">find<wbr></wbr>Or<wbr></wbr>Fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#first" class="internal-link" title="orionis.orm.Model.first">first</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#firstOrFail" class="internal-link" title="orionis.orm.Model.firstOrFail">first<wbr></wbr>Or<wbr></wbr>Fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#freshTimestamp" class="internal-link" title="orionis.orm.Model.freshTimestamp">fresh<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getConnection" class="internal-link" title="orionis.orm.Model.getConnection">get<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#newUniqueId" class="internal-link" title="orionis.orm.Model.newUniqueId">new<wbr></wbr>Unique<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#query" class="internal-link" title="orionis.orm.Model.query">query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#removeGlobalScope" class="internal-link" title="orionis.orm.Model.removeGlobalScope">remove<wbr></wbr>Global<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__getattr__" class="internal-link" title="orionis.orm.Model.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.orm.Model.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repr__" class="internal-link" title="orionis.orm.Model.__repr__">__repr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__setattr__" class="internal-link" title="orionis.orm.Model.__setattr__">__setattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performForceDelete" class="internal-link" title="orionis.orm.Model._performForceDelete">_perform<wbr></wbr>Force<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performInsert" class="internal-link" title="orionis.orm.Model._performInsert">_perform<wbr></wbr>Insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_performUpdate" class="internal-link" title="orionis.orm.Model._performUpdate">_perform<wbr></wbr>Update</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_primaryKeyValue" class="internal-link" title="orionis.orm.Model._primaryKeyValue">_primary<wbr></wbr>Key<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#delete" class="internal-link" title="orionis.orm.Model.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#save" class="internal-link" title="orionis.orm.Model.save">save</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#update" class="internal-link" title="orionis.orm.Model.update">update</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#flushEvents" class="internal-link" title="orionis.orm.events.EventsMixin.flushEvents">flush<wbr></wbr>Events</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#observe" class="internal-link" title="orionis.orm.events.EventsMixin.observe">observe</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#registerEvent" class="internal-link" title="orionis.orm.events.EventsMixin.registerEvent">register<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#exclude" class="internal-link" title="orionis.orm.attributes.AttributesMixin.exclude">exclude</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#fill" class="internal-link" title="orionis.orm.attributes.AttributesMixin.fill">fill</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#getAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.getAttribute">get<wbr></wbr>Attribute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#hasAccessor" class="internal-link" title="orionis.orm.attributes.AttributesMixin.hasAccessor">has<wbr></wbr>Accessor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#only" class="internal-link" title="orionis.orm.attributes.AttributesMixin.only">only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#serialize" class="internal-link" title="orionis.orm.attributes.AttributesMixin.serialize">serialize</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#setAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.setAttribute">set<wbr></wbr>Attribute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#toDict" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.AttributesMixin.html#toJson" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toJson">to<wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.events.EventsMixin.html#fireEvent" class="internal-link" title="orionis.orm.events.EventsMixin.fireEvent">fire<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#belongsTo" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsTo">belongs<wbr></wbr>To</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#belongsToMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsToMany">belongs<wbr></wbr>To<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#getRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.getRelation">get<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#hasMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasMany">has<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#hasOne" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasOne">has<wbr></wbr>One</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#relationLoaded" class="internal-link" title="orionis.orm.relations.RelationsMixin.relationLoaded">relation<wbr></wbr>Loaded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.relations.RelationsMixin.html#setRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.setRelation">set<wbr></wbr>Relation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#_performSoftDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin._performSoftDelete">_perform<wbr></wbr>Soft<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#forceDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.forceDelete">force<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#restore" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.restore">restore</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#trashed" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.trashed">trashed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.StateMixin.html#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CREATED_AT" class="internal-link" title="orionis.orm.Model.CREATED_AT">CREATED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#DELETED_AT" class="internal-link" title="orionis.orm.Model.DELETED_AT">DELETED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#UPDATED_AT" class="internal-link" title="orionis.orm.Model.UPDATED_AT">UPDATED<wbr></wbr>_AT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__abstract__" class="internal-link" title="orionis.orm.Model.__abstract__">__abstract__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__meta__" class="internal-link" title="orionis.orm.Model.__meta__">__meta__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.Model.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appends" class="internal-link" title="orionis.orm.Model.appends">appends</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#casts" class="internal-link" title="orionis.orm.Model.casts">casts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.orm.Model.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fillable" class="internal-link" title="orionis.orm.Model.fillable">fillable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#guarded" class="internal-link" title="orionis.orm.Model.guarded">guarded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hidden" class="internal-link" title="orionis.orm.Model.hidden">hidden</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#incrementing" class="internal-link" title="orionis.orm.Model.incrementing">incrementing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#primary_key" class="internal-link" title="orionis.orm.Model.primary_key">primary<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#soft_deletes" class="internal-link" title="orionis.orm.Model.soft_deletes">soft<wbr></wbr>_deletes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.orm.Model.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table_definition" class="internal-link" title="orionis.orm.Model.table_definition">table<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timestamps" class="internal-link" title="orionis.orm.Model.timestamps">timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#uuids" class="internal-link" title="orionis.orm.Model.uuids">uuids</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_changes" class="internal-link" title="orionis.orm.Model._changes">_changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_exists" class="internal-link" title="orionis.orm.Model._exists">_exists</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.html#__dir__" class="internal-link" title="orionis.orm.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.html#__getattr__" class="internal-link" title="orionis.orm.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.html#_EXPORTS" class="internal-link" title="orionis.orm._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.orm.html" class="internal-link" title="orionis.orm">orm</a></code><wbr></wbr>.<code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Model</span>(<a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a>, <a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a>, <a href="orionis.orm.relations.RelationsMixin.html" class="internal-link" title="orionis.orm.relations.RelationsMixin">RelationsMixin</a>, <a href="orionis.orm.events.EventsMixin.html" class="internal-link" title="orionis.orm.events.EventsMixin">EventsMixin</a>, <a href="orionis.orm.soft_deletes.SoftDeletesMixin.html" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin">SoftDeletesMixin</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L38" class="sourceLink">(source)</a></code></p><p>Constructors: <code><a href="#_newFromDatabase" class="internal-link" title="orionis.orm.Model._newFromDatabase">Model._newFromDatabase(row)</a></code>, <code><a href="#create" class="internal-link" title="orionis.orm.Model.create">Model.create(attributes)</a></code>, <code><a href="#findOrFail" class="internal-link" title="orionis.orm.Model.findOrFail">Model.findOrFail(key)</a></code>, <code><a href="#firstOrFail" class="internal-link" title="orionis.orm.Model.firstOrFail">Model.firstOrFail()</a></code>, <code><a href="#__init__" class="internal-link" title="orionis.orm.Model.__init__">Model(attributes)</a></code></p><p><a href="classIndex.html#orionis.orm.Model">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Base class of the Orionis active-record models.</p>
+<p>Concrete models declare their columns with the fluent schema types
+and interact with the database exclusively through the Orionis query
+builder; the underlying SQL engine never surfaces. Class-level entry
+points such as <tt class="rst-docutils rst-literal">where</tt> or <tt class="rst-docutils rst-literal">orderBy</tt> start a builder implicitly.</p>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1605">
+  
+  
+  <tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#_newFromDatabase" class="internal-link" title="orionis.orm.Model._newFromDatabase">_new<wbr></wbr>From<wbr></wbr>Database</a></code></td>
+    <td>Hydrate a model instance from a database row.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#addGlobalScope" class="internal-link" title="orionis.orm.Model.addGlobalScope">add<wbr></wbr>Global<wbr></wbr>Scope</a></code></td>
+    <td>Register a constraint applied to every query of this model.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#all" class="internal-link" title="orionis.orm.Model.all">all</a></code></td>
+    <td>Retrieve every row of the model table.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#create" class="internal-link" title="orionis.orm.Model.create">create</a></code></td>
+    <td>Create, persist, and return a new model.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#destroy" class="internal-link" title="orionis.orm.Model.destroy">destroy</a></code></td>
+    <td>Delete the models matching the given primary keys.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#find" class="internal-link" title="orionis.orm.Model.find">find</a></code></td>
+    <td>Retrieve a model by its primary key.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#findOrFail" class="internal-link" title="orionis.orm.Model.findOrFail">find<wbr></wbr>Or<wbr></wbr>Fail</a></code></td>
+    <td>Retrieve a model by primary key or raise when absent.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#first" class="internal-link" title="orionis.orm.Model.first">first</a></code></td>
+    <td>Retrieve the first row of the model table.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Async Class Method</td>
+    <td><code><a href="#firstOrFail" class="internal-link" title="orionis.orm.Model.firstOrFail">first<wbr></wbr>Or<wbr></wbr>Fail</a></code></td>
+    <td>Retrieve the first row or raise when the table is empty.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#freshTimestamp" class="internal-link" title="orionis.orm.Model.freshTimestamp">fresh<wbr></wbr>Timestamp</a></code></td>
+    <td>Produce the current timestamp for persistence operations.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#getConnection" class="internal-link" title="orionis.orm.Model.getConnection">get<wbr></wbr>Connection</a></code></td>
+    <td>Resolve the connection configured for this model.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#newUniqueId" class="internal-link" title="orionis.orm.Model.newUniqueId">new<wbr></wbr>Unique<wbr></wbr>Id</a></code></td>
+    <td>Produce a client-generated primary key value.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#query" class="internal-link" title="orionis.orm.Model.query">query</a></code></td>
+    <td>Start a new query builder bound to this model.</td>
+  </tr><tr class="classmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="#removeGlobalScope" class="internal-link" title="orionis.orm.Model.removeGlobalScope">remove<wbr></wbr>Global<wbr></wbr>Scope</a></code></td>
+    <td>Unregister a previously added global scope.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__getattr__" class="internal-link" title="orionis.orm.Model.__getattr__">__getattr__</a></code></td>
+    <td>Serve column values and accessor-backed attributes.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.orm.Model.__init__">__init__</a></code></td>
+    <td>Initialize a new, unsaved model instance.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__repr__" class="internal-link" title="orionis.orm.Model.__repr__">__repr__</a></code></td>
+    <td>Return a concise developer representation of the model.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__setattr__" class="internal-link" title="orionis.orm.Model.__setattr__">__setattr__</a></code></td>
+    <td>Route column assignments into the attribute store.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_performForceDelete" class="internal-link" title="orionis.orm.Model._performForceDelete">_perform<wbr></wbr>Force<wbr></wbr>Delete</a></code></td>
+    <td>Remove the persisted row permanently.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_performInsert" class="internal-link" title="orionis.orm.Model._performInsert">_perform<wbr></wbr>Insert</a></code></td>
+    <td>Insert the model attributes as a new row.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_performUpdate" class="internal-link" title="orionis.orm.Model._performUpdate">_perform<wbr></wbr>Update</a></code></td>
+    <td>Write the dirty attributes of an existing model.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_primaryKeyValue" class="internal-link" title="orionis.orm.Model._primaryKeyValue">_primary<wbr></wbr>Key<wbr></wbr>Value</a></code></td>
+    <td>Return the primary key value identifying the stored row.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#delete" class="internal-link" title="orionis.orm.Model.delete">delete</a></code></td>
+    <td>Delete the model row, honoring soft deletes when enabled.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#save" class="internal-link" title="orionis.orm.Model.save">save</a></code></td>
+    <td>Persist the model, inserting or updating as appropriate.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#update" class="internal-link" title="orionis.orm.Model.update">update</a></code></td>
+    <td>Mass assign the given attributes and persist the model.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CREATED_AT" class="internal-link" title="orionis.orm.Model.CREATED_AT">CREATED<wbr></wbr>_AT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#DELETED_AT" class="internal-link" title="orionis.orm.Model.DELETED_AT">DELETED<wbr></wbr>_AT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#UPDATED_AT" class="internal-link" title="orionis.orm.Model.UPDATED_AT">UPDATED<wbr></wbr>_AT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__abstract__" class="internal-link" title="orionis.orm.Model.__abstract__">__abstract__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__meta__" class="internal-link" title="orionis.orm.Model.__meta__">__meta__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.Model.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#appends" class="internal-link" title="orionis.orm.Model.appends">appends</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#casts" class="internal-link" title="orionis.orm.Model.casts">casts</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#connection" class="internal-link" title="orionis.orm.Model.connection">connection</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#fillable" class="internal-link" title="orionis.orm.Model.fillable">fillable</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#guarded" class="internal-link" title="orionis.orm.Model.guarded">guarded</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#hidden" class="internal-link" title="orionis.orm.Model.hidden">hidden</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#incrementing" class="internal-link" title="orionis.orm.Model.incrementing">incrementing</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#primary_key" class="internal-link" title="orionis.orm.Model.primary_key">primary<wbr></wbr>_key</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#soft_deletes" class="internal-link" title="orionis.orm.Model.soft_deletes">soft<wbr></wbr>_deletes</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#table" class="internal-link" title="orionis.orm.Model.table">table</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#table_definition" class="internal-link" title="orionis.orm.Model.table_definition">table<wbr></wbr>_definition</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#timestamps" class="internal-link" title="orionis.orm.Model.timestamps">timestamps</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#uuids" class="internal-link" title="orionis.orm.Model.uuids">uuids</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_changes" class="internal-link" title="orionis.orm.Model._changes">_changes</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_exists" class="internal-link" title="orionis.orm.Model._exists">_exists</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a></code>:
+            </p>
+            <table class="children sortable" id="id1606">
+  
+  
+  <tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#exclude" class="internal-link" title="orionis.orm.attributes.AttributesMixin.exclude">exclude</a></code></td>
+    <td>Return every attribute except the given keys.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#fill" class="internal-link" title="orionis.orm.attributes.AttributesMixin.fill">fill</a></code></td>
+    <td>Mass assign the given attributes honoring the assignment rules.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#getAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.getAttribute">get<wbr></wbr>Attribute</a></code></td>
+    <td>Return a single attribute value through its accessor.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#hasAccessor" class="internal-link" title="orionis.orm.attributes.AttributesMixin.hasAccessor">has<wbr></wbr>Accessor</a></code></td>
+    <td>Report whether an attribute is served by an accessor.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#only" class="internal-link" title="orionis.orm.attributes.AttributesMixin.only">only</a></code></td>
+    <td>Return a subset of attributes limited to the given keys.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#serialize" class="internal-link" title="orionis.orm.attributes.AttributesMixin.serialize">serialize</a></code></td>
+    <td>Serialize the model for collection-level serialization.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#setAttribute" class="internal-link" title="orionis.orm.attributes.AttributesMixin.setAttribute">set<wbr></wbr>Attribute</a></code></td>
+    <td>Assign a single attribute applying its mutator and cast.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#toDict" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toDict">to<wbr></wbr>Dict</a></code></td>
+    <td>Serialize the visible attributes into a dictionary.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.attributes.AttributesMixin.html#toJson" class="internal-link" title="orionis.orm.attributes.AttributesMixin.toJson">to<wbr></wbr>Json</a></code></td>
+    <td>Serialize the visible attributes into a JSON string.</td>
+  </tr>
+</table>
+            
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a></code> (via <code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a></code>):
+            </p>
+            <table class="children sortable" id="id1607">
+  
+  
+  <tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code></td>
+    <td>Return the attributes persisted by the last save operation.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code></td>
+    <td>Return the attributes modified since the last sync.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code></td>
+    <td>Return the original attribute snapshot or a single original value.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code></td>
+    <td>Report whether no attribute changed since the last sync.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code></td>
+    <td>Report whether any attribute changed since the last sync.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code></td>
+    <td>Snapshot the current attributes as the new original state.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.state.StateMixin.html#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code></td>
+    <td>Report whether the last save operation changed any attribute.</td>
+  </tr>
+</table>
+            
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.orm.relations.RelationsMixin.html" class="internal-link" title="orionis.orm.relations.RelationsMixin">RelationsMixin</a></code> (via <code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a></code>, <code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a></code>):
+            </p>
+            <table class="children sortable" id="id1608">
+  
+  
+  <tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#belongsTo" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsTo">belongs<wbr></wbr>To</a></code></td>
+    <td>Define the inverse of a <tt class="rst-docutils rst-literal">hasOne</tt>/<tt class="rst-docutils rst-literal">hasMany</tt> relationship.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#belongsToMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.belongsToMany">belongs<wbr></wbr>To<wbr></wbr>Many</a></code></td>
+    <td>Define a many-to-many relationship backed by a pivot table.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#getRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.getRelation">get<wbr></wbr>Relation</a></code></td>
+    <td>Return an already-resolved relationship result.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#hasMany" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasMany">has<wbr></wbr>Many</a></code></td>
+    <td>Define a one-to-many relationship owned by the related table.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#hasOne" class="internal-link" title="orionis.orm.relations.RelationsMixin.hasOne">has<wbr></wbr>One</a></code></td>
+    <td>Define a one-to-one relationship owned by the related table.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#relationLoaded" class="internal-link" title="orionis.orm.relations.RelationsMixin.relationLoaded">relation<wbr></wbr>Loaded</a></code></td>
+    <td>Report whether a relationship result has already been resolved.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.relations.RelationsMixin.html#setRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.setRelation">set<wbr></wbr>Relation</a></code></td>
+    <td>Store an already-resolved relationship result.</td>
+  </tr>
+</table>
+            
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.orm.events.EventsMixin.html" class="internal-link" title="orionis.orm.events.EventsMixin">EventsMixin</a></code> (via <code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a></code>, <code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a></code>, <code><a href="orionis.orm.relations.RelationsMixin.html" class="internal-link" title="orionis.orm.relations.RelationsMixin">RelationsMixin</a></code>):
+            </p>
+            <table class="children sortable" id="id1609">
+  
+  
+  <tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.orm.events.EventsMixin.html#flushEvents" class="internal-link" title="orionis.orm.events.EventsMixin.flushEvents">flush<wbr></wbr>Events</a></code></td>
+    <td>Remove registered listeners from the model.</td>
+  </tr><tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.orm.events.EventsMixin.html#observe" class="internal-link" title="orionis.orm.events.EventsMixin.observe">observe</a></code></td>
+    <td>Register every lifecycle method exposed by an observer.</td>
+  </tr><tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.orm.events.EventsMixin.html#registerEvent" class="internal-link" title="orionis.orm.events.EventsMixin.registerEvent">register<wbr></wbr>Event</a></code></td>
+    <td>Register a listener for a model lifecycle event.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Async Method</td>
+    <td><code><a href="orionis.orm.events.EventsMixin.html#fireEvent" class="internal-link" title="orionis.orm.events.EventsMixin.fireEvent">fire<wbr></wbr>Event</a></code></td>
+    <td>Dispatch a lifecycle event to its listeners.</td>
+  </tr>
+</table>
+            
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin">SoftDeletesMixin</a></code> (via <code><a href="orionis.orm.attributes.AttributesMixin.html" class="internal-link" title="orionis.orm.attributes.AttributesMixin">AttributesMixin</a></code>, <code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a></code>, <code><a href="orionis.orm.relations.RelationsMixin.html" class="internal-link" title="orionis.orm.relations.RelationsMixin">RelationsMixin</a></code>, <code><a href="orionis.orm.events.EventsMixin.html" class="internal-link" title="orionis.orm.events.EventsMixin">EventsMixin</a></code>):
+            </p>
+            <table class="children sortable" id="id1610">
+  
+  
+  <tr class="basemethod">
+    
+    <td>Async Method</td>
+    <td><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#_performSoftDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin._performSoftDelete">_perform<wbr></wbr>Soft<wbr></wbr>Delete</a></code></td>
+    <td>Stamp the soft delete column of the persisted row.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Async Method</td>
+    <td><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#forceDelete" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.forceDelete">force<wbr></wbr>Delete</a></code></td>
+    <td>Delete the row permanently, ignoring soft deletes.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Async Method</td>
+    <td><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#restore" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.restore">restore</a></code></td>
+    <td>Bring a soft deleted row back by clearing its delete stamp.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.orm.soft_deletes.SoftDeletesMixin.html#trashed" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.trashed">trashed</a></code></td>
+    <td>Report whether the instance is currently soft deleted.</td>
+  </tr>
+</table>
+            
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model._newFromDatabase">
+    
+  </a>
+  <a name="_newFromDatabase">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_newFromDatabase</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">row: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L223">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_newFromDatabase" title="orionis.orm.Model._newFromDatabase">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Hydrate a model instance from a database row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">row:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Raw row values keyed by column name. The mapping is not
+shared with any other caller, so it is adopted and mutated
+in place instead of being copied.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Existing model instance with casts applied.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.addGlobalScope">
+    
+  </a>
+  <a name="addGlobalScope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">addGlobalScope</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">scope: <code>Callable[<wbr></wbr>[<wbr></wbr><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder">ModelQueryBuilder</a>[<wbr></wbr>Any]], <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L282">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#addGlobalScope" title="orionis.orm.Model.addGlobalScope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Register a constraint applied to every query of this model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name the scope is registered under, used to disable it later
+with <tt class="rst-docutils rst-literal">withoutGlobalScope</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code>Callable</code></td><td class="fieldArgDesc">Callable receiving the builder and constraining it in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The model class, enabling fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.all">
+    
+  </a>
+  <a name="all">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Collection</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L325">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#all" title="orionis.orm.Model.all">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve every row of the model table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Collection of hydrated model instances.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.create">
+    
+  </a>
+  <a name="create">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">create</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L405">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#create" title="orionis.orm.Model.create">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create, persist, and return a new model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Attributes to mass assign honoring the fillable rules.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Persisted model instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.MassAssignmentException.html" class="internal-link" title="orionis.orm.exceptions.MassAssignmentException">MassAssignmentException</a></code></td><td>If an attribute violates the mass assignment rules.</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the insert statement fails.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.destroy">
+    
+  </a>
+  <a name="destroy">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">destroy</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">*keys: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L431">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#destroy" title="orionis.orm.Model.destroy">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Delete the models matching the given primary keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*keys:</span><code>Any</code></td><td class="fieldArgDesc">Primary key values to delete.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of deleted rows.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.find">
+    
+  </a>
+  <a name="find">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">find</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">key: <code>Any</code></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L337">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#find" title="orionis.orm.Model.find">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve a model by its primary key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code>Any</code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Matching model, or <tt class="rst-docutils rst-literal">None</tt> when absent.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.findOrFail">
+    
+  </a>
+  <a name="findOrFail">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">findOrFail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">key: <code>Any</code></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L354">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#findOrFail" title="orionis.orm.Model.findOrFail">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve a model by primary key or raise when absent.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code>Any</code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Matching model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.ModelNotFoundException.html" class="internal-link" title="orionis.orm.exceptions.ModelNotFoundException">ModelNotFoundException</a></code></td><td>If no record matches the key.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.first">
+    
+  </a>
+  <a name="first">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">first</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L376">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#first" title="orionis.orm.Model.first">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve the first row of the model table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">First model, or <tt class="rst-docutils rst-literal">None</tt> when the table is empty.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.firstOrFail">
+    
+  </a>
+  <a name="firstOrFail">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">firstOrFail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L388">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#firstOrFail" title="orionis.orm.Model.firstOrFail">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retrieve the first row or raise when the table is empty.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">First model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.ModelNotFoundException.html" class="internal-link" title="orionis.orm.exceptions.ModelNotFoundException">ModelNotFoundException</a></code></td><td>If the table has no rows.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.freshTimestamp">
+    
+  </a>
+  <a name="freshTimestamp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">freshTimestamp</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L574">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#freshTimestamp" title="orionis.orm.Model.freshTimestamp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Produce the current timestamp for persistence operations.</p>
+<p>Timezone-aware timestamps are produced when the update column
+is a timezone-aware type, naive UTC otherwise.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">Current UTC timestamp.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.getConnection">
+    
+  </a>
+  <a name="getConnection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getConnection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>IConnection</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L263">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getConnection" title="orionis.orm.Model.getConnection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the connection configured for this model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection used for model queries and persistence.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.OrmConfigurationException.html" class="internal-link" title="orionis.orm.exceptions.OrmConfigurationException">OrmConfigurationException</a></code></td><td>If no connection manager has been installed.</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the configured connection is not declared.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.newUniqueId">
+    
+  </a>
+  <a name="newUniqueId">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">newUniqueId</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Any</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L599">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#newUniqueId" title="orionis.orm.Model.newUniqueId">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Produce a client-generated primary key value.</p>
+<p>Overridable by models needing a different identifier scheme,
+such as ULIDs or prefixed keys.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Fresh unique identifier.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.query">
+    
+  </a>
+  <a name="query">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">query</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder">ModelQueryBuilder</a>[<wbr></wbr>Any]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L251">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#query" title="orionis.orm.Model.query">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Start a new query builder bound to this model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder">ModelQueryBuilder</a></code></td><td class="fieldArgDesc">Fresh builder targeting the model table.</td></tr></table></div>
+  </div>
+</div><div class="baseclassmethod">
+  
+  
+  <a name="orionis.orm.Model.removeGlobalScope">
+    
+  </a>
+  <a name="removeGlobalScope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">removeGlobalScope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L307">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#removeGlobalScope" title="orionis.orm.Model.removeGlobalScope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Unregister a previously added global scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name the scope was registered under.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The model class, enabling fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.__getattr__">
+    
+  </a>
+  <a name="__getattr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__getattr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Any</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L136">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__getattr__" title="orionis.orm.Model.__getattr__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Serve column values and accessor-backed attributes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Attribute name being accessed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Attribute value; <tt class="rst-docutils rst-literal">None</tt> for declared but unloaded columns.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the name is neither loaded, a declared column, nor an
+accessor-backed attribute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L107">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.orm.Model.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize a new, unsaved model instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Attributes to mass assign honoring the fillable rules.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.MassAssignmentException.html" class="internal-link" title="orionis.orm.exceptions.MassAssignmentException">MassAssignmentException</a></code></td><td>If an attribute violates the mass assignment rules.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.__repr__">
+    
+  </a>
+  <a name="__repr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__repr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L206">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__repr__" title="orionis.orm.Model.__repr__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return a concise developer representation of the model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Representation including the class name and primary key.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.__setattr__">
+    
+  </a>
+  <a name="__setattr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__setattr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L179">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__setattr__" title="orionis.orm.Model.__setattr__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Route column assignments into the attribute store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Attribute name being assigned.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>Any</code></td><td class="fieldArgDesc">Value to assign.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model._performForceDelete">
+    
+  </a>
+  <a name="_performForceDelete">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_performForceDelete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L544">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_performForceDelete" title="orionis.orm.Model._performForceDelete">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Remove the persisted row permanently.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when a row was removed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model._performInsert">
+    
+  </a>
+  <a name="_performInsert">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_performInsert</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L633">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_performInsert" title="orionis.orm.Model._performInsert">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Insert the model attributes as a new row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the insert succeeds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model._performUpdate">
+    
+  </a>
+  <a name="_performUpdate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_performUpdate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L676">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_performUpdate" title="orionis.orm.Model._performUpdate">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Write the dirty attributes of an existing model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when a row was written or nothing changed,
+<tt class="rst-docutils rst-literal">False</tt> when no stored row matched the primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model._primaryKeyValue">
+    
+  </a>
+  <a name="_primaryKeyValue">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_primaryKeyValue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Any</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L616">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_primaryKeyValue" title="orionis.orm.Model._primaryKeyValue">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the primary key value identifying the stored row.</p>
+<p>The original value is preferred so a dirty primary key still
+targets the persisted row.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Primary key value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.delete">
+    
+  </a>
+  <a name="delete">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L511">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#delete" title="orionis.orm.Model.delete">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Delete the model row, honoring soft deletes when enabled.</p>
+<p>Models declaring <tt class="rst-docutils rst-literal">soft_deletes</tt> stamp their delete column
+instead of removing the row; every other model is deleted
+permanently.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when a row was deleted or stamped, <tt class="rst-docutils rst-literal">False</tt> for
+unsaved models or when a listener vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.save">
+    
+  </a>
+  <a name="save">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">save</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L452">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#save" title="orionis.orm.Model.save">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Persist the model, inserting or updating as appropriate.</p>
+<p>New models are inserted, receiving their generated primary key;
+existing models write only their dirty attributes. Timestamps
+are maintained automatically when enabled, and the <tt class="rst-docutils rst-literal">saving</tt>,
+<tt class="rst-docutils rst-literal">creating</tt>/<tt class="rst-docutils rst-literal">updating</tt>, <tt class="rst-docutils rst-literal">created</tt>/<tt class="rst-docutils rst-literal">updated</tt> and <tt class="rst-docutils rst-literal">saved</tt>
+events are dispatched around the write.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the operation succeeds or nothing changed,
+<tt class="rst-docutils rst-literal">False</tt> when a listener vetoed the write.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.Model.update">
+    
+  </a>
+  <a name="update">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L487">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#update" title="orionis.orm.Model.update">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Mass assign the given attributes and persist the model.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Attributes to assign honoring the fillable rules.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the operation succeeds or nothing changed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.MassAssignmentException.html" class="internal-link" title="orionis.orm.exceptions.MassAssignmentException">MassAssignmentException</a></code></td><td>If an attribute violates the mass assignment rules.</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.orm.Model.CREATED_AT">
+    
+  </a>
+  <a name="CREATED_AT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CREATED_AT</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L100">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CREATED_AT" title="orionis.orm.Model.CREATED_AT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">created_at</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.orm.Model.DELETED_AT">
+    
+  </a>
+  <a name="DELETED_AT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">DELETED_AT</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L102">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#DELETED_AT" title="orionis.orm.Model.DELETED_AT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">deleted_at</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.orm.Model.UPDATED_AT">
+    
+  </a>
+  <a name="UPDATED_AT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">UPDATED_AT</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L101">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#UPDATED_AT" title="orionis.orm.Model.UPDATED_AT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">updated_at</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.__abstract__">
+    
+  </a>
+  <a name="__abstract__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__abstract__</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__abstract__" title="orionis.orm.Model.__abstract__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.__meta__">
+    
+  </a>
+  <a name="__meta__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__meta__</span>: <code>ClassVar[<wbr></wbr>ModelMetadata | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L105">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__meta__" title="orionis.orm.Model.__meta__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L56">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.orm.Model.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.attributes.AttributesMixin.html#__slots__" class="internal-link">orionis.orm.attributes.AttributesMixin.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.appends">
+    
+  </a>
+  <a name="appends">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">appends</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L97">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appends" title="orionis.orm.Model.appends">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.casts">
+    
+  </a>
+  <a name="casts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">casts</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L79">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#casts" title="orionis.orm.Model.casts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.connection">
+    
+  </a>
+  <a name="connection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">connection</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L67">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#connection" title="orionis.orm.Model.connection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.fillable">
+    
+  </a>
+  <a name="fillable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">fillable</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L70">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#fillable" title="orionis.orm.Model.fillable">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.guarded">
+    
+  </a>
+  <a name="guarded">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">guarded</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L73">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#guarded" title="orionis.orm.Model.guarded">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.hidden">
+    
+  </a>
+  <a name="hidden">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">hidden</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L76">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#hidden" title="orionis.orm.Model.hidden">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.incrementing">
+    
+  </a>
+  <a name="incrementing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">incrementing</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L85">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#incrementing" title="orionis.orm.Model.incrementing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.primary_key">
+    
+  </a>
+  <a name="primary_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">primary_key</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L82">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#primary_key" title="orionis.orm.Model.primary_key">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.soft_deletes">
+    
+  </a>
+  <a name="soft_deletes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">soft_deletes</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L91">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#soft_deletes" title="orionis.orm.Model.soft_deletes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.table">
+    
+  </a>
+  <a name="table">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">table</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#table" title="orionis.orm.Model.table">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.table_definition">
+    
+  </a>
+  <a name="table_definition">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">table_definition</span>: <code>ClassVar[<wbr></wbr>TableDefinition | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#table_definition" title="orionis.orm.Model.table_definition">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.timestamps">
+    
+  </a>
+  <a name="timestamps">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">timestamps</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L88">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#timestamps" title="orionis.orm.Model.timestamps">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.Model.uuids">
+    
+  </a>
+  <a name="uuids">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">uuids</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#uuids" title="orionis.orm.Model.uuids">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.orm.Model._changes">
+    
+  </a>
+  <a name="_changes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_changes</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L672">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_changes" title="orionis.orm.Model._changes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.orm.Model._exists">
+    
+  </a>
+  <a name="_exists">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_exists</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/model.py#L569">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_exists" title="orionis.orm.Model._exists">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

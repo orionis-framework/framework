@@ -194,13 +194,15 @@ class TestMcpIntegration(TestCase):
                 self.assertIs(manager, await app.make(IMcpManager))
                 await manager.shutdown()
 
-    async def test_ai_registrations_load_once_per_app_independent_of_import_cache(self):
+    async def test_ai_registrations_load_once_per_app_independent_of_import_cache(
+        self,
+    ) -> None:
         """Load registrations for each application even when Python cached imports.
 
         Returns
         -------
         None
-            Complete the documented checks or setup without a return value.
+            Verify independent registrations and resolved AI routing paths.
         """
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -224,7 +226,10 @@ class TestMcpIntegration(TestCase):
                     )
                     paths = app.routingPaths("ai")
                     paths.clear()
-                    self.assertEqual(app.routingPaths("ai"), [root / "ai.py"])
+                    self.assertEqual(
+                        app.routingPaths("ai"),
+                        [(root / "ai.py").resolve()],
+                    )
 
     async def test_duplicate_registration_and_unregistered_events_fail_at_boot(self):
         """Reject duplicate handles, ambiguous paths and unknown server events.

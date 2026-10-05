@@ -27,32 +27,74 @@ class ISession(ABC):
     @property
     @abstractmethod
     def id(self) -> str | None:
-        """Current session identifier, or ``None`` before the first write."""
+        """
+        Current session identifier, or ``None`` before the first write.
+
+        Returns
+        -------
+        str | None
+            Result of the operation described above.
+        """
 
     @property
     @abstractmethod
     def started(self) -> bool:
-        """``True`` once the session has been activated by a write."""
+        """
+        ``True`` once the session has been activated by a write.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
 
     @property
     @abstractmethod
     def dirty(self) -> bool:
-        """``True`` if pending changes must be written to the backing store."""
+        """
+        ``True`` if pending changes must be written to the backing store.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
 
     @property
     @abstractmethod
     def invalidated(self) -> bool:
-        """``True`` when the session has been marked for full deletion."""
+        """
+        ``True`` when the session has been marked for full deletion.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
 
     @property
     @abstractmethod
     def isNew(self) -> bool:
-        """``True`` for sessions not loaded from a backing store."""
+        """
+        ``True`` for sessions not loaded from a backing store.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
 
     @property
     @abstractmethod
     def wantsRegenerate(self) -> bool:
-        """``True`` when the session ID should be rotated before saving."""
+        """
+        ``True`` when the session ID should be rotated before saving.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
 
     # ── Public API ──────────────────────────────────────────────────────────────
 

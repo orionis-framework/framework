@@ -386,14 +386,16 @@ ruff check orionis/queues orionis/console/commands/queue tests/queues
 ```
 
 La suite regular no necesita un servidor Redis externo. Las pruebas de transporte
-utilizan un fake explícito del contrato de scripts atómicos; los scripts Lua se
-se verifican además con una suite explícita que falla si falta el servidor:
+utilizan un fake explícito del contrato de scripts atómicos. Las pruebas Lua se
+descubren normalmente y se omiten de forma explícita hasta definir
+`ORIONIS_QUEUE_REDIS_HOST`. Con esa configuración, los errores del servidor
+siguen siendo fallos:
 
 ```powershell
 $env:ORIONIS_QUEUE_REDIS_HOST = "127.0.0.1"
 $env:ORIONIS_QUEUE_REDIS_PORT = "6379"
 $env:ORIONIS_QUEUE_REDIS_DB = "0"
-python -X utf8 reactor test --start-dir=tests/queues/drivers --file-pattern=redis_integration.py --no-panel
+python -X utf8 reactor test --start-dir=tests/queues/drivers --file-pattern=test_redis_integration.py --no-panel
 ```
 
 El host y puerto deben apuntar a un servidor Redis con soporte para operaciones

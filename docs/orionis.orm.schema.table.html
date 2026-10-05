@@ -1,0 +1,1594 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.orm.schema.table</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.orm.schema.table.html" class="internal-link" title="This module">table</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.orm.schema.html" class="internal-link" title="The parent of this module">schema</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16894"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId16894">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.column.html" class="internal-link" title="orionis.orm.schema.column">column</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.column.definition.html" class="internal-link" title="orionis.orm.schema.column.definition">definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.column.options.html" class="internal-link" title="orionis.orm.schema.column.options">options</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition"><wbr></wbr>Column<wbr></wbr>Definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.column.ColumnOptions.html" class="internal-link" title="orionis.orm.schema.column.ColumnOptions"><wbr></wbr>Column<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16895"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId16895">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.constraints.html" class="internal-link" title="orionis.orm.schema.constraints">constraints</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.composite_foreign_key.html" class="internal-link" title="orionis.orm.schema.constraints.composite_foreign_key">composite<wbr></wbr>_foreign<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.foreign_reference.html" class="internal-link" title="orionis.orm.schema.constraints.foreign_reference">foreign<wbr></wbr>_reference</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.table_index.html" class="internal-link" title="orionis.orm.schema.constraints.table_index">table<wbr></wbr>_index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.unique_constraint.html" class="internal-link" title="orionis.orm.schema.constraints.unique_constraint">unique<wbr></wbr>_constraint</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.CompositeForeignKey.html" class="internal-link" title="orionis.orm.schema.constraints.CompositeForeignKey"><wbr></wbr>Composite<wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.ForeignReference.html" class="internal-link" title="orionis.orm.schema.constraints.ForeignReference"><wbr></wbr>Foreign<wbr></wbr>Reference</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.TableIndex.html" class="internal-link" title="orionis.orm.schema.constraints.TableIndex"><wbr></wbr>Table<wbr></wbr>Index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.constraints.UniqueConstraint.html" class="internal-link" title="orionis.orm.schema.constraints.UniqueConstraint"><wbr></wbr>Unique<wbr></wbr>Constraint</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16896"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.table.html" class="internal-link" title="orionis.orm.schema.table">table</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16897"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId16897">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.types.html" class="internal-link" title="orionis.orm.schema.types">types</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types._constants.html" class="internal-link" title="orionis.orm.schema.types._constants">_constants</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.big_integer.html" class="internal-link" title="orionis.orm.schema.types.big_integer">big<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.boolean.html" class="internal-link" title="orionis.orm.schema.types.boolean">boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.column_type.html" class="internal-link" title="orionis.orm.schema.types.column_type">column<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.date.html" class="internal-link" title="orionis.orm.schema.types.date">date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.date_time.html" class="internal-link" title="orionis.orm.schema.types.date_time">date<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.double.html" class="internal-link" title="orionis.orm.schema.types.double">double</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.enum_type.html" class="internal-link" title="orionis.orm.schema.types.enum_type">enum<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.float_type.html" class="internal-link" title="orionis.orm.schema.types.float_type">float<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.integer.html" class="internal-link" title="orionis.orm.schema.types.integer">integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.interval.html" class="internal-link" title="orionis.orm.schema.types.interval">interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.large_binary.html" class="internal-link" title="orionis.orm.schema.types.large_binary">large<wbr></wbr>_binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.match_type.html" class="internal-link" title="orionis.orm.schema.types.match_type">match<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.numeric.html" class="internal-link" title="orionis.orm.schema.types.numeric">numeric</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.numeric_common.html" class="internal-link" title="orionis.orm.schema.types.numeric_common">numeric<wbr></wbr>_common</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.pickle_type.html" class="internal-link" title="orionis.orm.schema.types.pickle_type">pickle<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.schema_type.html" class="internal-link" title="orionis.orm.schema.types.schema_type">schema<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.small_integer.html" class="internal-link" title="orionis.orm.schema.types.small_integer">small<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_array.html" class="internal-link" title="orionis.orm.schema.types.strict_array">strict<wbr></wbr>_array</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_big_int.html" class="internal-link" title="orionis.orm.schema.types.strict_big_int">strict<wbr></wbr>_big<wbr></wbr>_int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_binary.html" class="internal-link" title="orionis.orm.schema.types.strict_binary">strict<wbr></wbr>_binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_blob.html" class="internal-link" title="orionis.orm.schema.types.strict_blob">strict<wbr></wbr>_blob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_char.html" class="internal-link" title="orionis.orm.schema.types.strict_char">strict<wbr></wbr>_char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_clob.html" class="internal-link" title="orionis.orm.schema.types.strict_clob">strict<wbr></wbr>_clob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_decimal.html" class="internal-link" title="orionis.orm.schema.types.strict_decimal">strict<wbr></wbr>_decimal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_double_precision.html" class="internal-link" title="orionis.orm.schema.types.strict_double_precision">strict<wbr></wbr>_double<wbr></wbr>_precision</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_int.html" class="internal-link" title="orionis.orm.schema.types.strict_int">strict<wbr></wbr>_int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_json.html" class="internal-link" title="orionis.orm.schema.types.strict_json">strict<wbr></wbr>_json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_nchar.html" class="internal-link" title="orionis.orm.schema.types.strict_nchar">strict<wbr></wbr>_nchar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_nvarchar.html" class="internal-link" title="orionis.orm.schema.types.strict_nvarchar">strict<wbr></wbr>_nvarchar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_real.html" class="internal-link" title="orionis.orm.schema.types.strict_real">strict<wbr></wbr>_real</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_small_int.html" class="internal-link" title="orionis.orm.schema.types.strict_small_int">strict<wbr></wbr>_small<wbr></wbr>_int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_timestamp.html" class="internal-link" title="orionis.orm.schema.types.strict_timestamp">strict<wbr></wbr>_timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_var_binary.html" class="internal-link" title="orionis.orm.schema.types.strict_var_binary">strict<wbr></wbr>_var<wbr></wbr>_binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.strict_varchar.html" class="internal-link" title="orionis.orm.schema.types.strict_varchar">strict<wbr></wbr>_varchar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.string_type.html" class="internal-link" title="orionis.orm.schema.types.string_type">string<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.text.html" class="internal-link" title="orionis.orm.schema.types.text">text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.time_type.html" class="internal-link" title="orionis.orm.schema.types.time_type">time<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.unicode.html" class="internal-link" title="orionis.orm.schema.types.unicode">unicode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.unicode_text.html" class="internal-link" title="orionis.orm.schema.types.unicode_text">unicode<wbr></wbr>_text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.uuid_type.html" class="internal-link" title="orionis.orm.schema.types.uuid_type">uuid<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.BigInteger.html" class="internal-link" title="orionis.orm.schema.types.BigInteger"><wbr></wbr>Big<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Boolean.html" class="internal-link" title="orionis.orm.schema.types.Boolean"><wbr></wbr>Boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.ColumnType.html" class="internal-link" title="orionis.orm.schema.types.ColumnType"><wbr></wbr>Column<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Date.html" class="internal-link" title="orionis.orm.schema.types.Date"><wbr></wbr>Date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.DateTime.html" class="internal-link" title="orionis.orm.schema.types.DateTime"><wbr></wbr>Date<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Double.html" class="internal-link" title="orionis.orm.schema.types.Double"><wbr></wbr>Double</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Enum.html" class="internal-link" title="orionis.orm.schema.types.Enum"><wbr></wbr>Enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Float.html" class="internal-link" title="orionis.orm.schema.types.Float"><wbr></wbr>Float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Integer.html" class="internal-link" title="orionis.orm.schema.types.Integer"><wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Interval.html" class="internal-link" title="orionis.orm.schema.types.Interval"><wbr></wbr>Interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.LargeBinary.html" class="internal-link" title="orionis.orm.schema.types.LargeBinary"><wbr></wbr>Large<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.MatchType.html" class="internal-link" title="orionis.orm.schema.types.MatchType"><wbr></wbr>Match<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Numeric.html" class="internal-link" title="orionis.orm.schema.types.Numeric"><wbr></wbr>Numeric</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.NumericCommon.html" class="internal-link" title="orionis.orm.schema.types.NumericCommon"><wbr></wbr>Numeric<wbr></wbr>Common</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.PickleType.html" class="internal-link" title="orionis.orm.schema.types.PickleType"><wbr></wbr>Pickle<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.SchemaType.html" class="internal-link" title="orionis.orm.schema.types.SchemaType"><wbr></wbr>Schema<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.SmallInteger.html" class="internal-link" title="orionis.orm.schema.types.SmallInteger"><wbr></wbr>Small<wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictArray.html" class="internal-link" title="orionis.orm.schema.types.StrictArray"><wbr></wbr>Strict<wbr></wbr>Array</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictBigInt.html" class="internal-link" title="orionis.orm.schema.types.StrictBigInt"><wbr></wbr>Strict<wbr></wbr>Big<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictBinary.html" class="internal-link" title="orionis.orm.schema.types.StrictBinary"><wbr></wbr>Strict<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictBlob.html" class="internal-link" title="orionis.orm.schema.types.StrictBlob"><wbr></wbr>Strict<wbr></wbr>Blob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictChar.html" class="internal-link" title="orionis.orm.schema.types.StrictChar"><wbr></wbr>Strict<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictClob.html" class="internal-link" title="orionis.orm.schema.types.StrictClob"><wbr></wbr>Strict<wbr></wbr>Clob</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictDecimal.html" class="internal-link" title="orionis.orm.schema.types.StrictDecimal"><wbr></wbr>Strict<wbr></wbr>Decimal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictDoublePrecision.html" class="internal-link" title="orionis.orm.schema.types.StrictDoublePrecision"><wbr></wbr>Strict<wbr></wbr>Double<wbr></wbr>Precision</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictInt.html" class="internal-link" title="orionis.orm.schema.types.StrictInt"><wbr></wbr>Strict<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictJson.html" class="internal-link" title="orionis.orm.schema.types.StrictJson"><wbr></wbr>Strict<wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictNChar.html" class="internal-link" title="orionis.orm.schema.types.StrictNChar"><wbr></wbr>Strict<wbr></wbr>NChar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictNVarChar.html" class="internal-link" title="orionis.orm.schema.types.StrictNVarChar"><wbr></wbr>Strict<wbr></wbr>NVar<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictReal.html" class="internal-link" title="orionis.orm.schema.types.StrictReal"><wbr></wbr>Strict<wbr></wbr>Real</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictSmallInt.html" class="internal-link" title="orionis.orm.schema.types.StrictSmallInt"><wbr></wbr>Strict<wbr></wbr>Small<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictTimestamp.html" class="internal-link" title="orionis.orm.schema.types.StrictTimestamp"><wbr></wbr>Strict<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictVarBinary.html" class="internal-link" title="orionis.orm.schema.types.StrictVarBinary"><wbr></wbr>Strict<wbr></wbr>Var<wbr></wbr>Binary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.StrictVarChar.html" class="internal-link" title="orionis.orm.schema.types.StrictVarChar"><wbr></wbr>Strict<wbr></wbr>Var<wbr></wbr>Char</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.String.html" class="internal-link" title="orionis.orm.schema.types.String"><wbr></wbr>String</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Text.html" class="internal-link" title="orionis.orm.schema.types.Text"><wbr></wbr>Text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Time.html" class="internal-link" title="orionis.orm.schema.types.Time"><wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Unicode.html" class="internal-link" title="orionis.orm.schema.types.Unicode"><wbr></wbr>Unicode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.UnicodeText.html" class="internal-link" title="orionis.orm.schema.types.UnicodeText"><wbr></wbr>Unicode<wbr></wbr>Text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.types.Uuid.html" class="internal-link" title="orionis.orm.schema.types.Uuid"><wbr></wbr>Uuid</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16898"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId16898">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition"><wbr></wbr>Table<wbr></wbr>Definition</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#columnNames" class="internal-link" title="orionis.orm.schema.TableDefinition.columnNames">column<wbr></wbr>Names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#hasColumn" class="internal-link" title="orionis.orm.schema.TableDefinition.hasColumn">has<wbr></wbr>Column</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#columns" class="internal-link" title="orionis.orm.schema.TableDefinition.columns">columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#comment" class="internal-link" title="orionis.orm.schema.TableDefinition.comment">comment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#composite_primary_key" class="internal-link" title="orionis.orm.schema.TableDefinition.composite_primary_key">composite<wbr></wbr>_primary<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#foreign_keys" class="internal-link" title="orionis.orm.schema.TableDefinition.foreign_keys">foreign<wbr></wbr>_keys</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#indexes" class="internal-link" title="orionis.orm.schema.TableDefinition.indexes">indexes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#name" class="internal-link" title="orionis.orm.schema.TableDefinition.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#primary_key" class="internal-link" title="orionis.orm.schema.TableDefinition.primary_key">primary<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#schema" class="internal-link" title="orionis.orm.schema.TableDefinition.schema">schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.schema.TableDefinition.html#unique_constraints" class="internal-link" title="orionis.orm.schema.TableDefinition.unique_constraints">unique<wbr></wbr>_constraints</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.orm.html" class="internal-link" title="orionis.orm">orm</a></code><wbr></wbr>.<code><a href="orionis.orm.schema.html" class="internal-link" title="orionis.orm.schema">schema</a></code><wbr></wbr>.<code><a href="orionis.orm.schema.table.html" class="internal-link" title="orionis.orm.schema.table">table</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/schema/table.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

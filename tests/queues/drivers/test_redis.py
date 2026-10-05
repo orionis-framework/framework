@@ -4,7 +4,7 @@ from orionis.foundation.config.queue import Redis as RedisConfig
 from orionis.queues.drivers.redis import RedisQueueDriver
 from orionis.queues.exceptions import QueueConfigurationError, QueueStorageError
 from orionis.test import TestCase
-from tests.queues.drivers.contract import make_envelope
+from tests.queues.drivers.test_database import make_envelope
 
 if TYPE_CHECKING:
     from orionis.queues.entities.reserved_job import ReservedJob

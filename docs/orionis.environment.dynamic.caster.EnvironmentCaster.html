@@ -1,0 +1,1941 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.environment.dynamic.caster.EnvironmentCaster</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="This class"><wbr></wbr>Environment<wbr></wbr>Caster</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parseTyped" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.parseTyped">parse<wbr></wbr>Typed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#supportedTypes" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.supportedTypes">supported<wbr></wbr>Types</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBase64">__parse<wbr></wbr>Base64</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBool">__parse<wbr></wbr>Bool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseDict">__parse<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseFloat">__parse<wbr></wbr>Float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseInt">__parse<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseList">__parse<wbr></wbr>List</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parsePath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parsePath">__parse<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseSet">__parse<wbr></wbr>Set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseStr">__parse<wbr></wbr>Str</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseTuple">__parse<wbr></wbr>Tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBase64">__to<wbr></wbr>Base64</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBool">__to<wbr></wbr>Bool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toDict">__to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toFloat">__to<wbr></wbr>Float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toInt">__to<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toList">__to<wbr></wbr>List</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toPath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toPath">__to<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toSet">__to<wbr></wbr>Set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toStr">__to<wbr></wbr>Str</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toTuple">__to<wbr></wbr>Tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__type_hint" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">__type<wbr></wbr>_hint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__value_raw" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">__value<wbr></wbr>_raw</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.environment.dynamic.caster.html" class="internal-link" title="The parent of this class">caster</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5791"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster"><wbr></wbr>Environment<wbr></wbr>Caster</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parseTyped" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.parseTyped">parse<wbr></wbr>Typed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#supportedTypes" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.supportedTypes">supported<wbr></wbr>Types</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBase64">__parse<wbr></wbr>Base64</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBool">__parse<wbr></wbr>Bool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseDict">__parse<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseFloat">__parse<wbr></wbr>Float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseInt">__parse<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseList">__parse<wbr></wbr>List</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parsePath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parsePath">__parse<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseSet">__parse<wbr></wbr>Set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseStr">__parse<wbr></wbr>Str</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__parseTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseTuple">__parse<wbr></wbr>Tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBase64">__to<wbr></wbr>Base64</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBool">__to<wbr></wbr>Bool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toDict">__to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toFloat">__to<wbr></wbr>Float</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toInt">__to<wbr></wbr>Int</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toList">__to<wbr></wbr>List</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toPath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toPath">__to<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toSet">__to<wbr></wbr>Set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toStr">__to<wbr></wbr>Str</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__toTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toTuple">__to<wbr></wbr>Tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__type_hint" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">__type<wbr></wbr>_hint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__value_raw" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">__value<wbr></wbr>_raw</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.environment.html" class="internal-link" title="orionis.environment">environment</a></code><wbr></wbr>.<code><a href="orionis.environment.dynamic.html" class="internal-link" title="orionis.environment.dynamic">dynamic</a></code><wbr></wbr>.<code><a href="orionis.environment.dynamic.caster.html" class="internal-link" title="orionis.environment.dynamic.caster">caster</a></code><wbr></wbr>.<code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">EnvironmentCaster</span>(<a href="orionis.environment.contracts.caster.IEnvironmentCaster.html" class="internal-link" title="orionis.environment.contracts.caster.IEnvironmentCaster">IEnvironmentCaster</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">EnvironmentCaster(raw)</a></code></p><p><a href="classIndex.html#orionis.environment.dynamic.caster.EnvironmentCaster">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id540">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#parseTyped" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.parseTyped">parse<wbr></wbr>Typed</a></code></td>
+    <td>Parse a typed string (e.g. 'int:42') without full object construction.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#supportedTypes" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.supportedTypes">supported<wbr></wbr>Types</a></code></td>
+    <td>Return the set of valid type hints supported by this class.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">__init__</a></code></td>
+    <td>Initialize the caster by parsing input to extract type hint and value.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBase64">__parse<wbr></wbr>Base64</a></code></td>
+    <td>Decode the internal raw value from Base64 encoding.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBool">__parse<wbr></wbr>Bool</a></code></td>
+    <td>Convert the internal raw value to a boolean.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseDict">__parse<wbr></wbr>Dict</a></code></td>
+    <td>Parse the internal raw value and convert it to a Python dictionary.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseFloat">__parse<wbr></wbr>Float</a></code></td>
+    <td>Convert the internal raw value to a float.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseInt">__parse<wbr></wbr>Int</a></code></td>
+    <td>Convert the internal raw value to an integer.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseList">__parse<wbr></wbr>List</a></code></td>
+    <td>Parse the internal raw value and convert it to a Python list.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parsePath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parsePath">__parse<wbr></wbr>Path</a></code></td>
+    <td>Convert the internal raw value to a normalized POSIX path string.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseSet">__parse<wbr></wbr>Set</a></code></td>
+    <td>Parse the internal raw value and convert it to a Python set.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseStr">__parse<wbr></wbr>Str</a></code></td>
+    <td>Return the internal raw value as a string with leading whitespace removed.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__parseTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseTuple">__parse<wbr></wbr>Tuple</a></code></td>
+    <td>Parse the internal raw value and convert it to a Python tuple.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toBase64" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBase64">__to<wbr></wbr>Base64</a></code></td>
+    <td>Convert internal value to Base64 encoded string with type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toBool" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBool">__to<wbr></wbr>Bool</a></code></td>
+    <td>Convert the internal value to a boolean string with type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toDict" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toDict">__to<wbr></wbr>Dict</a></code></td>
+    <td>Convert the internal value to a string with dictionary type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toFloat" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toFloat">__to<wbr></wbr>Float</a></code></td>
+    <td>Convert the internal value to a string with the float type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toInt" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toInt">__to<wbr></wbr>Int</a></code></td>
+    <td>Convert the internal value to a string with the integer type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toList" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toList">__to<wbr></wbr>List</a></code></td>
+    <td>Convert the internal value to a string representation with list type hint.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toPath" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toPath">__to<wbr></wbr>Path</a></code></td>
+    <td>Convert internal value to absolute POSIX path string with type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toSet" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toSet">__to<wbr></wbr>Set</a></code></td>
+    <td>Convert the internal value to a string with the set type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toStr" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toStr">__to<wbr></wbr>Str</a></code></td>
+    <td>Return the internal value as a string prefixed by the type hint.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__toTuple" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toTuple">__to<wbr></wbr>Tuple</a></code></td>
+    <td>Convert the internal value to a string with the tuple type hint prefix.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#get" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.get">get</a></code></td>
+    <td>Return the processed value according to the type hint.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#to" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.to">to</a></code></td>
+    <td>Convert the internal value to the specified type and return as a string.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__type_hint" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">__type<wbr></wbr>_hint</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__value_raw" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">__value<wbr></wbr>_raw</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.parseTyped">
+    
+  </a>
+  <a name="parseTyped">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">parseTyped</span><span class="function-signature">(<span class="rst-sig-param">value_str: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#parseTyped" title="orionis.environment.dynamic.caster.EnvironmentCaster.parseTyped">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse a typed string (e.g. 'int:42') without full object construction.</p>
+<p>Provides a fast path for the common case where a string with a known
+type prefix must be parsed. Primitive types (int, float, bool, str) are
+handled inline without allocating an EnvironmentCaster instance. Complex
+types (list, dict, tuple, set, path, base64) fall back to full
+instantiation only when necessary.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value<wbr></wbr>_str:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">A string in the format <tt class="rst-docutils rst-literal"><span class="pre">&lt;type_hint&gt;:&lt;value&gt;</span></tt>, e.g. <tt class="rst-docutils rst-literal">int:42</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The parsed Python value according to the embedded type hint.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to the indicated type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is incompatible with the indicated type.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.supportedTypes">
+    
+  </a>
+  <a name="supportedTypes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">supportedTypes</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#supportedTypes" title="orionis.environment.dynamic.caster.EnvironmentCaster.supportedTypes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the set of valid type hints supported by this class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Set of valid type hint strings that can be used for environment
+value casting.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L89">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the caster by parsing input to extract type hint and value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raw:</span><code>str | object</code></td><td class="fieldArgDesc">Input value to be parsed. If string containing a colon, the part
+before the colon is treated as type hint and after as value. If no
+colon is present, entire string is treated as value with no type
+hint. Non-string inputs are treated as values with no type hint.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Does not return a value; initializes instance attributes.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBase64">
+    
+  </a>
+  <a name="__parseBase64">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseBase64</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L343">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseBase64" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBase64">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode the internal raw value from Base64 encoding.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | bytes</code></td><td class="fieldArgDesc">The decoded value. Returns a UTF-8 string if the decoded bytes
+represent valid UTF-8 text, otherwise returns the raw bytes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be decoded from Base64.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBool">
+    
+  </a>
+  <a name="__parseBool">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseBool</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L674">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseBool" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseBool">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal raw value to a boolean.</p>
+<p>Strips leading and trailing whitespace, converts to lowercase, and checks
+for common boolean representations. Returns True for 'true', '1', 'yes',
+'on', 'enabled'. Returns False for 'false', '0', 'no', 'off', 'disabled'.
+Raises ValueError if the value does not match any valid representation.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True or False based on the value's representation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a boolean.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseDict">
+    
+  </a>
+  <a name="__parseDict">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L833">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseDict" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseDict">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse the internal raw value and convert it to a Python dictionary.</p>
+<p>Strips leading and trailing whitespace from the internal raw value,
+then safely evaluates the string as a Python dictionary using
+<code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>. Raises an error if the conversion fails or the
+result is not a dictionary.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">The internal value converted to a dictionary.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a dictionary due to invalid
+format or type.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseFloat">
+    
+  </a>
+  <a name="__parseFloat">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseFloat</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L589">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseFloat" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseFloat">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal raw value to a float.</p>
+<p>Strips leading and trailing whitespace from the internal raw value and
+attempts to convert it to a float.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">The internal value converted to a float.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a float due to invalid format or type.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseInt">
+    
+  </a>
+  <a name="__parseInt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseInt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L513">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseInt" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseInt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal raw value to an integer.</p>
+<p>Strip leading and trailing whitespace from the internal raw value and
+attempt to convert it to an integer.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The internal value converted to an integer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to an integer due to invalid format
+or type.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseList">
+    
+  </a>
+  <a name="__parseList">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseList</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L767">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseList" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseList">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse the internal raw value and convert it to a Python list.</p>
+<p>Strips leading and trailing whitespace from the internal raw value,
+then safely evaluates the string as a Python list using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+Raises an exception if the conversion fails or the result is not a list.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></td><td class="fieldArgDesc">The internal value converted to a list.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a list due to invalid format.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#SyntaxError" class="intersphinx-link">SyntaxError</a></code></td><td>If the value contains invalid Python syntax.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a list.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parsePath">
+    
+  </a>
+  <a name="__parsePath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parsePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L379">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parsePath" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parsePath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal raw value to a normalized POSIX path string.</p>
+<p>Process the internal value as a file system path. If the value is already
+a <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code> object, return its POSIX representation. If the value is a string,
+replace backslashes with forward slashes for normalization and return the
+POSIX path string.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The normalized POSIX path string representing the file system path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be processed as a valid path.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseSet">
+    
+  </a>
+  <a name="__parseSet">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseSet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L971">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseSet" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseSet">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse the internal raw value and convert it to a Python set.</p>
+<p>Remove leading and trailing whitespace from the internal raw value,
+then safely evaluate the string as a Python set using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+Raise a TypeError if the result is not a set, or a ValueError if the
+conversion fails.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code></td><td class="fieldArgDesc">The internal value converted to a set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a set.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a set due to invalid format or type.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseStr">
+    
+  </a>
+  <a name="__parseStr">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseStr</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L466">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseStr" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseStr">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the internal raw value as a string with leading whitespace removed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The internal value as a string with leading whitespace stripped.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__parseTuple">
+    
+  </a>
+  <a name="__parseTuple">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseTuple</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L902">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__parseTuple" title="orionis.environment.dynamic.caster.EnvironmentCaster.__parseTuple">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Parse the internal raw value and convert it to a Python tuple.</p>
+<p>Remove leading and trailing whitespace from the internal raw value,
+then safely evaluate the string as a Python tuple using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+Raise a ValueError if conversion fails or the result is not a tuple.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">The internal value converted to a tuple.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a tuple due to invalid format or type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a tuple.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toBase64">
+    
+  </a>
+  <a name="__toBase64">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toBase64</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L282">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toBase64" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBase64">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert internal value to Base64 encoded string with type hint prefix.</p>
+<p>If the value is already valid Base64, it is preserved as-is.
+Otherwise, the value is encoded to Base64 format.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in format "&lt;type_hint&gt;:&lt;base64_value&gt;" where base64_value
+is the Base64 encoded representation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a string or bytes type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If there's an error during Base64 encoding/decoding operations.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toBool">
+    
+  </a>
+  <a name="__toBool">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toBool</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L710">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toBool" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toBool">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a boolean string with type hint prefix.</p>
+<p>Converts the internal value to a string representation of a boolean,
+prefixed by the type hint. Accepts common boolean representations for
+string inputs.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;value&gt; is
+'true' or 'false' in lowercase.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be converted to a boolean.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value type is not convertible to boolean.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toDict">
+    
+  </a>
+  <a name="__toDict">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L869">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toDict" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toDict">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string with dictionary type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the string representation of the dict.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a dictionary.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toFloat">
+    
+  </a>
+  <a name="__toFloat">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toFloat</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L623">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toFloat" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toFloat">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string with the float type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the float value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value cannot be converted to a float.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be converted to a float due to invalid format.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toInt">
+    
+  </a>
+  <a name="__toInt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toInt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L543">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toInt" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toInt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string with the integer type hint prefix.</p>
+<p>Supports conversion from string values to integers for usability.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the integer value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be converted to an integer.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toList">
+    
+  </a>
+  <a name="__toList">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toList</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L805">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toList" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toList">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string representation with list type hint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the string representation of the list.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a list.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toPath">
+    
+  </a>
+  <a name="__toPath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toPath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L416">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toPath" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toPath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert internal value to absolute POSIX path string with type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in format "&lt;type_hint&gt;:&lt;absolute_path&gt;" where absolute_path
+is the normalized, absolute POSIX path representation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a string or pathlib.Path object.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toSet">
+    
+  </a>
+  <a name="__toSet">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toSet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L1008">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toSet" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toSet">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string with the set type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the string representation of the set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a set.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toStr">
+    
+  </a>
+  <a name="__toStr">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toStr</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L480">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toStr" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toStr">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the internal value as a string prefixed by the type hint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the string value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__toTuple">
+    
+  </a>
+  <a name="__toTuple">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__toTuple</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L938">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__toTuple" title="orionis.environment.dynamic.caster.EnvironmentCaster.__toTuple">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert the internal value to a string with the tuple type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+current type hint and &lt;value&gt; is the string representation of the tuple.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a tuple.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.get">
+    
+  </a>
+  <a name="get">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L136">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#get" title="orionis.environment.dynamic.caster.EnvironmentCaster.get">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.environment.contracts.caster.IEnvironmentCaster.html#get" class="internal-link">orionis.environment.contracts.caster.IEnvironmentCaster.get</a></code></div>
+    <div><p>Return the processed value according to the type hint.</p>
+<p>If a valid type hint is present, dispatch to the corresponding internal
+parsing method for that type. Supported type hints include: 'path', 'str',
+'int', 'float', 'bool', 'list', 'dict', 'tuple', 'set', and 'base64'.
+If no type hint is set, return the raw value.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The value converted or processed according to the specified type hint.
+If no type hint is set, returns the raw value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an error occurs during type conversion or processing.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an error occurs during type conversion or processing.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.to">
+    
+  </a>
+  <a name="to">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">to</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">type_hint: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | EnvironmentValueType</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L209">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#to" title="orionis.environment.dynamic.caster.EnvironmentCaster.to">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.environment.contracts.caster.IEnvironmentCaster.html#to" class="internal-link">orionis.environment.contracts.caster.IEnvironmentCaster.to</a></code></div>
+    <div><p>Convert the internal value to the specified type and return as a string.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a></code></td><td class="fieldArgDesc">The type to which the internal value should be converted. Must be a
+valid option in <code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String representation of the value with the type hint prefix, e.g.,
+int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the provided type hint is invalid or conversion fails.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">
+    
+  </a>
+  <a name="OPTIONS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">OPTIONS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L13">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#OPTIONS" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>(e.value for e in EnvironmentValueType))</code></pre></td></tr></table>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L16">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.environment.contracts.caster.IEnvironmentCaster.html#__slots__" class="internal-link">orionis.environment.contracts.caster.IEnvironmentCaster.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">
+    
+  </a>
+  <a name="__type_hint">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__type_hint</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L110">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__type_hint" title="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">
+    
+  </a>
+  <a name="__value_raw">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__value_raw</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/environment/dynamic/caster.py#L111">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__value_raw" title="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

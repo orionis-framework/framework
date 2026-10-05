@@ -1,0 +1,1032 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.adapters.response.streams</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.http.adapters.response.streams.html" class="internal-link" title="This module">streams</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cancel_tasks" class="internal-link" title="orionis.http.adapters.response.streams._cancel_tasks">_cancel<wbr></wbr>_tasks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finish_cancelled_cleanup" class="internal-link" title="orionis.http.adapters.response.streams._finish_cancelled_cleanup">_finish<wbr></wbr>_cancelled<wbr></wbr>_cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_raise_task_errors" class="internal-link" title="orionis.http.adapters.response.streams._raise_task_errors">_raise<wbr></wbr>_task<wbr></wbr>_errors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_record_completion" class="internal-link" title="orionis.http.adapters.response.streams._record_completion">_record<wbr></wbr>_completion</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#await_cleanup" class="internal-link" title="orionis.http.adapters.response.streams.await_cleanup">await<wbr></wbr>_cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close_stream" class="internal-link" title="orionis.http.adapters.response.streams.close_stream">close<wbr></wbr>_stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#send_until_disconnect" class="internal-link" title="orionis.http.adapters.response.streams.send_until_disconnect">send<wbr></wbr>_until<wbr></wbr>_disconnect</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.http.adapters.response.html" class="internal-link" title="The parent of this module">response</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9055"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9055">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.asgi.html" class="internal-link" title="orionis.http.adapters.response.asgi">asgi</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.asgi.ASGIResponseAdapter.html" class="internal-link" title="orionis.http.adapters.response.asgi.ASGIResponseAdapter"><wbr></wbr>ASGIResponse<wbr></wbr>Adapter</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9056"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9056">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.contracts.html" class="internal-link" title="orionis.http.adapters.response.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.contracts.response.html" class="internal-link" title="orionis.http.adapters.response.contracts.response">response</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9057"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9057">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.files.html" class="internal-link" title="orionis.http.adapters.response.files">files</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.files.html#_drain_future" class="internal-link" title="orionis.http.adapters.response.files._drain_future">_drain<wbr></wbr>_future</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.files.html#complete_file_read" class="internal-link" title="orionis.http.adapters.response.files.complete_file_read">complete<wbr></wbr>_file<wbr></wbr>_read</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.files.html#open_file" class="internal-link" title="orionis.http.adapters.response.files.open_file">open<wbr></wbr>_file</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9058"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9058">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.ranges.html" class="internal-link" title="orionis.http.adapters.response.ranges">ranges</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.ranges.html#parse_range" class="internal-link" title="orionis.http.adapters.response.ranges.parse_range">parse<wbr></wbr>_range</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9059"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9059">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.rsgi.html" class="internal-link" title="orionis.http.adapters.response.rsgi">rsgi</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.adapters.response.rsgi.RSGIResponseAdapter.html" class="internal-link" title="orionis.http.adapters.response.rsgi.RSGIResponseAdapter"><wbr></wbr>RSGIResponse<wbr></wbr>Adapter</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9060"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.adapters.response.streams.html" class="internal-link" title="orionis.http.adapters.response.streams">streams</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_cancel_tasks" class="internal-link" title="orionis.http.adapters.response.streams._cancel_tasks">_cancel<wbr></wbr>_tasks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finish_cancelled_cleanup" class="internal-link" title="orionis.http.adapters.response.streams._finish_cancelled_cleanup">_finish<wbr></wbr>_cancelled<wbr></wbr>_cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_raise_task_errors" class="internal-link" title="orionis.http.adapters.response.streams._raise_task_errors">_raise<wbr></wbr>_task<wbr></wbr>_errors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_record_completion" class="internal-link" title="orionis.http.adapters.response.streams._record_completion">_record<wbr></wbr>_completion</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#await_cleanup" class="internal-link" title="orionis.http.adapters.response.streams.await_cleanup">await<wbr></wbr>_cleanup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#close_stream" class="internal-link" title="orionis.http.adapters.response.streams.close_stream">close<wbr></wbr>_stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#send_until_disconnect" class="internal-link" title="orionis.http.adapters.response.streams.send_until_disconnect">send<wbr></wbr>_until<wbr></wbr>_disconnect</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.adapters.html" class="internal-link" title="orionis.http.adapters">adapters</a></code><wbr></wbr>.<code><a href="orionis.http.adapters.response.html" class="internal-link" title="orionis.http.adapters.response">response</a></code><wbr></wbr>.<code><a href="orionis.http.adapters.response.streams.html" class="internal-link" title="orionis.http.adapters.response.streams">streams</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id899">
+  
+  
+  <tr class="function">
+    
+    <td>Async Function</td>
+    <td><code><a href="#_cancel_tasks" class="internal-link" title="orionis.http.adapters.response.streams._cancel_tasks">_cancel<wbr></wbr>_tasks</a></code></td>
+    <td>Cancel and join both owned tasks without abandoning asynchronous cleanup.</td>
+  </tr><tr class="function">
+    
+    <td>Async Function</td>
+    <td><code><a href="#_finish_cancelled_cleanup" class="internal-link" title="orionis.http.adapters.response.streams._finish_cancelled_cleanup">_finish<wbr></wbr>_cancelled<wbr></wbr>_cleanup</a></code></td>
+    <td>Join owned cleanup after cancellation and retain its failure cause.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_raise_task_errors" class="internal-link" title="orionis.http.adapters.response.streams._raise_task_errors">_raise<wbr></wbr>_task<wbr></wbr>_errors</a></code></td>
+    <td>Propagate real sender and watcher failures after both tasks finish.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_record_completion" class="internal-link" title="orionis.http.adapters.response.streams._record_completion">_record<wbr></wbr>_completion</a></code></td>
+    <td>Record the first completed future in event-loop callback order.</td>
+  </tr><tr class="function">
+    
+    <td>Async Function</td>
+    <td><code><a href="#await_cleanup" class="internal-link" title="orionis.http.adapters.response.streams.await_cleanup">await<wbr></wbr>_cleanup</a></code></td>
+    <td>Await owned cleanup before propagating cancellation to its caller.</td>
+  </tr><tr class="function">
+    
+    <td>Async Function</td>
+    <td><code><a href="#close_stream" class="internal-link" title="orionis.http.adapters.response.streams.close_stream">close<wbr></wbr>_stream</a></code></td>
+    <td>Close an iterator without letting sibling cancellation erase a failure.</td>
+  </tr><tr class="function">
+    
+    <td>Async Function</td>
+    <td><code><a href="#send_until_disconnect" class="internal-link" title="orionis.http.adapters.response.streams.send_until_disconnect">send<wbr></wbr>_until<wbr></wbr>_disconnect</a></code></td>
+    <td>Race a stream delivery against the transport's disconnect notification.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams._cancel_tasks">
+    
+  </a>
+  <a name="_cancel_tasks">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_cancel_tasks</span><span class="function-signature">(<span class="rst-sig-param">tasks: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L137">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_cancel_tasks" title="orionis.http.adapters.response.streams._cancel_tasks">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Cancel and join both owned tasks without abandoning asynchronous cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tasks:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>], <a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></td><td class="fieldArgDesc">Sender and disconnect watcher owned by one response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish both tasks before propagating their errors or cancellation.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams._finish_cancelled_cleanup">
+    
+  </a>
+  <a name="_finish_cancelled_cleanup">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finish_cancelled_cleanup</span><span class="function-signature long-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code>, </span><span class="rst-sig-param">ready: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]]</code>, </span><span class="rst-sig-param">cancellation: <code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L38">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_finish_cancelled_cleanup" title="orionis.http.adapters.response.streams._finish_cancelled_cleanup">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Join owned cleanup after cancellation and retain its failure cause.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Cleanup operation which must finish before its owner returns.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ready:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]]</code></td><td class="fieldArgDesc">Completion notification carrying no cleanup exception.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cancellation:</span><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td class="fieldArgDesc">Cancellation that the owner will re-raise after cleanup succeeds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup while deferring additional cancellation requests.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If cleanup fails, chain its error to the original cancellation.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams._raise_task_errors">
+    
+  </a>
+  <a name="_raise_task_errors">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_raise_task_errors</span><span class="function-signature">(<span class="rst-sig-param">results: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L107">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_raise_task_errors" title="orionis.http.adapters.response.streams._raise_task_errors">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Propagate real sender and watcher failures after both tasks finish.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">results:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[BaseException | None]</code></td><td class="fieldArgDesc">Outcomes collected from both owned response tasks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Return when both tasks succeeded or were cancelled.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Preserve one failure or group simultaneous failures.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams._record_completion">
+    
+  </a>
+  <a name="_record_completion">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_record_completion</span><span class="function-signature">(<span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]]</code>, </span><span class="rst-sig-param">completed: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L162">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_record_completion" title="orionis.http.adapters.response.streams._record_completion">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Record the first completed future in event-loop callback order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">first:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]]</code></td><td class="fieldArgDesc">Completion notification awaited by the stream coordinator or cleanup.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">completed:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Operation whose completion triggered this callback.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Preserve the first completion without changing a cancelled result.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams.await_cleanup">
+    
+  </a>
+  <a name="await_cleanup">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">await_cleanup</span><span class="function-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code></span>) -&gt; <code>T</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L73">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#await_cleanup" title="orionis.http.adapters.response.streams.await_cleanup">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Await owned cleanup before propagating cancellation to its caller.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Cleanup operation protected from cancellation of its owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>T</code></td><td class="fieldArgDesc">Completed cleanup result when the owner was not cancelled.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate cleanup failure, or cancellation after successful cleanup.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams.close_stream">
+    
+  </a>
+  <a name="close_stream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close_stream</span><span class="function-signature">(<span class="rst-sig-param">iterator: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">failure: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L11">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#close_stream" title="orionis.http.adapters.response.streams.close_stream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Close an iterator without letting sibling cancellation erase a failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">iterator:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | None</code></td><td class="fieldArgDesc">Owned source whose optional asynchronous close must be awaited, if present.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failure:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Producer or transport failure already propagating through cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup, retaining a real delivery error if cancellation races it.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.http.adapters.response.streams.send_until_disconnect">
+    
+  </a>
+  <a name="send_until_disconnect">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send_until_disconnect</span><span class="function-signature long-signature">(<span class="rst-sig-param">sending: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>, </span><span class="rst-sig-param">disconnected: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/adapters/response/streams.py#L183">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#send_until_disconnect" title="orionis.http.adapters.response.streams.send_until_disconnect">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Race a stream delivery against the transport's disconnect notification.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sending:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Delivery operation, including iterator cleanup and final framing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disconnected:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Operation returning when the client disconnects.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether delivery completed before the disconnect watcher.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate delivery, notification, cleanup errors or request cancellation.</td></tr></table></div>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

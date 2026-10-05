@@ -1,0 +1,2760 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.cache.serializer</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.cache.serializer.html" class="internal-link" title="This module">serializer</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1989"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1989">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.serializer.Serializer.html" class="internal-link" title="orionis.cache.serializer.Serializer"><wbr></wbr>Serializer</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializer.Serializer.html#dumps" class="internal-link" title="orionis.cache.serializer.Serializer.dumps">dumps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializer.Serializer.html#dumpToFile" class="internal-link" title="orionis.cache.serializer.Serializer.dumpToFile">dump<wbr></wbr>To<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializer.Serializer.html#loadFromFile" class="internal-link" title="orionis.cache.serializer.Serializer.loadFromFile">load<wbr></wbr>From<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializer.Serializer.html#loads" class="internal-link" title="orionis.cache.serializer.Serializer.loads">loads</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_complex" class="internal-link" title="orionis.cache.serializer._dec_complex">_dec<wbr></wbr>_complex</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_enum" class="internal-link" title="orionis.cache.serializer._dec_enum">_dec<wbr></wbr>_enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_frozenset" class="internal-link" title="orionis.cache.serializer._dec_frozenset">_dec<wbr></wbr>_frozenset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_missing" class="internal-link" title="orionis.cache.serializer._dec_missing">_dec<wbr></wbr>_missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_set" class="internal-link" title="orionis.cache.serializer._dec_set">_dec<wbr></wbr>_set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_timedelta" class="internal-link" title="orionis.cache.serializer._dec_timedelta">_dec<wbr></wbr>_timedelta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_tuple" class="internal-link" title="orionis.cache.serializer._dec_tuple">_dec<wbr></wbr>_tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_type" class="internal-link" title="orionis.cache.serializer._dec_type">_dec<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode" class="internal-link" title="orionis.cache.serializer._decode">_decode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode" class="internal-link" title="orionis.cache.serializer._encode">_encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_subclass" class="internal-link" title="orionis.cache.serializer._encode_subclass">_encode<wbr></wbr>_subclass</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DECODE_DISPATCH" class="internal-link" title="orionis.cache.serializer._DECODE_DISPATCH">_DECODE<wbr></wbr>_DISPATCH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ENCODE_EXACT" class="internal-link" title="orionis.cache.serializer._ENCODE_EXACT">_ENCODE<wbr></wbr>_EXACT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TK" class="internal-link" title="orionis.cache.serializer._TK">_TK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_VK" class="internal-link" title="orionis.cache.serializer._VK">_VK</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.cache.html" class="internal-link" title="The parent of this module">cache</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1990"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.cache_manager.html" class="internal-link" title="orionis.cache.cache_manager">cache<wbr></wbr>_manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1991"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1991">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.contracts.html" class="internal-link" title="orionis.cache.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.cache_manager.html" class="internal-link" title="orionis.cache.contracts.cache_manager">cache<wbr></wbr>_manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.file_based_cache.html" class="internal-link" title="orionis.cache.contracts.file_based_cache">file<wbr></wbr>_based<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.repository.html" class="internal-link" title="orionis.cache.contracts.repository">repository</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link" title="orionis.cache.contracts.ICacheManager"><wbr></wbr>ICache<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.ICacheRepository.html" class="internal-link" title="orionis.cache.contracts.ICacheRepository"><wbr></wbr>ICache<wbr></wbr>Repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.IFileBasedCache.html" class="internal-link" title="orionis.cache.contracts.IFileBasedCache"><wbr></wbr>IFile<wbr></wbr>Based<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1992"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1992">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.exceptions.html" class="internal-link" title="orionis.cache.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.exceptions.CacheException.html" class="internal-link" title="orionis.cache.exceptions.CacheException"><wbr></wbr>Cache<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.exceptions.CacheStoreException.html" class="internal-link" title="orionis.cache.exceptions.CacheStoreException"><wbr></wbr>Cache<wbr></wbr>Store<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1993"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.file_based_cache.html" class="internal-link" title="orionis.cache.file_based_cache">file<wbr></wbr>_based<wbr></wbr>_cache</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1994"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1994">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.locks.html" class="internal-link" title="orionis.cache.locks">locks</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.locks.lock.html" class="internal-link" title="orionis.cache.locks.lock">lock</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1995"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1995">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.provider.html" class="internal-link" title="orionis.cache.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.provider.CacheProvider.html" class="internal-link" title="orionis.cache.provider.CacheProvider"><wbr></wbr>Cache<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1996"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1996">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.repository.html" class="internal-link" title="orionis.cache.repository">repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.repository.html#_MISSING" class="internal-link" title="orionis.cache.repository._MISSING">_MISSING</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1997"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.serializer.html" class="internal-link" title="orionis.cache.serializer">serializer</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializer.Serializer.html" class="internal-link" title="orionis.cache.serializer.Serializer"><wbr></wbr>Serializer</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_complex" class="internal-link" title="orionis.cache.serializer._dec_complex">_dec<wbr></wbr>_complex</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_enum" class="internal-link" title="orionis.cache.serializer._dec_enum">_dec<wbr></wbr>_enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_frozenset" class="internal-link" title="orionis.cache.serializer._dec_frozenset">_dec<wbr></wbr>_frozenset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_missing" class="internal-link" title="orionis.cache.serializer._dec_missing">_dec<wbr></wbr>_missing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_set" class="internal-link" title="orionis.cache.serializer._dec_set">_dec<wbr></wbr>_set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_timedelta" class="internal-link" title="orionis.cache.serializer._dec_timedelta">_dec<wbr></wbr>_timedelta</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_tuple" class="internal-link" title="orionis.cache.serializer._dec_tuple">_dec<wbr></wbr>_tuple</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_dec_type" class="internal-link" title="orionis.cache.serializer._dec_type">_dec<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_decode" class="internal-link" title="orionis.cache.serializer._decode">_decode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode" class="internal-link" title="orionis.cache.serializer._encode">_encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_subclass" class="internal-link" title="orionis.cache.serializer._encode_subclass">_encode<wbr></wbr>_subclass</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_DECODE_DISPATCH" class="internal-link" title="orionis.cache.serializer._DECODE_DISPATCH">_DECODE<wbr></wbr>_DISPATCH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ENCODE_EXACT" class="internal-link" title="orionis.cache.serializer._ENCODE_EXACT">_ENCODE<wbr></wbr>_EXACT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TK" class="internal-link" title="orionis.cache.serializer._TK">_TK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_VK" class="internal-link" title="orionis.cache.serializer._VK">_VK</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1998"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1998">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.serializers.html" class="internal-link" title="orionis.cache.serializers">serializers</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.serializers.json.html" class="internal-link" title="orionis.cache.serializers.json">json</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1999"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1999">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.stores.html" class="internal-link" title="orionis.cache.stores">stores</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.stores.database.html" class="internal-link" title="orionis.cache.stores.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.stores.file.html" class="internal-link" title="orionis.cache.stores.file">file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.stores.memcached.html" class="internal-link" title="orionis.cache.stores.memcached">memcached</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.stores.memory.html" class="internal-link" title="orionis.cache.stores.memory">memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.stores.redis.html" class="internal-link" title="orionis.cache.stores.redis">redis</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2000"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId2000">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.CacheManager.html" class="internal-link" title="orionis.cache.CacheManager"><wbr></wbr>Cache<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#__init__" class="internal-link" title="orionis.cache.CacheManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_buildBackend" class="internal-link" title="orionis.cache.CacheManager._buildBackend">_build<wbr></wbr>Backend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_buildDatabaseBackend" class="internal-link" title="orionis.cache.CacheManager._buildDatabaseBackend">_build<wbr></wbr>Database<wbr></wbr>Backend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#add" class="internal-link" title="orionis.cache.CacheManager.add">add</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#clear" class="internal-link" title="orionis.cache.CacheManager.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#decrement" class="internal-link" title="orionis.cache.CacheManager.decrement">decrement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#delete" class="internal-link" title="orionis.cache.CacheManager.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#get" class="internal-link" title="orionis.cache.CacheManager.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#getMany" class="internal-link" title="orionis.cache.CacheManager.getMany">get<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#has" class="internal-link" title="orionis.cache.CacheManager.has">has</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#increment" class="internal-link" title="orionis.cache.CacheManager.increment">increment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#lock" class="internal-link" title="orionis.cache.CacheManager.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#pull" class="internal-link" title="orionis.cache.CacheManager.pull">pull</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#remember" class="internal-link" title="orionis.cache.CacheManager.remember">remember</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#rememberForever" class="internal-link" title="orionis.cache.CacheManager.rememberForever">remember<wbr></wbr>Forever</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#set" class="internal-link" title="orionis.cache.CacheManager.set">set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#setMany" class="internal-link" title="orionis.cache.CacheManager.setMany">set<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#store" class="internal-link" title="orionis.cache.CacheManager.store">store</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#__slots__" class="internal-link" title="orionis.cache.CacheManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_app" class="internal-link" title="orionis.cache.CacheManager._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_base_path" class="internal-link" title="orionis.cache.CacheManager._base_path">_base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_config" class="internal-link" title="orionis.cache.CacheManager._config">_config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_default" class="internal-link" title="orionis.cache.CacheManager._default">_default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_prefix" class="internal-link" title="orionis.cache.CacheManager._prefix">_prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheManager.html#_repositories" class="internal-link" title="orionis.cache.CacheManager._repositories">_repositories</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2001"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId2001">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.CacheRepository.html" class="internal-link" title="orionis.cache.CacheRepository"><wbr></wbr>Cache<wbr></wbr>Repository</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#__init__" class="internal-link" title="orionis.cache.CacheRepository.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#_k" class="internal-link" title="orionis.cache.CacheRepository._k">_k</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#add" class="internal-link" title="orionis.cache.CacheRepository.add">add</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#clear" class="internal-link" title="orionis.cache.CacheRepository.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#decrement" class="internal-link" title="orionis.cache.CacheRepository.decrement">decrement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#delete" class="internal-link" title="orionis.cache.CacheRepository.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#get" class="internal-link" title="orionis.cache.CacheRepository.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#getMany" class="internal-link" title="orionis.cache.CacheRepository.getMany">get<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#has" class="internal-link" title="orionis.cache.CacheRepository.has">has</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#increment" class="internal-link" title="orionis.cache.CacheRepository.increment">increment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#lock" class="internal-link" title="orionis.cache.CacheRepository.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#pull" class="internal-link" title="orionis.cache.CacheRepository.pull">pull</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#remember" class="internal-link" title="orionis.cache.CacheRepository.remember">remember</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#rememberForever" class="internal-link" title="orionis.cache.CacheRepository.rememberForever">remember<wbr></wbr>Forever</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#replace" class="internal-link" title="orionis.cache.CacheRepository.replace">replace</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#set" class="internal-link" title="orionis.cache.CacheRepository.set">set</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#setMany" class="internal-link" title="orionis.cache.CacheRepository.setMany">set<wbr></wbr>Many</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#__slots__" class="internal-link" title="orionis.cache.CacheRepository.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#_backend" class="internal-link" title="orionis.cache.CacheRepository._backend">_backend</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.CacheRepository.html#_prefix" class="internal-link" title="orionis.cache.CacheRepository._prefix">_prefix</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2002"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId2002">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.cache.FileBasedCache.html" class="internal-link" title="orionis.cache.FileBasedCache"><wbr></wbr>File<wbr></wbr>Based<wbr></wbr>Cache</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__collectFiles" class="internal-link" title="orionis.cache.FileBasedCache.__collectFiles">__collect<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__collectFromDirs" class="internal-link" title="orionis.cache.FileBasedCache.__collectFromDirs">__collect<wbr></wbr>From<wbr></wbr>Dirs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__collectFromFiles" class="internal-link" title="orionis.cache.FileBasedCache.__collectFromFiles">__collect<wbr></wbr>From<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__computeSourcesHash" class="internal-link" title="orionis.cache.FileBasedCache.__computeSourcesHash">__compute<wbr></wbr>Sources<wbr></wbr>Hash</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__init__" class="internal-link" title="orionis.cache.FileBasedCache.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#clear" class="internal-link" title="orionis.cache.FileBasedCache.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#get" class="internal-link" title="orionis.cache.FileBasedCache.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#save" class="internal-link" title="orionis.cache.FileBasedCache.save">save</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#CACHE_VERSION" class="internal-link" title="orionis.cache.FileBasedCache.CACHE_VERSION">CACHE<wbr></wbr>_VERSION</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__slots__" class="internal-link" title="orionis.cache.FileBasedCache.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__file" class="internal-link" title="orionis.cache.FileBasedCache.__file">__file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__file_resolved" class="internal-link" title="orionis.cache.FileBasedCache.__file_resolved">__file<wbr></wbr>_resolved</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__hashInterval" class="internal-link" title="orionis.cache.FileBasedCache.__hashInterval">__hash<wbr></wbr>Interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__lasthashcheck" class="internal-link" title="orionis.cache.FileBasedCache.__lasthashcheck">__lasthashcheck</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__monitored_dirs" class="internal-link" title="orionis.cache.FileBasedCache.__monitored_dirs">__monitored<wbr></wbr>_dirs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__monitored_files" class="internal-link" title="orionis.cache.FileBasedCache.__monitored_files">__monitored<wbr></wbr>_files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__path" class="internal-link" title="orionis.cache.FileBasedCache.__path">__path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.FileBasedCache.html#__sourceshashcache" class="internal-link" title="orionis.cache.FileBasedCache.__sourceshashcache">__sourceshashcache</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.html#__dir__" class="internal-link" title="orionis.cache.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.html#__getattr__" class="internal-link" title="orionis.cache.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.html#_EXPORTS" class="internal-link" title="orionis.cache._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.cache.html" class="internal-link" title="orionis.cache">cache</a></code><wbr></wbr>.<code><a href="orionis.cache.serializer.html" class="internal-link" title="orionis.cache.serializer">serializer</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id119">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.cache.serializer.Serializer.html" class="internal-link" title="orionis.cache.serializer.Serializer"><wbr></wbr>Serializer</a></code></td>
+    <td><span class="rst-undocumented">No class docstring; 4/4 static methods documented</span></td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_complex" class="internal-link" title="orionis.cache.serializer._dec_complex">_dec<wbr></wbr>_complex</a></code></td>
+    <td>Decode a mapping payload into a complex number.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_enum" class="internal-link" title="orionis.cache.serializer._dec_enum">_dec<wbr></wbr>_enum</a></code></td>
+    <td>Reconstruct an enum member from its serialized class path and value.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_frozenset" class="internal-link" title="orionis.cache.serializer._dec_frozenset">_dec<wbr></wbr>_frozenset</a></code></td>
+    <td>Decode an iterable payload into a frozenset.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_missing" class="internal-link" title="orionis.cache.serializer._dec_missing">_dec<wbr></wbr>_missing</a></code></td>
+    <td>Return the singleton marker for missing values.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_set" class="internal-link" title="orionis.cache.serializer._dec_set">_dec<wbr></wbr>_set</a></code></td>
+    <td>Decode an iterable payload into a set.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_timedelta" class="internal-link" title="orionis.cache.serializer._dec_timedelta">_dec<wbr></wbr>_timedelta</a></code></td>
+    <td>Decode a mapping into a <tt class="rst-docutils rst-literal">datetime.timedelta</tt>.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_tuple" class="internal-link" title="orionis.cache.serializer._dec_tuple">_dec<wbr></wbr>_tuple</a></code></td>
+    <td>Decode an iterable payload into a tuple.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_dec_type" class="internal-link" title="orionis.cache.serializer._dec_type">_dec<wbr></wbr>_type</a></code></td>
+    <td>Resolve a dotted class path to the corresponding type object.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_decode" class="internal-link" title="orionis.cache.serializer._decode">_decode</a></code></td>
+    <td>Decode recursively serialized cache payloads into Python objects.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_encode" class="internal-link" title="orionis.cache.serializer._encode">_encode</a></code></td>
+    <td>Encode a Python object into a JSON-compatible structure.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_encode_subclass" class="internal-link" title="orionis.cache.serializer._encode_subclass">_encode<wbr></wbr>_subclass</a></code></td>
+    <td>Encode subclass instances not covered by the exact-type dispatch table.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a></code></td>
+    <td>Return <em>o</em> unchanged.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_DECODE_DISPATCH" class="internal-link" title="orionis.cache.serializer._DECODE_DISPATCH">_DECODE<wbr></wbr>_DISPATCH</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_ENCODE_EXACT" class="internal-link" title="orionis.cache.serializer._ENCODE_EXACT">_ENCODE<wbr></wbr>_EXACT</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_TK" class="internal-link" title="orionis.cache.serializer._TK">_TK</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_VK" class="internal-link" title="orionis.cache.serializer._VK">_VK</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_complex">
+    
+  </a>
+  <a name="_dec_complex">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_complex</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L326">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_complex" title="orionis.cache.serializer._dec_complex">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode a mapping payload into a complex number.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">real</tt> and <tt class="rst-docutils rst-literal">imag</tt> components.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a></code></td><td class="fieldArgDesc">Decoded complex value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_enum">
+    
+  </a>
+  <a name="_dec_enum">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_enum</span><span class="function-signature">(<span class="rst-sig-param">val: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L244">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_enum" title="orionis.cache.serializer._dec_enum">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reconstruct an enum member from its serialized class path and value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">"class"</tt> (dotted class path) and <tt class="rst-docutils rst-literal">"value"</tt> keys.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The enum member corresponding to the encoded value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_frozenset">
+    
+  </a>
+  <a name="_dec_frozenset">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_frozenset</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L310">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_frozenset" title="orionis.cache.serializer._dec_frozenset">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode an iterable payload into a frozenset.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of frozenset elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a></code></td><td class="fieldArgDesc">Frozen set with recursively decoded elements.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_missing">
+    
+  </a>
+  <a name="_dec_missing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_missing</span><span class="function-signature">(<span class="rst-sig-param">_: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L210">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_missing" title="orionis.cache.serializer._dec_missing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the singleton marker for missing values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Ignored encoded payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">MISSING</tt> sentinel.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_set">
+    
+  </a>
+  <a name="_dec_set">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_set</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L294">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_set" title="orionis.cache.serializer._dec_set">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode an iterable payload into a set.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of set elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code></td><td class="fieldArgDesc">Set with recursively decoded elements.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_timedelta">
+    
+  </a>
+  <a name="_dec_timedelta">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_timedelta</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">datetime.timedelta</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L262">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_timedelta" title="orionis.cache.serializer._dec_timedelta">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode a mapping into a <tt class="rst-docutils rst-literal">datetime.timedelta</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Mapping of timedelta constructor fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">datetime.timedelta</a></code></td><td class="fieldArgDesc">Decoded time delta value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_tuple">
+    
+  </a>
+  <a name="_dec_tuple">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_tuple</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L278">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_tuple" title="orionis.cache.serializer._dec_tuple">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode an iterable payload into a tuple.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of tuple elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Tuple with recursively decoded elements.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._dec_type">
+    
+  </a>
+  <a name="_dec_type">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_type</span><span class="function-signature">(<span class="rst-sig-param">val: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L226">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_dec_type" title="orionis.cache.serializer._dec_type">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve a dotted class path to the corresponding type object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Fully qualified class name, e.g. <tt class="rst-docutils rst-literal">"module.submodule.ClassName"</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The class object referenced by <em>val</em>.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._decode">
+    
+  </a>
+  <a name="_decode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_decode</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L361">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_decode" title="orionis.cache.serializer._decode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Decode recursively serialized cache payloads into Python objects.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Value produced by the serializer, including nested lists and mappings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Decoded Python object, with typed payload wrappers resolved via
+<tt class="rst-docutils rst-literal">_DECODE_DISPATCH</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a serialized type key is present but has no registered decoder.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._encode">
+    
+  </a>
+  <a name="_encode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L175">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_encode" title="orionis.cache.serializer._encode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Encode a Python object into a JSON-compatible structure.</p>
+<p>Dispatch to <tt class="rst-docutils rst-literal">_ENCODE_EXACT</tt> for known types via O(1) hash lookup;
+fall back to fast-path dict/list handling, then <tt class="rst-docutils rst-literal">_encode_subclass</tt>
+for all remaining cases.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The Python object to encode.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">A JSON-serialisable representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> is of an unsupported type.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._encode_subclass">
+    
+  </a>
+  <a name="_encode_subclass">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_subclass</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">t: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L42">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_encode_subclass" title="orionis.cache.serializer._encode_subclass">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Encode subclass instances not covered by the exact-type dispatch table.</p>
+<p>Walk a priority-ordered chain of <tt class="rst-docutils rst-literal">isinstance</tt> checks to handle Path
+subclasses, datetime hierarchy, collection subclasses, and sentinel
+values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupported types.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Object whose type is not present in <tt class="rst-docutils rst-literal">_ENCODE_EXACT</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">t:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">type(obj)</tt>, passed by the caller to avoid recomputing it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">JSON-compatible representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> does not match any supported subclass or singleton.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.cache.serializer._identity">
+    
+  </a>
+  <a name="_identity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_identity</span><span class="function-signature">(<span class="rst-sig-param">o: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_identity" title="orionis.cache.serializer._identity">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return <em>o</em> unchanged.</p>
+<p>Used as the encoder for primitive types (<tt class="rst-docutils rst-literal">str</tt>, <tt class="rst-docutils rst-literal">int</tt>, <tt class="rst-docutils rst-literal">float</tt>,
+<tt class="rst-docutils rst-literal">bool</tt>, <tt class="rst-docutils rst-literal">None</tt>) that need no transformation before JSON serialisation.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">o:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Value to pass through.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The same object <em>o</em>, unmodified.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.cache.serializer._DECODE_DISPATCH">
+    
+  </a>
+  <a name="_DECODE_DISPATCH">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_DECODE_DISPATCH</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L343">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_DECODE_DISPATCH" title="orionis.cache.serializer._DECODE_DISPATCH">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">missing</span><span class="rst-variable-quote">'</span>: <a href="#_dec_missing" class="internal-link" title="orionis.cache.serializer._dec_missing">_dec_missing</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">path</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">bytes</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/base64.html#base64.b64decode" class="intersphinx-link">base64.b64decode</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">datetime</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat" class="intersphinx-link">datetime.datetime.fromisoformat</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">date</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/datetime.html#datetime.date.fromisoformat" class="intersphinx-link">datetime.date.fromisoformat</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">time</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/datetime.html#datetime.time.fromisoformat" class="intersphinx-link">datetime.time.fromisoformat</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">timedelta</span><span class="rst-variable-quote">'</span>: <a href="#_dec_timedelta" class="internal-link" title="orionis.cache.serializer._dec_timedelta">_dec_timedelta</a>,
+<span class="rst-variable-ellipsis">...</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.cache.serializer._ENCODE_EXACT">
+    
+  </a>
+  <a name="_ENCODE_EXACT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_ENCODE_EXACT</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L131">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_ENCODE_EXACT" title="orionis.cache.serializer._ENCODE_EXACT">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>(<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>): <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a>: (lambda o: {_TK: 'path', _VK: str(o)}),
+ <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>: (lambda o: {_TK: 'bytes', _VK: base64.b64encode(o).decode()}),
+<span class="rst-variable-ellipsis">...</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.cache.serializer._TK">
+    
+  </a>
+  <a name="_TK">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_TK</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L20">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_TK" title="orionis.cache.serializer._TK">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">__type__</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.cache.serializer._VK">
+    
+  </a>
+  <a name="_VK">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_VK</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/cache/serializer.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_VK" title="orionis.cache.serializer._VK">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">__value__</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -1,9 +1,4 @@
-"""Cross-cutting boundaries of the shared dispatcher and catalog execution."""
-
-import unittest
-
 import msgspec
-
 from orionis.container.container import Container
 from orionis.mcp import (
     CacheHint,
@@ -23,31 +18,45 @@ from orionis.mcp.protocol.constants import (
 )
 from orionis.mcp.protocol.requests import RequestParams
 from orionis.mcp.protocol.results import CallToolResult, CompleteResult
-from orionis.mcp.testing import McpTestClient
+from orionis.test import TestCase
 from tests.mcp.test_dispatcher import _Elicit, _Prompt, _Weather
-
 
 class _Params(RequestParams, frozen=True):
     value: int
 
-
 class _Result(CompleteResult, frozen=True):
     value: int
 
-
 def _extension(request: McpRequest, params: _Params) -> _Result:
-    """Exercise an explicitly negotiated, independently typed extension."""
-    return _Result(value=params.value + int(request.meta.get("offset", 0)))
+    """Exercise an explicitly negotiated, independently typed extension.
 
+    Parameters
+    ----------
+    request : McpRequest
+        Value supplied for ``request``.
+    params : _Params
+        Value supplied for ``params``.
+
+    Returns
+    -------
+    _Result
+        Return the result produced by ``_extension``.
+    """
+    return _Result(value=params.value + int(request.meta.get("offset", 0)))
 
 class _BadOutput(Tool):
     name = "bad-output"
     output = int
 
     async def handle(self):
-        """Omit isError so its UNSET default must still validate output."""
-        return CallToolResult(content=(), structuredContent="not an integer")
+        """Omit isError so its UNSET default must still validate output.
 
+        Returns
+        -------
+        CallToolResult
+            Return the result produced by ``handle``.
+        """
+        return CallToolResult(content=(), structuredContent="not an integer")
 
 class _CacheResource(Resource):
     name = "cache"
@@ -55,9 +64,14 @@ class _CacheResource(Resource):
     cache = CacheHint(ttl_ms=5000, scope="public")
 
     async def handle(self):
-        """Declare a cacheable resource whose retry still must not be cached."""
-        return McpResponse.text("data")
+        """Declare a cacheable resource whose retry still must not be cached.
 
+        Returns
+        -------
+        object
+            Return the result produced by ``handle``.
+        """
+        return McpResponse.text("data")
 
 class _Server(Server):
     name = "Dispatcher edges"
@@ -72,21 +86,32 @@ class _Server(Server):
         ),
     )
 
-
-class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
+class TestDispatcherEdges(TestCase):
     """Test behavior that crosses compiler, protocol and execution boundaries."""
 
-    def setUp(self):
-        """Use a real native container with isolated bindings."""
+    async def asyncSetUp(self) -> None:
+        """Use a real native container with isolated bindings.
+
+        Returns
+        -------
+        None
+            Prepare a native test client on the isolated container.
+        """
 
         class _Container(Container):
             pass
 
         self.app = _Container()
-        self.client = McpTestClient(self.app, _Server)
+        self.client = await self.mcp(_Server, app=self.app)
 
     async def test_extension_negotiation_and_typed_params(self):
-        """Extensions require this request's capability and their own decoder."""
+        """Extensions require this request's capability and their own decoder.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         denied = await self.client.request("example.com/add", {"value": 3})
         self.assertEqual(denied.message["error"]["code"], -32021)
         meta = {CLIENT_CAPABILITIES: {"extensions": {"example.com/arithmetic": {}}}}
@@ -100,13 +125,25 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(invalid.message["error"]["code"], -32602)
 
     async def test_invalid_declared_output_with_unset_error(self):
-        """Validate successful raw results even when isError was omitted."""
+        """Validate successful raw results even when isError was omitted.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         result = await self.client.tool("bad-output")
         self.assertTrue(result.message["result"]["isError"])
         self.assertNotIn("not an integer", str(result.message))
 
     async def test_empty_input_responses_disable_resource_cache(self):
-        """The presence of a retry field matters even for an empty map."""
+        """The presence of a retry field matters even for an empty map.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         ordinary = await self.client.request("resources/read", {"uri": "data://cache"})
         self.assertEqual(ordinary.message["result"]["ttlMs"], 5000)
         retry = await self.client.request(
@@ -117,7 +154,13 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(retry.message["result"]["cacheScope"], "private")
 
     async def test_unknown_completion_argument_and_malformed_uri(self):
-        """Reject client input rather than turning it into an internal error."""
+        """Reject client input rather than turning it into an internal error.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         completion = await self.client.request(
             "completion/complete",
             {
@@ -130,7 +173,13 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(response.message["error"]["code"], -32602)
 
     async def test_catalog_limits_and_validation(self):
-        """Catalog calls cannot bypass argument validation or batch bounds."""
+        """Catalog calls cannot bypass argument validation or batch bounds.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         invalid = await self.client.tool(
             "execute_tools",
             {
@@ -139,7 +188,9 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
         )
         nested = invalid.message["result"]["structuredContent"]["results"][0]
         self.assertTrue(nested["result"]["isError"])
-        limited = McpTestClient(self.app, _Server, McpConfig(tool_search_max_calls=1))
+        limited = await self.mcp(
+            _Server, McpConfig(tool_search_max_calls=1), app=self.app,
+        )
         response = await limited.tool(
             "execute_tools",
             {
@@ -149,7 +200,13 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.message["error"]["code"], -32602)
 
     async def test_single_catalog_mrtr_and_retry(self):
-        """Surface interim input at the enclosing protocol result boundary."""
+        """Surface interim input at the enclosing protocol result boundary.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         params = {"name": "execute_tools", "arguments": {"calls": [{"name": "elicit"}]}}
         result = await self.client.request(
             "tools/call",
@@ -170,8 +227,14 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
         self.assertIn("received", str(retried.message))
 
     async def test_subscription_capacity_and_unstarted_cleanup(self):
-        """Reject admission before SSE begins and release unstarted subscriptions."""
-        client = McpTestClient(self.app, _Server, McpConfig(max_subscriptions=1))
+        """Reject admission before SSE begins and release unstarted subscriptions.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
+        client = await self.mcp(_Server, McpConfig(max_subscriptions=1), app=self.app)
         data = msgspec.json.encode(
             {
                 "jsonrpc": "2.0",
@@ -198,7 +261,13 @@ class TestDispatcherEdges(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(client.dispatcher.bus.listener_count, 0)
 
     async def test_catalog_multi_call_interim_does_not_trigger_batch_replay(self):
-        """Prevent retrying earlier side effects through an ambiguous batch interim."""
+        """Prevent retrying earlier side effects through an ambiguous batch interim.
+
+        Returns
+        -------
+        None
+            Complete the documented checks or setup without a return value.
+        """
         response = await self.client.request(
             "tools/call",
             {

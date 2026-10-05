@@ -1,0 +1,1557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.http.contracts.response.IResponse</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.http.contracts.response.IResponse.html" class="internal-link" title="This class"><wbr></wbr>IResponse</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.addHeader">add<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#deleteCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.deleteCookie">delete<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getBody" class="internal-link" title="orionis.http.contracts.response.IResponse.getBody">get<wbr></wbr>Body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getFlashData" class="internal-link" title="orionis.http.contracts.response.IResponse.getFlashData">get<wbr></wbr>Flash<wbr></wbr>Data</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.getHeader">get<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMediaType" class="internal-link" title="orionis.http.contracts.response.IResponse.getMediaType">get<wbr></wbr>Media<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getRawHeaders" class="internal-link" title="orionis.http.contracts.response.IResponse.getRawHeaders">get<wbr></wbr>Raw<wbr></wbr>Headers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getStatusCode" class="internal-link" title="orionis.http.contracts.response.IResponse.getStatusCode">get<wbr></wbr>Status<wbr></wbr>Code</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getStream" class="internal-link" title="orionis.http.contracts.response.IResponse.getStream">get<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.hasHeader">has<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasStream" class="internal-link" title="orionis.http.contracts.response.IResponse.hasStream">has<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#removeHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.removeHeader">remove<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#render" class="internal-link" title="orionis.http.contracts.response.IResponse.render">render</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#runBackground" class="internal-link" title="orionis.http.contracts.response.IResponse.runBackground">run<wbr></wbr>Background</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.setCookie">set<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.setHeader">set<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookie">with<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withCookies" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookies">with<wbr></wbr>Cookies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withErrors" class="internal-link" title="orionis.http.contracts.response.IResponse.withErrors">with<wbr></wbr>Errors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withFlash" class="internal-link" title="orionis.http.contracts.response.IResponse.withFlash">with<wbr></wbr>Flash</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withInput" class="internal-link" title="orionis.http.contracts.response.IResponse.withInput">with<wbr></wbr>Input</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withoutCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withoutCookie">without<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.contracts.response.IResponse.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.http.contracts.response.html" class="internal-link" title="The parent of this class">response</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9195"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.http.contracts.response.IResponse.html" class="internal-link" title="orionis.http.contracts.response.IResponse"><wbr></wbr>IResponse</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#addHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.addHeader">add<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#deleteCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.deleteCookie">delete<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getBody" class="internal-link" title="orionis.http.contracts.response.IResponse.getBody">get<wbr></wbr>Body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getFlashData" class="internal-link" title="orionis.http.contracts.response.IResponse.getFlashData">get<wbr></wbr>Flash<wbr></wbr>Data</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.getHeader">get<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getMediaType" class="internal-link" title="orionis.http.contracts.response.IResponse.getMediaType">get<wbr></wbr>Media<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getRawHeaders" class="internal-link" title="orionis.http.contracts.response.IResponse.getRawHeaders">get<wbr></wbr>Raw<wbr></wbr>Headers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getStatusCode" class="internal-link" title="orionis.http.contracts.response.IResponse.getStatusCode">get<wbr></wbr>Status<wbr></wbr>Code</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getStream" class="internal-link" title="orionis.http.contracts.response.IResponse.getStream">get<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.hasHeader">has<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasStream" class="internal-link" title="orionis.http.contracts.response.IResponse.hasStream">has<wbr></wbr>Stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#removeHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.removeHeader">remove<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#render" class="internal-link" title="orionis.http.contracts.response.IResponse.render">render</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#runBackground" class="internal-link" title="orionis.http.contracts.response.IResponse.runBackground">run<wbr></wbr>Background</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.setCookie">set<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.setHeader">set<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookie">with<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withCookies" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookies">with<wbr></wbr>Cookies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withErrors" class="internal-link" title="orionis.http.contracts.response.IResponse.withErrors">with<wbr></wbr>Errors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withFlash" class="internal-link" title="orionis.http.contracts.response.IResponse.withFlash">with<wbr></wbr>Flash</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withInput" class="internal-link" title="orionis.http.contracts.response.IResponse.withInput">with<wbr></wbr>Input</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#withoutCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withoutCookie">without<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.http.contracts.response.IResponse.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.http.html" class="internal-link" title="orionis.http">http</a></code><wbr></wbr>.<code><a href="orionis.http.contracts.html" class="internal-link" title="orionis.http.contracts">contracts</a></code><wbr></wbr>.<code><a href="orionis.http.contracts.response.html" class="internal-link" title="orionis.http.contracts.response">response</a></code><wbr></wbr>.<code><a href="orionis.http.contracts.response.IResponse.html" class="internal-link" title="orionis.http.contracts.response.IResponse">IResponse</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IResponse</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L9" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></p><p><a href="classIndex.html#orionis.http.contracts.response.IResponse">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id919">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#addHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.addHeader">add<wbr></wbr>Header</a></code></td>
+    <td>Add a header to the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#deleteCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.deleteCookie">delete<wbr></wbr>Cookie</a></code></td>
+    <td>Delete a cookie by setting its expiration to the past.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getBody" class="internal-link" title="orionis.http.contracts.response.IResponse.getBody">get<wbr></wbr>Body</a></code></td>
+    <td>Return the response body as bytes.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getFlashData" class="internal-link" title="orionis.http.contracts.response.IResponse.getFlashData">get<wbr></wbr>Flash<wbr></wbr>Data</a></code></td>
+    <td>Return the data queued by <tt class="rst-docutils rst-literal">withFlash()</tt> for the session flash bag.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.getHeader">get<wbr></wbr>Header</a></code></td>
+    <td>Get the values for a header.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getMediaType" class="internal-link" title="orionis.http.contracts.response.IResponse.getMediaType">get<wbr></wbr>Media<wbr></wbr>Type</a></code></td>
+    <td>Return the media type of the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getRawHeaders" class="internal-link" title="orionis.http.contracts.response.IResponse.getRawHeaders">get<wbr></wbr>Raw<wbr></wbr>Headers</a></code></td>
+    <td>Return the headers as a list of (key, value) byte tuples.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getStatusCode" class="internal-link" title="orionis.http.contracts.response.IResponse.getStatusCode">get<wbr></wbr>Status<wbr></wbr>Code</a></code></td>
+    <td>Return the HTTP status code of the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getStream" class="internal-link" title="orionis.http.contracts.response.IResponse.getStream">get<wbr></wbr>Stream</a></code></td>
+    <td>Return the response stream if present.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#hasHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.hasHeader">has<wbr></wbr>Header</a></code></td>
+    <td>Check if a header is present.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#hasStream" class="internal-link" title="orionis.http.contracts.response.IResponse.hasStream">has<wbr></wbr>Stream</a></code></td>
+    <td>Check if the response has a stream.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#removeHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.removeHeader">remove<wbr></wbr>Header</a></code></td>
+    <td>Remove a header from the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#render" class="internal-link" title="orionis.http.contracts.response.IResponse.render">render</a></code></td>
+    <td>Render the content to bytes.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#runBackground" class="internal-link" title="orionis.http.contracts.response.IResponse.runBackground">run<wbr></wbr>Background</a></code></td>
+    <td>Run the background task if it exists.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.setCookie">set<wbr></wbr>Cookie</a></code></td>
+    <td>Set a cookie header in the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setHeader" class="internal-link" title="orionis.http.contracts.response.IResponse.setHeader">set<wbr></wbr>Header</a></code></td>
+    <td>Set a header, replacing any existing values.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookie">with<wbr></wbr>Cookie</a></code></td>
+    <td>Attach a cookie and return the response for chaining.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withCookies" class="internal-link" title="orionis.http.contracts.response.IResponse.withCookies">with<wbr></wbr>Cookies</a></code></td>
+    <td>Attach several cookies at once and return the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withErrors" class="internal-link" title="orionis.http.contracts.response.IResponse.withErrors">with<wbr></wbr>Errors</a></code></td>
+    <td>Flash validation errors for the next request.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withFlash" class="internal-link" title="orionis.http.contracts.response.IResponse.withFlash">with<wbr></wbr>Flash</a></code></td>
+    <td>Flash a status message into the session and return the response.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withInput" class="internal-link" title="orionis.http.contracts.response.IResponse.withInput">with<wbr></wbr>Input</a></code></td>
+    <td>Flash the submitted payload so the next request can repopulate it.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#withoutCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.withoutCookie">without<wbr></wbr>Cookie</a></code></td>
+    <td>Expire a cookie and return the response for chaining.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.http.contracts.response.IResponse.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.addHeader">
+    
+  </a>
+  <a name="addHeader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">addHeader</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#addHeader" title="orionis.http.contracts.response.IResponse.addHeader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Add a header to the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.deleteCookie">
+    
+  </a>
+  <a name="deleteCookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">deleteCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">/</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">domain: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L173">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#deleteCookie" title="orionis.http.contracts.response.IResponse.deleteCookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Delete a cookie by setting its expiration to the past.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the cookie to delete.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>default</em> <span class="rst-variable-string">"/"</span></code></td><td class="fieldArgDesc">The path for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">domain:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The domain for which the cookie is valid.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getBody">
+    
+  </a>
+  <a name="getBody">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getBody</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L354">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getBody" title="orionis.http.contracts.response.IResponse.getBody">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the response body as bytes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>bytes | None</code></td><td class="fieldArgDesc">The response body as bytes, or None if not set.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getFlashData">
+    
+  </a>
+  <a name="getFlashData">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getFlashData</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L343">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getFlashData" title="orionis.http.contracts.response.IResponse.getFlashData">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the data queued by <tt class="rst-docutils rst-literal">withFlash()</tt> for the session flash bag.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | None</code></td><td class="fieldArgDesc">The queued key-value pairs, or None when nothing was queued.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getHeader">
+    
+  </a>
+  <a name="getHeader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getHeader</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L67">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getHeader" title="orionis.http.contracts.response.IResponse.getHeader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Get the values for a header.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">The list of header values, or None if not present.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getMediaType">
+    
+  </a>
+  <a name="getMediaType">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getMediaType</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L409">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getMediaType" title="orionis.http.contracts.response.IResponse.getMediaType">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the media type of the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">The media type, or None if not set.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getRawHeaders">
+    
+  </a>
+  <a name="getRawHeaders">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getRawHeaders</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L115">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getRawHeaders" title="orionis.http.contracts.response.IResponse.getRawHeaders">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the headers as a list of (key, value) byte tuples.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of (<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>)</code></td><td class="fieldArgDesc">The headers as (key, value) pairs encoded in latin-1.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getStatusCode">
+    
+  </a>
+  <a name="getStatusCode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getStatusCode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L398">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getStatusCode" title="orionis.http.contracts.response.IResponse.getStatusCode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the HTTP status code of the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The HTTP status code.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.getStream">
+    
+  </a>
+  <a name="getStream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getStream" title="orionis.http.contracts.response.IResponse.getStream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Return the response stream if present.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | None</code></td><td class="fieldArgDesc">The response stream, or None if not set.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.hasHeader">
+    
+  </a>
+  <a name="hasHeader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">hasHeader</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L83">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#hasHeader" title="orionis.http.contracts.response.IResponse.hasHeader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Check if a header is present.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the header is present, False otherwise.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.hasStream">
+    
+  </a>
+  <a name="hasStream">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">hasStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L376">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#hasStream" title="orionis.http.contracts.response.IResponse.hasStream">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Check if the response has a stream.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if a stream is present, False otherwise.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.removeHeader">
+    
+  </a>
+  <a name="removeHeader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">removeHeader</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L99">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#removeHeader" title="orionis.http.contracts.response.IResponse.removeHeader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Remove a header from the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.render">
+    
+  </a>
+  <a name="render">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">render</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">content: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#render" title="orionis.http.contracts.response.IResponse.render">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Render the content to bytes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The content to render.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">The rendered content as bytes.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.runBackground">
+    
+  </a>
+  <a name="runBackground">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">runBackground</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L387">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#runBackground" title="orionis.http.contracts.response.IResponse.runBackground">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Run the background task if it exists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.setCookie">
+    
+  </a>
+  <a name="setCookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setCookie</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_age: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">expires: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">/</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">domain: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">secure: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">http_only: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">same_site: <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">lax</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">strict</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">none</span><span class="rst-variable-quote">'</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">lax</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">partitioned: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L126">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setCookie" title="orionis.http.contracts.response.IResponse.setCookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Set a cookie header in the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The cookie name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">The cookie value. Defaults to an empty string.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_age:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">The maximum age of the cookie in seconds.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expires:</span><code>datetime | str | int | None, <em>optional</em></code></td><td class="fieldArgDesc">The expiration date of the cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The path for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">domain:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The domain for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">secure:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is secure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">http<wbr></wbr>_only:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is HTTP only.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">same<wbr></wbr>_site:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The SameSite policy for the cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">partitioned:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is partitioned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.setHeader">
+    
+  </a>
+  <a name="setHeader">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setHeader</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L49">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setHeader" title="orionis.http.contracts.response.IResponse.setHeader">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Set a header, replacing any existing values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The header value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withCookie">
+    
+  </a>
+  <a name="withCookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withCookie</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_age: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">expires: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">/</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">domain: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">secure: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">http_only: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">same_site: <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">lax</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">strict</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">none</span><span class="rst-variable-quote">'</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">lax</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">partitioned: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L199">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withCookie" title="orionis.http.contracts.response.IResponse.withCookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Attach a cookie and return the response for chaining.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The cookie name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">The cookie value. Defaults to an empty string.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_age:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">The maximum age of the cookie in seconds.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expires:</span><code>datetime | str | int | None, <em>optional</em></code></td><td class="fieldArgDesc">The expiration date of the cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The path for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">domain:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The domain for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">secure:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is secure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">http<wbr></wbr>_only:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is HTTP only.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">same<wbr></wbr>_site:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The SameSite policy for the cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">partitioned:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the cookie is partitioned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withCookies">
+    
+  </a>
+  <a name="withCookies">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withCookies</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cookies: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L246">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withCookies" title="orionis.http.contracts.response.IResponse.withCookies">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Attach several cookies at once and return the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cookies:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, str | Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></td><td class="fieldArgDesc">Mapping of cookie names to either a plain value or a mapping of
+keyword arguments accepted by <code><a href="#setCookie" class="internal-link" title="orionis.http.contracts.response.IResponse.setCookie">setCookie</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withErrors">
+    
+  </a>
+  <a name="withErrors">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withErrors</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">errors: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L327">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withErrors" title="orionis.http.contracts.response.IResponse.withErrors">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Flash validation errors for the next request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | Exception</code></td><td class="fieldArgDesc">Mapping of field to message(s), or a validation exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withFlash">
+    
+  </a>
+  <a name="withFlash">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withFlash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L292">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withFlash" title="orionis.http.contracts.response.IResponse.withFlash">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Flash a status message into the session and return the response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Flash data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value to flash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withInput">
+    
+  </a>
+  <a name="withInput">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withInput</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L310">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withInput" title="orionis.http.contracts.response.IResponse.withInput">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Flash the submitted payload so the next request can repopulate it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Submitted form payload to remember.  Credential-like fields
+are stripped before storing.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.withoutCookie">
+    
+  </a>
+  <a name="withoutCookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">withoutCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">/</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">domain: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L266">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#withoutCookie" title="orionis.http.contracts.response.IResponse.withoutCookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p>Expire a cookie and return the response for chaining.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the cookie to delete.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>default</em> <span class="rst-variable-string">"/"</span></code></td><td class="fieldArgDesc">The path for which the cookie is valid.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">domain:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The domain for which the cookie is valid.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same response instance, allowing fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.http.contracts.response.IResponse.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/http/contracts/response.py#L13">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.http.contracts.response.IResponse.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

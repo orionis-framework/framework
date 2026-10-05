@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.orm.state.StateMixin</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="This class"><wbr></wbr>State<wbr></wbr>Mixin</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.state.StateMixin.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.orm.state.html" class="internal-link" title="The parent of this class">state</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId23590"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin"><wbr></wbr>State<wbr></wbr>Mixin</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.state.StateMixin.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.state.html#_UNSET" class="internal-link" title="orionis.orm.state._UNSET">_UNSET</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.orm.html" class="internal-link" title="orionis.orm">orm</a></code><wbr></wbr>.<code><a href="orionis.orm.state.html" class="internal-link" title="orionis.orm.state">state</a></code><wbr></wbr>.<code><a href="orionis.orm.state.StateMixin.html" class="internal-link" title="orionis.orm.state.StateMixin">StateMixin</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">StateMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L7" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.state.StateMixin">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Attribute state tracking behavior shared by every model.</p>
+<p>Tracks the original attribute snapshot taken at hydration or after
+the last successful save, the current attribute values, and the
+changes applied by the most recent save operation.</p>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1604">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getChanges" class="internal-link" title="orionis.orm.state.StateMixin.getChanges">get<wbr></wbr>Changes</a></code></td>
+    <td>Return the attributes persisted by the last save operation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getDirty" class="internal-link" title="orionis.orm.state.StateMixin.getDirty">get<wbr></wbr>Dirty</a></code></td>
+    <td>Return the attributes modified since the last sync.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getOriginal" class="internal-link" title="orionis.orm.state.StateMixin.getOriginal">get<wbr></wbr>Original</a></code></td>
+    <td>Return the original attribute snapshot or a single original value.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#isClean" class="internal-link" title="orionis.orm.state.StateMixin.isClean">is<wbr></wbr>Clean</a></code></td>
+    <td>Report whether no attribute changed since the last sync.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#isDirty" class="internal-link" title="orionis.orm.state.StateMixin.isDirty">is<wbr></wbr>Dirty</a></code></td>
+    <td>Report whether any attribute changed since the last sync.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#syncOriginal" class="internal-link" title="orionis.orm.state.StateMixin.syncOriginal">sync<wbr></wbr>Original</a></code></td>
+    <td>Snapshot the current attributes as the new original state.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#wasChanged" class="internal-link" title="orionis.orm.state.StateMixin.wasChanged">was<wbr></wbr>Changed</a></code></td>
+    <td>Report whether the last save operation changed any attribute.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.state.StateMixin.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.getChanges">
+    
+  </a>
+  <a name="getChanges">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getChanges</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L95">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getChanges" title="orionis.orm.state.StateMixin.getChanges">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the attributes persisted by the last save operation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Attribute values written by the last save.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.getDirty">
+    
+  </a>
+  <a name="getDirty">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getDirty</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getDirty" title="orionis.orm.state.StateMixin.getDirty">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the attributes modified since the last sync.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Changed attribute values keyed by name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.getOriginal">
+    
+  </a>
+  <a name="getOriginal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getOriginal</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L106">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getOriginal" title="orionis.orm.state.StateMixin.getOriginal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the original attribute snapshot or a single original value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Attribute name, or <tt class="rst-docutils rst-literal">None</tt> for the whole snapshot.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value returned when the attribute is absent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Original snapshot dictionary, or the original value for
+the requested key.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.isClean">
+    
+  </a>
+  <a name="isClean">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">isClean</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L60">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#isClean" title="orionis.orm.state.StateMixin.isClean">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report whether no attribute changed since the last sync.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Restrict the check to these attribute names when provided.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when no tracked attribute changed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.isDirty">
+    
+  </a>
+  <a name="isDirty">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">isDirty</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#isDirty" title="orionis.orm.state.StateMixin.isDirty">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report whether any attribute changed since the last sync.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Restrict the check to these attribute names when provided.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when at least one tracked attribute changed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.syncOriginal">
+    
+  </a>
+  <a name="syncOriginal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">syncOriginal</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L131">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#syncOriginal" title="orionis.orm.state.StateMixin.syncOriginal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Snapshot the current attributes as the new original state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">The same instance, enabling fluent chaining.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.state.StateMixin.wasChanged">
+    
+  </a>
+  <a name="wasChanged">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">wasChanged</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L76">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#wasChanged" title="orionis.orm.state.StateMixin.wasChanged">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report whether the last save operation changed any attribute.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Restrict the check to these attribute names when provided.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the last save persisted at least one change.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.state.StateMixin.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/state.py#L16">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.orm.state.StateMixin.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

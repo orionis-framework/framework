@@ -1,0 +1,3272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.config.validation</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.foundation.config.validation.html" class="internal-link" title="This module">validation</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_enum_values" class="internal-link" title="orionis.foundation.config.validation._enum_values">_enum<wbr></wbr>_values</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#copy_string_list" class="internal-link" title="orionis.foundation.config.validation.copy_string_list">copy<wbr></wbr>_string<wbr></wbr>_list</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#normalize_enum" class="internal-link" title="orionis.foundation.config.validation.normalize_enum">normalize<wbr></wbr>_enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_boolean" class="internal-link" title="orionis.foundation.config.validation.validate_boolean">validate<wbr></wbr>_boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_cookie_name" class="internal-link" title="orionis.foundation.config.validation.validate_cookie_name">validate<wbr></wbr>_cookie<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_driver" class="internal-link" title="orionis.foundation.config.validation.validate_driver">validate<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_http_origin" class="internal-link" title="orionis.foundation.config.validation.validate_http_origin">validate<wbr></wbr>_http<wbr></wbr>_origin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_integer" class="internal-link" title="orionis.foundation.config.validation.validate_integer">validate<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_name" class="internal-link" title="orionis.foundation.config.validation.validate_name">validate<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_seconds" class="internal-link" title="orionis.foundation.config.validation.validate_seconds">validate<wbr></wbr>_seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_string" class="internal-link" title="orionis.foundation.config.validation.validate_string">validate<wbr></wbr>_string</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ENUM_SCALAR_TYPES" class="internal-link" title="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">_ENUM<wbr></wbr>_SCALAR<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NAME_PATTERN" class="internal-link" title="orionis.foundation.config.validation._NAME_PATTERN">_NAME<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TABLE_PATTERN" class="internal-link" title="orionis.foundation.config.validation._TABLE_PATTERN">_TABLE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.config.html" class="internal-link" title="The parent of this module">config</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8526"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8526">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.app.html" class="internal-link" title="orionis.foundation.config.app">app</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.entities.html" class="internal-link" title="orionis.foundation.config.app.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.enums.html" class="internal-link" title="orionis.foundation.config.app.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.App.html" class="internal-link" title="orionis.foundation.config.app.App"><wbr></wbr>App</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.Cipher.html" class="internal-link" title="orionis.foundation.config.app.Cipher"><wbr></wbr>Cipher</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.Environments.html" class="internal-link" title="orionis.foundation.config.app.Environments"><wbr></wbr>Environments</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8527"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8527">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.auth.html" class="internal-link" title="orionis.foundation.config.auth">auth</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.entities.html" class="internal-link" title="orionis.foundation.config.auth.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.enums.html" class="internal-link" title="orionis.foundation.config.auth.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Auth.html" class="internal-link" title="orionis.foundation.config.auth.Auth"><wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Identity.html" class="internal-link" title="orionis.foundation.config.auth.Identity"><wbr></wbr>Identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.PasswordReset.html" class="internal-link" title="orionis.foundation.config.auth.PasswordReset"><wbr></wbr>Password<wbr></wbr>Reset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.RememberAuth.html" class="internal-link" title="orionis.foundation.config.auth.RememberAuth"><wbr></wbr>Remember<wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.SessionAuth.html" class="internal-link" title="orionis.foundation.config.auth.SessionAuth"><wbr></wbr>Session<wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Tokens.html" class="internal-link" title="orionis.foundation.config.auth.Tokens"><wbr></wbr>Tokens</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8528"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8528">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.cache.html" class="internal-link" title="orionis.foundation.config.cache">cache</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.entities.html" class="internal-link" title="orionis.foundation.config.cache.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.enums.html" class="internal-link" title="orionis.foundation.config.cache.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Cache.html" class="internal-link" title="orionis.foundation.config.cache.Cache"><wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Database.html" class="internal-link" title="orionis.foundation.config.cache.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Drivers.html" class="internal-link" title="orionis.foundation.config.cache.Drivers"><wbr></wbr>Drivers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.File.html" class="internal-link" title="orionis.foundation.config.cache.File"><wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Memcached.html" class="internal-link" title="orionis.foundation.config.cache.Memcached"><wbr></wbr>Memcached</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Memory.html" class="internal-link" title="orionis.foundation.config.cache.Memory"><wbr></wbr>Memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Redis.html" class="internal-link" title="orionis.foundation.config.cache.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Stores.html" class="internal-link" title="orionis.foundation.config.cache.Stores"><wbr></wbr>Stores</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8529"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8529">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.html" class="internal-link" title="orionis.foundation.config.database">database</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.html" class="internal-link" title="orionis.foundation.config.database.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.html" class="internal-link" title="orionis.foundation.config.database.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html" class="internal-link" title="orionis.foundation.config.database.ConnectionName"><wbr></wbr>Connection<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html" class="internal-link" title="orionis.foundation.config.database.Connections"><wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Database.html" class="internal-link" title="orionis.foundation.config.database.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html" class="internal-link" title="orionis.foundation.config.database.MySQL"><wbr></wbr>My<wbr></wbr>SQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html" class="internal-link" title="orionis.foundation.config.database.MySQLCharset"><wbr></wbr>My<wbr></wbr>SQLCharset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html" class="internal-link" title="orionis.foundation.config.database.MySQLCollation"><wbr></wbr>My<wbr></wbr>SQLCollation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLEngine.html" class="internal-link" title="orionis.foundation.config.database.MySQLEngine"><wbr></wbr>My<wbr></wbr>SQLEngine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html" class="internal-link" title="orionis.foundation.config.database.Oracle"><wbr></wbr>Oracle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleEncoding.html" class="internal-link" title="orionis.foundation.config.database.OracleEncoding"><wbr></wbr>Oracle<wbr></wbr>Encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleNencoding.html" class="internal-link" title="orionis.foundation.config.database.OracleNencoding"><wbr></wbr>Oracle<wbr></wbr>Nencoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html" class="internal-link" title="orionis.foundation.config.database.PGSQL">PGSQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset"><wbr></wbr>PGSQLCharset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCollation.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCollation"><wbr></wbr>PGSQLCollation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode"><wbr></wbr>PGSQLSSLMode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html" class="internal-link" title="orionis.foundation.config.database.SQLite"><wbr></wbr>SQLite</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteForeignKey.html" class="internal-link" title="orionis.foundation.config.database.SQLiteForeignKey"><wbr></wbr>SQLite<wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode"><wbr></wbr>SQLite<wbr></wbr>Journal<wbr></wbr>Mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous"><wbr></wbr>SQLite<wbr></wbr>Synchronous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html" class="internal-link" title="orionis.foundation.config.database.SQLServer"><wbr></wbr>SQLServer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset"><wbr></wbr>SQLServer<wbr></wbr>Charset</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__dir__" class="internal-link" title="orionis.foundation.config.database.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__getattr__" class="internal-link" title="orionis.foundation.config.database.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.database._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8530"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8530">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.environment.html" class="internal-link" title="orionis.foundation.config.environment">environment</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.environment.html#http_origins" class="internal-link" title="orionis.foundation.config.environment.http_origins">http<wbr></wbr>_origins</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.environment.html#redis_url" class="internal-link" title="orionis.foundation.config.environment.redis_url">redis<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8531"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8531">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.filesystems.html" class="internal-link" title="orionis.foundation.config.filesystems">filesystems</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.entitites.html" class="internal-link" title="orionis.foundation.config.filesystems.entitites">entitites</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.enums.html" class="internal-link" title="orionis.foundation.config.filesystems.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Azure.html" class="internal-link" title="orionis.foundation.config.filesystems.Azure"><wbr></wbr>Azure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Disks.html" class="internal-link" title="orionis.foundation.config.filesystems.Disks"><wbr></wbr>Disks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Filesystems.html" class="internal-link" title="orionis.foundation.config.filesystems.Filesystems"><wbr></wbr>Filesystems</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.GCS.html" class="internal-link" title="orionis.foundation.config.filesystems.GCS">GCS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Local.html" class="internal-link" title="orionis.foundation.config.filesystems.Local"><wbr></wbr>Local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Public.html" class="internal-link" title="orionis.foundation.config.filesystems.Public"><wbr></wbr>Public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.S3.html" class="internal-link" title="orionis.foundation.config.filesystems.S3">S3</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8532"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8532">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.hashing.html" class="internal-link" title="orionis.foundation.config.hashing">hashing</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.entities.html" class="internal-link" title="orionis.foundation.config.hashing.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.enums.html" class="internal-link" title="orionis.foundation.config.hashing.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Argon2.html" class="internal-link" title="orionis.foundation.config.hashing.Argon2"><wbr></wbr>Argon2</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Bcrypt.html" class="internal-link" title="orionis.foundation.config.hashing.Bcrypt"><wbr></wbr>Bcrypt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Drivers.html" class="internal-link" title="orionis.foundation.config.hashing.Drivers"><wbr></wbr>Drivers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Hashing.html" class="internal-link" title="orionis.foundation.config.hashing.Hashing"><wbr></wbr>Hashing</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8533"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8533">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.http.html" class="internal-link" title="orionis.foundation.config.http">http</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.entitites.html" class="internal-link" title="orionis.foundation.config.http.entitites">entitites</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.Cors.html" class="internal-link" title="orionis.foundation.config.http.Cors"><wbr></wbr>Cors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTP.html" class="internal-link" title="orionis.foundation.config.http.HTTP">HTTP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPBodyLimits.html" class="internal-link" title="orionis.foundation.config.http.HTTPBodyLimits"><wbr></wbr>HTTPBody<wbr></wbr>Limits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPCsrf.html" class="internal-link" title="orionis.foundation.config.http.HTTPCsrf"><wbr></wbr>HTTPCsrf</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPProxies.html" class="internal-link" title="orionis.foundation.config.http.HTTPProxies"><wbr></wbr>HTTPProxies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPRateLimit.html" class="internal-link" title="orionis.foundation.config.http.HTTPRateLimit"><wbr></wbr>HTTPRate<wbr></wbr>Limit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPSecurity.html" class="internal-link" title="orionis.foundation.config.http.HTTPSecurity"><wbr></wbr>HTTPSecurity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPWebSocket.html" class="internal-link" title="orionis.foundation.config.http.HTTPWebSocket"><wbr></wbr>HTTPWeb<wbr></wbr>Socket</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8534"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8534">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.logging.html" class="internal-link" title="orionis.foundation.config.logging">logging</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.channel_options.html" class="internal-link" title="orionis.foundation.config.logging.channel_options">channel<wbr></wbr>_options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.entities.html" class="internal-link" title="orionis.foundation.config.logging.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.enums.html" class="internal-link" title="orionis.foundation.config.logging.enums">enums</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.validators.html" class="internal-link" title="orionis.foundation.config.logging.validators">validators</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Channels.html" class="internal-link" title="orionis.foundation.config.logging.Channels"><wbr></wbr>Channels</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Chunked.html" class="internal-link" title="orionis.foundation.config.logging.Chunked"><wbr></wbr>Chunked</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Daily.html" class="internal-link" title="orionis.foundation.config.logging.Daily"><wbr></wbr>Daily</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Hourly.html" class="internal-link" title="orionis.foundation.config.logging.Hourly"><wbr></wbr>Hourly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Level.html" class="internal-link" title="orionis.foundation.config.logging.Level"><wbr></wbr>Level</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Logging.html" class="internal-link" title="orionis.foundation.config.logging.Logging"><wbr></wbr>Logging</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Monthly.html" class="internal-link" title="orionis.foundation.config.logging.Monthly"><wbr></wbr>Monthly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Stack.html" class="internal-link" title="orionis.foundation.config.logging.Stack"><wbr></wbr>Stack</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Weekly.html" class="internal-link" title="orionis.foundation.config.logging.Weekly"><wbr></wbr>Weekly</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8535"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8535">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.mail.html" class="internal-link" title="orionis.foundation.config.mail">mail</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.entities.html" class="internal-link" title="orionis.foundation.config.mail.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.enums.html" class="internal-link" title="orionis.foundation.config.mail.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.File.html" class="internal-link" title="orionis.foundation.config.mail.File"><wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.FromAddress.html" class="internal-link" title="orionis.foundation.config.mail.FromAddress"><wbr></wbr>From<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Mail.html" class="internal-link" title="orionis.foundation.config.mail.Mail"><wbr></wbr>Mail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.MailDriver.html" class="internal-link" title="orionis.foundation.config.mail.MailDriver"><wbr></wbr>Mail<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Mailers.html" class="internal-link" title="orionis.foundation.config.mail.Mailers"><wbr></wbr>Mailers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Smtp.html" class="internal-link" title="orionis.foundation.config.mail.Smtp"><wbr></wbr>Smtp</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8536"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8536">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.mcp.html" class="internal-link" title="orionis.foundation.config.mcp">mcp</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mcp.entities.html" class="internal-link" title="orionis.foundation.config.mcp.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8537"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8537">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.html" class="internal-link" title="orionis.foundation.config.queue">queue</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.html" class="internal-link" title="orionis.foundation.config.queue.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.html" class="internal-link" title="orionis.foundation.config.queue.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html" class="internal-link" title="orionis.foundation.config.queue.Connections"><wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed"><wbr></wbr>Failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Queue.html" class="internal-link" title="orionis.foundation.config.queue.Queue"><wbr></wbr>Queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync"><wbr></wbr>Sync</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker"><wbr></wbr>Worker</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8538"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8538">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.realtime.html" class="internal-link" title="orionis.foundation.config.realtime">realtime</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.realtime.entities.html" class="internal-link" title="orionis.foundation.config.realtime.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8539"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8539">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.scheduler.html" class="internal-link" title="orionis.foundation.config.scheduler">scheduler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.entities.html" class="internal-link" title="orionis.foundation.config.scheduler.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.enums.html" class="internal-link" title="orionis.foundation.config.scheduler.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Database.html" class="internal-link" title="orionis.foundation.config.scheduler.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Memory.html" class="internal-link" title="orionis.foundation.config.scheduler.Memory"><wbr></wbr>Memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Redis.html" class="internal-link" title="orionis.foundation.config.scheduler.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Scheduler.html" class="internal-link" title="orionis.foundation.config.scheduler.Scheduler"><wbr></wbr>Scheduler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Stores.html" class="internal-link" title="orionis.foundation.config.scheduler.Stores"><wbr></wbr>Stores</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8540"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8540">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.html" class="internal-link" title="orionis.foundation.config.session">session</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.entities.html" class="internal-link" title="orionis.foundation.config.session.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.enums.html" class="internal-link" title="orionis.foundation.config.session.enums">enums</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.helpers.html" class="internal-link" title="orionis.foundation.config.session.helpers">helpers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session"><wbr></wbr>Session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html" class="internal-link" title="orionis.foundation.config.session.SessionDriver"><wbr></wbr>Session<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8541"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8541">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.startup.html" class="internal-link" title="orionis.foundation.config.startup">startup</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.startup.Configuration.html" class="internal-link" title="orionis.foundation.config.startup.Configuration"><wbr></wbr>Configuration</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.startup.html#_SECTION_MAP" class="internal-link" title="orionis.foundation.config.startup._SECTION_MAP">_SECTION<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8542"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8542">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.testing.html" class="internal-link" title="orionis.foundation.config.testing">testing</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.entities.html" class="internal-link" title="orionis.foundation.config.testing.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.enums.html" class="internal-link" title="orionis.foundation.config.testing.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.Testing.html" class="internal-link" title="orionis.foundation.config.testing.Testing"><wbr></wbr>Testing</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8543"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.validation.html" class="internal-link" title="orionis.foundation.config.validation">validation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_enum_values" class="internal-link" title="orionis.foundation.config.validation._enum_values">_enum<wbr></wbr>_values</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#copy_string_list" class="internal-link" title="orionis.foundation.config.validation.copy_string_list">copy<wbr></wbr>_string<wbr></wbr>_list</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#normalize_enum" class="internal-link" title="orionis.foundation.config.validation.normalize_enum">normalize<wbr></wbr>_enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_boolean" class="internal-link" title="orionis.foundation.config.validation.validate_boolean">validate<wbr></wbr>_boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_cookie_name" class="internal-link" title="orionis.foundation.config.validation.validate_cookie_name">validate<wbr></wbr>_cookie<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_driver" class="internal-link" title="orionis.foundation.config.validation.validate_driver">validate<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_http_origin" class="internal-link" title="orionis.foundation.config.validation.validate_http_origin">validate<wbr></wbr>_http<wbr></wbr>_origin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_integer" class="internal-link" title="orionis.foundation.config.validation.validate_integer">validate<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_name" class="internal-link" title="orionis.foundation.config.validation.validate_name">validate<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_seconds" class="internal-link" title="orionis.foundation.config.validation.validate_seconds">validate<wbr></wbr>_seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#validate_string" class="internal-link" title="orionis.foundation.config.validation.validate_string">validate<wbr></wbr>_string</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_ENUM_SCALAR_TYPES" class="internal-link" title="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">_ENUM<wbr></wbr>_SCALAR<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_NAME_PATTERN" class="internal-link" title="orionis.foundation.config.validation._NAME_PATTERN">_NAME<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_TABLE_PATTERN" class="internal-link" title="orionis.foundation.config.validation._TABLE_PATTERN">_TABLE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8544"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8544">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.view.html" class="internal-link" title="orionis.foundation.config.view">view</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.entities.html" class="internal-link" title="orionis.foundation.config.view.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.View.html" class="internal-link" title="orionis.foundation.config.view.View"><wbr></wbr>View</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.validation.html" class="internal-link" title="orionis.foundation.config.validation">validation</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id835">
+  
+  
+  <tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_enum_values" class="internal-link" title="orionis.foundation.config.validation._enum_values">_enum<wbr></wbr>_values</a></code></td>
+    <td>Index enum names and values in declaration order.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#copy_string_list" class="internal-link" title="orionis.foundation.config.validation.copy_string_list">copy<wbr></wbr>_string<wbr></wbr>_list</a></code></td>
+    <td>Validate a list of non-empty strings and return an independent copy.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#normalize_enum" class="internal-link" title="orionis.foundation.config.validation.normalize_enum">normalize<wbr></wbr>_enum</a></code></td>
+    <td>Normalize an enum member, member name, or string value.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_boolean" class="internal-link" title="orionis.foundation.config.validation.validate_boolean">validate<wbr></wbr>_boolean</a></code></td>
+    <td>Require a boolean without coercing truthy values.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_cookie_name" class="internal-link" title="orionis.foundation.config.validation.validate_cookie_name">validate<wbr></wbr>_cookie<wbr></wbr>_name</a></code></td>
+    <td>Validate a cookie name with the HTTP response serializer.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_driver" class="internal-link" title="orionis.foundation.config.validation.validate_driver">validate<wbr></wbr>_driver</a></code></td>
+    <td>Require the driver implemented by a connection entity.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_http_origin" class="internal-link" title="orionis.foundation.config.validation.validate_http_origin">validate<wbr></wbr>_http<wbr></wbr>_origin</a></code></td>
+    <td>Require an explicit serialized HTTP(S) origin without wildcards.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_integer" class="internal-link" title="orionis.foundation.config.validation.validate_integer">validate<wbr></wbr>_integer</a></code></td>
+    <td>Validate an integer within an inclusive range.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_name" class="internal-link" title="orionis.foundation.config.validation.validate_name">validate<wbr></wbr>_name</a></code></td>
+    <td>Require a safe connection, queue, or SQL table identifier.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_seconds" class="internal-link" title="orionis.foundation.config.validation.validate_seconds">validate<wbr></wbr>_seconds</a></code></td>
+    <td>Require finite nonnegative or strictly positive seconds.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#validate_string" class="internal-link" title="orionis.foundation.config.validation.validate_string">validate<wbr></wbr>_string</a></code></td>
+    <td>Validate a string and optionally allow blank values.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_ENUM_SCALAR_TYPES" class="internal-link" title="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">_ENUM<wbr></wbr>_SCALAR<wbr></wbr>_TYPES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_NAME_PATTERN" class="internal-link" title="orionis.foundation.config.validation._NAME_PATTERN">_NAME<wbr></wbr>_PATTERN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_TABLE_PATTERN" class="internal-link" title="orionis.foundation.config.validation._TABLE_PATTERN">_TABLE<wbr></wbr>_PATTERN</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation._enum_values">
+    
+  </a>
+  <a name="_enum_values">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>(<wbr></wbr>maxsize=64)<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_enum_values</span><span class="function-signature">(<span class="rst-sig-param">enum_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/library/enum.html#enum.Enum" class="intersphinx-link">Enum</a>]</code>, </span><span class="rst-sig-param">_member_count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/types.html#types.MappingProxyType" class="intersphinx-link">MappingProxyType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L120">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_enum_values" title="orionis.foundation.config.validation._enum_values">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Index enum names and values in declaration order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">enum<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/library/enum.html#enum.Enum" class="intersphinx-link">Enum</a>]</code></td><td class="fieldArgDesc">Enum class defining the accepted names and values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_member<wbr></wbr>_count:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of declared names, including aliases, used as a cache revision.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/types.html#types.MappingProxyType" class="intersphinx-link">MappingProxyType</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Read-only scalar lookup preserving declaration order, or None when values
+require their current string representation on every lookup.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.copy_string_list">
+    
+  </a>
+  <a name="copy_string_list">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">copy_string_list</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L195">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#copy_string_list" title="orionis.foundation.config.validation.copy_string_list">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate a list of non-empty strings and return an independent copy.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">List to validate and copy.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">A new list containing the validated strings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is not a list or an item is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an item is blank.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.normalize_enum">
+    
+  </a>
+  <a name="normalize_enum">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_enum</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">enum_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/library/enum.html#enum.Enum" class="intersphinx-link">Enum</a>]</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L148">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#normalize_enum" title="orionis.foundation.config.validation.normalize_enum">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Normalize an enum member, member name, or string value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Enum member, member name, or string value to normalize.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">enum<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/library/enum.html#enum.Enum" class="intersphinx-link">Enum</a>]</code></td><td class="fieldArgDesc">Enum class that defines the accepted members.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The normalized enum member value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is neither an enum member nor a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the string does not match an enum member or value.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_boolean">
+    
+  </a>
+  <a name="validate_boolean">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_boolean</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_boolean" title="orionis.foundation.config.validation.validate_boolean">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require a boolean without coercing truthy values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This function validates the value without returning a result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is not a boolean.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_cookie_name">
+    
+  </a>
+  <a name="validate_cookie_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_cookie_name</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L226">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_cookie_name" title="orionis.foundation.config.validation.validate_cookie_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate a cookie name with the HTTP response serializer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Cookie name to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This function validates the name without returning a result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is not a non-empty string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the serializer rejects <tt class="rst-docutils rst-literal">value</tt> as a cookie name.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_driver">
+    
+  </a>
+  <a name="validate_driver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_driver</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">expected: <code>Drivers</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L322">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_driver" title="orionis.foundation.config.validation.validate_driver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require the driver implemented by a connection entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Configured driver name or enum member.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code>Drivers</code></td><td class="fieldArgDesc">Driver supported by the entity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the driver without changing its representation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the driver is not a string or string enum.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the driver does not match the connection entity.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_http_origin">
+    
+  </a>
+  <a name="validate_http_origin">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_http_origin</span><span class="function-signature">(<span class="rst-sig-param">origin: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L351">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_http_origin" title="orionis.foundation.config.validation.validate_http_origin">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require an explicit serialized HTTP(S) origin without wildcards.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">origin:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">One trusted browser origin from configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Accept the validated origin without changing its spelling.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the configured origin is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If its syntax could permit ambiguous or unrestricted matching.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_integer">
+    
+  </a>
+  <a name="validate_integer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_integer</span><span class="function-signature long-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">minimum: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">maximum: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_integer" title="orionis.foundation.config.validation.validate_integer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate an integer within an inclusive range.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">minimum:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Minimum allowed value, inclusive.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">maximum:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Maximum allowed value, inclusive, or <tt class="rst-docutils rst-literal">None</tt> for no upper bound.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This function validates the value without returning a result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is not an integer or is a boolean.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is outside the configured range.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_name">
+    
+  </a>
+  <a name="validate_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_name</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L258">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_name" title="orionis.foundation.config.validation.validate_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require a safe connection, queue, or SQL table identifier.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Identifier to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configuration field used in errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Restrict the identifier to an unqualified SQL table name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the identifier without changing it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the identifier is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the identifier is empty or unsafe.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_seconds">
+    
+  </a>
+  <a name="validate_seconds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_seconds</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">positive: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L289">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_seconds" title="orionis.foundation.config.validation.validate_seconds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require finite nonnegative or strictly positive seconds.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Numeric duration to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configuration field used in errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">positive:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Reject zero when true.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the duration without coercion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the duration is not numeric or is a boolean.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the duration is nonfinite or outside its allowed range.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.foundation.config.validation.validate_string">
+    
+  </a>
+  <a name="validate_string">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_string</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">allow_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#validate_string" title="orionis.foundation.config.validation.validate_string">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate a string and optionally allow blank values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Field name used in validation errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">allow<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to allow strings containing only whitespace.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This function validates the value without returning a result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">value</tt> is blank and empty strings are not allowed.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">
+    
+  </a>
+  <a name="_ENUM_SCALAR_TYPES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_ENUM_SCALAR_TYPES</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L16">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_ENUM_SCALAR_TYPES" title="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>(<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>)]))</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.foundation.config.validation._NAME_PATTERN">
+    
+  </a>
+  <a name="_NAME_PATTERN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_NAME_PATTERN</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L14">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_NAME_PATTERN" title="orionis.foundation.config.validation._NAME_PATTERN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z0<span class="rst-re-op">-</span>9<span class="rst-re-group">]</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z0<span class="rst-re-op">-</span>9_\.-<span class="rst-re-group">]</span><span class="rst-re-op">{,127}</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.foundation.config.validation._TABLE_PATTERN">
+    
+  </a>
+  <a name="_TABLE_PATTERN">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_TABLE_PATTERN</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/validation.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_TABLE_PATTERN" title="orionis.foundation.config.validation._TABLE_PATTERN">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z_<span class="rst-re-group">]</span>\w<span class="rst-re-op">*</span><span class="rst-variable-quote">'</span>,
+           <a href="https://docs.python.org/3/library/re.html#re.ASCII" class="intersphinx-link">re.ASCII</a>)</code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

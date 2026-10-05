@@ -2358,7 +2358,7 @@ class ITask(ABC):
         ----------
         year, month, day, week, day_of_week, hour, minute, second : str | None
             Cron-like expressions defining when the job should run.
-            Examples: "*/5" (every 5 units), "1-5" (range), "0,15,30,45" (list).
+            Examples: ``*/5`` (every 5 units), ``1-5`` (range), ``0,15,30,45`` (list).
 
         Returns
         -------

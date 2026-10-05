@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 from orionis.environment import Env
+from orionis.foundation.config.environment import redis_url
 from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
@@ -81,9 +82,7 @@ class HTTPRateLimit(BaseEntity):
     )
 
     rate_limit_redis_url: str = field(
-        default_factory=lambda: Env.get(
-            "RATE_LIMIT_REDIS_URL", "redis://127.0.0.1:6379/0",
-        ),
+        default_factory=lambda: redis_url("RATE_LIMIT_REDIS_URL"),
         metadata={
             "description": "Redis connection URL.",
             "default": "redis://127.0.0.1:6379/0",

@@ -1,9 +1,5 @@
-"""Generate valid MCP JSON Schema once from Orionis/msgspec type declarations."""
-
 from typing import Annotated, cast, get_args, get_origin
-
 import msgspec
-
 from orionis.schemas.schema import Schema
 from orionis.schemas.validator import Schema as Validator
 
@@ -36,18 +32,41 @@ _ANNOTATION_KEYS = frozenset(
     },
 )
 _DIALECT = "https://json-schema.org/draft/2020-12/schema"
-
+_DEFINITIONS = "$defs"
 
 def _schema_hook(annotation: type) -> dict[str, object]:
-    """Represent an unconstrained JSON value without inventing custom type schemas."""
+    """
+    Represent an unconstrained JSON value without inventing custom type schemas.
+
+    Parameters
+    ----------
+    annotation : type
+        Native type annotation to inspect or validate.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     if annotation is object:
         return {"$comment": "Any JSON value."}
     message = f"Unsupported native MCP schema type {annotation!r}."
     raise TypeError(message)
 
-
 def _check_metadata(annotation: object) -> None:
-    """Reject extra schema validation rules the native validator cannot enforce."""
+    """
+    Reject extra schema validation rules the native validator cannot enforce.
+
+    Parameters
+    ----------
+    annotation : object
+        Native type annotation to inspect or validate.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     args = get_args(annotation)
     if get_origin(annotation) is not Annotated:
         return
@@ -66,6 +85,31 @@ def _check_metadata(annotation: object) -> None:
         if item.extra_json_schema:
             additions.append(item.extra_json_schema)
     native = msgspec.json.schema(Annotated[tuple(clean)], schema_hook=_schema_hook)
+    _validate_schema_additions(native, additions)
+
+def _validate_schema_additions(
+    native: dict[str, object], additions: list[dict[str, object]],
+) -> None:
+    """
+    Require additional schema keywords to match native validation behavior.
+
+    Parameters
+    ----------
+    native : dict[str, object]
+        JSON Schema generated from native type constraints.
+    additions : list[dict[str, object]]
+        Additional keywords declared by the application.
+
+    Returns
+    -------
+    None
+        Every validation keyword matches a native constraint.
+
+    Raises
+    ------
+    ValueError
+        If an additional keyword advertises an unenforced constraint.
+    """
     for extra in additions:
         for key, value in extra.items():
             if key in _ANNOTATION_KEYS:
@@ -79,9 +123,22 @@ def _check_metadata(annotation: object) -> None:
                 )
                 raise ValueError(message)
 
-
 def _check_type(annotation: object, visited: set[object]) -> None:
-    """Inspect metadata across nested fields and recursive type declarations."""
+    """
+    Inspect metadata across nested fields and recursive type declarations.
+
+    Parameters
+    ----------
+    annotation : object
+        Native type annotation to inspect or validate.
+    visited : set[object]
+        Value supplied for ``visited``.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     _check_metadata(annotation)
     if isinstance(annotation, type) and issubclass(annotation, msgspec.Struct):
         if annotation in visited:
@@ -94,11 +151,24 @@ def _check_type(annotation: object, visited: set[object]) -> None:
             if not isinstance(item, msgspec.Meta):
                 _check_type(item, visited)
 
-
 def compile_schema(
     annotation: object, *, input_schema: bool = False,
 ) -> dict[str, object]:
-    """Produce the native JSON Schema, preserving local references and constraints."""
+    """
+    Produce the native JSON Schema, preserving local references and constraints.
+
+    Parameters
+    ----------
+    annotation : object
+        Native type annotation to inspect or validate.
+    input_schema : bool
+        Value supplied for ``input_schema``.
+
+    Returns
+    -------
+    dict[str, object]
+        Result of the operation described above.
+    """
     _check_type(annotation, set())
     schema = msgspec.json.schema(annotation, schema_hook=_schema_hook)
     if input_schema:
@@ -109,18 +179,17 @@ def compile_schema(
                 "MCP tool inputs must be Orionis Schema or msgspec.Struct classes."
             )
             raise TypeError(message)
-        definitions = schema.get("$defs", {})
+        definitions = schema.get(_DEFINITIONS, {})
         referenced: set[str] = set()
         schema = cast("dict[str, object]", _inline(schema, definitions, (), referenced))
         if referenced:
             # Keep recursive definitions exactly once; acyclic definitions are
             # inlined so nested x-mcp-header fields are statically reachable.
-            schema["$defs"] = definitions
+            schema[_DEFINITIONS] = definitions
         if schema.get("type") != "object":
             message = "MCP input schemas must encode objects, not array-like structs."
             raise TypeError(message)
     return schema
-
 
 def _inline(
     value: object,
@@ -128,7 +197,25 @@ def _inline(
     ancestors: tuple[str, ...],
     referenced: set[str],
 ) -> object:
-    """Inline acyclic local references while preserving recursive definitions."""
+    """
+    Inline acyclic local references while preserving recursive definitions.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+    definitions : dict[str, object]
+        Value supplied for ``definitions``.
+    ancestors : tuple[str, ...]
+        Value supplied for ``ancestors``.
+    referenced : set[str]
+        Value supplied for ``referenced``.
+
+    Returns
+    -------
+    object
+        Result of the operation described above.
+    """
     if isinstance(value, list):
         return [_inline(item, definitions, ancestors, referenced) for item in value]
     if not isinstance(value, dict):
@@ -145,18 +232,32 @@ def _inline(
         return {
             **expanded,
             **{
-                key: item for key, item in value.items() if key not in ("$ref", "$defs")
+                key: item for key, item in value.items()
+                if key not in ("$ref", _DEFINITIONS)
             },
         }
     return {
         key: _inline(item, definitions, ancestors, referenced)
         for key, item in value.items()
-        if key != "$defs"
+        if key != _DEFINITIONS
     }
 
-
 def convert_payload(value: object, annotation: object) -> object:
-    """Validate native rules for Schema and strict msgspec types otherwise."""
+    """
+    Validate native rules for Schema and strict msgspec types otherwise.
+
+    Parameters
+    ----------
+    value : object
+        Value to inspect, transform or validate.
+    annotation : object
+        Native type annotation to inspect or validate.
+
+    Returns
+    -------
+    object
+        Result of the operation described above.
+    """
     if isinstance(annotation, type) and issubclass(annotation, Schema):
         return Validator.validate(value, annotation)
     return msgspec.convert(value, type=annotation, strict=True)

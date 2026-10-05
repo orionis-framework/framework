@@ -70,6 +70,11 @@ class ReflectionAbstract(IReflectionAbstract):
         abstract : type
             Provide the abstract base class to inspect.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         TypeError
@@ -117,6 +122,11 @@ class ReflectionAbstract(IReflectionAbstract):
             Specify the cache key to assign.
         value : object
             Provide the value to store.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._cache[key] = value
 
@@ -145,6 +155,11 @@ class ReflectionAbstract(IReflectionAbstract):
         key : str
             Specify the cache key to remove.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Notes
         -----
         Ignore missing keys without raising an exception.
@@ -154,6 +169,11 @@ class ReflectionAbstract(IReflectionAbstract):
     def _ensureScanned(self) -> None:
         """
         Ensure class members are scanned once before member access.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Notes
         -----
@@ -168,6 +188,11 @@ class ReflectionAbstract(IReflectionAbstract):
     def _invalidateMembers(self) -> None:
         """
         Invalidate cached member classifications.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Notes
         -----

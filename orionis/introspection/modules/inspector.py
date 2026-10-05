@@ -205,6 +205,8 @@ class ModuleInspector:
     def fileImportsAny(
         file_path: Path,
         target_modules: set[str],
+        *,
+        allow_empty: bool = False,
     ) -> bool:
         """
         Determine if a file imports any target modules using AST analysis.
@@ -215,19 +217,23 @@ class ModuleInspector:
             Path to the file to analyze.
         target_modules : set[str]
             Set of module names to check for imports.
+        allow_empty : bool, optional
+            Whether an empty source is accepted without a required import.
 
         Returns
         -------
         bool
-            True if the file imports any of the target modules, otherwise False.
+            Whether the file imports a target or is explicitly allowed to be empty.
         """
         # Return when there is no source or no import target to inspect.
         if not target_modules or not file_path.is_file():
             return False
 
         try:
-            # Parse the file content into an AST tree
-            tree = ast.parse(file_path.read_text(encoding="utf-8"))
+            source = file_path.read_text(encoding="utf-8")
+            if allow_empty and not source.strip():
+                return True
+            tree = ast.parse(source)
         except (SyntaxError, UnicodeDecodeError):
             return False
 

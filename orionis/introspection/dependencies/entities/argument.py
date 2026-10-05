@@ -46,6 +46,11 @@ class Argument:
         """
         Validate field types after dataclass initialisation.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         TypeError

@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from _collections_abc import dict_items
     from orionis.introspection.dependencies.entities.argument import Argument
 
-
 @dataclass(frozen=True, kw_only=True)
 class Signature(BaseEntity):
     """
@@ -33,6 +32,11 @@ class Signature(BaseEntity):
     def __post_init__(self) -> None:
         """
         Validate that all three bucket fields are dictionaries.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Raises
         ------

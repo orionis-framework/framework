@@ -1,0 +1,2547 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.schemas.fields</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.schemas.fields.html" class="internal-link" title="This module">fields</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.schemas.html" class="internal-link" title="The parent of this module">schemas</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25102"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25102">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.compiler.html" class="internal-link" title="orionis.schemas.compiler">compiler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.compiler.MetaCompiler.html" class="internal-link" title="orionis.schemas.compiler.MetaCompiler"><wbr></wbr>Meta<wbr></wbr>Compiler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link" title="orionis.schemas.compiler.MetadataConflictError"><wbr></wbr>Metadata<wbr></wbr>Conflict<wbr></wbr>Error</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25103"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25103">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.constraints.html" class="internal-link" title="orionis.schemas.constraints">constraints</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.GreaterThan.html" class="internal-link" title="orionis.schemas.constraints.GreaterThan"><wbr></wbr>Greater<wbr></wbr>Than</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.GreaterThanOrEqual.html" class="internal-link" title="orionis.schemas.constraints.GreaterThanOrEqual"><wbr></wbr>Greater<wbr></wbr>Than<wbr></wbr>Or<wbr></wbr>Equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.LessThan.html" class="internal-link" title="orionis.schemas.constraints.LessThan"><wbr></wbr>Less<wbr></wbr>Than</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.LessThanOrEqual.html" class="internal-link" title="orionis.schemas.constraints.LessThanOrEqual"><wbr></wbr>Less<wbr></wbr>Than<wbr></wbr>Or<wbr></wbr>Equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.MaxLength.html" class="internal-link" title="orionis.schemas.constraints.MaxLength"><wbr></wbr>Max<wbr></wbr>Length</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.MinLength.html" class="internal-link" title="orionis.schemas.constraints.MinLength"><wbr></wbr>Min<wbr></wbr>Length</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.MultipleOf.html" class="internal-link" title="orionis.schemas.constraints.MultipleOf"><wbr></wbr>Multiple<wbr></wbr>Of</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.Pattern.html" class="internal-link" title="orionis.schemas.constraints.Pattern"><wbr></wbr>Pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.TimezoneAware.html" class="internal-link" title="orionis.schemas.constraints.TimezoneAware"><wbr></wbr>Timezone<wbr></wbr>Aware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.constraints.TimezoneNaive.html" class="internal-link" title="orionis.schemas.constraints.TimezoneNaive"><wbr></wbr>Timezone<wbr></wbr>Naive</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25104"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25104">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.contracts.html" class="internal-link" title="orionis.schemas.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.contracts.constraint.html" class="internal-link" title="orionis.schemas.contracts.constraint">constraint</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25105"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25105">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.entities.html" class="internal-link" title="orionis.schemas.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.entities.failure.html" class="internal-link" title="orionis.schemas.entities.failure">failure</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25106"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25106">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.exception_parser.html" class="internal-link" title="orionis.schemas.exception_parser">exception<wbr></wbr>_parser</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.ValidationErrorParser.html" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser"><wbr></wbr>Validation<wbr></wbr>Error<wbr></wbr>Parser</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_get_fields_map" class="internal-link" title="orionis.schemas.exception_parser._get_fields_map">_get<wbr></wbr>_fields<wbr></wbr>_map</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_CONSTRAINT_PATTERNS" class="internal-link" title="orionis.schemas.exception_parser._CONSTRAINT_PATTERNS">_CONSTRAINT<wbr></wbr>_PATTERNS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_MISSING" class="internal-link" title="orionis.schemas.exception_parser._MISSING">_MISSING</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_NESTED_TYPE_CACHE" class="internal-link" title="orionis.schemas.exception_parser._NESTED_TYPE_CACHE">_NESTED<wbr></wbr>_TYPE<wbr></wbr>_CACHE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_MARKER" class="internal-link" title="orionis.schemas.exception_parser._PATH_MARKER">_PATH<wbr></wbr>_MARKER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_MARKER_LEN" class="internal-link" title="orionis.schemas.exception_parser._PATH_MARKER_LEN">_PATH<wbr></wbr>_MARKER<wbr></wbr>_LEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_STRUCT_FIELDS_MAP" class="internal-link" title="orionis.schemas.exception_parser._STRUCT_FIELDS_MAP">_STRUCT<wbr></wbr>_FIELDS<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#MISSING_FIELD_RE" class="internal-link" title="orionis.schemas.exception_parser.MISSING_FIELD_RE">MISSING<wbr></wbr>_FIELD<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25107"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25107">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.exceptions.html" class="internal-link" title="orionis.schemas.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exceptions.validation.html" class="internal-link" title="orionis.schemas.exceptions.validation">validation</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exceptions.ValidationException.html" class="internal-link" title="orionis.schemas.exceptions.ValidationException"><wbr></wbr>Validation<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25108"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25108">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.failure_collector.html" class="internal-link" title="orionis.schemas.failure_collector">failure<wbr></wbr>_collector</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.FailureCollector.html" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector"><wbr></wbr>Failure<wbr></wbr>Collector</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.html#_async_field_plan" class="internal-link" title="orionis.schemas.failure_collector._async_field_plan">_async<wbr></wbr>_field<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.html#_field_plan" class="internal-link" title="orionis.schemas.failure_collector._field_plan">_field<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.html#_nested_schema" class="internal-link" title="orionis.schemas.failure_collector._nested_schema">_nested<wbr></wbr>_schema</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.html#_ASYNC_FIELD_PLAN_CACHE" class="internal-link" title="orionis.schemas.failure_collector._ASYNC_FIELD_PLAN_CACHE">_ASYNC<wbr></wbr>_FIELD<wbr></wbr>_PLAN<wbr></wbr>_CACHE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.html#_FIELD_PLAN_CACHE" class="internal-link" title="orionis.schemas.failure_collector._FIELD_PLAN_CACHE">_FIELD<wbr></wbr>_PLAN<wbr></wbr>_CACHE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25109"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.fields.html" class="internal-link" title="orionis.schemas.fields">fields</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25110"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25110">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.meta.html" class="internal-link" title="orionis.schemas.meta">meta</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.meta.constraint.html" class="internal-link" title="orionis.schemas.meta.constraint">constraint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.meta.document.html" class="internal-link" title="orionis.schemas.meta.document">document</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.meta.validation.html" class="internal-link" title="orionis.schemas.meta.validation">validation</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25111"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25111">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.metadata.html" class="internal-link" title="orionis.schemas.metadata">metadata</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.Description.html" class="internal-link" title="orionis.schemas.metadata.Description"><wbr></wbr>Description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.Examples.html" class="internal-link" title="orionis.schemas.metadata.Examples"><wbr></wbr>Examples</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.Extra.html" class="internal-link" title="orionis.schemas.metadata.Extra"><wbr></wbr>Extra</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.ExtraJsonSchema.html" class="internal-link" title="orionis.schemas.metadata.ExtraJsonSchema"><wbr></wbr>Extra<wbr></wbr>Json<wbr></wbr>Schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.Message.html" class="internal-link" title="orionis.schemas.metadata.Message"><wbr></wbr>Message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.metadata.Title.html" class="internal-link" title="orionis.schemas.metadata.Title"><wbr></wbr>Title</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25112"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25112">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.rule.html" class="internal-link" title="orionis.schemas.rule">rule</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rule.Rule.html" class="internal-link" title="orionis.schemas.rule.Rule"><wbr></wbr>Rule</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25113"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25113">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.rules.html" class="internal-link" title="orionis.schemas.rules">rules</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.accepted.html" class="internal-link" title="orionis.schemas.rules.accepted">accepted</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.active_url.html" class="internal-link" title="orionis.schemas.rules.active_url">active<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.after.html" class="internal-link" title="orionis.schemas.rules.after">after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.after_or_equal.html" class="internal-link" title="orionis.schemas.rules.after_or_equal">after<wbr></wbr>_or<wbr></wbr>_equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.alpha.html" class="internal-link" title="orionis.schemas.rules.alpha">alpha</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ascii.html" class="internal-link" title="orionis.schemas.rules.ascii">ascii</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.before.html" class="internal-link" title="orionis.schemas.rules.before">before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.before_or_equal.html" class="internal-link" title="orionis.schemas.rules.before_or_equal">before<wbr></wbr>_or<wbr></wbr>_equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.between.html" class="internal-link" title="orionis.schemas.rules.between">between</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.confirm_password.html" class="internal-link" title="orionis.schemas.rules.confirm_password">confirm<wbr></wbr>_password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.date_format.html" class="internal-link" title="orionis.schemas.rules.date_format">date<wbr></wbr>_format</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.decimal_places.html" class="internal-link" title="orionis.schemas.rules.decimal_places">decimal<wbr></wbr>_places</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.different.html" class="internal-link" title="orionis.schemas.rules.different">different</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.dimensions.html" class="internal-link" title="orionis.schemas.rules.dimensions">dimensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.doesnt_end_with.html" class="internal-link" title="orionis.schemas.rules.doesnt_end_with">doesnt<wbr></wbr>_end<wbr></wbr>_with</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.doesnt_start_with.html" class="internal-link" title="orionis.schemas.rules.doesnt_start_with">doesnt<wbr></wbr>_start<wbr></wbr>_with</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.email.html" class="internal-link" title="orionis.schemas.rules.email">email</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.encoding.html" class="internal-link" title="orionis.schemas.rules.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ends_with.html" class="internal-link" title="orionis.schemas.rules.ends_with">ends<wbr></wbr>_with</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.file.html" class="internal-link" title="orionis.schemas.rules.file">file</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.greater_than_or_equal_field.html" class="internal-link" title="orionis.schemas.rules.greater_than_or_equal_field">greater<wbr></wbr>_than<wbr></wbr>_or<wbr></wbr>_equal<wbr></wbr>_field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.image.html" class="internal-link" title="orionis.schemas.rules.image">image</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.image_probe.html" class="internal-link" title="orionis.schemas.rules.image_probe">image<wbr></wbr>_probe</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.integer.html" class="internal-link" title="orionis.schemas.rules.integer">integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ip_address.html" class="internal-link" title="orionis.schemas.rules.ip_address">ip<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.json_string.html" class="internal-link" title="orionis.schemas.rules.json_string">json<wbr></wbr>_string</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.less_than_or_equal_field.html" class="internal-link" title="orionis.schemas.rules.less_than_or_equal_field">less<wbr></wbr>_than<wbr></wbr>_or<wbr></wbr>_equal<wbr></wbr>_field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.lowercase.html" class="internal-link" title="orionis.schemas.rules.lowercase">lowercase</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.mac_address.html" class="internal-link" title="orionis.schemas.rules.mac_address">mac<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.max_digits.html" class="internal-link" title="orionis.schemas.rules.max_digits">max<wbr></wbr>_digits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.measure.html" class="internal-link" title="orionis.schemas.rules.measure">measure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.mime_types.html" class="internal-link" title="orionis.schemas.rules.mime_types">mime<wbr></wbr>_types</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.size.html" class="internal-link" title="orionis.schemas.rules.size">size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.starts_with.html" class="internal-link" title="orionis.schemas.rules.starts_with">starts<wbr></wbr>_with</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.strong_password.html" class="internal-link" title="orionis.schemas.rules.strong_password">strong<wbr></wbr>_password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.temporal.html" class="internal-link" title="orionis.schemas.rules.temporal">temporal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ulid.html" class="internal-link" title="orionis.schemas.rules.ulid">ulid</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.unique.html" class="internal-link" title="orionis.schemas.rules.unique">unique</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.uppercase.html" class="internal-link" title="orionis.schemas.rules.uppercase">uppercase</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.uuid_string.html" class="internal-link" title="orionis.schemas.rules.uuid_string">uuid<wbr></wbr>_string</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Accepted.html" class="internal-link" title="orionis.schemas.rules.Accepted"><wbr></wbr>Accepted</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ActiveUrl.html" class="internal-link" title="orionis.schemas.rules.ActiveUrl"><wbr></wbr>Active<wbr></wbr>Url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.After.html" class="internal-link" title="orionis.schemas.rules.After"><wbr></wbr>After</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.AfterOrEqual.html" class="internal-link" title="orionis.schemas.rules.AfterOrEqual"><wbr></wbr>After<wbr></wbr>Or<wbr></wbr>Equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Alpha.html" class="internal-link" title="orionis.schemas.rules.Alpha"><wbr></wbr>Alpha</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Ascii.html" class="internal-link" title="orionis.schemas.rules.Ascii"><wbr></wbr>Ascii</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Before.html" class="internal-link" title="orionis.schemas.rules.Before"><wbr></wbr>Before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.BeforeOrEqual.html" class="internal-link" title="orionis.schemas.rules.BeforeOrEqual"><wbr></wbr>Before<wbr></wbr>Or<wbr></wbr>Equal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Between.html" class="internal-link" title="orionis.schemas.rules.Between"><wbr></wbr>Between</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.ConfirmPassword.html" class="internal-link" title="orionis.schemas.rules.ConfirmPassword"><wbr></wbr>Confirm<wbr></wbr>Password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.DateFormat.html" class="internal-link" title="orionis.schemas.rules.DateFormat"><wbr></wbr>Date<wbr></wbr>Format</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.DecimalPlaces.html" class="internal-link" title="orionis.schemas.rules.DecimalPlaces"><wbr></wbr>Decimal<wbr></wbr>Places</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Different.html" class="internal-link" title="orionis.schemas.rules.Different"><wbr></wbr>Different</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Dimensions.html" class="internal-link" title="orionis.schemas.rules.Dimensions"><wbr></wbr>Dimensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.DoesntEndWith.html" class="internal-link" title="orionis.schemas.rules.DoesntEndWith"><wbr></wbr>Doesnt<wbr></wbr>End<wbr></wbr>With</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.DoesntStartWith.html" class="internal-link" title="orionis.schemas.rules.DoesntStartWith"><wbr></wbr>Doesnt<wbr></wbr>Start<wbr></wbr>With</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Email.html" class="internal-link" title="orionis.schemas.rules.Email"><wbr></wbr>Email</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Encoding.html" class="internal-link" title="orionis.schemas.rules.Encoding"><wbr></wbr>Encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.EndsWith.html" class="internal-link" title="orionis.schemas.rules.EndsWith"><wbr></wbr>Ends<wbr></wbr>With</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.File.html" class="internal-link" title="orionis.schemas.rules.File"><wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.GreaterThanOrEqualField.html" class="internal-link" title="orionis.schemas.rules.GreaterThanOrEqualField"><wbr></wbr>Greater<wbr></wbr>Than<wbr></wbr>Or<wbr></wbr>Equal<wbr></wbr>Field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Image.html" class="internal-link" title="orionis.schemas.rules.Image"><wbr></wbr>Image</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Integer.html" class="internal-link" title="orionis.schemas.rules.Integer"><wbr></wbr>Integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.IpAddress.html" class="internal-link" title="orionis.schemas.rules.IpAddress"><wbr></wbr>Ip<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Json.html" class="internal-link" title="orionis.schemas.rules.Json"><wbr></wbr>Json</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.LessThanOrEqualField.html" class="internal-link" title="orionis.schemas.rules.LessThanOrEqualField"><wbr></wbr>Less<wbr></wbr>Than<wbr></wbr>Or<wbr></wbr>Equal<wbr></wbr>Field</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Lowercase.html" class="internal-link" title="orionis.schemas.rules.Lowercase"><wbr></wbr>Lowercase</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.MacAddress.html" class="internal-link" title="orionis.schemas.rules.MacAddress"><wbr></wbr>Mac<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.MaxDigits.html" class="internal-link" title="orionis.schemas.rules.MaxDigits"><wbr></wbr>Max<wbr></wbr>Digits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.MimeTypes.html" class="internal-link" title="orionis.schemas.rules.MimeTypes"><wbr></wbr>Mime<wbr></wbr>Types</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Size.html" class="internal-link" title="orionis.schemas.rules.Size"><wbr></wbr>Size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.StartsWith.html" class="internal-link" title="orionis.schemas.rules.StartsWith"><wbr></wbr>Starts<wbr></wbr>With</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.StrongPassword.html" class="internal-link" title="orionis.schemas.rules.StrongPassword"><wbr></wbr>Strong<wbr></wbr>Password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Ulid.html" class="internal-link" title="orionis.schemas.rules.Ulid"><wbr></wbr>Ulid</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Unique.html" class="internal-link" title="orionis.schemas.rules.Unique"><wbr></wbr>Unique</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Uppercase.html" class="internal-link" title="orionis.schemas.rules.Uppercase"><wbr></wbr>Uppercase</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.Uuid.html" class="internal-link" title="orionis.schemas.rules.Uuid"><wbr></wbr>Uuid</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.html#__dir__" class="internal-link" title="orionis.schemas.rules.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.html#__getattr__" class="internal-link" title="orionis.schemas.rules.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules.html#_EXPORTS" class="internal-link" title="orionis.schemas.rules._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25114"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25114">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.rules_executor.html" class="internal-link" title="orionis.schemas.rules_executor">rules<wbr></wbr>_executor</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_async_validators" class="internal-link" title="orionis.schemas.rules_executor._async_validators">_async<wbr></wbr>_validators</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_build_plan" class="internal-link" title="orionis.schemas.rules_executor._build_plan">_build<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collect_async_nested" class="internal-link" title="orionis.schemas.rules_executor._collect_async_nested">_collect<wbr></wbr>_async<wbr></wbr>_nested</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collect_async_rules" class="internal-link" title="orionis.schemas.rules_executor._collect_async_rules">_collect<wbr></wbr>_async<wbr></wbr>_rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collect_nested" class="internal-link" title="orionis.schemas.rules_executor._collect_nested">_collect<wbr></wbr>_nested</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collect_with_async_plan" class="internal-link" title="orionis.schemas.rules_executor._collect_with_async_plan">_collect<wbr></wbr>_with<wbr></wbr>_async<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collect_with_plan" class="internal-link" title="orionis.schemas.rules_executor._collect_with_plan">_collect<wbr></wbr>_with<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_field_rules" class="internal-link" title="orionis.schemas.rules_executor._field_rules">_field<wbr></wbr>_rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_type_contains_nested" class="internal-link" title="orionis.schemas.rules_executor._type_contains_nested">_type<wbr></wbr>_contains<wbr></wbr>_nested</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_type_uses_async" class="internal-link" title="orionis.schemas.rules_executor._type_uses_async">_type<wbr></wbr>_uses<wbr></wbr>_async</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_warm_child_plan" class="internal-link" title="orionis.schemas.rules_executor._warm_child_plan">_warm<wbr></wbr>_child<wbr></wbr>_plan</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_ASYNC_PLAN_CACHE" class="internal-link" title="orionis.schemas.rules_executor._ASYNC_PLAN_CACHE">_ASYNC<wbr></wbr>_PLAN<wbr></wbr>_CACHE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_EMPTY_META" class="internal-link" title="orionis.schemas.rules_executor._EMPTY_META">_EMPTY<wbr></wbr>_META</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_PLAN_CACHE" class="internal-link" title="orionis.schemas.rules_executor._PLAN_CACHE">_PLAN<wbr></wbr>_CACHE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25115"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25115">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.schema.html" class="internal-link" title="orionis.schemas.schema">schema</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.schema.SchemaMeta.html" class="internal-link" title="orionis.schemas.schema.SchemaMeta"><wbr></wbr>Schema<wbr></wbr>Meta</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.schema.html#_CONSTRAINT_MSGSPEC_KEYS" class="internal-link" title="orionis.schemas.schema._CONSTRAINT_MSGSPEC_KEYS">_CONSTRAINT<wbr></wbr>_MSGSPEC<wbr></wbr>_KEYS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.schema.html#_StructMeta" class="internal-link" title="orionis.schemas.schema._StructMeta">_<wbr></wbr>Struct<wbr></wbr>Meta</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25116"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25116">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.validator.html" class="internal-link" title="orionis.schemas.validator">validator</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.validator.Schema.html" class="internal-link" title="orionis.schemas.validator.Schema"><wbr></wbr>Schema</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25117"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId25117">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.schemas.Schema.html" class="internal-link" title="orionis.schemas.Schema"><wbr></wbr>Schema</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.Schema.html#toDict" class="internal-link" title="orionis.schemas.Schema.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.html#__dir__" class="internal-link" title="orionis.schemas.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.html#__getattr__" class="internal-link" title="orionis.schemas.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.html#_EXPORTS" class="internal-link" title="orionis.schemas._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.schemas.html" class="internal-link" title="orionis.schemas">schemas</a></code><wbr></wbr>.<code><a href="orionis.schemas.fields.html" class="internal-link" title="orionis.schemas.fields">fields</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/schemas/fields.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

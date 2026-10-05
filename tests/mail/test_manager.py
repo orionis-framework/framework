@@ -21,6 +21,7 @@ from tests.mail.test_composer import (
     MemoryStorage,
     RecordingFactory,
     RecordingTransport,
+    create_mail_views,
 )
 
 if TYPE_CHECKING:
@@ -40,6 +41,7 @@ class TestMailManager(TestCase):
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
+        create_mail_views(self.root)
         self.settings = {
             "default": "archive",
             "mailers": {

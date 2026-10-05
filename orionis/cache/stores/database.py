@@ -125,6 +125,11 @@ class DatabaseCacheBackend:
         lock_table : str | None, optional
             Table name used to store atomic locks. Defaults to
             ``'cache_locks'`` when not provided.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._connection = connection
         self._table = table

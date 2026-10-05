@@ -45,6 +45,11 @@ class CacheLock:
             Cache key to lock on.
         timeout : float | None
             Lock timeout in seconds.  ``None`` means no timeout.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._backend = backend
         self._key = key
@@ -133,6 +138,11 @@ class CacheLock:
             Exception instance, if any.
         exc_tb : types.TracebackType | None
             Traceback object, if any.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         if isinstance(self._backend, FileCacheBackend):
             if isinstance(self._impl, asyncio.Lock):

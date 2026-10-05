@@ -35,6 +35,11 @@ class FileCacheBackend:
         ----------
         path : Path
             Directory where cache files will be stored.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         path = path.resolve()
         self._path: Path = path
@@ -166,6 +171,11 @@ class FileCacheBackend:
         entry : dict
             Serializable cache entry.
 
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+
         Raises
         ------
         OSError
@@ -184,6 +194,11 @@ class FileCacheBackend:
             Destination cache file.
         entry : dict
             Encodable cache entry.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Raises
         ------
@@ -209,6 +224,11 @@ class FileCacheBackend:
             Staging file holding the encoded entry.
         file : Path
             Destination cache file.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
 
         Raises
         ------

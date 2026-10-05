@@ -37,6 +37,11 @@ class CacheManager(ICacheManager):
         ----------
         app : IApplication
             Application container used to read config and the base path.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self._app = app
         self._base_path: Path = app.basePath

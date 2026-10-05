@@ -33,6 +33,11 @@ class CacheRepository(ICacheRepository):
             Storage backend implementing the low-level cache protocol.
         prefix : str, optional
             String prepended to every key, separated by ``:``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         # Store the backend and prefix for use in all subsequent operations.
         self._backend = backend

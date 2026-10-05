@@ -1,0 +1,1691 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.auth.context.AuthenticationContext</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="This class"><wbr></wbr>Authentication<wbr></wbr>Context</a></code> 
+      </div>
+      
+      <div>
+         
+          <div class="childrenKindTitle">Contents</div>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-4">Concurrency</a></li>
+</ul>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__isCurrent" class="internal-link" title="orionis.auth.context.AuthenticationContext.__isCurrent">__is<wbr></wbr>Current</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repr__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repr__">__repr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_bindToScope" class="internal-link" title="orionis.auth.context.AuthenticationContext._bindToScope">_bind<wbr></wbr>To<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fork" class="internal-link" title="orionis.auth.context.AuthenticationContext._fork">_fork</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#authorization" class="internal-link" title="orionis.auth.context.AuthenticationContext.authorization">authorization</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#identifier" class="internal-link" title="orionis.auth.context.AuthenticationContext.identifier">identifier</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.__abilities">__abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__credential_id" class="internal-link" title="orionis.auth.context.AuthenticationContext.__credential_id">__credential<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.__guard">__guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.__identity">__identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__lock" class="internal-link" title="orionis.auth.context.AuthenticationContext.__lock">__lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repository" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repository">__repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__scope" class="internal-link" title="orionis.auth.context.AuthenticationContext.__scope">__scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__snapshot" class="internal-link" title="orionis.auth.context.AuthenticationContext.__snapshot">__snapshot</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.abilities">abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#credentialId" class="internal-link" title="orionis.auth.context.AuthenticationContext.credentialId">credential<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.guard">guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.identity">identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isAuthenticated" class="internal-link" title="orionis.auth.context.AuthenticationContext.isAuthenticated">is<wbr></wbr>Authenticated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isGuest" class="internal-link" title="orionis.auth.context.AuthenticationContext.isGuest">is<wbr></wbr>Guest</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.auth.context.html" class="internal-link" title="The parent of this class">context</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId380"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.context.context.html" class="internal-link" title="orionis.auth.context.context">context</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId381"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId381">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.context.functions.html" class="internal-link" title="orionis.auth.context.functions">functions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.functions.html#authentication_lock" class="internal-link" title="orionis.auth.context.functions.authentication_lock">authentication<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.functions.html#_AUTH_LOCK" class="internal-link" title="orionis.auth.context.functions._AUTH_LOCK">_AUTH<wbr></wbr>_LOCK</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId382"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="orionis.auth.context.AuthenticationContext"><wbr></wbr>Authentication<wbr></wbr>Context</a></code>
+
+                <div class="expandableContent">
+                    <div>
+         
+          <div class="childrenKindTitle">Contents</div>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-5">Concurrency</a></li>
+</ul>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__isCurrent" class="internal-link" title="orionis.auth.context.AuthenticationContext.__isCurrent">__is<wbr></wbr>Current</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repr__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repr__">__repr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_bindToScope" class="internal-link" title="orionis.auth.context.AuthenticationContext._bindToScope">_bind<wbr></wbr>To<wbr></wbr>Scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fork" class="internal-link" title="orionis.auth.context.AuthenticationContext._fork">_fork</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#authorization" class="internal-link" title="orionis.auth.context.AuthenticationContext.authorization">authorization</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#identifier" class="internal-link" title="orionis.auth.context.AuthenticationContext.identifier">identifier</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.__abilities">__abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__credential_id" class="internal-link" title="orionis.auth.context.AuthenticationContext.__credential_id">__credential<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.__guard">__guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.__identity">__identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__lock" class="internal-link" title="orionis.auth.context.AuthenticationContext.__lock">__lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__repository" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repository">__repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__scope" class="internal-link" title="orionis.auth.context.AuthenticationContext.__scope">__scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__snapshot" class="internal-link" title="orionis.auth.context.AuthenticationContext.__snapshot">__snapshot</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.abilities">abilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#credentialId" class="internal-link" title="orionis.auth.context.AuthenticationContext.credentialId">credential<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.guard">guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.identity">identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isAuthenticated" class="internal-link" title="orionis.auth.context.AuthenticationContext.isAuthenticated">is<wbr></wbr>Authenticated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#isGuest" class="internal-link" title="orionis.auth.context.AuthenticationContext.isGuest">is<wbr></wbr>Guest</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#bind_auth_context" class="internal-link" title="orionis.auth.context.bind_auth_context">bind<wbr></wbr>_auth<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#current_auth_context" class="internal-link" title="orionis.auth.context.current_auth_context">current<wbr></wbr>_auth<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#GUEST_CONTEXT" class="internal-link" title="orionis.auth.context.GUEST_CONTEXT">GUEST<wbr></wbr>_CONTEXT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.auth.html" class="internal-link" title="orionis.auth">auth</a></code><wbr></wbr>.<code><a href="orionis.auth.context.html" class="internal-link" title="orionis.auth.context">context</a></code><wbr></wbr>.<code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="orionis.auth.context.AuthenticationContext">AuthenticationContext</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AuthenticationContext</span>(<a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__init__">AuthenticationContext(identity, guard, abilities, repository, ...)</a></code></p><p><a href="classIndex.html#orionis.auth.context.AuthenticationContext">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Hold the authenticated state of one request.</p>
+<p>A context is created by the authentication middleware and stored in
+the container scope opened by the HTTP kernel. It is never attached
+to a singleton, so two requests running concurrently on the same
+event loop can never observe each other's identity.</p>
+<div class="rst-section" id="rst-concurrency">
+<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-3">Concurrency</a></h2>
+<p>The identity, the guard name and the abilities are fixed at
+construction time. The authorization snapshot is resolved lazily
+under an <tt class="rst-docutils rst-literal">asyncio.Lock</tt> owned by this context, so several
+coroutines of the same request share a single database round trip.</p>
+</div>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id29">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__init__">__init__</a></code></td>
+    <td>Build the authentication context of a request.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__isCurrent" class="internal-link" title="orionis.auth.context.AuthenticationContext.__isCurrent">__is<wbr></wbr>Current</a></code></td>
+    <td>Report whether this context still belongs to a live request.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__repr__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repr__">__repr__</a></code></td>
+    <td>Return a debugging representation of the context.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_bindToScope" class="internal-link" title="orionis.auth.context.AuthenticationContext._bindToScope">_bind<wbr></wbr>To<wbr></wbr>Scope</a></code></td>
+    <td>Associate this context with one scope for its remaining lifetime.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_fork" class="internal-link" title="orionis.auth.context.AuthenticationContext._fork">_fork</a></code></td>
+    <td>Copy the current identity into a fresh, independently scoped context.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#authorization" class="internal-link" title="orionis.auth.context.AuthenticationContext.authorization">authorization</a></code></td>
+    <td>Return the effective authorization snapshot of the request.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#identifier" class="internal-link" title="orionis.auth.context.AuthenticationContext.identifier">identifier</a></code></td>
+    <td>Return the unique identifier of the authenticated identity.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.context.AuthenticationContext.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.__abilities">__abilities</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__credential_id" class="internal-link" title="orionis.auth.context.AuthenticationContext.__credential_id">__credential<wbr></wbr>_id</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.__guard">__guard</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.__identity">__identity</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__lock" class="internal-link" title="orionis.auth.context.AuthenticationContext.__lock">__lock</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__repository" class="internal-link" title="orionis.auth.context.AuthenticationContext.__repository">__repository</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__scope" class="internal-link" title="orionis.auth.context.AuthenticationContext.__scope">__scope</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#__snapshot" class="internal-link" title="orionis.auth.context.AuthenticationContext.__snapshot">__snapshot</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#abilities" class="internal-link" title="orionis.auth.context.AuthenticationContext.abilities">abilities</a></code></td>
+    <td>Return the abilities carried by the presented credential.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#credentialId" class="internal-link" title="orionis.auth.context.AuthenticationContext.credentialId">credential<wbr></wbr>Id</a></code></td>
+    <td>Return the identifier of the credential that authenticated.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#guard" class="internal-link" title="orionis.auth.context.AuthenticationContext.guard">guard</a></code></td>
+    <td>Return the name of the guard that resolved the identity.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#identity" class="internal-link" title="orionis.auth.context.AuthenticationContext.identity">identity</a></code></td>
+    <td>Return the authenticated identity of the request.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#isAuthenticated" class="internal-link" title="orionis.auth.context.AuthenticationContext.isAuthenticated">is<wbr></wbr>Authenticated</a></code></td>
+    <td>Report whether the request carries an authenticated identity.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#isGuest" class="internal-link" title="orionis.auth.context.AuthenticationContext.isGuest">is<wbr></wbr>Guest</a></code></td>
+    <td>Report whether the request is anonymous.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">guard: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">abilities: <code>Iterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">repository: <code>IPermissionRepository | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">credential_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L45">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.auth.context.AuthenticationContext.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Build the authentication context of a request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code>IAuthenticatable | None, <em>optional</em></code></td><td class="fieldArgDesc">Identity resolved by a guard, or <tt class="rst-docutils rst-literal">None</tt> for a guest.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">guard:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Name of the guard that resolved the identity.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">abilities:</span><code>Iterable[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Abilities restricting the presented credential.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">repository:</span><code>IPermissionRepository | None, <em>optional</em></code></td><td class="fieldArgDesc">Source used to resolve the authorization snapshot. It is only
+required for authenticated contexts.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">credential<wbr></wbr>_id:</span><code>object | None, <em>optional</em></code></td><td class="fieldArgDesc">Identifier of the revocable credential that authenticated the
+request, such as a personal access token.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The context starts without a resolved snapshot.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__isCurrent">
+    
+  </a>
+  <a name="__isCurrent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__isCurrent</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L134">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__isCurrent" title="orionis.auth.context.AuthenticationContext.__isCurrent">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Report whether this context still belongs to a live request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False once replaced or once its owning scope has closed.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__repr__">
+    
+  </a>
+  <a name="__repr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__repr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L282">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__repr__" title="orionis.auth.context.AuthenticationContext.__repr__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return a debugging representation of the context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Description exposing the guard and the identifier only, never
+any credential material.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext._bindToScope">
+    
+  </a>
+  <a name="_bindToScope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_bindToScope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code>ScopeManager</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L88">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_bindToScope" title="orionis.auth.context.AuthenticationContext._bindToScope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Associate this context with one scope for its remaining lifetime.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link" title="orionis.container.context.manager.ScopeManager">ScopeManager</a></code></td><td class="fieldArgDesc">Active request scope publishing this context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Later reads verify that the context is still current in this scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>AuthException</code></td><td>If a context is shared between different request scopes.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext._fork">
+    
+  </a>
+  <a name="_fork">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_fork</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="orionis.auth.context.AuthenticationContext">AuthenticationContext</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L112">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_fork" title="orionis.auth.context.AuthenticationContext._fork">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Copy the current identity into a fresh, independently scoped context.</p>
+<p>Framework lifecycles call this while the owning scope is current, then
+bind the returned context inside their new scope. Authorization remains
+lazy and is resolved independently; neither a cached permission snapshot
+nor the source scope or lock is retained. A stale context yields a guest.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="orionis.auth.context.AuthenticationContext">AuthenticationContext</a></code></td><td class="fieldArgDesc">Unbound context carrying the current identity and credential limits.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.authorization">
+    
+  </a>
+  <a name="authorization">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">authorization</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>IAuthorizationSnapshot</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L237">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#authorization" title="orionis.auth.context.AuthenticationContext.authorization">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#authorization" class="internal-link">orionis.auth.contracts.IAuthenticationContext.authorization</a></code></div>
+    <div><p>Return the effective authorization snapshot of the request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.contracts.IAuthorizationSnapshot.html" class="internal-link" title="orionis.auth.contracts.IAuthorizationSnapshot">IAuthorizationSnapshot</a></code></td><td class="fieldArgDesc">Snapshot resolved at most once per request. Guests and
+contexts without a permission repository resolve to the
+shared empty snapshot.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.identifier">
+    
+  </a>
+  <a name="identifier">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">identifier</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L223">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#identifier" title="orionis.auth.context.AuthenticationContext.identifier">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#identifier" class="internal-link">orionis.auth.contracts.IAuthenticationContext.identifier</a></code></div>
+    <div><p>Return the unique identifier of the authenticated identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>object | None</code></td><td class="fieldArgDesc">Identifier of the identity, or <tt class="rst-docutils rst-literal">None</tt> for a guest request.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.auth.context.AuthenticationContext.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#__slots__" class="internal-link">orionis.auth.contracts.IAuthenticationContext.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__abilities">
+    
+  </a>
+  <a name="__abilities">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__abilities</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L78">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__abilities" title="orionis.auth.context.AuthenticationContext.__abilities">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__credential_id">
+    
+  </a>
+  <a name="__credential_id">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__credential_id</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L82">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__credential_id" title="orionis.auth.context.AuthenticationContext.__credential_id">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__guard">
+    
+  </a>
+  <a name="__guard">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__guard</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L77">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__guard" title="orionis.auth.context.AuthenticationContext.__guard">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__identity">
+    
+  </a>
+  <a name="__identity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__identity</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L76">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__identity" title="orionis.auth.context.AuthenticationContext.__identity">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__lock">
+    
+  </a>
+  <a name="__lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__lock</span>: <code><a href="https://docs.python.org/3/library/asyncio-sync.html#asyncio.Lock" class="intersphinx-link">asyncio.Lock</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L86">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__lock" title="orionis.auth.context.AuthenticationContext.__lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__repository">
+    
+  </a>
+  <a name="__repository">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__repository</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__repository" title="orionis.auth.context.AuthenticationContext.__repository">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__scope">
+    
+  </a>
+  <a name="__scope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__scope</span>: <code>ScopeManager | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L84">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__scope" title="orionis.auth.context.AuthenticationContext.__scope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.__snapshot">
+    
+  </a>
+  <a name="__snapshot">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__snapshot</span>: <code>IAuthorizationSnapshot | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L83">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__snapshot" title="orionis.auth.context.AuthenticationContext.__snapshot">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.abilities">
+    
+  </a>
+  <a name="abilities">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">abilities</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L174">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#abilities" title="orionis.auth.context.AuthenticationContext.abilities">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#abilities" class="internal-link">orionis.auth.contracts.IAuthenticationContext.abilities</a></code></div>
+    <div><p>Return the abilities carried by the presented credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Abilities of the credential, or <tt class="rst-docutils rst-literal">None</tt> when unrestricted.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.credentialId">
+    
+  </a>
+  <a name="credentialId">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">credentialId</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L186">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#credentialId" title="orionis.auth.context.AuthenticationContext.credentialId">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#credentialId" class="internal-link">orionis.auth.contracts.IAuthenticationContext.credentialId</a></code></div>
+    <div><p>Return the identifier of the credential that authenticated.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>object | None</code></td><td class="fieldArgDesc">Identifier of the revocable credential, or <tt class="rst-docutils rst-literal">None</tt> when the
+guard uses none.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.guard">
+    
+  </a>
+  <a name="guard">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">guard</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L162">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#guard" title="orionis.auth.context.AuthenticationContext.guard">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#guard" class="internal-link">orionis.auth.contracts.IAuthenticationContext.guard</a></code></div>
+    <div><p>Return the name of the guard that resolved the identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Guard name, or <tt class="rst-docutils rst-literal">None</tt> when the request is anonymous.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.identity">
+    
+  </a>
+  <a name="identity">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">identity</span>: <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L150">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#identity" title="orionis.auth.context.AuthenticationContext.identity">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#identity" class="internal-link">orionis.auth.contracts.IAuthenticationContext.identity</a></code></div>
+    <div><p>Return the authenticated identity of the request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>IAuthenticatable | None</code></td><td class="fieldArgDesc">Resolved identity, or <tt class="rst-docutils rst-literal">None</tt> for a guest request.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.isAuthenticated">
+    
+  </a>
+  <a name="isAuthenticated">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">isAuthenticated</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L199">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#isAuthenticated" title="orionis.auth.context.AuthenticationContext.isAuthenticated">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#isAuthenticated" class="internal-link">orionis.auth.contracts.IAuthenticationContext.isAuthenticated</a></code></div>
+    <div><p>Report whether the request carries an authenticated identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when an identity was resolved by a guard.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.auth.context.AuthenticationContext.isGuest">
+    
+  </a>
+  <a name="isGuest">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">isGuest</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/context/context.py#L211">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#isGuest" title="orionis.auth.context.AuthenticationContext.isGuest">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthenticationContext.html#isGuest" class="internal-link">orionis.auth.contracts.IAuthenticationContext.isGuest</a></code></div>
+    <div><p>Report whether the request is anonymous.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when no identity was resolved by any guard.</td></tr></table></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

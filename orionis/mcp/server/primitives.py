@@ -1,8 +1,5 @@
-"""Orionis declarations; compilation creates all wire metadata once."""
-
 from types import MappingProxyType
 from typing import ClassVar, TYPE_CHECKING
-
 from orionis.mcp.protocol.metadata import (
     CacheHint,
     ContentAnnotations,
@@ -13,7 +10,6 @@ from orionis.mcp.protocol.metadata import (
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
-
 
 class Primitive:
     """Static metadata shared by tools, resources and prompts."""
@@ -27,8 +23,7 @@ class Primitive:
     meta: ClassVar[Mapping[str, object]] = MappingProxyType({})
     cache: ClassVar[CacheHint] = CacheHint()
 
-
-class Tool[Input = object, Output = object](Primitive):
+class Tool[InputType = object, OutputType = object](Primitive):
     """Declare a typed input, optional typed output, and an injectable handle method."""
 
     __slots__ = ()
@@ -36,7 +31,6 @@ class Tool[Input = object, Output = object](Primitive):
     input: ClassVar[object] = None
     output: ClassVar[object] = None
     annotations: ClassVar[ToolAnnotations | None] = None
-
 
 class Resource(Primitive):
     """Read a declared URI or RFC 6570 template without implicit file access."""
@@ -49,14 +43,12 @@ class Resource(Primitive):
     size: ClassVar[int | None] = None
     annotations: ClassVar[ContentAnnotations | None] = None
 
-
 class Prompt(Primitive):
     """Declare string arguments and return user/assistant prompt messages."""
 
     __slots__ = ()
 
     arguments: ClassVar[tuple[PromptArgument, ...]] = ()
-
 
 class Server:
     """Define a server independently of any connection or transport."""

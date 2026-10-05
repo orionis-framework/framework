@@ -232,6 +232,7 @@ class Stub:
             Directory where the generated Python file is created.
         relative_to : Path | None, optional
             Path to which the generated file path should be made relative.
+            Both paths are resolved before computing the relative path.
             If None, the file path is returned as an absolute path.
         extension : str, optional
             File extension for the generated Python file. Defaults to "py".
@@ -248,7 +249,8 @@ class Stub:
         TypeError
             If a replacement key or value is not a string.
         ValueError
-            If the generated filename, template name, or extension is invalid.
+            If the generated filename, template name, or extension is invalid,
+            or the resolved file is outside ``relative_to``.
         """
         if not isinstance(extension, str):
             error_msg = "The generated file extension must be a string."
@@ -280,7 +282,7 @@ class Stub:
 
         # If a root path is provided, make the file path relative to it.
         if relative_to is not None:
-            file_path = file_path.relative_to(relative_to)
+            file_path = file_path.resolve().relative_to(relative_to.resolve())
 
         # Return the path to the generated file as a string.
         return str(file_path)

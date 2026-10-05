@@ -1,0 +1,2768 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.auth.guards</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code class="thisobject"><a href="orionis.auth.guards.html" class="internal-link" title="This package">guards</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1091"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1091">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.guards.session_guard.html" class="internal-link" title="orionis.auth.guards.session_guard">session<wbr></wbr>_guard</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.session_guard.html#_DEFAULT_SESSION_KEY" class="internal-link" title="orionis.auth.guards.session_guard._DEFAULT_SESSION_KEY">_DEFAULT<wbr></wbr>_SESSION<wbr></wbr>_KEY</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1092"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.guards.token_guard.html" class="internal-link" title="orionis.auth.guards.token_guard">token<wbr></wbr>_guard</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1093"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1093">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.guards.SessionGuard.html" class="internal-link" title="orionis.auth.guards.SessionGuard"><wbr></wbr>Session<wbr></wbr>Guard</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__session" class="internal-link" title="orionis.auth.guards.SessionGuard.__session">__session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__init__" class="internal-link" title="orionis.auth.guards.SessionGuard.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__restoreRemembered" class="internal-link" title="orionis.auth.guards.SessionGuard.__restoreRemembered">__restore<wbr></wbr>Remembered</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#attempt" class="internal-link" title="orionis.auth.guards.SessionGuard.attempt">attempt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#login" class="internal-link" title="orionis.auth.guards.SessionGuard.login">login</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#logout" class="internal-link" title="orionis.auth.guards.SessionGuard.logout">logout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#resolve" class="internal-link" title="orionis.auth.guards.SessionGuard.resolve">resolve</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__slots__" class="internal-link" title="orionis.auth.guards.SessionGuard.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__csrf_key" class="internal-link" title="orionis.auth.guards.SessionGuard.__csrf_key">__csrf<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__csrf_length" class="internal-link" title="orionis.auth.guards.SessionGuard.__csrf_length">__csrf<wbr></wbr>_length</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__identities" class="internal-link" title="orionis.auth.guards.SessionGuard.__identities">__identities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__password_key" class="internal-link" title="orionis.auth.guards.SessionGuard.__password_key">__password<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__remember" class="internal-link" title="orionis.auth.guards.SessionGuard.__remember">__remember</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#__session_key" class="internal-link" title="orionis.auth.guards.SessionGuard.__session_key">__session<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html#name" class="internal-link" title="orionis.auth.guards.SessionGuard.name">name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1094"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1094">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.guards.TokenGuard.html" class="internal-link" title="orionis.auth.guards.TokenGuard"><wbr></wbr>Token<wbr></wbr>Guard</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#__init__" class="internal-link" title="orionis.auth.guards.TokenGuard.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#resolve" class="internal-link" title="orionis.auth.guards.TokenGuard.resolve">resolve</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#__slots__" class="internal-link" title="orionis.auth.guards.TokenGuard.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#__identities" class="internal-link" title="orionis.auth.guards.TokenGuard.__identities">__identities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#__tokens" class="internal-link" title="orionis.auth.guards.TokenGuard.__tokens">__tokens</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html#name" class="internal-link" title="orionis.auth.guards.TokenGuard.name">name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.auth.html" class="internal-link" title="The parent of this package">auth</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1095"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1095">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.authorization.html" class="internal-link" title="orionis.auth.authorization">authorization</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.authorizer.html" class="internal-link" title="orionis.auth.authorization.authorizer">authorizer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.policy.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.registrar.html" class="internal-link" title="orionis.auth.authorization.registrar">registrar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.registry.html" class="internal-link" title="orionis.auth.authorization.registry">registry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.repository.html" class="internal-link" title="orionis.auth.authorization.repository">repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.snapshot.html" class="internal-link" title="orionis.auth.authorization.snapshot">snapshot</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.AuthorizationSnapshot.html" class="internal-link" title="orionis.auth.authorization.AuthorizationSnapshot"><wbr></wbr>Authorization<wbr></wbr>Snapshot</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.Policy.html" class="internal-link" title="orionis.auth.authorization.Policy"><wbr></wbr>Policy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.PolicyRegistry.html" class="internal-link" title="orionis.auth.authorization.PolicyRegistry"><wbr></wbr>Policy<wbr></wbr>Registry</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.authorization.html#EMPTY_SNAPSHOT" class="internal-link" title="orionis.auth.authorization.EMPTY_SNAPSHOT">EMPTY<wbr></wbr>_SNAPSHOT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1096"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1096">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.concerns.html" class="internal-link" title="orionis.auth.concerns">concerns</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.authenticatable.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.authorizable.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.functions.html" class="internal-link" title="orionis.auth.concerns.functions">functions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.must_verify_email.html" class="internal-link" title="orionis.auth.concerns.must_verify_email">must<wbr></wbr>_verify<wbr></wbr>_email</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.Authenticatable.html" class="internal-link" title="orionis.auth.concerns.Authenticatable"><wbr></wbr>Authenticatable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.Authorizable.html" class="internal-link" title="orionis.auth.concerns.Authorizable"><wbr></wbr>Authorizable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.MustVerifyEmail.html" class="internal-link" title="orionis.auth.concerns.MustVerifyEmail"><wbr></wbr>Must<wbr></wbr>Verify<wbr></wbr>Email</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.concerns.html#model_primary_key" class="internal-link" title="orionis.auth.concerns.model_primary_key">model<wbr></wbr>_primary<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1097"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1097">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.context.html" class="internal-link" title="orionis.auth.context">context</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.context.html" class="internal-link" title="orionis.auth.context.context">context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.functions.html" class="internal-link" title="orionis.auth.context.functions">functions</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link" title="orionis.auth.context.AuthenticationContext"><wbr></wbr>Authentication<wbr></wbr>Context</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#bind_auth_context" class="internal-link" title="orionis.auth.context.bind_auth_context">bind<wbr></wbr>_auth<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#current_auth_context" class="internal-link" title="orionis.auth.context.current_auth_context">current<wbr></wbr>_auth<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.context.html#GUEST_CONTEXT" class="internal-link" title="orionis.auth.context.GUEST_CONTEXT">GUEST<wbr></wbr>_CONTEXT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1098"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1098">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.contracts.html" class="internal-link" title="orionis.auth.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.authenticatable.html" class="internal-link" title="orionis.auth.contracts.authenticatable">authenticatable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.authorizable.html" class="internal-link" title="orionis.auth.contracts.authorizable">authorizable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.authorizer.html" class="internal-link" title="orionis.auth.contracts.authorizer">authorizer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.context.html" class="internal-link" title="orionis.auth.contracts.context">context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.guard.html" class="internal-link" title="orionis.auth.contracts.guard">guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.identity_provider.html" class="internal-link" title="orionis.auth.contracts.identity_provider">identity<wbr></wbr>_provider</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.manager.html" class="internal-link" title="orionis.auth.contracts.manager">manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.permission_repository.html" class="internal-link" title="orionis.auth.contracts.permission_repository">permission<wbr></wbr>_repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.policy.html" class="internal-link" title="orionis.auth.contracts.policy">policy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.session_guard.html" class="internal-link" title="orionis.auth.contracts.session_guard">session<wbr></wbr>_guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.snapshot.html" class="internal-link" title="orionis.auth.contracts.snapshot">snapshot</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.token_repository.html" class="internal-link" title="orionis.auth.contracts.token_repository">token<wbr></wbr>_repository</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAccessTokenRepository.html" class="internal-link" title="orionis.auth.contracts.IAccessTokenRepository"><wbr></wbr>IAccess<wbr></wbr>Token<wbr></wbr>Repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable"><wbr></wbr>IAuthenticatable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext"><wbr></wbr>IAuthentication<wbr></wbr>Context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link" title="orionis.auth.contracts.IAuthManager"><wbr></wbr>IAuth<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link" title="orionis.auth.contracts.IAuthorizable"><wbr></wbr>IAuthorizable</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthorizationSnapshot.html" class="internal-link" title="orionis.auth.contracts.IAuthorizationSnapshot"><wbr></wbr>IAuthorization<wbr></wbr>Snapshot</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IAuthorizer.html" class="internal-link" title="orionis.auth.contracts.IAuthorizer"><wbr></wbr>IAuthorizer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IGuard.html" class="internal-link" title="orionis.auth.contracts.IGuard"><wbr></wbr>IGuard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IIdentityProvider.html" class="internal-link" title="orionis.auth.contracts.IIdentityProvider"><wbr></wbr>IIdentity<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IPermissionRepository.html" class="internal-link" title="orionis.auth.contracts.IPermissionRepository"><wbr></wbr>IPermission<wbr></wbr>Repository</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.IPolicy.html" class="internal-link" title="orionis.auth.contracts.IPolicy"><wbr></wbr>IPolicy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.ISessionGuard.html" class="internal-link" title="orionis.auth.contracts.ISessionGuard"><wbr></wbr>ISession<wbr></wbr>Guard</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1099"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1099">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.entities.html" class="internal-link" title="orionis.auth.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.access_token.html" class="internal-link" title="orionis.auth.entities.access_token">access<wbr></wbr>_token</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.guard_result.html" class="internal-link" title="orionis.auth.entities.guard_result">guard<wbr></wbr>_result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.new_access_token.html" class="internal-link" title="orionis.auth.entities.new_access_token">new<wbr></wbr>_access<wbr></wbr>_token</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.AccessToken.html" class="internal-link" title="orionis.auth.entities.AccessToken"><wbr></wbr>Access<wbr></wbr>Token</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.GuardResult.html" class="internal-link" title="orionis.auth.entities.GuardResult"><wbr></wbr>Guard<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.entities.NewAccessToken.html" class="internal-link" title="orionis.auth.entities.NewAccessToken"><wbr></wbr>New<wbr></wbr>Access<wbr></wbr>Token</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1100"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.exceptions.html" class="internal-link" title="orionis.auth.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1101"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.guards.html" class="internal-link" title="orionis.auth.guards">guards</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.session_guard.html" class="internal-link" title="orionis.auth.guards.session_guard">session<wbr></wbr>_guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.token_guard.html" class="internal-link" title="orionis.auth.guards.token_guard">token<wbr></wbr>_guard</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.SessionGuard.html" class="internal-link" title="orionis.auth.guards.SessionGuard"><wbr></wbr>Session<wbr></wbr>Guard</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.guards.TokenGuard.html" class="internal-link" title="orionis.auth.guards.TokenGuard"><wbr></wbr>Token<wbr></wbr>Guard</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1102"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1102">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.identity.html" class="internal-link" title="orionis.auth.identity">identity</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.identity.provider.html" class="internal-link" title="orionis.auth.identity.provider">provider</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.identity.ModelIdentityProvider.html" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider"><wbr></wbr>Model<wbr></wbr>Identity<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1103"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1103">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.manager.html" class="internal-link" title="orionis.auth.manager">manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.manager.AuthManager.html" class="internal-link" title="orionis.auth.manager.AuthManager"><wbr></wbr>Auth<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1104"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1104">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.middleware.html" class="internal-link" title="orionis.auth.middleware">middleware</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.authenticate.html" class="internal-link" title="orionis.auth.middleware.authenticate">authenticate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.authorize.html" class="internal-link" title="orionis.auth.middleware.authorize">authorize</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.guest.html" class="internal-link" title="orionis.auth.middleware.guest">guest</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.policy.html" class="internal-link" title="orionis.auth.middleware.policy">policy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.resolve_identity.html" class="internal-link" title="orionis.auth.middleware.resolve_identity">resolve<wbr></wbr>_identity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.AuthenticateMiddleware.html" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware"><wbr></wbr>Authenticate<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.AuthenticateSessionMiddleware.html" class="internal-link" title="orionis.auth.middleware.AuthenticateSessionMiddleware"><wbr></wbr>Authenticate<wbr></wbr>Session<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.AuthenticateTokenMiddleware.html" class="internal-link" title="orionis.auth.middleware.AuthenticateTokenMiddleware"><wbr></wbr>Authenticate<wbr></wbr>Token<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.GuestMiddleware.html" class="internal-link" title="orionis.auth.middleware.GuestMiddleware"><wbr></wbr>Guest<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.RequirePermissionMiddleware.html" class="internal-link" title="orionis.auth.middleware.RequirePermissionMiddleware"><wbr></wbr>Require<wbr></wbr>Permission<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.RequirePolicyMiddleware.html" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware"><wbr></wbr>Require<wbr></wbr>Policy<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.RequireRoleMiddleware.html" class="internal-link" title="orionis.auth.middleware.RequireRoleMiddleware"><wbr></wbr>Require<wbr></wbr>Role<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware"><wbr></wbr>Resolve<wbr></wbr>Identity<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.ResolveSessionIdentityMiddleware.html" class="internal-link" title="orionis.auth.middleware.ResolveSessionIdentityMiddleware"><wbr></wbr>Resolve<wbr></wbr>Session<wbr></wbr>Identity<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.middleware.ResolveTokenIdentityMiddleware.html" class="internal-link" title="orionis.auth.middleware.ResolveTokenIdentityMiddleware"><wbr></wbr>Resolve<wbr></wbr>Token<wbr></wbr>Identity<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1105"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1105">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.passwords.html" class="internal-link" title="orionis.auth.passwords">passwords</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.passwords.broker.html" class="internal-link" title="orionis.auth.passwords.broker">broker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1106"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1106">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.provider.html" class="internal-link" title="orionis.auth.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.provider.AuthProvider.html" class="internal-link" title="orionis.auth.provider.AuthProvider"><wbr></wbr>Auth<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1107"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1107">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.remember.html" class="internal-link" title="orionis.auth.remember">remember</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.remember.RememberMe.html" class="internal-link" title="orionis.auth.remember.RememberMe"><wbr></wbr>Remember<wbr></wbr>Me</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.remember.html#apply_remember_cookie" class="internal-link" title="orionis.auth.remember.apply_remember_cookie">apply<wbr></wbr>_remember<wbr></wbr>_cookie</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.remember.html#_COOKIE_PATTERN" class="internal-link" title="orionis.auth.remember._COOKIE_PATTERN">_COOKIE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.remember.html#_COOKIE_STATE" class="internal-link" title="orionis.auth.remember._COOKIE_STATE">_COOKIE<wbr></wbr>_STATE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.remember.html#_MAX_COOKIE_LENGTH" class="internal-link" title="orionis.auth.remember._MAX_COOKIE_LENGTH">_MAX<wbr></wbr>_COOKIE<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1108"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId1108">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.tokens.html" class="internal-link" title="orionis.auth.tokens">tokens</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.functions.html" class="internal-link" title="orionis.auth.tokens.functions">functions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.repository.html" class="internal-link" title="orionis.auth.tokens.repository">repository</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.AccessTokenRepository.html" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository"><wbr></wbr>Access<wbr></wbr>Token<wbr></wbr>Repository</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.html#generate_token_secret" class="internal-link" title="orionis.auth.tokens.generate_token_secret">generate<wbr></wbr>_token<wbr></wbr>_secret</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.tokens.html#hash_token_secret" class="internal-link" title="orionis.auth.tokens.hash_token_secret">hash<wbr></wbr>_token<wbr></wbr>_secret</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1109"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.AuthConfigurationException.html" class="internal-link" title="orionis.auth.AuthConfigurationException"><wbr></wbr>Auth<wbr></wbr>Configuration<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1110"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.AuthenticationException.html" class="internal-link" title="orionis.auth.AuthenticationException"><wbr></wbr>Authentication<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1111"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.AuthException.html" class="internal-link" title="orionis.auth.AuthException"><wbr></wbr>Auth<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1112"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.AuthorizationException.html" class="internal-link" title="orionis.auth.AuthorizationException"><wbr></wbr>Authorization<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1113"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.GuardNotFoundException.html" class="internal-link" title="orionis.auth.GuardNotFoundException"><wbr></wbr>Guard<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1114"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.IdentityProviderException.html" class="internal-link" title="orionis.auth.IdentityProviderException"><wbr></wbr>Identity<wbr></wbr>Provider<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1115"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.PolicyNotFoundException.html" class="internal-link" title="orionis.auth.PolicyNotFoundException"><wbr></wbr>Policy<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId1116"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.auth.TokenException.html" class="internal-link" title="orionis.auth.TokenException"><wbr></wbr>Token<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.html#__dir__" class="internal-link" title="orionis.auth.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.html#__getattr__" class="internal-link" title="orionis.auth.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.html#_EXPORTS" class="internal-link" title="orionis.auth._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="package"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.auth.html" class="internal-link" title="orionis.auth">auth</a></code><wbr></wbr>.<code><a href="orionis.auth.guards.html" class="internal-link" title="orionis.auth.guards">guards</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          package documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/auth/guards/__init__.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id50">
+  
+  
+  <tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.auth.guards.session_guard.html" class="internal-link" title="orionis.auth.guards.session_guard">session<wbr></wbr>_guard</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.auth.guards.token_guard.html" class="internal-link" title="orionis.auth.guards.token_guard">token<wbr></wbr>_guard</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            <p class="fromInitPy">From <code>__init__.py</code>:</p><table class="children sortable" id="id51">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.auth.guards.SessionGuard.html" class="internal-link" title="orionis.auth.guards.SessionGuard"><wbr></wbr>Session<wbr></wbr>Guard</a></code></td>
+    <td>Resolve the identity of web requests from the HTTP session.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.auth.guards.TokenGuard.html" class="internal-link" title="orionis.auth.guards.TokenGuard"><wbr></wbr>Token<wbr></wbr>Guard</a></code></td>
+    <td>Resolve the identity of API requests from a personal access token.</td>
+  </tr>
+</table>
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -67,7 +67,7 @@ Configure `app.withRouting(ai="routes/ai.py")` before `app.create()`. Start the
 local server with `python reactor mcp:start status`. Every request declares its
 version and capabilities; no initialization session is required.
 
-Read the [MCP guide](docs/mcp/README.md) or [guía en español](docs/mcp/README.es.md)
+Read the [MCP guide](orionis/mcp/docs/README.md) or [guía en español](orionis/mcp/docs/README.es.md)
 for typed tools, resources, prompts, HTTP headers, security, subscriptions and
 verification commands.
 

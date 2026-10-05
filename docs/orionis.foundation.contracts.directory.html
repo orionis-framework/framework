@@ -1,0 +1,919 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.contracts.directory</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.foundation.contracts.directory.html" class="internal-link" title="This module">directory</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8588"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8588">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory"><wbr></wbr>IDirectory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#app" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appConsole" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsole">app<wbr></wbr>Console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appConsoleCommands" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">app<wbr></wbr>Console<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appConsoleListeners" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">app<wbr></wbr>Console<wbr></wbr>Listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appContracts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appContracts">app<wbr></wbr>Contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appExceptions" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appExceptions">app<wbr></wbr>Exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appFacades" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appFacades">app<wbr></wbr>Facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appHttp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttp">app<wbr></wbr>Http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appHttpControllers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">app<wbr></wbr>Http<wbr></wbr>Controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appHttpMiddleware" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">app<wbr></wbr>Http<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appHttpSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">app<wbr></wbr>Http<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appHttpSchemasRules" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">app<wbr></wbr>Http<wbr></wbr>Schemas<wbr></wbr>Rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appJobs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appJobs">app<wbr></wbr>Jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appMcp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcp">app<wbr></wbr>Mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appMcpPrompts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">app<wbr></wbr>Mcp<wbr></wbr>Prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appMcpResources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpResources">app<wbr></wbr>Mcp<wbr></wbr>Resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appMcpServers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpServers">app<wbr></wbr>Mcp<wbr></wbr>Servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appMcpTools" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpTools">app<wbr></wbr>Mcp<wbr></wbr>Tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appModels" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appModels">app<wbr></wbr>Models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appNotifications" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appNotifications">app<wbr></wbr>Notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appProviders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appProviders">app<wbr></wbr>Providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#appServices" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appServices">app<wbr></wbr>Services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#bootstrap" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#config" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#database" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#databaseFactories" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseFactories">database<wbr></wbr>Factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#databaseMigrations" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">database<wbr></wbr>Migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#databaseSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">database<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#databaseSeeders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">database<wbr></wbr>Seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#resources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#resourcesCss" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesCss">resources<wbr></wbr>Css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#resourcesJs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesJs">resources<wbr></wbr>Js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#resourcesLang" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesLang">resources<wbr></wbr>Lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#resourcesViews" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesViews">resources<wbr></wbr>Views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#root" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.root">root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#routes" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storage" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storageApp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageApp">storage<wbr></wbr>App</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storageAppPrivate" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">storage<wbr></wbr>App<wbr></wbr>Private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storageAppPublic" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">storage<wbr></wbr>App<wbr></wbr>Public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storageFramework" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageFramework">storage<wbr></wbr>Framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#storageLogs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageLogs">storage<wbr></wbr>Logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#tests" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html#__slots__" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.contracts.html" class="internal-link" title="The parent of this module">contracts</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8589"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8589">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.contracts.application.html" class="internal-link" title="orionis.foundation.contracts.application">application</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.application.html#_SENTINEL" class="internal-link" title="orionis.foundation.contracts.application._SENTINEL">_SENTINEL</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8590"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.contracts.directory.html" class="internal-link" title="orionis.foundation.contracts.directory">directory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory"><wbr></wbr>IDirectory</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.contracts.html" class="internal-link" title="orionis.foundation.contracts">contracts</a></code><wbr></wbr>.<code><a href="orionis.foundation.contracts.directory.html" class="internal-link" title="orionis.foundation.contracts.directory">directory</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id843">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory"><wbr></wbr>IDirectory</a></code></td>
+    <td>Define access to the application directory paths.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

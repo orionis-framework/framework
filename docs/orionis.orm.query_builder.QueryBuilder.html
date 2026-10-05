@@ -1,0 +1,1216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.orm.query_builder.QueryBuilder</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.orm.query_builder.QueryBuilder.html" class="internal-link" title="This class"><wbr></wbr>Query<wbr></wbr>Builder</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resolve" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._resolve">_resolve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#beginTransaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.beginTransaction">begin<wbr></wbr>Transaction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#commit" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#execute" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.execute">execute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.getDefaultName">get<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#rollback" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.rollback">rollback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#select" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.select">select</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.setDefaultName">set<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#statement" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.statement">statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#transaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.transaction">transaction</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_connection_name" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._connection_name">_connection<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_db_manager" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._db_manager">_db<wbr></wbr>_manager</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.orm.query_builder.html" class="internal-link" title="The parent of this class">query<wbr></wbr>_builder</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16522"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.query_builder.QueryBuilder.html" class="internal-link" title="orionis.orm.query_builder.QueryBuilder"><wbr></wbr>Query<wbr></wbr>Builder</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resolve" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._resolve">_resolve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#beginTransaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.beginTransaction">begin<wbr></wbr>Transaction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#commit" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#execute" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.execute">execute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.getDefaultName">get<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#rollback" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.rollback">rollback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#select" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.select">select</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#setDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.setDefaultName">set<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#statement" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.statement">statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#transaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.transaction">transaction</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_connection_name" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._connection_name">_connection<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_db_manager" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._db_manager">_db<wbr></wbr>_manager</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.orm.html" class="internal-link" title="orionis.orm">orm</a></code><wbr></wbr>.<code><a href="orionis.orm.query_builder.html" class="internal-link" title="orionis.orm.query_builder">query_builder</a></code><wbr></wbr>.<code><a href="orionis.orm.query_builder.QueryBuilder.html" class="internal-link" title="orionis.orm.query_builder.QueryBuilder">QueryBuilder</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">QueryBuilder</span>(<a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.query_builder.IQueryBuilder">IQueryBuilder</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L12" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__init__">QueryBuilder(db_manager, connection_name)</a></code></p><p><a href="classIndex.html#orionis.orm.query_builder.QueryBuilder">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Entry point of the model-less query API, backing the <tt class="rst-docutils rst-literal">DB</tt> facade.</p>
+<p>Registered as a singleton, so it never keeps per-query state: every
+call returns a brand-new object and the connection scope is carried
+by value. Sharing mutable state here would leak one caller's target
+connection into every other concurrent request.</p>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1513">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__init__">__init__</a></code></td>
+    <td>Initialize the gateway with the connection manager to delegate to.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_resolve" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._resolve">_resolve</a></code></td>
+    <td>Resolve the connection a call targets.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#beginTransaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.beginTransaction">begin<wbr></wbr>Transaction</a></code></td>
+    <td>Begin a transaction, or a savepoint when one is already active.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#commit" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.commit">commit</a></code></td>
+    <td>Commit the innermost active transaction or savepoint.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#connection" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.connection">connection</a></code></td>
+    <td>Return a gateway scoped to the connection with the given name.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#execute" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.execute">execute</a></code></td>
+    <td>Run a raw data-modifying statement and return the affected rows.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.getDefaultName">get<wbr></wbr>Default<wbr></wbr>Name</a></code></td>
+    <td>Return the name of the default connection.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#rollback" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.rollback">rollback</a></code></td>
+    <td>Roll back the innermost active transaction or savepoint.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#select" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.select">select</a></code></td>
+    <td>Run a raw SELECT statement and return its rows.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#setDefaultName" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.setDefaultName">set<wbr></wbr>Default<wbr></wbr>Name</a></code></td>
+    <td>Change the connection used when none is specified.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#statement" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.statement">statement</a></code></td>
+    <td>Run a raw statement without inspecting its result.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#table" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.table">table</a></code></td>
+    <td>Build a fluent, model-less query over a plain table name.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#transaction" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.transaction">transaction</a></code></td>
+    <td>Return a transaction usable as an async context manager.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.query_builder.QueryBuilder.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_connection_name" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._connection_name">_connection<wbr></wbr>_name</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_db_manager" class="internal-link" title="orionis.orm.query_builder.QueryBuilder._db_manager">_db<wbr></wbr>_manager</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">db_manager: <code>IConnectionManager</code>, </span><span class="rst-sig-param">connection_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.orm.query_builder.QueryBuilder.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize the gateway with the connection manager to delegate to.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db<wbr></wbr>_manager:</span><code>IConnectionManager</code></td><td class="fieldArgDesc">Manager resolving named database connections.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection every query defaults to, or <tt class="rst-docutils rst-literal">None</tt> for the
+configured default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder._resolve">
+    
+  </a>
+  <a name="_resolve">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code>IConnection</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L330">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_resolve" title="orionis.orm.query_builder.QueryBuilder._resolve">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the connection a call targets.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Explicit connection name, or <tt class="rst-docutils rst-literal">None</tt> to fall back to the
+connection this gateway is scoped to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection bound to its configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.beginTransaction">
+    
+  </a>
+  <a name="beginTransaction">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">beginTransaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L234">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#beginTransaction" title="orionis.orm.query_builder.QueryBuilder.beginTransaction">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#beginTransaction" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.beginTransaction</a></code></div>
+    <div><p>Begin a transaction, or a savepoint when one is already active.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to start the transaction on, or <tt class="rst-docutils rst-literal">None</tt>
+for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If the transaction cannot be started.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.commit">
+    
+  </a>
+  <a name="commit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">commit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L259">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#commit" title="orionis.orm.query_builder.QueryBuilder.commit">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#commit" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.commit</a></code></div>
+    <div><p>Commit the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to commit, or <tt class="rst-docutils rst-literal">None</tt> for the default
+connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If no transaction is active.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.connection">
+    
+  </a>
+  <a name="connection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#connection" title="orionis.orm.query_builder.QueryBuilder.connection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#connection" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.connection</a></code></div>
+    <div><p>Return a gateway scoped to the connection with the given name.</p>
+<p>A new gateway is returned instead of mutating this one: the
+service is a container singleton, so storing the name on it
+would silently retarget every other caller.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection name as declared in the database configuration,
+or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.query_builder.QueryBuilder.html" class="internal-link" title="orionis.orm.query_builder.QueryBuilder">QueryBuilder</a></code></td><td class="fieldArgDesc">Gateway bound to the requested connection.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.execute">
+    
+  </a>
+  <a name="execute">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L172">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#execute" title="orionis.orm.query_builder.QueryBuilder.execute">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#execute" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.execute</a></code></div>
+    <div><p>Run a raw data-modifying statement and return the affected rows.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL using named <tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Values bound to the placeholders of the statement.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to run the statement on; defaults to the
+connection this gateway is scoped to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.getDefaultName">
+    
+  </a>
+  <a name="getDefaultName">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getDefaultName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L109">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getDefaultName" title="orionis.orm.query_builder.QueryBuilder.getDefaultName">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#getDefaultName" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.getDefaultName</a></code></div>
+    <div><p>Return the name of the default connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the connection used when none is specified.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.rollback">
+    
+  </a>
+  <a name="rollback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rollback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L284">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#rollback" title="orionis.orm.query_builder.QueryBuilder.rollback">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#rollback" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.rollback</a></code></div>
+    <div><p>Roll back the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to roll back, or <tt class="rst-docutils rst-literal">None</tt> for the default
+connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If no transaction is active.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.select">
+    
+  </a>
+  <a name="select">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">select</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L141">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#select" title="orionis.orm.query_builder.QueryBuilder.select">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#select" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.select</a></code></div>
+    <div><p>Run a raw SELECT statement and return its rows.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL using named <tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Values bound to the placeholders of the statement.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to run the statement on; defaults to the
+connection this gateway is scoped to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">One dictionary per row keyed by column name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.setDefaultName">
+    
+  </a>
+  <a name="setDefaultName">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">setDefaultName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L120">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#setDefaultName" title="orionis.orm.query_builder.QueryBuilder.setDefaultName">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#setDefaultName" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.setDefaultName</a></code></div>
+    <div><p>Change the connection used when none is specified.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection name as declared in the database configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.statement">
+    
+  </a>
+  <a name="statement">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">statement</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L203">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#statement" title="orionis.orm.query_builder.QueryBuilder.statement">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#statement" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.statement</a></code></div>
+    <div><p>Run a raw statement without inspecting its result.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL statement, typically DDL or a maintenance command.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Values bound to the placeholders of the statement.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to run the statement on; defaults to the
+connection this gateway is scoped to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.table">
+    
+  </a>
+  <a name="table">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">table</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L74">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#table" title="orionis.orm.query_builder.QueryBuilder.table">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#table" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.table</a></code></div>
+    <div><p>Build a fluent, model-less query over a plain table name.</p>
+<p>A brand-new builder is created on every call so that concurrent
+callers sharing this gateway never mutate each other's query
+state.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name, without the connection prefix.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">alias:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Alias the table is referred to by inside the query.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection to run the query against; defaults to the
+connection this gateway is scoped to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Fluent, model-less query builder over the table.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.transaction">
+    
+  </a>
+  <a name="transaction">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">transaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>ITransaction</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L309">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#transaction" title="orionis.orm.query_builder.QueryBuilder.transaction">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#transaction" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.transaction</a></code></div>
+    <div><p>Return a transaction usable as an async context manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named connection the transaction runs against, or <tt class="rst-docutils rst-literal">None</tt>
+for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.ITransaction.html" class="internal-link" title="orionis.database.contracts.ITransaction">ITransaction</a></code></td><td class="fieldArgDesc">Context manager committing on success and rolling back on
+error.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L24">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.orm.query_builder.QueryBuilder.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html#__slots__" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder._connection_name">
+    
+  </a>
+  <a name="_connection_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_connection_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_connection_name" title="orionis.orm.query_builder.QueryBuilder._connection_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.orm.query_builder.QueryBuilder._db_manager">
+    
+  </a>
+  <a name="_db_manager">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_db_manager</span>: <code>IConnectionManager</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/orm/query_builder.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_db_manager" title="orionis.orm.query_builder.QueryBuilder._db_manager">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

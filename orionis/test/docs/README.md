@@ -16,6 +16,7 @@ Spanish version: [README.es.md](README.es.md)
   - [Module layout](#module-layout)
 - [API reference](#api-reference)
   - [TestCase](#testcase)
+  - [MCP clients](#mcp-clients)
   - [ITestingEngine](#itestingengine)
   - [TestingEngine](#testingengine)
   - [TestRunner](#testrunner)
@@ -52,6 +53,7 @@ Direct dependencies on other Orionis modules:
 | `orionis.support.facades.testing` | `TestingProvider.boot()` pins the `Test` facade. |
 | `orionis.support.entities.base` | `TestResult` extends `BaseEntity` (provides `toDict()`). |
 | `orionis.support.facades.datetime` | `TestRunner` renders the start timestamp with `DateTime.now()`. |
+| `orionis.mcp` | MCP clients reuse native codecs, dispatch and request scopes; loaded only when MCP support is requested. |
 
 External dependency: `rich` (console, panels, tables, styled text). It is a
 core dependency of the framework, so no extra installation is required.
@@ -95,8 +97,9 @@ graph TD
 
 | Path | Contents |
 | --- | --- |
-| `orionis/test/__init__.py` | Re-exports `TestCase` (`__all__ = ["TestCase"]`). |
+| `orionis/test/__init__.py` | Lazily exports `TestCase`, `McpTestClient` and `McpTestResponse`. |
 | `orionis/test/cases/case.py` | `TestCase`. |
+| `orionis/test/clients/mcp.py` | `McpTestClient` and `McpTestResponse`. |
 | `orionis/test/contracts/engine.py` | `ITestingEngine` (ABC). |
 | `orionis/test/core/engine.py` | `TestingEngine`. |
 | `orionis/test/entities/result.py` | `TestResult` (frozen dataclass). |
@@ -125,6 +128,14 @@ class TestCase(unittest.IsolatedAsyncioTestCase):
     def setMethodPattern(cls, pattern: str) -> None: ...
 
     def __init__(self, method_name: str = "runTest") -> None: ...
+
+    async def mcp(
+      self,
+      server: type[Server] | CompiledMcpServer,
+      config: McpConfig | None = None,
+      *,
+      app: IContainer | None = None,
+    ) -> McpTestClient: ...
 
     def _resolveTest(self, method: Callable[..., Any]) -> Callable[..., Any]: ...
 ```
@@ -169,6 +180,43 @@ Module-level constants (private, but they define the behaviour above):
 - `_DEFAULT_PATTERN: re.Pattern[str]` — precompiled `fnmatch.translate("test*")`.
 - `_METHOD_PATTERN: ContextVar[re.Pattern[str]]` — context-local pattern in
   effect, defaulting to `_DEFAULT_PATTERN`.
+
+### MCP clients
+
+MCP tests inherit the ordinary `TestCase` and run with `reactor test`. In an
+asynchronous test or `asyncSetUp`, pass a `Server` subclass or a compiled server
+to `await self.mcp(server)`:
+
+```python
+client = await self.mcp(server)
+response = await client.tool("weather", {"location": "Bogota"})
+response.assertOk()
+response.assertTextContains("Bogota")
+```
+
+The helper resolves the application already booted by the runner. It never
+creates a second application. Pass `app=container` to use isolated native
+bindings, and `config=McpConfig(...)` to override client limits. Omitting
+`config` constructs `McpConfig()`; a supplied compiled server is reused.
+Each client owns an independent dispatcher and event bus.
+
+| Member | Behaviour |
+| --- | --- |
+| `await client.tool(name, arguments=None)` | Call a tool through encoded JSON-RPC input and output. |
+| `await client.request(method, params=None, *, meta=None, request_id=1)` | Collect a finite exchange into `McpTestResponse`. |
+| `client.stream(method, params=None, *, meta=None, request_id=1)` | Iterate decoded messages while keeping the request scope open. |
+| `response.message` / `response.notifications` | Final decoded message and the tuple of collected notifications. |
+| `response.assertOk()` | Raise `AssertionError` for protocol errors or tool results with `isError`. |
+| `response.assertTextContains(text)` | Require a matching substring in returned tool text. |
+
+Use `stream()` for subscriptions and close it when stopping early, for example
+with `contextlib.aclosing`. Closing releases the listener and restores the
+parent scope. These in-process checks do not exercise HTTP routing, headers or
+middleware; transport integration tests cover those separately.
+
+Low-level clients and responses are also available through
+`from orionis.test import McpTestClient, McpTestResponse`. Importing only
+`TestCase` does not load MCP dependencies.
 
 ### ITestingEngine
 

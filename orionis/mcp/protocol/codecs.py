@@ -1,9 +1,5 @@
-"""Precompiled msgspec decoders for the single supported MCP revision."""
-
 from types import MappingProxyType
-
 import msgspec
-
 from orionis.mcp.exceptions import McpInvalidParams, McpProtocolException
 from orionis.mcp.protocol.constants import SUPPORTED_VERSIONS
 from orionis.mcp.protocol.metavalidation import (
@@ -40,9 +36,20 @@ METHOD_DECODERS = MappingProxyType(
     },
 )
 
-
 def decode_envelope(data: bytes) -> JsonRpcRequest:
-    """Parse a single UTF-8 JSON-RPC message without decoding its payload."""
+    """
+    Parse a single UTF-8 JSON-RPC message without decoding its payload.
+
+    Parameters
+    ----------
+    data : bytes
+        Value supplied for ``data``.
+
+    Returns
+    -------
+    JsonRpcRequest
+        Result of the operation described above.
+    """
     try:
         return _ENVELOPE.decode(data)
     except msgspec.ValidationError as exc:
@@ -50,9 +57,20 @@ def decode_envelope(data: bytes) -> JsonRpcRequest:
     except msgspec.DecodeError as exc:
         raise McpProtocolException(-32700, "Parse error") from exc
 
-
 def decode_params(request: JsonRpcRequest) -> RequestParams:
-    """Validate method-specific parameters and per-request metadata."""
+    """
+    Validate method-specific parameters and per-request metadata.
+
+    Parameters
+    ----------
+    request : JsonRpcRequest
+        Current request and its trusted execution context.
+
+    Returns
+    -------
+    RequestParams
+        Result of the operation described above.
+    """
     decoder = METHOD_DECODERS.get(request.method)
     if decoder is None:
         raise McpProtocolException(
@@ -83,12 +101,25 @@ def decode_params(request: JsonRpcRequest) -> RequestParams:
         raise McpInvalidParams from exc
     return params
 
-
 def encode_error(
     exception: McpProtocolException,
     request_id: str | int | msgspec.UnsetType = msgspec.UNSET,
 ) -> bytes:
-    """Serialize only explicitly public exception fields."""
+    """
+    Serialize only explicitly public exception fields.
+
+    Parameters
+    ----------
+    exception : McpProtocolException
+        Exception being inspected or reported.
+    request_id : str | int | msgspec.UnsetType
+        Value supplied for ``request_id``.
+
+    Returns
+    -------
+    bytes
+        Result of the operation described above.
+    """
     return msgspec.json.encode(
         ErrorResponse(
             id=request_id,

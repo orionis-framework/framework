@@ -300,7 +300,7 @@ class ModelMeta(type):
     """
 
     def __new__( # NOSONAR
-        mcs,
+        mcs: type[ModelMeta],
         name: str,
         bases: tuple[type, ...],
         namespace: dict[str, Any],
@@ -319,6 +319,9 @@ class ModelMeta(type):
             Class namespace as declared in the class body.
         **kwargs : Any
             Additional keyword arguments forwarded to ``type``.
+
+        mcs : type[ModelMeta]
+            Metaclass creating the model, including specialized subclasses.
 
         Returns
         -------

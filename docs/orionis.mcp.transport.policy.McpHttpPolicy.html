@@ -1,0 +1,953 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mcp.transport.policy.McpHttpPolicy</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.mcp.transport.policy.McpHttpPolicy.html" class="internal-link" title="This class"><wbr></wbr>Mcp<wbr></wbr>Http<wbr></wbr>Policy</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#before" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.before">before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#response" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.response">response</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_origins" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._origins">_origins</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.mcp.transport.policy.html" class="internal-link" title="The parent of this class">policy</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14891"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.policy.McpHttpPolicy.html" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy"><wbr></wbr>Mcp<wbr></wbr>Http<wbr></wbr>Policy</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#before" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.before">before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#response" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.response">response</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_origins" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._origins">_origins</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14892"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14892">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse"><wbr></wbr>Mcp<wbr></wbr>Protocol<wbr></wbr>Response</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html#__init__" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html#__slots__" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_error" class="internal-link" title="orionis.mcp.transport.policy._error">_error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#origin_allowed" class="internal-link" title="orionis.mcp.transport.policy.origin_allowed">origin<wbr></wbr>_allowed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_AUTHENTICATION_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._AUTHENTICATION_HEADERS">_AUTHENTICATION<wbr></wbr>_HEADERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_CLIENT_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._CLIENT_ERROR_START">_CLIENT<wbr></wbr>_ERROR<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_EXCEPTION_STATUS" class="internal-link" title="orionis.mcp.transport.policy._EXCEPTION_STATUS">_EXCEPTION<wbr></wbr>_STATUS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_JSON_MEDIA_TYPE" class="internal-link" title="orionis.mcp.transport.policy._JSON_MEDIA_TYPE">_JSON<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_LOGGER" class="internal-link" title="orionis.mcp.transport.policy._LOGGER">_LOGGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_REDIRECTION_START" class="internal-link" title="orionis.mcp.transport.policy._REDIRECTION_START">_REDIRECTION<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_REPLACED_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._REPLACED_HEADERS">_REPLACED<wbr></wbr>_HEADERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.policy.html#_SERVER_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._SERVER_ERROR_START">_SERVER<wbr></wbr>_ERROR<wbr></wbr>_START</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.transport.html" class="internal-link" title="orionis.mcp.transport">transport</a></code><wbr></wbr>.<code><a href="orionis.mcp.transport.policy.html" class="internal-link" title="orionis.mcp.transport.policy">policy</a></code><wbr></wbr>.<code><a href="orionis.mcp.transport.policy.McpHttpPolicy.html" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy">McpHttpPolicy</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpHttpPolicy</span>(<a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L129" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__init__">McpHttpPolicy(app, config)</a></code></p><p><a href="classIndex.html#orionis.mcp.transport.policy.McpHttpPolicy">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Enforce MCP origin and error rules around the existing HTTP pipeline.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1402">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__init__">__init__</a></code></td>
+    <td>Compile an origin set without capturing any request or identity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#before" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.before">before</a></code></td>
+    <td>Validate Origin for preflight and unsupported methods as well as POST.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#exception" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.exception">exception</a></code></td>
+    <td>Report failures without calling the native HTML/debug presenter.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#response" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.response">response</a></code></td>
+    <td>Preserve protocol output and replace browser bodies with safe errors.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#monitor_disconnects" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_app" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._app">_app</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_origins" class="internal-link" title="orionis.mcp.transport.policy.McpHttpPolicy._origins">_origins</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">config: <code><a href="orionis.mcp.config.McpConfig.html" class="internal-link" title="orionis.mcp.config.McpConfig">McpConfig</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L135">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.mcp.transport.policy.McpHttpPolicy.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile an origin set without capturing any request or identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application container supplying configuration and dependencies.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="orionis.mcp.config.McpConfig.html" class="internal-link" title="orionis.mcp.config.McpConfig">McpConfig</a></code></td><td class="fieldArgDesc">Validated configuration controlling this component.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.before">
+    
+  </a>
+  <a name="before">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">before</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L154">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#before" title="orionis.mcp.transport.policy.McpHttpPolicy.before">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html#before" class="internal-link">orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.before</a></code></div>
+    <div><p>Validate Origin for preflight and unsupported methods as well as POST.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">adapter</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Response | None</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.exception">
+    
+  </a>
+  <a name="exception">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exception</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-param">request: <code>Request | <a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code>Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L204">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#exception" title="orionis.mcp.transport.policy.McpHttpPolicy.exception">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html#exception" class="internal-link">orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.exception</a></code></div>
+    <div><p>Report failures without calling the native HTML/debug presenter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Exception being inspected or reported.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code>Request | TransportAdapter</code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.response">
+    
+  </a>
+  <a name="response">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">response</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code></span>) -&gt; <code>Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L170">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#response" title="orionis.mcp.transport.policy.McpHttpPolicy.response">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html#response" class="internal-link">orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.response</a></code></div>
+    <div><p>Preserve protocol output and replace browser bodies with safe errors.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">response</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L132">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.mcp.transport.policy.McpHttpPolicy.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html#__slots__" class="internal-link">orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy.monitor_disconnects">
+    
+  </a>
+  <a name="monitor_disconnects">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">monitor_disconnects</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L133">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#monitor_disconnects" title="orionis.mcp.transport.policy.McpHttpPolicy.monitor_disconnects">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html#monitor_disconnects" class="internal-link">orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.monitor_disconnects</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy._app">
+    
+  </a>
+  <a name="_app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_app</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L151">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_app" title="orionis.mcp.transport.policy.McpHttpPolicy._app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.transport.policy.McpHttpPolicy._origins">
+    
+  </a>
+  <a name="_origins">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_origins</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/transport/policy.py#L152">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_origins" title="orionis.mcp.transport.policy.McpHttpPolicy._origins">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

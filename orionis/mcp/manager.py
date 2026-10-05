@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import re
 from typing import TYPE_CHECKING
 from orionis.foundation.contracts.application import IApplication  # noqa: TC001 - Constructor DI.
@@ -21,16 +20,37 @@ if TYPE_CHECKING:
 
 _LOCAL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
 
-
 class McpManager(IMcpManager):
     """Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
 
     __slots__ = ("_app", "_bus", "_compiled", "_config", "_local", "_router", "_web")
 
     def __init__(
-        self, app: IApplication, router: IRouter, config: McpConfig, bus: IMcpEventBus,
+        self,
+        app: IApplication,
+        router: IRouter,
+        config: McpConfig,
+        bus: IMcpEventBus,
     ) -> None:
-        """Capture application services without opening transports or performing I/O."""
+        """
+        Capture application services without opening transports or performing I/O.
+
+        Parameters
+        ----------
+        app : IApplication
+            Application container supplying configuration and dependencies.
+        router : IRouter
+            Value supplied for ``router``.
+        config : McpConfig
+            Validated configuration controlling this component.
+        bus : IMcpEventBus
+            Value supplied for ``bus``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._app = app
         self._router = router
         self._config = config
@@ -42,7 +62,19 @@ class McpManager(IMcpManager):
         self._local: dict[str, CompiledMcpServer] = {}
 
     def _compile(self, server: type[Server]) -> CompiledMcpServer:
-        """Validate and compile a server exactly once per application manager."""
+        """
+        Validate and compile a server exactly once per application manager.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        CompiledMcpServer
+            Result of the operation described above.
+        """
         if not isinstance(server, type) or not issubclass(server, Server):
             message = "MCP server registration requires a Server subclass"
             raise TypeError(message)
@@ -51,7 +83,21 @@ class McpManager(IMcpManager):
         return self._compiled[server]
 
     def web(self, path: str, server: type[Server]) -> FluentRoute:
-        """Register one native POST endpoint with API authentication semantics."""
+        """
+        Register one native POST endpoint with API authentication semantics.
+
+        Parameters
+        ----------
+        path : str
+            Value supplied for ``path``.
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        FluentRoute
+            Result of the operation described above.
+        """
         if not isinstance(path, str):
             message = "MCP endpoint paths must be strings"
             raise TypeError(message)
@@ -71,7 +117,21 @@ class McpManager(IMcpManager):
         return route
 
     def local(self, name: str, server: type[Server]) -> None:
-        """Register an explicit handle without accepting dynamic module imports."""
+        """
+        Register an explicit handle without accepting dynamic module imports.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if not isinstance(name, str):
             message = "MCP local handles must be strings"
             raise TypeError(message)
@@ -87,12 +147,31 @@ class McpManager(IMcpManager):
         self._local[name] = self._compile(server)
 
     def getWebServer(self, path: str) -> CompiledMcpServer:
-        """Return compiled HTTP metadata by normalized native route path."""
+        """
+        Return compiled HTTP metadata by normalized native route path.
+
+        Parameters
+        ----------
+        path : str
+            Value supplied for ``path``.
+
+        Returns
+        -------
+        CompiledMcpServer
+            Compiled HTTP metadata by normalized native route path.
+        """
         self.finalizeRoutes()
         return self._web[normalize_request_path(path)][1]
 
     def finalizeRoutes(self) -> None:
-        """Index final fluent paths once at boot, preserving constant-time dispatch."""
+        """
+        Index final fluent paths once at boot, preserving constant-time dispatch.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         indexed = {}
         for route, compiled, transport in self._web.values():
             path = normalize_request_path(route.path)
@@ -106,11 +185,30 @@ class McpManager(IMcpManager):
         self._web = indexed
 
     def getLocalServer(self, name: str) -> CompiledMcpServer:
-        """Return compiled local metadata by its configured handle."""
+        """
+        Return compiled local metadata by its configured handle.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        CompiledMcpServer
+            Compiled local metadata by its configured handle.
+        """
         return self._local[name]
 
     def servers(self) -> tuple[tuple[str, str, type[Server]], ...]:
-        """Return an immutable transport/address/declaration inventory."""
+        """
+        Return an immutable transport/address/declaration inventory.
+
+        Returns
+        -------
+        tuple[tuple[str, str, type[Server]], ...]
+            An immutable transport/address/declaration inventory.
+        """
         self.finalizeRoutes()
         return tuple(
             ("http", path, compiled.definition)
@@ -121,30 +219,104 @@ class McpManager(IMcpManager):
         )
 
     async def dispatchHttp(self, request: Request) -> Response:
-        """Use the same server and invoker reached by its local registration."""
+        """
+        Use the same server and invoker reached by its local registration.
+
+        Parameters
+        ----------
+        request : Request
+            Current request and its trusted execution context.
+
+        Returns
+        -------
+        Response
+            Result of the operation described above.
+        """
         transport = self._web[normalize_request_path(request.path)][2]
         return await transport.handle(request)
 
     async def startLocal(self, name: str) -> None:
-        """Serve only a configured local handle using native standard streams."""
+        """
+        Serve only a configured local handle using native standard streams.
+
+        Parameters
+        ----------
+        name : str
+            Value supplied for ``name``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         compiled = self.getLocalServer(name)
         transport = McpStdioTransport(self._app, compiled, self._config, self._bus)
-        await transport.run_standard_streams()
+        await transport.runStandardStreams()
 
     async def toolsChanged(self, server: type[Server]) -> None:
-        """Publish a catalog change without retaining the current identity."""
+        """
+        Publish a catalog change without retaining the current identity.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         await self._publish(server, "notifications/tools/list_changed")
 
     async def promptsChanged(self, server: type[Server]) -> None:
-        """Publish a prompt catalog change to the matching server's listeners."""
+        """
+        Publish a prompt catalog change to the matching server's listeners.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         await self._publish(server, "notifications/prompts/list_changed")
 
     async def resourcesChanged(self, server: type[Server]) -> None:
-        """Publish a resource catalog change to the matching server's listeners."""
+        """
+        Publish a resource catalog change to the matching server's listeners.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         await self._publish(server, "notifications/resources/list_changed")
 
     async def resourceUpdated(self, server: type[Server], uri: str) -> None:
-        """Publish one changed URI without resolving its content or identity."""
+        """
+        Publish one changed URI without resolving its content or identity.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+        uri : str
+            Value supplied for ``uri``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if not isinstance(uri, str) or not uri:
             message = "A changed resource must have a nonempty URI"
             raise ValueError(message)
@@ -153,12 +325,35 @@ class McpManager(IMcpManager):
     async def _publish(
         self, server: type[Server], method: str, uri: str | None = None,
     ) -> None:
-        """Scope events to a declaration already registered in this application."""
+        """
+        Scope events to a declaration already registered in this application.
+
+        Parameters
+        ----------
+        server : type[Server]
+            Value supplied for ``server``.
+        method : str
+            Value supplied for ``method``.
+        uri : str | None
+            Value supplied for ``uri``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         if server not in self._compiled:
             message = "MCP change notifications require a registered server"
             raise ValueError(message)
         await self._bus.publish(server, method, uri)
 
     async def shutdown(self) -> None:
-        """Wake subscriptions so their request owners can complete and clean up."""
+        """
+        Wake subscriptions so their request owners can complete and clean up.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         await self._bus.shutdown()

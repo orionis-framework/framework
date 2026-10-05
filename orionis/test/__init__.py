@@ -3,17 +3,23 @@ from orionis._exports import resolve_export as _resolve_export
 
 if _TYPE_CHECKING:
     from orionis.test.cases.case import TestCase
+    from orionis.test.clients.mcp import McpTestClient, McpTestResponse
 
 __all__ = [
+    "McpTestClient",
+    "McpTestResponse",
     "TestCase",
 ]
 
 _EXPORTS = {
+    "McpTestClient": ("orionis.test.clients.mcp", "McpTestClient"),
+    "McpTestResponse": ("orionis.test.clients.mcp", "McpTestResponse"),
     "TestCase": ("orionis.test.cases.case", "TestCase"),
 }
 
 def __getattr__(name: str) -> object:
-    """Resolve and cache a public package export.
+    """
+    Resolve and cache a public package export.
 
     Parameters
     ----------
@@ -33,7 +39,8 @@ def __getattr__(name: str) -> object:
     return _resolve_export(globals(), _EXPORTS, name)
 
 def __dir__() -> list[str]:
-    """List loaded attributes and declared public exports.
+    """
+    List loaded attributes and declared public exports.
 
     Returns
     -------

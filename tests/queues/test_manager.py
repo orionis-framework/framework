@@ -21,7 +21,7 @@ from orionis.queues.serializer import JobSerializer
 from orionis.queues.worker import Worker, WorkerOptions
 from orionis.support.facades.queue import Queue
 from orionis.test import TestCase
-from tests.queues._worker_fakes import (
+from tests.queues.test_worker import (
     FailJob, FailedRepository, FakeApp, GateJob, MemoryDriver, RecordJob, ScopedService,
     State, envelope,
 )
@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from orionis.queues.entities.envelope import JobEnvelope
 
 _CREDENTIAL = "test:@/credential"
-
 
 class FastFailureDriver(MemoryDriver):
     """Execute a requeued job before administrative retry finishes."""
@@ -73,7 +72,6 @@ class FastFailureDriver(MemoryDriver):
         reserved = await self.reserve((envelope.queue,), 90)
         await self._worker.execute(reserved)
         return dispatch_id
-
 
 class TestQueueManager(TestCase):
     """Verify lazy canonical dispatch, provider pinning and administration."""
@@ -237,7 +235,7 @@ class TestQueueManager(TestCase):
         """Expose PendingDispatch directly after eager provider startup."""
         previous = Queue._application
         previous_pin = Queue._pinned_instance
-        Queue._application = self.app
+        Queue._application = self.app # NOSONAR
         provider = QueueProvider(self.app)
         self.assertNotIsInstance(provider, DeferrableProvider)
         try:
@@ -256,9 +254,8 @@ class TestQueueManager(TestCase):
                 await callback()
             self.assertTrue(driver.closed)
         finally:
-            Queue._pinned_instance = previous_pin
-            Queue._application = previous
-
+            Queue._pinned_instance = previous_pin # NOSONAR
+            Queue._application = previous # NOSONAR
 
 class TestQueueJobDiscovery(TestCase):
     """Discover jobs from resolved paths without queue module configuration."""
@@ -279,7 +276,7 @@ class TestQueueJobDiscovery(TestCase):
         nested.mkdir(parents=True)
         (nested / "discovered.py").write_text(
             "from orionis.queues.job import BaseJob\n"
-            "from tests.queues._worker_fakes import RecordJob\n"
+            "from tests.queues.test_worker import RecordJob\n"
             "\n"
             "class DiscoveredJob(RecordJob):\n"
             '    """Expose a job defined inside the custom jobs path."""\n'

@@ -1,0 +1,2119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mail.entities.Envelope</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="This class"><wbr></wbr>Envelope</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mail.entities.Envelope.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#recipients" class="internal-link" title="orionis.mail.entities.Envelope.recipients">recipients</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bcc" class="internal-link" title="orionis.mail.entities.Envelope.bcc">bcc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cc" class="internal-link" title="orionis.mail.entities.Envelope.cc">cc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#from_address" class="internal-link" title="orionis.mail.entities.Envelope.from_address">from<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reply_to" class="internal-link" title="orionis.mail.entities.Envelope.reply_to">reply<wbr></wbr>_to</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#subject" class="internal-link" title="orionis.mail.entities.Envelope.subject">subject</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.mail.entities.Envelope.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.mail.entities.html" class="internal-link" title="The parent of this class">entities</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12634"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12634">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.address.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.address.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.address.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12635"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12636"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12637"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12638"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.options.html" class="internal-link" title="orionis.mail.entities.options">options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12639"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.prepared.html" class="internal-link" title="orionis.mail.entities.prepared">prepared</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12640"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.result.html" class="internal-link" title="orionis.mail.entities.result">result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12641"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12641">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.smtp_settings.html" class="internal-link" title="orionis.mail.entities.smtp_settings">smtp<wbr></wbr>_settings</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_has_controls" class="internal-link" title="orionis.mail.entities.smtp_settings._has_controls">_has<wbr></wbr>_controls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_port" class="internal-link" title="orionis.mail.entities.smtp_settings._port">_port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_text" class="internal-link" title="orionis.mail.entities.smtp_settings._text">_text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_timeout" class="internal-link" title="orionis.mail.entities.smtp_settings._timeout">_timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_url_overrides" class="internal-link" title="orionis.mail.entities.smtp_settings._url_overrides">_url<wbr></wbr>_overrides</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_DEFAULT_PORT" class="internal-link" title="orionis.mail.entities.smtp_settings._DEFAULT_PORT">_DEFAULT<wbr></wbr>_PORT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_ENCRYPTIONS" class="internal-link" title="orionis.mail.entities.smtp_settings._ENCRYPTIONS">_ENCRYPTIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_FIRST_PRINTABLE" class="internal-link" title="orionis.mail.entities.smtp_settings._FIRST_PRINTABLE">_FIRST<wbr></wbr>_PRINTABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_MAX_PORT" class="internal-link" title="orionis.mail.entities.smtp_settings._MAX_PORT">_MAX<wbr></wbr>_PORT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.smtp_settings.html#_SMTPS_PORT" class="internal-link" title="orionis.mail.entities.smtp_settings._SMTPS_PORT">_SMTPS<wbr></wbr>_PORT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12642"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12642">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address"><wbr></wbr>Address</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Address.html#__post_init__" class="internal-link" title="orionis.mail.entities.Address.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Address.html#asHeader" class="internal-link" title="orionis.mail.entities.Address.asHeader">as<wbr></wbr>Header</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Address.html#address" class="internal-link" title="orionis.mail.entities.Address.address">address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Address.html#name" class="internal-link" title="orionis.mail.entities.Address.name">name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12643"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12643">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.Attachment.html" class="internal-link" title="orionis.mail.entities.Attachment"><wbr></wbr>Attachment</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#fromStorage" class="internal-link" title="orionis.mail.entities.Attachment.fromStorage">from<wbr></wbr>Storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#__post_init__" class="internal-link" title="orionis.mail.entities.Attachment.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#disk" class="internal-link" title="orionis.mail.entities.Attachment.disk">disk</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#mime_type" class="internal-link" title="orionis.mail.entities.Attachment.mime_type">mime<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#name" class="internal-link" title="orionis.mail.entities.Attachment.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Attachment.html#path" class="internal-link" title="orionis.mail.entities.Attachment.path">path</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12644"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12644">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.Content.html" class="internal-link" title="orionis.mail.entities.Content"><wbr></wbr>Content</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#__post_init__" class="internal-link" title="orionis.mail.entities.Content.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#data" class="internal-link" title="orionis.mail.entities.Content.data">data</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#html" class="internal-link" title="orionis.mail.entities.Content.html">html</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#text" class="internal-link" title="orionis.mail.entities.Content.text">text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#text_view" class="internal-link" title="orionis.mail.entities.Content.text_view">text<wbr></wbr>_view</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.Content.html#view" class="internal-link" title="orionis.mail.entities.Content.view">view</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12645"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="orionis.mail.entities.Envelope"><wbr></wbr>Envelope</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mail.entities.Envelope.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#recipients" class="internal-link" title="orionis.mail.entities.Envelope.recipients">recipients</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bcc" class="internal-link" title="orionis.mail.entities.Envelope.bcc">bcc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cc" class="internal-link" title="orionis.mail.entities.Envelope.cc">cc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#from_address" class="internal-link" title="orionis.mail.entities.Envelope.from_address">from<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reply_to" class="internal-link" title="orionis.mail.entities.Envelope.reply_to">reply<wbr></wbr>_to</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#subject" class="internal-link" title="orionis.mail.entities.Envelope.subject">subject</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#to" class="internal-link" title="orionis.mail.entities.Envelope.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12646"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12646">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.MailOptions.html" class="internal-link" title="orionis.mail.entities.MailOptions"><wbr></wbr>Mail<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#envelope" class="internal-link" title="orionis.mail.entities.MailOptions.envelope">envelope</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#attachments" class="internal-link" title="orionis.mail.entities.MailOptions.attachments">attachments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#bcc" class="internal-link" title="orionis.mail.entities.MailOptions.bcc">bcc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#cc" class="internal-link" title="orionis.mail.entities.MailOptions.cc">cc</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#from_address" class="internal-link" title="orionis.mail.entities.MailOptions.from_address">from<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#mailer" class="internal-link" title="orionis.mail.entities.MailOptions.mailer">mailer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#reply_to" class="internal-link" title="orionis.mail.entities.MailOptions.reply_to">reply<wbr></wbr>_to</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#subject" class="internal-link" title="orionis.mail.entities.MailOptions.subject">subject</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailOptions.html#to" class="internal-link" title="orionis.mail.entities.MailOptions.to">to</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12647"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12647">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult"><wbr></wbr>Mail<wbr></wbr>Result</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#__post_init__" class="internal-link" title="orionis.mail.entities.MailResult.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#accepted_recipients" class="internal-link" title="orionis.mail.entities.MailResult.accepted_recipients">accepted<wbr></wbr>_recipients</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#driver" class="internal-link" title="orionis.mail.entities.MailResult.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#file_path" class="internal-link" title="orionis.mail.entities.MailResult.file_path">file<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#mailer" class="internal-link" title="orionis.mail.entities.MailResult.mailer">mailer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#message_id" class="internal-link" title="orionis.mail.entities.MailResult.message_id">message<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#recipients" class="internal-link" title="orionis.mail.entities.MailResult.recipients">recipients</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#rejected_recipients" class="internal-link" title="orionis.mail.entities.MailResult.rejected_recipients">rejected<wbr></wbr>_recipients</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.MailResult.html#status" class="internal-link" title="orionis.mail.entities.MailResult.status">status</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12648"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12648">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail"><wbr></wbr>Prepared<wbr></wbr>Mail</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.PreparedMail.html#message_id" class="internal-link" title="orionis.mail.entities.PreparedMail.message_id">message<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.PreparedMail.html#mime" class="internal-link" title="orionis.mail.entities.PreparedMail.mime">mime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.PreparedMail.html#recipients" class="internal-link" title="orionis.mail.entities.PreparedMail.recipients">recipients</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.PreparedMail.html#sender" class="internal-link" title="orionis.mail.entities.PreparedMail.sender">sender</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.PreparedMail.html#smtp_utf8" class="internal-link" title="orionis.mail.entities.PreparedMail.smtp_utf8">smtp<wbr></wbr>_utf8</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12649"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12649">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mail.entities.SmtpSettings.html" class="internal-link" title="orionis.mail.entities.SmtpSettings"><wbr></wbr>Smtp<wbr></wbr>Settings</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#fromConfig" class="internal-link" title="orionis.mail.entities.SmtpSettings.fromConfig">from<wbr></wbr>Config</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#encryption" class="internal-link" title="orionis.mail.entities.SmtpSettings.encryption">encryption</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#host" class="internal-link" title="orionis.mail.entities.SmtpSettings.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#password" class="internal-link" title="orionis.mail.entities.SmtpSettings.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#port" class="internal-link" title="orionis.mail.entities.SmtpSettings.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#sensitive" class="internal-link" title="orionis.mail.entities.SmtpSettings.sensitive">sensitive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#timeout" class="internal-link" title="orionis.mail.entities.SmtpSettings.timeout">timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.entities.SmtpSettings.html#username" class="internal-link" title="orionis.mail.entities.SmtpSettings.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mail.html" class="internal-link" title="orionis.mail">mail</a></code><wbr></wbr>.<code><a href="orionis.mail.entities.html" class="internal-link" title="orionis.mail.entities">entities</a></code><wbr></wbr>.<code><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="orionis.mail.entities.Envelope">Envelope</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Envelope</span>: <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L10" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.entities.Envelope.__init__">Envelope(subject, from_address, to, cc, ...)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.Envelope">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Store normalized immutable headers and intended recipients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subject</span></td><td class="fieldArgDesc">Literal subject, including an intentionally empty subject.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">from<wbr></wbr>_address</span></td><td class="fieldArgDesc">From header and transport sender.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">to</span></td><td class="fieldArgDesc">Primary visible recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cc</span></td><td class="fieldArgDesc">Additional visible recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bcc</span></td><td class="fieldArgDesc">Hidden transport recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reply<wbr></wbr>_to</span></td><td class="fieldArgDesc">Reply destinations, which are never transport recipients.</td></tr></table></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1206">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.mail.entities.Envelope.__init__">__init__</a></code></td>
+    <td>Normalize a declarative envelope without performing I/O.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#recipients" class="internal-link" title="orionis.mail.entities.Envelope.recipients">recipients</a></code></td>
+    <td>Return the stable deduplicated transport recipient union.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#bcc" class="internal-link" title="orionis.mail.entities.Envelope.bcc">bcc</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#cc" class="internal-link" title="orionis.mail.entities.Envelope.cc">cc</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#from_address" class="internal-link" title="orionis.mail.entities.Envelope.from_address">from<wbr></wbr>_address</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#reply_to" class="internal-link" title="orionis.mail.entities.Envelope.reply_to">reply<wbr></wbr>_to</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#subject" class="internal-link" title="orionis.mail.entities.Envelope.subject">subject</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#to" class="internal-link" title="orionis.mail.entities.Envelope.to">to</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.mail.entities.Envelope.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">subject: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">from_address: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">to: <code>Recipients</code> = (), </span><span class="rst-sig-param">cc: <code>Recipients</code> = (), </span><span class="rst-sig-param">bcc: <code>Recipients</code> = (), </span><span class="rst-sig-param">reply_to: <code>Recipients</code> = ()</span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L38">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.mail.entities.Envelope.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Normalize a declarative envelope without performing I/O.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subject:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Literal subject, including an empty subject.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">from<wbr></wbr>_address:</span><code>str | Address | None</code></td><td class="fieldArgDesc">From header and transport sender.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">to:</span><code>Recipients</code></td><td class="fieldArgDesc">Primary visible recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cc:</span><code>Recipients</code></td><td class="fieldArgDesc">Additional visible recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bcc:</span><code>Recipients</code></td><td class="fieldArgDesc">Hidden transport recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reply<wbr></wbr>_to:</span><code>Recipients</code></td><td class="fieldArgDesc">Reply destinations, not transport recipients.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Copy and validate all address collections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If headers are invalid or a hidden recipient is also visible.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mail.entities.Envelope.recipients">
+    
+  </a>
+  <a name="recipients">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">recipients</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#recipients" title="orionis.mail.entities.Envelope.recipients">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Return the stable deduplicated transport recipient union.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">To, Cc, and Bcc addresses without Reply-To.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.bcc">
+    
+  </a>
+  <a name="bcc">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">bcc</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a>, ...]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L35">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#bcc" title="orionis.mail.entities.Envelope.bcc">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.cc">
+    
+  </a>
+  <a name="cc">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cc</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a>, ...]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cc" title="orionis.mail.entities.Envelope.cc">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.from_address">
+    
+  </a>
+  <a name="from_address">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">from_address</span>: <code>Address | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L32">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#from_address" title="orionis.mail.entities.Envelope.from_address">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.reply_to">
+    
+  </a>
+  <a name="reply_to">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">reply_to</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a>, ...]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L36">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#reply_to" title="orionis.mail.entities.Envelope.reply_to">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.subject">
+    
+  </a>
+  <a name="subject">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">subject</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#subject" title="orionis.mail.entities.Envelope.subject">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mail.entities.Envelope.to">
+    
+  </a>
+  <a name="to">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">to</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a>, ...]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mail/entities/envelope.py#L33">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#to" title="orionis.mail.entities.Envelope.to">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

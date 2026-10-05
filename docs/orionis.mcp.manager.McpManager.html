@@ -1,0 +1,1620 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mcp.manager.McpManager</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.mcp.manager.McpManager.html" class="internal-link" title="This class"><wbr></wbr>Mcp<wbr></wbr>Manager</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.manager.McpManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compile" class="internal-link" title="orionis.mcp.manager.McpManager._compile">_compile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_publish" class="internal-link" title="orionis.mcp.manager.McpManager._publish">_publish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#dispatchHttp" class="internal-link" title="orionis.mcp.manager.McpManager.dispatchHttp">dispatch<wbr></wbr>Http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finalizeRoutes" class="internal-link" title="orionis.mcp.manager.McpManager.finalizeRoutes">finalize<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getLocalServer" class="internal-link" title="orionis.mcp.manager.McpManager.getLocalServer">get<wbr></wbr>Local<wbr></wbr>Server</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getWebServer" class="internal-link" title="orionis.mcp.manager.McpManager.getWebServer">get<wbr></wbr>Web<wbr></wbr>Server</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#local" class="internal-link" title="orionis.mcp.manager.McpManager.local">local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#promptsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.promptsChanged">prompts<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesChanged" class="internal-link" title="orionis.mcp.manager.McpManager.resourcesChanged">resources<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourceUpdated" class="internal-link" title="orionis.mcp.manager.McpManager.resourceUpdated">resource<wbr></wbr>Updated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#servers" class="internal-link" title="orionis.mcp.manager.McpManager.servers">servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#shutdown" class="internal-link" title="orionis.mcp.manager.McpManager.shutdown">shutdown</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#startLocal" class="internal-link" title="orionis.mcp.manager.McpManager.startLocal">start<wbr></wbr>Local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#toolsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.toolsChanged">tools<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#web" class="internal-link" title="orionis.mcp.manager.McpManager.web">web</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.manager.McpManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.mcp.manager.McpManager._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_bus" class="internal-link" title="orionis.mcp.manager.McpManager._bus">_bus</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compiled" class="internal-link" title="orionis.mcp.manager.McpManager._compiled">_compiled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_config" class="internal-link" title="orionis.mcp.manager.McpManager._config">_config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_local" class="internal-link" title="orionis.mcp.manager.McpManager._local">_local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_router" class="internal-link" title="orionis.mcp.manager.McpManager._router">_router</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_web" class="internal-link" title="orionis.mcp.manager.McpManager._web">_web</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.mcp.manager.html" class="internal-link" title="The parent of this class">manager</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13328"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.manager.McpManager.html" class="internal-link" title="orionis.mcp.manager.McpManager"><wbr></wbr>Mcp<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.manager.McpManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compile" class="internal-link" title="orionis.mcp.manager.McpManager._compile">_compile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_publish" class="internal-link" title="orionis.mcp.manager.McpManager._publish">_publish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#dispatchHttp" class="internal-link" title="orionis.mcp.manager.McpManager.dispatchHttp">dispatch<wbr></wbr>Http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finalizeRoutes" class="internal-link" title="orionis.mcp.manager.McpManager.finalizeRoutes">finalize<wbr></wbr>Routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getLocalServer" class="internal-link" title="orionis.mcp.manager.McpManager.getLocalServer">get<wbr></wbr>Local<wbr></wbr>Server</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#getWebServer" class="internal-link" title="orionis.mcp.manager.McpManager.getWebServer">get<wbr></wbr>Web<wbr></wbr>Server</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#local" class="internal-link" title="orionis.mcp.manager.McpManager.local">local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#promptsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.promptsChanged">prompts<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesChanged" class="internal-link" title="orionis.mcp.manager.McpManager.resourcesChanged">resources<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourceUpdated" class="internal-link" title="orionis.mcp.manager.McpManager.resourceUpdated">resource<wbr></wbr>Updated</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#servers" class="internal-link" title="orionis.mcp.manager.McpManager.servers">servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#shutdown" class="internal-link" title="orionis.mcp.manager.McpManager.shutdown">shutdown</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#startLocal" class="internal-link" title="orionis.mcp.manager.McpManager.startLocal">start<wbr></wbr>Local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#toolsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.toolsChanged">tools<wbr></wbr>Changed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#web" class="internal-link" title="orionis.mcp.manager.McpManager.web">web</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.manager.McpManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_app" class="internal-link" title="orionis.mcp.manager.McpManager._app">_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_bus" class="internal-link" title="orionis.mcp.manager.McpManager._bus">_bus</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_compiled" class="internal-link" title="orionis.mcp.manager.McpManager._compiled">_compiled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_config" class="internal-link" title="orionis.mcp.manager.McpManager._config">_config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_local" class="internal-link" title="orionis.mcp.manager.McpManager._local">_local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_router" class="internal-link" title="orionis.mcp.manager.McpManager._router">_router</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_web" class="internal-link" title="orionis.mcp.manager.McpManager._web">_web</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.manager.html#_LOCAL_NAME" class="internal-link" title="orionis.mcp.manager._LOCAL_NAME">_LOCAL<wbr></wbr>_NAME</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.manager.html" class="internal-link" title="orionis.mcp.manager">manager</a></code><wbr></wbr>.<code><a href="orionis.mcp.manager.McpManager.html" class="internal-link" title="orionis.mcp.manager.McpManager">McpManager</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpManager</span>(<a href="orionis.mcp.contracts.manager.IMcpManager.html" class="internal-link" title="orionis.mcp.contracts.manager.IMcpManager">IMcpManager</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.manager.McpManager.__init__">McpManager(app, router, config, bus)</a></code></p><p><a href="classIndex.html#orionis.mcp.manager.McpManager">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Own one compiled registry shared by native HTTP, STDIO, DI and the facade.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1260">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.mcp.manager.McpManager.__init__">__init__</a></code></td>
+    <td>Capture application services without opening transports or performing I/O.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_compile" class="internal-link" title="orionis.mcp.manager.McpManager._compile">_compile</a></code></td>
+    <td>Validate and compile a server exactly once per application manager.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_publish" class="internal-link" title="orionis.mcp.manager.McpManager._publish">_publish</a></code></td>
+    <td>Scope events to a declaration already registered in this application.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#dispatchHttp" class="internal-link" title="orionis.mcp.manager.McpManager.dispatchHttp">dispatch<wbr></wbr>Http</a></code></td>
+    <td>Use the same server and invoker reached by its local registration.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#finalizeRoutes" class="internal-link" title="orionis.mcp.manager.McpManager.finalizeRoutes">finalize<wbr></wbr>Routes</a></code></td>
+    <td>Index final fluent paths once at boot, preserving constant-time dispatch.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getLocalServer" class="internal-link" title="orionis.mcp.manager.McpManager.getLocalServer">get<wbr></wbr>Local<wbr></wbr>Server</a></code></td>
+    <td>Return compiled local metadata by its configured handle.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#getWebServer" class="internal-link" title="orionis.mcp.manager.McpManager.getWebServer">get<wbr></wbr>Web<wbr></wbr>Server</a></code></td>
+    <td>Return compiled HTTP metadata by normalized native route path.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#local" class="internal-link" title="orionis.mcp.manager.McpManager.local">local</a></code></td>
+    <td>Register an explicit handle without accepting dynamic module imports.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#promptsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.promptsChanged">prompts<wbr></wbr>Changed</a></code></td>
+    <td>Publish a prompt catalog change to the matching server's listeners.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#resourcesChanged" class="internal-link" title="orionis.mcp.manager.McpManager.resourcesChanged">resources<wbr></wbr>Changed</a></code></td>
+    <td>Publish a resource catalog change to the matching server's listeners.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#resourceUpdated" class="internal-link" title="orionis.mcp.manager.McpManager.resourceUpdated">resource<wbr></wbr>Updated</a></code></td>
+    <td>Publish one changed URI without resolving its content or identity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#servers" class="internal-link" title="orionis.mcp.manager.McpManager.servers">servers</a></code></td>
+    <td>Return an immutable transport/address/declaration inventory.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#shutdown" class="internal-link" title="orionis.mcp.manager.McpManager.shutdown">shutdown</a></code></td>
+    <td>Wake subscriptions so their request owners can complete and clean up.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#startLocal" class="internal-link" title="orionis.mcp.manager.McpManager.startLocal">start<wbr></wbr>Local</a></code></td>
+    <td>Serve only a configured local handle using native standard streams.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#toolsChanged" class="internal-link" title="orionis.mcp.manager.McpManager.toolsChanged">tools<wbr></wbr>Changed</a></code></td>
+    <td>Publish a catalog change without retaining the current identity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#web" class="internal-link" title="orionis.mcp.manager.McpManager.web">web</a></code></td>
+    <td>Register one native POST endpoint with API authentication semantics.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.mcp.manager.McpManager.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_app" class="internal-link" title="orionis.mcp.manager.McpManager._app">_app</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_bus" class="internal-link" title="orionis.mcp.manager.McpManager._bus">_bus</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_compiled" class="internal-link" title="orionis.mcp.manager.McpManager._compiled">_compiled</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_config" class="internal-link" title="orionis.mcp.manager.McpManager._config">_config</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_local" class="internal-link" title="orionis.mcp.manager.McpManager._local">_local</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_router" class="internal-link" title="orionis.mcp.manager.McpManager._router">_router</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_web" class="internal-link" title="orionis.mcp.manager.McpManager._web">_web</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">router: <code><a href="orionis.http.routes.contracts.router.IRouter.html" class="internal-link" title="orionis.http.routes.contracts.router.IRouter">IRouter</a></code>, </span><span class="rst-sig-param">config: <code><a href="orionis.mcp.config.McpConfig.html" class="internal-link" title="orionis.mcp.config.McpConfig">McpConfig</a></code>, </span><span class="rst-sig-param">bus: <code><a href="orionis.mcp.contracts.event_bus.IMcpEventBus.html" class="internal-link" title="orionis.mcp.contracts.event_bus.IMcpEventBus">IMcpEventBus</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L28">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.mcp.manager.McpManager.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Capture application services without opening transports or performing I/O.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application container supplying configuration and dependencies.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">router:</span><code><a href="orionis.http.routes.contracts.router.IRouter.html" class="internal-link" title="orionis.http.routes.contracts.router.IRouter">IRouter</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">router</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="orionis.mcp.config.McpConfig.html" class="internal-link" title="orionis.mcp.config.McpConfig">McpConfig</a></code></td><td class="fieldArgDesc">Validated configuration controlling this component.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bus:</span><code><a href="orionis.mcp.contracts.event_bus.IMcpEventBus.html" class="internal-link" title="orionis.mcp.contracts.event_bus.IMcpEventBus">IMcpEventBus</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">bus</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._compile">
+    
+  </a>
+  <a name="_compile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_compile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_compile" title="orionis.mcp.manager.McpManager._compile">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate and compile a server exactly once per application manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._publish">
+    
+  </a>
+  <a name="_publish">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_publish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L325">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_publish" title="orionis.mcp.manager.McpManager._publish">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Scope events to a declaration already registered in this application.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">method</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">uri</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.dispatchHttp">
+    
+  </a>
+  <a name="dispatchHttp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">dispatchHttp</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L221">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#dispatchHttp" title="orionis.mcp.manager.McpManager.dispatchHttp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#dispatchHttp" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.dispatchHttp</a></code></div>
+    <div><p>Use the same server and invoker reached by its local registration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.finalizeRoutes">
+    
+  </a>
+  <a name="finalizeRoutes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">finalizeRoutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L166">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#finalizeRoutes" title="orionis.mcp.manager.McpManager.finalizeRoutes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#finalizeRoutes" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.finalizeRoutes</a></code></div>
+    <div><p>Index final fluent paths once at boot, preserving constant-time dispatch.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.getLocalServer">
+    
+  </a>
+  <a name="getLocalServer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getLocalServer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L187">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getLocalServer" title="orionis.mcp.manager.McpManager.getLocalServer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#getLocalServer" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.getLocalServer</a></code></div>
+    <div><p>Return compiled local metadata by its configured handle.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code></td><td class="fieldArgDesc">Compiled local metadata by its configured handle.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.getWebServer">
+    
+  </a>
+  <a name="getWebServer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">getWebServer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L149">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#getWebServer" title="orionis.mcp.manager.McpManager.getWebServer">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#getWebServer" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.getWebServer</a></code></div>
+    <div><p>Return compiled HTTP metadata by normalized native route path.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">path</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code></td><td class="fieldArgDesc">Compiled HTTP metadata by normalized native route path.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.local">
+    
+  </a>
+  <a name="local">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">local</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L119">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#local" title="orionis.mcp.manager.McpManager.local">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#local" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.local</a></code></div>
+    <div><p>Register an explicit handle without accepting dynamic module imports.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.promptsChanged">
+    
+  </a>
+  <a name="promptsChanged">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">promptsChanged</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L272">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#promptsChanged" title="orionis.mcp.manager.McpManager.promptsChanged">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#promptsChanged" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.promptsChanged</a></code></div>
+    <div><p>Publish a prompt catalog change to the matching server's listeners.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.resourcesChanged">
+    
+  </a>
+  <a name="resourcesChanged">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">resourcesChanged</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L288">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourcesChanged" title="orionis.mcp.manager.McpManager.resourcesChanged">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#resourcesChanged" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.resourcesChanged</a></code></div>
+    <div><p>Publish a resource catalog change to the matching server's listeners.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.resourceUpdated">
+    
+  </a>
+  <a name="resourceUpdated">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">resourceUpdated</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L304">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourceUpdated" title="orionis.mcp.manager.McpManager.resourceUpdated">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#resourceUpdated" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.resourceUpdated</a></code></div>
+    <div><p>Publish one changed URI without resolving its content or identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">uri</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.servers">
+    
+  </a>
+  <a name="servers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">servers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]], <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L203">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#servers" title="orionis.mcp.manager.McpManager.servers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#servers" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.servers</a></code></div>
+    <div><p>Return an immutable transport/address/declaration inventory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]], ...]</code></td><td class="fieldArgDesc">An immutable transport/address/declaration inventory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.shutdown">
+    
+  </a>
+  <a name="shutdown">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">shutdown</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L350">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#shutdown" title="orionis.mcp.manager.McpManager.shutdown">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#shutdown" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.shutdown</a></code></div>
+    <div><p>Wake subscriptions so their request owners can complete and clean up.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.startLocal">
+    
+  </a>
+  <a name="startLocal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">startLocal</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L238">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#startLocal" title="orionis.mcp.manager.McpManager.startLocal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#startLocal" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.startLocal</a></code></div>
+    <div><p>Serve only a configured local handle using native standard streams.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.toolsChanged">
+    
+  </a>
+  <a name="toolsChanged">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">toolsChanged</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L256">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#toolsChanged" title="orionis.mcp.manager.McpManager.toolsChanged">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#toolsChanged" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.toolsChanged</a></code></div>
+    <div><p>Publish a catalog change without retaining the current identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.web">
+    
+  </a>
+  <a name="web">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">web</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">server: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L85">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#web" title="orionis.mcp.manager.McpManager.web">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#web" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.web</a></code></div>
+    <div><p>Register one native POST endpoint with API authentication semantics.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">path</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">server:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">server</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.mcp.manager.McpManager.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.mcp.contracts.manager.IMcpManager.html#__slots__" class="internal-link">orionis.mcp.contracts.manager.IMcpManager.__slots__</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._app">
+    
+  </a>
+  <a name="_app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_app</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L54">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_app" title="orionis.mcp.manager.McpManager._app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._bus">
+    
+  </a>
+  <a name="_bus">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_bus</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L57">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_bus" title="orionis.mcp.manager.McpManager._bus">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._compiled">
+    
+  </a>
+  <a name="_compiled">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_compiled</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server], <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L58">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_compiled" title="orionis.mcp.manager.McpManager._compiled">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._config">
+    
+  </a>
+  <a name="_config">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_config</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L56">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_config" title="orionis.mcp.manager.McpManager._config">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._local">
+    
+  </a>
+  <a name="_local">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_local</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L62">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_local" title="orionis.mcp.manager.McpManager._local">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._router">
+    
+  </a>
+  <a name="_router">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_router</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_router" title="orionis.mcp.manager.McpManager._router">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.manager.McpManager._web">
+    
+  </a>
+  <a name="_web">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_web</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a>, <wbr></wbr><a href="orionis.mcp.transport.http.McpHttpTransport.html" class="internal-link" title="orionis.mcp.transport.http.McpHttpTransport">McpHttpTransport</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/manager.py#L59">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_web" title="orionis.mcp.manager.McpManager._web">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

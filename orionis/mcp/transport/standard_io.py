@@ -1,7 +1,4 @@
-"""Bounded daemon I/O bridges that never occupy the event loop's executor."""
-
 from __future__ import annotations
-
 import asyncio
 from concurrent.futures import CancelledError
 import threading
@@ -11,14 +8,27 @@ if TYPE_CHECKING:
     from concurrent.futures import Future
     from typing import BinaryIO
 
-
 class StandardReader:
     """Read at most one queued frame using an interruptible async queue boundary."""
 
     __slots__ = ("_closed", "_limit", "_loop", "_pending", "_queue", "_stream")
 
     def __init__(self, stream: BinaryIO, limit: int) -> None:
-        """Start one daemon so an idle Windows pipe cannot delay executor shutdown."""
+        """
+        Start one daemon so an idle Windows pipe cannot delay executor shutdown.
+
+        Parameters
+        ----------
+        stream : BinaryIO
+            Value supplied for ``stream``.
+        limit : int
+            Value supplied for ``limit``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._stream = stream
         self._limit = limit
         self._loop = asyncio.get_running_loop()
@@ -30,7 +40,19 @@ class StandardReader:
         ).start()
 
     def _offer(self, item: bytes | OSError) -> bool:
-        """Apply queue backpressure in the daemon rather than allocating callbacks."""
+        """
+        Apply queue backpressure in the daemon rather than allocating callbacks.
+
+        Parameters
+        ----------
+        item : bytes | OSError
+            Value supplied for ``item``.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
+        """
         if self._closed.is_set():
             return False
         operation = self._queue.put(item)
@@ -46,7 +68,14 @@ class StandardReader:
         return not self._closed.is_set()
 
     def _read(self) -> None:
-        """Read bounded chunks and drain oversized frames without accumulating them."""
+        """
+        Read bounded chunks and drain oversized frames without accumulating them.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         try:
             while not self._closed.is_set():
                 line = self._stream.readline(self._limit + 2)
@@ -63,27 +92,53 @@ class StandardReader:
             self._offer(exc)
 
     async def readline(self) -> bytes:
-        """Return the next frame or propagate a real input transport failure."""
+        """
+        Return the next frame or propagate a real input transport failure.
+
+        Returns
+        -------
+        bytes
+            The next frame or propagate a real input transport failure.
+        """
         value = await self._queue.get()
         if isinstance(value, OSError):
             raise value
         return value
 
     def close(self) -> None:
-        """Stop future deliveries without waiting on an uninterruptible OS read."""
+        """
+        Stop future deliveries without waiting on an uninterruptible OS read.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._closed.set()
         if self._pending is not None:
             self._pending.cancel()
 
-
 def _finish_write(future: asyncio.Future[None], error: OSError | None) -> None:
-    """Resolve delivery only on the owning loop, ignoring canceled callers."""
+    """
+    Resolve delivery only on the owning loop, ignoring canceled callers.
+
+    Parameters
+    ----------
+    future : asyncio.Future[None]
+        Value supplied for ``future``.
+    error : OSError | None
+        Failure being inspected or reported.
+
+    Returns
+    -------
+    None
+        Complete the documented operation without returning a value.
+    """
     if not future.done():
         if error is None:
             future.set_result(None)
         else:
             future.set_exception(error)
-
 
 class StandardWriter:
     """Serialize bounded queued output without blocking async cancellation."""
@@ -91,7 +146,19 @@ class StandardWriter:
     __slots__ = ("_closed", "_loop", "_pending", "_queue", "_stream")
 
     def __init__(self, stream: BinaryIO) -> None:
-        """Start one daemon dedicated to the captured binary protocol channel."""
+        """
+        Start one daemon dedicated to the captured binary protocol channel.
+
+        Parameters
+        ----------
+        stream : BinaryIO
+            Value supplied for ``stream``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._stream = stream
         self._loop = asyncio.get_running_loop()
         self._queue: asyncio.Queue[tuple[bytes, asyncio.Future[None]]] = asyncio.Queue(
@@ -104,7 +171,14 @@ class StandardWriter:
         ).start()
 
     def _write(self) -> None:
-        """Write whole frames and acknowledge flush completion with backpressure."""
+        """
+        Write whole frames and acknowledge flush completion with backpressure.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         while not self._closed.is_set():
             operation = self._queue.get()
             try:
@@ -130,13 +204,32 @@ class StandardWriter:
                 return
 
     async def write(self, data: bytes) -> None:
-        """Wait for one complete protocol frame to reach the output stream."""
+        """
+        Wait for one complete protocol frame to reach the output stream.
+
+        Parameters
+        ----------
+        data : bytes
+            Value supplied for ``data``.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         completed: asyncio.Future[None] = self._loop.create_future()
         await self._queue.put((data, completed))
         await completed
 
     def close(self) -> None:
-        """Stop queued output without joining a potentially blocked OS writer."""
+        """
+        Stop queued output without joining a potentially blocked OS writer.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
+        """
         self._closed.set()
         if self._pending is not None:
             self._pending.cancel()

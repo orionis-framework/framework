@@ -1,0 +1,3859 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.database.seeders</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code class="thisobject"><a href="orionis.database.seeders.html" class="internal-link" title="This package">seeders</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5262"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5262">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.events.html" class="internal-link" title="orionis.database.seeders.events">events</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link" title="orionis.database.seeders.events.SeederEvents"><wbr></wbr>Seeder<wbr></wbr>Events</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.events.html#NO_EVENTS" class="internal-link" title="orionis.database.seeders.events.NO_EVENTS">NO<wbr></wbr>_EVENTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5263"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5263">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.runner.html" class="internal-link" title="orionis.database.seeders.runner">runner</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.runner._ClaimFailed.html" class="internal-link" title="orionis.database.seeders.runner._ClaimFailed">_<wbr></wbr>Claim<wbr></wbr>Failed</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.runner.html#_build_seeders_table" class="internal-link" title="orionis.database.seeders.runner._build_seeders_table">_build<wbr></wbr>_seeders<wbr></wbr>_table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.runner.html#_SEEDERS_TABLE" class="internal-link" title="orionis.database.seeders.runner._SEEDERS_TABLE">_SEEDERS<wbr></wbr>_TABLE</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5264"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.seeder.html" class="internal-link" title="orionis.database.seeders.seeder">seeder</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5265"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5265">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder"><wbr></wbr>Seeder</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.Seeder.html#run" class="internal-link" title="orionis.database.seeders.Seeder.run">run</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.Seeder.html#__slots__" class="internal-link" title="orionis.database.seeders.Seeder.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5266"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5266">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.SeederRunner.html" class="internal-link" title="orionis.database.seeders.SeederRunner"><wbr></wbr>Seeder<wbr></wbr>Runner</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__discover" class="internal-link" title="orionis.database.seeders.SeederRunner.__discover">__discover</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__ensureTrackingTable" class="internal-link" title="orionis.database.seeders.SeederRunner.__ensureTrackingTable">__ensure<wbr></wbr>Tracking<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__getRan" class="internal-link" title="orionis.database.seeders.SeederRunner.__getRan">__get<wbr></wbr>Ran</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__init__" class="internal-link" title="orionis.database.seeders.SeederRunner.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__isRecorded" class="internal-link" title="orionis.database.seeders.SeederRunner.__isRecorded">__is<wbr></wbr>Recorded</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__runStep" class="internal-link" title="orionis.database.seeders.SeederRunner.__runStep">__run<wbr></wbr>Step</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__seedersPath" class="internal-link" title="orionis.database.seeders.SeederRunner.__seedersPath">__seeders<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#seed" class="internal-link" title="orionis.database.seeders.SeederRunner.seed">seed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__slots__" class="internal-link" title="orionis.database.seeders.SeederRunner.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__app" class="internal-link" title="orionis.database.seeders.SeederRunner.__app">__app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__conn_manager" class="internal-link" title="orionis.database.seeders.SeederRunner.__conn_manager">__conn<wbr></wbr>_manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html#__discovered_cache" class="internal-link" title="orionis.database.seeders.SeederRunner.__discovered_cache">__discovered<wbr></wbr>_cache</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.database.html" class="internal-link" title="The parent of this package">database</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5267"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5267">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.compiler.html" class="internal-link" title="orionis.database.compiler">compiler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_BETWEEN_BOUNDS" class="internal-link" title="orionis.database.compiler._BETWEEN_BOUNDS">_BETWEEN<wbr></wbr>_BOUNDS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_COMPARATORS" class="internal-link" title="orionis.database.compiler._COMPARATORS">_COMPARATORS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_EQUALITY_OPERATORS" class="internal-link" title="orionis.database.compiler._EQUALITY_OPERATORS">_EQUALITY<wbr></wbr>_OPERATORS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_INEQUALITY_OPERATORS" class="internal-link" title="orionis.database.compiler._INEQUALITY_OPERATORS">_INEQUALITY<wbr></wbr>_OPERATORS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_PATTERN_OPERATORS" class="internal-link" title="orionis.database.compiler._PATTERN_OPERATORS">_PATTERN<wbr></wbr>_OPERATORS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.compiler.html#_SIMPLE_CLAUSES" class="internal-link" title="orionis.database.compiler._SIMPLE_CLAUSES">_SIMPLE<wbr></wbr>_CLAUSES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5268"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5268">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.connection.html" class="internal-link" title="orionis.database.connection">connection</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.connection._TransactionState.html" class="internal-link" title="orionis.database.connection._TransactionState">_<wbr></wbr>Transaction<wbr></wbr>State</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.connection.html#_text_statement" class="internal-link" title="orionis.database.connection._text_statement">_text<wbr></wbr>_statement</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.connection.html#_NO_ACTIVE_TRANSACTION" class="internal-link" title="orionis.database.connection._NO_ACTIVE_TRANSACTION">_NO<wbr></wbr>_ACTIVE<wbr></wbr>_TRANSACTION</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5269"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.connection_manager.html" class="internal-link" title="orionis.database.connection_manager">connection<wbr></wbr>_manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5270"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5270">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.contracts.html" class="internal-link" title="orionis.database.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.connection.html" class="internal-link" title="orionis.database.contracts.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.connection_manager.html" class="internal-link" title="orionis.database.contracts.connection_manager">connection<wbr></wbr>_manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.migration.html" class="internal-link" title="orionis.database.contracts.migration">migration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.migrator.html" class="internal-link" title="orionis.database.contracts.migrator">migrator</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.schema.html" class="internal-link" title="orionis.database.contracts.schema">schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.transaction.html" class="internal-link" title="orionis.database.contracts.transaction">transaction</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection"><wbr></wbr>IConnection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link" title="orionis.database.contracts.IConnectionManager"><wbr></wbr>IConnection<wbr></wbr>Manager</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.contracts.ITransaction.html" class="internal-link" title="orionis.database.contracts.ITransaction"><wbr></wbr>ITransaction</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5271"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5271">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.dialect.html" class="internal-link" title="orionis.database.dialect">dialect</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._MySQLParameterEscaper.html" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper">_<wbr></wbr>My<wbr></wbr>SQLParameter<wbr></wbr>Escaper</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_config_text" class="internal-link" title="orionis.database.dialect._config_text">_config<wbr></wbr>_text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_configure_mysql_binary_parameters" class="internal-link" title="orionis.database.dialect._configure_mysql_binary_parameters">_configure<wbr></wbr>_mysql<wbr></wbr>_binary<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_enum_value" class="internal-link" title="orionis.database.dialect._enum_value">_enum<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_is_sqlite_memory" class="internal-link" title="orionis.database.dialect._is_sqlite_memory">_is<wbr></wbr>_sqlite<wbr></wbr>_memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_mysql_session_commands" class="internal-link" title="orionis.database.dialect._mysql_session_commands">_mysql<wbr></wbr>_session<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_normalize_switch" class="internal-link" title="orionis.database.dialect._normalize_switch">_normalize<wbr></wbr>_switch</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_oracle_query" class="internal-link" title="orionis.database.dialect._oracle_query">_oracle<wbr></wbr>_query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_oracle_url" class="internal-link" title="orionis.database.dialect._oracle_url">_oracle<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_pgsql_connect_args" class="internal-link" title="orionis.database.dialect._pgsql_connect_args">_pgsql<wbr></wbr>_connect<wbr></wbr>_args</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_server_query" class="internal-link" title="orionis.database.dialect._server_query">_server<wbr></wbr>_query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_server_url" class="internal-link" title="orionis.database.dialect._server_url">_server<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_session_statements" class="internal-link" title="orionis.database.dialect._session_statements">_session<wbr></wbr>_statements</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_sqlite_pragmas" class="internal-link" title="orionis.database.dialect._sqlite_pragmas">_sqlite<wbr></wbr>_pragmas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_sqlite_url" class="internal-link" title="orionis.database.dialect._sqlite_url">_sqlite<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_yes_no" class="internal-link" title="orionis.database.dialect._yes_no">_yes<wbr></wbr>_no</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#build_engine_url" class="internal-link" title="orionis.database.dialect.build_engine_url">build<wbr></wbr>_engine<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#configure_engine" class="internal-link" title="orionis.database.dialect.configure_engine">configure<wbr></wbr>_engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#engine_options" class="internal-link" title="orionis.database.dialect.engine_options">engine<wbr></wbr>_options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#missing_dependency_error" class="internal-link" title="orionis.database.dialect.missing_dependency_error">missing<wbr></wbr>_dependency<wbr></wbr>_error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#resolve_driver" class="internal-link" title="orionis.database.dialect.resolve_driver">resolve<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_ASYNC_DIALECTS" class="internal-link" title="orionis.database.dialect._ASYNC_DIALECTS">_ASYNC<wbr></wbr>_DIALECTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_ASYNC_DRIVER_PACKAGES" class="internal-link" title="orionis.database.dialect._ASYNC_DRIVER_PACKAGES">_ASYNC<wbr></wbr>_DRIVER<wbr></wbr>_PACKAGES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_DEFAULT_ODBC_DRIVER" class="internal-link" title="orionis.database.dialect._DEFAULT_ODBC_DRIVER">_DEFAULT<wbr></wbr>_ODBC<wbr></wbr>_DRIVER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_IDENTIFIER_PATTERN" class="internal-link" title="orionis.database.dialect._IDENTIFIER_PATTERN">_IDENTIFIER<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_MYSQL_RELAXED_MODE" class="internal-link" title="orionis.database.dialect._MYSQL_RELAXED_MODE">_MYSQL<wbr></wbr>_RELAXED<wbr></wbr>_MODE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_MYSQL_STRICT_MODE" class="internal-link" title="orionis.database.dialect._MYSQL_STRICT_MODE">_MYSQL<wbr></wbr>_STRICT<wbr></wbr>_MODE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SQLITE_MEMORY_MARKERS" class="internal-link" title="orionis.database.dialect._SQLITE_MEMORY_MARKERS">_SQLITE<wbr></wbr>_MEMORY<wbr></wbr>_MARKERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SYNC_DIALECTS" class="internal-link" title="orionis.database.dialect._SYNC_DIALECTS">_SYNC<wbr></wbr>_DIALECTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SYNC_DRIVER_PACKAGES" class="internal-link" title="orionis.database.dialect._SYNC_DRIVER_PACKAGES">_SYNC<wbr></wbr>_DRIVER<wbr></wbr>_PACKAGES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5272"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5272">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.entities.html" class="internal-link" title="orionis.database.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.entities.result.html" class="internal-link" title="orionis.database.entities.result">result</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.entities.InsertResult.html" class="internal-link" title="orionis.database.entities.InsertResult"><wbr></wbr>Insert<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5273"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.exceptions.html" class="internal-link" title="orionis.database.exceptions">exceptions</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5274"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5274">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.migrations.html" class="internal-link" title="orionis.database.migrations">migrations</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.migrations.context.html" class="internal-link" title="orionis.database.migrations.context">context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.migrations.events.html" class="internal-link" title="orionis.database.migrations.events">events</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.migrations.migrator.html" class="internal-link" title="orionis.database.migrations.migrator">migrator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.migrations.Migrator.html" class="internal-link" title="orionis.database.migrations.Migrator"><wbr></wbr>Migrator</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5275"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5275">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.provider.html" class="internal-link" title="orionis.database.provider">provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.provider.ConnectionManagerProvider.html" class="internal-link" title="orionis.database.provider.ConnectionManagerProvider"><wbr></wbr>Connection<wbr></wbr>Manager<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5276"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5276">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema.html" class="internal-link" title="orionis.database.schema">schema</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.blueprint.html" class="internal-link" title="orionis.database.schema.blueprint">blueprint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.column.html" class="internal-link" title="orionis.database.schema.column">column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.comment.html" class="internal-link" title="orionis.database.schema.comment">comment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.definition_bucket.html" class="internal-link" title="orionis.database.schema.definition_bucket">definition<wbr></wbr>_bucket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.definitions.html" class="internal-link" title="orionis.database.schema.definitions">definitions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.foreign.html" class="internal-link" title="orionis.database.schema.foreign">foreign</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.index.html" class="internal-link" title="orionis.database.schema.index">index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.primary.html" class="internal-link" title="orionis.database.schema.primary">primary</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.schema.html" class="internal-link" title="orionis.database.schema.schema">schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.table_creation.html" class="internal-link" title="orionis.database.schema.table_creation">table<wbr></wbr>_creation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.timestamp.html" class="internal-link" title="orionis.database.schema.timestamp">timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.unique.html" class="internal-link" title="orionis.database.schema.unique">unique</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Blueprint.html" class="internal-link" title="orionis.database.schema.Blueprint"><wbr></wbr>Blueprint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column"><wbr></wbr>Column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment"><wbr></wbr>Comment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey"><wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index"><wbr></wbr>Index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey"><wbr></wbr>Primary<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Timestamps.html" class="internal-link" title="orionis.database.schema.Timestamps"><wbr></wbr>Timestamps</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique"><wbr></wbr>Unique</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5277"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5277">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.schema_provider.html" class="internal-link" title="orionis.database.schema_provider">schema<wbr></wbr>_provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema_provider.SchemaProvider.html" class="internal-link" title="orionis.database.schema_provider.SchemaProvider"><wbr></wbr>Schema<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5278"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.seeders.html" class="internal-link" title="orionis.database.seeders">seeders</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.events.html" class="internal-link" title="orionis.database.seeders.events">events</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.runner.html" class="internal-link" title="orionis.database.seeders.runner">runner</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.seeder.html" class="internal-link" title="orionis.database.seeders.seeder">seeder</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder"><wbr></wbr>Seeder</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.seeders.SeederRunner.html" class="internal-link" title="orionis.database.seeders.SeederRunner"><wbr></wbr>Seeder<wbr></wbr>Runner</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5279"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.transaction.html" class="internal-link" title="orionis.database.transaction">transaction</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5280"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5280">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.Connection.html" class="internal-link" title="orionis.database.Connection"><wbr></wbr>Connection</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#__init__" class="internal-link" title="orionis.database.Connection.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_acquire" class="internal-link" title="orionis.database.Connection._acquire">_acquire</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_getEngine" class="internal-link" title="orionis.database.Connection._getEngine">_get<wbr></wbr>Engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_queryException" class="internal-link" title="orionis.database.Connection._queryException">_query<wbr></wbr>Exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_releaseIfSettled" class="internal-link" title="orionis.database.Connection._releaseIfSettled">_release<wbr></wbr>If<wbr></wbr>Settled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_run" class="internal-link" title="orionis.database.Connection._run">_run</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_transactionState" class="internal-link" title="orionis.database.Connection._transactionState">_transaction<wbr></wbr>State</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#begin" class="internal-link" title="orionis.database.Connection.begin">begin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#commit" class="internal-link" title="orionis.database.Connection.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#createTable" class="internal-link" title="orionis.database.Connection.createTable">create<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#delete" class="internal-link" title="orionis.database.Connection.delete">delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#disconnect" class="internal-link" title="orionis.database.Connection.disconnect">disconnect</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#dropTable" class="internal-link" title="orionis.database.Connection.dropTable">drop<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#execute" class="internal-link" title="orionis.database.Connection.execute">execute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#getName" class="internal-link" title="orionis.database.Connection.getName">get<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#insert" class="internal-link" title="orionis.database.Connection.insert">insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#inTransaction" class="internal-link" title="orionis.database.Connection.inTransaction">in<wbr></wbr>Transaction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#rollback" class="internal-link" title="orionis.database.Connection.rollback">rollback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#scalar" class="internal-link" title="orionis.database.Connection.scalar">scalar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#select" class="internal-link" title="orionis.database.Connection.select">select</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#statement" class="internal-link" title="orionis.database.Connection.statement">statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#transaction" class="internal-link" title="orionis.database.Connection.transaction">transaction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#update" class="internal-link" title="orionis.database.Connection.update">update</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#__slots__" class="internal-link" title="orionis.database.Connection.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_compiler" class="internal-link" title="orionis.database.Connection._compiler">_compiler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_config" class="internal-link" title="orionis.database.Connection._config">_config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_engine" class="internal-link" title="orionis.database.Connection._engine">_engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_name" class="internal-link" title="orionis.database.Connection._name">_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Connection.html#_tx_state" class="internal-link" title="orionis.database.Connection._tx_state">_tx<wbr></wbr>_state</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5281"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5281">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.ConnectionManager.html" class="internal-link" title="orionis.database.ConnectionManager"><wbr></wbr>Connection<wbr></wbr>Manager</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#__init__" class="internal-link" title="orionis.database.ConnectionManager.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#__unknownConnectionMessage" class="internal-link" title="orionis.database.ConnectionManager.__unknownConnectionMessage">__unknown<wbr></wbr>Connection<wbr></wbr>Message</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#addConnection" class="internal-link" title="orionis.database.ConnectionManager.addConnection">add<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#configFor" class="internal-link" title="orionis.database.ConnectionManager.configFor">config<wbr></wbr>For</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#connection" class="internal-link" title="orionis.database.ConnectionManager.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#disconnect" class="internal-link" title="orionis.database.ConnectionManager.disconnect">disconnect</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#getDefaultName" class="internal-link" title="orionis.database.ConnectionManager.getDefaultName">get<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#hasConnection" class="internal-link" title="orionis.database.ConnectionManager.hasConnection">has<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#setDefaultName" class="internal-link" title="orionis.database.ConnectionManager.setDefaultName">set<wbr></wbr>Default<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#__slots__" class="internal-link" title="orionis.database.ConnectionManager.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#_cached_connections" class="internal-link" title="orionis.database.ConnectionManager._cached_connections">_cached<wbr></wbr>_connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#_connections" class="internal-link" title="orionis.database.ConnectionManager._connections">_connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.ConnectionManager.html#_default" class="internal-link" title="orionis.database.ConnectionManager._default">_default</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5282"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5282">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.Migration.html" class="internal-link" title="orionis.database.Migration"><wbr></wbr>Migration</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Migration.html#down" class="internal-link" title="orionis.database.Migration.down">down</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Migration.html#up" class="internal-link" title="orionis.database.Migration.up">up</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Migration.html#__slots__" class="internal-link" title="orionis.database.Migration.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5283"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5283">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.SQLCompiler.html" class="internal-link" title="orionis.database.SQLCompiler"><wbr></wbr>SQLCompiler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_betweenExpression" class="internal-link" title="orionis.database.SQLCompiler._betweenExpression">_between<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_combineExpressions" class="internal-link" title="orionis.database.SQLCompiler._combineExpressions">_combine<wbr></wbr>Expressions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_rawElement" class="internal-link" title="orionis.database.SQLCompiler._rawElement">_raw<wbr></wbr>Element</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#supportsBatchInsert" class="internal-link" title="orionis.database.SQLCompiler.supportsBatchInsert">supports<wbr></wbr>Batch<wbr></wbr>Insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#__init__" class="internal-link" title="orionis.database.SQLCompiler.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_aggregateExpression" class="internal-link" title="orionis.database.SQLCompiler._aggregateExpression">_aggregate<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_applyJoin" class="internal-link" title="orionis.database.SQLCompiler._applyJoin">_apply<wbr></wbr>Join</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_applyOrderingAndPaging" class="internal-link" title="orionis.database.SQLCompiler._applyOrderingAndPaging">_apply<wbr></wbr>Ordering<wbr></wbr>And<wbr></wbr>Paging</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_applyUnions" class="internal-link" title="orionis.database.SQLCompiler._applyUnions">_apply<wbr></wbr>Unions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_bareNameForIdentifier" class="internal-link" title="orionis.database.SQLCompiler._bareNameForIdentifier">_bare<wbr></wbr>Name<wbr></wbr>For<wbr></wbr>Identifier</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_basicExpression" class="internal-link" title="orionis.database.SQLCompiler._basicExpression">_basic<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_buildSelect" class="internal-link" title="orionis.database.SQLCompiler._buildSelect">_build<wbr></wbr>Select</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_cacheKey" class="internal-link" title="orionis.database.SQLCompiler._cacheKey">_cache<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_clauseExpression" class="internal-link" title="orionis.database.SQLCompiler._clauseExpression">_clause<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_clauseValue" class="internal-link" title="orionis.database.SQLCompiler._clauseValue">_clause<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_collectClauseColumnNames" class="internal-link" title="orionis.database.SQLCompiler._collectClauseColumnNames">_collect<wbr></wbr>Clause<wbr></wbr>Column<wbr></wbr>Names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_collectPlanColumnNames" class="internal-link" title="orionis.database.SQLCompiler._collectPlanColumnNames">_collect<wbr></wbr>Plan<wbr></wbr>Column<wbr></wbr>Names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_columnComparison" class="internal-link" title="orionis.database.SQLCompiler._columnComparison">_column<wbr></wbr>Comparison</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_columnlessExpression" class="internal-link" title="orionis.database.SQLCompiler._columnlessExpression">_columnless<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_ensureRawColumns" class="internal-link" title="orionis.database.SQLCompiler._ensureRawColumns">_ensure<wbr></wbr>Raw<wbr></wbr>Columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_ensureReferencedColumns" class="internal-link" title="orionis.database.SQLCompiler._ensureReferencedColumns">_ensure<wbr></wbr>Referenced<wbr></wbr>Columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_ensureReferencedTable" class="internal-link" title="orionis.database.SQLCompiler._ensureReferencedTable">_ensure<wbr></wbr>Referenced<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_ensureSelectRawColumns" class="internal-link" title="orionis.database.SQLCompiler._ensureSelectRawColumns">_ensure<wbr></wbr>Select<wbr></wbr>Raw<wbr></wbr>Columns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_joinCondition" class="internal-link" title="orionis.database.SQLCompiler._joinCondition">_join<wbr></wbr>Condition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_joinConditionExpression" class="internal-link" title="orionis.database.SQLCompiler._joinConditionExpression">_join<wbr></wbr>Condition<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_joinSource" class="internal-link" title="orionis.database.SQLCompiler._joinSource">_join<wbr></wbr>Source</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_physicalName" class="internal-link" title="orionis.database.SQLCompiler._physicalName">_physical<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_projectionElement" class="internal-link" title="orionis.database.SQLCompiler._projectionElement">_projection<wbr></wbr>Element</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_resolveColumn" class="internal-link" title="orionis.database.SQLCompiler._resolveColumn">_resolve<wbr></wbr>Column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_resolveSources" class="internal-link" title="orionis.database.SQLCompiler._resolveSources">_resolve<wbr></wbr>Sources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_selectProjection" class="internal-link" title="orionis.database.SQLCompiler._selectProjection">_select<wbr></wbr>Projection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_splitQualifiedColumn" class="internal-link" title="orionis.database.SQLCompiler._splitQualifiedColumn">_split<wbr></wbr>Qualified<wbr></wbr>Column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_sqlColumn" class="internal-link" title="orionis.database.SQLCompiler._sqlColumn">_sql<wbr></wbr>Column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_sqlTable" class="internal-link" title="orionis.database.SQLCompiler._sqlTable">_sql<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_sqlType" class="internal-link" title="orionis.database.SQLCompiler._sqlType">_sql<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_tableConstraints" class="internal-link" title="orionis.database.SQLCompiler._tableConstraints">_table<wbr></wbr>Constraints</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_whereExpression" class="internal-link" title="orionis.database.SQLCompiler._whereExpression">_where<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileCreateTable" class="internal-link" title="orionis.database.SQLCompiler.compileCreateTable">compile<wbr></wbr>Create<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileDelete" class="internal-link" title="orionis.database.SQLCompiler.compileDelete">compile<wbr></wbr>Delete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileDropTable" class="internal-link" title="orionis.database.SQLCompiler.compileDropTable">compile<wbr></wbr>Drop<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileInsert" class="internal-link" title="orionis.database.SQLCompiler.compileInsert">compile<wbr></wbr>Insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileSelect" class="internal-link" title="orionis.database.SQLCompiler.compileSelect">compile<wbr></wbr>Select</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#compileUpdate" class="internal-link" title="orionis.database.SQLCompiler.compileUpdate">compile<wbr></wbr>Update</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_TYPE_BUILDERS" class="internal-link" title="orionis.database.SQLCompiler._TYPE_BUILDERS">_TYPE<wbr></wbr>_BUILDERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#__slots__" class="internal-link" title="orionis.database.SQLCompiler.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_definitions" class="internal-link" title="orionis.database.SQLCompiler._definitions">_definitions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_metadata" class="internal-link" title="orionis.database.SQLCompiler._metadata">_metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_prefix" class="internal-link" title="orionis.database.SQLCompiler._prefix">_prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_tables" class="internal-link" title="orionis.database.SQLCompiler._tables">_tables</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5284"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId5284">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.Transaction.html" class="internal-link" title="orionis.database.Transaction"><wbr></wbr>Transaction</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Transaction.html#__aenter__" class="internal-link" title="orionis.database.Transaction.__aenter__">__aenter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Transaction.html#__aexit__" class="internal-link" title="orionis.database.Transaction.__aexit__">__aexit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Transaction.html#__init__" class="internal-link" title="orionis.database.Transaction.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Transaction.html#__slots__" class="internal-link" title="orionis.database.Transaction.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.Transaction.html#_connection" class="internal-link" title="orionis.database.Transaction._connection">_connection</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5285"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.ConnectionNotFoundException.html" class="internal-link" title="orionis.database.ConnectionNotFoundException"><wbr></wbr>Connection<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5286"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.DatabaseException.html" class="internal-link" title="orionis.database.DatabaseException"><wbr></wbr>Database<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5287"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.MigrationNotFoundException.html" class="internal-link" title="orionis.database.MigrationNotFoundException"><wbr></wbr>Migration<wbr></wbr>Not<wbr></wbr>Found<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5288"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.MissingDatabaseDependencyException.html" class="internal-link" title="orionis.database.MissingDatabaseDependencyException"><wbr></wbr>Missing<wbr></wbr>Database<wbr></wbr>Dependency<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5289"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.QueryException.html" class="internal-link" title="orionis.database.QueryException"><wbr></wbr>Query<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5290"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.TransactionException.html" class="internal-link" title="orionis.database.TransactionException"><wbr></wbr>Transaction<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5291"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.UnsupportedDriverException.html" class="internal-link" title="orionis.database.UnsupportedDriverException"><wbr></wbr>Unsupported<wbr></wbr>Driver<wbr></wbr>Exception</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.html#__dir__" class="internal-link" title="orionis.database.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.html#__getattr__" class="internal-link" title="orionis.database.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.html#_EXPORTS" class="internal-link" title="orionis.database._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="package"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.database.html" class="internal-link" title="orionis.database">database</a></code><wbr></wbr>.<code><a href="orionis.database.seeders.html" class="internal-link" title="orionis.database.seeders">seeders</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          package documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/database/seeders/__init__.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id505">
+  
+  
+  <tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.database.seeders.events.html" class="internal-link" title="orionis.database.seeders.events">events</a></code></td>
+    <td><span class="rst-undocumented">No module docstring; 0/1 constant, 1/1 class documented</span></td>
+  </tr><tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.database.seeders.runner.html" class="internal-link" title="orionis.database.seeders.runner">runner</a></code></td>
+    <td><span class="rst-undocumented">No module docstring; 0/1 constant, 1/1 function, 1/1 exception documented</span></td>
+  </tr><tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.database.seeders.seeder.html" class="internal-link" title="orionis.database.seeders.seeder">seeder</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            <p class="fromInitPy">From <code>__init__.py</code>:</p><table class="children sortable" id="id506">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder"><wbr></wbr>Seeder</a></code></td>
+    <td>Base class for asynchronous application database seeders.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.database.seeders.SeederRunner.html" class="internal-link" title="orionis.database.seeders.SeederRunner"><wbr></wbr>Seeder<wbr></wbr>Runner</a></code></td>
+    <td>Apply new seeders exactly once on the selected database connection.</td>
+  </tr>
+</table>
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

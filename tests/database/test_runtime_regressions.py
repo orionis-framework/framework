@@ -1,6 +1,5 @@
 from __future__ import annotations
 import asyncio
-import unittest
 from types import MappingProxyType
 from unittest.mock import AsyncMock, MagicMock
 from sqlalchemy import event, literal
@@ -20,8 +19,9 @@ from orionis.orm.query.expressions import (
 )
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer
+from orionis.test import TestCase
 
-class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
+class TestRuntimeRegressions(TestCase):
     """Exercise connection isolation and compiler behavior without application DI."""
 
     async def asyncSetUp(self) -> None:
@@ -488,7 +488,7 @@ class TestRuntimeRegressions(unittest.IsolatedAsyncioTestCase):
         """
         self.assertFalse(hasattr(self.connection, "__dict__"))
 
-class TestTransactionStartFailures(unittest.IsolatedAsyncioTestCase):
+class TestTransactionStartFailures(TestCase):
     """Verify acquired resources are released when a transaction cannot begin."""
 
     async def testBeginFailureClosesRawConnection(self) -> None:

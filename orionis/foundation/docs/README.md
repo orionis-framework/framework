@@ -3,6 +3,31 @@
 Spanish manual and performance review: [README.es.md](README.es.md).
 Measured samples: [benchmark-results.json](benchmark-results.json).
 
+## Shared Environment Defaults
+
+The HTTP rate limiter now derives its Redis URL from `REDIS_HOST`, `REDIS_PORT`,
+`REDIS_DB` and `REDIS_PASSWORD` when `RATE_LIMIT_REDIS_URL` is absent. Credentials
+are percent-encoded and IPv6 hosts are bracketed. Cache, queues and scheduler keep
+their existing fields and isolated namespaces; scheduler's absent host default is
+also `127.0.0.1`. An explicit service URL takes precedence without reading unused
+shared settings.
+
+`config/mcp.py` exposes all 14 MCP settings. Factories read `MCP_<FIELD_NAME>` for
+every new entity; request size and concurrency can fall back to the corresponding
+HTTP environment limits. Core WebSocket entities now read their environment just
+like the application template. Explicit CORS origins are shared when protocol
+overrides are absent; wildcard CORS entries never implicitly grant WebSocket/MCP
+access. Empty protocol overrides remain meaningful and take precedence.
+
+The example environment has one `DB_DATABASE` and no blank overrides that invalidate
+cache, mail, scheduler or database entities. An isolated child-process test creates
+all 16 application configurations from that file. This validates configuration,
+not connectivity or credentials for external services.
+
+`withRouting(..., *, websocket=None)` adds a separate WebSocket route file without
+changing existing positional parameters. Route import validation reads each file
+once, accepting empty optional files through the inspector's `allow_empty` flag.
+
 ## Explicit Readiness And Headless Startup
 
 `create()` retains its synchronous configuration/registration behavior.

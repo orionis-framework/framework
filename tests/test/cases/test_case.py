@@ -3,6 +3,9 @@ import contextvars
 import fnmatch
 import inspect
 import re
+from orionis.foundation.contracts.application import IApplication
+from orionis.mcp.protocol.constants import MCP_PROTOCOL_VERSION
+from orionis.mcp.server.primitives import Server
 from orionis.test import TestCase
 from orionis.test.cases import TestCase as PackageTestCase
 from orionis.test.cases.case import (
@@ -32,6 +35,12 @@ def _probe_method(_self: object) -> str:
 def _make_probe(name: str, member: object) -> type:
     """Create a throwaway TestCase subclass exposing a single member."""
     return type("_Probe", (CoreTestCase,), {name: member})
+
+class _McpServer(Server):
+    """Expose an empty server through the ordinary test case."""
+
+    name = "test-case-mcp"
+    version = "1.0.0"
 
 class TestTestCaseDefinition(TestCase):
 
@@ -247,6 +256,29 @@ class TestTestCaseWrapping(TestCase):
         self.assertNotIn("testProbe", probe.__dict__)
 
 class TestTestCaseResolution(TestCase):
+
+    async def testMcpReusesTheRunnerApplication(self, app: IApplication) -> None:
+        """Use MCP support through the standard test case and runner application.
+
+        Parameters
+        ----------
+        app : IApplication
+            Booted application injected by the Orionis test runner.
+
+        Returns
+        -------
+        None
+            Verify discovery succeeds without constructing another application.
+        """
+        client = await self.mcp(_McpServer)
+        self.assertIsInstance(client.app, IApplication)
+        self.assertIs(client.app, app)
+        response = await client.request("server/discover")
+        response.assertOk()
+        self.assertEqual(response.message["result"]["resultType"], "complete")
+        self.assertEqual(
+            response.message["result"]["supportedVersions"], [MCP_PROTOCOL_VERSION],
+        )
 
     def testResolveTestReturnsCoroutineFunction(self) -> None:
         """

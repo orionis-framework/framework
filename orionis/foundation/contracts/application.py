@@ -288,13 +288,15 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def withRouting(
+    def withRouting(  # noqa: PLR0913
         self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
         health: str | None = None,
         ai: str | list[str] | None = None,
+        *,
+        websocket: str | list[str] | None = None,
     ) -> Self:
         """
         Configure routing paths for the application.
@@ -311,6 +313,8 @@ class IApplication(IContainer, ABC):
             Path to health check route.
         ai : str | list[str] | None, optional
             MCP registration files loaded for HTTP and CLI runtimes.
+        websocket : str | list[str] | None, optional
+            WebSocket and Hub route files using the web middleware profile.
 
         Returns
         -------

@@ -1,0 +1,4494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.console.fluent</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code class="thisobject"><a href="orionis.console.fluent.html" class="internal-link" title="This package">fluent</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3752"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.command.html" class="internal-link" title="orionis.console.fluent.command">command</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3753"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3753">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.contracts.html" class="internal-link" title="orionis.console.fluent.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.contracts.command.html" class="internal-link" title="orionis.console.fluent.contracts.command">command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.contracts.task.html" class="internal-link" title="orionis.console.fluent.contracts.task">task</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3754"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.task.html" class="internal-link" title="orionis.console.fluent.task">task</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3755"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3755">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.Command.html" class="internal-link" title="orionis.console.fluent.Command"><wbr></wbr>Command</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__init__" class="internal-link" title="orionis.console.fluent.Command.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#arguments" class="internal-link" title="orionis.console.fluent.Command.arguments">arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#description" class="internal-link" title="orionis.console.fluent.Command.description">description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#get" class="internal-link" title="orionis.console.fluent.Command.get">get</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#timestamp" class="internal-link" title="orionis.console.fluent.Command.timestamp">timestamp</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__arguments" class="internal-link" title="orionis.console.fluent.Command.__arguments">__arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__concrete" class="internal-link" title="orionis.console.fluent.Command.__concrete">__concrete</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__description" class="internal-link" title="orionis.console.fluent.Command.__description">__description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__method" class="internal-link" title="orionis.console.fluent.Command.__method">__method</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__signature" class="internal-link" title="orionis.console.fluent.Command.__signature">__signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html#__timestamp" class="internal-link" title="orionis.console.fluent.Command.__timestamp">__timestamp</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3756"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3756">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.Task.html" class="internal-link" title="orionis.console.fluent.Task"><wbr></wbr>Task</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__datetime" class="internal-link" title="orionis.console.fluent.Task.__datetime">__datetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__init__" class="internal-link" title="orionis.console.fluent.Task.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#coalesce" class="internal-link" title="orionis.console.fluent.Task.coalesce">coalesce</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#cron" class="internal-link" title="orionis.console.fluent.Task.cron">cron</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#daily" class="internal-link" title="orionis.console.fluent.Task.daily">daily</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#dailyAt" class="internal-link" title="orionis.console.fluent.Task.dailyAt">daily<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#endDate" class="internal-link" title="orionis.console.fluent.Task.endDate">end<wbr></wbr>Date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#entity" class="internal-link" title="orionis.console.fluent.Task.entity">entity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#every" class="internal-link" title="orionis.console.fluent.Task.every">every</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyDays" class="internal-link" title="orionis.console.fluent.Task.everyDays">every<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyDaysAt" class="internal-link" title="orionis.console.fluent.Task.everyDaysAt">every<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyEightHours" class="internal-link" title="orionis.console.fluent.Task.everyEightHours">every<wbr></wbr>Eight<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyEightHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyEightHoursAt">every<wbr></wbr>Eight<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyElevenHours" class="internal-link" title="orionis.console.fluent.Task.everyElevenHours">every<wbr></wbr>Eleven<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyElevenHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyElevenHoursAt">every<wbr></wbr>Eleven<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyEvenHours" class="internal-link" title="orionis.console.fluent.Task.everyEvenHours">every<wbr></wbr>Even<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFifteenMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFifteenMinutes">every<wbr></wbr>Fifteen<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFifteenMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFifteenMinutesAt">every<wbr></wbr>Fifteen<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFifteenSeconds" class="internal-link" title="orionis.console.fluent.Task.everyFifteenSeconds">every<wbr></wbr>Fifteen<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftyFiveMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFiftyFiveMinutes">every<wbr></wbr>Fifty<wbr></wbr>Five<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftyFiveMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFiftyFiveMinutesAt">every<wbr></wbr>Fifty<wbr></wbr>Five<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftyFiveSeconds" class="internal-link" title="orionis.console.fluent.Task.everyFiftyFiveSeconds">every<wbr></wbr>Fifty<wbr></wbr>Five<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftyMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFiftyMinutes">every<wbr></wbr>Fifty<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftyMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFiftyMinutesAt">every<wbr></wbr>Fifty<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiftySeconds" class="internal-link" title="orionis.console.fluent.Task.everyFiftySeconds">every<wbr></wbr>Fifty<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveDays" class="internal-link" title="orionis.console.fluent.Task.everyFiveDays">every<wbr></wbr>Five<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveDaysAt" class="internal-link" title="orionis.console.fluent.Task.everyFiveDaysAt">every<wbr></wbr>Five<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveHours" class="internal-link" title="orionis.console.fluent.Task.everyFiveHours">every<wbr></wbr>Five<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyFiveHoursAt">every<wbr></wbr>Five<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFiveMinutes">every<wbr></wbr>Five<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFiveMinutesAt">every<wbr></wbr>Five<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFiveSeconds" class="internal-link" title="orionis.console.fluent.Task.everyFiveSeconds">every<wbr></wbr>Five<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortyFiveMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFortyFiveMinutes">every<wbr></wbr>Forty<wbr></wbr>Five<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortyFiveMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFortyFiveMinutesAt">every<wbr></wbr>Forty<wbr></wbr>Five<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortyFiveSeconds" class="internal-link" title="orionis.console.fluent.Task.everyFortyFiveSeconds">every<wbr></wbr>Forty<wbr></wbr>Five<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortyMinutes" class="internal-link" title="orionis.console.fluent.Task.everyFortyMinutes">every<wbr></wbr>Forty<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortyMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyFortyMinutesAt">every<wbr></wbr>Forty<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFortySeconds" class="internal-link" title="orionis.console.fluent.Task.everyFortySeconds">every<wbr></wbr>Forty<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFourDays" class="internal-link" title="orionis.console.fluent.Task.everyFourDays">every<wbr></wbr>Four<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFourDaysAt" class="internal-link" title="orionis.console.fluent.Task.everyFourDaysAt">every<wbr></wbr>Four<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFourHours" class="internal-link" title="orionis.console.fluent.Task.everyFourHours">every<wbr></wbr>Four<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFourHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyFourHoursAt">every<wbr></wbr>Four<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyFridayAt" class="internal-link" title="orionis.console.fluent.Task.everyFridayAt">every<wbr></wbr>Friday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyHours" class="internal-link" title="orionis.console.fluent.Task.everyHours">every<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyHoursAt">every<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyMinuteAt" class="internal-link" title="orionis.console.fluent.Task.everyMinuteAt">every<wbr></wbr>Minute<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyMinutes" class="internal-link" title="orionis.console.fluent.Task.everyMinutes">every<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyMinutesAt">every<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyMondayAt" class="internal-link" title="orionis.console.fluent.Task.everyMondayAt">every<wbr></wbr>Monday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyNineHours" class="internal-link" title="orionis.console.fluent.Task.everyNineHours">every<wbr></wbr>Nine<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyNineHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyNineHoursAt">every<wbr></wbr>Nine<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyOddHours" class="internal-link" title="orionis.console.fluent.Task.everyOddHours">every<wbr></wbr>Odd<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySaturdayAt" class="internal-link" title="orionis.console.fluent.Task.everySaturdayAt">every<wbr></wbr>Saturday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySeconds" class="internal-link" title="orionis.console.fluent.Task.everySeconds">every<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySevenDays" class="internal-link" title="orionis.console.fluent.Task.everySevenDays">every<wbr></wbr>Seven<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySevenDaysAt" class="internal-link" title="orionis.console.fluent.Task.everySevenDaysAt">every<wbr></wbr>Seven<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySevenHours" class="internal-link" title="orionis.console.fluent.Task.everySevenHours">every<wbr></wbr>Seven<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySevenHoursAt" class="internal-link" title="orionis.console.fluent.Task.everySevenHoursAt">every<wbr></wbr>Seven<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySixDays" class="internal-link" title="orionis.console.fluent.Task.everySixDays">every<wbr></wbr>Six<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySixDaysAt" class="internal-link" title="orionis.console.fluent.Task.everySixDaysAt">every<wbr></wbr>Six<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySixHours" class="internal-link" title="orionis.console.fluent.Task.everySixHours">every<wbr></wbr>Six<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySixHoursAt" class="internal-link" title="orionis.console.fluent.Task.everySixHoursAt">every<wbr></wbr>Six<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everySundayAt" class="internal-link" title="orionis.console.fluent.Task.everySundayAt">every<wbr></wbr>Sunday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTenHours" class="internal-link" title="orionis.console.fluent.Task.everyTenHours">every<wbr></wbr>Ten<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTenHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyTenHoursAt">every<wbr></wbr>Ten<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTenMinutes" class="internal-link" title="orionis.console.fluent.Task.everyTenMinutes">every<wbr></wbr>Ten<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTenMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyTenMinutesAt">every<wbr></wbr>Ten<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTenSeconds" class="internal-link" title="orionis.console.fluent.Task.everyTenSeconds">every<wbr></wbr>Ten<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtyFiveMinutes" class="internal-link" title="orionis.console.fluent.Task.everyThirtyFiveMinutes">every<wbr></wbr>Thirty<wbr></wbr>Five<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtyFiveMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyThirtyFiveMinutesAt">every<wbr></wbr>Thirty<wbr></wbr>Five<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtyFiveSeconds" class="internal-link" title="orionis.console.fluent.Task.everyThirtyFiveSeconds">every<wbr></wbr>Thirty<wbr></wbr>Five<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtyMinutes" class="internal-link" title="orionis.console.fluent.Task.everyThirtyMinutes">every<wbr></wbr>Thirty<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtyMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyThirtyMinutesAt">every<wbr></wbr>Thirty<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThirtySeconds" class="internal-link" title="orionis.console.fluent.Task.everyThirtySeconds">every<wbr></wbr>Thirty<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThreeDays" class="internal-link" title="orionis.console.fluent.Task.everyThreeDays">every<wbr></wbr>Three<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThreeDaysAt" class="internal-link" title="orionis.console.fluent.Task.everyThreeDaysAt">every<wbr></wbr>Three<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThreeHours" class="internal-link" title="orionis.console.fluent.Task.everyThreeHours">every<wbr></wbr>Three<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThreeHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyThreeHoursAt">every<wbr></wbr>Three<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyThursdayAt" class="internal-link" title="orionis.console.fluent.Task.everyThursdayAt">every<wbr></wbr>Thursday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTuesdayAt" class="internal-link" title="orionis.console.fluent.Task.everyTuesdayAt">every<wbr></wbr>Tuesday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwelveHours" class="internal-link" title="orionis.console.fluent.Task.everyTwelveHours">every<wbr></wbr>Twelve<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwelveHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyTwelveHoursAt">every<wbr></wbr>Twelve<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentyFiveMinutes" class="internal-link" title="orionis.console.fluent.Task.everyTwentyFiveMinutes">every<wbr></wbr>Twenty<wbr></wbr>Five<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentyFiveMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyTwentyFiveMinutesAt">every<wbr></wbr>Twenty<wbr></wbr>Five<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentyFiveSeconds" class="internal-link" title="orionis.console.fluent.Task.everyTwentyFiveSeconds">every<wbr></wbr>Twenty<wbr></wbr>Five<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentyMinutes" class="internal-link" title="orionis.console.fluent.Task.everyTwentyMinutes">every<wbr></wbr>Twenty<wbr></wbr>Minutes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentyMinutesAt" class="internal-link" title="orionis.console.fluent.Task.everyTwentyMinutesAt">every<wbr></wbr>Twenty<wbr></wbr>Minutes<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwentySeconds" class="internal-link" title="orionis.console.fluent.Task.everyTwentySeconds">every<wbr></wbr>Twenty<wbr></wbr>Seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwoDays" class="internal-link" title="orionis.console.fluent.Task.everyTwoDays">every<wbr></wbr>Two<wbr></wbr>Days</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwoDaysAt" class="internal-link" title="orionis.console.fluent.Task.everyTwoDaysAt">every<wbr></wbr>Two<wbr></wbr>Days<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwoHours" class="internal-link" title="orionis.console.fluent.Task.everyTwoHours">every<wbr></wbr>Two<wbr></wbr>Hours</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyTwoHoursAt" class="internal-link" title="orionis.console.fluent.Task.everyTwoHoursAt">every<wbr></wbr>Two<wbr></wbr>Hours<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyWednesdayAt" class="internal-link" title="orionis.console.fluent.Task.everyWednesdayAt">every<wbr></wbr>Wednesday<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#everyWeeks" class="internal-link" title="orionis.console.fluent.Task.everyWeeks">every<wbr></wbr>Weeks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#hourly" class="internal-link" title="orionis.console.fluent.Task.hourly">hourly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#hourlyAt" class="internal-link" title="orionis.console.fluent.Task.hourlyAt">hourly<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#maxInstances" class="internal-link" title="orionis.console.fluent.Task.maxInstances">max<wbr></wbr>Instances</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#misfireGraceTime" class="internal-link" title="orionis.console.fluent.Task.misfireGraceTime">misfire<wbr></wbr>Grace<wbr></wbr>Time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#on" class="internal-link" title="orionis.console.fluent.Task.on">on</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#onceAt" class="internal-link" title="orionis.console.fluent.Task.onceAt">once<wbr></wbr>At</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#purpose" class="internal-link" title="orionis.console.fluent.Task.purpose">purpose</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#randomDelay" class="internal-link" title="orionis.console.fluent.Task.randomDelay">random<wbr></wbr>Delay</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#registerListener" class="internal-link" title="orionis.console.fluent.Task.registerListener">register<wbr></wbr>Listener</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#startDate" class="internal-link" title="orionis.console.fluent.Task.startDate">start<wbr></wbr>Date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#weekly" class="internal-link" title="orionis.console.fluent.Task.weekly">weekly</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#_ERROR_MSG_INVALID_HOUR" class="internal-link" title="orionis.console.fluent.Task._ERROR_MSG_INVALID_HOUR">_ERROR<wbr></wbr>_MSG<wbr></wbr>_INVALID<wbr></wbr>_HOUR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#_ERROR_MSG_INVALID_INTERVAL" class="internal-link" title="orionis.console.fluent.Task._ERROR_MSG_INVALID_INTERVAL">_ERROR<wbr></wbr>_MSG<wbr></wbr>_INVALID<wbr></wbr>_INTERVAL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#_ERROR_MSG_INVALID_MINUTE" class="internal-link" title="orionis.console.fluent.Task._ERROR_MSG_INVALID_MINUTE">_ERROR<wbr></wbr>_MSG<wbr></wbr>_INVALID<wbr></wbr>_MINUTE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#_ERROR_MSG_INVALID_SECOND" class="internal-link" title="orionis.console.fluent.Task._ERROR_MSG_INVALID_SECOND">_ERROR<wbr></wbr>_MSG<wbr></wbr>_INVALID<wbr></wbr>_SECOND</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#_LISTENER_METHODS_MAP" class="internal-link" title="orionis.console.fluent.Task._LISTENER_METHODS_MAP">_LISTENER<wbr></wbr>_METHODS<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__args" class="internal-link" title="orionis.console.fluent.Task.__args">__args</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__coalesce" class="internal-link" title="orionis.console.fluent.Task.__coalesce">__coalesce</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__default_tz" class="internal-link" title="orionis.console.fluent.Task.__default_tz">__default<wbr></wbr>_tz</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__details" class="internal-link" title="orionis.console.fluent.Task.__details">__details</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__end_date" class="internal-link" title="orionis.console.fluent.Task.__end_date">__end<wbr></wbr>_date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__kwargs" class="internal-link" title="orionis.console.fluent.Task.__kwargs">__kwargs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__listeners" class="internal-link" title="orionis.console.fluent.Task.__listeners">__listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__max_instances" class="internal-link" title="orionis.console.fluent.Task.__max_instances">__max<wbr></wbr>_instances</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__misfire_grace_time" class="internal-link" title="orionis.console.fluent.Task.__misfire_grace_time">__misfire<wbr></wbr>_grace<wbr></wbr>_time</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__purpose" class="internal-link" title="orionis.console.fluent.Task.__purpose">__purpose</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__random_delay" class="internal-link" title="orionis.console.fluent.Task.__random_delay">__random<wbr></wbr>_delay</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__signature" class="internal-link" title="orionis.console.fluent.Task.__signature">__signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__start_date" class="internal-link" title="orionis.console.fluent.Task.__start_date">__start<wbr></wbr>_date</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html#__trigger" class="internal-link" title="orionis.console.fluent.Task.__trigger">__trigger</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.console.html" class="internal-link" title="The parent of this package">console</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3757"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3757">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.args.html" class="internal-link" title="orionis.console.args">args</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.args.argument.html" class="internal-link" title="orionis.console.args.argument">argument</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3758"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3758">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.base.html" class="internal-link" title="orionis.console.base">base</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.command.html" class="internal-link" title="orionis.console.base.command">command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.contracts.html" class="internal-link" title="orionis.console.base.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.listener.html" class="internal-link" title="orionis.console.base.listener">listener</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.scheduler.html" class="internal-link" title="orionis.console.base.scheduler">scheduler</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.BaseCommand.html" class="internal-link" title="orionis.console.base.BaseCommand"><wbr></wbr>Base<wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.BaseScheduler.html" class="internal-link" title="orionis.console.base.BaseScheduler"><wbr></wbr>Base<wbr></wbr>Scheduler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.BaseTaskListener.html" class="internal-link" title="orionis.console.base.BaseTaskListener"><wbr></wbr>Base<wbr></wbr>Task<wbr></wbr>Listener</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.html#__dir__" class="internal-link" title="orionis.console.base.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.html#__getattr__" class="internal-link" title="orionis.console.base.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.base.html#_EXPORTS" class="internal-link" title="orionis.console.base._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3759"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3759">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.html" class="internal-link" title="orionis.console.commands">commands</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.db.html" class="internal-link" title="orionis.console.commands.db">db</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make.html" class="internal-link" title="orionis.console.commands.make">make</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.mcp.html" class="internal-link" title="orionis.console.commands.mcp">mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.migrate.html" class="internal-link" title="orionis.console.commands.migrate">migrate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.queue.html" class="internal-link" title="orionis.console.commands.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.route.html" class="internal-link" title="orionis.console.commands.route">route</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.schedule.html" class="internal-link" title="orionis.console.commands.schedule">schedule</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.seed.html" class="internal-link" title="orionis.console.commands.seed">seed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.serve.html" class="internal-link" title="orionis.console.commands.serve">serve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.support.html" class="internal-link" title="orionis.console.commands.support">support</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.test.html" class="internal-link" title="orionis.console.commands.test">test</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3760"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3760">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.contracts.html" class="internal-link" title="orionis.console.contracts">contracts</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.kernel.html" class="internal-link" title="orionis.console.contracts.kernel">kernel</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.schedule.html" class="internal-link" title="orionis.console.contracts.schedule">schedule</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.store.html" class="internal-link" title="orionis.console.contracts.store">store</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.ISchedule.html" class="internal-link" title="orionis.console.contracts.ISchedule"><wbr></wbr>ISchedule</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.html#__dir__" class="internal-link" title="orionis.console.contracts.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.html#__getattr__" class="internal-link" title="orionis.console.contracts.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.contracts.html#_EXPORTS" class="internal-link" title="orionis.console.contracts._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3761"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3761">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.core.html" class="internal-link" title="orionis.console.core">core</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.commands.html" class="internal-link" title="orionis.console.core.commands">commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.contracts.html" class="internal-link" title="orionis.console.core.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.loader.html" class="internal-link" title="orionis.console.core.loader">loader</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.core.reactor.html" class="internal-link" title="orionis.console.core.reactor">reactor</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3762"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3762">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.debug.html" class="internal-link" title="orionis.console.debug">debug</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.debug.contracts.html" class="internal-link" title="orionis.console.debug.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.debug.dumper.html" class="internal-link" title="orionis.console.debug.dumper">dumper</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3763"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3763">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.dynamic.html" class="internal-link" title="orionis.console.dynamic">dynamic</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.dynamic.contracts.html" class="internal-link" title="orionis.console.dynamic.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.dynamic.progress_bar.html" class="internal-link" title="orionis.console.dynamic.progress_bar">progress<wbr></wbr>_bar</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3764"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3764">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.entities.html" class="internal-link" title="orionis.console.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.command.html" class="internal-link" title="orionis.console.entities.command">command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.scheduler_event.html" class="internal-link" title="orionis.console.entities.scheduler_event">scheduler<wbr></wbr>_event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.task.html" class="internal-link" title="orionis.console.entities.task">task</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.task_event.html" class="internal-link" title="orionis.console.entities.task_event">task<wbr></wbr>_event</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.Command.html" class="internal-link" title="orionis.console.entities.Command"><wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.SchedulerEvent.html" class="internal-link" title="orionis.console.entities.SchedulerEvent"><wbr></wbr>Scheduler<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.Task.html" class="internal-link" title="orionis.console.entities.Task"><wbr></wbr>Task</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link" title="orionis.console.entities.TaskEvent"><wbr></wbr>Task<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3765"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3765">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.enums.html" class="internal-link" title="orionis.console.enums">enums</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.actions.html" class="internal-link" title="orionis.console.enums.actions">actions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.events.html" class="internal-link" title="orionis.console.enums.events">events</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.states.html" class="internal-link" title="orionis.console.enums.states">states</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.styles.html" class="internal-link" title="orionis.console.enums.styles">styles</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.ANSIColors.html" class="internal-link" title="orionis.console.enums.ANSIColors"><wbr></wbr>ANSIColors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.ArgumentAction.html" class="internal-link" title="orionis.console.enums.ArgumentAction"><wbr></wbr>Argument<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.SchedulerEvent.html" class="internal-link" title="orionis.console.enums.SchedulerEvent"><wbr></wbr>Scheduler<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.ScheduleStates.html" class="internal-link" title="orionis.console.enums.ScheduleStates"><wbr></wbr>Schedule<wbr></wbr>States</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.enums.TaskEvent.html" class="internal-link" title="orionis.console.enums.TaskEvent"><wbr></wbr>Task<wbr></wbr>Event</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3766"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent.html" class="internal-link" title="orionis.console.fluent">fluent</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.command.html" class="internal-link" title="orionis.console.fluent.command">command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.contracts.html" class="internal-link" title="orionis.console.fluent.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.task.html" class="internal-link" title="orionis.console.fluent.task">task</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Command.html" class="internal-link" title="orionis.console.fluent.Command"><wbr></wbr>Command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent.Task.html" class="internal-link" title="orionis.console.fluent.Task"><wbr></wbr>Task</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3767"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3767">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.kernel.html" class="internal-link" title="orionis.console.kernel">kernel</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.kernel.KernelCLI.html" class="internal-link" title="orionis.console.kernel.KernelCLI"><wbr></wbr>Kernel<wbr></wbr>CLI</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3768"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3768">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.output.html" class="internal-link" title="orionis.console.output">output</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.console.html" class="internal-link" title="orionis.console.output.console">console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.contracts.html" class="internal-link" title="orionis.console.output.contracts">contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.executor.html" class="internal-link" title="orionis.console.output.executor">executor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.help_command.html" class="internal-link" title="orionis.console.output.help_command">help<wbr></wbr>_command</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.http_request.html" class="internal-link" title="orionis.console.output.http_request">http<wbr></wbr>_request</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.output.var_dumper.html" class="internal-link" title="orionis.console.output.var_dumper">var<wbr></wbr>_dumper</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3769"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3769">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.reactor_provider.html" class="internal-link" title="orionis.console.reactor_provider">reactor<wbr></wbr>_provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.reactor_provider.ReactorProvider.html" class="internal-link" title="orionis.console.reactor_provider.ReactorProvider"><wbr></wbr>Reactor<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3770"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3770">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.scheduler_provider.html" class="internal-link" title="orionis.console.scheduler_provider">scheduler<wbr></wbr>_provider</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.scheduler_provider.ScheduleProvider.html" class="internal-link" title="orionis.console.scheduler_provider.ScheduleProvider"><wbr></wbr>Schedule<wbr></wbr>Provider</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3771"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3771">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.stdio.html" class="internal-link" title="orionis.console.stdio">stdio</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.stdio.html#protocol_stdio" class="internal-link" title="orionis.console.stdio.protocol_stdio">protocol<wbr></wbr>_stdio</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.stdio.html#protocol_stdout" class="internal-link" title="orionis.console.stdio.protocol_stdout">protocol<wbr></wbr>_stdout</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.stdio.html#_PROTOCOL_STDOUT" class="internal-link" title="orionis.console.stdio._PROTOCOL_STDOUT">_PROTOCOL<wbr></wbr>_STDOUT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3772"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3772">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.tasks.html" class="internal-link" title="orionis.console.tasks">tasks</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.tasks.schedule.html" class="internal-link" title="orionis.console.tasks.schedule">schedule</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.tasks.store.html" class="internal-link" title="orionis.console.tasks.store">store</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3773"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3773">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.templates.html" class="internal-link" title="orionis.console.templates">templates</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.templates.stub.html" class="internal-link" title="orionis.console.templates.stub">stub</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3774"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3774">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.Argument.html" class="internal-link" title="orionis.console.Argument"><wbr></wbr>Argument</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#__post_init__" class="internal-link" title="orionis.console.Argument.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#addToParser" class="internal-link" title="orionis.console.Argument.addToParser">add<wbr></wbr>To<wbr></wbr>Parser</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#action" class="internal-link" title="orionis.console.Argument.action">action</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#choices" class="internal-link" title="orionis.console.Argument.choices">choices</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#const" class="internal-link" title="orionis.console.Argument.const">const</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#default" class="internal-link" title="orionis.console.Argument.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#dest" class="internal-link" title="orionis.console.Argument.dest">dest</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#extra" class="internal-link" title="orionis.console.Argument.extra">extra</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#help" class="internal-link" title="orionis.console.Argument.help">help</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#metavar" class="internal-link" title="orionis.console.Argument.metavar">metavar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#name_or_flags" class="internal-link" title="orionis.console.Argument.name_or_flags">name<wbr></wbr>_or<wbr></wbr>_flags</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#nargs" class="internal-link" title="orionis.console.Argument.nargs">nargs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#required" class="internal-link" title="orionis.console.Argument.required">required</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#type_" class="internal-link" title="orionis.console.Argument.type_">type_</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Argument.html#version" class="internal-link" title="orionis.console.Argument.version">version</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3775"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3775">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console"><wbr></wbr>Console</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#__getNow" class="internal-link" title="orionis.console.Console.__getNow">__get<wbr></wbr>Now</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#__getTimestamp" class="internal-link" title="orionis.console.Console.__getTimestamp">__get<wbr></wbr>Timestamp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#__printColored" class="internal-link" title="orionis.console.Console.__printColored">__print<wbr></wbr>Colored</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#__printWithBackground" class="internal-link" title="orionis.console.Console.__printWithBackground">__print<wbr></wbr>With<wbr></wbr>Background</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#anticipate" class="internal-link" title="orionis.console.Console.anticipate">anticipate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#ask" class="internal-link" title="orionis.console.Console.ask">ask</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#choice" class="internal-link" title="orionis.console.Console.choice">choice</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#clear" class="internal-link" title="orionis.console.Console.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#clearLine" class="internal-link" title="orionis.console.Console.clearLine">clear<wbr></wbr>Line</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#confirm" class="internal-link" title="orionis.console.Console.confirm">confirm</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#dump" class="internal-link" title="orionis.console.Console.dump">dump</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#error" class="internal-link" title="orionis.console.Console.error">error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#exception" class="internal-link" title="orionis.console.Console.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#exitError" class="internal-link" title="orionis.console.Console.exitError">exit<wbr></wbr>Error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#exitSuccess" class="internal-link" title="orionis.console.Console.exitSuccess">exit<wbr></wbr>Success</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#fail" class="internal-link" title="orionis.console.Console.fail">fail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#info" class="internal-link" title="orionis.console.Console.info">info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#line" class="internal-link" title="orionis.console.Console.line">line</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#newLine" class="internal-link" title="orionis.console.Console.newLine">new<wbr></wbr>Line</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#secret" class="internal-link" title="orionis.console.Console.secret">secret</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#sleep" class="internal-link" title="orionis.console.Console.sleep">sleep</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#success" class="internal-link" title="orionis.console.Console.success">success</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#table" class="internal-link" title="orionis.console.Console.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textError" class="internal-link" title="orionis.console.Console.textError">text<wbr></wbr>Error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textErrorBold" class="internal-link" title="orionis.console.Console.textErrorBold">text<wbr></wbr>Error<wbr></wbr>Bold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textInfo" class="internal-link" title="orionis.console.Console.textInfo">text<wbr></wbr>Info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textInfoBold" class="internal-link" title="orionis.console.Console.textInfoBold">text<wbr></wbr>Info<wbr></wbr>Bold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textMuted" class="internal-link" title="orionis.console.Console.textMuted">text<wbr></wbr>Muted</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textMutedBold" class="internal-link" title="orionis.console.Console.textMutedBold">text<wbr></wbr>Muted<wbr></wbr>Bold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textSuccess" class="internal-link" title="orionis.console.Console.textSuccess">text<wbr></wbr>Success</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textSuccessBold" class="internal-link" title="orionis.console.Console.textSuccessBold">text<wbr></wbr>Success<wbr></wbr>Bold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textUnderline" class="internal-link" title="orionis.console.Console.textUnderline">text<wbr></wbr>Underline</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textWarning" class="internal-link" title="orionis.console.Console.textWarning">text<wbr></wbr>Warning</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#textWarningBold" class="internal-link" title="orionis.console.Console.textWarningBold">text<wbr></wbr>Warning<wbr></wbr>Bold</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#warning" class="internal-link" title="orionis.console.Console.warning">warning</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#write" class="internal-link" title="orionis.console.Console.write">write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#writeLine" class="internal-link" title="orionis.console.Console.writeLine">write<wbr></wbr>Line</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Console.html#progressBar" class="internal-link" title="orionis.console.Console.progressBar">progress<wbr></wbr>Bar</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3776"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3776">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.Dumper.html" class="internal-link" title="orionis.console.Dumper"><wbr></wbr>Dumper</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Dumper.html#dd" class="internal-link" title="orionis.console.Dumper.dd">dd</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.Dumper.html#dump" class="internal-link" title="orionis.console.Dumper.dump">dump</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3777"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId3777">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.ProgressBar.html" class="internal-link" title="orionis.console.ProgressBar"><wbr></wbr>Progress<wbr></wbr>Bar</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#__init__" class="internal-link" title="orionis.console.ProgressBar.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#__updateBar" class="internal-link" title="orionis.console.ProgressBar.__updateBar">__update<wbr></wbr>Bar</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#advance" class="internal-link" title="orionis.console.ProgressBar.advance">advance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#finish" class="internal-link" title="orionis.console.ProgressBar.finish">finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#start" class="internal-link" title="orionis.console.ProgressBar.start">start</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#_flush" class="internal-link" title="orionis.console.ProgressBar._flush">_flush</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#_write" class="internal-link" title="orionis.console.ProgressBar._write">_write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#bar_width" class="internal-link" title="orionis.console.ProgressBar.bar_width">bar<wbr></wbr>_width</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#progress" class="internal-link" title="orionis.console.ProgressBar.progress">progress</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.ProgressBar.html#total" class="internal-link" title="orionis.console.ProgressBar.total">total</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.html#__dir__" class="internal-link" title="orionis.console.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.html#__getattr__" class="internal-link" title="orionis.console.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.html#_EXPORTS" class="internal-link" title="orionis.console._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="package"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.fluent.html" class="internal-link" title="orionis.console.fluent">fluent</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          package documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/console/fluent/__init__.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id368">
+  
+  
+  <tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.console.fluent.command.html" class="internal-link" title="orionis.console.fluent.command">command</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="package">
+    
+    <td>Package</td>
+    <td><code><a href="orionis.console.fluent.contracts.html" class="internal-link" title="orionis.console.fluent.contracts">contracts</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="module">
+    
+    <td>Module</td>
+    <td><code><a href="orionis.console.fluent.task.html" class="internal-link" title="orionis.console.fluent.task">task</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            <p class="fromInitPy">From <code>__init__.py</code>:</p><table class="children sortable" id="id369">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.console.fluent.Command.html" class="internal-link" title="orionis.console.fluent.Command"><wbr></wbr>Command</a></code></td>
+    <td><span class="rst-undocumented">No class docstring; 0/6 instance variable, 5/5 methods documented</span></td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.console.fluent.Task.html" class="internal-link" title="orionis.console.fluent.Task"><wbr></wbr>Task</a></code></td>
+    <td><span class="rst-undocumented">No class docstring; 0/14 instance variable, 0/5 constant, 105/105 methods documented</span></td>
+  </tr>
+</table>
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

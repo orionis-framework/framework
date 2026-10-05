@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 from tempfile import TemporaryDirectory
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
@@ -6,6 +7,7 @@ from orionis.http.routes.loader import RouteLoader
 from orionis.http.routes.route_cache import RouteCache
 from orionis.http.routes.route_compiler import RouteCompiler
 from orionis.http.routes.router import Router
+from orionis.support.facades.router import Route
 from orionis.test import TestCase
 from tests.http.routes.test_nested_routing import UserController, route_handler
 from tests.http.test_kernel import boot_kernel, dispatch
@@ -15,7 +17,7 @@ class _LoaderApp:
 
     __slots__ = (
         "cache_only", "compiled", "compiledInvalidationPathsDirs",
-        "compiledInvalidationPathsFiles", "compiledPath", "imports",
+        "compiledInvalidationPathsFiles", "compiledPath", "imports", "route_files",
     )
 
     @property
@@ -54,6 +56,7 @@ class _LoaderApp:
         self.compiledInvalidationPathsFiles: list[Path] = []
         self.imports: list[str] = []
         self.cache_only = cache_only
+        self.route_files: dict[str, list[Path]] = {}
 
     def getMiddleware(self) -> list[type]:
         """Return an empty application middleware stack.
@@ -65,7 +68,22 @@ class _LoaderApp:
         """
         return []
 
-    def routingPaths(self, kind: str) -> None:
+    def path(self, _key: str) -> Path:
+        """Return the root containing this test's route modules.
+
+        Parameters
+        ----------
+        _key : str
+            Application directory requested by the loader.
+
+        Returns
+        -------
+        Path
+            Test-owned module root.
+        """
+        return self.compiledPath
+
+    def routingPaths(self, kind: str) -> list[Path] | None:
         """Record cold imports and fail if a warm load requests route files.
 
         Parameters
@@ -75,8 +93,8 @@ class _LoaderApp:
 
         Returns
         -------
-        None
-            Completes the operation described above.
+        list[Path] | None
+            Route files associated with the requested kind, when configured.
 
         Raises
         ------
@@ -87,6 +105,7 @@ class _LoaderApp:
             error_msg = "A cache hit must not import route files"
             raise AssertionError(error_msg)
         self.imports.append(kind)
+        return self.route_files.get(kind)
 
 class _CacheOnlyRouter(Router):
     """Use a real router while rejecting exports during a cache hit."""
@@ -161,7 +180,7 @@ class TestLoaderFallbackPersistence(TestCase):
                 loader = RouteLoader(app, router, RouteCompiler(), RouteCache())
                 routes = loader.load()
                 self.assertEqual(router.export()["fallback"], (None, None))
-                self.assertEqual(app.imports, ["web", "api"])
+                self.assertEqual(app.imports, ["web", "api", "websocket"])
                 loaders = [loader]
                 if compiled:
                     self.assertTrue((path / "routes").is_file())
@@ -188,7 +207,7 @@ class TestLoaderFallbackPersistence(TestCase):
                     )
                     await dispatch(kernel, "/missing")
                     self.assertIsInstance(catch.handled[0], RouteNotFound)
-                self.assertEqual(app.imports, ["web", "api"])
+                self.assertEqual(app.imports, ["web", "api", "websocket"])
                 if compiled:
                     self.assertEqual(warm_app.imports, [])
                 else:
@@ -242,7 +261,7 @@ class TestLoaderFallbackPersistence(TestCase):
                     self.assertEqual(response.getStatusCode(), 200)
                     self.assertEqual(response.getBody(), b"routed")
                     self.assertEqual(catch.handled, [])
-                self.assertEqual(app.imports, ["web", "api"])
+                self.assertEqual(app.imports, ["web", "api", "websocket"])
                 self.assertEqual(warm_app.imports, [])
 
     def testStaleRouteCacheVersionRebuildsWithAnAbsentFallback(self) -> None:
@@ -265,7 +284,7 @@ class TestLoaderFallbackPersistence(TestCase):
             routes = loader.load()
             self.assertIs(loader.load(), routes)
             self.assertIn("/up", routes["GET"]["static"])
-            self.assertEqual(app.imports, ["web", "api"])
+            self.assertEqual(app.imports, ["web", "api", "websocket"])
             saved = persistence.get()
             self.assertEqual(saved["version"], RouteCache.VERSION)
             self.assertIsNone(saved["fallback"])
@@ -276,3 +295,69 @@ class TestLoaderFallbackPersistence(TestCase):
             self.assertIsNone(warm.fallback)
             self.assertIn("/up", warm.load()["GET"]["static"])
             self.assertEqual(warm_app.imports, [])
+
+class TestDedicatedRouteFiles(TestCase):
+    """Load protocol-specific route files through the real import path."""
+
+    def setUp(self) -> None:
+        """Install a test-owned route facade and importable temporary modules.
+
+        Returns
+        -------
+        None
+            Each route kind has its own module and registrations.
+        """
+        self._directory = TemporaryDirectory()
+        root = Path(self._directory.name)
+        self._app = _LoaderApp(root, compiled=False)
+        self._router = Router(self._app)
+        self._previous = Route._pinned_instance
+        Route._pinned_instance = self._router
+        self._module_names = []
+        sys.path.insert(0, str(root))
+        for kind in ("web", "api", "websocket"):
+            module_name = "_orionis_audit_routes_" + kind
+            self._module_names.append(module_name)
+            route_file = root / (module_name + ".py")
+            method = "websocket" if kind == "websocket" else "get"
+            route_file.write_text(
+                "from orionis.support.facades.router import Route\n"
+                "from tests.http.routes.test_nested_routing import route_handler\n"
+                f"Route.{method}('/{kind}', route_handler)\n",
+                encoding="utf-8",
+            )
+            self._app.route_files[kind] = [route_file]
+
+    def tearDown(self) -> None:
+        """Restore facade and import state after discarding temporary modules.
+
+        Returns
+        -------
+        None
+            No route registrations or modules leak into other tests.
+        """
+        Route._pinned_instance = self._previous
+        sys.path.remove(self._directory.name)
+        for module_name in self._module_names:
+            sys.modules.pop(module_name, None)
+        self._directory.cleanup()
+
+    def testDedicatedFilesPreserveProfilesAndLoadOnlyOnce(self) -> None:
+        """Load WebSocket separately while retaining the web middleware profile.
+
+        Returns
+        -------
+        None
+            Three independent files register once in deterministic order.
+        """
+        loader = RouteLoader(self._app, self._router, RouteCompiler(), RouteCache())
+        loaded = loader.load()
+        self.assertIs(loader.load(), loaded)
+        self.assertEqual(self._app.imports, ["web", "api", "websocket"])
+        routes = {
+            item["path"]: item for item in self._router.export()["routes"]
+        }
+        self.assertEqual(routes["/web"]["kind"], "web")
+        self.assertEqual(routes["/api"]["kind"], "api")
+        self.assertEqual(routes["/websocket"]["kind"], "web")
+        self.assertEqual(routes["/websocket"]["protocol"], "websocket")

@@ -1,0 +1,2647 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.contracts.directory.IDirectory</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="This class"><wbr></wbr>IDirectory</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsole" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsole">app<wbr></wbr>Console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsoleCommands" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">app<wbr></wbr>Console<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsoleListeners" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">app<wbr></wbr>Console<wbr></wbr>Listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appContracts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appContracts">app<wbr></wbr>Contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appExceptions" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appExceptions">app<wbr></wbr>Exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appFacades" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appFacades">app<wbr></wbr>Facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttp">app<wbr></wbr>Http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpControllers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">app<wbr></wbr>Http<wbr></wbr>Controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpMiddleware" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">app<wbr></wbr>Http<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">app<wbr></wbr>Http<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpSchemasRules" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">app<wbr></wbr>Http<wbr></wbr>Schemas<wbr></wbr>Rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appJobs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appJobs">app<wbr></wbr>Jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcp">app<wbr></wbr>Mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpPrompts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">app<wbr></wbr>Mcp<wbr></wbr>Prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpResources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpResources">app<wbr></wbr>Mcp<wbr></wbr>Resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpServers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpServers">app<wbr></wbr>Mcp<wbr></wbr>Servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpTools" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpTools">app<wbr></wbr>Mcp<wbr></wbr>Tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appModels" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appModels">app<wbr></wbr>Models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appNotifications" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appNotifications">app<wbr></wbr>Notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appProviders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appProviders">app<wbr></wbr>Providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appServices" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appServices">app<wbr></wbr>Services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#config" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseFactories" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseFactories">database<wbr></wbr>Factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseMigrations" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">database<wbr></wbr>Migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">database<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseSeeders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">database<wbr></wbr>Seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesCss" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesCss">resources<wbr></wbr>Css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesJs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesJs">resources<wbr></wbr>Js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesLang" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesLang">resources<wbr></wbr>Lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesViews" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesViews">resources<wbr></wbr>Views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#root" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.root">root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routes" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageApp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageApp">storage<wbr></wbr>App</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageAppPrivate" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">storage<wbr></wbr>App<wbr></wbr>Private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageAppPublic" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">storage<wbr></wbr>App<wbr></wbr>Public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageFramework" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageFramework">storage<wbr></wbr>Framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageLogs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageLogs">storage<wbr></wbr>Logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tests" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.foundation.contracts.directory.html" class="internal-link" title="The parent of this class">directory</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8591"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory"><wbr></wbr>IDirectory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsole" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsole">app<wbr></wbr>Console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsoleCommands" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">app<wbr></wbr>Console<wbr></wbr>Commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appConsoleListeners" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">app<wbr></wbr>Console<wbr></wbr>Listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appContracts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appContracts">app<wbr></wbr>Contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appExceptions" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appExceptions">app<wbr></wbr>Exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appFacades" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appFacades">app<wbr></wbr>Facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttp">app<wbr></wbr>Http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpControllers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">app<wbr></wbr>Http<wbr></wbr>Controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpMiddleware" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">app<wbr></wbr>Http<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">app<wbr></wbr>Http<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appHttpSchemasRules" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">app<wbr></wbr>Http<wbr></wbr>Schemas<wbr></wbr>Rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appJobs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appJobs">app<wbr></wbr>Jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcp">app<wbr></wbr>Mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpPrompts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">app<wbr></wbr>Mcp<wbr></wbr>Prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpResources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpResources">app<wbr></wbr>Mcp<wbr></wbr>Resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpServers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpServers">app<wbr></wbr>Mcp<wbr></wbr>Servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appMcpTools" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpTools">app<wbr></wbr>Mcp<wbr></wbr>Tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appModels" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appModels">app<wbr></wbr>Models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appNotifications" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appNotifications">app<wbr></wbr>Notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appProviders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appProviders">app<wbr></wbr>Providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#appServices" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appServices">app<wbr></wbr>Services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#config" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseFactories" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseFactories">database<wbr></wbr>Factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseMigrations" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">database<wbr></wbr>Migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">database<wbr></wbr>Schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#databaseSeeders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">database<wbr></wbr>Seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesCss" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesCss">resources<wbr></wbr>Css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesJs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesJs">resources<wbr></wbr>Js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesLang" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesLang">resources<wbr></wbr>Lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resourcesViews" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesViews">resources<wbr></wbr>Views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#root" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.root">root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routes" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageApp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageApp">storage<wbr></wbr>App</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageAppPrivate" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">storage<wbr></wbr>App<wbr></wbr>Private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageAppPublic" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">storage<wbr></wbr>App<wbr></wbr>Public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageFramework" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageFramework">storage<wbr></wbr>Framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storageLogs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageLogs">storage<wbr></wbr>Logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tests" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.contracts.html" class="internal-link" title="orionis.foundation.contracts">contracts</a></code><wbr></wbr>.<code><a href="orionis.foundation.contracts.directory.html" class="internal-link" title="orionis.foundation.contracts.directory">directory</a></code><wbr></wbr>.<code><a href="orionis.foundation.contracts.directory.IDirectory.html" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory">IDirectory</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IDirectory</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></p><p><a href="classIndex.html#orionis.foundation.contracts.directory.IDirectory">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Define access to the application directory paths.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id844">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#app" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.app">app</a></code></td>
+    <td>Return the application directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appConsole" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsole">app<wbr></wbr>Console</a></code></td>
+    <td>Return the application console directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appConsoleCommands" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">app<wbr></wbr>Console<wbr></wbr>Commands</a></code></td>
+    <td>Return the application console commands directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appConsoleListeners" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">app<wbr></wbr>Console<wbr></wbr>Listeners</a></code></td>
+    <td>Return the application console listeners directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appContracts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appContracts">app<wbr></wbr>Contracts</a></code></td>
+    <td>Return the application contracts directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appExceptions" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appExceptions">app<wbr></wbr>Exceptions</a></code></td>
+    <td>Return the application exceptions directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appFacades" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appFacades">app<wbr></wbr>Facades</a></code></td>
+    <td>Return the application facades directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appHttp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttp">app<wbr></wbr>Http</a></code></td>
+    <td>Return the application HTTP directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appHttpControllers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">app<wbr></wbr>Http<wbr></wbr>Controllers</a></code></td>
+    <td>Return the application controllers directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appHttpMiddleware" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">app<wbr></wbr>Http<wbr></wbr>Middleware</a></code></td>
+    <td>Return the application HTTP middleware directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appHttpSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">app<wbr></wbr>Http<wbr></wbr>Schemas</a></code></td>
+    <td>Return the application HTTP schemas directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appHttpSchemasRules" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">app<wbr></wbr>Http<wbr></wbr>Schemas<wbr></wbr>Rules</a></code></td>
+    <td>Return the application HTTP schema rules directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appJobs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appJobs">app<wbr></wbr>Jobs</a></code></td>
+    <td>Return the application jobs directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appMcp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcp">app<wbr></wbr>Mcp</a></code></td>
+    <td>Return the MCP application directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appMcpPrompts" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">app<wbr></wbr>Mcp<wbr></wbr>Prompts</a></code></td>
+    <td>Return the MCP prompt declarations directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appMcpResources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpResources">app<wbr></wbr>Mcp<wbr></wbr>Resources</a></code></td>
+    <td>Return the MCP resource declarations directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appMcpServers" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpServers">app<wbr></wbr>Mcp<wbr></wbr>Servers</a></code></td>
+    <td>Return the MCP server declarations directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appMcpTools" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appMcpTools">app<wbr></wbr>Mcp<wbr></wbr>Tools</a></code></td>
+    <td>Return the MCP tool declarations directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appModels" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appModels">app<wbr></wbr>Models</a></code></td>
+    <td>Return the application models directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appNotifications" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appNotifications">app<wbr></wbr>Notifications</a></code></td>
+    <td>Return the application notifications directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appProviders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appProviders">app<wbr></wbr>Providers</a></code></td>
+    <td>Return the application providers directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#appServices" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.appServices">app<wbr></wbr>Services</a></code></td>
+    <td>Return the application services directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.bootstrap">bootstrap</a></code></td>
+    <td>Return the bootstrap directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#config" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.config">config</a></code></td>
+    <td>Return the configuration directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#database" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.database">database</a></code></td>
+    <td>Return the database directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#databaseFactories" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseFactories">database<wbr></wbr>Factories</a></code></td>
+    <td>Return the database factories directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#databaseMigrations" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">database<wbr></wbr>Migrations</a></code></td>
+    <td>Return the database migrations directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#databaseSchemas" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">database<wbr></wbr>Schemas</a></code></td>
+    <td>Return the database schemas directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#databaseSeeders" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">database<wbr></wbr>Seeders</a></code></td>
+    <td>Return the database seeders directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resources" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resources">resources</a></code></td>
+    <td>Return the resources directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resourcesCss" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesCss">resources<wbr></wbr>Css</a></code></td>
+    <td>Return the resources CSS directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resourcesJs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesJs">resources<wbr></wbr>Js</a></code></td>
+    <td>Return the resources JavaScript directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resourcesLang" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesLang">resources<wbr></wbr>Lang</a></code></td>
+    <td>Return the resources language directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resourcesViews" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.resourcesViews">resources<wbr></wbr>Views</a></code></td>
+    <td>Return the resources views directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#root" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.root">root</a></code></td>
+    <td>Return the application root directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#routes" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.routes">routes</a></code></td>
+    <td>Return the routes directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storage" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storage">storage</a></code></td>
+    <td>Return the storage directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storageApp" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageApp">storage<wbr></wbr>App</a></code></td>
+    <td>Return the storage application directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storageAppPrivate" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">storage<wbr></wbr>App<wbr></wbr>Private</a></code></td>
+    <td>Return the private storage application directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storageAppPublic" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">storage<wbr></wbr>App<wbr></wbr>Public</a></code></td>
+    <td>Return the public storage application directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storageFramework" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageFramework">storage<wbr></wbr>Framework</a></code></td>
+    <td>Return the framework storage directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#storageLogs" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.storageLogs">storage<wbr></wbr>Logs</a></code></td>
+    <td>Return the storage logs directory.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#tests" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.tests">tests</a></code></td>
+    <td>Return the tests directory.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.foundation.contracts.directory.IDirectory.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.app">
+    
+  </a>
+  <a name="app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">app</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app" title="orionis.foundation.contracts.directory.IDirectory.app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appConsole">
+    
+  </a>
+  <a name="appConsole">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appConsole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L33">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appConsole" title="orionis.foundation.contracts.directory.IDirectory.appConsole">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application console directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application console directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">
+    
+  </a>
+  <a name="appConsoleCommands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appConsoleCommands</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L43">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appConsoleCommands" title="orionis.foundation.contracts.directory.IDirectory.appConsoleCommands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application console commands directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application console commands directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">
+    
+  </a>
+  <a name="appConsoleListeners">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appConsoleListeners</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L53">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appConsoleListeners" title="orionis.foundation.contracts.directory.IDirectory.appConsoleListeners">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application console listeners directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application console listeners directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appContracts">
+    
+  </a>
+  <a name="appContracts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appContracts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L183">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appContracts" title="orionis.foundation.contracts.directory.IDirectory.appContracts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application contracts directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application contracts directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appExceptions">
+    
+  </a>
+  <a name="appExceptions">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appExceptions</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appExceptions" title="orionis.foundation.contracts.directory.IDirectory.appExceptions">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application exceptions directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application exceptions directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appFacades">
+    
+  </a>
+  <a name="appFacades">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appFacades</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L163">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appFacades" title="orionis.foundation.contracts.directory.IDirectory.appFacades">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application facades directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application facades directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appHttp">
+    
+  </a>
+  <a name="appHttp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appHttp</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L73">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appHttp" title="orionis.foundation.contracts.directory.IDirectory.appHttp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application HTTP directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application HTTP directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">
+    
+  </a>
+  <a name="appHttpControllers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appHttpControllers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L83">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appHttpControllers" title="orionis.foundation.contracts.directory.IDirectory.appHttpControllers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application controllers directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application controllers directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">
+    
+  </a>
+  <a name="appHttpMiddleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appHttpMiddleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L93">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appHttpMiddleware" title="orionis.foundation.contracts.directory.IDirectory.appHttpMiddleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application HTTP middleware directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application HTTP middleware directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">
+    
+  </a>
+  <a name="appHttpSchemas">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appHttpSchemas</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L103">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appHttpSchemas" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemas">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application HTTP schemas directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application HTTP schemas directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">
+    
+  </a>
+  <a name="appHttpSchemasRules">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appHttpSchemasRules</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L113">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appHttpSchemasRules" title="orionis.foundation.contracts.directory.IDirectory.appHttpSchemasRules">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application HTTP schema rules directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application HTTP schema rules directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appJobs">
+    
+  </a>
+  <a name="appJobs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appJobs</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L173">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appJobs" title="orionis.foundation.contracts.directory.IDirectory.appJobs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application jobs directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application jobs directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appMcp">
+    
+  </a>
+  <a name="appMcp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appMcp</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L393">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appMcp" title="orionis.foundation.contracts.directory.IDirectory.appMcp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the MCP application directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">
+    
+  </a>
+  <a name="appMcpPrompts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appMcpPrompts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L433">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appMcpPrompts" title="orionis.foundation.contracts.directory.IDirectory.appMcpPrompts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the MCP prompt declarations directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appMcpResources">
+    
+  </a>
+  <a name="appMcpResources">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appMcpResources</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L423">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appMcpResources" title="orionis.foundation.contracts.directory.IDirectory.appMcpResources">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the MCP resource declarations directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appMcpServers">
+    
+  </a>
+  <a name="appMcpServers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appMcpServers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L403">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appMcpServers" title="orionis.foundation.contracts.directory.IDirectory.appMcpServers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the MCP server declarations directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appMcpTools">
+    
+  </a>
+  <a name="appMcpTools">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appMcpTools</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L413">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appMcpTools" title="orionis.foundation.contracts.directory.IDirectory.appMcpTools">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the MCP tool declarations directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appModels">
+    
+  </a>
+  <a name="appModels">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appModels</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L123">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appModels" title="orionis.foundation.contracts.directory.IDirectory.appModels">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application models directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application models directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appNotifications">
+    
+  </a>
+  <a name="appNotifications">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appNotifications</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L143">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appNotifications" title="orionis.foundation.contracts.directory.IDirectory.appNotifications">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application notifications directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application notifications directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appProviders">
+    
+  </a>
+  <a name="appProviders">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appProviders</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L133">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appProviders" title="orionis.foundation.contracts.directory.IDirectory.appProviders">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application providers directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application providers directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.appServices">
+    
+  </a>
+  <a name="appServices">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">appServices</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L153">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#appServices" title="orionis.foundation.contracts.directory.IDirectory.appServices">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application services directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application services directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.bootstrap">
+    
+  </a>
+  <a name="bootstrap">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">bootstrap</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L193">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#bootstrap" title="orionis.foundation.contracts.directory.IDirectory.bootstrap">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the bootstrap directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured bootstrap directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.config">
+    
+  </a>
+  <a name="config">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">config</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L203">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#config" title="orionis.foundation.contracts.directory.IDirectory.config">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the configuration directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured configuration directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.database">
+    
+  </a>
+  <a name="database">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">database</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L213">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database" title="orionis.foundation.contracts.directory.IDirectory.database">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the database directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured database directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.databaseFactories">
+    
+  </a>
+  <a name="databaseFactories">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">databaseFactories</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L223">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#databaseFactories" title="orionis.foundation.contracts.directory.IDirectory.databaseFactories">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the database factories directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured database factories directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">
+    
+  </a>
+  <a name="databaseMigrations">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">databaseMigrations</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L233">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#databaseMigrations" title="orionis.foundation.contracts.directory.IDirectory.databaseMigrations">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the database migrations directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured database migrations directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">
+    
+  </a>
+  <a name="databaseSchemas">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">databaseSchemas</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L243">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#databaseSchemas" title="orionis.foundation.contracts.directory.IDirectory.databaseSchemas">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the database schemas directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured database schemas directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">
+    
+  </a>
+  <a name="databaseSeeders">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">databaseSeeders</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L253">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#databaseSeeders" title="orionis.foundation.contracts.directory.IDirectory.databaseSeeders">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the database seeders directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured database seeders directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.resources">
+    
+  </a>
+  <a name="resources">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resources</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L263">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources" title="orionis.foundation.contracts.directory.IDirectory.resources">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the resources directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured resources directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.resourcesCss">
+    
+  </a>
+  <a name="resourcesCss">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resourcesCss</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L273">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourcesCss" title="orionis.foundation.contracts.directory.IDirectory.resourcesCss">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the resources CSS directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured resources CSS directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.resourcesJs">
+    
+  </a>
+  <a name="resourcesJs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resourcesJs</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L283">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourcesJs" title="orionis.foundation.contracts.directory.IDirectory.resourcesJs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the resources JavaScript directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured resources JavaScript directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.resourcesLang">
+    
+  </a>
+  <a name="resourcesLang">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resourcesLang</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L293">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourcesLang" title="orionis.foundation.contracts.directory.IDirectory.resourcesLang">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the resources language directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured resources language directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.resourcesViews">
+    
+  </a>
+  <a name="resourcesViews">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">resourcesViews</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L303">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resourcesViews" title="orionis.foundation.contracts.directory.IDirectory.resourcesViews">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the resources views directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured resources views directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.root">
+    
+  </a>
+  <a name="root">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">root</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L13">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#root" title="orionis.foundation.contracts.directory.IDirectory.root">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the application root directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured application root directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.routes">
+    
+  </a>
+  <a name="routes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">routes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L313">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#routes" title="orionis.foundation.contracts.directory.IDirectory.routes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the routes directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured routes directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storage">
+    
+  </a>
+  <a name="storage">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storage</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L323">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage" title="orionis.foundation.contracts.directory.IDirectory.storage">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the storage directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured storage directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storageApp">
+    
+  </a>
+  <a name="storageApp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storageApp</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L333">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storageApp" title="orionis.foundation.contracts.directory.IDirectory.storageApp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the storage application directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured storage application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">
+    
+  </a>
+  <a name="storageAppPrivate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storageAppPrivate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L343">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storageAppPrivate" title="orionis.foundation.contracts.directory.IDirectory.storageAppPrivate">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the private storage application directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured private storage application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">
+    
+  </a>
+  <a name="storageAppPublic">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storageAppPublic</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L353">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storageAppPublic" title="orionis.foundation.contracts.directory.IDirectory.storageAppPublic">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the public storage application directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured public storage application directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storageFramework">
+    
+  </a>
+  <a name="storageFramework">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storageFramework</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L363">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storageFramework" title="orionis.foundation.contracts.directory.IDirectory.storageFramework">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the framework storage directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured framework storage directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.storageLogs">
+    
+  </a>
+  <a name="storageLogs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">storageLogs</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L373">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storageLogs" title="orionis.foundation.contracts.directory.IDirectory.storageLogs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the storage logs directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured storage logs directory.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.tests">
+    
+  </a>
+  <a name="tests">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">tests</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L383">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#tests" title="orionis.foundation.contracts.directory.IDirectory.tests">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p>Return the tests directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">The configured tests directory.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.contracts.directory.IDirectory.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/contracts/directory.py#L11">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.foundation.contracts.directory.IDirectory.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.foundation.directory.Directory.html" class="internal-link">orionis.foundation.directory.Directory</a></code></div>
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

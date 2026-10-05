@@ -26,7 +26,36 @@ if TYPE_CHECKING:
     from orionis.storage.contracts.manager import IStorageManager
     from orionis.view.contracts.engine import IViewEngine
 
-_FIXTURE_ROOT = Path(__file__).parent / "fixtures"
+_MAIL_TEMPLATES = {
+    "invoice.html": "<h1>Invoice {{ invoice_number }}</h1>\n",
+    "welcome.html": "<h1>Welcome, {{ name }}</h1>\n",
+    "welcome.txt": "Hello, {{ name }}.\n",
+}
+
+def create_mail_views(base_path: Path) -> Path:
+    """Create mail templates in a test-owned temporary directory.
+
+    Parameters
+    ----------
+    base_path : Path
+        Temporary application root owned by the current test.
+
+    Returns
+    -------
+    Path
+        View directory containing the mail templates.
+
+    Raises
+    ------
+    OSError
+        If the temporary templates cannot be created.
+    """
+    view_path = base_path / "views"
+    emails = view_path / "emails"
+    emails.mkdir(parents=True, exist_ok=True)
+    for name, template in _MAIL_TEMPLATES.items():
+        (emails / name).write_text(template, encoding="utf-8")
+    return view_path
 
 class ViewApplication:
     """Expose explicit view configuration without an HTTP request."""
@@ -60,7 +89,7 @@ class ViewApplication:
         return self.base_path
 
     def config(self, key: str) -> object:
-        """Return the fixture template directory as the configured loader.
+        """Return the temporary template directory as the configured loader.
 
         Parameters
         ----------
@@ -81,7 +110,7 @@ class ViewApplication:
             error_msg = "Unexpected configuration section."
             raise KeyError(error_msg)
         return {
-            "paths": [str(_FIXTURE_ROOT)],
+            "paths": [str(self.base_path / "views")],
             "cache_path": None,
             "autoescape": True,
         }
@@ -545,6 +574,7 @@ class TestMailComposer(TestCase):
         temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.app = ViewApplication(Path(temporary.name))
+        create_mail_views(self.app.basePath)
         self.view = Jinja2Engine(ViewEnvironment(cast("IApplication", self.app)))
         self.storage = MemoryStorage()
         self.composer = MailComposer(self.view, cast("IStorageManager", self.storage))

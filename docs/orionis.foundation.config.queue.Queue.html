@@ -1,0 +1,2102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.config.queue.Queue</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.config.queue.Queue.html" class="internal-link" title="This class"><wbr></wbr>Queue</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateConnections">__validate<wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateStorageNamespaces" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateStorageNamespaces">__validate<wbr></wbr>Storage<wbr></wbr>Namespaces</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeConnections">__normalize<wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeFailed" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeFailed">__normalize<wbr></wbr>Failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeWorker" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeWorker">__normalize<wbr></wbr>Worker</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Queue.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connections" class="internal-link" title="orionis.foundation.config.queue.Queue.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#default" class="internal-link" title="orionis.foundation.config.queue.Queue.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#failed" class="internal-link" title="orionis.foundation.config.queue.Queue.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#worker" class="internal-link" title="orionis.foundation.config.queue.Queue.worker">worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.config.queue.html" class="internal-link" title="The parent of this class">queue</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8229"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8229">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.entities.html" class="internal-link" title="orionis.foundation.config.queue.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.connections.html" class="internal-link" title="orionis.foundation.config.queue.entities.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.database.html" class="internal-link" title="orionis.foundation.config.queue.entities.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.failed.html" class="internal-link" title="orionis.foundation.config.queue.entities.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.queue.html" class="internal-link" title="orionis.foundation.config.queue.entities.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.redis.html" class="internal-link" title="orionis.foundation.config.queue.entities.redis">redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.sync.html" class="internal-link" title="orionis.foundation.config.queue.entities.sync">sync</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.worker.html" class="internal-link" title="orionis.foundation.config.queue.entities.worker">worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8230"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8230">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.enums.html" class="internal-link" title="orionis.foundation.config.queue.enums">enums</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.Drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.Drivers"><wbr></wbr>Drivers</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8231"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8231">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Connections.html" class="internal-link" title="orionis.foundation.config.queue.Connections"><wbr></wbr>Connections</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Connections.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html#database" class="internal-link" title="orionis.foundation.config.queue.Connections.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html#redis" class="internal-link" title="orionis.foundation.config.queue.Connections.redis">redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html#sync" class="internal-link" title="orionis.foundation.config.queue.Connections.sync">sync</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8232"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8232">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database"><wbr></wbr>Database</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Database.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#connection" class="internal-link" title="orionis.foundation.config.queue.Database.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#driver" class="internal-link" title="orionis.foundation.config.queue.Database.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#queue" class="internal-link" title="orionis.foundation.config.queue.Database.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#retry_after" class="internal-link" title="orionis.foundation.config.queue.Database.retry_after">retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html#table" class="internal-link" title="orionis.foundation.config.queue.Database.table">table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8233"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8233">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed"><wbr></wbr>Failed</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Failed.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Failed.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Failed.html#connection" class="internal-link" title="orionis.foundation.config.queue.Failed.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Failed.html#table" class="internal-link" title="orionis.foundation.config.queue.Failed.table">table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8234"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Queue.html" class="internal-link" title="orionis.foundation.config.queue.Queue"><wbr></wbr>Queue</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateConnections">__validate<wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateStorageNamespaces" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateStorageNamespaces">__validate<wbr></wbr>Storage<wbr></wbr>Namespaces</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeConnections">__normalize<wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeFailed" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeFailed">__normalize<wbr></wbr>Failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__normalizeWorker" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeWorker">__normalize<wbr></wbr>Worker</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Queue.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connections" class="internal-link" title="orionis.foundation.config.queue.Queue.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#default" class="internal-link" title="orionis.foundation.config.queue.Queue.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#failed" class="internal-link" title="orionis.foundation.config.queue.Queue.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#worker" class="internal-link" title="orionis.foundation.config.queue.Queue.worker">worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8235"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8235">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis"><wbr></wbr>Redis</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Redis.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#db" class="internal-link" title="orionis.foundation.config.queue.Redis.db">db</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#driver" class="internal-link" title="orionis.foundation.config.queue.Redis.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#endpoint" class="internal-link" title="orionis.foundation.config.queue.Redis.endpoint">endpoint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#password" class="internal-link" title="orionis.foundation.config.queue.Redis.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#port" class="internal-link" title="orionis.foundation.config.queue.Redis.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#prefix" class="internal-link" title="orionis.foundation.config.queue.Redis.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#queue" class="internal-link" title="orionis.foundation.config.queue.Redis.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html#retry_after" class="internal-link" title="orionis.foundation.config.queue.Redis.retry_after">retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8236"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8236">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync"><wbr></wbr>Sync</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Sync.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html#driver" class="internal-link" title="orionis.foundation.config.queue.Sync.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html#queue" class="internal-link" title="orionis.foundation.config.queue.Sync.queue">queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html#retry_after" class="internal-link" title="orionis.foundation.config.queue.Sync.retry_after">retry<wbr></wbr>_after</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8237"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8237">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker"><wbr></wbr>Worker</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Worker.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#backoff" class="internal-link" title="orionis.foundation.config.queue.Worker.backoff">backoff</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#concurrency" class="internal-link" title="orionis.foundation.config.queue.Worker.concurrency">concurrency</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#sleep" class="internal-link" title="orionis.foundation.config.queue.Worker.sleep">sleep</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#timeout" class="internal-link" title="orionis.foundation.config.queue.Worker.timeout">timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html#tries" class="internal-link" title="orionis.foundation.config.queue.Worker.tries">tries</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.queue.html" class="internal-link" title="orionis.foundation.config.queue">queue</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.queue.Queue.html" class="internal-link" title="orionis.foundation.config.queue.Queue">Queue</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Queue</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L14" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Queue">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Configure named queue connections, failure storage, and workers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default</span></td><td class="fieldArgDesc">Default connection name, read from <tt class="rst-docutils rst-literal">QUEUE_CONNECTION</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connections</span></td><td class="fieldArgDesc">Conventional connections or named backends converted to typed entities.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed</span></td><td class="fieldArgDesc">Database connection and table used to preserve failed jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">worker</span></td><td class="fieldArgDesc">Default concurrency, polling interval, timeout, tries, and backoff.</td></tr></table></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id781">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__validateConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateConnections">__validate<wbr></wbr>Connections</a></code></td>
+    <td>Validate reservation leases and isolate failure storage.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#__validateStorageNamespaces" class="internal-link" title="orionis.foundation.config.queue.Queue.__validateStorageNamespaces">__validate<wbr></wbr>Storage<wbr></wbr>Namespaces</a></code></td>
+    <td>Require distinct persistent storage for named durable connections.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__normalizeConnections" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeConnections">__normalize<wbr></wbr>Connections</a></code></td>
+    <td>Validate conventional or named connections as typed entities.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__normalizeFailed" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeFailed">__normalize<wbr></wbr>Failed</a></code></td>
+    <td>Convert failure storage mappings to a validated immutable entity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__normalizeWorker" class="internal-link" title="orionis.foundation.config.queue.Queue.__normalizeWorker">__normalize<wbr></wbr>Worker</a></code></td>
+    <td>Convert worker mappings to a validated immutable entity.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Queue.__post_init__">__post<wbr></wbr>_init__</a></code></td>
+    <td>Normalize nested entities and reject invalid worker leases.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#connections" class="internal-link" title="orionis.foundation.config.queue.Queue.connections">connections</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#default" class="internal-link" title="orionis.foundation.config.queue.Queue.default">default</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#failed" class="internal-link" title="orionis.foundation.config.queue.Queue.failed">failed</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#worker" class="internal-link" title="orionis.foundation.config.queue.Queue.worker">worker</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
+            </p>
+            <table class="children sortable" id="id782">
+  
+  
+  <tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code></td>
+    <td>Retrieve field definitions and normalized types cached by class.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code></td>
+    <td>Describe field names, normalized types, defaults, and metadata.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code></td>
+    <td>Convert the dataclass instance to a recursively copied dictionary.</td>
+  </tr><tr class="baseclassvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+            
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__validateConnections">
+    
+  </a>
+  <a name="__validateConnections">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateConnections</span><span class="function-signature long-signature">(<span class="rst-sig-param">connections: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync">Sync</a> | <a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database">Database</a> | <a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis">Redis</a>]</code>, </span><span class="rst-sig-param">worker: <code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker">Worker</a></code>, </span><span class="rst-sig-param">failed: <code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed">Failed</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L184">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateConnections" title="orionis.foundation.config.queue.Queue.__validateConnections">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate reservation leases and isolate failure storage.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connections:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Sync | Database | Redis]</code></td><td class="fieldArgDesc">Validated named connection entities.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">worker:</span><code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker">Worker</a></code></td><td class="fieldArgDesc">Validated execution defaults.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed:</span><code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed">Failed</a></code></td><td class="fieldArgDesc">Validated failed-job storage.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Check relationships across the configuration entities.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a lease is unsafe or persistent storage namespaces overlap.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__validateStorageNamespaces">
+    
+  </a>
+  <a name="__validateStorageNamespaces">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateStorageNamespaces</span><span class="function-signature">(<span class="rst-sig-param">connections: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync">Sync</a> | <a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database">Database</a> | <a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis">Redis</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L228">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateStorageNamespaces" title="orionis.foundation.config.queue.Queue.__validateStorageNamespaces">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Require distinct persistent storage for named durable connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connections:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Sync | Database | Redis]</code></td><td class="fieldArgDesc">Validated named connection entities.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Require independent tables or Redis prefixes for durable connections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If two connections use the same persistent storage namespace.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__normalizeConnections">
+    
+  </a>
+  <a name="__normalizeConnections">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__normalizeConnections</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync">Sync</a> | <a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database">Database</a> | <a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis">Redis</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L139">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__normalizeConnections" title="orionis.foundation.config.queue.Queue.__normalizeConnections">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate conventional or named connections as typed entities.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Sync | Database | Redis]</code></td><td class="fieldArgDesc">Validated connections indexed by their configured names.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a connection has an unexpected type or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a connection name, driver, or nested setting is invalid.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__normalizeFailed">
+    
+  </a>
+  <a name="__normalizeFailed">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__normalizeFailed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed">Failed</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L114">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__normalizeFailed" title="orionis.foundation.config.queue.Queue.__normalizeFailed">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert failure storage mappings to a validated immutable entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed">Failed</a></code></td><td class="fieldArgDesc">Validated failed-job storage.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If settings have an unexpected type or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a database identifier is invalid.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__normalizeWorker">
+    
+  </a>
+  <a name="__normalizeWorker">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__normalizeWorker</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker">Worker</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L89">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__normalizeWorker" title="orionis.foundation.config.queue.Queue.__normalizeWorker">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Convert worker mappings to a validated immutable entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker">Worker</a></code></td><td class="fieldArgDesc">Validated worker defaults.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If settings have an unexpected type or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a worker limit or duration is invalid.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.__post_init__">
+    
+  </a>
+  <a name="__post_init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__post_init__" title="orionis.foundation.config.queue.Queue.__post_init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
+    <div><p>Normalize nested entities and reject invalid worker leases.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store typed settings and validate their relationships.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If settings or durations have invalid types.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If identifiers, drivers, defaults, or lease relationships are invalid.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.connections">
+    
+  </a>
+  <a name="connections">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">connections</span>: <code>Connections | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L39">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#connections" title="orionis.foundation.config.queue.Queue.connections">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.default">
+    
+  </a>
+  <a name="default">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">default</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L31">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#default" title="orionis.foundation.config.queue.Queue.default">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.failed">
+    
+  </a>
+  <a name="failed">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">failed</span>: <code>Failed | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#failed" title="orionis.foundation.config.queue.Queue.failed">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.queue.Queue.worker">
+    
+  </a>
+  <a name="worker">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">worker</span>: <code>Worker | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/queue/entities/queue.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#worker" title="orionis.foundation.config.queue.Queue.worker">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -93,10 +93,14 @@ The opt-in suite uses real Redis Lua scripts, two separately owned clients makin
 100 concurrent attempts, three spawned processes sharing a quota, expiration,
 store recreation and incompatible stored key types:
 
+These tests are discovered normally and explicitly skipped when
+`ORIONIS_HTTP_REDIS_URL` is unset. A configured but unavailable server remains a
+test failure.
+
 ```powershell
 $env:PYTHONIOENCODING = "utf-8"
 $env:ORIONIS_HTTP_REDIS_URL = "redis://127.0.0.1:6379/0"
-.\.venv\Scripts\python.exe reactor test --start-dir="tests/http/layer/store" --file-pattern="redis_rate_limit_integration.py" --verbosity=1
+.\.venv\Scripts\python.exe reactor test --start-dir="tests/http/layer/store" --file-pattern="test_redis_rate_limit_integration.py" --verbosity=1
 ```
 
 The real integration checks were executed on Windows with Python 3.14 and Redis

@@ -1,11 +1,7 @@
-"""Compile an invocation plan that cannot bind client keys to dependencies."""
-
 import inspect
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, cast, get_type_hints
-
 import msgspec
-
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.http.contracts.request import IRequest
 from orionis.http.request import Request
@@ -14,7 +10,6 @@ from orionis.mcp.context import McpRequest
 if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.container.contracts.container import IContainer
-
 
 @dataclass(frozen=True, slots=True)
 class _Parameter:
@@ -34,7 +29,6 @@ class _Parameter:
     value: object
     positional: bool
 
-
 def _classify(
     parameter: inspect.Parameter,
     annotation: object,
@@ -42,7 +36,27 @@ def _classify(
     argument_names: tuple[str, ...],
     uri_names: tuple[str, ...],
 ) -> _Parameter:
-    """Assign one trusted source to an argument before accepting requests."""
+    """
+    Assign one trusted source to an argument before accepting requests.
+
+    Parameters
+    ----------
+    parameter : inspect.Parameter
+        Value supplied for ``parameter``.
+    annotation : object
+        Native type annotation to inspect or validate.
+    payload_type : object
+        Value supplied for ``payload_type``.
+    argument_names : tuple[str, ...]
+        Value supplied for ``argument_names``.
+    uri_names : tuple[str, ...]
+        Value supplied for ``uri_names``.
+
+    Returns
+    -------
+    _Parameter
+        Result of the operation described above.
+    """
     source = "dependency"
     value = annotation
     if payload_type is not None and annotation == payload_type:
@@ -77,7 +91,6 @@ def _classify(
         parameter.name, source, value, parameter.kind is parameter.POSITIONAL_ONLY,
     )
 
-
 @dataclass(frozen=True, slots=True)
 class McpInvoker:
     """A reusable unbound handler plan; payloads never become keyword mappings."""
@@ -96,7 +109,27 @@ class McpInvoker:
         argument_names: tuple[str, ...] = (),
         uri_names: tuple[str, ...] = (),
     ) -> McpInvoker:
-        """Resolve annotations and classify all parameters once during boot."""
+        """
+        Resolve annotations and classify all parameters once during boot.
+
+        Parameters
+        ----------
+        definition : type
+            Class declaration whose metadata is being inspected.
+        method : str
+            Value supplied for ``method``.
+        payload_type : object
+            Value supplied for ``payload_type``.
+        argument_names : tuple[str, ...]
+            Value supplied for ``argument_names``.
+        uri_names : tuple[str, ...]
+            Value supplied for ``uri_names``.
+
+        Returns
+        -------
+        McpInvoker
+            Result of the operation described above.
+        """
         descriptor = inspect.getattr_static(definition, method)
         receiver = "instance"
         if isinstance(descriptor, staticmethod):
@@ -141,7 +174,25 @@ class McpInvoker:
         request: McpRequest,
         payload: object = msgspec.UNSET,
     ) -> object:
-        """Inject trusted context/services while preserving generator results."""
+        """
+        Inject trusted context/services while preserving generator results.
+
+        Parameters
+        ----------
+        instance : object
+            Instance supplying values or receiving the invocation.
+        app : IContainer
+            Application container supplying configuration and dependencies.
+        request : McpRequest
+            Current request and its trusted execution context.
+        payload : object
+            Input payload supplied for conversion or processing.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         positional: list[object] = []
         keyword: dict[str, object] = {}
         if self.receiver != "none":
@@ -164,9 +215,27 @@ class McpInvoker:
         request: McpRequest,
         payload: object,
     ) -> object:
-        """Resolve the trusted source chosen at compile time."""
+        """
+        Resolve the trusted source chosen at compile time.
+
+        Parameters
+        ----------
+        parameter : _Parameter
+            Value supplied for ``parameter``.
+        app : IContainer
+            Application container supplying configuration and dependencies.
+        request : McpRequest
+            Current request and its trusted execution context.
+        payload : object
+            Input payload supplied for conversion or processing.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         if parameter.source in ("payload", "argument", "uri"):
-            return McpInvoker._client_value(parameter, request, payload)
+            return McpInvoker._clientValue(parameter, request, payload)
         match parameter.source:
             case "request":
                 return request
@@ -185,10 +254,26 @@ class McpInvoker:
                 return await app.make(cast("type", parameter.value))
 
     @staticmethod
-    def _client_value(
+    def _clientValue(
         parameter: _Parameter, request: McpRequest, payload: object,
     ) -> object:
-        """Read only parameters explicitly declared as client-controlled input."""
+        """
+        Read only parameters explicitly declared as client-controlled input.
+
+        Parameters
+        ----------
+        parameter : _Parameter
+            Value supplied for ``parameter``.
+        request : McpRequest
+            Current request and its trusted execution context.
+        payload : object
+            Input payload supplied for conversion or processing.
+
+        Returns
+        -------
+        object
+            Result of the operation described above.
+        """
         match parameter.source:
             case "payload":
                 if payload is msgspec.UNSET:

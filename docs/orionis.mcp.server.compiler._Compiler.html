@@ -1,0 +1,1851 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.mcp.server.compiler._Compiler</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="This class">_<wbr></wbr>Compiler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_prompt" class="internal-link" title="orionis.mcp.server.compiler._Compiler._prompt">_prompt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resource" class="internal-link" title="orionis.mcp.server.compiler._Compiler._resource">_resource</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_tool" class="internal-link" title="orionis.mcp.server.compiler._Compiler._tool">_tool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#primitive" class="internal-link" title="orionis.mcp.server.compiler._Compiler.primitive">primitive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schema" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schema">schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#synthetic" class="internal-link" title="orionis.mcp.server.compiler._Compiler.synthetic">synthetic</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.mcp.server.compiler._Compiler.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extensions" class="internal-link" title="orionis.mcp.server.compiler._Compiler.extensions">extensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schemas" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schemas">schemas</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.mcp.server.compiler.html" class="internal-link" title="The parent of this class">compiler</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14670"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14670">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler._CatalogCall.html" class="internal-link" title="orionis.mcp.server.compiler._CatalogCall">_<wbr></wbr>Catalog<wbr></wbr>Call</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler._CatalogCall.html#arguments" class="internal-link" title="orionis.mcp.server.compiler._CatalogCall.arguments">arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler._CatalogCall.html#name" class="internal-link" title="orionis.mcp.server.compiler._CatalogCall.name">name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14671"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_<wbr></wbr>Compiler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_prompt" class="internal-link" title="orionis.mcp.server.compiler._Compiler._prompt">_prompt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_resource" class="internal-link" title="orionis.mcp.server.compiler._Compiler._resource">_resource</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_tool" class="internal-link" title="orionis.mcp.server.compiler._Compiler._tool">_tool</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#primitive" class="internal-link" title="orionis.mcp.server.compiler._Compiler.primitive">primitive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schema" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schema">schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#synthetic" class="internal-link" title="orionis.mcp.server.compiler._Compiler.synthetic">synthetic</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.mcp.server.compiler._Compiler.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#extensions" class="internal-link" title="orionis.mcp.server.compiler._Compiler.extensions">extensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#schemas" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schemas">schemas</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14672"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14672">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler._ExecutePayload.html" class="internal-link" title="orionis.mcp.server.compiler._ExecutePayload">_<wbr></wbr>Execute<wbr></wbr>Payload</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler._ExecutePayload.html#calls" class="internal-link" title="orionis.mcp.server.compiler._ExecutePayload.calls">calls</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14673"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14673">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler._SearchPayload.html" class="internal-link" title="orionis.mcp.server.compiler._SearchPayload">_<wbr></wbr>Search<wbr></wbr>Payload</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler._SearchPayload.html#limit" class="internal-link" title="orionis.mcp.server.compiler._SearchPayload.limit">limit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler._SearchPayload.html#query" class="internal-link" title="orionis.mcp.server.compiler._SearchPayload.query">query</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14674"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14674">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler.CompiledCatalog.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog"><wbr></wbr>Compiled<wbr></wbr>Catalog</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledCatalog.html#execute_name" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog.execute_name">execute<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledCatalog.html#index" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog.index">index</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledCatalog.html#search_name" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog.search_name">search<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledCatalog.html#tools" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog.tools">tools</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14675"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14675">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer"><wbr></wbr>Compiled<wbr></wbr>Mcp<wbr></wbr>Server</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#cache" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#capabilities" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.capabilities">capabilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#capabilities_wire" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.capabilities_wire">capabilities<wbr></wbr>_wire</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#catalog_tools" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.catalog_tools">catalog<wbr></wbr>_tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#catalogs" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.catalogs">catalogs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#definition" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.definition">definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#extensions" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.extensions">extensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#info" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.info">info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#instructions" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.instructions">instructions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#prompts" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.prompts">prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#resources" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#templates" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.templates">templates</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html#tools" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer.tools">tools</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId14676"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId14676">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive"><wbr></wbr>Compiled<wbr></wbr>Primitive</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#authorization" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.authorization">authorization</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#availability" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.availability">availability</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#cache" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#catalog" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.catalog">catalog</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#completion" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.completion">completion</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#definition" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.definition">definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#description" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.description">description</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#handler" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.handler">handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#input_schema" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.input_schema">input<wbr></wbr>_schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#input_type" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.input_type">input<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#matcher" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.matcher">matcher</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#metadata" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.metadata">metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#mime_type" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.mime_type">mime<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#mirrored_headers" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.mirrored_headers">mirrored<wbr></wbr>_headers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#name" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#output_schema" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.output_schema">output<wbr></wbr>_schema</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#prompt_arguments" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.prompt_arguments">prompt<wbr></wbr>_arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#search_text" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.search_text">search<wbr></wbr>_text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#synthetic" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.synthetic">synthetic</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html#uri" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive.uri">uri</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_capabilities" class="internal-link" title="orionis.mcp.server.compiler._capabilities">_capabilities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_extend_metadata" class="internal-link" title="orionis.mcp.server.compiler._extend_metadata">_extend<wbr></wbr>_metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_extensions" class="internal-link" title="orionis.mcp.server.compiler._extensions">_extensions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_hook" class="internal-link" title="orionis.mcp.server.compiler._hook">_hook</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_insert" class="internal-link" title="orionis.mcp.server.compiler._insert">_insert</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_metadata" class="internal-link" title="orionis.mcp.server.compiler._metadata">_metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_name" class="internal-link" title="orionis.mcp.server.compiler._name">_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_ordered" class="internal-link" title="orionis.mcp.server.compiler._ordered">_ordered</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_resource_registry" class="internal-link" title="orionis.mcp.server.compiler._resource_registry">_resource<wbr></wbr>_registry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_tool_arguments" class="internal-link" title="orionis.mcp.server.compiler._tool_arguments">_tool<wbr></wbr>_arguments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_tool_registry" class="internal-link" title="orionis.mcp.server.compiler._tool_registry">_tool<wbr></wbr>_registry</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_tool_types" class="internal-link" title="orionis.mcp.server.compiler._tool_types">_tool<wbr></wbr>_types</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_validate_static_metadata" class="internal-link" title="orionis.mcp.server.compiler._validate_static_metadata">_validate<wbr></wbr>_static<wbr></wbr>_metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_wire" class="internal-link" title="orionis.mcp.server.compiler._wire">_wire</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#compile_server" class="internal-link" title="orionis.mcp.server.compiler.compile_server">compile<wbr></wbr>_server</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#validate_output" class="internal-link" title="orionis.mcp.server.compiler.validate_output">validate<wbr></wbr>_output</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#validate_payload" class="internal-link" title="orionis.mcp.server.compiler.validate_payload">validate<wbr></wbr>_payload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#validate_prompt_arguments" class="internal-link" title="orionis.mcp.server.compiler.validate_prompt_arguments">validate<wbr></wbr>_prompt<wbr></wbr>_arguments</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_CORE_METHODS" class="internal-link" title="orionis.mcp.server.compiler._CORE_METHODS">_CORE<wbr></wbr>_METHODS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_NAME" class="internal-link" title="orionis.mcp.server.compiler._NAME">_NAME</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.compiler.html" class="internal-link" title="orionis.mcp.server.compiler">compiler</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_Compiler</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_Compiler</span>: <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L308" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__init__">_Compiler(extensions, cache)</a></code></p><p><a href="classIndex.html#orionis.mcp.server.compiler._Compiler">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Own only boot-time schema caches; discard them after the registry is built.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1378">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_prompt" class="internal-link" title="orionis.mcp.server.compiler._Compiler._prompt">_prompt</a></code></td>
+    <td>Compile only explicitly named prompt arguments.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_resource" class="internal-link" title="orionis.mcp.server.compiler._Compiler._resource">_resource</a></code></td>
+    <td>Compile exact resources and RFC templates with safe inverse matching.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__init__">__init__</a></code></td>
+    <td>Use a per-compilation cache rather than growing a process-global cache.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_tool" class="internal-link" title="orionis.mcp.server.compiler._Compiler._tool">_tool</a></code></td>
+    <td>Compile typed tool schemas and statically reachable header bindings.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#primitive" class="internal-link" title="orionis.mcp.server.compiler._Compiler.primitive">primitive</a></code></td>
+    <td>Compile one ordinary primitive and all of its immutable handler plans.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#schema" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schema">schema</a></code></td>
+    <td>Share one schema snapshot per type and direction inside this compilation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#synthetic" class="internal-link" title="orionis.mcp.server.compiler._Compiler.synthetic">synthetic</a></code></td>
+    <td>Describe runtime-owned catalog operations using native typed schemas.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.mcp.server.compiler._Compiler.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#cache" class="internal-link" title="orionis.mcp.server.compiler._Compiler.cache">cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#extensions" class="internal-link" title="orionis.mcp.server.compiler._Compiler.extensions">extensions</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#schemas" class="internal-link" title="orionis.mcp.server.compiler._Compiler.schemas">schemas</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler._prompt">
+    
+  </a>
+  <a name="_prompt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_prompt</span><span class="function-signature long-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Prompt]</code>, </span><span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L513">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_prompt" title="orionis.mcp.server.compiler._Compiler._prompt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile only explicitly named prompt arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Prompt.html" class="internal-link" title="orionis.mcp.Prompt">Prompt</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler._resource">
+    
+  </a>
+  <a name="_resource">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_resource</span><span class="function-signature long-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Resource]</code>, </span><span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L462">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_resource" title="orionis.mcp.server.compiler._Compiler._resource">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile exact resources and RFC templates with safe inverse matching.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Resource.html" class="internal-link" title="orionis.mcp.Resource">Resource</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">extensions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>McpExtension, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">cache: <code>CacheHint</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L313">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.mcp.server.compiler._Compiler.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Use a per-compilation cache rather than growing a process-global cache.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">extensions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.McpExtension.html" class="internal-link" title="orionis.mcp.McpExtension">McpExtension</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">extensions</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.mcp.CacheHint.html" class="internal-link" title="orionis.mcp.CacheHint">CacheHint</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">cache</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler._tool">
+    
+  </a>
+  <a name="_tool">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_tool</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Tool]</code>, </span><span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L413">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_tool" title="orionis.mcp.server.compiler._Compiler._tool">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile typed tool schemas and statically reachable header bindings.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Tool.html" class="internal-link" title="orionis.mcp.Tool">Tool</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.primitive">
+    
+  </a>
+  <a name="primitive">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">primitive</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code>, </span><span class="rst-sig-param">kind: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L354">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#primitive" title="orionis.mcp.server.compiler._Compiler.primitive">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compile one ordinary primitive and all of its immutable handler plans.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kind:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">kind</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.schema">
+    
+  </a>
+  <a name="schema">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">schema</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">input_schema: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L333">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#schema" title="orionis.mcp.server.compiler._Compiler.schema">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Share one schema snapshot per type and direction inside this compilation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">annotation:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Native type annotation to inspect or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">input<wbr></wbr>_schema:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">input_schema</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.synthetic">
+    
+  </a>
+  <a name="synthetic">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">synthetic</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">kind: <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">search</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">execute</span><span class="rst-variable-quote">'</span>]</code>, </span><span class="rst-sig-param">catalog: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L548">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#synthetic" title="orionis.mcp.server.compiler._Compiler.synthetic">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Describe runtime-owned catalog operations using native typed schemas.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kind:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<span class="rst-variable-string">'search'</span>, <span class="rst-variable-string">'execute'</span>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">kind</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">catalog:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">catalog</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L311">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.mcp.server.compiler._Compiler.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.cache">
+    
+  </a>
+  <a name="cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cache</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L331">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cache" title="orionis.mcp.server.compiler._Compiler.cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.extensions">
+    
+  </a>
+  <a name="extensions">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">extensions</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L330">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#extensions" title="orionis.mcp.server.compiler._Compiler.extensions">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.mcp.server.compiler._Compiler.schemas">
+    
+  </a>
+  <a name="schemas">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">schemas</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/mcp/server/compiler.py#L329">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#schemas" title="orionis.mcp.server.compiler._Compiler.schemas">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -156,3 +156,20 @@ dev = [
 docs = [
     "pydoctor>=25.10.1",
 ]
+
+# Reusable API documentation settings; DOCS.ps1 supplies the current version and Git revision.
+[tool.pydoctor]
+project-name = "Orionis"
+project-url = "https://orionis-framework.com/"
+project-base-dir = "."
+add-package = ["orionis"]
+html-output = "docs"
+html-viewsource-base = "https://github.com/orionis-framework/framework/tree/master"
+docformat = "numpy"
+theme = "base"
+template-dir = ["resources/docs/pydoctor/templates"]
+privacy = ["PUBLIC:**"]
+intersphinx = ["https://docs.python.org/3/objects.inv"]
+sidebar-expand-depth = 2
+sidebar-toc-depth = 3
+use-hardlinks = true

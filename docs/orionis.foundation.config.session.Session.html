@@ -1,0 +1,2270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.foundation.config.session.Session</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="This class"><wbr></wbr>Session</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.session.Session.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateBooleans" class="internal-link" title="orionis.foundation.config.session.Session.__validateBooleans">__validate<wbr></wbr>Booleans</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateCache" class="internal-link" title="orionis.foundation.config.session.Session.__validateCache">__validate<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateConnection" class="internal-link" title="orionis.foundation.config.session.Session.__validateConnection">__validate<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateCookie" class="internal-link" title="orionis.foundation.config.session.Session.__validateCookie">__validate<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateDomain" class="internal-link" title="orionis.foundation.config.session.Session.__validateDomain">__validate<wbr></wbr>Domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateDriver" class="internal-link" title="orionis.foundation.config.session.Session.__validateDriver">__validate<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateFiles" class="internal-link" title="orionis.foundation.config.session.Session.__validateFiles">__validate<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateLifetime" class="internal-link" title="orionis.foundation.config.session.Session.__validateLifetime">__validate<wbr></wbr>Lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validatePath" class="internal-link" title="orionis.foundation.config.session.Session.__validatePath">__validate<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateSameSite" class="internal-link" title="orionis.foundation.config.session.Session.__validateSameSite">__validate<wbr></wbr>Same<wbr></wbr>Site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateTable" class="internal-link" title="orionis.foundation.config.session.Session.__validateTable">__validate<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.foundation.config.session.Session.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.foundation.config.session.Session.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cookie" class="internal-link" title="orionis.foundation.config.session.Session.cookie">cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#domain" class="internal-link" title="orionis.foundation.config.session.Session.domain">domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#driver" class="internal-link" title="orionis.foundation.config.session.Session.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#expire_on_close" class="internal-link" title="orionis.foundation.config.session.Session.expire_on_close">expire<wbr></wbr>_on<wbr></wbr>_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#files" class="internal-link" title="orionis.foundation.config.session.Session.files">files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#http_only" class="internal-link" title="orionis.foundation.config.session.Session.http_only">http<wbr></wbr>_only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lifetime" class="internal-link" title="orionis.foundation.config.session.Session.lifetime">lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#partitioned" class="internal-link" title="orionis.foundation.config.session.Session.partitioned">partitioned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.foundation.config.session.Session.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#renewal_interval" class="internal-link" title="orionis.foundation.config.session.Session.renewal_interval">renewal<wbr></wbr>_interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#same_site" class="internal-link" title="orionis.foundation.config.session.Session.same_site">same<wbr></wbr>_site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#secure" class="internal-link" title="orionis.foundation.config.session.Session.secure">secure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.foundation.config.session.Session.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#track_previous_url" class="internal-link" title="orionis.foundation.config.session.Session.track_previous_url">track<wbr></wbr>_previous<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.config.session.html" class="internal-link" title="The parent of this class">session</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8456"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8456">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.entities.html" class="internal-link" title="orionis.foundation.config.session.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.entities.session.html" class="internal-link" title="orionis.foundation.config.session.entities.session">session</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8457"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8457">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.enums.html" class="internal-link" title="orionis.foundation.config.session.enums">enums</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.enums.drivers.html" class="internal-link" title="orionis.foundation.config.session.enums.drivers">drivers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.enums.same_site_policy.html" class="internal-link" title="orionis.foundation.config.session.enums.same_site_policy">same<wbr></wbr>_site<wbr></wbr>_policy</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.enums.SameSitePolicy.html" class="internal-link" title="orionis.foundation.config.session.enums.SameSitePolicy"><wbr></wbr>Same<wbr></wbr>Site<wbr></wbr>Policy</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8458"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8458">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.helpers.html" class="internal-link" title="orionis.foundation.config.session.helpers">helpers</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.helpers.secret_key.html" class="internal-link" title="orionis.foundation.config.session.helpers.secret_key">secret<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8459"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session"><wbr></wbr>Session</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.session.Session.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateBooleans" class="internal-link" title="orionis.foundation.config.session.Session.__validateBooleans">__validate<wbr></wbr>Booleans</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateCache" class="internal-link" title="orionis.foundation.config.session.Session.__validateCache">__validate<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateConnection" class="internal-link" title="orionis.foundation.config.session.Session.__validateConnection">__validate<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateCookie" class="internal-link" title="orionis.foundation.config.session.Session.__validateCookie">__validate<wbr></wbr>Cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateDomain" class="internal-link" title="orionis.foundation.config.session.Session.__validateDomain">__validate<wbr></wbr>Domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateDriver" class="internal-link" title="orionis.foundation.config.session.Session.__validateDriver">__validate<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateFiles" class="internal-link" title="orionis.foundation.config.session.Session.__validateFiles">__validate<wbr></wbr>Files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateLifetime" class="internal-link" title="orionis.foundation.config.session.Session.__validateLifetime">__validate<wbr></wbr>Lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validatePath" class="internal-link" title="orionis.foundation.config.session.Session.__validatePath">__validate<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateSameSite" class="internal-link" title="orionis.foundation.config.session.Session.__validateSameSite">__validate<wbr></wbr>Same<wbr></wbr>Site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__validateTable" class="internal-link" title="orionis.foundation.config.session.Session.__validateTable">__validate<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cache" class="internal-link" title="orionis.foundation.config.session.Session.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#connection" class="internal-link" title="orionis.foundation.config.session.Session.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cookie" class="internal-link" title="orionis.foundation.config.session.Session.cookie">cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#domain" class="internal-link" title="orionis.foundation.config.session.Session.domain">domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#driver" class="internal-link" title="orionis.foundation.config.session.Session.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#expire_on_close" class="internal-link" title="orionis.foundation.config.session.Session.expire_on_close">expire<wbr></wbr>_on<wbr></wbr>_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#files" class="internal-link" title="orionis.foundation.config.session.Session.files">files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#http_only" class="internal-link" title="orionis.foundation.config.session.Session.http_only">http<wbr></wbr>_only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lifetime" class="internal-link" title="orionis.foundation.config.session.Session.lifetime">lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#partitioned" class="internal-link" title="orionis.foundation.config.session.Session.partitioned">partitioned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.foundation.config.session.Session.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#renewal_interval" class="internal-link" title="orionis.foundation.config.session.Session.renewal_interval">renewal<wbr></wbr>_interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#same_site" class="internal-link" title="orionis.foundation.config.session.Session.same_site">same<wbr></wbr>_site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#secure" class="internal-link" title="orionis.foundation.config.session.Session.secure">secure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#table" class="internal-link" title="orionis.foundation.config.session.Session.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#track_previous_url" class="internal-link" title="orionis.foundation.config.session.Session.track_previous_url">track<wbr></wbr>_previous<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId8460"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId8460">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.SessionDriver.html" class="internal-link" title="orionis.foundation.config.session.SessionDriver"><wbr></wbr>Session<wbr></wbr>Driver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html#CACHE" class="internal-link" title="orionis.foundation.config.session.SessionDriver.CACHE">CACHE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html#DATABASE" class="internal-link" title="orionis.foundation.config.session.SessionDriver.DATABASE">DATABASE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html#FILE" class="internal-link" title="orionis.foundation.config.session.SessionDriver.FILE">FILE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html#MEMORY" class="internal-link" title="orionis.foundation.config.session.SessionDriver.MEMORY">MEMORY</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.session.html" class="internal-link" title="orionis.foundation.config.session">session</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Session</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L13" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.session.Session">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Configure the session middleware.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver</span></td><td class="fieldArgDesc">Session driver. Defaults to SessionDriver.MEMORY.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lifetime</span></td><td class="fieldArgDesc">Session lifetime in minutes. Defaults to 120.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expire<wbr></wbr>_on<wbr></wbr>_close</span></td><td class="fieldArgDesc">Expire session on browser close (omits Max-Age). Defaults to False.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">track<wbr></wbr>_previous<wbr></wbr>_url</span></td><td class="fieldArgDesc">Remember successful navigation URLs in the session. Defaults to True.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">renewal<wbr></wbr>_interval</span></td><td class="fieldArgDesc">Minimum seconds between renewal writes for unchanged scalar payloads.
+Zero renews every request. Must be strictly below the lifetime in
+seconds so renewal can occur while the session is still valid.
+Mutable payloads and dirty sessions are always persisted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">files</span></td><td class="fieldArgDesc">Path to session files (file driver). Defaults to 'storage/framework/sessions'.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection</span></td><td class="fieldArgDesc">Database connection for session storage (database driver). Defaults to None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table</span></td><td class="fieldArgDesc">Database table for session storage (database driver). Defaults to 'sessions'.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache</span></td><td class="fieldArgDesc">Cache store for session storage (cache driver). Defaults to None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cookie</span></td><td class="fieldArgDesc">Name of the session cookie. Defaults to 'sessionid'.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path</span></td><td class="fieldArgDesc">Cookie path. Defaults to '/'.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">domain</span></td><td class="fieldArgDesc">Cookie domain for cross-subdomain usage.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">secure</span></td><td class="fieldArgDesc">Restrict cookies to HTTPS. Defaults to False.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">http<wbr></wbr>_only</span></td><td class="fieldArgDesc">Prevent JavaScript from accessing the cookie. Defaults to True.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">same<wbr></wbr>_site</span></td><td class="fieldArgDesc">SameSite cookie policy. Defaults to SameSitePolicy.LAX.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">partitioned</span></td><td class="fieldArgDesc">Enable CHIPS (partitioned) cookies. Defaults to False.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class does not return a value.</td></tr></table></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id820">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.session.Session.__post_init__">__post<wbr></wbr>_init__</a></code></td>
+    <td>Validate all fields after dataclass initialisation.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateBooleans" class="internal-link" title="orionis.foundation.config.session.Session.__validateBooleans">__validate<wbr></wbr>Booleans</a></code></td>
+    <td>Validate all boolean fields in a single pass.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateCache" class="internal-link" title="orionis.foundation.config.session.Session.__validateCache">__validate<wbr></wbr>Cache</a></code></td>
+    <td>Validate the <em>cache</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateConnection" class="internal-link" title="orionis.foundation.config.session.Session.__validateConnection">__validate<wbr></wbr>Connection</a></code></td>
+    <td>Validate the <em>connection</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateCookie" class="internal-link" title="orionis.foundation.config.session.Session.__validateCookie">__validate<wbr></wbr>Cookie</a></code></td>
+    <td>Validate the <em>cookie</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateDomain" class="internal-link" title="orionis.foundation.config.session.Session.__validateDomain">__validate<wbr></wbr>Domain</a></code></td>
+    <td>Validate the <em>domain</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateDriver" class="internal-link" title="orionis.foundation.config.session.Session.__validateDriver">__validate<wbr></wbr>Driver</a></code></td>
+    <td>Normalise and validate the <em>driver</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateFiles" class="internal-link" title="orionis.foundation.config.session.Session.__validateFiles">__validate<wbr></wbr>Files</a></code></td>
+    <td>Validate the <em>files</em> path field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateLifetime" class="internal-link" title="orionis.foundation.config.session.Session.__validateLifetime">__validate<wbr></wbr>Lifetime</a></code></td>
+    <td>Validate the <em>lifetime</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validatePath" class="internal-link" title="orionis.foundation.config.session.Session.__validatePath">__validate<wbr></wbr>Path</a></code></td>
+    <td>Validate the <em>path</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateSameSite" class="internal-link" title="orionis.foundation.config.session.Session.__validateSameSite">__validate<wbr></wbr>Same<wbr></wbr>Site</a></code></td>
+    <td>Normalise and validate the <em>same_site</em> field.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__validateTable" class="internal-link" title="orionis.foundation.config.session.Session.__validateTable">__validate<wbr></wbr>Table</a></code></td>
+    <td>Validate the <em>table</em> field.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#cache" class="internal-link" title="orionis.foundation.config.session.Session.cache">cache</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#connection" class="internal-link" title="orionis.foundation.config.session.Session.connection">connection</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#cookie" class="internal-link" title="orionis.foundation.config.session.Session.cookie">cookie</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#domain" class="internal-link" title="orionis.foundation.config.session.Session.domain">domain</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#driver" class="internal-link" title="orionis.foundation.config.session.Session.driver">driver</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#expire_on_close" class="internal-link" title="orionis.foundation.config.session.Session.expire_on_close">expire<wbr></wbr>_on<wbr></wbr>_close</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#files" class="internal-link" title="orionis.foundation.config.session.Session.files">files</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#http_only" class="internal-link" title="orionis.foundation.config.session.Session.http_only">http<wbr></wbr>_only</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#lifetime" class="internal-link" title="orionis.foundation.config.session.Session.lifetime">lifetime</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#partitioned" class="internal-link" title="orionis.foundation.config.session.Session.partitioned">partitioned</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#path" class="internal-link" title="orionis.foundation.config.session.Session.path">path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#renewal_interval" class="internal-link" title="orionis.foundation.config.session.Session.renewal_interval">renewal<wbr></wbr>_interval</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#same_site" class="internal-link" title="orionis.foundation.config.session.Session.same_site">same<wbr></wbr>_site</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#secure" class="internal-link" title="orionis.foundation.config.session.Session.secure">secure</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#table" class="internal-link" title="orionis.foundation.config.session.Session.table">table</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#track_previous_url" class="internal-link" title="orionis.foundation.config.session.Session.track_previous_url">track<wbr></wbr>_previous<wbr></wbr>_url</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
+            </p>
+            <table class="children sortable" id="id821">
+  
+  
+  <tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code></td>
+    <td>Retrieve field definitions and normalized types cached by class.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code></td>
+    <td>Describe field names, normalized types, defaults, and metadata.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code></td>
+    <td>Convert the dataclass instance to a recursively copied dictionary.</td>
+  </tr><tr class="baseclassvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+            
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__post_init__">
+    
+  </a>
+  <a name="__post_init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L563">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__post_init__" title="orionis.foundation.config.session.Session.__post_init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
+    <div><p>Validate all fields after dataclass initialisation.</p>
+<p>Called automatically by the dataclass machinery immediately
+after <tt class="rst-docutils rst-literal">__init__</tt>.  Delegates to individual field validators
+in a deterministic order.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateBooleans">
+    
+  </a>
+  <a name="__validateBooleans">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateBooleans</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L291">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateBooleans" title="orionis.foundation.config.session.Session.__validateBooleans">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate all boolean fields in a single pass.</p>
+<p>Iterate over every boolean field and raise on the first value
+that is not a <tt class="rst-docutils rst-literal">bool</tt> instance.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any boolean field holds a non-boolean value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateCache">
+    
+  </a>
+  <a name="__validateCache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L532">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateCache" title="orionis.foundation.config.session.Session.__validateCache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>cache</em> field.</p>
+<p>When provided the value must be a non-empty string naming a
+cache store (cache driver).</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>cache</em> is provided but is not a non-empty string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateConnection">
+    
+  </a>
+  <a name="__validateConnection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateConnection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L470">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateConnection" title="orionis.foundation.config.session.Session.__validateConnection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>connection</em> field.</p>
+<p>When provided the value must be a non-empty string naming a
+database connection (database driver).</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>connection</em> is provided but is not a non-empty string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateCookie">
+    
+  </a>
+  <a name="__validateCookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L239">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateCookie" title="orionis.foundation.config.session.Session.__validateCookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>cookie</em> field.</p>
+<p>The cookie name must conform to the restrictions imposed by RFC 6265.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method performs validation and returns None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the cookie name is invalid.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateDomain">
+    
+  </a>
+  <a name="__validateDomain">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateDomain</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L398">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateDomain" title="orionis.foundation.config.session.Session.__validateDomain">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>domain</em> field.</p>
+<p>When provided the domain must be a non-empty string that does
+not begin or end with a dot and contains no consecutive dots.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>domain</em> is an empty string or violates dot rules.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateDriver">
+    
+  </a>
+  <a name="__validateDriver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateDriver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L194">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateDriver" title="orionis.foundation.config.session.Session.__validateDriver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Normalise and validate the <em>driver</em> field.</p>
+<p>Accept a <tt class="rst-docutils rst-literal">SessionDriver</tt> enum member or a plain string
+matching a recognised driver name (case-insensitive).  When a
+valid string is supplied it is coerced to the corresponding
+<tt class="rst-docutils rst-literal">SessionDriver</tt> member via <tt class="rst-docutils rst-literal">object.__setattr__</tt>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Mutates <em>driver</em> in-place when a plain string is given.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the string does not match any registered driver name.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is neither a <tt class="rst-docutils rst-literal">str</tt> nor a <tt class="rst-docutils rst-literal">SessionDriver</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateFiles">
+    
+  </a>
+  <a name="__validateFiles">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateFiles</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L439">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateFiles" title="orionis.foundation.config.session.Session.__validateFiles">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>files</em> path field.</p>
+<p>When provided the value must be a non-empty string pointing to
+the directory used by the file session driver.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>files</em> is provided but is not a non-empty string.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateLifetime">
+    
+  </a>
+  <a name="__validateLifetime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateLifetime</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L257">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateLifetime" title="orionis.foundation.config.session.Session.__validateLifetime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>lifetime</em> field.</p>
+<p>The lifetime represents the server-side session duration in
+minutes and must be a strictly positive integer.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>lifetime</em> is not an <tt class="rst-docutils rst-literal">int</tt>.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>lifetime</em> is not strictly greater than zero.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validatePath">
+    
+  </a>
+  <a name="__validatePath">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validatePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L371">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validatePath" title="orionis.foundation.config.session.Session.__validatePath">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>path</em> field.</p>
+<p>The cookie path must be a string that begins with <tt class="rst-docutils rst-literal">'/'</tt> as
+required by RFC 6265 §4.1.1.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>path</em> is not a string or does not start with <tt class="rst-docutils rst-literal">'/'</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateSameSite">
+    
+  </a>
+  <a name="__validateSameSite">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateSameSite</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L326">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateSameSite" title="orionis.foundation.config.session.Session.__validateSameSite">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Normalise and validate the <em>same_site</em> field.</p>
+<p>Accept a <tt class="rst-docutils rst-literal">SameSitePolicy</tt> member or a plain string.  The
+stored value is always the canonical lowercase string form of
+the policy (e.g. <tt class="rst-docutils rst-literal">"lax"</tt>).</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Mutates <em>same_site</em> in-place to its canonical string form.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the string is not a valid <tt class="rst-docutils rst-literal">SameSitePolicy</tt> value.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is neither a <tt class="rst-docutils rst-literal">str</tt> nor a <tt class="rst-docutils rst-literal">SameSitePolicy</tt>.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.session.Session.__validateTable">
+    
+  </a>
+  <a name="__validateTable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L501">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__validateTable" title="orionis.foundation.config.session.Session.__validateTable">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the <em>table</em> field.</p>
+<p>When provided the value must be a non-empty string naming the
+database table used to persist session records (database driver).</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session">Session</a></code></td><td class="fieldArgDesc">The Session instance being validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <em>table</em> is provided but is not a non-empty string.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.cache">
+    
+  </a>
+  <a name="cache">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cache</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L130">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cache" title="orionis.foundation.config.session.Session.cache">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.connection">
+    
+  </a>
+  <a name="connection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">connection</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L112">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#connection" title="orionis.foundation.config.session.Session.connection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.cookie">
+    
+  </a>
+  <a name="cookie">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cookie</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L138">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cookie" title="orionis.foundation.config.session.Session.cookie">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.domain">
+    
+  </a>
+  <a name="domain">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">domain</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L154">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#domain" title="orionis.foundation.config.session.Session.domain">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.driver">
+    
+  </a>
+  <a name="driver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">driver</span>: <code>str | SessionDriver</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L62">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#driver" title="orionis.foundation.config.session.Session.driver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.expire_on_close">
+    
+  </a>
+  <a name="expire_on_close">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">expire_on_close</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L78">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#expire_on_close" title="orionis.foundation.config.session.Session.expire_on_close">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.files">
+    
+  </a>
+  <a name="files">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">files</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L103">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#files" title="orionis.foundation.config.session.Session.files">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.http_only">
+    
+  </a>
+  <a name="http_only">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">http_only</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L170">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#http_only" title="orionis.foundation.config.session.Session.http_only">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.lifetime">
+    
+  </a>
+  <a name="lifetime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">lifetime</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L70">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#lifetime" title="orionis.foundation.config.session.Session.lifetime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.partitioned">
+    
+  </a>
+  <a name="partitioned">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">partitioned</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L186">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#partitioned" title="orionis.foundation.config.session.Session.partitioned">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.path">
+    
+  </a>
+  <a name="path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L146">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#path" title="orionis.foundation.config.session.Session.path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.renewal_interval">
+    
+  </a>
+  <a name="renewal_interval">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">renewal_interval</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L94">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#renewal_interval" title="orionis.foundation.config.session.Session.renewal_interval">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.same_site">
+    
+  </a>
+  <a name="same_site">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">same_site</span>: <code>str | SameSitePolicy</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L178">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#same_site" title="orionis.foundation.config.session.Session.same_site">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.secure">
+    
+  </a>
+  <a name="secure">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">secure</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L162">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#secure" title="orionis.foundation.config.session.Session.secure">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.table">
+    
+  </a>
+  <a name="table">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">table</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L121">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#table" title="orionis.foundation.config.session.Session.table">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.session.Session.track_previous_url">
+    
+  </a>
+  <a name="track_previous_url">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">track_previous_url</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/foundation/config/session/entities/session.py#L86">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#track_previous_url" title="orionis.foundation.config.session.Session.track_previous_url">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

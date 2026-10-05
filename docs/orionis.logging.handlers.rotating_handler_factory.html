@@ -1,0 +1,1171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>orionis.logging.handlers.rotating_handler_factory</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.logging.handlers.rotating_handler_factory.html" class="internal-link" title="This module">rotating<wbr></wbr>_handler<wbr></wbr>_factory</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12290"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12290">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory"><wbr></wbr>Rotating<wbr></wbr>Handler<wbr></wbr>Factory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.html#createHandler" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.createHandler">create<wbr></wbr>Handler</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_chunked" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_chunked">_create<wbr></wbr>_chunked</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_daily" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_daily">_create<wbr></wbr>_daily</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_hourly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">_create<wbr></wbr>_hourly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_monthly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_monthly">_create<wbr></wbr>_monthly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_stack" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_stack">_create<wbr></wbr>_stack</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_weekly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_weekly">_create<wbr></wbr>_weekly</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_CHANNEL_CREATORS" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">_CHANNEL<wbr></wbr>_CREATORS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.logging.handlers.html" class="internal-link" title="The parent of this module">handlers</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12291"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12291">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.advanced_rotating_file_handler.html" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler">advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler"><wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12292"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12292">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.chunked_suffix_resolver.html" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver">chunked<wbr></wbr>_suffix<wbr></wbr>_resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.html" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver"><wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12293"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12293">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.daily_suffix_resolver.html" class="internal-link" title="orionis.logging.handlers.daily_suffix_resolver">daily<wbr></wbr>_suffix<wbr></wbr>_resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.html" class="internal-link" title="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver"><wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12294"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12294">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.hourly_suffix_resolver.html" class="internal-link" title="orionis.logging.handlers.hourly_suffix_resolver">hourly<wbr></wbr>_suffix<wbr></wbr>_resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.html" class="internal-link" title="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver"><wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12295"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12295">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.monthly_suffix_resolver.html" class="internal-link" title="orionis.logging.handlers.monthly_suffix_resolver">monthly<wbr></wbr>_suffix<wbr></wbr>_resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.html" class="internal-link" title="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver"><wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12296"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.rotating_handler_factory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory">rotating<wbr></wbr>_handler<wbr></wbr>_factory</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory"><wbr></wbr>Rotating<wbr></wbr>Handler<wbr></wbr>Factory</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_chunked" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_chunked">_create<wbr></wbr>_chunked</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_daily" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_daily">_create<wbr></wbr>_daily</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_hourly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">_create<wbr></wbr>_hourly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_monthly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_monthly">_create<wbr></wbr>_monthly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_stack" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_stack">_create<wbr></wbr>_stack</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_create_weekly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_weekly">_create<wbr></wbr>_weekly</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_CHANNEL_CREATORS" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">_CHANNEL<wbr></wbr>_CREATORS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId12297"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId12297">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.logging.handlers.weekly_suffix_resolver.html" class="internal-link" title="orionis.logging.handlers.weekly_suffix_resolver">weekly<wbr></wbr>_suffix<wbr></wbr>_resolver</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.html" class="internal-link" title="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver"><wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.logging.html" class="internal-link" title="orionis.logging">logging</a></code><wbr></wbr>.<code><a href="orionis.logging.handlers.html" class="internal-link" title="orionis.logging.handlers">handlers</a></code><wbr></wbr>.<code><a href="orionis.logging.handlers.rotating_handler_factory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory">rotating_handler_factory</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id1184">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory"><wbr></wbr>Rotating<wbr></wbr>Handler<wbr></wbr>Factory</a></code></td>
+    <td><span class="rst-undocumented">No class docstring; 1/1 static method documented</span></td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_chunked" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_chunked">_create<wbr></wbr>_chunked</a></code></td>
+    <td>Create a size-based rotating file handler.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_daily" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_daily">_create<wbr></wbr>_daily</a></code></td>
+    <td>Create a daily rotating file handler.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_hourly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">_create<wbr></wbr>_hourly</a></code></td>
+    <td>Create an hourly rotating file handler.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_monthly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_monthly">_create<wbr></wbr>_monthly</a></code></td>
+    <td>Create a monthly rotating file handler.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_stack" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_stack">_create<wbr></wbr>_stack</a></code></td>
+    <td>Create a non-rotating file handler for the stack channel.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_create_weekly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_weekly">_create<wbr></wbr>_weekly</a></code></td>
+    <td>Create a weekly rotating file handler.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_CHANNEL_CREATORS" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">_CHANNEL<wbr></wbr>_CREATORS</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_chunked">
+    
+  </a>
+  <a name="_create_chunked">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_chunked</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L189">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_chunked" title="orionis.logging.handlers.rotating_handler_factory._create_chunked">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a size-based rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel settings containing optional <tt class="rst-docutils rst-literal">mb_size</tt> and <tt class="rst-docutils rst-literal">files</tt> values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using chunked
+rotation and compressed rotated files.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_daily">
+    
+  </a>
+  <a name="_create_daily">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_daily</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L81">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_daily" title="orionis.logging.handlers.rotating_handler_factory._create_daily">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a daily rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
+and <tt class="rst-docutils rst-literal">retention_days</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a daily
+suffix resolver.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_hourly">
+    
+  </a>
+  <a name="_create_hourly">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_hourly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L46">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_hourly" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create an hourly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">retention_hours</tt> to
+control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using an hourly
+suffix resolver.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_monthly">
+    
+  </a>
+  <a name="_create_monthly">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_monthly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L153">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_monthly" title="orionis.logging.handlers.rotating_handler_factory._create_monthly">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a monthly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
+and <tt class="rst-docutils rst-literal">retention_months</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a monthly
+suffix resolver.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_stack">
+    
+  </a>
+  <a name="_create_stack">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_stack</span><span class="function-signature long-signature">(<span class="rst-sig-param">_channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_stack" title="orionis.logging.handlers.rotating_handler_factory._create_stack">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a non-rotating file handler for the stack channel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary (unused for this handler type).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">FileHandler</tt> instance.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._create_weekly">
+    
+  </a>
+  <a name="_create_weekly">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_weekly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L117">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_create_weekly" title="orionis.logging.handlers.rotating_handler_factory._create_weekly">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a weekly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
+and <tt class="rst-docutils rst-literal">retention_weeks</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a weekly
+suffix resolver.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">
+    
+  </a>
+  <a name="_CHANNEL_CREATORS">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_CHANNEL_CREATORS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>], <wbr></wbr><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/logging/handlers/rotating_handler_factory.py#L227">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_CHANNEL_CREATORS" title="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">stack</span><span class="rst-variable-quote">'</span>: <a href="#_create_stack" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_stack">_create_stack</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">hourly</span><span class="rst-variable-quote">'</span>: <a href="#_create_hourly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">_create_hourly</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">daily</span><span class="rst-variable-quote">'</span>: <a href="#_create_daily" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_daily">_create_daily</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">weekly</span><span class="rst-variable-quote">'</span>: <a href="#_create_weekly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_weekly">_create_weekly</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">monthly</span><span class="rst-variable-quote">'</span>: <a href="#_create_monthly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_monthly">_create_monthly</a>,
+ <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">chunked</span><span class="rst-variable-quote">'</span>: <a href="#_create_chunked" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_chunked">_create_chunked</a>}</code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

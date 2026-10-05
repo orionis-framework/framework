@@ -22,12 +22,25 @@ class IIdentityProvider(ABC):
         expected: str | None,  # noqa: ARG002
         token: str | None,  # noqa: ARG002
     ) -> bool:
-        """
-        Optionally compare and replace a persistent credential atomically.
+        """Optionally compare and replace a persistent credential atomically.
 
         Providers supporting remember-me must also compare the current password
         and require an active identity when issuing a non-null token. Providers
         without persistent login support return False and issue no cookie.
+
+        Parameters
+        ----------
+        identity : IAuthenticatable
+            Value supplied for ``identity``.
+        expected : str | None
+            Value supplied for ``expected``.
+        token : str | None
+            Value supplied for ``token``.
+
+        Returns
+        -------
+        bool
+            Result of the operation described above.
         """
         return False
 

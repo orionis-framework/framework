@@ -1,9 +1,9 @@
 import asyncio
-from unittest import IsolatedAsyncioTestCase
 from unittest.mock import patch
 from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
+from orionis.test import TestCase
 from tests.foundation.test_application_async import (
     _AsyncCall,
     _AsyncGate,
@@ -28,7 +28,7 @@ def lifecycle_events(application):
     yield
     application.events.append("ready")
 
-class TestApplicationDispatch(IsolatedAsyncioTestCase):
+class TestApplicationDispatch(TestCase):
     """Exercise direct requests without server-created helper tasks."""
 
     async def testDirectDispatchKeepsServerTaskAndTransport(self) -> None:

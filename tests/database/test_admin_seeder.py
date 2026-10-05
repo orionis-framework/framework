@@ -1,4 +1,3 @@
-import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
@@ -18,8 +17,9 @@ from orionis.database.seeders.runner import SeederRunner
 from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
+from orionis.test import TestCase
 
-class TestAdminSeeder(unittest.IsolatedAsyncioTestCase):
+class TestAdminSeeder(TestCase):
     """Exercise the real user model and authorization tables together."""
 
     async def asyncSetUp(self) -> None:

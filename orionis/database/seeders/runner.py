@@ -37,6 +37,11 @@ class _ClaimFailed(Exception):
         ----------
         error : QueryException
             Query failure that prevented the claim.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self.error = error
         super().__init__(str(error))
@@ -105,6 +110,11 @@ class SeederRunner:
             Application providing the seeder directory.
         conn_manager : IConnectionManager
             Manager resolving configured database connections.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self.__app = app
         self.__conn_manager = conn_manager

@@ -39,7 +39,19 @@ _NO_ACTIVE_TRANSACTION: str = "No active transaction on this connection."
 
 @lru_cache(maxsize=256)
 def _text_statement(sql: str) -> TextClause:
-    """Parse a SQL string into a reusable parameterized statement."""
+    """
+    Parse a SQL string into a reusable parameterized statement.
+
+    Parameters
+    ----------
+    sql : str
+        Value supplied for ``sql``.
+
+    Returns
+    -------
+    TextClause
+        Result of the operation described above.
+    """
     return text(sql)
 
 class _TransactionState:
@@ -627,7 +639,14 @@ class Connection(IConnection):
         return self._engine
 
     def _transactionState(self) -> _TransactionState | None:
-        """Resolve the transaction owned by the current asyncio task."""
+        """
+        Resolve the transaction owned by the current asyncio task.
+
+        Returns
+        -------
+        _TransactionState | None
+            Result of the operation described above.
+        """
         state = self._tx_state.get()
         if state is None or state.owner is current_task():
             return state

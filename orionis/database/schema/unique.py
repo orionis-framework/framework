@@ -13,5 +13,10 @@ class Unique:
         name : str | None, optional
             Name of the unique constraint. If not provided, a default name
             will be generated.
+
+        Returns
+        -------
+        None
+            Complete the documented operation without returning a value.
         """
         self.constraint = UniqueConstraint(columns=columns, name=name)

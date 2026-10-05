@@ -72,7 +72,6 @@ _MYSQL_RELAXED_MODE: str = "NO_ENGINE_SUBSTITUTION"
 # SQLite database markers that identify an in-memory database.
 _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
 
-
 class _MySQLParameterEscaper:
     """Escape binary parameters independently of aiomysql's removed converter."""
 
@@ -352,7 +351,19 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
     if sqlite:
         @event.listens_for(engine.sync_engine, "begin")
         def _begin_sqlite_transaction(connection: SqlConnection) -> None:
-            """Start a database transaction before statements or savepoints."""
+            """
+            Start a database transaction before statements or savepoints.
+
+            Parameters
+            ----------
+            connection : SqlConnection
+                Value supplied for ``connection``.
+
+            Returns
+            -------
+            None
+                Complete the documented operation without returning a value.
+            """
             connection.exec_driver_sql("BEGIN")
 
     # Register a Core pool event on the underlying sync engine; the async

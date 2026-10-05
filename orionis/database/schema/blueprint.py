@@ -77,7 +77,21 @@ class Blueprint:
             raise AttributeError(error_msg)
 
         def _build(*args: object, **kwargs: object) -> ColumnDefinition:
-            """Build the column via ``Column`` and register it on the table."""
+            """
+            Build the column via ``Column`` and register it on the table.
+
+            Parameters
+            ----------
+            *args : object
+                Value supplied for ``*args``.
+            **kwargs : object
+                Value supplied for ``**kwargs``.
+
+            Returns
+            -------
+            ColumnDefinition
+                Result of the operation described above.
+            """
             column = factory(*args, **kwargs)
             self.__columns.append(column)
             return column

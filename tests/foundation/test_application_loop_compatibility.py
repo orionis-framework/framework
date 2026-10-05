@@ -4,8 +4,8 @@ import gc
 import warnings
 from contextlib import ExitStack
 from types import SimpleNamespace
-from unittest import IsolatedAsyncioTestCase
 from unittest.mock import patch
+from orionis.test import TestCase
 from tests.foundation.test_application_async import (
     _AsyncCall,
     _AsyncGate,
@@ -92,7 +92,7 @@ class _AlternateLoop:
     # Expose the event-loop protocol name through the camelCase implementation.
     create_task = createTask
 
-class TestApplicationLoopCompatibility(IsolatedAsyncioTestCase):
+class TestApplicationLoopCompatibility(TestCase):
     """Check monitored request lifetimes without requiring native eager support."""
 
     async def _exerciseLifecycle(

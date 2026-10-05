@@ -927,11 +927,10 @@ class IReflectionInstance(ABC):
         -------
         Signature
             Structured representation of the constructor dependencies. Contains:
-            - resolved : dict
-                Dictionary of resolved dependencies with names and values.
-            - unresolved : list
-                List of unresolved dependencies (parameter names without default
-                values or annotations).
+
+            - ``resolved``: dictionary of resolved dependencies with names and values.
+            - ``unresolved``: list of unresolved dependencies (parameter names
+              without default values or annotations).
         """
 
     @abstractmethod
@@ -948,8 +947,9 @@ class IReflectionInstance(ABC):
         -------
         Signature
             Structured representation of the method dependencies, including:
-            - resolved: dict of resolved dependencies with names and values.
-            - unresolved: list of unresolved dependencies (parameter names
+
+            - ``resolved``: dictionary of resolved dependencies with names and values.
+            - ``unresolved``: list of unresolved dependencies (parameter names
               without default values or annotations).
 
         Raises

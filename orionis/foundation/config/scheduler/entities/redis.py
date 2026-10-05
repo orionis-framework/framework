@@ -17,7 +17,7 @@ class Redis(BaseEntity):
     driver : str
         The driver type. Defaults to ``'redis'``.
     host : str
-        Redis host address. Defaults to ``'localhost'``.
+        Redis host address. Defaults to ``'127.0.0.1'``.
     port : int
         Redis port number. Defaults to ``6379``.
     db : int
@@ -39,10 +39,10 @@ class Redis(BaseEntity):
     )
 
     host: str = field(
-        default_factory=lambda: Env.get("REDIS_HOST", "localhost"),
+        default_factory=lambda: Env.get("REDIS_HOST", "127.0.0.1"),
         metadata={
             "description": "Redis host address.",
-            "default": "localhost",
+            "default": "127.0.0.1",
         },
     )
 

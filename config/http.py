@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
+from orionis.foundation.config.environment import http_origins, redis_url
 from orionis.foundation.config.http import (
     HTTP, Cors, HTTPBodyLimits, HTTPCsrf, HTTPProxies, HTTPRateLimit, HTTPSecurity,
     HTTPWebSocket,
@@ -44,7 +45,7 @@ class BootstrapHTTP(HTTP):
         default_factory=lambda: HTTPWebSocket(
             max_connections=Env.get("WEBSOCKET_MAX_CONNECTIONS", 128),
             max_message_size=Env.get("WEBSOCKET_MAX_MESSAGE_SIZE", 1024 * 1024),
-            allow_origins=Env.get("WEBSOCKET_ALLOW_ORIGINS", []),
+            allow_origins=http_origins("WEBSOCKET_ALLOW_ORIGINS"),
         ),
     )
 
@@ -125,9 +126,7 @@ class BootstrapHTTP(HTTP):
             # rate_limit_redis_url : str, optional
             # --- Redis URL for shared quotas; the connection is lazy.
             # --------------------------------------------------------------------------
-            rate_limit_redis_url=Env.get(
-                "RATE_LIMIT_REDIS_URL", "redis://127.0.0.1:6379/0",
-            ),
+            rate_limit_redis_url=redis_url("RATE_LIMIT_REDIS_URL"),
             # --------------------------------------------------------------------------
             # rate_limit_redis_prefix : str, optional
             # --- Namespace prefix used for Redis quota keys.

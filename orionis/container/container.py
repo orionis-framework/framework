@@ -52,7 +52,7 @@ class Container(IContainer):
     loops fall back to per-loop serialisation only.
     """
 
-    # ruff: noqa: ANN401, FBT001, ANN002, ANN003, ARG004, C901
+    # ruff: noqa: ANN401, FBT001, ARG004, C901
 
     # Dictionary to hold singleton instances for each class
     # This allows proper inheritance of the singleton pattern
@@ -62,12 +62,19 @@ class Container(IContainer):
     # This lock ensures that only one thread can create or access instances at a time
     _lock: ClassVar[threading.RLock] = threading.RLock()
 
-    def __new__(cls, *args, **kwargs) -> Self:
+    def __new__(cls, *args: object, **kwargs: object) -> Self:
         """
         Create and return a singleton instance for each class in the hierarchy.
 
         Ensures thread-safe singleton instantiation for each subclass of Container.
         Uses double-checked locking to avoid race conditions and optimize performance.
+
+        Parameters
+        ----------
+        *args : object
+            Value supplied for ``*args``.
+        **kwargs : object
+            Value supplied for ``**kwargs``.
 
         Returns
         -------
@@ -1537,7 +1544,7 @@ class Container(IContainer):
         data = await request.data()
 
         # Validate and deserialize the data using the specified schema
-        return Schema.validate(data, argument.type)
+        return await Schema.validateAsync(data, argument.type)
 
     async def __resolveArgument(
         self,
